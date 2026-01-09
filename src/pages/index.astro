@@ -1,0 +1,187 @@
+---
+/**
+ * 首页 - 展示所有工作流
+ * 完整的首页布局，包含 Hero、统计、工作流网格和无限滚动
+ */
+
+import MainLayout from '../layouts/MainLayout.astro';
+import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
+import InfiniteScrollSentinel from '../components/workflow/InfiniteScrollSentinel.astro';
+import SearchBar from '../components/ui/SearchBar.astro';
+import { getWorkflows } from '../lib/services/workflows';
+import { getStats } from '../lib/services/stats';
+
+// 获取初始工作流数据
+let workflows = [];
+let totalCount = 0;
+
+try {
+  const result = await getWorkflows({
+    sort: 'date-desc',
+    limit: 12,
+    offset: 0,
+  });
+  workflows = result.workflows;
+  totalCount = result.total;
+} catch (error) {
+  console.error('Error fetching workflows:', error);
+}
+
+// 获取统计数据
+let stats = {
+  totalWorkflows: 7943,
+  totalAuthors: 1250,
+  totalCategories: 45,
+  totalDownloads: 150000,
+};
+
+try {
+  stats = await getStats();
+} catch (error) {
+  console.error('Error fetching stats:', error);
+}
+
+// SEO 配置
+const seoConfig = {
+  title: 'N8N Workflows - Discover Automation Workflows',
+  description: 'Browse thousands of n8n automation workflows created by the community. Find workflows for email automation, data sync, notifications, and more.',
+  canonical: '/',
+};
+
+// 无限滚动配置
+const loadMoreUrl = '/api/load-more-workflows.json?type=all&sort=date-desc';
+---
+
+<MainLayout {...seoConfig}>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-12 md:py-20">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-6">
+          Discover Powerful
+          <span class="text-gradient">N8N Workflows</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">
+          Browse thousands of automation workflows created by the community. Save time and boost productivity with ready-to-use workflows.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/popular"
+            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+          >
+            Browse Popular
+          </a>
+          <a
+            href="/categories"
+            class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+          >
+            View Categories
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search Section -->
+  <section class="py-8 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto">
+        <SearchBar placeholder="Search workflows by title, description, or category..." />
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-8 border-b border-gray-200 dark:border-gray-700">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class="text-3xl md:text-4xl font-black text-primary-600 mb-2">{stats.totalWorkflows.toLocaleString()}</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Workflows</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl md:text-4xl font-black text-primary-600 mb-2">{stats.totalAuthors.toLocaleString()}+</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Authors</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl md:text-4xl font-black text-primary-600 mb-2">{stats.totalCategories}+</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Categories</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl md:text-4xl font-black text-primary-600 mb-2">{(stats.totalDownloads / 1000).toFixed(0)}K+</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Downloads</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflows Section -->
+  <section class="py-12 md:py-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+          Latest Workflows
+        </h2>
+        <a
+          href="/recent"
+          class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+        >
+          View all →
+        </a>
+      </div>
+
+      <!-- 工作流网格 -->
+      {workflows.length > 0 ? (
+        <>
+          <WorkflowGrid workflows={workflows} columns={3} />
+
+          <!-- 无限滚动哨兵 -->
+          {totalCount > workflows.length && (
+            <InfiniteScrollSentinel
+              loadMoreUrl={loadMoreUrl}
+              totalCount={totalCount}
+              initialOffset={workflows.length}
+            />
+          )}
+        </>
+      ) : (
+        <div class="text-center py-12">
+          <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            No workflows available
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400">
+            Workflows will appear here once they're added to the platform.
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-16 bg-primary-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">
+          Ready to Automate?
+        </h2>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
+          Start using n8n today and join thousands of users automating their workflows.
+        </p>
+        <a
+          href="https://n8n.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+        >
+          Get Started with n8n
+          <svg class="ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</MainLayout>

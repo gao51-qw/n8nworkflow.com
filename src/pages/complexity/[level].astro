@@ -1,0 +1,173 @@
+---
+/**
+ * 单个复杂度级别页面（动态路由）
+ * 展示特定复杂度级别的所有工作流
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import WorkflowGrid from '../../components/workflow/WorkflowGrid.astro';
+import InfiniteScrollSentinel from '../../components/workflow/InfiniteScrollSentinel.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import SortDropdown from '../../components/ui/SortDropdown.astro';
+import { getWorkflows } from '../../lib/services/workflows';
+
+// 复杂度级别定义
+const complexityLevels = {
+  beginner: {
+    name: 'Beginner',
+    icon: '🌱',
+    description: 'Perfect for those new to n8n. Simple workflows with basic nodes and straightforward logic.',
+    color: 'from-green-400 to-green-600',
+    bgColor: 'bg-green-50 dark:bg-green-900/20',
+    textColor: 'text-green-800 dark:text-green-200',
+  },
+  intermediate: {
+    name: 'Intermediate',
+    icon: '🚀',
+    description: 'For users with some n8n experience. Workflows with moderate complexity and multiple integrations.',
+    color: 'from-blue-400 to-blue-600',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    textColor: 'text-blue-800 dark:text-blue-200',
+  },
+  advanced: {
+    name: 'Advanced',
+    icon: '⚡',
+    description: 'For experienced users. Complex workflows with advanced logic, error handling, and optimizations.',
+    color: 'from-purple-400 to-purple-600',
+    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    textColor: 'text-purple-800 dark:text-purple-200',
+  },
+};
+
+// 生成静态路径
+export async function getStaticPaths() {
+  return Object.keys(complexityLevels).map((level) => ({
+    params: { level },
+  }));
+}
+
+const { level } = Astro.params;
+const levelInfo = complexityLevels[level as keyof typeof complexityLevels];
+
+if (!levelInfo) {
+  return Astro.redirect('/complexity');
+}
+
+// 获取该复杂度级别的工作流
+let workflows = [];
+let totalCount = 0;
+
+try {
+  const result = await getWorkflows({
+    complexity: level,
+    limit: 12,
+    offset: 0,
+  });
+  workflows = result.workflows;
+  totalCount = result.total;
+} catch (error) {
+  console.error('Error fetching workflows:', error);
+}
+
+// SEO 配置
+const seoConfig = {
+  title: `${levelInfo.name} Workflows - N8N Workflows`,
+  description: levelInfo.description,
+  canonical: `/complexity/${level}`,
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Complexity Levels', href: '/complexity' },
+  { label: levelInfo.name }
+];
+
+// 无限滚动配置
+const loadMoreUrl = `/api/load-more-workflows.json?type=complexity&complexity=${level}&sort=date-desc`;
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-start gap-4 mb-4">
+        <div class={`flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br ${levelInfo.color} flex items-center justify-center text-3xl shadow-lg`}>
+          {levelInfo.icon}
+        </div>
+        <div class="flex-1">
+          <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
+            {levelInfo.name} Workflows
+          </h1>
+          <p class="text-lg text-gray-600 dark:text-gray-300">
+            {levelInfo.description}
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span><strong class="text-gray-900 dark:text-white">{totalCount}</strong> workflow{totalCount !== 1 ? 's' : ''} found</span>
+        </div>
+        <SortDropdown currentSort="date-desc" />
+      </div>
+    </div>
+
+    <!-- Workflows Grid -->
+    {workflows.length > 0 ? (
+      <>
+        <WorkflowGrid workflows={workflows} columns={3} />
+        
+        <!-- Infinite Scroll Sentinel -->
+        {totalCount > workflows.length && (
+          <InfiniteScrollSentinel
+            loadMoreUrl={loadMoreUrl}
+            totalCount={totalCount}
+            initialOffset={workflows.length}
+          />
+        )}
+      </>
+    ) : (
+      <EmptyState
+        title="No workflows found"
+        description={`There are currently no ${levelInfo.name.toLowerCase()} workflows. Check back later or explore other complexity levels.`}
+        icon="workflows"
+        actionText="Browse All Complexity Levels"
+        actionHref="/complexity"
+      />
+    )}
+
+    <!-- Other Levels -->
+    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        Explore Other Complexity Levels
+      </h2>
+      <div class="flex flex-wrap gap-3">
+        {Object.entries(complexityLevels).map(([key, info]) => (
+          key !== level && (
+            <a
+              href={`/complexity/${key}`}
+              class={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium ${info.bgColor} ${info.textColor} hover:opacity-80 transition-opacity`}
+            >
+              <span class="mr-2">{info.icon}</span>
+              {info.name}
+            </a>
+          )
+        ))}
+        <a
+          href="/complexity"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          View All Levels
+        </a>
+      </div>
+    </div>
+  </div>
+</MainLayout>

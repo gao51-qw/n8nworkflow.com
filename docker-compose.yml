@@ -1,0 +1,174 @@
+version: '3.8'
+
+# N8N Workflows - Docker Compose 配置
+# 用于本地开发和测试环境
+
+services:
+  # ============================================
+  # Web 应用服务
+  # ============================================
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: n8nworkflows-web
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=production
+      - PORT=4321
+    env_file:
+      - .env
+    volumes:
+      # 开发模式下挂载源代码 (生产环境注释掉)
+      # - ./src:/app/src
+      # - ./public:/app/public
+      - ./dist:/app/dist:ro
+    restart: unless-stopped
+    networks:
+      - n8nworkflows-network
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4321/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.n8nworkflows.description=N8N Workflows Web Application"
+      - "com.n8nworkflows.version=1.0.0"
+
+  # ============================================
+  # PostgreSQL 数据库 (可选 - 如果不使用 Supabase)
+  # ============================================
+  db:
+    image: postgres:15-alpine
+    container_name: n8nworkflows-db
+    environment:
+      - POSTGRES_DB=n8nworkflows
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+    networks:
+      - n8nworkflows-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.n8nworkflows.description=PostgreSQL Database"
+
+  # ============================================
+  # Redis 缓存 (可选)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: n8nworkflows-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - n8nworkflows-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    labels:
+      - "com.n8nworkflows.description=Redis Cache"
+
+  # ============================================
+  # Nginx 反向代理 (可选)
+  # ============================================
+  nginx:
+    image: nginx:alpine
+    container_name: n8nworkflows-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    restart: unless-stopped
+    networks:
+      - n8nworkflows-network
+    depends_on:
+      - web
+    labels:
+      - "com.n8nworkflows.description=Nginx Reverse Proxy"
+
+# ============================================
+# 网络配置
+# ============================================
+networks:
+  n8nworkflows-network:
+    driver: bridge
+    name: n8nworkflows-network
+
+# ============================================
+# 数据卷
+# ============================================
+volumes:
+  postgres-data:
+    name: n8nworkflows-postgres-data
+  redis-data:
+    name: n8nworkflows-redis-data
+  nginx-cache:
+    name: n8nworkflows-nginx-cache
+
+# ============================================
+# 使用说明
+# ============================================
+# 启动所有服务:
+#   docker-compose up -d
+#
+# 启动特定服务:
+#   docker-compose up -d web
+#
+# 查看日志:
+#   docker-compose logs -f
+#   docker-compose logs -f web
+#
+# 停止服务:
+#   docker-compose down
+#
+# 停止并删除数据卷:
+#   docker-compose down -v
+#
+# 重新构建:
+#   docker-compose up -d --build
+#
+# 查看运行状态:
+#   docker-compose ps
+#
+# 进入容器:
+#   docker-compose exec web sh
+#
+# ============================================
+# 开发环境配置
+# ============================================
+# 对于开发环境，可以创建 docker-compose.dev.yml:
+#   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# ============================================
+# 生产环境注意事项
+# ============================================
+# 1. 使用环境变量文件管理敏感信息
+# 2. 配置适当的资源限制
+# 3. 启用日志轮转
+# 4. 配置备份策略
+# 5. 使用 secrets 管理敏感数据
+# 6. 配置监控和告警
+# 7. 定期更新镜像
+# 8. 实施安全最佳实践

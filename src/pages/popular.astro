@@ -1,0 +1,172 @@
+---
+/**
+ * 热门工作流页面
+ * 按浏览量排序展示最受欢迎的工作流
+ */
+
+import MainLayout from '../layouts/MainLayout.astro';
+import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
+import InfiniteScrollSentinel from '../components/workflow/InfiniteScrollSentinel.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import SortDropdown from '../components/ui/SortDropdown.astro';
+import FilterBar from '../components/ui/FilterBar.astro';
+import { getWorkflows } from '../lib/services/workflows';
+import { getCategories } from '../lib/services/categories';
+
+// 获取热门工作流（按浏览量排序）
+let workflows = [];
+let totalCount = 0;
+
+try {
+  const result = await getWorkflows({
+    sort: 'visitors-desc',
+    limit: 12,
+    offset: 0,
+  });
+  workflows = result.workflows;
+  totalCount = result.total;
+} catch (error) {
+  console.error('Error fetching popular workflows:', error);
+}
+
+// 获取分类用于筛选
+let categories = [];
+try {
+  categories = await getCategories();
+} catch (error) {
+  console.error('Error fetching categories:', error);
+}
+
+// SEO 配置
+const seoConfig = {
+  title: 'Popular Workflows - N8N Workflows',
+  description: 'Discover the most popular n8n automation workflows. Browse workflows sorted by views and downloads from the community.',
+  canonical: '/popular',
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Popular Workflows' }
+];
+
+// 无限滚动配置
+const loadMoreUrl = '/api/load-more-workflows.json?type=popular&sort=visitors-desc';
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-start gap-4 mb-4">
+        <div class="flex-shrink-0 w-16 h-16 flex items-center justify-center bg-gradient-to-br from-yellow-400 to-orange-600 rounded-lg shadow-lg">
+          <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
+            Popular Workflows
+          </h1>
+          <p class="text-lg text-gray-600 dark:text-gray-300">
+            Discover the most viewed and downloaded workflows from the community.
+          </p>
+        </div>
+      </div>
+
+      <!-- Stats Banner -->
+      <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-800 rounded-lg p-6 border border-yellow-200 dark:border-gray-700">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+          <div>
+            <div class="text-2xl font-black text-gray-900 dark:text-white">
+              {totalCount} Popular Workflows
+            </div>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Sorted by community engagement and views
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <FilterBar categories={categories} currentPrice="all" currentComplexity="all" />
+
+    <!-- Sort Bar -->
+    <div class="flex items-center justify-between mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <div class="text-sm text-gray-600 dark:text-gray-400">
+        Showing <strong class="text-gray-900 dark:text-white">{workflows.length}</strong> of <strong class="text-gray-900 dark:text-white">{totalCount}</strong> workflows
+      </div>
+      <SortDropdown currentSort="visitors-desc" />
+    </div>
+
+    <!-- Workflows Grid -->
+    {workflows.length > 0 ? (
+      <>
+        <WorkflowGrid workflows={workflows} columns={3} />
+        
+        <!-- Infinite Scroll Sentinel -->
+        {totalCount > workflows.length && (
+          <InfiniteScrollSentinel
+            loadMoreUrl={loadMoreUrl}
+            totalCount={totalCount}
+            initialOffset={workflows.length}
+          />
+        )}
+      </>
+    ) : (
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          No workflows available
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400">
+          Popular workflows will appear here once they're added.
+        </p>
+      </div>
+    )}
+
+    <!-- Info Section -->
+    <div class="mt-12 bg-primary-50 dark:bg-gray-800 rounded-lg p-8 border border-primary-200 dark:border-gray-700">
+      <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+        Why These Workflows Are Popular
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6 text-sm text-gray-600 dark:text-gray-300">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <strong class="text-gray-900 dark:text-white">Proven Solutions</strong>
+          </div>
+          <p>These workflows have been tested and used by many community members.</p>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <strong class="text-gray-900 dark:text-white">High Engagement</strong>
+          </div>
+          <p>Most viewed and downloaded by the n8n community.</p>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            <strong class="text-gray-900 dark:text-white">Community Favorites</strong>
+          </div>
+          <p>Highly rated and recommended by experienced users.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>

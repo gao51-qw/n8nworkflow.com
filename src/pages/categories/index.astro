@@ -1,0 +1,113 @@
+---
+/**
+ * 分类列表页
+ * 展示所有工作流分类
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import CategoryCard from '../../components/ui/CategoryCard.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import { getCategories } from '../../lib/services/categories';
+
+// 获取所有分类
+let categories = [];
+try {
+  categories = await getCategories();
+} catch (error) {
+  console.error('Error fetching categories:', error);
+}
+
+// SEO 配置
+const seoConfig = {
+  title: 'Browse Workflow Categories - N8N Workflows',
+  description: 'Explore n8n workflows organized by categories. Find automation workflows for email, data sync, notifications, DevOps, and more.',
+  canonical: '/categories',
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Categories' }
+];
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-3">
+        Browse by Category
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-gray-300">
+        Discover workflows organized by their primary use case and functionality.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="bg-primary-50 dark:bg-gray-800 rounded-lg p-6 mb-8">
+      <div class="flex items-center gap-3">
+        <svg class="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <div>
+          <div class="text-2xl font-black text-gray-900 dark:text-white">
+            {categories.length} Categories
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            Covering all major automation use cases
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Grid -->
+    {categories.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categories.map((category) => (
+          <CategoryCard category={category} />
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          No categories available
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400">
+          Categories will appear here once workflows are added.
+        </p>
+      </div>
+    )}
+
+    <!-- CTA Section -->
+    <div class="mt-12 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-800 rounded-lg p-8 text-center">
+      <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-3">
+        Can't find what you're looking for?
+      </h2>
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        Try searching for specific workflows or browse all available workflows.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a
+          href="/search"
+          class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Search Workflows
+        </a>
+        <a
+          href="/"
+          class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Browse All Workflows
+        </a>
+      </div>
+    </div>
+  </div>
+</MainLayout>

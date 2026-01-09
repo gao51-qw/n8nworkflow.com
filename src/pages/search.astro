@@ -1,0 +1,246 @@
+---
+/**
+ * 搜索页面
+ * 搜索和筛选工作流
+ */
+
+import MainLayout from '../layouts/MainLayout.astro';
+import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
+import SearchBar from '../components/ui/SearchBar.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import EmptyState from '../components/ui/EmptyState.astro';
+import FilterBar from '../components/ui/FilterBar.astro';
+import { getCategories } from '../lib/services/categories';
+
+// 获取查询参数
+const url = new URL(Astro.request.url);
+const query = url.searchParams.get('q') || '';
+const category = url.searchParams.get('category') || 'all';
+const complexity = url.searchParams.get('complexity') || 'all';
+const price = url.searchParams.get('price') || 'all';
+
+// 获取分类用于筛选
+let categories = [];
+try {
+  categories = await getCategories();
+} catch (error) {
+  console.error('Error fetching categories:', error);
+}
+
+// 搜索结果（客户端会通过 API 获取）
+const workflows: any[] = [];
+const totalCount = 0;
+
+// SEO 配置
+const seoConfig = {
+  title: query ? `Search: ${query} - N8N Workflows` : 'Search Workflows - N8N Workflows',
+  description: 'Search for n8n automation workflows. Find workflows by keyword, category, complexity level, and more.',
+  canonical: '/search',
+  noindex: true, // 搜索页面通常不需要索引
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Search' }
+];
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">
+        Search Workflows
+      </h1>
+      
+      <!-- Search Bar -->
+      <div class="max-w-2xl">
+        <SearchBar placeholder="Search by title, description, or category..." initialQuery={query} autoFocus={true} />
+      </div>
+
+      {query && (
+        <p class="mt-4 text-gray-600 dark:text-gray-400">
+          Searching for: <strong class="text-gray-900 dark:text-white">"{query}"</strong>
+        </p>
+      )}
+    </div>
+
+    <!-- Filters -->
+    <FilterBar 
+      categories={categories} 
+      currentCategory={category}
+      currentComplexity={complexity}
+      currentPrice={price}
+    />
+
+    <!-- Search Results Container -->
+    <div id="search-results">
+      {query ? (
+        <!-- Results will be loaded via JavaScript -->
+        <div class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Searching...</p>
+        </div>
+      ) : (
+        <!-- No Query State -->
+        <div class="text-center py-12">
+          <svg class="w-20 h-20 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            Start Your Search
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Enter keywords to find workflows that match your needs.
+          </p>
+          
+          <!-- Popular Searches -->
+          <div class="max-w-2xl mx-auto">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Popular searches:
+            </p>
+            <div class="flex flex-wrap justify-center gap-2">
+              {['email automation', 'slack notifications', 'data sync', 'webhook', 'api integration', 'scheduling'].map((term) => (
+                <a
+                  href={`/search?q=${encodeURIComponent(term)}`}
+                  class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 hover:bg-primary-100 hover:text-primary-800 dark:hover:bg-primary-900 dark:hover:text-primary-200 transition-colors"
+                >
+                  {term}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <!-- Search Tips -->
+    <div class="mt-12 bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        Search Tips
+      </h2>
+      <div class="grid md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-300">
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2">🔍 Use Keywords</h3>
+          <p>Search by workflow title, description, or functionality. Try terms like "email", "slack", "database", etc.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2">🏷️ Filter by Category</h3>
+          <p>Narrow down results by selecting a specific category from the filter dropdown.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2">📊 Filter by Complexity</h3>
+          <p>Find workflows that match your skill level: beginner, intermediate, or advanced.</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2">💰 Filter by Price</h3>
+          <p>Choose between free workflows or premium paid solutions.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Browse Alternatives -->
+    <div class="mt-8 text-center">
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        Or browse workflows by:
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a
+          href="/categories"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Categories
+        </a>
+        <a
+          href="/authors"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Authors
+        </a>
+        <a
+          href="/complexity"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Complexity
+        </a>
+        <a
+          href="/popular"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Popular
+        </a>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<!-- Search Script -->
+<script>
+  // 客户端搜索逻辑
+  document.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+    
+    if (!query) return;
+
+    const resultsContainer = document.getElementById('search-results');
+    if (!resultsContainer) return;
+
+    try {
+      // 调用搜索 API
+      const response = await fetch(`/api/search.json?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      if (data.results && data.results.length > 0) {
+        // 显示结果
+        resultsContainer.innerHTML = `
+          <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            Found <strong class="text-gray-900 dark:text-white">${data.total}</strong> result${data.total !== 1 ? 's' : ''}
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${data.results.map((workflow: any) => `
+              <a href="/workflows/${workflow.slug}" class="group">
+                <div class="flex flex-col overflow-hidden rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-gray-800 dark:border-gray-700 h-full">
+                  <div class="aspect-video bg-gray-100 dark:bg-gray-700 overflow-hidden relative">
+                    <img src="${workflow.thumbnail || '/placeholder-workflow.webp'}" alt="${workflow.title}" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  </div>
+                  <div class="flex flex-col p-4 flex-1">
+                    <h3 class="text-lg font-black text-gray-900 dark:text-white mb-2">${workflow.title}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 flex-1">${workflow.description}</p>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                      ${workflow.author?.name || 'Anonymous'} • ${workflow.date}
+                    </div>
+                  </div>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        // 无结果
+        resultsContainer.innerHTML = `
+          <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No results found</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Try different keywords or browse our categories.</p>
+            <a href="/categories" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors">
+              Browse Categories
+            </a>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      resultsContainer.innerHTML = `
+        <div class="text-center py-12">
+          <p class="text-red-600 dark:text-red-400">An error occurred while searching. Please try again.</p>
+        </div>
+      `;
+    }
+  });
+</script>

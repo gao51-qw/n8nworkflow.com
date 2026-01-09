@@ -1,0 +1,193 @@
+---
+/**
+ * 单个作者页面（动态路由）
+ * 展示特定作者的所有工作流
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import WorkflowGrid from '../../components/workflow/WorkflowGrid.astro';
+import InfiniteScrollSentinel from '../../components/workflow/InfiniteScrollSentinel.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import SortDropdown from '../../components/ui/SortDropdown.astro';
+import { getAuthors, getAuthorBySlug } from '../../lib/services/authors';
+import { getWorkflows } from '../../lib/services/workflows';
+
+// 生成静态路径
+export async function getStaticPaths() {
+  try {
+    const authors = await getAuthors();
+    return authors.map((author) => ({
+      params: { slug: author.slug },
+      props: { author },
+    }));
+  } catch (error) {
+    console.error('Error generating author paths:', error);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+const { author } = Astro.props;
+
+// 获取该作者的工作流
+let workflows = [];
+let totalCount = 0;
+
+try {
+  const result = await getWorkflows({
+    author: slug,
+    limit: 12,
+    offset: 0,
+  });
+  workflows = result.workflows;
+  totalCount = result.total;
+} catch (error) {
+  console.error('Error fetching workflows:', error);
+}
+
+// SEO 配置
+const seoConfig = {
+  title: `${author.name}'s Workflows - N8N Workflows`,
+  description: author.bio || `Browse automation workflows created by ${author.name}. Discover n8n workflows and automation solutions.`,
+  canonical: `/authors/${slug}`,
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Authors', href: '/authors' },
+  { label: author.name }
+];
+
+// 无限滚动配置
+const loadMoreUrl = `/api/load-more-workflows.json?type=author&author=${slug}&sort=date-desc`;
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Author Profile -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 md:p-8 mb-8">
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+          {author.avatar ? (
+            <img
+              src={author.avatar}
+              alt={author.name}
+              class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover ring-4 ring-gray-200 dark:ring-gray-700"
+              loading="eager"
+            />
+          ) : (
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center ring-4 ring-gray-200 dark:ring-gray-700">
+              <span class="text-4xl md:text-5xl font-bold text-white">
+                {author.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1">
+          <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
+            {author.name}
+          </h1>
+          {author.bio && (
+            <p class="text-lg text-gray-600 dark:text-gray-300 mb-4">
+              {author.bio}
+            </p>
+          )}
+
+          <!-- Stats -->
+          <div class="flex flex-wrap gap-6 mb-4">
+            <div>
+              <div class="text-2xl font-black text-primary-600">{totalCount}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">Workflow{totalCount !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
+
+          <!-- Social Links -->
+          {(author.website || author.twitter || author.github) && (
+            <div class="flex flex-wrap gap-3">
+              {author.website && (
+                <a
+                  href={author.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  </svg>
+                  Website
+                </a>
+              )}
+              {author.twitter && (
+                <a
+                  href={`https://twitter.com/${author.twitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
+                  </svg>
+                  Twitter
+                </a>
+              )}
+              {author.github && (
+                <a
+                  href={`https://github.com/${author.github}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                  </svg>
+                  GitHub
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflows Section -->
+    <div class="mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+          Workflows by {author.name}
+        </h2>
+        <SortDropdown currentSort="date-desc" />
+      </div>
+    </div>
+
+    <!-- Workflows Grid -->
+    {workflows.length > 0 ? (
+      <>
+        <WorkflowGrid workflows={workflows} columns={3} />
+        
+        <!-- Infinite Scroll Sentinel -->
+        {totalCount > workflows.length && (
+          <InfiniteScrollSentinel
+            loadMoreUrl={loadMoreUrl}
+            totalCount={totalCount}
+            initialOffset={workflows.length}
+          />
+        )}
+      </>
+    ) : (
+      <EmptyState
+        title="No workflows yet"
+        description={`${author.name} hasn't published any workflows yet. Check back later or explore other authors.`}
+        icon="workflows"
+        actionText="Browse All Authors"
+        actionHref="/authors"
+      />
+    )}
+  </div>
+</MainLayout>

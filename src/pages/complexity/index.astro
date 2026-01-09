@@ -1,0 +1,179 @@
+---
+/**
+ * 复杂度列表页
+ * 展示所有复杂度级别
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import { getWorkflows } from '../../lib/services/workflows';
+
+// 复杂度级别定义
+const complexityLevels = [
+  {
+    level: 'beginner',
+    name: 'Beginner',
+    icon: '🌱',
+    description: 'Perfect for those new to n8n. Simple workflows with basic nodes and straightforward logic.',
+    color: 'from-green-400 to-green-600',
+    bgColor: 'bg-green-50 dark:bg-green-900/20',
+    textColor: 'text-green-800 dark:text-green-200',
+  },
+  {
+    level: 'intermediate',
+    name: 'Intermediate',
+    icon: '🚀',
+    description: 'For users with some n8n experience. Workflows with moderate complexity and multiple integrations.',
+    color: 'from-blue-400 to-blue-600',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    textColor: 'text-blue-800 dark:text-blue-200',
+  },
+  {
+    level: 'advanced',
+    name: 'Advanced',
+    icon: '⚡',
+    description: 'For experienced users. Complex workflows with advanced logic, error handling, and optimizations.',
+    color: 'from-purple-400 to-purple-600',
+    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    textColor: 'text-purple-800 dark:text-purple-200',
+  },
+];
+
+// 获取每个级别的工作流数量
+const levelCounts = await Promise.all(
+  complexityLevels.map(async (level) => {
+    try {
+      const result = await getWorkflows({
+        complexity: level.level,
+        limit: 1,
+        offset: 0,
+      });
+      return { level: level.level, count: result.total };
+    } catch (error) {
+      console.error(`Error fetching ${level.level} workflows:`, error);
+      return { level: level.level, count: 0 };
+    }
+  })
+);
+
+// 合并数据
+const levelsWithCounts = complexityLevels.map((level) => ({
+  ...level,
+  count: levelCounts.find((c) => c.level === level.level)?.count || 0,
+}));
+
+// SEO 配置
+const seoConfig = {
+  title: 'Browse by Complexity Level - N8N Workflows',
+  description: 'Find n8n workflows based on complexity level. From beginner-friendly to advanced automation workflows.',
+  canonical: '/complexity',
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Complexity Levels' }
+];
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-3">
+        Browse by Complexity
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-gray-300">
+        Find workflows that match your skill level and experience with n8n.
+      </p>
+    </div>
+
+    <!-- Complexity Levels Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      {levelsWithCounts.map((level) => (
+        <a
+          href={`/complexity/${level.level}`}
+          class="group block p-6 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary-500 dark:hover:border-primary-500 hover:shadow-lg transition-all duration-300"
+        >
+          <!-- Icon -->
+          <div class={`w-16 h-16 mb-4 rounded-full bg-gradient-to-br ${level.color} flex items-center justify-center text-3xl shadow-lg`}>
+            {level.icon}
+          </div>
+
+          <!-- Title -->
+          <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            {level.name}
+          </h2>
+
+          <!-- Description -->
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            {level.description}
+          </p>
+
+          <!-- Count -->
+          <div class={`inline-flex items-center px-3 py-1.5 rounded-full ${level.bgColor} ${level.textColor} text-sm font-medium`}>
+            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {level.count} workflow{level.count !== 1 ? 's' : ''}
+          </div>
+
+          <!-- Arrow -->
+          <div class="mt-4 flex items-center text-sm font-medium text-gray-500 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            View workflows
+            <svg class="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Info Section -->
+    <div class="bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-gray-800 dark:to-gray-800 rounded-lg p-8">
+      <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+        How to Choose the Right Complexity Level
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center">
+            <span class="text-2xl mr-2">🌱</span>
+            Beginner
+          </h3>
+          <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <li>• New to n8n</li>
+            <li>• 1-5 nodes</li>
+            <li>• Basic integrations</li>
+            <li>• Simple logic</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center">
+            <span class="text-2xl mr-2">🚀</span>
+            Intermediate
+          </h3>
+          <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <li>• Some n8n experience</li>
+            <li>• 5-15 nodes</li>
+            <li>• Multiple integrations</li>
+            <li>• Conditional logic</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center">
+            <span class="text-2xl mr-2">⚡</span>
+            Advanced
+          </h3>
+          <ul class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <li>• Experienced user</li>
+            <li>• 15+ nodes</li>
+            <li>• Complex integrations</li>
+            <li>• Error handling & optimization</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>

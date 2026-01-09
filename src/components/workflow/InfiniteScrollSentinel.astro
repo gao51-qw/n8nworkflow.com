@@ -1,0 +1,121 @@
+---
+/**
+ * 无限滚动哨兵组件
+ * 用于触发无限滚动加载更多工作流
+ */
+
+interface Props {
+  loadMoreUrl: string;
+  totalCount: number;
+  initialOffset?: number;
+}
+
+const { loadMoreUrl, totalCount, initialOffset = 12 } = Astro.props;
+---
+
+<!-- 无限滚动哨兵元素 -->
+<div
+  id="infinite-scroll-sentinel"
+  data-url={loadMoreUrl}
+  data-total={totalCount}
+  class="w-full h-10"
+  aria-hidden="true"
+>
+</div>
+
+<!-- 状态容器 -->
+<div id="infinite-scroll-status" class="w-full py-8">
+  <!-- 加载中状态 -->
+  <div class="loading hidden flex flex-col items-center justify-center">
+    <div class="inline-block w-8 h-8 border-4 border-gray-300 border-t-primary-600 rounded-full animate-spin"></div>
+    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">Loading more workflows...</p>
+  </div>
+
+  <!-- 没有更多数据状态 -->
+  <div class="no-more hidden flex flex-col items-center justify-center">
+    <svg
+      class="w-12 h-12 text-gray-300 dark:text-gray-600 mb-3"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+      You've reached the end
+    </p>
+    <p class="text-xs text-gray-600 dark:text-gray-400">
+      No more workflows to load
+    </p>
+  </div>
+
+  <!-- 错误状态 -->
+  <div class="error hidden flex flex-col items-center justify-center">
+    <svg
+      class="w-12 h-12 text-red-400 dark:text-red-500 mb-3"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+      Failed to load workflows
+    </p>
+    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+      Something went wrong. Please try again.
+    </p>
+    <button
+      id="retry-button"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+    >
+      <svg
+        class="w-4 h-4 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+      Retry
+    </button>
+  </div>
+</div>
+
+<script>
+  // 重试按钮事件处理
+  document.addEventListener('DOMContentLoaded', () => {
+    const retryButton = document.getElementById('retry-button');
+    const errorContainer = document.querySelector('.error');
+    
+    retryButton?.addEventListener('click', () => {
+      // 隐藏错误消息
+      errorContainer?.classList.add('hidden');
+      
+      // 触发重新加载
+      window.dispatchEvent(new CustomEvent('infinite-scroll-retry'));
+    });
+  });
+</script>
+
+<style>
+  /* 确保哨兵元素不影响布局 */
+  #infinite-scroll-sentinel {
+    pointer-events: none;
+  }
+</style>

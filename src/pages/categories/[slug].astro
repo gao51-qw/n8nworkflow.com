@@ -1,0 +1,157 @@
+---
+/**
+ * 单个分类页面（动态路由）
+ * 展示特定分类下的所有工作流
+ */
+
+import MainLayout from '../../layouts/MainLayout.astro';
+import WorkflowGrid from '../../components/workflow/WorkflowGrid.astro';
+import InfiniteScrollSentinel from '../../components/workflow/InfiniteScrollSentinel.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import EmptyState from '../../components/ui/EmptyState.astro';
+import SortDropdown from '../../components/ui/SortDropdown.astro';
+import { getCategories, getCategoryBySlug } from '../../lib/services/categories';
+import { getWorkflows } from '../../lib/services/workflows';
+
+// 生成静态路径
+export async function getStaticPaths() {
+  try {
+    const categories = await getCategories();
+    return categories.map((category) => ({
+      params: { slug: category.slug },
+      props: { category },
+    }));
+  } catch (error) {
+    console.error('Error generating category paths:', error);
+    return [];
+  }
+}
+
+const { slug } = Astro.params;
+const { category } = Astro.props;
+
+// 获取该分类下的工作流
+let workflows = [];
+let totalCount = 0;
+
+try {
+  const result = await getWorkflows({
+    category: slug,
+    limit: 12,
+    offset: 0,
+  });
+  workflows = result.workflows;
+  totalCount = result.total;
+} catch (error) {
+  console.error('Error fetching workflows:', error);
+}
+
+// SEO 配置
+const seoConfig = {
+  title: `${category.name} Workflows - N8N Workflows`,
+  description: category.description || `Browse ${category.name} automation workflows. Find ready-to-use n8n workflows for ${category.name.toLowerCase()}.`,
+  canonical: `/categories/${slug}`,
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Categories', href: '/categories' },
+  { label: category.name }
+];
+
+// 无限滚动配置
+const loadMoreUrl = `/api/load-more-workflows.json?type=category&category=${slug}&sort=date-desc`;
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-start gap-4 mb-4">
+        {category.icon && (
+          <div class="flex-shrink-0 w-16 h-16 flex items-center justify-center bg-primary-100 dark:bg-primary-900 rounded-lg">
+            <span class="text-3xl">{category.icon}</span>
+          </div>
+        )}
+        <div class="flex-1">
+          <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-2">
+            {category.name} Workflows
+          </h1>
+          {category.description && (
+            <p class="text-lg text-gray-600 dark:text-gray-300">
+              {category.description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span><strong class="text-gray-900 dark:text-white">{totalCount}</strong> workflow{totalCount !== 1 ? 's' : ''} found</span>
+        </div>
+        <SortDropdown currentSort="date-desc" />
+      </div>
+    </div>
+
+    <!-- Workflows Grid -->
+    {workflows.length > 0 ? (
+      <>
+        <WorkflowGrid workflows={workflows} columns={3} />
+        
+        <!-- Infinite Scroll Sentinel -->
+        {totalCount > workflows.length && (
+          <InfiniteScrollSentinel
+            loadMoreUrl={loadMoreUrl}
+            totalCount={totalCount}
+            initialOffset={workflows.length}
+          />
+        )}
+      </>
+    ) : (
+      <EmptyState
+        title="No workflows found"
+        description={`There are currently no workflows in the ${category.name} category. Check back later or explore other categories.`}
+        icon="workflows"
+        actionText="Browse All Categories"
+        actionHref="/categories"
+      />
+    )}
+
+    <!-- Related Categories -->
+    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        Explore Other Categories
+      </h2>
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="/categories"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          View All Categories
+          <svg class="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a
+          href="/"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          All Workflows
+        </a>
+        <a
+          href="/popular"
+          class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        >
+          Popular
+        </a>
+      </div>
+    </div>
+  </div>
+</MainLayout>
