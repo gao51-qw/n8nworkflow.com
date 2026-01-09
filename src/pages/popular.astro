@@ -6,12 +6,17 @@
 
 import MainLayout from '../layouts/MainLayout.astro';
 import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
-import InfiniteScrollSentinel from '../components/workflow/InfiniteScrollSentinel.astro';
+import Pagination from '../components/ui/Pagination.astro';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import SortDropdown from '../components/ui/SortDropdown.astro';
 import FilterBar from '../components/ui/FilterBar.astro';
 import { getWorkflows } from '../lib/services/workflows';
 import { getCategories } from '../lib/services/categories';
+
+// 获取分页参数
+const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const pageSize = 12;
+const offset = (currentPage - 1) * pageSize;
 
 // 获取热门工作流（按浏览量排序）
 let workflows = [];
@@ -20,8 +25,8 @@ let totalCount = 0;
 try {
   const result = await getWorkflows({
     sort: 'visitors-desc',
-    limit: 12,
-    offset: 0,
+    limit: pageSize,
+    offset: offset,
   });
   workflows = result.workflows;
   totalCount = result.total;
@@ -49,8 +54,8 @@ const breadcrumbItems = [
   { label: 'Popular Workflows' }
 ];
 
-// 无限滚动配置
-const loadMoreUrl = '/api/load-more-workflows.json?type=popular&sort=visitors-desc';
+// 计算总页数
+const totalPages = Math.ceil(totalCount / pageSize);
 ---
 
 <MainLayout {...seoConfig}>
@@ -110,12 +115,12 @@ const loadMoreUrl = '/api/load-more-workflows.json?type=popular&sort=visitors-de
       <>
         <WorkflowGrid workflows={workflows} columns={3} />
         
-        <!-- Infinite Scroll Sentinel -->
-        {totalCount > workflows.length && (
-          <InfiniteScrollSentinel
-            loadMoreUrl={loadMoreUrl}
-            totalCount={totalCount}
-            initialOffset={workflows.length}
+        <!-- 分页 -->
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl="/popular"
           />
         )}
       </>

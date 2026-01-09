@@ -6,7 +6,7 @@
 
 import MainLayout from '../../layouts/MainLayout.astro';
 import WorkflowGrid from '../../components/workflow/WorkflowGrid.astro';
-import InfiniteScrollSentinel from '../../components/workflow/InfiniteScrollSentinel.astro';
+import Pagination from '../../components/ui/Pagination.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import EmptyState from '../../components/ui/EmptyState.astro';
 import SortDropdown from '../../components/ui/SortDropdown.astro';
@@ -30,6 +30,11 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { category } = Astro.props;
 
+// 获取分页参数
+const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const pageSize = 12;
+const offset = (currentPage - 1) * pageSize;
+
 // 获取该分类下的工作流
 let workflows = [];
 let totalCount = 0;
@@ -37,8 +42,8 @@ let totalCount = 0;
 try {
   const result = await getWorkflows({
     category: slug,
-    limit: 12,
-    offset: 0,
+    limit: pageSize,
+    offset: offset,
   });
   workflows = result.workflows;
   totalCount = result.total;
@@ -59,8 +64,8 @@ const breadcrumbItems = [
   { label: category.name }
 ];
 
-// 无限滚动配置
-const loadMoreUrl = `/api/load-more-workflows.json?type=category&category=${slug}&sort=date-desc`;
+// 计算总页数
+const totalPages = Math.ceil(totalCount / pageSize);
 ---
 
 <MainLayout {...seoConfig}>
@@ -105,12 +110,12 @@ const loadMoreUrl = `/api/load-more-workflows.json?type=category&category=${slug
       <>
         <WorkflowGrid workflows={workflows} columns={3} />
         
-        <!-- Infinite Scroll Sentinel -->
-        {totalCount > workflows.length && (
-          <InfiniteScrollSentinel
-            loadMoreUrl={loadMoreUrl}
-            totalCount={totalCount}
-            initialOffset={workflows.length}
+        <!-- 分页 -->
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            baseUrl={`/categories/${slug}`}
           />
         )}
       </>

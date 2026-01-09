@@ -1,25 +1,30 @@
 ---
 /**
  * 首页 - 展示所有工作流
- * 完整的首页布局，包含 Hero、统计、工作流网格和无限滚动
+ * 完整的首页布局，包含 Hero、统计、工作流网格和分页
  */
 
 import MainLayout from '../layouts/MainLayout.astro';
 import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
-import InfiniteScrollSentinel from '../components/workflow/InfiniteScrollSentinel.astro';
+import Pagination from '../components/ui/Pagination.astro';
 import SearchBar from '../components/ui/SearchBar.astro';
 import { getWorkflows } from '../lib/services/workflows';
 import { getStats } from '../lib/services/stats';
 
-// 获取初始工作流数据
+// 获取分页参数
+const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const pageSize = 12;
+const offset = (currentPage - 1) * pageSize;
+
+// 获取工作流数据
 let workflows = [];
 let totalCount = 0;
 
 try {
   const result = await getWorkflows({
     sort: 'date-desc',
-    limit: 12,
-    offset: 0,
+    limit: pageSize,
+    offset: offset,
   });
   workflows = result.workflows;
   totalCount = result.total;
@@ -48,8 +53,8 @@ const seoConfig = {
   canonical: '/',
 };
 
-// 无限滚动配置
-const loadMoreUrl = '/api/load-more-workflows.json?type=all&sort=date-desc';
+// 计算总页数
+const totalPages = Math.ceil(totalCount / pageSize);
 ---
 
 <MainLayout {...seoConfig}>
@@ -135,12 +140,12 @@ const loadMoreUrl = '/api/load-more-workflows.json?type=all&sort=date-desc';
         <>
           <WorkflowGrid workflows={workflows} columns={3} />
 
-          <!-- 无限滚动哨兵 -->
-          {totalCount > workflows.length && (
-            <InfiniteScrollSentinel
-              loadMoreUrl={loadMoreUrl}
-              totalCount={totalCount}
-              initialOffset={workflows.length}
+          <!-- 分页 -->
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl="/"
             />
           )}
         </>
