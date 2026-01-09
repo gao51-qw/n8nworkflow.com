@@ -16,6 +16,15 @@
 
 ---
 
+## [1.0.1] - 2026-01-09
+
+### 🚀 版本更新
+- 新增文档：N8N_QUICK_START.md、N8N_INTEGRATION.md
+- 新增 API：`/api/n8n-workflows.json`
+- 新增服务：`src/lib/services/n8n.ts`
+- 更新页面与布局：主页、热门、最新、分类、作者、复杂度页面
+
+
 ## [1.0.0] - 2026-01-09
 
 ### 🎉 初始版本
@@ -396,7 +405,7 @@
 
 ## 链接
 
-- [项目主页](https://n8nworkflows.xyz)
+- [项目主页](https://n8nworkflow.com)
 - [GitHub 仓库](https://github.com/your-org/n8nworkflows.xyz)
 - [问题追踪](https://github.com/your-org/n8nworkflows.xyz/issues)
 - [贡献指南](./CONTRIBUTING.md)
