@@ -10,6 +10,7 @@ import Pagination from '../components/ui/Pagination.astro';
 import SearchBar from '../components/ui/SearchBar.astro';
 import { getWorkflows } from '../lib/services/workflows';
 import { getStats } from '../lib/services/stats';
+import { generateHeroContent } from '../lib/services/content-generator';
 
 // 获取分页参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
@@ -46,6 +47,23 @@ try {
   console.error('Error fetching stats:', error);
 }
 
+// 获取Hero内容
+let heroContent = {
+  title: 'Discover Powerful N8N Workflows',
+  subtitle: 'Browse thousands of automation workflows created by the community. Save time and boost productivity with ready-to-use workflows.',
+  stats: {
+    workflows: '1,000+',
+    authors: '100+',
+    recent: '50+',
+  },
+};
+
+try {
+  heroContent = await generateHeroContent();
+} catch (error) {
+  console.error('Error generating hero content:', error);
+}
+
 // SEO 配置
 const seoConfig = {
   title: 'N8N Workflows - Discover Automation Workflows',
@@ -63,11 +81,11 @@ const totalPages = Math.ceil(totalCount / pageSize);
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center max-w-3xl mx-auto">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white mb-6">
-          Discover Powerful
+          Discover {heroContent.stats.workflows}
           <span class="text-gradient">N8N Workflows</span>
         </h1>
         <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">
-          Browse thousands of automation workflows created by the community. Save time and boost productivity with ready-to-use workflows.
+          {heroContent.subtitle}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a
@@ -173,7 +191,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
           Ready to Automate?
         </h2>
         <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
-          Start using n8n today and join thousands of users automating their workflows.
+          Start using n8n today and join {stats.totalAuthors} authors who have created {stats.totalWorkflows} workflows, with {stats.recentWorkflows} new additions this month.
         </p>
         <a
           href="https://n8n.io"

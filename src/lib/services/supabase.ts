@@ -20,7 +20,7 @@ export const supabase = hasSupabaseConfig
       },
       global: {
         headers: {
-          'x-client-info': 'n8nworkflows.xyz',
+          'x-client-info': 'n8nworkflow.com',
         },
       },
     })

@@ -61,7 +61,7 @@
 ```html
 <title>工作流标题 - N8N Workflows</title>
 <meta name="description" content="工作流描述...">
-<link rel="canonical" href="https://n8nworkflows.xyz/workflows/slug">
+<link rel="canonical" href="https://n8nworkflow.com/workflows/slug">
 <meta property="og:title" content="工作流标题">
 <meta property="og:image" content="缩略图 URL">
 ```
@@ -121,7 +121,7 @@ sitemap({
 - ✅ 支持 Atom 扩展
 
 #### 访问地址
-- `https://n8nworkflows.xyz/rss.xml`
+- `https://n8nworkflow.com/rss.xml`
 
 ### 5. Robots.txt
 
@@ -134,7 +134,7 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://n8nworkflows.xyz/sitemap.xml
+Sitemap: https://n8nworkflow.com/sitemap.xml
 ```
 
 ---
@@ -306,7 +306,7 @@ Content-Security-Policy:
 
 #### 重定向规则
 ```
-http://n8nworkflows.xyz/* https://n8nworkflows.xyz/:splat 301!
+http://n8nworkflow.com/* https://n8nworkflow.com/:splat 301!
 ```
 
 ---
@@ -413,7 +413,7 @@ monitorWebVitals((metric) => {
 ```bash
 PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-PUBLIC_SITE_URL=https://n8nworkflows.xyz
+PUBLIC_SITE_URL=https://n8nworkflow.com
 PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 

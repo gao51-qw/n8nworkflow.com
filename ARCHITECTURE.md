@@ -208,7 +208,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   // 网站 URL
-  site: 'https://n8nworkflows.xyz',
+  site: 'https://n8nworkflow.com',
   
   // 集成
   integrations: [
@@ -417,14 +417,14 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # 网站配置
-PUBLIC_SITE_URL=https://n8nworkflows.xyz
+PUBLIC_SITE_URL=https://n8nworkflow.com
 PUBLIC_SITE_NAME=N8N Workflows
 
 # Google Analytics
 PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # API 配置
-API_BASE_URL=https://n8nworkflows.xyz/api
+API_BASE_URL=https://n8nworkflow.com/api
 
 # 功能开关
 ENABLE_ANALYTICS=true
@@ -1299,17 +1299,17 @@ Cache-Control: public, max-age=300, s-maxage=600
 <meta name="description" content="...">
 <meta name="keywords" content="n8n, workflows, automation">
 <meta name="author" content="N8N Workflows">
-<link rel="canonical" href="https://n8nworkflows.xyz/">
+<link rel="canonical" href="https://n8nworkflow.com/">
 ```
 
 ### 9.2 Open Graph 标签
 
 ```html
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://n8nworkflows.xyz/">
+<meta property="og:url" content="https://n8nworkflow.com/">
 <meta property="og:title" content="N8N Workflows">
 <meta property="og:description" content="...">
-<meta property="og:image" content="https://n8nworkflows.xyz/og-image.png">
+<meta property="og:image" content="https://n8nworkflow.com/og-image.png">
 ```
 
 ### 9.3 结构化数据 (Schema.org)
@@ -1319,11 +1319,11 @@ Cache-Control: public, max-age=300, s-maxage=600
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "N8N Workflows",
-  "url": "https://n8nworkflows.xyz",
+  "url": "https://n8nworkflow.com",
   "description": "Discover and share n8n automation workflows",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://n8nworkflows.xyz/search?q={search_term_string}",
+    "target": "https://n8nworkflow.com/search?q={search_term_string}",
     "query-input": "required name=search_term_string"
   }
 }
@@ -1338,7 +1338,7 @@ Cache-Control: public, max-age=300, s-maxage=600
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://n8nworkflows.xyz',
+  site: 'https://n8nworkflow.com',
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/api/'),
@@ -1356,7 +1356,7 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://n8nworkflows.xyz/sitemap.xml
+Sitemap: https://n8nworkflow.com/sitemap.xml
 ```
 
 ---

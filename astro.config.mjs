@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   // 网站 URL
-  site: 'https://n8nworkflows.xyz',
+  site: 'https://n8nworkflow.com',
   
   // 集成
   integrations: [

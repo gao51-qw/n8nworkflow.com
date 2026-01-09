@@ -23,7 +23,7 @@
 ```bash
 # 1. 克隆项目
 git clone <repository-url>
-cd n8nworkflows.xyz
+cd n8nworkflow.com
 
 # 2. 安装依赖
 npm install

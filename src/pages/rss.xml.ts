@@ -14,7 +14,7 @@ export async function GET(context: APIContext) {
     return rss({
       title: 'N8N Workflows - 最新工作流',
       description: '发现和分享 n8n 自动化工作流，提升工作效率',
-      site: context.site || 'https://n8nworkflows.xyz',
+      site: context.site || 'https://n8nworkflow.com',
       items: workflows.map((workflow) => ({
         title: workflow.title,
         description: workflow.description,

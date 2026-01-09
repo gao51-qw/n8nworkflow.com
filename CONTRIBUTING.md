@@ -607,7 +607,7 @@ npm test -- --coverage
 
 - **GitHub Issues**: [项目 Issues](https://github.com/your-org/n8nworkflows.xyz/issues)
 - **Discord**: [加入我们的 Discord](https://discord.gg/your-invite)
-- **Email**: contact@n8nworkflows.xyz
+- **Email**: contact@n8nworkflow.com
 
 ---
 

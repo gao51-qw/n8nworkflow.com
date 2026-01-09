@@ -483,10 +483,10 @@ docker-compose up -d
 
 ## 📞 联系方式
 
-- **项目主页**: https://n8nworkflows.xyz
+- **项目主页**: https://n8nworkflow.com
 - **GitHub**: https://github.com/your-org/n8nworkflows.xyz
 - **问题追踪**: https://github.com/your-org/n8nworkflows.xyz/issues
-- **邮箱**: contact@n8nworkflows.xyz
+- **邮箱**: contact@n8nworkflow.com
 
 ---
 

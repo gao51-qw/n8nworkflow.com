@@ -1,7 +1,7 @@
 # N8N Workflows 网站架构分析与实现方法
 
 ## 网站概述
-N8N Workflows (https://n8nworkflows.xyz/) 是一个展示和分享 n8n 自动化工作流的目录网站。网站提供了工作流的浏览、搜索、分类等功能，支持明暗主题切换和无限滚动加载。
+N8N Workflows (https://n8nworkflow.com/) 是一个展示和分享 n8n 自动化工作流的目录网站。网站提供了工作流的浏览、搜索、分类等功能，支持明暗主题切换和无限滚动加载。
 
 ## 技术栈分析
 
@@ -95,7 +95,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   integrations: [tailwind()],
-  site: 'https://n8nworkflows.xyz'
+  site: 'https://n8nworkflow.com'
 });
 ```
 

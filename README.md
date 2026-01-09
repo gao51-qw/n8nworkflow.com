@@ -11,7 +11,7 @@
 
 一个基于 Astro 构建的现代化 N8N 工作流展示平台，用于发现、浏览和分享自动化工作流。
 
-[在线演示](https://n8nworkflows.xyz) · [报告问题](https://github.com/your-org/n8nworkflows.xyz/issues) · [功能建议](https://github.com/your-org/n8nworkflows.xyz/issues)
+[在线演示](https://n8nworkflow.com) · [报告问题](https://github.com/your-org/n8nworkflows.xyz/issues) · [功能建议](https://github.com/your-org/n8nworkflows.xyz/issues)
 
 </div>
 
@@ -421,10 +421,10 @@ in the Software without restriction...
 
 ## 📞 联系方式
 
-- **网站**: [https://n8nworkflows.xyz](https://n8nworkflows.xyz)
+- **网站**: [https://n8nworkflow.com](https://n8nworkflow.com)
 - **GitHub**: [https://github.com/your-org/n8nworkflows.xyz](https://github.com/your-org/n8nworkflows.xyz)
 - **问题追踪**: [GitHub Issues](https://github.com/your-org/n8nworkflows.xyz/issues)
-- **邮箱**: contact@n8nworkflows.xyz
+- **邮箱**: contact@n8nworkflow.com
 
 ---
 
