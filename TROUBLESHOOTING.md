@@ -819,6 +819,88 @@ npm run dev
 
 ---
 
+### 问题 1.5: Tailwind CSS 类不存在错误
+
+**症状：**
+```bash
+[vite:css] [postcss] /opt/buildhome/repo/src/styles/global.css:7:1: The `border-border` class does not exist
+```
+
+或在构建时出现类似错误：
+```bash
+The `<class-name>` class does not exist
+```
+
+**原因：**
+使用了不存在的 Tailwind CSS 类名。这通常发生在：
+- 自定义类名拼写错误
+- 使用了未在 [`tailwind.config.js`](tailwind.config.js) 中定义的自定义颜色
+- 使用了已弃用的 Tailwind 类名
+
+**解决方案：**
+
+1. **检查 global.css 中的 @apply 指令**
+```css
+/* ❌ 错误 - border-border 不存在 */
+* {
+  @apply border-border;
+}
+
+/* ✅ 正确 - 使用标准 Tailwind 颜色 */
+* {
+  @apply border-gray-200 dark:border-gray-700;
+}
+```
+
+2. **验证 Tailwind 配置中的自定义颜色**
+```javascript
+// tailwind.config.js
+export default {
+  theme: {
+    extend: {
+      colors: {
+        // 确保所有使用的颜色都在这里定义
+        primary: { /* ... */ },
+        secondary: { /* ... */ },
+      }
+    }
+  }
+}
+```
+
+3. **使用标准 Tailwind 颜色**
+
+标准 Tailwind 颜色包括：
+- `gray-*` (50-900)
+- `slate-*` (50-900)
+- `red-*`, `blue-*`, `green-*` 等
+- `primary-*`, `secondary-*` (如果在配置中定义)
+
+4. **搜索并替换所有不存在的类**
+```bash
+# 在项目中搜索不存在的类
+grep -r "border-border" src/
+grep -r "@apply.*-.*" src/styles/
+
+# 替换为有效的类
+# 例如: border-border → border-gray-200 dark:border-gray-700
+```
+
+5. **清除缓存并重建**
+```bash
+rm -rf .astro node_modules/.vite dist
+npm run build
+```
+
+**常见替换：**
+| 不存在的类 | 替换为 |
+|-----------|--------|
+| `border-border` | `border-gray-200 dark:border-gray-700` |
+| `text-text` | `text-gray-900 dark:text-white` |
+| `bg-bg` | `bg-white dark:bg-gray-900` |
+
+---
+
 ### 问题 2: 样式冲突
 
 **症状：**
