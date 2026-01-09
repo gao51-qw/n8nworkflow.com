@@ -620,6 +620,65 @@ dig your-domain.com
 
 ---
 
+### 问题 5: npm 包不存在或版本不匹配
+
+**症状：**
+```bash
+error: No version matching "^0.1.0" found for specifier "@n8n_io/n8n-demo-component" (but package exists)
+error: @n8n_io/n8n-demo-component@^0.1.0 failed to resolve
+```
+
+**原因：**
+某些包可能：
+- 不存在于 npm registry
+- 版本号不正确
+- 是私有包或示例包名
+- 已被废弃或删除
+
+**解决方案：**
+
+1. **验证包是否存在**
+```bash
+# 在 npm 上搜索包
+npm search @n8n_io/n8n-demo-component
+
+# 或访问
+https://www.npmjs.com/package/@n8n_io/n8n-demo-component
+```
+
+2. **从 package.json 中移除不存在的包**
+```json
+{
+  "dependencies": {
+    // 移除不存在的包
+    // "@n8n_io/n8n-demo-component": "^0.1.0"
+  }
+}
+```
+
+3. **寻找替代方案**
+- 查找官方文档确认正确的包名
+- 使用其他类似功能的包
+- 自行实现所需功能
+
+4. **清理并重新安装**
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**特定案例 - @n8n_io/n8n-demo-component：**
+
+这个包在原始项目规划中提到，但实际上不存在于 npm registry。如果需要集成 n8n 工作流展示功能，可以：
+
+- 使用 iframe 嵌入 n8n 工作流
+- 使用 n8n 的官方 API 获取工作流数据
+- 创建自定义组件展示工作流 JSON
+
+参考 [`src/components/workflow/WorkflowDetail.astro`](src/components/workflow/WorkflowDetail.astro:1) 中的注释说明。
+
+---
+
 ## ⚡ 性能问题
 
 ### 问题 1: 页面加载缓慢

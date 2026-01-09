@@ -568,6 +568,78 @@ NODE_OPTIONS=--max-old-space-size=4096
   Access-Control-Allow-Methods: GET, POST, OPTIONS
 ```
 
+#### 错误 6：npm 包不存在或版本不匹配
+
+**错误信息：**
+```
+error: No version matching "^0.1.0" found for specifier "@n8n_io/n8n-demo-component" (but package exists)
+error: @n8n_io/n8n-demo-component@^0.1.0 failed to resolve
+```
+
+**原因：**
+- 包不存在于 npm registry
+- 版本号不正确
+- 私有包或示例包名
+- 包已被废弃或删除
+
+**解决方案：**
+
+1. **验证包是否存在**
+```bash
+# 在 npm 上搜索包
+npm search @n8n_io/n8n-demo-component
+
+# 或访问 npm 网站
+https://www.npmjs.com/package/@n8n_io/n8n-demo-component
+```
+
+2. **从 package.json 中移除不存在的包**
+```json
+{
+  "dependencies": {
+    // 移除不存在的包
+    // "@n8n_io/n8n-demo-component": "^0.1.0",
+    // "@webcomponents/webcomponentsjs": "^2.8.0",
+    // "lit": "^3.1.0"
+  }
+}
+```
+
+3. **清理并重新安装**
+```bash
+# Windows (PowerShell)
+Remove-Item -Recurse -Force node_modules, package-lock.json
+npm install
+
+# 或使用 cmd
+rmdir /s /q node_modules
+del package-lock.json
+npm install
+```
+
+4. **本地测试构建**
+```bash
+npm run build
+```
+
+5. **重新部署到 Cloudflare**
+```bash
+# 提交更改
+git add package.json
+git commit -m "fix: remove non-existent npm package"
+git push
+
+# 或使用 Wrangler
+npm run build
+wrangler pages deploy dist
+```
+
+**特定案例 - @n8n_io/n8n-demo-component：**
+
+这个包在原始项目规划中提到，但实际上不存在。如果需要集成 n8n 工作流展示功能，请参考：
+- [`src/components/workflow/WorkflowDetail.astro`](src/components/workflow/WorkflowDetail.astro:1) 中的注释说明
+- [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md:1) 中的"问题 5: npm 包不存在或版本不匹配"
+
 ### 调试技巧
 
 #### 1. 查看构建日志
