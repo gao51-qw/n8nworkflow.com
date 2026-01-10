@@ -14,115 +14,84 @@ interface Props {
 const { workflow, lazy = true } = Astro.props;
 
 // 格式化日期
-const displayDate = workflow.date || new Date(workflow.publishedAt).toLocaleDateString('en-US', {
+const displayDate = workflow.date || new Date(workflow.publishedAt).toLocaleDateString('en-GB', {
   day: 'numeric',
   month: 'short',
   year: 'numeric',
 });
-
-// 价格标签样式
-const priceStyle = workflow.price
-  ? 'background-color: rgba(255, 212, 71, 0.5); color: black;'
-  : 'background-color: rgba(255, 94, 77, 0.5); color: white;';
-
-// 复杂度标签文本
-const complexityText = workflow.complexityLevel.charAt(0).toUpperCase() + workflow.complexityLevel.slice(1);
 ---
 
-<a href={`/workflows/${workflow.slug}`} class="group">
-  <div class="flex flex-col overflow-hidden rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-gray-800 dark:border-gray-700 h-full">
+<a href={`/workflows/${workflow.slug}`} class="group block h-full">
+  <div class="flex flex-col bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
     <!-- 缩略图 -->
     <div class="aspect-video bg-gray-100 dark:bg-gray-700 overflow-hidden relative">
       <img
         src={workflow.thumbnail || '/placeholder-workflow.webp'}
         alt={`Workflow preview: ${workflow.title}`}
-        class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+        class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         loading={lazy ? 'lazy' : 'eager'}
         decoding="async"
         onerror="this.onerror=null; this.src='/placeholder-workflow.webp';"
       />
       
-      <!-- 价格标签 -->
-      <span
-        class="absolute top-2 right-2 text-xs px-2 py-1 rounded-full whitespace-nowrap shadow-sm font-medium"
-        style={priceStyle}
-      >
-        {workflow.price ? 'Paid' : 'Free'}
-      </span>
-      
-      <!-- 复杂度标签 -->
-      <span class="absolute bottom-2 right-2 text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 whitespace-nowrap shadow-sm">
-        {complexityText}
-      </span>
+      <!-- Badges -->
+      <div class="absolute top-3 left-3 flex flex-wrap gap-2">
+        <span class="px-2.5 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-sm text-primary-600">
+          {workflow.price ? 'Paid' : 'Free'}
+        </span>
+        <span class="px-2.5 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-sm text-gray-600 dark:text-gray-400">
+          {workflow.complexityLevel}
+        </span>
+      </div>
     </div>
 
     <!-- 内容区 -->
-    <div class="flex flex-col p-4 flex-1">
-      <!-- 标题 -->
-      <div class="mb-2">
-        <h3 class="text-lg font-black text-gray-900 dark:text-white break-words line-clamp-2">
-          {workflow.title}
-        </h3>
-      </div>
-
-      <!-- 描述 -->
-      <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 flex-1 line-clamp-3">
+    <div class="p-5 flex flex-col flex-1">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+        {workflow.title}
+      </h3>
+      
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 flex-1">
         {workflow.description}
       </p>
 
-      <!-- 元信息 -->
-      <div class="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
-        <!-- 作者和分类 -->
-        <div class="flex justify-center items-center gap-4 mb-2 mt-2">
-          <!-- 作者 -->
-          <div class="flex items-center text-xs text-gray-600 dark:text-gray-300">
-            <svg class="h-3.5 w-3.5 mr-1.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span class="truncate max-w-[120px]">{workflow.author?.name || 'Anonymous'}</span>
-          </div>
-
-          <!-- 分类标签 -->
-          <div class="flex flex-wrap gap-1.5">
-            {workflow.categories?.slice(0, 2).map((category) => (
-              <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-0.5 rounded-full">
-                {category}
-              </span>
-            ))}
-            {workflow.categories && workflow.categories.length > 2 && (
-              <span class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">
-                +{workflow.categories.length - 2}
-              </span>
+      <!-- Author & Categories -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 overflow-hidden">
+            {workflow.author?.avatar ? (
+              <img src={workflow.author.avatar} alt={workflow.author.name} class="w-full h-full object-cover" />
+            ) : (
+              workflow.author?.name?.charAt(0) || 'A'
             )}
           </div>
+          <span class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[100px]">
+            {workflow.author?.name || 'Anonymous'}
+          </span>
         </div>
+        
+        <div class="flex gap-1.5">
+          {workflow.categories?.slice(0, 1).map((category) => (
+            <span class="text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-md">
+              {category}
+            </span>
+          ))}
+        </div>
+      </div>
 
-        <!-- 统计信息 -->
-        <div class="flex justify-center items-center gap-8 mt-1">
-          <!-- 日期 -->
-          <div class="flex items-center">
-            <svg class="h-3.5 w-3.5 mr-1.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>{displayDate}</span>
-          </div>
-
-          <!-- 浏览量 -->
-          <div class="flex items-center">
-            <svg class="h-3.5 w-3.5 mr-1.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span>{workflow.visitors || 0}</span>
-          </div>
-
-          <!-- 下载量 -->
-          <div class="flex items-center">
-            <svg class="h-3.5 w-3.5 mr-1.5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            <span>{workflow.downloads || 0}</span>
-          </div>
+      <!-- Stats -->
+      <div class="flex items-center gap-4 pt-4 border-t border-gray-50 dark:border-gray-700 text-[11px] text-gray-400 font-medium">
+        <div class="flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          <span>{displayDate}</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+          <span>{workflow.visitors || 0}</span>
+        </div>
+        <div class="flex items-center gap-1 ml-auto">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          <span>{workflow.likes || 0}</span>
         </div>
       </div>
     </div>

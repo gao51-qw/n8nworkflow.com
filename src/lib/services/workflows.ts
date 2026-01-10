@@ -5,7 +5,8 @@
 
 import type { Workflow, LoadMoreParams } from '../types/workflow';
 import { supabase, isSupabaseConfigured, handleSupabaseError, withRetry } from './supabase';
-import { getAllMockWorkflows, getMockWorkflowBySlug } from '../../data/mock-workflows';
+import { getAllMockWorkflows, getMockWorkflowBySlug, getMockWorkflowById } from '../../data/mock-workflows';
+import { mockWorkflowDetails } from '../../data/mock-workflow-details';
 import { formatShortDate } from '../utils/date';
 
 /**
