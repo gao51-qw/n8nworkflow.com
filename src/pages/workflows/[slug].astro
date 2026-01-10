@@ -6,10 +6,11 @@
 
 import MainLayout from '../../layouts/MainLayout.astro';
 import WorkflowDetail from '../../components/workflow/WorkflowDetail.astro';
+import WorkflowDetailedView from '../../components/workflow/WorkflowDetailedView.astro';
 import WorkflowMeta from '../../components/workflow/WorkflowMeta.astro';
 import RelatedWorkflows from '../../components/workflow/RelatedWorkflows.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
-import { getWorkflows, getWorkflowBySlug } from '../../lib/services/workflows';
+import { getWorkflows, getWorkflowBySlug, getWorkflowDetailedById } from '../../lib/services/workflows';
 
 // 生成静态路径
 export async function getStaticPaths() {
@@ -26,7 +27,21 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const { workflow } = Astro.props;
+let { workflow } = Astro.props;
+
+// 获取详细工作流信息（含结构化内容）
+let workflowDetailed = workflow;
+try {
+  if (workflow.id) {
+    const detailed = await getWorkflowDetailedById(workflow.id);
+    if (detailed) {
+      workflowDetailed = detailed;
+    }
+  }
+} catch (error) {
+  console.error('Error fetching detailed workflow:', error);
+  // 降级到基础工作流信息
+}
 
 // 获取相关工作流（同分类或同作者）
 let relatedWorkflows = [];
@@ -65,109 +80,120 @@ const breadcrumbItems = [
 ---
 
 <MainLayout {...seoConfig}>
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Breadcrumb -->
-    <Breadcrumb items={breadcrumbItems} />
+  <div class="w-full bg-gradient-to-b from-gray-50 via-transparent to-transparent dark:from-gray-900 dark:via-transparent dark:to-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Breadcrumb -->
+      <Breadcrumb items={breadcrumbItems} />
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Main Column -->
-      <div class="lg:col-span-2">
-        <WorkflowDetail workflow={workflow} />
+      <!-- Main Content Grid (8-4 layout for better balance) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+        <!-- Main Column -->
+        <div class="lg:col-span-8">
+         <!-- 使用新的 WorkflowDetailedView 如果有详情内容 -->
+         {workflowDetailed.overview ||
+ workflowDetailed.logicalBlocks ||
+ workflowDetailed.nodeDetails ? (
+           <WorkflowDetailedView workflow={workflowDetailed} />
+         ) : (
+           <>
+             <WorkflowDetail workflow={workflow} />
+ 
+             <!-- n8n Demo Component Placeholder -->
+             {workflow.sourceUrl && (
+               <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                 <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+                   Interactive Workflow Preview
+                 </h2>
+                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 text-center">
+                   <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                   </svg>
+                   <p class="text-gray-600 dark:text-gray-400 mb-4">
+                     Interactive workflow preview will be displayed here using the n8n-demo-component.
+                   </p>
+                   <p class="text-sm text-gray-500 dark:text-gray-500">
+                     Component integration: <code class="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded">@n8n_io/n8n-demo-component</code>
+                   </p>
+                 </div>
+               </div>
+             )}
+ 
+             <!-- Additional Information -->
+             <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+               <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
+                 About This Workflow
+               </h2>
+               <div class="prose dark:prose-invert max-w-none">
+                 <p class="text-gray-600 dark:text-gray-300">
+                   {workflow.description}
+                 </p>
+                 {workflow.nodes && (
+                   <div class="mt-4">
+                     <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Workflow Details</h3>
+                     <ul class="text-gray-600 dark:text-gray-300">
+                       <li>Number of nodes: <strong>{workflow.nodes}</strong></li>
+                       <li>Complexity level: <strong class="capitalize">{workflow.complexityLevel}</strong></li>
+                       {workflow.version && <li>Compatible with n8n version: <strong>{workflow.version}</strong></li>}
+                     </ul>
+                   </div>
+                 )}
+               </div>
+             </div>
+           </>
+         )}
+       </div>
 
-        <!-- n8n Demo Component Placeholder -->
-        {workflow.sourceUrl && (
-          <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-              Interactive Workflow Preview
-            </h2>
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 text-center">
-              <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-              </svg>
-              <p class="text-gray-600 dark:text-gray-400 mb-4">
-                Interactive workflow preview will be displayed here using the n8n-demo-component.
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-500">
-                Component integration: <code class="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded">@n8n_io/n8n-demo-component</code>
-              </p>
-            </div>
-          </div>
-        )}
+       <!-- Sidebar -->
+       <div class="lg:col-span-4">
+         <div class="sticky top-8 space-y-6">
+           <WorkflowMeta workflow={workflow} />
 
-        <!-- Additional Information -->
-        <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-            About This Workflow
-          </h2>
-          <div class="prose dark:prose-invert max-w-none">
-            <p class="text-gray-600 dark:text-gray-300">
-              {workflow.description}
-            </p>
-            {workflow.nodes && (
-              <div class="mt-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Workflow Details</h3>
-                <ul class="text-gray-600 dark:text-gray-300">
-                  <li>Number of nodes: <strong>{workflow.nodes}</strong></li>
-                  <li>Complexity level: <strong class="capitalize">{workflow.complexityLevel}</strong></li>
-                  {workflow.version && <li>Compatible with n8n version: <strong>{workflow.version}</strong></li>}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+           <!-- Quick Actions -->
+           <div class="bg-gradient-to-br from-amber-50 to-amber-50/50 dark:from-gray-800 dark:to-gray-900 rounded-lg p-6 border border-amber-200 dark:border-gray-700">
+             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+               <span class="text-lg">⚡</span> 快速操作
+             </h3>
+             <div class="space-y-2">
+               <a
+                 href={`/categories/${workflow.categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || ''}`}
+                 class="block w-full px-4 py-2 text-sm font-medium text-center text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+               >
+                 查看类似工作流
+               </a>
+               <a
+                 href={`/authors/${workflow.author.slug}`}
+                 class="block w-full px-4 py-2 text-sm font-medium text-center text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+               >
+                 更多来自 {workflow.author.name}
+               </a>
+             </div>
+           </div>
 
-      <!-- Sidebar -->
-      <div class="lg:col-span-1">
-        <div class="sticky top-8 space-y-6">
-          <WorkflowMeta workflow={workflow} />
+           <!-- Help Section -->
+           <div class="bg-gradient-to-br from-blue-50 to-blue-50/50 dark:from-gray-800 dark:to-gray-900 rounded-lg p-6 border border-blue-200 dark:border-gray-700">
+             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+               <span class="text-lg">💬</span> 需要帮助?
+             </h3>
+             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+               加入 n8n 社区获得支持和讨论。
+             </p>
+             <a
+               href="https://community.n8n.io"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-md hover:from-primary-700 hover:to-primary-800 transition-all"
+             >
+               访问社区论坛
+             </a>
+           </div>
+         </div>
+       </div>
+     </div>
 
-          <!-- Quick Actions -->
-          <div class="bg-primary-50 dark:bg-gray-800 rounded-lg p-6 border border-primary-200 dark:border-gray-700">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3">
-              Quick Actions
-            </h3>
-            <div class="space-y-2">
-              <a
-                href={`/categories/${workflow.categories?.[0]?.toLowerCase().replace(/\s+/g, '-') || ''}`}
-                class="block w-full px-4 py-2 text-sm font-medium text-center text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-              >
-                View Similar Workflows
-              </a>
-              <a
-                href={`/authors/${workflow.author.slug}`}
-                class="block w-full px-4 py-2 text-sm font-medium text-center text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-              >
-                More by {workflow.author.name}
-              </a>
-            </div>
-          </div>
-
-          <!-- Help Section -->
-          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-3">
-              Need Help?
-            </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Join the n8n community for support and discussions.
-            </p>
-            <a
-              href="https://community.n8n.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-primary-600 rounded-md hover:bg-primary-700 transition-colors"
-            >
-              Visit Community Forum
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Related Workflows -->
-    {relatedWorkflows.length > 0 && (
-      <RelatedWorkflows workflows={relatedWorkflows} />
-    )}
-  </div>
+     <!-- Related Workflows -->
+     {relatedWorkflows.length > 0 && (
+       <RelatedWorkflows workflows={relatedWorkflows} />
+     )}
+   </div>
+ </div>
 </MainLayout>

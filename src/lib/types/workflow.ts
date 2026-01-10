@@ -83,6 +83,59 @@ export interface Workflow {
 }
 
 /**
+ * 逻辑块定义 - 用于详情页展示
+ */
+export interface LogicalBlock {
+  id: string;
+  order: number;
+  title: string;
+  description: string;
+  blockType?: 'trigger' | 'action' | 'condition';
+}
+
+/**
+ * 节点详细信息 - 用于 Block-by-Block Analysis
+ */
+export interface NodeDetail {
+  name: string;
+  type: string;
+  role: string;
+  config?: Record<string, any>;
+  connections?: string[];
+  edgeCases?: string[];
+  configDescription?: string;
+  failureHandling?: string;
+}
+
+/**
+ * 工作流概览 - 用于详情页概览部分
+ */
+export interface WorkflowOverview {
+  title: string;
+  workflowName: string;
+  description: string;
+  features?: string[];
+  useCases?: string[];
+}
+
+/**
+ * 扩展的工作流详细信息 (用于详情页)
+ */
+export interface WorkflowDetailed extends Workflow {
+  // 文档内容
+  disclaimer?: string; // 免责声明
+  overview?: WorkflowOverview;
+  logicalBlocks?: LogicalBlock[];
+  nodeDetails?: NodeDetail[];
+
+  // 内容管理
+  updatedContentAt?: string; // 内容最后更新时间
+
+  // 扩展字段
+  relatedWorkflows?: number[]; // 相关工作流ID数组
+}
+
+/**
  * API 响应 - 加载更多工作流
  */
 export interface LoadMoreResponse {

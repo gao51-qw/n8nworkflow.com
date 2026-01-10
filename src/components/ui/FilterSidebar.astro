@@ -1,0 +1,223 @@
+---
+import { initFilterSidebar } from '../../scripts/filter-sidebar';
+
+/**
+ * FilterSidebar 组件
+ * 路径: src/components/ui/FilterSidebar.astro
+ *
+ * 用途: 展示工作流筛选面板（时间段、价格、复杂度、分类、排序）
+ * 优先级: P0
+ *
+ * Props 接口:
+ * - currentFilters?: 当前活跃的筛选条件
+ * - filterCounts?: 各筛选选项的计数
+ *
+ * 特性:
+ * - 响应式设计：Desktop固定侧边栏，Mobile底部Sheet
+ * - 实时计数显示
+ * - 可折叠区间
+ * - 多选分类支持
+ * - 排序下拉菜单
+ *
+ * 交互:
+ * - 选择筛选条件时更新URL参数
+ * - 同步调用filter-counts API获取实时计数
+ * - 禁用计数为0的选项
+ */
+
+interface Props {
+  currentFilters?: {
+    timePeriod?: string | null;
+    category?: string[];
+    complexity?: string | null;
+    price?: 'all' | 'free' | 'paid';
+    sortBy?: string;
+  };
+  filterCounts?: {
+    timePeriods: Record<string, number>;
+    categories: Record<string, number>;
+    complexities: Record<string, number>;
+    price: Record<string, number>;
+  };
+}
+
+const {
+  currentFilters = {},
+  filterCounts = {
+    timePeriods: { all: 7947, '7days': 8, month: 374, '6months': 4508, year: 6758 },
+    categories: { 'multimodal-ai': 2270, ai: 1600, 'ai-summarization': 1088 },
+    complexities: { all: 7947, beginner: 500, intermediate: 2835, advanced: 4602 },
+    price: { all: 7947, free: 6898, paid: 1049 },
+  },
+} = Astro.props;
+---
+
+<!--
+  筛选面板容器
+  在 Desktop (lg) 显示为固定左侧侧边栏 (250px)
+  在 Tablet (md) 以上显示为隐藏,通过汉堡菜单触发
+  在 Mobile (<md) 显示为底部 Sheet
+-->
+<aside
+  class="filter-sidebar hidden lg:block"
+>
+  <!-- 筛选面板标题 -->
+  <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-6">筛选</h2>
+
+    <!-- 时间段筛选 -->
+    <div class="filter-group">
+      <h3 class="filter-group-title">
+        <span>📅</span>
+        <span>时间段</span>
+      </h3>
+      <div class="filter-options">
+        {
+          Object.entries(filterCounts.timePeriods).map(([period, count]) => (
+            <label class="filter-option">
+              <input
+                type="checkbox"
+                value={period}
+                checked={currentFilters.timePeriod === period}
+                class="filter-checkbox"
+                data-filter="timePeriod"
+              />
+              <span class="filter-label">
+                {period === 'all' ? '全部' : period === '7days' ? '最近7天' : period === 'month' ? '最近一月' : '最近6月'}
+              </span>
+              <span class="filter-count">({count})</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- 价格筛选 -->
+    <div class="filter-group">
+      <h3 class="filter-group-title">
+        <span>💰</span>
+        <span>价格</span>
+      </h3>
+      <div class="filter-options">
+        {
+          Object.entries(filterCounts.price).map(([priceType, count]) => (
+            <label class="filter-option">
+              <input
+                type="checkbox"
+                value={priceType}
+                checked={currentFilters.price === priceType}
+                class="filter-checkbox"
+                data-filter="price"
+              />
+              <span class="filter-label">
+                {priceType === 'all' ? '全部' : priceType === 'free' ? '免费' : '付费'}
+              </span>
+              <span class="filter-count">({count})</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- 复杂度筛选 -->
+    <div class="filter-group">
+      <h3 class="filter-group-title">
+        <span>🎯</span>
+        <span>难度</span>
+      </h3>
+      <div class="filter-options">
+        {
+          Object.entries(filterCounts.complexities).map(([complexity, count]) => (
+            <label class="filter-option">
+              <input
+                type="checkbox"
+                value={complexity}
+                checked={currentFilters.complexity === complexity}
+                class="filter-checkbox"
+                data-filter="complexity"
+              />
+              <span class="filter-label">
+                {complexity === 'all' ? '全部' : complexity === 'beginner' ? '初级' : complexity === 'intermediate' ? '中级' : '高级'}
+              </span>
+              <span class="filter-count">({count})</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- 排序下拉菜单 -->
+    <div class="filter-group">
+      <h3 class="filter-group-title">
+        <span>📊</span>
+        <span>排序</span>
+      </h3>
+      <select
+        class="filter-select"
+        data-filter="sortBy"
+      >
+        <option value="date">最新发布</option>
+        <option value="downloads">下载次数</option>
+        <option value="views">浏览次数</option>
+        <option value="likes">点赞次数</option>
+      </select>
+    </div>
+
+    <!-- 分类列表（带滚动） -->
+    <div class="filter-group">
+      <h3 class="filter-group-title">
+        <span>📁</span>
+        <span>分类</span>
+      </h3>
+      <div class="filter-options max-h-48 overflow-y-auto pr-2">
+        {
+          Object.entries(filterCounts.categories).map(([category, count]) => (
+            <label class="filter-option">
+              <input
+                type="checkbox"
+                value={category}
+                checked={currentFilters.category?.includes(category) || false}
+                class="filter-checkbox"
+                data-filter="category"
+              />
+              <span class="filter-label truncate">
+                {category}
+              </span>
+              <span class="filter-count">({count})</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- 重置筛选按钮 -->
+    <button
+      class="reset-filters-btn mt-6"
+      data-action="reset-filters"
+    >
+      重置筛选
+    </button>
+  </div>
+</aside>
+
+<!-- Mobile 版本: 底部 Sheet 触发按钮 -->
+<button
+  class="mobile-filter-toggle"
+  data-action="toggle-mobile-filters"
+  aria-label="打开筛选面板"
+>
+  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+    />
+  </svg>
+</button>
+
+<script>
+  import { initFilterSidebar } from '../../scripts/filter-sidebar';
+  
+  // 初始化筛选侧边栏交互
+  initFilterSidebar();
+</script>

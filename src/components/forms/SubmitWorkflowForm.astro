@@ -1,0 +1,232 @@
+---
+/**
+ * SubmitWorkflowForm 组件
+ * 路径: src/components/forms/SubmitWorkflowForm.astro
+ * 
+ * 用途: 用户工作流提交表单
+ * 优先级: P1
+ * 
+ * Props 接口:
+ * - categories: string[] - 可用的分类选项
+ * 
+ * 表单字段:
+ * - Workflow URL (必需)
+ * - Title (必需, 3-100字符)
+ * - Description (必需, 20-2000字符)
+ * - Categories (必需, 多选)
+ * - Complexity (可选)
+ * - Submitter Name (可选)
+ * - Submitter Email (必需)
+ * 
+ * 特性:
+ * - 实时表单验证
+ * - 字符计数反馈
+ * - URL访问性检查
+ * - 提交状态显示
+ */
+
+interface Props {
+  categories?: string[];
+}
+
+const { categories = ['AI', 'Automation', 'Data Processing', 'Integration', 'Notification'] } = Astro.props;
+---
+
+<form id="submit-workflow-form" class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8 space-y-6">
+  <!-- 表单标题 -->
+  <div>
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">提交您的工作流</h2>
+    <p class="text-gray-600 dark:text-gray-400">分享您创建的工作流，让更多人了解和使用它</p>
+  </div>
+
+  <!-- Workflow URL 字段 -->
+  <div>
+    <label for="url" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      工作流 URL <span class="text-red-600">*</span>
+    </label>
+    <input
+      type="url"
+      id="url"
+      name="url"
+      placeholder="https://n8n.io/workflows/..."
+      required
+      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+    />
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+      提供可访问的工作流 URL（例如：n8n.io 导出链接）
+    </p>
+  </div>
+
+  <!-- Title 字段 -->
+  <div>
+    <label for="title" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      工作流标题 <span class="text-red-600">*</span>
+    </label>
+    <div class="relative">
+      <input
+        type="text"
+        id="title"
+        name="title"
+        placeholder="输入工作流标题"
+        minlength="3"
+        maxlength="100"
+        required
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+      />
+      <span class="absolute right-3 top-2.5 text-xs text-gray-500 dark:text-gray-400">
+        <span id="title-count">0</span>/100
+      </span>
+    </div>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">最少 3 个字符，最多 100 个字符</p>
+  </div>
+
+  <!-- Description 字段 -->
+  <div>
+    <label for="description" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      工作流描述 <span class="text-red-600">*</span>
+    </label>
+    <div class="relative">
+      <textarea
+        id="description"
+        name="description"
+        placeholder="详细描述此工作流的功能和用途..."
+        minlength="20"
+        maxlength="2000"
+        rows="5"
+        required
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+      ></textarea>
+      <span class="absolute right-3 bottom-2.5 text-xs text-gray-500 dark:text-gray-400">
+        <span id="description-count">0</span>/2000
+      </span>
+    </div>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">20-2000 个字符</p>
+  </div>
+
+  <!-- Categories 字段 -->
+  <div>
+    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      分类 <span class="text-red-600">*</span>
+    </label>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {
+        categories.map((category) => (
+          <label class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="categories"
+              value={category.toLowerCase()}
+              required
+              class="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">{category}</span>
+          </label>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Complexity 字段 -->
+  <div>
+    <label for="complexity" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      难度级别 <span class="text-gray-500 text-xs">(可选)</span>
+    </label>
+    <select
+      id="complexity"
+      name="complexity"
+      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+    >
+      <option value="">选择难度级别</option>
+      <option value="beginner">初级</option>
+      <option value="intermediate">中级</option>
+      <option value="advanced">高级</option>
+    </select>
+  </div>
+
+  <!-- Submitter Name 字段 -->
+  <div>
+    <label for="name" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      您的名字 <span class="text-gray-500 text-xs">(可选)</span>
+    </label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      placeholder="您的名字或组织名称"
+      maxlength="100"
+      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+    />
+  </div>
+
+  <!-- Submitter Email 字段 -->
+  <div>
+    <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      联系邮箱 <span class="text-red-600">*</span>
+    </label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      placeholder="your@email.com"
+      required
+      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+    />
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">我们会用此邮箱与您联系审核结果</p>
+  </div>
+
+  <!-- 同意条款 -->
+  <label class="flex items-start gap-2">
+    <input type="checkbox" name="terms" required class="w-4 h-4 mt-1 rounded" />
+    <span class="text-xs text-gray-700 dark:text-gray-300">
+      我同意将此工作流以
+      <a href="#" class="text-primary-600 hover:text-primary-700 dark:text-primary-400">MIT 许可证</a>
+      发布，并允许他人自由使用和修改
+    </span>
+  </label>
+
+  <!-- 提交按钮 -->
+  <button
+    type="submit"
+    class="w-full px-4 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    提交工作流
+  </button>
+
+  <!-- 消息提示 -->
+  <div id="form-message" class="hidden p-4 rounded-lg"></div>
+</form>
+
+<script>
+  // TODO: 实现表单验证和提交逻辑
+  // 1. 实时字符计数反馈
+  // 2. URL可访问性验证
+  // 3. 表单字段验证
+  // 4. 提交到 /api/submit-workflow
+  // 5. 显示成功/错误提示
+
+  const form = document.getElementById('submit-workflow-form') as HTMLFormElement;
+  const titleInput = document.getElementById('title') as HTMLInputElement;
+  const descriptionInput = document.getElementById('description') as HTMLTextAreaElement;
+  const titleCount = document.getElementById('title-count') as HTMLSpanElement;
+  const descriptionCount = document.getElementById('description-count') as HTMLSpanElement;
+
+  if (titleInput && titleCount) {
+    titleInput.addEventListener('input', (e) => {
+      titleCount.textContent = (e.target as HTMLInputElement).value.length.toString();
+    });
+  }
+
+  if (descriptionInput && descriptionCount) {
+    descriptionInput.addEventListener('input', (e) => {
+      descriptionCount.textContent = (e.target as HTMLTextAreaElement).value.length.toString();
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', async (e: Event) => {
+      e.preventDefault();
+      console.log('Submit workflow form submitted');
+      // TODO: 实现表单提交逻辑
+    });
+  }
+</script>

@@ -1,0 +1,136 @@
+---
+/**
+ * NewsletterSubscribe 组件
+ * 路径: src/components/common/NewsletterSubscribe.astro
+ * 
+ * 用途: Newsletter 订阅表单（支持多种布局变体）
+ * 优先级: P1
+ * 
+ * Props 接口:
+ * - variant?: 'hero' | 'footer' | 'sidebar'
+ * 
+ * 特性:
+ * - 实时邮箱验证
+ * - 频率选择
+ * - 分类选择（可选）
+ * - 成功/错误提示
+ * - 隐私政策链接
+ */
+
+interface Props {
+  variant?: 'hero' | 'footer' | 'sidebar';
+}
+
+const { variant = 'hero' } = Astro.props;
+
+const containerClasses = {
+  hero: 'bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900 dark:to-primary-800 p-8 rounded-lg max-w-md mx-auto',
+  footer: 'bg-gray-100 dark:bg-gray-800 p-6 rounded',
+  sidebar: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-lg',
+};
+---
+
+<div class={containerClasses[variant]}>
+  <!-- 标题 -->
+  <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+    {variant === 'hero' ? '💬 订阅我们的简报' : '📬 订阅更新'}
+  </h2>
+  <p class="text-sm text-gray-700 dark:text-gray-300 mb-6">
+    {variant === 'hero'
+      ? '获取每周最新的 N8N 工作流和自动化技巧'
+      : '及时了解最新的工作流和社区动态'}
+  </p>
+
+  <!-- 订阅表单 -->
+  <form id="newsletter-form" class="space-y-4">
+    <!-- 邮箱输入 -->
+    <div>
+      <input
+        type="email"
+        name="email"
+        placeholder="your@email.com"
+        required
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+      />
+      <p class="text-xs text-red-600 dark:text-red-400 mt-1 hidden" id="email-error"></p>
+    </div>
+
+    <!-- 频率选择 -->
+    <div>
+      <select
+        name="frequency"
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+      >
+        <option value="weekly">每周</option>
+        <option value="daily">每天</option>
+        <option value="monthly">每月</option>
+      </select>
+    </div>
+
+    <!-- 分类选择 (仅在 hero 变体显示) -->
+    {
+      variant === 'hero' && (
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-gray-900 dark:text-white">感兴趣的分类</label>
+          <div class="grid grid-cols-2 gap-2">
+            {['AI', 'Automation', 'Data'].map((cat) => (
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="categories"
+                  value={cat.toLowerCase()}
+                  class="w-4 h-4 rounded"
+                />
+                <span class="text-xs text-gray-700 dark:text-gray-300">{cat}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    <!-- 同意条款 -->
+    <label class="flex items-start gap-2">
+      <input type="checkbox" name="terms" required class="w-4 h-4 mt-0.5 rounded" />
+      <span class="text-xs text-gray-700 dark:text-gray-300">
+        我同意隐私政策并接收邮件更新
+      </span>
+    </label>
+
+    <!-- 提交按钮 -->
+    <button
+      type="submit"
+      class="w-full px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      订阅
+    </button>
+  </form>
+
+  <!-- 成功/错误提示 -->
+  <div id="form-message" class="mt-4 p-3 rounded text-sm hidden"></div>
+
+  <!-- 隐私政策链接 -->
+  <p class="text-xs text-gray-600 dark:text-gray-400 mt-4 text-center">
+    <a href="/privacy" class="text-primary-600 hover:text-primary-700 dark:text-primary-400">隐私政策</a>
+  </p>
+</div>
+
+<script>
+  // TODO: 实现 Newsletter 订阅表单逻辑
+  // 1. 监听表单提交
+  // 2. 前端邮箱验证
+  // 3. 发送到 /api/newsletter-subscribe
+  // 4. 显示成功/错误提示
+  // 5. 重置表单
+
+  const form = document.getElementById('newsletter-form') as HTMLFormElement;
+  const messageDiv = document.getElementById('form-message') as HTMLDivElement;
+
+  if (form) {
+    form.addEventListener('submit', async (e: Event) => {
+      e.preventDefault();
+      console.log('Newsletter form submitted');
+      // TODO: 实现表单提交逻辑
+    });
+  }
+</script>

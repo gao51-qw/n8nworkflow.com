@@ -6,9 +6,10 @@
 
 import MainLayout from '../layouts/MainLayout.astro';
 import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
+import FilterSidebar from '../components/ui/FilterSidebar.astro';
 import Pagination from '../components/ui/Pagination.astro';
 import SearchBar from '../components/ui/SearchBar.astro';
-import { getWorkflows } from '../lib/services/workflows';
+import { getWorkflows, getFilterCountsV2 } from '../lib/services/workflows';
 import { getStats } from '../lib/services/stats';
 import { generateHeroContent } from '../lib/services/content-generator';
 
@@ -31,6 +32,20 @@ try {
   totalCount = result.total;
 } catch (error) {
   console.error('Error fetching workflows:', error);
+}
+
+// 获取筛选计数数据
+let filterCounts = {
+  timePeriods: { all: 7947, '7days': 8, month: 374, '6months': 4508, year: 6758 },
+  categories: { 'multimodal-ai': 2270, ai: 1600 },
+  complexities: { all: 7947, beginner: 500, intermediate: 2835, advanced: 4602 },
+  price: { all: 7947, free: 6898, paid: 1049 },
+};
+
+try {
+  filterCounts = await getFilterCountsV2();
+} catch (error) {
+  console.error('Error fetching filter counts:', error);
 }
 
 // 获取统计数据
@@ -138,48 +153,58 @@ const totalPages = Math.ceil(totalCount / pageSize);
     </div>
   </section>
 
-  <!-- Workflows Section -->
+  <!-- Workflows Section with Sidebar -->
   <section class="py-12 md:py-16">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
-          Latest Workflows
-        </h2>
-        <a
-          href="/recent"
-          class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
-        >
-          View all →
-        </a>
-      </div>
-
-      <!-- 工作流网格 -->
-      {workflows.length > 0 ? (
-        <>
-          <WorkflowGrid workflows={workflows} columns={3} />
-
-          <!-- 分页 -->
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              baseUrl="/"
-            />
-          )}
-        </>
-      ) : (
-        <div class="text-center py-12">
-          <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            No workflows available
-          </h3>
-          <p class="text-gray-600 dark:text-gray-400">
-            Workflows will appear here once they're added to the platform.
-          </p>
+      <div class="flex gap-8">
+        <!-- FilterSidebar -->
+        <div class="hidden lg:block lg:w-64">
+          <FilterSidebar filterCounts={filterCounts} />
         </div>
-      )}
+
+        <!-- Main Content -->
+        <div class="flex-1">
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+              Latest Workflows
+            </h2>
+            <a
+              href="/recent"
+              class="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+            >
+              View all →
+            </a>
+          </div>
+
+          <!-- 工作流网格 -->
+          {workflows.length > 0 ? (
+            <>
+              <WorkflowGrid workflows={workflows} columns={3} />
+
+              <!-- 分页 -->
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  baseUrl="/"
+                />
+              )}
+            </>
+          ) : (
+            <div class="text-center py-12">
+              <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                No workflows available
+              </h3>
+              <p class="text-gray-600 dark:text-gray-400">
+                Workflows will appear here once they're added to the platform.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   </section>
 
