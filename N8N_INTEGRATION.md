@@ -1,4 +1,13 @@
-# N8N API 集成指南
+# N8N 集成指南
+
+本项目支持两种方式集成 n8n 工作流数据：
+
+1.  **GitHub Workflow Hub (推荐)**: 通过 n8n 抓取数据并推送到 GitHub 仓库，网站通过 GitHub API 获取。详见 [GITHUB_HUB_INTEGRATION.md](./GITHUB_HUB_INTEGRATION.md)。
+2.  **N8N 官方 API**: 直接从运行中的 n8n 实例获取数据。
+
+---
+
+## N8N 官方 API 集成
 
 本文档说明如何在 N8N Workflows 项目中集成并使用 N8N 官方 API 来获取 demo 工作流。
 

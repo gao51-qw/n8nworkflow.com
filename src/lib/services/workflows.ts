@@ -8,6 +8,7 @@ import { supabase, isSupabaseConfigured, handleSupabaseError, withRetry } from '
 import { getAllMockWorkflows, getMockWorkflowBySlug, getMockWorkflowById } from '../../data/mock-workflows';
 import { mockWorkflowDetails } from '../../data/mock-workflow-details';
 import { formatShortDate } from '../utils/date';
+import { fetchWorkflowsFromGitHub } from './n8n';
 
 /**
  * 获取工作流列表（支持分页、排序、筛选）
@@ -27,6 +28,54 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
     time,
     type,
   } = params;
+
+  // 优先尝试从 GitHub 获取数据
+  try {
+    const githubWorkflows = await fetchWorkflowsFromGitHub();
+    if (githubWorkflows.length > 0) {
+      let filtered = githubWorkflows;
+
+      // 分类筛选
+      if (category) {
+        filtered = filtered.filter((w) => w.categories.includes(category));
+      }
+
+      // 复杂度筛选
+      if (complexity) {
+        filtered = filtered.filter((w) => w.complexityLevel === complexity);
+      }
+
+      // 价格筛选
+      if (price === 'free') {
+        filtered = filtered.filter((w) => w.price === 0);
+      } else if (price === 'paid') {
+        filtered = filtered.filter((w) => w.price > 0);
+      }
+
+      // 排序
+      filtered.sort((a, b) => {
+        switch (sort) {
+          case 'date-desc':
+            return new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime();
+          case 'date-asc':
+            return new Date(a.publishedAt || a.createdAt).getTime() - new Date(b.publishedAt || b.createdAt).getTime();
+          case 'visitors-desc':
+            return (b.visitors || 0) - (a.visitors || 0);
+          case 'downloads-desc':
+            return (b.downloads || 0) - (a.downloads || 0);
+          default:
+            return 0;
+        }
+      });
+
+      return {
+        workflows: filtered.slice(offset, offset + limit),
+        total: filtered.length,
+      };
+    }
+  } catch (error) {
+    console.error('Failed to fetch workflows from GitHub, falling back to existing logic:', error);
+  }
 
   // 如果未配置 Supabase，使用模拟数据
   if (!isSupabaseConfigured()) {

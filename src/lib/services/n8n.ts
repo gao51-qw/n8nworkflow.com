@@ -218,3 +218,63 @@ export async function mergeWorkflows(
     return supabaseWorkflows;
   }
 }
+
+/**
+ * 从 GitHub 获取工作流数据
+ */
+export async function fetchWorkflowsFromGitHub(): Promise<Workflow[]> {
+  const token = import.meta.env.GITHUB_TOKEN;
+  const owner = import.meta.env.GITHUB_OWNER;
+  const repo = import.meta.env.GITHUB_REPO;
+
+  if (!token || !owner || !repo) {
+    console.warn('GitHub 配置不完整。请设置 GITHUB_TOKEN, GITHUB_OWNER 和 GITHUB_REPO 环境变量。');
+    return [];
+  }
+
+  try {
+    // 1. 获取 workflows/ 目录下的内容
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/workflows`, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch workflows directory: ${response.status} ${response.statusText}`);
+      return [];
+    }
+
+    const contents = await response.json();
+    const directories = contents.filter((item: any) => item.type === 'dir');
+
+    const workflows: Workflow[] = [];
+
+    // 2. 遍历每个目录获取 metadata.json
+    for (const dir of directories) {
+      try {
+        const metaResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/workflows/${dir.name}/metadata.json`, {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3.raw',
+          },
+        });
+
+        if (metaResponse.ok) {
+          const metadata = await metaResponse.json();
+          // 确保 metadata 符合 Workflow 接口
+          // 如果 metadata.json 中的格式与 Workflow 接口略有不同，可以在这里进行转换
+          workflows.push(metadata as Workflow);
+        }
+      } catch (err) {
+        console.error(`Error fetching metadata for ${dir.name}:`, err);
+      }
+    }
+
+    return workflows;
+  } catch (error) {
+    console.error('Error fetching workflows from GitHub:', error);
+    return [];
+  }
+}
