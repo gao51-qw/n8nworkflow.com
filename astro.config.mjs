@@ -55,4 +55,10 @@ export default defineConfig({
       wrap: true,
     },
   },
+
+  // 内容集合配置
+  content: {
+    // 启用内容集合
+    enabled: true,
+  },
 });

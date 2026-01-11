@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # Supabase Database for testing
+  supabase-db:
+    image: supabase/postgres:15.1.0.73
+    container_name: supabase-test-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: test_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - supabase-test-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d test_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7.0-alpine
+    container_name: test-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-test-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Test application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: n8n-test-app
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: test
+      PUBLIC_SUPABASE_URL: http://supabase-db:5432
+      PUBLIC_SUPABASE_ANON_KEY: testpassword
+      PUBLIC_SITE_URL: http://localhost:3001
+      PUBLIC_GA_MEASUREMENT_ID: G-TEST123456
+      TEST_DB_URL: postgresql://postgres:testpassword@supabase-db:5432/test_db
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Playwright for E2E testing
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.57.0
+    container_name: test-playwright
+    depends_on:
+      - app
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PLAYWRIGHT_BASE_URL=http://app:3000
+    command: tail -f /dev/null
+
+volumes:
+  supabase-test-db-data:
+  redis-test-data:

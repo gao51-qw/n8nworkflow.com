@@ -1,0 +1,39 @@
+# Test Dockerfile for N8N Workflows
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+RUN apk add --no-cache \
+    git \
+    bash \
+    curl \
+    openssl \
+    postgresql-client \
+    && rm -rf /var/cache/apk/*
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install npm dependencies
+RUN npm ci
+
+# Copy source files
+COPY . .
+
+# Install Playwright browsers
+RUN npx playwright install --with-deps
+
+# Build the application
+RUN npm run build
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables
+ENV NODE_ENV=test
+ENV PORT=3000
+
+# Start the application
+CMD ["npm", "run", "dev"]
