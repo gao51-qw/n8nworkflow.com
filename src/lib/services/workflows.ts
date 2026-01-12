@@ -1,14 +1,17 @@
+import type { Workflow, LoadMoreParams } from '../types/workflow';
+import { supabase, isSupabaseConfigured, handleSupabaseError, withRetry } from './supabase';
+import { getAllMockWorkflows, getMockWorkflowBySlug, getMockWorkflowById } from '../../data/mock-workflows';
+import workflowsData from '../../data/workflows.json';
+import { mockWorkflowDetails } from '../../data/mock-workflow-details';
+import fs from 'node:fs';
+import path from 'node:path';
+import { formatShortDate } from '../utils/date';
+import { fetchWorkflowsFromGitHub } from './n8n';
+
 /**
  * 工作流数据服务
  * 提供工作流数据的获取和查询功能
  */
-
-import type { Workflow, LoadMoreParams } from '../types/workflow';
-import { supabase, isSupabaseConfigured, handleSupabaseError, withRetry } from './supabase';
-import { getAllMockWorkflows, getMockWorkflowBySlug, getMockWorkflowById } from '../../data/mock-workflows';
-import { mockWorkflowDetails } from '../../data/mock-workflow-details';
-import { formatShortDate } from '../utils/date';
-import { fetchWorkflowsFromGitHub } from './n8n';
 
 /**
  * 获取工作流列表（支持分页、排序、筛选）
@@ -29,7 +32,50 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
     type,
   } = params;
 
-  // 优先尝试从 GitHub 获取数据
+  // 优先尝试从本地 JSON 获取数据
+  if (workflowsData && Array.isArray(workflowsData) && workflowsData.length > 0) {
+    let filtered = (workflowsData as any[]).map(formatWorkflowData);
+
+    // 分类筛选
+    if (category) {
+      filtered = filtered.filter((w) => w.categories.includes(category));
+    }
+
+    // 复杂度筛选
+    if (complexity) {
+      filtered = filtered.filter((w) => w.complexityLevel === complexity);
+    }
+
+    // 价格筛选
+    if (price === 'free') {
+      filtered = filtered.filter((w) => w.price === 0);
+    } else if (price === 'paid') {
+      filtered = filtered.filter((w) => w.price > 0);
+    }
+
+    // 排序
+    filtered.sort((a, b) => {
+      switch (sort) {
+        case 'date-desc':
+          return new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime();
+        case 'date-asc':
+          return new Date(a.publishedAt || a.createdAt).getTime() - new Date(b.publishedAt || b.createdAt).getTime();
+        case 'visitors-desc':
+          return (b.visitors || 0) - (a.visitors || 0);
+        case 'downloads-desc':
+          return (b.downloads || 0) - (a.downloads || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return {
+      workflows: filtered.slice(offset, offset + limit),
+      total: filtered.length,
+    };
+  }
+
+  // 尝试从 GitHub 获取数据
   try {
     const githubWorkflows = await fetchWorkflowsFromGitHub();
     if (githubWorkflows.length > 0) {
@@ -192,6 +238,12 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
  * 根据 slug 获取单个工作流
  */
 export async function getWorkflowBySlug(slug: string): Promise<Workflow | null> {
+  // 优先尝试从本地 JSON 获取数据
+  if (workflowsData && Array.isArray(workflowsData)) {
+    const workflow = workflowsData.find((w) => w.slug === slug);
+    if (workflow) return formatWorkflowData(workflow);
+  }
+
   // 如果未配置 Supabase，使用模拟数据
   if (!isSupabaseConfigured()) {
     return getMockWorkflowBySlug(slug) || null;
@@ -732,6 +784,26 @@ export async function getWorkflowsByTimePeriod(
  * 4. 返回 WorkflowDetailed 对象
  */
 export async function getWorkflowDetailedById(workflowId: number): Promise<any> {
+  // 优先尝试从本地 JSON 文件获取详情
+  try {
+    // 获取基础信息以确保有最新的 featuredImage
+    const baseWorkflow = workflowsData?.find((w: any) => w.id === workflowId);
+
+    // 注意：在 Astro 服务端渲染时可以使用 fs
+    const detailPath = path.join(process.cwd(), `src/data/workflows/${workflowId}.json`);
+    if (fs.existsSync(detailPath)) {
+      const detailData = JSON.parse(fs.readFileSync(detailPath, 'utf-8'));
+      return {
+        ...detailData,
+        ...(baseWorkflow || {}),
+        // 确保优先使用 baseWorkflow 中的 featuredImage
+        featuredImage: baseWorkflow?.featuredImage || detailData.featuredImage
+      };
+    }
+  } catch (err) {
+    console.error(`Error reading local workflow detail for ${workflowId}:`, err);
+  }
+
   if (!isSupabaseConfigured()) {
     // 如果未配置 Supabase，返回模拟数据
     return {

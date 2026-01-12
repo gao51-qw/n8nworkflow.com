@@ -18,13 +18,20 @@
  * 布局: 2列（60%内容 + 40%侧边栏）
  */
 
-import type { WorkflowDetailed } from '../../lib/types/workflow';
+import type { WorkflowDetailed, Workflow } from '../../lib/types/workflow';
+import { Image } from 'astro:assets';
 
 interface Props {
   workflow: WorkflowDetailed;
+  relatedWorkflows?: Workflow[];
 }
 
-const { workflow } = Astro.props;
+const { workflow, relatedWorkflows = [] } = Astro.props;
+
+// 提取节点类型
+const nodeTypes = workflow.nodeDetails 
+  ? [...new Set(workflow.nodeDetails.map(node => node.type.toLowerCase()))].slice(0, 8)
+  : ['set', 'gmail', 'telegram', 'agent', 'google-gemini'];
 
 // 格式化日期
 const formatDate = (dateStr?: string) => {
@@ -62,20 +69,55 @@ const formatDate = (dateStr?: string) => {
     {
       workflow.overview && (
         <section id="overview" class="prose dark:prose-invert max-w-none">
-          <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-            {workflow.overview.description}
-          </p>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">1. Workflow Overview</h2>
+          
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Title:</h3>
+              <p class="text-gray-700 dark:text-gray-300">{workflow.title}</p>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Workflow Name (n8n):</h3>
+              <p class="text-gray-700 dark:text-gray-300">{workflow.overview.workflowName || workflow.title}</p>
+            </div>
+            
+            <div>
+              <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                {workflow.overview.description}
+              </p>
+            </div>
 
-          {workflow.overview.features && workflow.overview.features.length > 0 && (
-            <ul class="space-y-2 list-none pl-0">
-              {workflow.overview.features.map((feature) => (
-                <li class="flex items-start gap-3 text-gray-700 dark:text-gray-300">
-                  <span class="text-gray-400 mt-1">-</span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+            {workflow.overview.features && workflow.overview.features.length > 0 && (
+              <ul class="space-y-2 list-none pl-0">
+                {workflow.overview.features.map((feature) => (
+                  <li class="flex items-start gap-3 text-gray-700 dark:text-gray-300">
+                    <span class="text-gray-400 mt-1">-</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    <!-- Logical blocks 部分 -->
+    {
+      workflow.logicalBlocks && workflow.logicalBlocks.length > 0 && (
+        <section class="space-y-6">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Logical blocks</h2>
+          <div class="space-y-4">
+            {workflow.logicalBlocks.map((block, index) => (
+              <div class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl border border-gray-100 dark:border-gray-800">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  1.{index + 1} {block.title}
+                </h3>
+                <p class="text-gray-700 dark:text-gray-300">{block.description}</p>
+              </div>
+            ))}
+          </div>
         </section>
       )
     }
@@ -83,86 +125,48 @@ const formatDate = (dateStr?: string) => {
     <!-- 2. Block-by-Block Analysis 部分 -->
     {
       workflow.nodeDetails && workflow.nodeDetails.length > 0 && (
-        <section id="block-analysis" class="space-y-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <div class="flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center font-bold text-gray-900 dark:text-white">M</div>
-              <span class="font-bold text-gray-900 dark:text-white">Copy Markdown content to clipboard</span>
-            </div>
-            <button class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg text-sm font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
-              Copy Markdown
-            </button>
-          </div>
-
-          <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-12">
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-4">
-              {workflow.title}
-            </h2>
-
-            <div class="space-y-12">
-              <div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">1. Workflow Overview</h3>
-                <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {workflow.overview?.description}
-                </p>
-              </div>
-
-              {workflow.logicalBlocks && workflow.logicalBlocks.length > 0 && (
-                <div>
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">2. Workflow Structure</h3>
-                  <div class="space-y-4">
-                    {workflow.logicalBlocks.map((block) => (
-                      <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-800">
-                        <span class="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                          {block.order}
-                        </span>
-                        <div>
-                          <h4 class="font-bold text-gray-900 dark:text-white">{block.title}</h4>
-                          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{block.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">{workflow.logicalBlocks ? '3' : '2'}. Block-by-Block Analysis</h3>
-                <div class="space-y-8">
-                  {workflow.nodeDetails.map((node, index) => (
-                    <div class="space-y-4">
-                      <h4 class="text-lg font-bold text-gray-900 dark:text-white">
-                        2.{index + 1} {node.name}
-                      </h4>
-                      
-                      <div class="space-y-4 text-gray-700 dark:text-gray-300">
-                        <ul class="list-none pl-0 space-y-4">
-                          <li>
-                            <strong class="text-gray-900 dark:text-white">Overview:</strong> {node.role}
-                          </li>
-                          {node.type && (
-                            <li>
-                              <strong class="text-gray-900 dark:text-white">Nodes Involved:</strong>
-                              <ul class="list-disc pl-8 mt-2">
-                                <li>{node.type}</li>
-                              </ul>
-                            </li>
-                          )}
-                          {node.configDescription && (
-                            <li>
-                              <strong class="text-gray-900 dark:text-white">Node Details:</strong>
-                              <ul class="list-disc pl-8 mt-2">
-                                <li>{node.configDescription}</li>
-                              </ul>
-                            </li>
-                          )}
+        <section id="block-analysis" class="space-y-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">2. Block-by-Block Analysis</h2>
+          
+          <div class="space-y-8">
+            {workflow.nodeDetails.map((node, index) => (
+              <div class="space-y-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  Node: {node.name}
+                </h3>
+                
+                <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                  <ul class="list-none pl-0 space-y-4">
+                    <li>
+                      <strong class="text-gray-900 dark:text-white">Type / Role:</strong> {node.type} — {node.role}
+                    </li>
+                    {node.configDescription && (
+                      <li>
+                        <strong class="text-gray-900 dark:text-white">Config choices:</strong>
+                        <ul class="list-disc pl-8 mt-2">
+                          <li>{node.configDescription}</li>
                         </ul>
-                      </div>
-                    </div>
-                  ))}
+                      </li>
+                    )}
+                    {node.connections && node.connections.length > 0 && (
+                      <li>
+                        <strong class="text-gray-900 dark:text-white">Connections:</strong> {node.connections.join(' → ')}
+                      </li>
+                    )}
+                    {node.edgeCases && node.edgeCases.length > 0 && (
+                      <li>
+                        <strong class="text-gray-900 dark:text-white">Edge cases / failures:</strong>
+                        <ul class="list-disc pl-8 mt-2">
+                          {node.edgeCases.map((edgeCase) => (
+                            <li>{edgeCase}</li>
+                          ))}
+                        </ul>
+                      </li>
+                    )}
+                  </ul>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </section>
       )
@@ -176,7 +180,13 @@ const formatDate = (dateStr?: string) => {
       <div class="flex items-center gap-4 mb-6">
         <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-bold text-2xl overflow-hidden">
           {workflow.author.avatar ? (
-            <img src={workflow.author.avatar} alt={workflow.author.name} class="w-full h-full object-cover" />
+            <Image 
+              src={workflow.author.avatar} 
+              alt={workflow.author.name} 
+              width={64}
+              height={64}
+              class="w-full h-full object-cover" 
+            />
           ) : (
             workflow.author.name.charAt(0)
           )}
@@ -194,7 +204,7 @@ const formatDate = (dateStr?: string) => {
         <div>
           <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3">Nodes</h3>
           <div class="flex flex-wrap gap-2">
-            {['set', 'gmail', 'telegram', 'agent', 'google-gemini'].map(node => (
+            {nodeTypes.map(node => (
               <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full">
                 {node}
               </span>
@@ -272,14 +282,51 @@ const formatDate = (dateStr?: string) => {
       </div>
     </div>
 
+    <!-- 建议 Workflow -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Related Workflows</h3>
+      {relatedWorkflows.length > 0 ? (
+        <div class="space-y-4">
+          {relatedWorkflows.slice(0, 3).map((relatedWorkflow) => (
+            <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-950 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+                  {relatedWorkflow.featuredImage ? (
+                    <Image 
+                      src={relatedWorkflow.featuredImage} 
+                      alt={relatedWorkflow.title} 
+                      width={48}
+                      height={48}
+                      class="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <span class="text-gray-500 text-xs">No Image</span>
+                  )}
+                </div>
+                <div>
+                  <h4 class="font-bold text-gray-900 dark:text-white line-clamp-2">{relatedWorkflow.title}</h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{relatedWorkflow.description}</p>
+                </div>
+              </div>
+              <a href={`/workflows/${relatedWorkflow.slug}`} class="py-3 px-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-bold text-sm hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+                View
+              </a>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 text-center">No related workflows found.</p>
+      )}
+    </div>
+
     <!-- Hire CTA -->
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
       <div class="flex items-center gap-4 mb-4">
         <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden">
-          <img src="https://www.franckdunand.com/wp-content/uploads/2023/05/franck-dunand-avatar.png" alt="Franck Dunand" class="w-full h-full object-cover" />
+          <span class="text-2xl">👨‍💻</span>
         </div>
         <div>
-          <h3 class="font-bold text-gray-900 dark:text-white">Franck Dunand</h3>
+          <h3 class="font-bold text-gray-900 dark:text-white">Need Custom Automation?</h3>
           <p class="text-xs text-gray-500 dark:text-gray-400">N8N Automation Expert</p>
         </div>
       </div>

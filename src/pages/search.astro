@@ -20,7 +20,7 @@ const complexity = url.searchParams.get('complexity') || 'all';
 const price = url.searchParams.get('price') || 'all';
 
 // 获取分类用于筛选
-let categories = [];
+let categories: any[] = [];
 try {
   categories = await getCategories();
 } catch (error) {
@@ -183,15 +183,25 @@ const breadcrumbItems = [
   document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get('q');
+    const category = urlParams.get('category');
+    const complexity = urlParams.get('complexity');
+    const price = urlParams.get('price');
     
-    if (!query) return;
+    if (!query && !category && !complexity && !price) return;
 
     const resultsContainer = document.getElementById('search-results');
     if (!resultsContainer) return;
 
     try {
+      // 构建 API URL
+      const apiUrl = new URL('/api/search.json', window.location.origin);
+      if (query) apiUrl.searchParams.set('q', query);
+      if (category && category !== 'all') apiUrl.searchParams.set('category', category);
+      if (complexity && complexity !== 'all') apiUrl.searchParams.set('complexity', complexity);
+      if (price && price !== 'all') apiUrl.searchParams.set('price', price);
+
       // 调用搜索 API
-      const response = await fetch(`/api/search.json?q=${encodeURIComponent(query)}`);
+      const response = await fetch(apiUrl.toString());
       const data = await response.json();
 
       if (data.results && data.results.length > 0) {
@@ -201,11 +211,11 @@ const breadcrumbItems = [
             Found <strong class="text-gray-900 dark:text-white">${data.total}</strong> result${data.total !== 1 ? 's' : ''}
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${data.results.map((workflow: any) => `
+            ${data.results.map((workflow) => `
               <a href="/workflows/${workflow.slug}" class="group">
                 <div class="flex flex-col overflow-hidden rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-gray-800 dark:border-gray-700 h-full">
                   <div class="aspect-video bg-gray-100 dark:bg-gray-700 overflow-hidden relative">
-                    <img src="${workflow.thumbnail || '/placeholder-workflow.webp'}" alt="${workflow.title}" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    <img src="${workflow.featuredImage || workflow.thumbnail || '/placeholder-workflow.webp'}" alt="${workflow.title}" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                   </div>
                   <div class="flex flex-col p-4 flex-1">
                     <h3 class="text-lg font-black text-gray-900 dark:text-white mb-2">${workflow.title}</h3>

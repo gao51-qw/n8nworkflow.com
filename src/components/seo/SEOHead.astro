@@ -8,6 +8,7 @@ import type { SEOMeta } from '../../lib/types/workflow';
 
 interface Props extends SEOMeta {
   siteName?: string;
+  schema?: object | object[];
 }
 
 const {
@@ -22,6 +23,7 @@ const {
   tags = [],
   noindex = false,
   siteName = 'N8N Workflows',
+  schema,
 } = Astro.props;
 
 // 获取站点 URL
@@ -45,7 +47,7 @@ const fullImage = image
 const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 
 // 构建结构化数据
-const structuredData = {
+const defaultStructuredData = {
   '@context': 'https://schema.org',
   '@type': type === 'article' ? 'Article' : 'WebPage',
   headline: title,
@@ -66,10 +68,15 @@ const structuredData = {
     name: siteName,
     logo: {
       '@type': 'ImageObject',
-      url: `${siteUrl}/logo.png`,
+      url: `${siteUrl}/favicon.svg`,
     },
   },
 };
+
+// 合并结构化数据
+const finalStructuredData = schema 
+  ? (Array.isArray(schema) ? [defaultStructuredData, ...schema] : [defaultStructuredData, schema])
+  : defaultStructuredData;
 ---
 
 <!-- 基础 Meta 标签 -->
@@ -89,7 +96,7 @@ const structuredData = {
 <meta property="og:image" content={fullImage} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:locale" content="en_US" />
+<meta property="og:locale" content="zh_CN" />
 
 {publishedTime && <meta property="article:published_time" content={publishedTime} />}
 {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
@@ -101,15 +108,15 @@ const structuredData = {
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={fullImage} />
-<meta name="twitter:site" content="@n8n_io" />
-<meta name="twitter:creator" content="@n8n_io" />
+<meta name="twitter:site" content="@n8nworkflows" />
+<meta name="twitter:creator" content="@n8nworkflows" />
 
 <!-- 额外的 Meta 标签 -->
 <meta name="keywords" content={tags.join(', ')} />
 {author && <meta name="author" content={author} />}
 
 <!-- 结构化数据 (JSON-LD) -->
-<script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+<script type="application/ld+json" set:html={JSON.stringify(finalStructuredData)} />
 
 <!-- Favicon -->
 <link rel="icon" type="image/x-icon" href="/favicon.ico" />

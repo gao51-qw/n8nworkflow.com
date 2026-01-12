@@ -12,6 +12,8 @@ import SearchBar from '../components/ui/SearchBar.astro';
 import { getWorkflows, getFilterCountsV2 } from '../lib/services/workflows';
 import { getStats } from '../lib/services/stats';
 import { generateHeroContent } from '../lib/services/content-generator';
+import { generateWebSiteSchema, generateOrganizationSchema, combineSchemas } from '../lib/utils/schema';
+import type { Workflow } from '../lib/types/workflow';
 
 // 获取分页参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
@@ -19,7 +21,7 @@ const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
 // 获取工作流数据
-let workflows = [];
+let workflows: Workflow[] = [];
 let totalCount = 0;
 
 try {
@@ -35,7 +37,7 @@ try {
 }
 
 // 获取筛选计数数据
-let filterCounts = {
+let filterCounts: any = {
   timePeriods: { all: 7947, '7days': 8, month: 374, '6months': 4508, year: 6758 },
   categories: { 'multimodal-ai': 2270, ai: 1600 },
   complexities: { all: 7947, beginner: 500, intermediate: 2835, advanced: 4602 },
@@ -79,17 +81,24 @@ try {
   console.error('Error generating hero content:', error);
 }
 
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://n8nworkflow.com';
+
+// 生成结构化数据
+const websiteSchema = generateWebSiteSchema(siteUrl);
+const organizationSchema = generateOrganizationSchema(siteUrl);
+const combinedSchema = combineSchemas(websiteSchema, organizationSchema);
+
 // SEO 配置
 const seoConfig = {
   title: 'N8N Workflows - Discover Automation Workflows',
   description: 'Browse thousands of n8n automation workflows created by the community. Find workflows for email automation, data sync, notifications, and more.',
   canonical: '/',
+  schema: combinedSchema,
 };
 
 // 计算总页数
 const totalPages = Math.ceil(totalCount / pageSize);
 ---
-
 <MainLayout {...seoConfig}>
   <div class="w-full min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -98,10 +107,10 @@ const totalPages = Math.ceil(totalCount / pageSize);
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
           N8N Workflows Catalog
         </h1>
-        <div class="inline-block px-4 py-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-400 mb-6 shadow-sm">
+        <div class="inline-block px-4 py-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-400 mb-6 shadow-sm">
           {stats.totalWorkflows.toLocaleString()} workflows available (updated Jan 10, 2026)
         </div>
-        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        <p class="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
           Discover ready-to-use automation workflows to optimize your processes.
         </p>
       </div>
@@ -110,12 +119,14 @@ const totalPages = Math.ceil(totalCount / pageSize);
       <div class="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 mb-12 shadow-sm">
         <div class="flex flex-col md:flex-row items-center gap-8">
           <div class="flex-1 text-center md:text-left">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Subscribe to our newsletter</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Get the latest updates and new workflows delivered to your inbox.</p>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Subscribe to our newsletter</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Get the latest updates and new workflows delivered to your inbox.</p>
           </div>
           <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3">
+            <label for="hero-newsletter-email" class="sr-only">Email address</label>
             <input
               type="email"
+              id="hero-newsletter-email"
               placeholder="Enter your email"
               class="px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-primary-500 outline-none min-w-[280px]"
             />
@@ -124,7 +135,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
             </button>
           </div>
         </div>
-        <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-4 text-center md:text-left">
+        <p class="text-[10px] text-gray-600 dark:text-gray-500 mt-4 text-center md:text-left">
           By subscribing, you agree to receive updates. You can unsubscribe at any time.
         </p>
       </div>
@@ -132,12 +143,14 @@ const totalPages = Math.ceil(totalCount / pageSize);
       <!-- Search Bar -->
       <div class="max-w-4xl mx-auto mb-12">
         <div class="relative">
+          <label for="hero-search-input" class="sr-only">Search for a workflow</label>
           <input
             type="text"
+            id="hero-search-input"
             placeholder="Search for a workflow..."
             class="w-full px-6 py-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-primary-500 outline-none text-lg"
           />
-          <button class="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors">
+          <button aria-label="Search" class="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-primary-700 text-white rounded-xl hover:bg-primary-800 transition-colors">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </button>
         </div>
@@ -151,9 +164,9 @@ const totalPages = Math.ceil(totalCount / pageSize);
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-bold text-gray-900 dark:text-white truncate">n8n Cloud</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">$20/month : Unlimited workflows</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">$20/month : Unlimited workflows</p>
           </div>
-          <span class="text-xs font-bold text-primary-600">Try free</span>
+          <span class="text-xs font-bold text-primary-700">Try free</span>
         </a>
         <a href="https://s.n8nworkflows.xyz/MVX4S" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
           <div class="w-12 h-12 flex-shrink-0 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -161,17 +174,17 @@ const totalPages = Math.ceil(totalCount / pageSize);
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Bright Data</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">#1 Web Scraping Platform</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">#1 Web Scraping Platform</p>
           </div>
-          <span class="text-xs font-bold text-primary-600">Try free</span>
+          <span class="text-xs font-bold text-primary-700">Try free</span>
         </a>
         <a href="https://s.n8nworkflows.xyz/uhyV1" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
           <div class="w-12 h-12 flex-shrink-0 bg-purple-50 rounded-lg flex items-center justify-center text-xl">🚀</div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Hostinger</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">Self-hosted n8n from $4.99</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">Self-hosted n8n from $4.99</p>
           </div>
-          <span class="text-xs font-bold text-primary-600">Try free</span>
+          <span class="text-xs font-bold text-primary-700">Try free</span>
         </a>
         <a href="https://s.n8nworkflows.xyz/apify" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
           <div class="w-12 h-12 flex-shrink-0 bg-orange-50 rounded-lg flex items-center justify-center">
@@ -179,16 +192,29 @@ const totalPages = Math.ceil(totalCount / pageSize);
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Apify</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">AI & Automation Hub</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">AI & Automation Hub</p>
           </div>
-          <span class="text-xs font-bold text-primary-600">Try free</span>
+          <span class="text-xs font-bold text-primary-700">Try free</span>
         </a>
       </div>
 
       <!-- Main Content - 2 Column Layout -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Mobile Filter Toggle -->
+        <div class="lg:hidden mb-4">
+          <button
+            id="mobile-filter-toggle"
+            class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold text-gray-900 dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span>Filters & Resources</span>
+          </button>
+        </div>
+
         <!-- Sidebar -->
-        <aside class="lg:col-span-3 space-y-8">
+        <aside id="sidebar-content" class="hidden lg:block lg:col-span-3 space-y-8">
           <!-- Buy me a coffee -->
           <a href="https://s.n8nworkflows.xyz/YBc9Q" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full py-3 px-4 bg-[#FFDD00] text-black rounded-xl font-bold hover:bg-[#FFCC00] transition-colors shadow-sm">
             <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="BMC" class="w-5 h-5" />
@@ -198,11 +224,11 @@ const totalPages = Math.ceil(totalCount / pageSize);
           <!-- Share CTA -->
           <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm text-center">
             <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">✨</div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Share Your Workflow</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Have a great workflow to share? Join the n8n Creator Hub and help the community!</p>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Share Your Workflow</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Have a great workflow to share? Join the n8n Creator Hub and help the community!</p>
             <div class="space-y-3">
-              <a href="#" class="block w-full py-2 px-4 bg-primary-600 text-white rounded-lg font-bold text-sm hover:bg-primary-700 transition-colors">Submit Your Template</a>
-              <a href="#" class="block w-full py-2 px-4 text-gray-600 dark:text-gray-400 font-bold text-sm hover:text-gray-900 dark:hover:text-white transition-colors">How to Submit</a>
+              <a href="#" class="block w-full py-2 px-4 bg-primary-700 text-white rounded-lg font-bold text-sm hover:bg-primary-800 transition-colors">Submit Your Template</a>
+              <a href="#" class="block w-full py-2 px-4 text-gray-700 dark:text-gray-400 font-bold text-sm hover:text-gray-900 dark:hover:text-white transition-colors">How to Submit</a>
             </div>
           </div>
 
@@ -217,8 +243,8 @@ const totalPages = Math.ceil(totalCount / pageSize);
               Latest Workflows
             </h2>
             <div class="flex items-center gap-4">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Sort by:</span>
-              <select class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary-500">
+              <label for="sort-select-hero" class="text-sm text-gray-700 dark:text-gray-400">Sort by:</label>
+              <select id="sort-select-hero" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary-500">
                 <option>Date (newest → oldest)</option>
                 <option>Date (oldest → newest)</option>
                 <option>Visits (high → low)</option>
@@ -240,7 +266,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
             </>
           ) : (
             <div class="text-center py-24 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
-              <p class="text-gray-500 dark:text-gray-400">No workflows found matching your criteria.</p>
+              <p class="text-gray-600 dark:text-gray-400">No workflows found matching your criteria.</p>
             </div>
           )}
         </div>
@@ -248,3 +274,17 @@ const totalPages = Math.ceil(totalCount / pageSize);
     </div>
   </div>
 </MainLayout>
+
+<script>
+  // Mobile Filter Toggle Logic
+  const toggleBtn = document.getElementById('mobile-filter-toggle');
+  const sidebar = document.getElementById('sidebar-content');
+
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      const isHidden = sidebar.classList.contains('hidden');
+      toggleBtn.querySelector('span')!.textContent = isHidden ? 'Filters & Resources' : 'Close Filters';
+    });
+  }
+</script>

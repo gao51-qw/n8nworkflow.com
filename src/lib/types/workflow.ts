@@ -48,6 +48,7 @@ export interface Workflow {
 
   // 媒体资源
   thumbnail: string;
+  featuredImage?: string;
   screenshots?: string[];
 
   // 作者信息

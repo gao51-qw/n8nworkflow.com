@@ -5,6 +5,7 @@
  */
 
 import type { Workflow } from '../../lib/types/workflow';
+import { Image } from 'astro:assets';
 
 interface Props {
   workflow: Workflow;
@@ -25,13 +26,14 @@ const displayDate = workflow.date || new Date(workflow.publishedAt).toLocaleDate
   <div class="flex flex-col bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
     <!-- 缩略图 -->
     <div class="aspect-video bg-gray-100 dark:bg-gray-700 overflow-hidden relative">
-      <img
-        src={workflow.thumbnail || '/placeholder-workflow.webp'}
+      <Image
+        src={workflow.featuredImage || workflow.thumbnail || '/images/placeholder-workflow.svg'}
         alt={`Workflow preview: ${workflow.title}`}
+        width={800}
+        height={450}
         class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         loading={lazy ? 'lazy' : 'eager'}
         decoding="async"
-        onerror="this.onerror=null; this.src='/placeholder-workflow.webp';"
       />
       
       <!-- Badges -->
@@ -51,7 +53,7 @@ const displayDate = workflow.date || new Date(workflow.publishedAt).toLocaleDate
         {workflow.title}
       </h3>
       
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 flex-1">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-2 flex-1">
         {workflow.description}
       </p>
 
@@ -60,7 +62,13 @@ const displayDate = workflow.date || new Date(workflow.publishedAt).toLocaleDate
         <div class="flex items-center gap-2">
           <div class="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 overflow-hidden">
             {workflow.author?.avatar ? (
-              <img src={workflow.author.avatar} alt={workflow.author.name} class="w-full h-full object-cover" />
+              <Image 
+                src={workflow.author.avatar} 
+                alt={workflow.author.name} 
+                width={24}
+                height={24}
+                class="w-full h-full object-cover" 
+              />
             ) : (
               workflow.author?.name?.charAt(0) || 'A'
             )}
@@ -80,7 +88,7 @@ const displayDate = workflow.date || new Date(workflow.publishedAt).toLocaleDate
       </div>
 
       <!-- Stats -->
-      <div class="flex items-center gap-4 pt-4 border-t border-gray-50 dark:border-gray-700 text-[11px] text-gray-400 font-medium">
+      <div class="flex items-center gap-4 pt-4 border-t border-gray-50 dark:border-gray-700 text-[11px] text-gray-600 dark:text-gray-400 font-medium">
         <div class="flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
           <span>{displayDate}</span>
