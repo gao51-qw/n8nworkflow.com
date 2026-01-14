@@ -11,6 +11,7 @@ import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import EmptyState from '../../components/ui/EmptyState.astro';
 import SortDropdown from '../../components/ui/SortDropdown.astro';
 import { getWorkflows } from '../../lib/services/workflows';
+import type { Workflow, ComplexityLevel } from '../../lib/types/workflow';
 
 // 复杂度级别定义
 export const complexityLevels = {
@@ -60,12 +61,12 @@ const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
 // 获取该复杂度级别的工作流
-let workflows = [];
+let workflows: Workflow[] = [];
 let totalCount = 0;
 
 try {
   const result = await getWorkflows({
-    complexity: level,
+    complexity: level as ComplexityLevel,
     limit: pageSize,
     offset: offset,
   });
@@ -144,7 +145,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
         title="No workflows found"
         description={`There are currently no ${levelInfo.name.toLowerCase()} workflows. Check back later or explore other complexity levels.`}
         icon="workflows"
-        actionText="Browse All Complexity Levels"
+        actionText="Browse All Complexity_levels"
         actionHref="/complexity"
       />
     )}

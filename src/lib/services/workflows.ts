@@ -14,6 +14,37 @@ import { fetchWorkflowsFromGitHub } from './n8n';
  */
 
 /**
+ * 动态扫描 public/data/workflows 目录并获取工作流元数据
+ */
+function getLocalWorkflowsFromPublic(): Workflow[] {
+  const workflows: Workflow[] = [];
+  const publicWorkflowsDir = path.join(process.cwd(), 'public/data/workflows');
+
+  if (!fs.existsSync(publicWorkflowsDir)) {
+    return workflows;
+  }
+
+  try {
+    const folders = fs.readdirSync(publicWorkflowsDir);
+    for (const folder of folders) {
+      const metadataPath = path.join(publicWorkflowsDir, folder, 'metadata.json');
+      if (fs.existsSync(metadataPath)) {
+        try {
+          const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+          workflows.push(formatWorkflowData(metadata));
+        } catch (e) {
+          console.error(`Error parsing metadata for folder ${folder}:`, e);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error reading public workflows directory:', e);
+  }
+
+  return workflows;
+}
+
+/**
  * 获取工作流列表（支持分页、排序、筛选）
  */
 export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promise<{
@@ -32,17 +63,30 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
     type,
   } = params;
 
-  // 优先尝试从本地 JSON 获取数据
-  if (workflowsData && Array.isArray(workflowsData) && workflowsData.length > 0) {
-    let filtered = (workflowsData as any[]).map(formatWorkflowData);
+  // 1. 优先尝试从 public/data/workflows 动态扫描（确保新下载的能显示）
+  let allLocalWorkflows = getLocalWorkflowsFromPublic();
+
+  // 2. 合并 workflows.json 中的数据（去重）
+  if (workflowsData && Array.isArray(workflowsData)) {
+    const existingIds = new Set(allLocalWorkflows.map(w => w.id));
+    const jsonWorkflows = (workflowsData as any[])
+      .map(formatWorkflowData)
+      .filter(w => !existingIds.has(w.id));
+    allLocalWorkflows = [...allLocalWorkflows, ...jsonWorkflows];
+  }
+
+  if (allLocalWorkflows.length > 0) {
+    let filtered = allLocalWorkflows;
 
     // 分类筛选
-    if (category) {
-      filtered = filtered.filter((w) => w.categories.includes(category));
+    if (category && category !== 'all') {
+      filtered = filtered.filter((w) => 
+        w.categories.some((c: string) => c.toLowerCase() === category.toLowerCase())
+      );
     }
 
     // 复杂度筛选
-    if (complexity) {
+    if (complexity && complexity !== 'all') {
       filtered = filtered.filter((w) => w.complexityLevel === complexity);
     }
 
@@ -51,6 +95,27 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
       filtered = filtered.filter((w) => w.price === 0);
     } else if (price === 'paid') {
       filtered = filtered.filter((w) => w.price > 0);
+    }
+
+    // 时间筛选
+    if (time && time !== 'all') {
+      const now = new Date();
+      let days = 0;
+      switch (time) {
+        case '7d': case '7days': case 'week': days = 7; break;
+        case '30d': case '30days': case '1m': case 'month': days = 30; break;
+        case '90d': case '90days': case 'quarter': days = 90; break;
+        case '6m': case '6months': days = 180; break;
+        case '1y': case 'year': days = 365; break;
+        case '2y': days = 730; break;
+        case '3y': days = 1095; break;
+        case 'today': days = 1; break;
+      }
+
+      if (days > 0) {
+        const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter((w) => new Date(w.publishedAt || w.createdAt) >= cutoff);
+      }
     }
 
     // 排序
@@ -81,9 +146,11 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
     if (githubWorkflows.length > 0) {
       let filtered = githubWorkflows;
 
-      // 分类筛选
+      // 分类筛选（不区分大小写）
       if (category) {
-        filtered = filtered.filter((w) => w.categories.includes(category));
+        filtered = filtered.filter((w) => 
+          w.categories.some((c: string) => c.toLowerCase() === category.toLowerCase())
+        );
       }
 
       // 复杂度筛选
@@ -96,6 +163,27 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
         filtered = filtered.filter((w) => w.price === 0);
       } else if (price === 'paid') {
         filtered = filtered.filter((w) => w.price > 0);
+      }
+
+      // 时间筛选
+      if (time && time !== 'all') {
+        const now = new Date();
+        let days = 0;
+        switch (time) {
+          case '7d': case '7days': case 'week': days = 7; break;
+          case '30d': case '30days': case '1m': case 'month': days = 30; break;
+          case '90d': case '90days': case 'quarter': days = 90; break;
+          case '6m': case '6months': days = 180; break;
+          case '1y': case 'year': days = 365; break;
+          case '2y': days = 730; break;
+          case '3y': days = 1095; break;
+          case 'today': days = 1; break;
+        }
+
+        if (days > 0) {
+          const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+          filtered = filtered.filter((w) => new Date(w.publishedAt || w.createdAt) >= cutoff);
+        }
       }
 
       // 排序
@@ -172,11 +260,28 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
           case 'today':
             startDate = new Date(now.setHours(0, 0, 0, 0));
             break;
+          case '7d':
+          case '7days':
           case 'week':
             startDate = new Date(now.setDate(now.getDate() - 7));
             break;
+          case '1m':
           case 'month':
             startDate = new Date(now.setMonth(now.getMonth() - 1));
+            break;
+          case '6m':
+          case '6months':
+            startDate = new Date(now.setMonth(now.getMonth() - 6));
+            break;
+          case '1y':
+          case 'year':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            break;
+          case '2y':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 2));
+            break;
+          case '3y':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 3));
             break;
           default:
             startDate = new Date(0);
@@ -425,9 +530,11 @@ function getMockWorkflows(params: Partial<LoadMoreParams>): {
 
   let workflows = getAllMockWorkflows(200);
 
-  // 筛选
-  if (category) {
-    workflows = workflows.filter((w) => w.categories.includes(category));
+  // 筛选（分类不区分大小写）
+  if (category && category !== 'all') {
+    workflows = workflows.filter((w) => 
+      w.categories.some((c: string) => c.toLowerCase() === category.toLowerCase())
+    );
   }
 
   if (complexity) {
@@ -490,9 +597,11 @@ function searchMockWorkflows(
       w.description.toLowerCase().includes(lowerQuery)
   );
 
-  // 筛选
-  if (category) {
-    workflows = workflows.filter((w) => w.categories.includes(category));
+  // 筛选（分类不区分大小写）
+  if (category && category !== 'all') {
+    workflows = workflows.filter((w) => 
+      w.categories.some((c: string) => c.toLowerCase() === category.toLowerCase())
+    );
   }
 
   if (complexity) {
@@ -648,9 +757,9 @@ function calculateFilterCounts(
 }
 
 /**
- * ============================================================================
+ * ========================================================================
  * P0 阶段改版 - 新增服务函数
- * ============================================================================
+ * ========================================================================
  */
 
 /**
@@ -764,11 +873,42 @@ export async function getWorkflowsByTimePeriod(
   period: '7days' | 'month' | '6months' | '1year',
   page: number = 1,
   limit: number = 12
-): Promise<{ workflows: Workflow[]; total: number; page: number; totalPages: number }> {
-  // TODO: 实现时间段查询逻辑
-  console.log('TODO: getWorkflowsByTimePeriod', period, page, limit);
+): Promise<{ workflows: Workflow[]; total: number; page: number; totalPages: number }>{
+  // 计算时间范围
+  const now = new Date();
+  let startDate: Date;
+  
+  switch (period) {
+    case '7days':
+      startDate = new Date(now.setDate(now.getDate() - 7));
+      break;
+    case 'month':
+      startDate = new Date(now.setMonth(now.getMonth() - 1));
+      break;
+    case '6months':
+      startDate = new Date(now.setMonth(now.getMonth() - 6));
+      break;
+    case '1year':
+      startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+      break;
+    default:
+      startDate = new Date(0);
+  }
 
-  return { workflows: [], total: 0, page, totalPages: 0 };
+  // 获取工作流数据
+  const { workflows, total } = await getWorkflows({
+    time: period,
+    offset: (page - 1) * limit,
+    limit,
+    sort: 'date-desc'
+  });
+
+  return {
+    workflows,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit)
+  };
 }
 
 /**
@@ -894,8 +1034,20 @@ export async function getWorkflowDetailedById(workflowId: number): Promise<any> 
  * 2. 合并基础和详情数据
  */
 export async function enrichWorkflowWithDetails(workflow: Workflow): Promise<any> {
-  // TODO: 实现数据扩展逻辑
-  console.log('TODO: enrichWorkflowWithDetails', workflow.id);
+  // 获取工作流详情
+  const detailedWorkflow = await getWorkflowDetailedById(workflow.id);
+
+  if (detailedWorkflow) {
+    return {
+      ...workflow,
+      ...detailedWorkflow,
+      // 确保保留基础工作流的所有字段
+      id: workflow.id,
+      slug: workflow.slug,
+      title: workflow.title,
+      description: workflow.description
+    };
+  }
 
   return { ...workflow };
 }
@@ -916,10 +1068,37 @@ export async function getRelatedWorkflows(
   workflowId: number,
   limit: number = 5
 ): Promise<Workflow[]> {
-  // TODO: 实现相关工作流查询
-  console.log('TODO: getRelatedWorkflows', workflowId, limit);
-
-  return [];
+  // 获取当前工作流
+  const currentWorkflow = await getWorkflowBySlug(workflowId.toString());
+  
+  if (!currentWorkflow) {
+    return [];
+  }
+  
+  // 获取相同分类的工作流
+  const relatedWorkflows: Workflow[] = [];
+  
+  for (const category of currentWorkflow.categories) {
+    const { workflows } = await getWorkflowsByCategory(category, 0, limit);
+    
+    // 过滤掉当前工作流并确保唯一性
+    workflows.forEach(workflow => {
+      if (workflow.id !== workflowId && 
+          !relatedWorkflows.some(w => w.id === workflow.id)) {
+        relatedWorkflows.push(workflow);
+      }
+    });
+    
+    // 如果已经达到限制，提前结束
+    if (relatedWorkflows.length >= limit) {
+      break;
+    }
+  }
+  
+  // 按热度排序
+  return relatedWorkflows
+    .sort((a, b) => (b.visitors || 0) - (a.visitors || 0))
+    .slice(0, limit);
 }
 
 /**
@@ -943,10 +1122,49 @@ export async function subscribeNewsletter(
     source?: string;
   }
 ): Promise<{ success: boolean; message: string; subscriptionId?: string }> {
-  // TODO: 实现订阅逻辑
-  console.log('TODO: subscribeNewsletter', email, preferences);
+  // 验证邮箱地址
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { success: false, message: 'Invalid email address' };
+  }
 
-  return { success: false, message: 'Not implemented' };
+  // 如果未配置 Supabase，返回模拟成功
+  if (!isSupabaseConfigured()) {
+    return {
+      success: true,
+      message: 'Subscription successful (mock)',
+      subscriptionId: 'mock-' + Math.random().toString(36).substring(2, 9)
+    };
+  }
+
+  try {
+    return await withRetry(async () => {
+      const { data, error } = await supabase!
+        .from('newsletter_subscriptions')
+        .insert([{
+          email,
+          preferences: preferences || {},
+          source: preferences?.source || 'website',
+          status: 'active',
+          subscribed_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+  
+      if (error) {
+        handleSupabaseError(error, 'subscribeNewsletter');
+        return { success: false, message: 'Failed to subscribe' };
+      }
+  
+      return {
+        success: true,
+        message: 'Subscription successful',
+        subscriptionId: data.id
+      };
+    });
+  } catch (error) {
+    console.error('Error subscribing to newsletter:', error);
+    return { success: false, message: 'Subscription failed' };
+  }
 }
 
 /**
@@ -971,10 +1189,69 @@ export async function submitWorkflow(submission: {
   submitterEmail: string;
   submitterName?: string;
 }): Promise<{ success: boolean; message: string; submissionId?: string }> {
-  // TODO: 实现工作流提交逻辑
-  console.log('TODO: submitWorkflow', submission);
+  // 验证提交数据
+  if (!submission.title || submission.title.length < 3 || submission.title.length > 100) {
+    return { success: false, message: 'Title must be 3-100 characters' };
+  }
 
-  return { success: false, message: 'Not implemented' };
+  if (!submission.description || submission.description.length < 10) {
+    return { success: false, message: 'Description must be at least 10 characters' };
+  }
+
+  if (!submission.workflowUrl || !/^https?:\/\/.+/.test(submission.workflowUrl)) {
+    return { success: false, message: 'Invalid workflow URL' };
+  }
+
+  if (!submission.categories || submission.categories.length === 0) {
+    return { success: false, message: 'At least one category is required' };
+  }
+
+  if (!submission.submitterEmail || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(submission.submitterEmail)) {
+    return { success: false, message: 'Invalid submitter email' };
+  }
+
+  // 如果未配置 Supabase，返回模拟成功
+  if (!isSupabaseConfigured()) {
+    return {
+      success: true,
+      message: 'Workflow submission successful (mock)',
+      submissionId: 'mock-' + Math.random().toString(36).substring(2, 9)
+    };
+  }
+
+  try {
+    return await withRetry(async () => {
+      const { data, error } = await supabase!
+        .from('workflow_submissions')
+        .insert([{
+          title: submission.title,
+          description: submission.description,
+          workflow_url: submission.workflowUrl,
+          categories: submission.categories,
+          complexity: submission.complexity || 'intermediate',
+          submitter_email: submission.submitterEmail,
+          submitter_name: submission.submitterName || '',
+          status: 'pending',
+          submitted_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        handleSupabaseError(error, 'submitWorkflow');
+        return { success: false, message: 'Failed to submit workflow' };
+      }
+
+      return {
+        success: true,
+        message: 'Workflow submission successful',
+        submissionId: data.id
+      };
+    });
+  } catch (error) {
+    console.error('Error submitting workflow:', error);
+    return { success: false, message: 'Workflow submission failed' };
+  }
 }
 
 /**
@@ -993,10 +1270,31 @@ export async function getWorkflowReviews(
   workflowId: number,
   limit: number = 10
 ): Promise<any[]> {
-  // TODO: 实现评论查询
-  console.log('TODO: getWorkflowReviews', workflowId);
+  // 如果未配置 Supabase，返回空数组
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
 
-  return [];
+  try {
+    return await withRetry(async () => {
+      const { data, error } = await supabase!
+        .from('workflow_reviews')
+        .select('*')
+        .eq('workflow_id', workflowId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        handleSupabaseError(error, 'getWorkflowReviews');
+        return [];
+      }
+
+      return data || [];
+    });
+  } catch (error) {
+    console.error('Error fetching workflow reviews:', error);
+    return [];
+  }
 }
 
 /**
@@ -1017,8 +1315,63 @@ export async function addWorkflowReview(review: {
   reviewerName?: string;
   reviewerEmail?: string;
 }): Promise<{ success: boolean; message: string }> {
-  // TODO: 实现评论添加逻辑
-  console.log('TODO: addWorkflowReview', review);
+  // 验证评论数据
+  if (!review.workflowId || review.workflowId <= 0) {
+    return { success: false, message: 'Invalid workflow ID' };
+  }
 
-  return { success: false, message: 'Not implemented' };
+  if (!review.rating || review.rating < 1 || review.rating > 5) {
+    return { success: false, message: 'Rating must be between 1 and 5' };
+  }
+
+  if (!review.comment || review.comment.length < 5) {
+    return { success: false, message: 'Comment must be at least 5 characters' };
+  }
+
+  // 如果未配置 Supabase，返回模拟成功
+  if (!isSupabaseConfigured()) {
+    return {
+      success: true,
+      message: 'Review added successfully (mock)'
+    };
+  }
+
+  try {
+    return await withRetry(async () => {
+      const { data, error } = await supabase!
+        .from('workflow_reviews')
+        .insert([{
+          workflow_id: review.workflowId,
+          rating: review.rating,
+          comment: review.comment,
+          reviewer_name: review.reviewerName || 'Anonymous',
+          reviewer_email: review.reviewerEmail || '',
+          created_at: new Date().toISOString(),
+          status: 'approved'
+        }]);
+
+      if (error) {
+        handleSupabaseError(error, 'addWorkflowReview');
+        return { success: false, message: 'Failed to add review' };
+      }
+
+      // 更新工作流平均评分
+      const { error: updateError } = await supabase!
+        .rpc('update_workflow_rating', {
+          workflow_id: review.workflowId
+        });
+
+      if (updateError) {
+        console.error('Failed to update workflow rating:', updateError);
+      }
+
+      return {
+        success: true,
+        message: 'Review added successfully'
+      };
+    });
+  } catch (error) {
+    console.error('Error adding workflow review:', error);
+    return { success: false, message: 'Failed to add review' };
+  }
 }

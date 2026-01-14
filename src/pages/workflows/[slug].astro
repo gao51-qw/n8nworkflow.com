@@ -71,13 +71,45 @@ const workflowSchema = generateWorkflowSchema(workflow, siteUrl);
 const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems, siteUrl);
 const combinedSchema = combineSchemas(workflowSchema, breadcrumbSchema);
 
+// 验证工作流 JSON 是否有效
+function validateWorkflowJson(json: any): boolean {
+  if (!json) return false;
+  if (!json.name || typeof json.name !== 'string') return false;
+  if (!json.nodes || !Array.isArray(json.nodes)) return false;
+  if (!json.connections || typeof json.connections !== 'object') return false;
+  if (json.nodes.length === 0) return false;
+  return true;
+}
+
 // 读取工作流 JSON 数据
 let workflowJson = null;
 try {
-  const workflowJsonPath = `/data/workflows/${slug}/${workflow.id}.json`;
+  // 生成下划线版本的slug（移除ID后缀）
+  const slugWithoutId = slug.replace(new RegExp(`-${workflow.id}$`), '');
+  const slugWithUnderscores = slugWithoutId.replace(/-/g, '_');
+  const workflowJsonPath = `/data/workflows/${slug}/${slugWithUnderscores}.json`;
   const response = await fetch(new URL(workflowJsonPath, Astro.url.origin));
   if (response.ok) {
-    workflowJson = await response.json();
+    const fullData = await response.json();
+    
+    // 构建完整的 n8n 工作流格式
+    workflowJson = {
+      name: fullData.name || workflow.title,
+      nodes: fullData.workflow?.nodes || fullData.nodes || [],
+      connections: fullData.workflow?.connections || fullData.connections || {},
+      settings: fullData.workflow?.settings || fullData.settings || {},
+      active: false,
+      // 可选字段
+      id: fullData.id,
+      createdAt: fullData.createdAt,
+      updatedAt: fullData.updatedAt || fullData.createdAt
+    };
+    
+    // 验证 JSON 格式
+    if (!validateWorkflowJson(workflowJson)) {
+      console.error('Invalid workflow JSON structure:', workflowJson);
+      workflowJson = null;
+    }
   }
 } catch (error) {
   console.error('Error loading workflow JSON:', error);
@@ -141,17 +173,28 @@ const seoConfig = {
             <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.0.0/webcomponents-loader.js" crossorigin="anonymous" data-cfasync="false"></script>
             <script src="https://www.unpkg.com/lit@2.0.0-rc.2/polyfill-support.js" crossorigin="anonymous" data-cfasync="false"></script>
             <script type="module" src="https://cdn.jsdelivr.net/npm/@n8n_io/n8n-demo-component/n8n-demo.bundled.js" crossorigin="anonymous" data-cfasync="false"></script>
-            <script type="4994abcb98f644aea97c64c4-text/javascript">
-              document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                  const footers = document.querySelectorAll('.workflow-canvas-footer');
-                  footers.forEach(function(footer) {
-                    footer.style.display = 'none';
-                  });
-                }, 1000);
-              });
+            
+            {/* 直接在 HTML 属性中传递 workflow JSON */}
+            <n8n-demo 
+              workflow={JSON.stringify(workflowJson)}
+              theme="light" 
+              frame="false" 
+              clicktointeract="true" 
+              disableinteractivity="false" 
+              hidecanvaserrors="true" 
+              collapseformobile="true" 
+              data-astro-cid-k6bappp3="true">
+            </n8n-demo>
+            
+            <script is:inline>
+              // 隐藏底部页脚
+              setTimeout(function() {
+                const footers = document.querySelectorAll('.workflow-canvas-footer');
+                footers.forEach(function(footer) {
+                  footer.style.display = 'none';
+                });
+              }, 1000);
             </script>
-            <n8n-demo workflow={JSON.stringify(workflowJson)} theme="light" frame="false" clicktointeract="true" disableinteractivity="false" hidecanvaserrors="true" collapseformobile="true" data-astro-cid-k6bappp3="true"></n8n-demo>
           </div>
         ) : (
           <img

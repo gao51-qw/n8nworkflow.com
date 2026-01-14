@@ -154,10 +154,10 @@ export interface LoadMoreParams {
   type?: 'all' | 'popular' | 'recent';
   category?: string;
   author?: string;
-  complexity?: ComplexityLevel;
+  complexity?: string;
   sort?: 'date-desc' | 'date-asc' | 'visitors-desc' | 'downloads-desc';
-  price?: 'all' | 'free' | 'paid';
-  time?: 'all' | 'today' | 'week' | 'month';
+  price?: string;
+  time?: string;
   offset: number;
   limit: number;
 }

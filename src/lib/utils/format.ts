@@ -12,22 +12,30 @@ export function formatNumber(num: number): string {
 }
 
 /**
- * 格式化数字为紧凑格式（如 1.2K, 1.5M）
+ * 格式化数字为紧凑格式（如 1.2K, 1.5M, 1.5B）
  * @param num - 要格式化的数字
  * @returns 格式化后的字符串
  */
 export function formatCompactNumber(num: number): string {
-  if (num < 1000) {
+  const absNum = Math.abs(num);
+  const sign = num < 0 ? '-' : '';
+  
+  if (absNum < 1000) {
     return num.toString();
   }
-
-  if (num < 1000000) {
-    const thousands = num / 1000;
-    return `${thousands.toFixed(thousands < 10 ? 1 : 0)}K`;
+  
+  if (absNum < 1000000) {
+    const thousands = absNum / 1000;
+    return `${sign}${thousands.toFixed(thousands < 10 ? 1 : 0)}K`;
   }
-
-  const millions = num / 1000000;
-  return `${millions.toFixed(millions < 10 ? 1 : 0)}M`;
+  
+  if (absNum < 1000000000) {
+    const millions = absNum / 1000000;
+    return `${sign}${millions.toFixed(millions < 10 ? 1 : 0)}M`;
+  }
+  
+  const billions = absNum / 1000000000;
+  return `${sign}${billions.toFixed(billions < 10 ? 1 : 0)}B`;
 }
 
 /**
@@ -40,8 +48,11 @@ export function formatPrice(price: number, currency: string = '$'): string {
   if (price === 0) {
     return 'Free';
   }
-
-  return `${currency}${price.toFixed(2)}`;
+  
+  const absPrice = Math.abs(price);
+  const sign = price < 0 ? '-' : '';
+  
+  return `${sign}${currency}${absPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**
@@ -55,7 +66,7 @@ export function truncateText(text: string, maxLength: number): string {
     return text;
   }
 
-  return text.slice(0, maxLength).trim() + '...';
+  return text.slice(0, maxLength).trim() + '…';
 }
 
 /**

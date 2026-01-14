@@ -5,15 +5,22 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// 环境变量
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+// 环境变量 - 兼容 Jest 测试环境
+const getEnvVar = (name: string): string | undefined => {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[name];
+  }
+  return undefined;
+};
+
+const supabaseUrl = getEnvVar('PUBLIC_SUPABASE_URL');
+const supabaseAnonKey = getEnvVar('PUBLIC_SUPABASE_ANON_KEY');
 
 // 检查环境变量是否存在
 const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);
 
 // 创建 Supabase 客户端（如果配置存在）
-export const supabase = hasSupabaseConfig
+export const supabase = hasSupabaseConfig && supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: false,

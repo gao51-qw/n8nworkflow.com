@@ -15,8 +15,21 @@ import { generateHeroContent } from '../lib/services/content-generator';
 import { generateWebSiteSchema, generateOrganizationSchema, combineSchemas } from '../lib/utils/schema';
 import type { Workflow } from '../lib/types/workflow';
 
-// 获取分页参数
+// 获取分页参数和过滤参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const timeFilter = Astro.url.searchParams.get('time') || undefined;
+const priceFilter = Astro.url.searchParams.get('price') as 'free' | 'paid' | undefined;
+const categoryFilter = Astro.url.searchParams.get('category') || undefined;
+const complexityFilter = Astro.url.searchParams.get('complexity') || undefined;
+
+// 构建当前过滤器对象
+const currentFilters = {
+  timePeriod: timeFilter,
+  price: priceFilter,
+  category: categoryFilter,
+  complexity: complexityFilter,
+};
+
 const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
@@ -29,6 +42,10 @@ try {
     sort: 'date-desc',
     limit: pageSize,
     offset: offset,
+    time: timeFilter,
+    price: priceFilter,
+    category: categoryFilter,
+    complexity: complexityFilter,
   });
   workflows = result.workflows;
   totalCount = result.total;
@@ -45,7 +62,12 @@ let filterCounts: any = {
 };
 
 try {
-  filterCounts = await getFilterCountsV2();
+  filterCounts = await getFilterCountsV2({
+    timePeriod: timeFilter,
+    price: priceFilter,
+    category: categoryFilter,
+    complexity: complexityFilter,
+  });
 } catch (error) {
   console.error('Error fetching filter counts:', error);
 }
@@ -233,7 +255,10 @@ const totalPages = Math.ceil(totalCount / pageSize);
           </div>
 
           <!-- Filter Sidebar Component -->
-          <FilterSidebar filterCounts={filterCounts} />
+          <FilterSidebar 
+            filterCounts={filterCounts} 
+            currentFilters={currentFilters} 
+          />
         </aside>
 
         <!-- Workflow Grid -->

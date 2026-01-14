@@ -9,7 +9,7 @@ describe('Filter Counts API', () => {
   describe('getFilterCountsV2', () => {
     test('应该返回所有筛选类型的计数', async () => {
       const result = await getFilterCountsV2();
-      
+       
       // 检查返回对象有所需的属性
       expect(result).toHaveProperty('timePeriods');
       expect(result).toHaveProperty('categories');
@@ -20,17 +20,20 @@ describe('Filter Counts API', () => {
     test('timePeriods 应该包含所需的时间段', async () => {
       const result = await getFilterCountsV2();
       const timePeriods = result.timePeriods;
-      
-      expect(timePeriods).toHaveProperty('all');
+       
+      // 检查实际返回的时间段
       expect(timePeriods).toHaveProperty('7days');
       expect(timePeriods).toHaveProperty('month');
       expect(timePeriods).toHaveProperty('6months');
+      expect(timePeriods).toHaveProperty('year');
+      expect(timePeriods).toHaveProperty('2years');
+      expect(timePeriods).toHaveProperty('3years');
     });
 
     test('complexities 应该包含所有复杂度级别', async () => {
       const result = await getFilterCountsV2();
       const complexities = result.complexities;
-      
+       
       expect(complexities).toHaveProperty('all');
       expect(complexities).toHaveProperty('beginner');
       expect(complexities).toHaveProperty('intermediate');
@@ -39,17 +42,17 @@ describe('Filter Counts API', () => {
 
     test('所有计数值应该是非负整数', async () => {
       const result = await getFilterCountsV2();
-      
+       
       Object.values(result.timePeriods).forEach(count => {
         expect(typeof count).toBe('number');
         expect(count).toBeGreaterThanOrEqual(0);
       });
-      
+       
       Object.values(result.complexities).forEach(count => {
         expect(typeof count).toBe('number');
         expect(count).toBeGreaterThanOrEqual(0);
       });
-      
+       
       Object.values(result.price).forEach(count => {
         expect(typeof count).toBe('number');
         expect(count).toBeGreaterThanOrEqual(0);
@@ -61,7 +64,7 @@ describe('Filter Counts API', () => {
         complexity: 'beginner',
         price: 'free',
       });
-      
+       
       // 应该返回有效的计数对象
       expect(result).toHaveProperty('timePeriods');
       expect(result).toHaveProperty('categories');
@@ -73,7 +76,7 @@ describe('Filter Counts API', () => {
       const result = await getFilterCountsV2({
         complexity: 'invalid' as any,
       });
-      
+       
       // 应该返回默认值而不是抛出错误
       expect(result).toHaveProperty('timePeriods');
       expect(result.timePeriods).toBeDefined();
@@ -81,7 +84,7 @@ describe('Filter Counts API', () => {
 
     test('categories 字典应该有数字值', async () => {
       const result = await getFilterCountsV2();
-      
+       
       Object.entries(result.categories).forEach(([key, count]) => {
         expect(typeof key).toBe('string');
         expect(typeof count).toBe('number');

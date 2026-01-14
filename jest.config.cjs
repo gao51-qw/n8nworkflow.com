@@ -9,7 +9,8 @@ module.exports = {
     '^@lib/(.*)$': '<rootDir>/src/lib/$1',
     '^@styles/(.*)$': '<rootDir>/src/styles/$1',
     '^@pages/(.*)$': '<rootDir>/src/pages/$1',
-    '^@layouts/(.*)$': '<rootDir>/src/layouts/$1'
+    '^@layouts/(.*)$': '<rootDir>/src/layouts/$1',
+    '^@/lib/services/supabase$': '<rootDir>/src/lib/services/__mocks__/supabase.ts'
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.cjs'],
   transform: {

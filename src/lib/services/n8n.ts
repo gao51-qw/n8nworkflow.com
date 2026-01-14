@@ -45,8 +45,16 @@ function getComplexityLevel(nodeCount: number): 'beginner' | 'intermediate' | 'a
  * 获取 N8N 配置
  */
 function getN8NConfig(): N8NConfig | null {
-  const apiUrl = import.meta.env.N8N_API_URL;
-  const apiKey = import.meta.env.N8N_API_KEY;
+  // 兼容 Jest 测试环境
+  const getEnvVar = (name: string): string | undefined => {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env[name];
+    }
+    return undefined;
+  };
+
+  const apiUrl = getEnvVar('N8N_API_URL');
+  const apiKey = getEnvVar('N8N_API_KEY');
 
   if (!apiUrl || !apiKey) {
     console.warn('N8N API 未配置。请设置 N8N_API_URL 和 N8N_API_KEY 环境变量。');
@@ -223,9 +231,17 @@ export async function mergeWorkflows(
  * 从 GitHub 获取工作流数据
  */
 export async function fetchWorkflowsFromGitHub(): Promise<Workflow[]> {
-  const token = import.meta.env.GITHUB_TOKEN;
-  const owner = import.meta.env.GITHUB_OWNER;
-  const repo = import.meta.env.GITHUB_REPO;
+  // 兼容 Jest 测试环境
+  const getEnvVar = (name: string): string | undefined => {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env[name];
+    }
+    return undefined;
+  };
+
+  const token = getEnvVar('GITHUB_TOKEN');
+  const owner = getEnvVar('GITHUB_OWNER');
+  const repo = getEnvVar('GITHUB_REPO');
 
   if (!token || !owner || !repo) {
     console.warn('GitHub 配置不完整。请设置 GITHUB_TOKEN, GITHUB_OWNER 和 GITHUB_REPO 环境变量。');
