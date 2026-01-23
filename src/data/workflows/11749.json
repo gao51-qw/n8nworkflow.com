@@ -1,0 +1,188 @@
+{
+  "id": 11749,
+  "slug": "11749",
+  "title": "Monitor German company register & financial events with Implisense API & notifications",
+  "description": "This n8n workflow monitors significant register, financial, and news-related events for German companies. It takes a list of companies (for example from a CRM or lead list), resolves them via the Implisense / German Company Data API, retrieves recent company events, normalizes and filters them by relevance (e.g. management changes, financing, M&A, insolvency), deduplicates results, and prepares structured notifications with urgency levels. The output can be routed to email, chat tools, webhooks, or downstream systems such as CRMs or data stores for continuous company monitoring and alerting.\n\n## Setup steps\n\n1. **Replace Mock Data**: Change \"Mock Lead Input\" node to your actual lead source\n   - CRM connector (Salesforce, HubSpot, etc.)\n   - Database query\n   - CSV import\n\n2. **Configure Credentials**: Set up RapidAPI API credentials\n   - Create an account on RapidAPI  (free tier available)\n    - [RapidAPI](https://rapidapi.com/Implisense/api/German%20Company%20Data)\n   - Insert your RapidAPI x-rapidapi-key as password\n\n3. **Adjust Notification**: Configure your peferred Notification system if needed\n\n4. **Connect Output**: Add nodes after the 'Create Summary' node",
+  "featuredImage": "/data/workflows/11749/11749.webp",
+  "author": {
+    "id": 101,
+    "slug": "implisense",
+    "name": "as311",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5,
+  "downloads": 0,
+  "createdAt": "2025-12-12T15:30:00.006Z",
+  "updatedAt": "2026-01-16T09:09:58.107Z",
+  "publishedAt": "2025-12-12T15:30:00.006Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11749",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor German company register & financial events with Implisense API & notifications",
+    "workflowName": "Monitor German company register & financial events with Implisense API & notifications",
+    "description": "This n8n workflow monitors significant register, financial, and news-related events for German companies. It takes a list of companies (for example from a CRM or lead list), resolves them via the Implisense / German Company Data API, retrieves recent company events, normalizes and filters them by relevance (e.g. management changes, financing, M&A, insolvency), deduplicates results, and prepares structured notifications with urgency levels. The output can be routed to email, chat tools, webhooks, or downstream systems such as CRMs or data stores for continuous company monitoring and alerting.\n\n## Setup steps\n\n1. **Replace Mock Data**: Change \"Mock Lead Input\" node to your actual lead source\n   - CRM connector (Salesforce, HubSpot, etc.)\n   - Database query\n   - CSV import\n\n2. **Configure Credentials**: Set up RapidAPI API credentials\n   - Create an account on RapidAPI  (free tier available)\n    - [RapidAPI](https://rapidapi.com/Implisense/api/German%20Company%20Data)\n   - Insert your RapidAPI x-rapidapi-key as password\n\n3. **Adjust Notification**: Configure your peferred Notification system if needed\n\n4. **Connect Output**: Add nodes after the 'Create Summary' node",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Split Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Rate Limit",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "API Success?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Normalize Events",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log API Error",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Filter Relevant",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Deduplicate",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Notification",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notification Sent?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Success",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log Failed",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Notifications",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Loop Continue",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Summary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Lookup Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Get Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🏗️ Architecture Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mock Lead Input",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email, Chat, Webhook etc.",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    }
+  ]
+}

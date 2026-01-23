@@ -1,0 +1,206 @@
+{
+  "id": 8083,
+  "slug": "8083",
+  "title": "Automate blog & LinkedIn content creation with OpenAI & Replicate AI images",
+  "description": "# AI Blog & LinkedIn Content Publisher\n## How it works\n\nDaily trigger scans your Notion database for unpublished blog ideas\nAI generates complete **blog posts** + engaging **LinkedIn content** using **OpenAI** (*Blog Posting is not implemented yet*)\nCreates custom images for posts using **Replicate's Flux-Schnell** AI model\nAuto-publishes to LinkedIn with image OR emails draft for review\nUpdates Notion with published content and tracks status\n\n## Set up steps\n**Connect accounts:** Notion, OpenAI, Replicate, LinkedIn, Gmail\n**Create 2 Notion databases:** Ideas (input) and Articles (output)\n**Update config node:** Add your database IDs and email\n**Test with one idea:** Run manually first to verify everything works\n**Enable daily automation:** Turn on the cron trigger\n\n**Perfect for:** Content creators, developers, and marketers who want to transform rough ideas into professional blog posts and LinkedIn content automatically.",
+  "featuredImage": "/data/workflows/8083/8083.webp",
+  "author": {
+    "id": 101,
+    "slug": "sbmagar13",
+    "name": "Sagar Budhathoki",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 615,
+  "downloads": 61,
+  "createdAt": "2025-08-31T14:57:10.163Z",
+  "updatedAt": "2026-01-16T08:54:03.489Z",
+  "publishedAt": "2025-08-31T14:57:10.163Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8083",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate blog & LinkedIn content creation with OpenAI & Replicate AI images",
+    "workflowName": "Automate blog & LinkedIn content creation with OpenAI & Replicate AI images",
+    "description": "# AI Blog & LinkedIn Content Publisher\n## How it works\n\nDaily trigger scans your Notion database for unpublished blog ideas\nAI generates complete **blog posts** + engaging **LinkedIn content** using **OpenAI** (*Blog Posting is not implemented yet*)\nCreates custom images for posts using **Replicate's Flux-Schnell** AI model\nAuto-publishes to LinkedIn with image OR emails draft for review\nUpdates Notion with published content and tracks status\n\n## Set up steps\n**Connect accounts:** Notion, OpenAI, Replicate, LinkedIn, Gmail\n**Create 2 Notion databases:** Ideas (input) and Articles (output)\n**Update config node:** Add your database IDs and email\n**Test with one idea:** Run manually first to verify everything works\n**Enable daily automation:** Turn on the cron trigger\n\n**Perfect for:** Content creators, developers, and marketers who want to transform rough ideas into professional blog posts and LinkedIn content automatically.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Cron (Schedule)",
+      "type": "n8n-nodes-base.cron",
+      "role": "cron",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set (Configs)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notion → Query Ideas DB (all)",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IF (Has Eligible?)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split In Batches (1)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Error Trigger (Any Node Fails)",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Count Eligible",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter Unpublished + Map",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Parse & Validate JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Normalize Arrays",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create a post",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a Article Database Page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Draft Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Published Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Draft Update Database",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update a database page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Replicate Image Prediction",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Content Creator",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Image prompt generator",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Failure Message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If LinkedIn Published Check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

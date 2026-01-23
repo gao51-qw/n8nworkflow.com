@@ -1,0 +1,103 @@
+{
+  "id": 10280,
+  "slug": "10280",
+  "title": "Automatically assign Jira Service Management reporter from forwarded emails",
+  "description": "## Automatically Assign Jira Service Management Reporter from Forwarded Emails\n\nThis workflow solves a common problem in Jira Service Management: when an email is forwarded to create a ticket, Jira often sets the forwarding system (e.g., support@yourcompany.com) as the reporter, not the original customer. This template automates the process of parsing the original sender's details from the email body and correctly assigning them as the ticket's reporter.\n\nIf the customer doesn't exist in Jira, a new customer profile is created automatically before the ticket is assigned.\n\n## What it Does\n1.  **Triggers on New Issue**: The workflow starts when a new issue is created in a specified Jira project.\n2.  **Filters Forwarded Emails**: An If node checks if the issue was created by one of your internal forwarding email addresses. The workflow only proceeds for these specific issues.\n3.  **Parses Details**: A Code node uses regular expressions to parse the issue description (the forwarded email's body) and extract the original sender's name and email address.\n4.  **Searches for Existing Customer**: An HTTP Request node checks if a customer with the extracted email already exists in your Jira Service Desk.\n5.  **Creates New Customer**: If the customer is not found, another HTTP Request node creates a new customer profile in Jira Service Management.\n6.  **Assigns Reporter**: Finally, a Jira node updates the issue's \"Reporter\" field to the existing or newly created customer, ensuring the ticket is correctly associated with the original sender.\n\n## Use Cases\n- **Shared Support Inboxes**: Automatically process emails sent to a general support inbox (e.g., `support@company.com`) that are then forwarded to Jira.\n- **Departmental Forwarding**: Handle tickets forwarded from specific departments (e.g., `sales@company.com` or `billing@company.com`) and assign the original sender correctly.\n- **Personal Email Forwarding**: Useful when a team member forwards a customer email from their personal inbox to the Jira Service Management-connected address.\n\n## Customization\nThe `Parse Details From Description` node uses a regular expression (regex) to find the sender's email. The default regex is designed for standard forwarded emails that look like this:\n`From: John Doe &lt;john.doe@example.com&gt;`\n\nIf your email client forwards emails in a different format, you may need to adjust the regex in the Code node. For example, if your format is `From: [john.doe@example.com]`, you would need to update the regex pattern to match this structure.\n\n## Troubleshooting\n- **Reporter Not Being Updated**:\n    -   Verify that the forwarding email addresses in the `Filter Forwarding Emails` node are correct.\n    -   Check the body of the Jira ticket's description to ensure the forwarded email content is present and in a format the regex can parse.\n- **Customer Not Found/Created**:\n    -   Ensure your Jira API credentials have the necessary permissions to search for and create customers in Jira Service Management.\n- **Workflow Not Triggering**:\n    -   Confirm that the Jira Trigger is correctly configured for the right project and that the webhook is active in your Jira instance.\n\n## Requirements\n- An n8n instance (self-hosted or cloud).\n- Jira Software Cloud API credentials with Service Management permissions.\n\n## How to Set Up\n1.  **Connect Credentials**: In the Jira Trigger, Jira, and HTTP Request nodes, select your Jira Software Cloud API credentials.\n2.  **Configure Trigger**: In the `Jira Trigger` node, select the Jira project you want this workflow to monitor.\n3.  **Set Filter Emails**: In the `Filter Forwarding Emails` (If) node, replace the placeholder email addresses with the internal email addresses that forward mail to Jira.\n4.  **Update Jira Domain**: In both HTTP Request nodes (`Search for Existing Customer` and `Create Customer`), replace the `YOUR_JIRA_DOMAIN` placeholder with your actual Atlassian domain (e.g., `my-company.atlassian.net`).\n5.  **Activate Workflow**: Save and activate the workflow.",
+  "featuredImage": "/data/workflows/10280/10280.webp",
+  "author": {
+    "id": 101,
+    "slug": "websensepro",
+    "name": "Websensepro",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 243,
+  "downloads": 24,
+  "createdAt": "2025-10-29T14:23:59.335Z",
+  "updatedAt": "2026-01-16T09:04:15.137Z",
+  "publishedAt": "2025-10-29T14:23:59.335Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10280",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatically assign Jira Service Management reporter from forwarded emails",
+    "workflowName": "Automatically assign Jira Service Management reporter from forwarded emails",
+    "description": "## Automatically Assign Jira Service Management Reporter from Forwarded Emails\n\nThis workflow solves a common problem in Jira Service Management: when an email is forwarded to create a ticket, Jira often sets the forwarding system (e.g., support@yourcompany.com) as the reporter, not the original customer. This template automates the process of parsing the original sender's details from the email body and correctly assigning them as the ticket's reporter.\n\nIf the customer doesn't exist in Jira, a new customer profile is created automatically before the ticket is assigned.\n\n## What it Does\n1.  **Triggers on New Issue**: The workflow starts when a new issue is created in a specified Jira project.\n2.  **Filters Forwarded Emails**: An If node checks if the issue was created by one of your internal forwarding email addresses. The workflow only proceeds for these specific issues.\n3.  **Parses Details**: A Code node uses regular expressions to parse the issue description (the forwarded email's body) and extract the original sender's name and email address.\n4.  **Searches for Existing Customer**: An HTTP Request node checks if a customer with the extracted email already exists in your Jira Service Desk.\n5.  **Creates New Customer**: If the customer is not found, another HTTP Request node creates a new customer profile in Jira Service Management.\n6.  **Assigns Reporter**: Finally, a Jira node updates the issue's \"Reporter\" field to the existing or newly created customer, ensuring the ticket is correctly associated with the original sender.\n\n## Use Cases\n- **Shared Support Inboxes**: Automatically process emails sent to a general support inbox (e.g., `support@company.com`) that are then forwarded to Jira.\n- **Departmental Forwarding**: Handle tickets forwarded from specific departments (e.g., `sales@company.com` or `billing@company.com`) and assign the original sender correctly.\n- **Personal Email Forwarding**: Useful when a team member forwards a customer email from their personal inbox to the Jira Service Management-connected address.\n\n## Customization\nThe `Parse Details From Description` node uses a regular expression (regex) to find the sender's email. The default regex is designed for standard forwarded emails that look like this:\n`From: John Doe &lt;john.doe@example.com&gt;`\n\nIf your email client forwards emails in a different format, you may need to adjust the regex in the Code node. For example, if your format is `From: [john.doe@example.com]`, you would need to update the regex pattern to match this structure.\n\n## Troubleshooting\n- **Reporter Not Being Updated**:\n    -   Verify that the forwarding email addresses in the `Filter Forwarding Emails` node are correct.\n    -   Check the body of the Jira ticket's description to ensure the forwarded email content is present and in a format the regex can parse.\n- **Customer Not Found/Created**:\n    -   Ensure your Jira API credentials have the necessary permissions to search for and create customers in Jira Service Management.\n- **Workflow Not Triggering**:\n    -   Confirm that the Jira Trigger is correctly configured for the right project and that the webhook is active in your Jira instance.\n\n## Requirements\n- An n8n instance (self-hosted or cloud).\n- Jira Software Cloud API credentials with Service Management permissions.\n\n## How to Set Up\n1.  **Connect Credentials**: In the Jira Trigger, Jira, and HTTP Request nodes, select your Jira Software Cloud API credentials.\n2.  **Configure Trigger**: In the `Jira Trigger` node, select the Jira project you want this workflow to monitor.\n3.  **Set Filter Emails**: In the `Filter Forwarding Emails` (If) node, replace the placeholder email addresses with the internal email addresses that forward mail to Jira.\n4.  **Update Jira Domain**: In both HTTP Request nodes (`Search for Existing Customer` and `Create Customer`), replace the `YOUR_JIRA_DOMAIN` placeholder with your actual Atlassian domain (e.g., `my-company.atlassian.net`).\n5.  **Activate Workflow**: Save and activate the workflow.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Forwarding Emails",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set Description Variable",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Parse Details From Description",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Reporter (New Customer)",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search for Existing Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "If Customer Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update Reporter (Existing Customer)",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Jira Trigger1",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "role": "jiraTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Create Customer1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>n8n Workflow Viewer v2.0</title>
+  <script src="lib/webcomponents-loader.js"></script>
+  <script src="lib/polyfill-support.js"></script>
+  <script type="module" src="lib/n8n-demo.bundled.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: auto;
+    }
+    #container {
+      background: white;
+      border: none;
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+    }
+    n8n-demo {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    /* 隐藏组件自带的控制按钮，让截图更纯净 */
+    n8n-demo::part(controls),
+    n8n-demo::part(zoom-controls),
+    .workflow-canvas-controls,
+    .canvas-controls,
+    .zoom-controls,
+    .controls,
+    [class*="controls"],
+    [class*="button"],
+    [class*="Zoom"] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <n8n-demo id="workflow" theme="light" frame="false" clicktointeract="false" disableinteractivity="true" zoom="2"></n8n-demo>
+  </div>
+  <script>
+    /**
+     * 渲染工作流数据
+     * @param {Object} data 工作流 JSON 数据
+     */
+    window.renderWorkflow = async (data) => {
+      // console.log('Starting render for workflow:', data.name || 'unnamed');
+      
+      const container = document.getElementById('container');
+      if (!container) {
+        throw new Error('Container element not found');
+      }
+
+      // 清理旧的组件，确保每次都是全新的开始
+      container.innerHTML = '';
+
+      // 万能提取公式：处理 api.n8n.io 的双重嵌套、标准嵌套、字符串化嵌套及扁平结构
+      // 严格按照主站逻辑 (workflows/[slug].astro) 构建
+      const extractWorkflow = (rawData) => {
+        let workflowObj = rawData;
+        
+        // 处理第一层嵌套
+        if (rawData.workflow) {
+          if (typeof rawData.workflow === 'object') {
+            workflowObj = rawData.workflow;
+          } else if (typeof rawData.workflow === 'string') {
+            try { workflowObj = JSON.parse(rawData.workflow); } catch (e) {
+              console.error('Failed to parse first-level workflow string:', e);
+            }
+          }
+        }
+
+        // 处理第二层嵌套 (api.n8n.io 格式)
+        let core = workflowObj;
+        if (workflowObj.workflow) {
+          if (typeof workflowObj.workflow === 'object') {
+            core = workflowObj.workflow;
+          } else if (typeof workflowObj.workflow === 'string') {
+            try { core = JSON.parse(workflowObj.workflow); } catch (e) {
+              console.error('Failed to parse second-level workflow string:', e);
+            }
+          }
+        }
+
+        // 严格按照主站逻辑构建，确保字段完整
+        // 注意：core 是最深层，优先使用它的数据
+        const finalData = {
+          name: rawData.name || workflowObj.name || core.name || 'Unnamed Workflow',
+          nodes: core.nodes || [],  // core.nodes 必须优先！
+          connections: core.connections || {},  // core.connections 必须优先！
+          settings: core.settings || workflowObj.settings || rawData.settings || {},
+          active: false,
+          id: rawData.id || workflowObj.id || core.id,
+          createdAt: rawData.createdAt || workflowObj.createdAt || core.createdAt,
+          updatedAt: rawData.updatedAt || workflowObj.updatedAt || core.updatedAt || rawData.createdAt || workflowObj.createdAt || core.createdAt
+        };
+        
+        console.log('Extract result - nodes:', finalData.nodes.length, 'from core:', !!core.nodes, 'from workflowObj:', !!workflowObj.nodes);
+        return finalData;
+      };
+
+      const workflowData = extractWorkflow(data);
+      console.log('Extracted workflow data:', {
+        name: workflowData.name,
+        nodeCount: workflowData.nodes?.length,
+        hasConnections: !!workflowData.connections
+      });
+      
+      if (!workflowData.nodes || !Array.isArray(workflowData.nodes)) {
+        console.error('Invalid workflow data: nodes missing or not an array', workflowData);
+        throw new Error('Invalid workflow structure: missing nodes array');
+      }
+      
+      if (workflowData.nodes.length === 0) {
+        console.warn('Workflow has zero nodes');
+      }
+
+      // 创建新的组件实例
+      const viz = document.createElement('n8n-demo');
+      viz.id = 'workflow';
+      viz.setAttribute('theme', 'light');
+      viz.setAttribute('frame', 'false');
+      viz.setAttribute('clicktointeract', 'false');
+      viz.setAttribute('disableinteractivity', 'true');
+      viz.setAttribute('hidecanvaserrors', 'true');
+      viz.setAttribute('zoom', '2');
+      
+      // 严格按照主站属性设置方式，不设置 src，使用默认值
+      const jsonStr = JSON.stringify(workflowData);
+      viz.setAttribute('workflow', jsonStr);
+      
+      console.log('Setting viz.workflow data, nodes count:', workflowData.nodes?.length);
+      
+      container.appendChild(viz);
+      
+      // 挂载后再设置一次 property，确保双向绑定生效
+      setTimeout(() => {
+        viz.workflow = jsonStr;
+      }, 0);
+
+      // 监控错误状态
+      const errorCheck = setInterval(() => {
+        if (viz.error) {
+          console.error('Component entered error state. Current workflow property:', viz.workflow ? 'set' : 'empty');
+          try {
+            const parsed = JSON.parse(viz.workflow);
+            console.log('Parsed workflow nodes count:', parsed.nodes?.length);
+          } catch (e) {
+            console.error('Workflow property is not valid JSON:', e.message);
+          }
+          clearInterval(errorCheck);
+        }
+      }, 100);
+
+      // 返回一个 Promise，确保渲染完成
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          console.warn('Render timeout reached, resolving anyway');
+          window.removeEventListener('message', onMessage);
+          resolve(true);
+        }, 90000); // 增加到 90 秒超时，支持超大型工作流
+
+        const onMessage = (event) => {
+          if (event.data && typeof event.data === 'string') {
+            try {
+              const msg = JSON.parse(event.data);
+              // 兼容多种 ready 消息
+              if (msg.command === 'n8nReady' || msg.event === 'READY' || msg.event === 'n8nReady') {
+                console.log('n8n iframe is ready, waiting for final layout...');
+                
+                // 触发缩放以适应
+                setTimeout(() => {
+                  const shadow = viz.shadowRoot;
+                  const iframe = shadow?.querySelector('iframe');
+                  if (iframe && iframe.contentWindow) {
+                    iframe.contentWindow.postMessage(JSON.stringify({
+                      event: 'COMMAND',
+                      command: 'zoomToFit'
+                    }), '*');
+                  }
+                  
+                  // 给一点时间让缩放完成
+                  setTimeout(() => {
+                    console.log('Rendering stable, resolving...');
+                    window.removeEventListener('message', onMessage);
+                    clearTimeout(timeout);
+                    resolve(true);
+                  }, 1000); // 缩短等待时间
+                }, 500);
+              }
+            } catch (e) {}
+          }
+        };
+
+        window.addEventListener('message', onMessage);
+      });
+    };
+
+    // 暴露一个状态检查函数供 Puppeteer 使用
+    window.isRendered = () => {
+      const viz = document.getElementById('workflow');
+      if (!viz || !viz.shadowRoot) return false;
+      const iframe = viz.shadowRoot.querySelector('iframe');
+      if (!iframe) return false;
+      
+      try {
+        // 只要 iframe 存在且加载了，我们就认为初步渲染了
+        // 具体的稳定逻辑交给 renderWorkflow 的 Promise
+        return true;
+      } catch (e) {
+        return !!iframe;
+      }
+    };
+
+    /**
+     * 获取工作流内容的实际边界
+     */
+    window.getWorkflowBounds = async () => {
+      const viz = document.getElementById('workflow');
+      if (!viz || !viz.shadowRoot) return null;
+      
+      const iframe = viz.shadowRoot.querySelector('iframe');
+      if (!iframe) return null;
+
+      try {
+        // 尝试从 iframe 内部获取内容尺寸
+        const bounds = await new Promise((resolve) => {
+          const onMessage = (event) => {
+            try {
+              const msg = JSON.parse(event.data);
+              if (msg.event === 'OUTPUT' && msg.command === 'canvasBounds') {
+                window.removeEventListener('message', onMessage);
+                resolve(msg.data);
+              }
+            } catch (e) {}
+          };
+          window.addEventListener('message', onMessage);
+          
+          // 请求边界信息
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: 'COMMAND',
+            command: 'getCanvasBounds'
+          }), '*');
+
+          // 兜底
+          setTimeout(() => {
+            window.removeEventListener('message', onMessage);
+            const rect = viz.getBoundingClientRect();
+            resolve({
+              width: rect.width,
+              height: rect.height,
+              x: 0,
+              y: 0
+            });
+          }, 2000);
+        });
+
+        return bounds;
+      } catch (e) {
+        console.error('Failed to get bounds:', e);
+        return null;
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+Fetches Zammad tickets at daily basis at 08:30 then sends them to #customer support&gt;ticket on zulip for daily standups.

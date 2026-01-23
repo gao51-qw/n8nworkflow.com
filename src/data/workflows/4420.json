@@ -1,0 +1,85 @@
+{
+  "id": 4420,
+  "slug": "4420",
+  "title": "Automated daily Outlook calendar meeting digest",
+  "description": "# Automated Daily Outlook Calendar Meeting Digest\n\n## Overall Goal\nThis workflow automatically runs at a scheduled time (daily at 8 AM by default), calculates the current day's date range, fetches all calendar events from a specified Microsoft Outlook account for that day, formats these events into a user-friendly HTML email, and then sends this digest to a designated email address.\n\n---\n\n## How it Works (Step-by-Step Breakdown):\n\n### Node: **Schedule Trigger** (Schedule Trigger Node)\n- **Type:** `n8n-nodes-base.scheduleTrigger`  \n- **Purpose:** Automatically starts the workflow at a predefined time.  \n- **Configuration:**  \n  - Rule &gt; Interval &gt; Trigger At Hour: 8  \n    (Triggers every day at 8:00 AM according to the n8n server's timezone)  \n- **Output:** Triggers the workflow execution at the scheduled time.\n\n### Node: **Code** (Code Node)\n- **Type:** `n8n-nodes-base.code`  \n- **Purpose:** Dynamically calculates the start and end timestamps for \"today,\" based on when the workflow is triggered.  \n- **Configuration (JS Code):**  \n  - Gets the current date and time (workflow runtime).  \n  - Sets `today` to beginning of current day (00:00:00).  \n  - Sets `tomorrow` to beginning of next day (00:00:00).  \n  - Converts these to ISO string format (e.g., `2023-10-27T00:00:00Z`).  \n- **Output:** JSON object with `today` and `tomorrow` ISO date strings.\n\n### Node: **Microsoft Outlook** (Microsoft Outlook Node)\n- **Type:** `n8n-nodes-base.microsoftOutlook`  \n- **Purpose:** Fetch calendar events from Outlook within the calculated date range.  \n- **Configuration:**  \n  - Resource: Event  \n  - Filters (Custom):  \n    ```\n    start/dateTime ge '{{$json.today}}' and start/dateTime lt '{{$json.tomorrow}}'\n    ```  \n  (OData filter to fetch events starting on or after today and before tomorrow, i.e., all today's events.)  \n- **Output:** List of event objects from Outlook.\n\n### Node: **Edit Fields** (Set Node)\n- **Type:** `n8n-nodes-base.set`  \n- **Purpose:** Transform and simplify the event data structure from Outlook.  \n- **Configuration:** Maps fields from Outlook event to new field names:  \n  - `id`  \n  - `subject`  \n  - `description` (from `bodyPreview`)  \n  - `meeting_start`  \n  - `meeting_end`  \n  - `attendees`  \n  - `meeting_organizer`  \n  - `meeting_organizer_email`  \n  - `meeting_link`  \n- **Output:** List of JSON objects with simplified meeting details.\n\n### Node: **Generate HTML** (Code Node)\n- **Type:** `n8n-nodes-base.code`  \n- **Purpose:** Generate a single HTML email body summarizing all meetings and create the email subject line.  \n- **Configuration (JS Code):**  \n  - Processes all meeting items from \"Edit Fields\" node.  \n  - Defines `generateMeetingReminderEmail` function to format each meeting into an HTML \"card.\"  \n  - Escapes HTML special characters, formats times, attendees, etc.  \n  - Concatenates all cards into a full HTML document.  \n  - Generates subject line (e.g., \"🗓️ Your Meetings Today – Friday, Oct 27\").  \n- **Output:** JSON object with:  \n  ```json\n  {\n    \"subject\": \"email subject string\",\n    \"html\": \"generated HTML content string\"\n  }\n  ```\n\n### Node: **Send Email** (Email Send Node)\n- **Type:** `n8n-nodes-base.emailSend`  \n- **Purpose:** Send the generated HTML digest email to the designated recipient.  \n- **Configuration:**  \n  - From Email: `test@gmail.com`  \n  - To Email: `akhilgadiraju@gmail.com`  \n  - Subject: `{{ $json.subject }}` (dynamic from Generate HTML node)  \n  - HTML: `{{ $json.html }}` (dynamic from Generate HTML node)  \n- **Output:** Email sending status.\n\n---\n\n## Sticky Notes\n- **Update Time:** Near \"Schedule Trigger\" node; configure trigger time as needed.  \n- **Update Email Details:** Near \"Send Email\" node; change sender and receiver email addresses.\n\n---\n\n## How to Customize It\n\n- **Schedule (Schedule Trigger node):**  \n  Modify the trigger hour, minutes, or days of week to change when the workflow runs.\n\n- **Date Range (Code node):**  \n  Adjust JS to change date range (e.g., next business day, upcoming week).\n\n- **Outlook Calendar (Microsoft Outlook node):**  \n  Specify Calendar ID or refine OData filters for event selection.\n\n- **Event Details (Edit Fields node):**  \n  Add/remove/modify event fields extracted.\n\n- **Email Appearance and Content (Generate HTML node):**  \n  Change CSS styling, meeting details, or subject line logic.\n\n- **No Meetings Scenario:**  \n  Use an \"If\" node after \"Edit Fields\" to handle no-meeting days (e.g., send \"No meetings today!\" email or skip email).\n\n- **Email Recipients (Send Email node):**  \n  Update \"From\" and \"To\" emails; multiple recipients separated by commas.\n\n---\n\n## Error Handling\n- Use \"Error Trigger\" nodes to catch and handle failures (Outlook API, SMTP errors).\n- Send alerts or log errors accordingly.\n\n---\n\n## Use Cases\n- **Automated Daily Personal Meeting Briefing:** Get daily email summaries of your meetings.  \n- **Automated Team Meeting Digest:** Send daily team calendar digest emails.  \n- **Proactive Daily Planning:** Automatically stay informed of your day’s schedule.\n\n---\n\n## Required Credentials\n\nAdd these credentials in your n8n instance under **Credentials**:\n\n- **Microsoft Outlook (OAuth2 API):**  \n  - Used by: \"Microsoft Outlook\" node  \n  - Credential Name in Workflow: `Outlook` (ID: `JcYqVJwcwZIhB8oy`)  \n  - Requires OAuth2 with `Calendars.Read` permission.\n\n- **SMTP:**  \n  - Used by: \"Send Email\" node  \n  - Credential Name in Workflow: `SMTP account` (ID: `vCexcphurglwGBfk`)  \n  - Requires SMTP server details (host, port, username, password).\n\nEnsure these credentials are configured correctly with required permissions. Activate the workflow for scheduled execution.\n\n---\n\nMade with ❤️ using n8n by Akhil.\n",
+  "featuredImage": "/data/workflows/4420/4420.webp",
+  "author": {
+    "id": 101,
+    "slug": "akhilv7",
+    "name": "Akhil Varma Gadiraju",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 4242,
+  "downloads": 424,
+  "createdAt": "2025-05-27T06:47:50.602Z",
+  "updatedAt": "2026-01-16T08:34:16.986Z",
+  "publishedAt": "2025-05-27T06:47:50.602Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4420",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated daily Outlook calendar meeting digest",
+    "workflowName": "Automated daily Outlook calendar meeting digest",
+    "description": "# Automated Daily Outlook Calendar Meeting Digest\n\n## Overall Goal\nThis workflow automatically runs at a scheduled time (daily at 8 AM by default), calculates the current day's date range, fetches all calendar events from a specified Microsoft Outlook account for that day, formats these events into a user-friendly HTML email, and then sends this digest to a designated email address.\n\n---\n\n## How it Works (Step-by-Step Breakdown):\n\n### Node: **Schedule Trigger** (Schedule Trigger Node)\n- **Type:** `n8n-nodes-base.scheduleTrigger`  \n- **Purpose:** Automatically starts the workflow at a predefined time.  \n- **Configuration:**  \n  - Rule &gt; Interval &gt; Trigger At Hour: 8  \n    (Triggers every day at 8:00 AM according to the n8n server's timezone)  \n- **Output:** Triggers the workflow execution at the scheduled time.\n\n### Node: **Code** (Code Node)\n- **Type:** `n8n-nodes-base.code`  \n- **Purpose:** Dynamically calculates the start and end timestamps for \"today,\" based on when the workflow is triggered.  \n- **Configuration (JS Code):**  \n  - Gets the current date and time (workflow runtime).  \n  - Sets `today` to beginning of current day (00:00:00).  \n  - Sets `tomorrow` to beginning of next day (00:00:00).  \n  - Converts these to ISO string format (e.g., `2023-10-27T00:00:00Z`).  \n- **Output:** JSON object with `today` and `tomorrow` ISO date strings.\n\n### Node: **Microsoft Outlook** (Microsoft Outlook Node)\n- **Type:** `n8n-nodes-base.microsoftOutlook`  \n- **Purpose:** Fetch calendar events from Outlook within the calculated date range.  \n- **Configuration:**  \n  - Resource: Event  \n  - Filters (Custom):  \n    ```\n    start/dateTime ge '{{$json.today}}' and start/dateTime lt '{{$json.tomorrow}}'\n    ```  \n  (OData filter to fetch events starting on or after today and before tomorrow, i.e., all today's events.)  \n- **Output:** List of event objects from Outlook.\n\n### Node: **Edit Fields** (Set Node)\n- **Type:** `n8n-nodes-base.set`  \n- **Purpose:** Transform and simplify the event data structure from Outlook.  \n- **Configuration:** Maps fields from Outlook event to new field names:  \n  - `id`  \n  - `subject`  \n  - `description` (from `bodyPreview`)  \n  - `meeting_start`  \n  - `meeting_end`  \n  - `attendees`  \n  - `meeting_organizer`  \n  - `meeting_organizer_email`  \n  - `meeting_link`  \n- **Output:** List of JSON objects with simplified meeting details.\n\n### Node: **Generate HTML** (Code Node)\n- **Type:** `n8n-nodes-base.code`  \n- **Purpose:** Generate a single HTML email body summarizing all meetings and create the email subject line.  \n- **Configuration (JS Code):**  \n  - Processes all meeting items from \"Edit Fields\" node.  \n  - Defines `generateMeetingReminderEmail` function to format each meeting into an HTML \"card.\"  \n  - Escapes HTML special characters, formats times, attendees, etc.  \n  - Concatenates all cards into a full HTML document.  \n  - Generates subject line (e.g., \"🗓️ Your Meetings Today – Friday, Oct 27\").  \n- **Output:** JSON object with:  \n  ```json\n  {\n    \"subject\": \"email subject string\",\n    \"html\": \"generated HTML content string\"\n  }\n  ```\n\n### Node: **Send Email** (Email Send Node)\n- **Type:** `n8n-nodes-base.emailSend`  \n- **Purpose:** Send the generated HTML digest email to the designated recipient.  \n- **Configuration:**  \n  - From Email: `test@gmail.com`  \n  - To Email: `akhilgadiraju@gmail.com`  \n  - Subject: `{{ $json.subject }}` (dynamic from Generate HTML node)  \n  - HTML: `{{ $json.html }}` (dynamic from Generate HTML node)  \n- **Output:** Email sending status.\n\n---\n\n## Sticky Notes\n- **Update Time:** Near \"Schedule Trigger\" node; configure trigger time as needed.  \n- **Update Email Details:** Near \"Send Email\" node; change sender and receiver email addresses.\n\n---\n\n## How to Customize It\n\n- **Schedule (Schedule Trigger node):**  \n  Modify the trigger hour, minutes, or days of week to change when the workflow runs.\n\n- **Date Range (Code node):**  \n  Adjust JS to change date range (e.g., next business day, upcoming week).\n\n- **Outlook Calendar (Microsoft Outlook node):**  \n  Specify Calendar ID or refine OData filters for event selection.\n\n- **Event Details (Edit Fields node):**  \n  Add/remove/modify event fields extracted.\n\n- **Email Appearance and Content (Generate HTML node):**  \n  Change CSS styling, meeting details, or subject line logic.\n\n- **No Meetings Scenario:**  \n  Use an \"If\" node after \"Edit Fields\" to handle no-meeting days (e.g., send \"No meetings today!\" email or skip email).\n\n- **Email Recipients (Send Email node):**  \n  Update \"From\" and \"To\" emails; multiple recipients separated by commas.\n\n---\n\n## Error Handling\n- Use \"Error Trigger\" nodes to catch and handle failures (Outlook API, SMTP errors).\n- Send alerts or log errors accordingly.\n\n---\n\n## Use Cases\n- **Automated Daily Personal Meeting Briefing:** Get daily email summaries of your meetings.  \n- **Automated Team Meeting Digest:** Send daily team calendar digest emails.  \n- **Proactive Daily Planning:** Automatically stay informed of your day’s schedule.\n\n---\n\n## Required Credentials\n\nAdd these credentials in your n8n instance under **Credentials**:\n\n- **Microsoft Outlook (OAuth2 API):**  \n  - Used by: \"Microsoft Outlook\" node  \n  - Credential Name in Workflow: `Outlook` (ID: `JcYqVJwcwZIhB8oy`)  \n  - Requires OAuth2 with `Calendars.Read` permission.\n\n- **SMTP:**  \n  - Used by: \"Send Email\" node  \n  - Credential Name in Workflow: `SMTP account` (ID: `vCexcphurglwGBfk`)  \n  - Requires SMTP server details (host, port, username, password).\n\nEnsure these credentials are configured correctly with required permissions. Activate the workflow for scheduled execution.\n\n---\n\nMade with ❤️ using n8n by Akhil.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Microsoft Outlook",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate HTML",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

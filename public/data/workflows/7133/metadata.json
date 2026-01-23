@@ -1,0 +1,27 @@
+{
+  "id": 7133,
+  "slug": "7133",
+  "title": "Daily Google Ads performance to Notion and Google Sheets",
+  "description": "## Description\n\nThis workflow automates the daily reporting of Google Ads campaign performance. It pulls click and conversion data from the Google Ads API, merges both datasets, and stores the results into Notion databases and Google Sheets.\n\nIt includes a campaign-level log and a daily performance summary. The workflow is triggered automatically every day at **08:00 AM**, helping marketing teams maintain a consistent and centralized reporting system without manual effort.\n\n---\n\n## How It Works\n\n1. **Scheduled Trigger at 08:00 AM**  \n   The workflow begins with a `Schedule Trigger` node that runs once per day at 08:00.\n\n2. **Set Yesterday’s Date**  \n   The `Set` node defines a variable for the target date (yesterday), which is used in the API queries.\n\n3. **Query Google Ads API – Clicks & Cost**  \n   The first HTTP request pulls campaign-level metrics:\n   - `campaign.id`, `campaign.name`  \n   - `metrics.clicks`, `metrics.impressions`, `metrics.cost_micros`\n\n4. **Query Google Ads API – Conversions**  \n   The second HTTP request pulls conversion-related data:\n   - `metrics.conversions`, `segments.conversion_action_name`\n\n5. **Split and Merge**  \n   Both responses are split into individual campaign rows and merged using:\n   - `campaign.id`  \n   - `segments.date`  \n\n6. **Store Campaign-Level Data**  \n   - Stored in Notion database: **\"Google Ads Campaign Tracker\"**  \n   - Appended to Google Sheets tab: **\"Campaign Daily Report\"**\n\n7. **Generate Daily Summary**  \n   A code node calculates daily totals across all campaigns:\n   - Total impressions, clicks, conversions, cost\n   - Unique conversion types  \n   The summary is stored in:\n   - Notion database: **\"Google Ads Daily Summary\"**  \n   - Google Sheets tab: **\"Summary Report\"**\n\n---\n\n## Setup Steps\n\n### 1. Schedule the Workflow\n- The workflow is triggered using a `Schedule Trigger` node\n- Set the schedule to run **every day at 08:00 AM**\n- Connect it to the `Set Yesterday Date` node\n\n### 2. Google Ads API Access\n- Create a Google Ads developer account and obtain a **developer token**\n- Set up OAuth2 credentials with Google Ads scope\n- In n8n, configure the **Google Ads OAuth2 API** credential\n- Ensure HTTP request headers include:\n  - `developer-token`\n  - `login-customer-id`\n  - `Content-Type: application/json`\n\n### 3. Notion Database Setup\nCreate two databases in Notion:\n- **Google Ads Campaign Tracker**\n  - Fields: `Campaign Name`, `Campaign ID`, `Impressions`, `Clicks`, `Cost`, `Conversion Type`, `Conversions`, `Date`\n- **Google Ads Daily Summary**\n  - Fields: `Date`, `Total Impressions`, `Total Clicks`, `Total Conversions`, `Total Cost`, `Conversion Types`\n- Share both databases with your Notion integration\n\n### 4. Google Sheets Setup\n- Create a spreadsheet with two tabs:\n  - `Campaign Daily Report` → for campaign-level rows\n  - `Summary Report` → for daily aggregated metrics\n- Match all column headers to the workflow fields\n- Connect your Google account to n8n using **Google Sheets OAuth2**\n\n---\n\n## Output Summary\n\n**Notion Databases:**\n- `Google Ads Campaign Tracker`: stores individual campaign metrics\n- `Google Ads Daily Summary`: stores daily totals and conversion types\n\n**Google Sheets Tabs:**\n- `Campaign Daily Report`: per-campaign data\n- `Summary Report`: aggregated daily performance",
+  "featuredImage": "/data/workflows/7133/7133.webp",
+  "author": {
+    "id": 101,
+    "slug": "azizdev",
+    "name": "Aziz dev",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1115,
+  "downloads": 111,
+  "createdAt": "2025-08-07T12:28:02.656Z",
+  "updatedAt": "2026-01-16T08:48:40.600Z",
+  "publishedAt": "2025-08-07T12:28:02.656Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7133"
+}

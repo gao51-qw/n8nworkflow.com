@@ -1,0 +1,98 @@
+# Redis locking for concurrent task handling
+
+> ## 👤 Who is this for?
+
+This workflow is great for **n8n users who want to prevent duplicate or overlapping workflow runs**. If you're a developer, DevOps engineer, or automation enthusiast managing tasks like **database updates, syncing tools, or hitting rate-limited APIs**, this one’s for you.
+
+---
+
+## 🧩 What problem does this solve?
+
+In the real world, automations can get triggered at the same time—whether that’s because of multiple webhook calls, overlapping schedules, or retries. And when two workflows try to do the same thing at once (like updating a record or syncing data), it can cause **conflicts, data corruption, or wasted API calls**.
+
+This workflow helps avoid that problem by using **Redis as a lock system**, so **only one instance runs at a time**. Think of it like putting up a “🚧 Workflow in Progress” sign while your logic is running.
+
+---
+
+## ⚙️ What this workflow does
+
+1. When the workflow starts, it tries to **set a Redis key** as a lock with a short expiry.
+2. If the lock is free:
+   - Your **main business logic runs**.
+   - Once it's done, the lock is cleared.
+3. If the lock is already taken (i.e., another run is in progress):
+   - The workflow will **wait and retry** a few times.
+4. If a duplicate request shows up while one is already being processed:
+   - It **skips that duplicate** to avoid unnecessary work.
+
+You can customize both the **timeout** and **retry logic** to match your needs.
+
+---
+
+## 🛠️ Setup guide
+
+To use this template:
+
+- You’ll need access to a **Redis instance** (either self-hosted or managed like Upstash, Redis Cloud, etc).
+- Set up your Redis credentials in the n8n Redis node.
+- Swap out the webhook node with your actual trigger or logic.
+- Adjust the lock timeout to match how long your task typically takes.
+
+&gt; 💡 **Bonus Tip:** Use this pattern wherever you need **idempotency** or want to avoid **duplicate processing**.
+
+---
+
+## 🧪 Example use case
+
+Let’s say you have a workflow that **syncs ClickUp tickets to Google Sheets**. It runs daily at 9 AM and updates tickets, adds notes, and makes sure nothing is missed.
+
+But what if two runs start at the same time? Or someone triggers a manual sync while the scheduled one is still working?
+
+By wrapping that whole sync inside this **Redis locking template**, you can make sure it **only runs one at a time**, saving your APIs (and your sanity).
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3444
+- **Complexity:** advanced
+- **Node Count:** 18
+- **Views:** 672
+- **Downloads:** 67
+- **Created:** 2025/4/6
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3444)
+
+## 👤 Author
+
+- **Name:** Geoffrey Saxena
+- **Username:** @geffy
+
+## 🏷️ Categories
+
+- DevOps
+
+## 🔗 Nodes Used
+
+- **noOp** 
+- **set** (×3)
+- **webhook** 
+- **code** 
+- **redis** (×3)
+- **if** (×3)
+- **wait** 
+- **stickyNote** (×4)
+- **switch** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 18 nodes with 12 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

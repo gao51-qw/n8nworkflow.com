@@ -1,0 +1,224 @@
+{
+  "id": 10560,
+  "slug": "10560",
+  "title": "Qualify leads with Salesforce, Explorium data & Claude AI analysis of API usage",
+  "description": "# Inbound Agent - AI-Powered Lead Qualification with Product Usage Intelligence\n\nThis n8n workflow automatically qualifies and scores inbound leads by combining their product usage patterns with deep company intelligence. The workflow pulls new leads from your CRM, analyzes which API endpoints they've been testing, enriches them with firmographic data, and generates comprehensive qualification reports with personalized talking points—giving your sales team everything they need to prioritize and convert high-quality leads.\n\n\n## DEMO\n\n[Template Demo](https://youtu.be/Mf2qQdI1KqY)\n\n## Credentials Required\n\nTo use this workflow, set up the following credentials in your n8n environment:\n\n### Salesforce\n- **Type:** OAuth2 or Username/Password\n- **Used for:** Pulling lead reports and creating follow-up tasks\n- Alternative CRM options: HubSpot, Zoho, Pipedrive\n- Get credentials at [Salesforce Setup](https://login.salesforce.com/)\n\n### Databricks (or Analytics Platform)\n- **Type:** HTTP Request with Bearer Token\n- **Header:** `Authorization`\n- **Value:** `Bearer YOUR_DATABRICKS_TOKEN`\n- **Used for:** Querying product usage and API endpoint data\n- Alternative options: Datadog, Mixpanel, Amplitude, custom data warehouse\n\n### Explorium API\n- **Type:** Generic Header Auth\n- **Header:** `Authorization`\n- **Value:** `Bearer YOUR_API_KEY`\n- **Used for:** Business matching and firmographic enrichment\n- Get your API key at [Explorium Dashboard](https://app.explorium.ai/)\n\n### Explorium MCP\n- **Type:** HTTP Header Auth\n- **Used for:** Real-time company intelligence and supplemental research\n- Connect to: `https://mcp.explorium.ai/mcp`\n\n### Anthropic API\n- **Type:** API Key\n- **Used for:** AI-powered lead qualification and analysis\n- Get your API key at [Anthropic Console](https://console.anthropic.com/)\n\nGo to **Settings → Credentials**, create these credentials, and assign them in the respective nodes before running the workflow.\n\n---\n\n## Workflow Overview\n\n### Node 1: When clicking 'Execute workflow'\nManual trigger that initiates the lead qualification process.\n\n- **Type:** Manual Trigger\n- **Purpose:** On-demand execution for testing or manual runs\n\n**Alternative Trigger Options:**\n- **Schedule Trigger:** Run automatically (hourly, daily, weekly)\n- **Webhook:** Trigger on CRM updates or new lead events\n- **CRM Trigger:** Real-time activation when leads are created\n\n### Node 2: GET SF Report\nPulls lead data from a pre-configured Salesforce report.\n\n- **Method:** GET\n- **Endpoint:** Salesforce Analytics Reports API\n- **Authentication:** Salesforce OAuth2\n\n**Returns:** Raw Salesforce report data including:\n- Lead contact information\n- Company names\n- Lead source and status\n- Created dates\n- Custom fields\n\n**CRM Alternatives:** This node can be replaced with HubSpot, Zoho, or any CRM's reporting API.\n\n### Node 3: Extract Records\nParses the Salesforce report structure and extracts individual lead records.\n\n**Extraction Logic:**\n- Navigates report's `factMap['T!T'].rows` structure\n- Maps data cells to named fields\n\n### Node 4: Extract Tenant Names\nPrepares tenant identifiers for usage data queries.\n\n**Purpose:** Formats tenant names as SQL-compatible strings for the Databricks query\n**Output:** Comma-separated, quoted list: `'tenant1', 'tenant2', 'tenant3'`\n\n### Node 5: Query Databricks\nQueries your analytics platform to retrieve API usage data for each lead.\n\n- **Method:** POST\n- **Endpoint:** `/api/2.0/sql/statements`\n- **Authentication:** Bearer token in headers\n- **Warehouse ID:** Your Databricks cluster ID\n\n**Platform Alternatives:** \n- **Datadog:** Query logs via Logs API\n- **Mixpanel:** Event segmentation API\n- **Amplitude:** Behavioral cohorts API\n- **Custom Warehouse:** PostgreSQL, Snowflake, BigQuery queries\n\n### Node 6: Split Out\nSplits the Databricks result array into individual items for processing.\n\n- **Field:** `result.data_array`\n- **Purpose:** Transform single response with multiple rows into separate items\n\n### Node 7: Rename Keys\nNormalizes column names from database query to readable field names.\n\n**Mapping:**\n- `0` → `TenantNames`\n- `1` → `endpoints`\n- `2` → `endpointsNum`\n\n### Node 8: Extract Business Names\nPrepares company names for Explorium enrichment.\n\n### Node 9: Loop Over Items\nIterates through each company for individual enrichment.\n\n### Node 10: Explorium API: Match Businesses\nMatches company names to Explorium's business entity database.\n\n- **Method:** POST\n- **Endpoint:** `/v1/businesses/match`\n- **Authentication:** Header Auth (Bearer token)\n\n**Returns:**\n- `business_id`: Unique Explorium identifier\n- `matched_businesses`: Array of potential matches\n- Match confidence scores\n\n### Node 11: Explorium API: Firmographics\nEnriches matched businesses with comprehensive company data.\n\n- **Method:** POST\n- **Endpoint:** `/v1/businesses/firmographics/bulk_enrich`\n- **Authentication:** Header Auth (Bearer token)\n\n**Returns:**\n- Company name, website, description\n- Industry categories (NAICS, SIC, LinkedIn)\n- Size: employee count range, revenue range\n- Location: headquarters address, city, region, country\n- Company age and founding information\n- Social profiles: LinkedIn, Twitter\n- Logo and branding assets\n\n### Node 12: Merge\nCombines API usage data with firmographic enrichment data.\n\n### Node 13: Organize Data as Items\nStructures merged data into clean, standardized lead objects.\n\n**Data Organization:**\n- Maps API usage by tenant name\n- Maps enrichment data by company name\n- Combines with original lead information\n- Creates complete lead profile for analysis\n\n### Node 14: Loop Over Items1\nIterates through each qualified lead for AI analysis.\n\n- **Batch Size:** 1 (analyzes leads individually)\n- **Purpose:** Generate personalized qualification reports\n\n### Node 15: Get many accounts1\nFetches the associated Salesforce account for context.\n\n- **Resource:** Account\n- **Operation:** Get All\n- **Filter:** Match by company name\n- **Limit:** 1 record\n\n**Purpose:** Link lead qualification back to Salesforce account for task creation\n\n### Node 16: AI Agent\nAnalyzes each lead to generate comprehensive qualification reports.\n\n**Input Data:**\n- Lead contact information\n- API usage patterns (which endpoints tested)\n- Firmographic data (company profile)\n- Lead source and status\n\n**Analysis Process:**\n- Evaluates lead quality based on usage, company fit, and signals\n- Identifies which Explorium APIs the lead explored\n- Assesses company size, industry, and potential value\n- Detects quality signals (legitimate company email, active usage) and red flags\n- Determines optimal sales approach and timing\n- Connected to Explorium MCP for supplemental company research if needed\n\n**Output:** Structured qualification report with:\n- **Lead Score:** High Priority, Medium Priority, Low Priority, or Nurture\n- **Quick Summary:** Executive overview of lead potential\n- **API Usage Analysis:** Endpoints used, usage insights, potential use case\n- **Company Profile:** Overview, fit assessment, potential value\n- **Quality Signals:** Positive indicators and concerns\n- **Recommended Actions:** Next steps, timing, and approach\n- **Talking Points:** Personalized conversation starters based on actual API usage\n\n### Node 18: Clean Outputs\nFormats the AI qualification report for Salesforce task creation.\n\n### Node 19: Update Salesforce Records\nCreates follow-up tasks in Salesforce with qualification intelligence.\n\n- **Resource:** Task\n- **Operation:** Create\n- **Authentication:** Salesforce OAuth2\n\n**Alternative Output Options:**\n- **HubSpot:** Create tasks or update deal stages\n- **Outreach/SalesLoft:** Add to sequences with custom messaging\n- **Slack:** Send qualification reports to sales channels\n- **Email:** Send reports to account owners\n- **Google Sheets:** Log qualified leads for tracking\n\n---\n\n## Workflow Flow Summary\n\n1. **Trigger:** Manual execution or scheduled run\n2. **Pull Leads:** Fetch new/updated leads from Salesforce report\n3. **Extract:** Parse lead records and tenant identifiers\n4. **Query Usage:** Retrieve API endpoint usage data from analytics platform\n5. **Prepare:** Format data for enrichment\n6. **Match:** Identify companies in Explorium database\n7. **Enrich:** Pull comprehensive firmographic data\n8. **Merge:** Combine usage patterns with company intelligence\n9. **Organize:** Structure complete lead profiles\n10. **Analyze:** AI evaluates each lead with quality scoring\n11. **Format:** Structure qualification reports for CRM\n12. **Create Tasks:** Automatically populate Salesforce with actionable intelligence\n\nThis workflow eliminates manual lead research and qualification, automatically analyzing product engagement patterns alongside company fit to help sales teams prioritize and personalize their outreach to the highest-value inbound leads.\n\n---\n\n## Customization Options\n\n### Flexible Triggers\nReplace the manual trigger with:\n- **Schedule:** Run hourly/daily to continuously qualify new leads\n- **Webhook:** Real-time qualification when leads are created\n- **CRM Trigger:** Activate on specific lead status changes\n\n### Analytics Platform Integration\nThe Databricks query can be adapted for:\n- **Datadog:** Query application logs and events\n- **Mixpanel:** Analyze user behavior and feature adoption\n- **Amplitude:** Track product engagement metrics\n- **Custom Databases:** PostgreSQL, MySQL, Snowflake, BigQuery\n\n### CRM Flexibility\nWorks with multiple CRMs:\n- **Salesforce:** Full integration (pull reports, create tasks)\n- **HubSpot:** Contact properties and deal updates\n- **Zoho:** Lead enrichment and task creation\n- **Pipedrive:** Deal qualification and activity creation\n\n### Enrichment Depth\nAdd more Explorium endpoints:\n- **Technographics:** Tech stack and product usage\n- **News & Events:** Recent company announcements\n- **Funding Data:** Investment rounds and financial events\n- **Hiring Signals:** Job postings and growth indicators\n\n### Output Destinations\nRoute qualification reports to:\n- **CRM Updates:** Salesforce, HubSpot (update lead scores/fields)\n- **Task Creation:** Any CRM task/activity system\n- **Team Notifications:** Slack, Microsoft Teams, Email\n- **Sales Tools:** Outreach, SalesLoft, Salesloft sequences\n- **Reporting:** Google Sheets, Data Studio dashboards\n\n### AI Model Options\nSwap AI providers:\n- Default: Anthropic Claude (Sonnet 4)\n- Alternatives: OpenAI GPT-4, Google Gemini\n\n---\n\n## Setup Notes\n\n1. **Salesforce Report Configuration:** Create a report with required fields (name, email, company, tenant ID) and use its API endpoint\n2. **Tenant Identification:** Ensure your product usage data includes identifiers that link to CRM leads\n3. **Usage Data Query:** Customize the SQL query to match your database schema and table structure\n4. **MCP Configuration:** Explorium MCP requires Header Auth—configure credentials properly\n5. **Lead Scoring Logic:** Adjust AI system prompts to match your ideal customer profile and qualification criteria\n6. **Task Assignment:** Configure Salesforce task assignment rules or add logic to route to specific sales reps\n\nThis workflow acts as an intelligent lead qualification system that combines behavioral signals (what they're testing) with firmographic fit (who they are) to give sales teams actionable intelligence for every inbound lead.",
+  "featuredImage": "/data/workflows/10560/10560.webp",
+  "author": {
+    "id": 101,
+    "slug": "explorium",
+    "name": "explorium",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 88,
+  "downloads": 8,
+  "createdAt": "2025-11-06T08:44:55.515Z",
+  "updatedAt": "2026-01-16T09:05:31.321Z",
+  "publishedAt": "2025-11-06T08:44:55.515Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10560",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Qualify leads with Salesforce, Explorium data & Claude AI analysis of API usage",
+    "workflowName": "Qualify leads with Salesforce, Explorium data & Claude AI analysis of API usage",
+    "description": "# Inbound Agent - AI-Powered Lead Qualification with Product Usage Intelligence\n\nThis n8n workflow automatically qualifies and scores inbound leads by combining their product usage patterns with deep company intelligence. The workflow pulls new leads from your CRM, analyzes which API endpoints they've been testing, enriches them with firmographic data, and generates comprehensive qualification reports with personalized talking points—giving your sales team everything they need to prioritize and convert high-quality leads.\n\n\n## DEMO\n\n[Template Demo](https://youtu.be/Mf2qQdI1KqY)\n\n## Credentials Required\n\nTo use this workflow, set up the following credentials in your n8n environment:\n\n### Salesforce\n- **Type:** OAuth2 or Username/Password\n- **Used for:** Pulling lead reports and creating follow-up tasks\n- Alternative CRM options: HubSpot, Zoho, Pipedrive\n- Get credentials at [Salesforce Setup](https://login.salesforce.com/)\n\n### Databricks (or Analytics Platform)\n- **Type:** HTTP Request with Bearer Token\n- **Header:** `Authorization`\n- **Value:** `Bearer YOUR_DATABRICKS_TOKEN`\n- **Used for:** Querying product usage and API endpoint data\n- Alternative options: Datadog, Mixpanel, Amplitude, custom data warehouse\n\n### Explorium API\n- **Type:** Generic Header Auth\n- **Header:** `Authorization`\n- **Value:** `Bearer YOUR_API_KEY`\n- **Used for:** Business matching and firmographic enrichment\n- Get your API key at [Explorium Dashboard](https://app.explorium.ai/)\n\n### Explorium MCP\n- **Type:** HTTP Header Auth\n- **Used for:** Real-time company intelligence and supplemental research\n- Connect to: `https://mcp.explorium.ai/mcp`\n\n### Anthropic API\n- **Type:** API Key\n- **Used for:** AI-powered lead qualification and analysis\n- Get your API key at [Anthropic Console](https://console.anthropic.com/)\n\nGo to **Settings → Credentials**, create these credentials, and assign them in the respective nodes before running the workflow.\n\n---\n\n## Workflow Overview\n\n### Node 1: When clicking 'Execute workflow'\nManual trigger that initiates the lead qualification process.\n\n- **Type:** Manual Trigger\n- **Purpose:** On-demand execution for testing or manual runs\n\n**Alternative Trigger Options:**\n- **Schedule Trigger:** Run automatically (hourly, daily, weekly)\n- **Webhook:** Trigger on CRM updates or new lead events\n- **CRM Trigger:** Real-time activation when leads are created\n\n### Node 2: GET SF Report\nPulls lead data from a pre-configured Salesforce report.\n\n- **Method:** GET\n- **Endpoint:** Salesforce Analytics Reports API\n- **Authentication:** Salesforce OAuth2\n\n**Returns:** Raw Salesforce report data including:\n- Lead contact information\n- Company names\n- Lead source and status\n- Created dates\n- Custom fields\n\n**CRM Alternatives:** This node can be replaced with HubSpot, Zoho, or any CRM's reporting API.\n\n### Node 3: Extract Records\nParses the Salesforce report structure and extracts individual lead records.\n\n**Extraction Logic:**\n- Navigates report's `factMap['T!T'].rows` structure\n- Maps data cells to named fields\n\n### Node 4: Extract Tenant Names\nPrepares tenant identifiers for usage data queries.\n\n**Purpose:** Formats tenant names as SQL-compatible strings for the Databricks query\n**Output:** Comma-separated, quoted list: `'tenant1', 'tenant2', 'tenant3'`\n\n### Node 5: Query Databricks\nQueries your analytics platform to retrieve API usage data for each lead.\n\n- **Method:** POST\n- **Endpoint:** `/api/2.0/sql/statements`\n- **Authentication:** Bearer token in headers\n- **Warehouse ID:** Your Databricks cluster ID\n\n**Platform Alternatives:** \n- **Datadog:** Query logs via Logs API\n- **Mixpanel:** Event segmentation API\n- **Amplitude:** Behavioral cohorts API\n- **Custom Warehouse:** PostgreSQL, Snowflake, BigQuery queries\n\n### Node 6: Split Out\nSplits the Databricks result array into individual items for processing.\n\n- **Field:** `result.data_array`\n- **Purpose:** Transform single response with multiple rows into separate items\n\n### Node 7: Rename Keys\nNormalizes column names from database query to readable field names.\n\n**Mapping:**\n- `0` → `TenantNames`\n- `1` → `endpoints`\n- `2` → `endpointsNum`\n\n### Node 8: Extract Business Names\nPrepares company names for Explorium enrichment.\n\n### Node 9: Loop Over Items\nIterates through each company for individual enrichment.\n\n### Node 10: Explorium API: Match Businesses\nMatches company names to Explorium's business entity database.\n\n- **Method:** POST\n- **Endpoint:** `/v1/businesses/match`\n- **Authentication:** Header Auth (Bearer token)\n\n**Returns:**\n- `business_id`: Unique Explorium identifier\n- `matched_businesses`: Array of potential matches\n- Match confidence scores\n\n### Node 11: Explorium API: Firmographics\nEnriches matched businesses with comprehensive company data.\n\n- **Method:** POST\n- **Endpoint:** `/v1/businesses/firmographics/bulk_enrich`\n- **Authentication:** Header Auth (Bearer token)\n\n**Returns:**\n- Company name, website, description\n- Industry categories (NAICS, SIC, LinkedIn)\n- Size: employee count range, revenue range\n- Location: headquarters address, city, region, country\n- Company age and founding information\n- Social profiles: LinkedIn, Twitter\n- Logo and branding assets\n\n### Node 12: Merge\nCombines API usage data with firmographic enrichment data.\n\n### Node 13: Organize Data as Items\nStructures merged data into clean, standardized lead objects.\n\n**Data Organization:**\n- Maps API usage by tenant name\n- Maps enrichment data by company name\n- Combines with original lead information\n- Creates complete lead profile for analysis\n\n### Node 14: Loop Over Items1\nIterates through each qualified lead for AI analysis.\n\n- **Batch Size:** 1 (analyzes leads individually)\n- **Purpose:** Generate personalized qualification reports\n\n### Node 15: Get many accounts1\nFetches the associated Salesforce account for context.\n\n- **Resource:** Account\n- **Operation:** Get All\n- **Filter:** Match by company name\n- **Limit:** 1 record\n\n**Purpose:** Link lead qualification back to Salesforce account for task creation\n\n### Node 16: AI Agent\nAnalyzes each lead to generate comprehensive qualification reports.\n\n**Input Data:**\n- Lead contact information\n- API usage patterns (which endpoints tested)\n- Firmographic data (company profile)\n- Lead source and status\n\n**Analysis Process:**\n- Evaluates lead quality based on usage, company fit, and signals\n- Identifies which Explorium APIs the lead explored\n- Assesses company size, industry, and potential value\n- Detects quality signals (legitimate company email, active usage) and red flags\n- Determines optimal sales approach and timing\n- Connected to Explorium MCP for supplemental company research if needed\n\n**Output:** Structured qualification report with:\n- **Lead Score:** High Priority, Medium Priority, Low Priority, or Nurture\n- **Quick Summary:** Executive overview of lead potential\n- **API Usage Analysis:** Endpoints used, usage insights, potential use case\n- **Company Profile:** Overview, fit assessment, potential value\n- **Quality Signals:** Positive indicators and concerns\n- **Recommended Actions:** Next steps, timing, and approach\n- **Talking Points:** Personalized conversation starters based on actual API usage\n\n### Node 18: Clean Outputs\nFormats the AI qualification report for Salesforce task creation.\n\n### Node 19: Update Salesforce Records\nCreates follow-up tasks in Salesforce with qualification intelligence.\n\n- **Resource:** Task\n- **Operation:** Create\n- **Authentication:** Salesforce OAuth2\n\n**Alternative Output Options:**\n- **HubSpot:** Create tasks or update deal stages\n- **Outreach/SalesLoft:** Add to sequences with custom messaging\n- **Slack:** Send qualification reports to sales channels\n- **Email:** Send reports to account owners\n- **Google Sheets:** Log qualified leads for tracking\n\n---\n\n## Workflow Flow Summary\n\n1. **Trigger:** Manual execution or scheduled run\n2. **Pull Leads:** Fetch new/updated leads from Salesforce report\n3. **Extract:** Parse lead records and tenant identifiers\n4. **Query Usage:** Retrieve API endpoint usage data from analytics platform\n5. **Prepare:** Format data for enrichment\n6. **Match:** Identify companies in Explorium database\n7. **Enrich:** Pull comprehensive firmographic data\n8. **Merge:** Combine usage patterns with company intelligence\n9. **Organize:** Structure complete lead profiles\n10. **Analyze:** AI evaluates each lead with quality scoring\n11. **Format:** Structure qualification reports for CRM\n12. **Create Tasks:** Automatically populate Salesforce with actionable intelligence\n\nThis workflow eliminates manual lead research and qualification, automatically analyzing product engagement patterns alongside company fit to help sales teams prioritize and personalize their outreach to the highest-value inbound leads.\n\n---\n\n## Customization Options\n\n### Flexible Triggers\nReplace the manual trigger with:\n- **Schedule:** Run hourly/daily to continuously qualify new leads\n- **Webhook:** Real-time qualification when leads are created\n- **CRM Trigger:** Activate on specific lead status changes\n\n### Analytics Platform Integration\nThe Databricks query can be adapted for:\n- **Datadog:** Query application logs and events\n- **Mixpanel:** Analyze user behavior and feature adoption\n- **Amplitude:** Track product engagement metrics\n- **Custom Databases:** PostgreSQL, MySQL, Snowflake, BigQuery\n\n### CRM Flexibility\nWorks with multiple CRMs:\n- **Salesforce:** Full integration (pull reports, create tasks)\n- **HubSpot:** Contact properties and deal updates\n- **Zoho:** Lead enrichment and task creation\n- **Pipedrive:** Deal qualification and activity creation\n\n### Enrichment Depth\nAdd more Explorium endpoints:\n- **Technographics:** Tech stack and product usage\n- **News & Events:** Recent company announcements\n- **Funding Data:** Investment rounds and financial events\n- **Hiring Signals:** Job postings and growth indicators\n\n### Output Destinations\nRoute qualification reports to:\n- **CRM Updates:** Salesforce, HubSpot (update lead scores/fields)\n- **Task Creation:** Any CRM task/activity system\n- **Team Notifications:** Slack, Microsoft Teams, Email\n- **Sales Tools:** Outreach, SalesLoft, Salesloft sequences\n- **Reporting:** Google Sheets, Data Studio dashboards\n\n### AI Model Options\nSwap AI providers:\n- Default: Anthropic Claude (Sonnet 4)\n- Alternatives: OpenAI GPT-4, Google Gemini\n\n---\n\n## Setup Notes\n\n1. **Salesforce Report Configuration:** Create a report with required fields (name, email, company, tenant ID) and use its API endpoint\n2. **Tenant Identification:** Ensure your product usage data includes identifiers that link to CRM leads\n3. **Usage Data Query:** Customize the SQL query to match your database schema and table structure\n4. **MCP Configuration:** Explorium MCP requires Header Auth—configure credentials properly\n5. **Lead Scoring Logic:** Adjust AI system prompts to match your ideal customer profile and qualification criteria\n6. **Task Assignment:** Configure Salesforce task assignment rules or add logic to route to specific sales reps\n\nThis workflow acts as an intelligent lead qualification system that combines behavioral signals (what they're testing) with firmographic fit (who they are) to give sales teams actionable intelligence for every inbound lead.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "GET SF Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Records",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Query Databricks1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rename Keys",
+      "type": "n8n-nodes-base.renameKeys",
+      "role": "renameKeys",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Tenant Names",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Salesforce Records",
+      "type": "n8n-nodes-base.salesforce",
+      "role": "salesforce",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get many accounts1",
+      "type": "n8n-nodes-base.salesforce",
+      "role": "salesforce",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Business Names",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Explorium API: Match Businesses",
+      "type": "@exploriumai/n8n-nodes-explorium-ai.exploriumApiNode",
+      "role": "exploriumApiNode",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Explorium API: Firmographics",
+      "type": "@exploriumai/n8n-nodes-explorium-ai.exploriumApiNode",
+      "role": "exploriumApiNode",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Organize Data as Items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean Outputs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Anthropic Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Loop Over Items4",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Loop Over Items5",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Explorium MCP2",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

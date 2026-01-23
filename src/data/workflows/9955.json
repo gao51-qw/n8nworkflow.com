@@ -1,0 +1,158 @@
+{
+  "id": 9955,
+  "slug": "9955",
+  "title": "Screen job applicants with Gemini AI: Jotform to Notion hiring pipeline",
+  "description": "Stop drowning in job applications. This workflow transforms your hiring process from a manual, time-consuming data-entry task into an automated, intelligent screening system.\n\nWhen a candidate applies via your **Jotform**, this workflow automatically:\n\n1.  Downloads their **PDF resume** (even from private links).\n2.  Extracts the text from the resume and reads their cover letter.\n3.  Compares the application to the **Notion** job description using **Gemini AI**.\n4.  Generates an \"AI Fit Score\" (0-100) and a concise summary.\n5.  **Filters out** low-scoring applicants.\n6.  Creates a new, fully detailed candidate page in your Notion database, linked to the correct job.\n7.  Instantly alerts your hiring team on **Slack** with the candidate's score and summary.\n8.  Sends an automated **confirmation email** to the candidate.\n\n### **Features**\n\n  * **Triggers on New Jotform Submissions:** Kicks off the moment a candidate clicks \"Apply Now.\"\n  * **Handles Private Files:** Securely downloads private resume files from Jotform using your API key.\n  * **PDF Text Extraction:** Automatically reads the text from any uploaded PDF resume.\n  * **Deep AI Analysis:** Uses Gemini AI to compare the candidate's resume *and* cover letter against the specific job description from Notion.\n  * **Relational Database Linking:** Automatically links the new candidate to the correct \"Open Position\" page in Notion.\n  * **Automated Quality Filtering:** An IF node stops low-scoring candidates from cluttering your database.\n  * **Multi-Channel Communication:** Provides instant feedback to your team (Slack) and the candidate (Email).\n\n### **Nodes Used**\n\n  * 🟣 **Jotform Trigger** (`Jotform Trigger`)\n  * ✉️ **Gmail** (`Send Confirmation Email`)\n  * ⬇️ **HTTP Request** (`Download Resume PDF`)\n  * 📄 **Extract From File** (`Read Resume Text`)\n  * 🔍 **Notion** (`Find Job in Notion`)\n  * 🖇️ **Merge** (`Combine Data`)\n  * 🧠 **AI Agent** (`AI Candidate Analysis`)\n  * ❓ **IF** (`Score &gt; 40?`)\n  * ➕ **Notion** (`Create Candidate in Notion`)\n  * 📣 **Slack** (`Alert Hiring Team`)\n  * 🚫 **No Operation, do nothing** (`Ignore (Score &lt; 40)`)\n\n-----\n\n### **How to use this template**\n\nThis template requires manual setup due to Jotform's unique Question IDs (QIDs). Please follow these steps carefully.\n\n#### ⚠️ **CRITICAL WARNING ON JOTFORM QIDs**\n\nTo get the file URL, this template requires you to turn **\"Resolve Data\" OFF** in the Jotform Trigger. This means the workflow uses Question IDs (e.g., `q7_positionApplying`, `q8_typeA8`) instead of human-readable labels.\n\n**Your QIDs will be different from the ones in this template.** You *must* run the trigger once, find your QIDs, and replace them in the downstream nodes.\n\n-----\n\n**1. Set up Jotform and Notion (See \"More Information\" section below)**\n\n  * Before you start, create your Jotform form and your two Notion databases (\"Open Positions\" and \"Candidates\") as described at the end of this document.\n\n**2. Configure the `Jotform Trigger` Node**\n\n  * **Credentials:** Connect your Jotform account.\n  * **Form:** Select your \"Job Application\" form.\n  * **IMPORTANT:** In the node **Parameters**, find the **\"Resolve Data\"** option and **turn it OFF**.\n  * **Test:** Run a test by submitting your form. Look at the output and write down your unique QIDs for each field (e.g., `q3_fullName`, `q7_positionApplying`, `q8_typeA8`, `uploadYour`).\n\n**3. Configure the `Download Resume PDF` (HTTP Request) Node**\n\n  * **Credentials:** This node needs your Jotform API Key.\n      * **Authentication:** `Query Auth`\n      * **Credential:** Create new `Header Auth` credentials.\n          * **Name:** `Jotform API Key (Query)`\n          * **Parameter Name:** `apiKey`\n          * **Parameter Value:** [Paste your Jotform API Key here]\n  * **URL:** Replace `uploadYour` in the expression `{{ $('Jotform Trigger').item.json.uploadYour[0] }}` with the QID for *your* file upload field.\n\n**4. Configure the `Find Job in Notion` Node**\n(See the \"Required Notion Setup\" section at the end of this document for detailed instructions on how to build this database)\n  * **Credentials:** Connect your Notion credentials.\n  * **Database ID:** Select your **\"Open Positions\"** database.\n  * **Filter Value:** Replace `q7_positionApplying` in the expression `{{ $('Jotform Trigger').item.json.q7_positionApplying }}` with the QID for *your* \"Position\" dropdown.\n\n**5. Configure the `AI Candidate Analysis` Node**\n\n  * **Credentials:** Connect your Google AI (Gemini) credentials.\n  * **Prompt:** In the prompt, find the line for **\"Candidate's Cover Letter\"**. Replace `q8_typeA8` in the expression `{{ $('Jotform Trigger').item.json.q8_typeA8 }}` with the QID for *your* cover letter field.\n\n**6. Configure the `IF (Score &gt; 40?)` Node**\n\n  * No credentials needed. You can change the \"Value 2\" from `40` to any score you want to use as your quality filter.\n\n**7. Configure the `Create Candidate in Notion` Node**\n(See the \"Required Notion Setup\" section at the end of this document for detailed instructions on how to build this database)\n  * This is the most important step. Connect your Notion credentials and select your **\"Candidates\"** database.\n  * You must go through **every single property** and replace my QIDs with your QIDs from the Jotform trigger.\n      * **Candidate Name:** `{{ $('Jotform Trigger').item.json.q3_fullName.first }} ...` (Replace `q3_fullName`)\n      * **Email:** `{{ $('Jotform Trigger').item.json.q4_email }}` (Replace `q4_email`)\n      * **Phone:** `{{ $('Jotform Trigger').item.json.q5_phoneNumber?.full ? ...` (Replace `q5_phoneNumber`)\n      * **Position (Relation):** This expression, `{{ $('Find Job in Notion').item.json.id }}`, is correct.\n      * **AI Summary, Score, Skills:** These expressions are also correct.\n      * **Resume (File):** In the URL field, replace `uploadYour` with your file QID.\n\n**8. Configure Communication Nodes**\n\n  * **`Send Confirmation Email` (Gmail):** Connect your email credentials and customize the email body.\n  * **`Alert Hiring Team` (Slack):** Connect your Slack credentials and select your desired channel (e.g., `#hiring`).\n\n**9. Activate your Workflow\\!**\n\n  * Once all steps are configured and QIDs are replaced, save and activate your workflow.\n\n-----\n\n### **How to Adapt the Template**\n\n  * **Log Rejected Candidates:** Connect the `false` (No) output of the `IF (Score &gt; 40?)` node to a Google Sheets node to keep a log of all candidates who didn't meet the score threshold.\n  * **Change the AI Prompt:** Edit the prompt in the `AI Candidate Analysis` node to ask for different insights, such as \"List 3 potential red flags\" or \"Estimate years of experience.\"\n  * **Use a Different AI:** Replace the Google AI node with an OpenAI or Claude node.\n  * **Change Notifications:** Swap the Slack node for Discord, Microsoft Teams, or a simple email notification.\n\n-----\n\n### **More Information**\n\n#### **About Jotform**\n\n[Jotform](https://www.jotform.com/?partner=atakhalighi) is a powerful and easy-to-use online form builder perfect for creating professional job application forms. Its flexibility with file uploads and webhooks makes it an ideal trigger for this n8n automation. If you don't have an account, you can get started using the link above.\n\n#### **Required Jotform Fields**\n\nYour Jotform **must** have these fields for the template to work:\n\n  * **Full Name**\n  * **Email**\n  * **Phone Number** (Can be optional)\n  * **File Upload** (Label: `Upload Your Resume`)\n      * **Crucial:** Set the file type option to **`pdf`** only.\n  * **Dropdown** (Label: `Position Applying For`)\n      * **Crucial:** The options (e.g., \"Marketing Manager\") must **exactly match** the page titles in your \"Open Positions\" Notion database.\n  * **Long Text** (Label: `Summary / Cover Letter`)\n\n#### **Required Notion Setup**\n\nThis workflow requires two separate databases in Notion that are linked together. **Both databases must be shared with your n8n integration.**\n\n**Database 1: \"Open Positions\"**\nThis database holds your job descriptions. The AI reads from this database to understand the job requirements.\n\n1.  Create a new **Table** database in Notion named **`Open Positions`**.\n2.  Create the following properties:\n      * **`Name` (Title):** This is the job title. It **must exactly match** the options in your Jotform dropdown (e.g., \"Marketing Manager\").\n      * **`Job Description` (Text):** A text field where you will paste the full job description for the role.\n\n**Database 2: \"Candidates\"**\nThis database will store every new applicant and their AI-generated score.\n\n1.  Create a new **Table** database in Notion named **`Candidates`**.\n2.  Create the following properties to store the data:\n      * **`Candidate Name` (Title):** This will be filled with the applicant's name from the form.\n      * **`Email` (Email):** Stores the candidate's email.\n      * **`Phone` (Phone):** Stores the candidate's phone number.\n      * **`Resume` (File):** Stores the link to the resume PDF.\n      * **`AI Summary` (Text):** Stores the 2-sentence summary from the AI.\n      * **`AI Fit Score` (Number):** Stores the 0-1S00 score from the AI.\n      * **`Key Skills` (Multi-select):** Stores the skills array generated by the AI.\n      * **`Position` (Relation):** This is the final, crucial property.\n          * **Type:** Select **`Relation`**.\n          * **Database:** In the menu, search for and select your **\"Open Positions\"** database.\n          * **IMPORTANT:** A toggle labeled **\"Show on 'Open Positions'\"** will appear. **You must turn this toggle ON.** This creates a two-way relation, which is required for n8n to see and use this property.",
+  "featuredImage": "/data/workflows/9955/9955.webp",
+  "author": {
+    "id": 101,
+    "slug": "attakhalighi",
+    "name": "Atta",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 135,
+  "downloads": 13,
+  "createdAt": "2025-10-20T19:06:46.664Z",
+  "updatedAt": "2026-01-16T09:02:44.871Z",
+  "publishedAt": "2025-10-20T19:06:46.664Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9955",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Screen job applicants with Gemini AI: Jotform to Notion hiring pipeline",
+    "workflowName": "Screen job applicants with Gemini AI: Jotform to Notion hiring pipeline",
+    "description": "Stop drowning in job applications. This workflow transforms your hiring process from a manual, time-consuming data-entry task into an automated, intelligent screening system.\n\nWhen a candidate applies via your **Jotform**, this workflow automatically:\n\n1.  Downloads their **PDF resume** (even from private links).\n2.  Extracts the text from the resume and reads their cover letter.\n3.  Compares the application to the **Notion** job description using **Gemini AI**.\n4.  Generates an \"AI Fit Score\" (0-100) and a concise summary.\n5.  **Filters out** low-scoring applicants.\n6.  Creates a new, fully detailed candidate page in your Notion database, linked to the correct job.\n7.  Instantly alerts your hiring team on **Slack** with the candidate's score and summary.\n8.  Sends an automated **confirmation email** to the candidate.\n\n### **Features**\n\n  * **Triggers on New Jotform Submissions:** Kicks off the moment a candidate clicks \"Apply Now.\"\n  * **Handles Private Files:** Securely downloads private resume files from Jotform using your API key.\n  * **PDF Text Extraction:** Automatically reads the text from any uploaded PDF resume.\n  * **Deep AI Analysis:** Uses Gemini AI to compare the candidate's resume *and* cover letter against the specific job description from Notion.\n  * **Relational Database Linking:** Automatically links the new candidate to the correct \"Open Position\" page in Notion.\n  * **Automated Quality Filtering:** An IF node stops low-scoring candidates from cluttering your database.\n  * **Multi-Channel Communication:** Provides instant feedback to your team (Slack) and the candidate (Email).\n\n### **Nodes Used**\n\n  * 🟣 **Jotform Trigger** (`Jotform Trigger`)\n  * ✉️ **Gmail** (`Send Confirmation Email`)\n  * ⬇️ **HTTP Request** (`Download Resume PDF`)\n  * 📄 **Extract From File** (`Read Resume Text`)\n  * 🔍 **Notion** (`Find Job in Notion`)\n  * 🖇️ **Merge** (`Combine Data`)\n  * 🧠 **AI Agent** (`AI Candidate Analysis`)\n  * ❓ **IF** (`Score &gt; 40?`)\n  * ➕ **Notion** (`Create Candidate in Notion`)\n  * 📣 **Slack** (`Alert Hiring Team`)\n  * 🚫 **No Operation, do nothing** (`Ignore (Score &lt; 40)`)\n\n-----\n\n### **How to use this template**\n\nThis template requires manual setup due to Jotform's unique Question IDs (QIDs). Please follow these steps carefully.\n\n#### ⚠️ **CRITICAL WARNING ON JOTFORM QIDs**\n\nTo get the file URL, this template requires you to turn **\"Resolve Data\" OFF** in the Jotform Trigger. This means the workflow uses Question IDs (e.g., `q7_positionApplying`, `q8_typeA8`) instead of human-readable labels.\n\n**Your QIDs will be different from the ones in this template.** You *must* run the trigger once, find your QIDs, and replace them in the downstream nodes.\n\n-----\n\n**1. Set up Jotform and Notion (See \"More Information\" section below)**\n\n  * Before you start, create your Jotform form and your two Notion databases (\"Open Positions\" and \"Candidates\") as described at the end of this document.\n\n**2. Configure the `Jotform Trigger` Node**\n\n  * **Credentials:** Connect your Jotform account.\n  * **Form:** Select your \"Job Application\" form.\n  * **IMPORTANT:** In the node **Parameters**, find the **\"Resolve Data\"** option and **turn it OFF**.\n  * **Test:** Run a test by submitting your form. Look at the output and write down your unique QIDs for each field (e.g., `q3_fullName`, `q7_positionApplying`, `q8_typeA8`, `uploadYour`).\n\n**3. Configure the `Download Resume PDF` (HTTP Request) Node**\n\n  * **Credentials:** This node needs your Jotform API Key.\n      * **Authentication:** `Query Auth`\n      * **Credential:** Create new `Header Auth` credentials.\n          * **Name:** `Jotform API Key (Query)`\n          * **Parameter Name:** `apiKey`\n          * **Parameter Value:** [Paste your Jotform API Key here]\n  * **URL:** Replace `uploadYour` in the expression `{{ $('Jotform Trigger').item.json.uploadYour[0] }}` with the QID for *your* file upload field.\n\n**4. Configure the `Find Job in Notion` Node**\n(See the \"Required Notion Setup\" section at the end of this document for detailed instructions on how to build this database)\n  * **Credentials:** Connect your Notion credentials.\n  * **Database ID:** Select your **\"Open Positions\"** database.\n  * **Filter Value:** Replace `q7_positionApplying` in the expression `{{ $('Jotform Trigger').item.json.q7_positionApplying }}` with the QID for *your* \"Position\" dropdown.\n\n**5. Configure the `AI Candidate Analysis` Node**\n\n  * **Credentials:** Connect your Google AI (Gemini) credentials.\n  * **Prompt:** In the prompt, find the line for **\"Candidate's Cover Letter\"**. Replace `q8_typeA8` in the expression `{{ $('Jotform Trigger').item.json.q8_typeA8 }}` with the QID for *your* cover letter field.\n\n**6. Configure the `IF (Score &gt; 40?)` Node**\n\n  * No credentials needed. You can change the \"Value 2\" from `40` to any score you want to use as your quality filter.\n\n**7. Configure the `Create Candidate in Notion` Node**\n(See the \"Required Notion Setup\" section at the end of this document for detailed instructions on how to build this database)\n  * This is the most important step. Connect your Notion credentials and select your **\"Candidates\"** database.\n  * You must go through **every single property** and replace my QIDs with your QIDs from the Jotform trigger.\n      * **Candidate Name:** `{{ $('Jotform Trigger').item.json.q3_fullName.first }} ...` (Replace `q3_fullName`)\n      * **Email:** `{{ $('Jotform Trigger').item.json.q4_email }}` (Replace `q4_email`)\n      * **Phone:** `{{ $('Jotform Trigger').item.json.q5_phoneNumber?.full ? ...` (Replace `q5_phoneNumber`)\n      * **Position (Relation):** This expression, `{{ $('Find Job in Notion').item.json.id }}`, is correct.\n      * **AI Summary, Score, Skills:** These expressions are also correct.\n      * **Resume (File):** In the URL field, replace `uploadYour` with your file QID.\n\n**8. Configure Communication Nodes**\n\n  * **`Send Confirmation Email` (Gmail):** Connect your email credentials and customize the email body.\n  * **`Alert Hiring Team` (Slack):** Connect your Slack credentials and select your desired channel (e.g., `#hiring`).\n\n**9. Activate your Workflow\\!**\n\n  * Once all steps are configured and QIDs are replaced, save and activate your workflow.\n\n-----\n\n### **How to Adapt the Template**\n\n  * **Log Rejected Candidates:** Connect the `false` (No) output of the `IF (Score &gt; 40?)` node to a Google Sheets node to keep a log of all candidates who didn't meet the score threshold.\n  * **Change the AI Prompt:** Edit the prompt in the `AI Candidate Analysis` node to ask for different insights, such as \"List 3 potential red flags\" or \"Estimate years of experience.\"\n  * **Use a Different AI:** Replace the Google AI node with an OpenAI or Claude node.\n  * **Change Notifications:** Swap the Slack node for Discord, Microsoft Teams, or a simple email notification.\n\n-----\n\n### **More Information**\n\n#### **About Jotform**\n\n[Jotform](https://www.jotform.com/?partner=atakhalighi) is a powerful and easy-to-use online form builder perfect for creating professional job application forms. Its flexibility with file uploads and webhooks makes it an ideal trigger for this n8n automation. If you don't have an account, you can get started using the link above.\n\n#### **Required Jotform Fields**\n\nYour Jotform **must** have these fields for the template to work:\n\n  * **Full Name**\n  * **Email**\n  * **Phone Number** (Can be optional)\n  * **File Upload** (Label: `Upload Your Resume`)\n      * **Crucial:** Set the file type option to **`pdf`** only.\n  * **Dropdown** (Label: `Position Applying For`)\n      * **Crucial:** The options (e.g., \"Marketing Manager\") must **exactly match** the page titles in your \"Open Positions\" Notion database.\n  * **Long Text** (Label: `Summary / Cover Letter`)\n\n#### **Required Notion Setup**\n\nThis workflow requires two separate databases in Notion that are linked together. **Both databases must be shared with your n8n integration.**\n\n**Database 1: \"Open Positions\"**\nThis database holds your job descriptions. The AI reads from this database to understand the job requirements.\n\n1.  Create a new **Table** database in Notion named **`Open Positions`**.\n2.  Create the following properties:\n      * **`Name` (Title):** This is the job title. It **must exactly match** the options in your Jotform dropdown (e.g., \"Marketing Manager\").\n      * **`Job Description` (Text):** A text field where you will paste the full job description for the role.\n\n**Database 2: \"Candidates\"**\nThis database will store every new applicant and their AI-generated score.\n\n1.  Create a new **Table** database in Notion named **`Candidates`**.\n2.  Create the following properties to store the data:\n      * **`Candidate Name` (Title):** This will be filled with the applicant's name from the form.\n      * **`Email` (Email):** Stores the candidate's email.\n      * **`Phone` (Phone):** Stores the candidate's phone number.\n      * **`Resume` (File):** Stores the link to the resume PDF.\n      * **`AI Summary` (Text):** Stores the 2-sentence summary from the AI.\n      * **`AI Fit Score` (Number):** Stores the 0-1S00 score from the AI.\n      * **`Key Skills` (Multi-select):** Stores the skills array generated by the AI.\n      * **`Position` (Relation):** This is the final, crucial property.\n          * **Type:** Select **`Relation`**.\n          * **Database:** In the menu, search for and select your **\"Open Positions\"** database.\n          * **IMPORTANT:** A toggle labeled **\"Show on 'Open Positions'\"** will appear. **You must turn this toggle ON.** This creates a two-way relation, which is required for n8n to see and use this property.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "JotForm Trigger",
+      "type": "n8n-nodes-base.jotFormTrigger",
+      "role": "jotFormTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Download Resume PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Read Resume Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Alert Hiring Team",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "AI Candidate Analysis",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Find Job in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Score > 40?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Candidate in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Ignore (Score < 40)",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

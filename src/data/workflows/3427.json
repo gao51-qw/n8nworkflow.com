@@ -1,0 +1,590 @@
+{
+  "id": 3427,
+  "slug": "3427",
+  "title": "Automate call scheduling with Voice AI receptionist using Vapi, Google Calendar & Airtable",
+  "description": "## Who is this template for?\n\nThis template is ideal for small businesses, agencies, and solo professionals who want to automate appointment scheduling and caller follow-up through a voice-based AI receptionist. If you’re using tools like Google Calendar, Airtable, and Vapi (Twilio), this setup is for you.\n\n\n\n## What problem does this workflow solve?\n\nManual call handling, appointment booking, and email coordination can be time-consuming and prone to errors. This workflow solves that by automating the receptionist role: answering calls, checking calendar availability, managing appointments, and storing call summaries—all without human intervention.\n\n\n## What this workflow does\n\nThis Agent Receptionist manages inbound voice calls and scheduling tasks using Vapi and Google Calendar. It checks availability, books or updates calendar events, sends email confirmations, and logs call details into Airtable. The workflow includes built-in logic for slot management, email triggers, and storing call transcripts. \n\n## Setup Instructions\n\nDuplicate Airtable Base: Use this Airtable base template[BASE LINK](.) \n\nImport Workflow: Load provided JSON into your n8n instance.\n\nCredentials: Connect your Google Calendar and Airtable credentials in n8n.\n\nActivate Workflow: Enable workflow to get live webhook URLs.\n\nVapi Configuration:\n\nPaste provided system prompt into Vapi Assistant. \n\nLink the appropriate webhook URLs from n8n (GetSlots, BookSlots, UpdateSlots, CancelSlots, and end-of-call report).\n\n\n\nDisclaimer\n\nOptimized for cloud-hosted n8n instances. Self-hosted users should verify webhook and credential setups.",
+  "featuredImage": "/data/workflows/3427/3427.webp",
+  "author": {
+    "id": 101,
+    "slug": "customaistudio",
+    "name": "SuperAgent",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 42323,
+  "downloads": 4232,
+  "createdAt": "2025-04-03T19:05:21.114Z",
+  "updatedAt": "2026-01-16T08:29:44.540Z",
+  "publishedAt": "2025-04-03T19:05:21.114Z",
+  "nodes": 92,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3427",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate call scheduling with Voice AI receptionist using Vapi, Google Calendar & Airtable",
+    "workflowName": "Automate call scheduling with Voice AI receptionist using Vapi, Google Calendar & Airtable",
+    "description": "## Who is this template for?\n\nThis template is ideal for small businesses, agencies, and solo professionals who want to automate appointment scheduling and caller follow-up through a voice-based AI receptionist. If you’re using tools like Google Calendar, Airtable, and Vapi (Twilio), this setup is for you.\n\n\n\n## What problem does this workflow solve?\n\nManual call handling, appointment booking, and email coordination can be time-consuming and prone to errors. This workflow solves that by automating the receptionist role: answering calls, checking calendar availability, managing appointments, and storing call summaries—all without human intervention.\n\n\n## What this workflow does\n\nThis Agent Receptionist manages inbound voice calls and scheduling tasks using Vapi and Google Calendar. It checks availability, books or updates calendar events, sends email confirmations, and logs call details into Airtable. The workflow includes built-in logic for slot management, email triggers, and storing call transcripts. \n\n## Setup Instructions\n\nDuplicate Airtable Base: Use this Airtable base template[BASE LINK](.) \n\nImport Workflow: Load provided JSON into your n8n instance.\n\nCredentials: Connect your Google Calendar and Airtable credentials in n8n.\n\nActivate Workflow: Enable workflow to get live webhook URLs.\n\nVapi Configuration:\n\nPaste provided system prompt into Vapi Assistant. \n\nLink the appropriate webhook URLs from n8n (GetSlots, BookSlots, UpdateSlots, CancelSlots, and end-of-call report).\n\n\n\nDisclaimer\n\nOptimized for cloud-hosted n8n instances. Self-hosted users should verify webhook and credential setups.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Input Arguments",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Format response",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sort",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Available Start Times & Ranges",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Flatten Slots",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Enrich Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Build Response Payload",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Booking Payload",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Success Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Add Friendly Error",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Error Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Escape Json",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Has all information",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Respond with Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Build Error Response Payload",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Build Error Response Payload2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot Webhook",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot Error",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot GCal",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot Error Handle",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note BookSlot Airtable",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot Webhook",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot Error",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot Search",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot GCal Delete",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot Airtable Update",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CancelSlot Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot Webhook",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot Error",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot Search",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot GCal Update",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot Airtable Update",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note UpdateSlot Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CallResults Webhook",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note CallResults Airtable",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Getslot_tool",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Availability",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check if time is available or not",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Time available (true) & Call_id",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get All Calendar Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract start, end and name",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert into Json format for Vapi",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Response to Vapi",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "bookslots_tool",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Input Arguments from booking tools",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Convert time to CST America / Chicago",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Respond to Vapi",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If the booking is confirmed then true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Information to be Saved in Airtable",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Logs the confirmed booking details",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Updateslots_tool",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Input Arguments from updateslot tool",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Checks if required info is provided.",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Finds original appointment",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Response with Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Update Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Updates Airtable record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Response & call_id",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Respond to Vapi about Updating slots",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "CancelSlots_tool",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Input Arguments from cancelslot tool",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Checks if required info is provided for cancelation",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Finds the appointment record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Build Error Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Respond with Error to Vapi",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Update Airtable record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Call_id & Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Respond to Vapi about cancelation",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "call_results",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "All Input Arguments",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Save all information",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

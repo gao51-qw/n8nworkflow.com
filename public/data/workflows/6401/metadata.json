@@ -1,0 +1,27 @@
+{
+  "id": 6401,
+  "slug": "6401",
+  "title": "Document-based AI chatbot with RAG, OpenAI and Cohere reranker",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n# Build intelligent AI chatbot with RAG and Cohere Reranker\n\n## Who is it for?\n\nThis template is perfect for developers, businesses, and automation enthusiasts who want to create intelligent chatbots that can answer questions based on their own documents. Whether you're building customer support systems, internal knowledge bases, or educational assistants, this workflow provides a solid foundation for document-based AI conversations.\n\n## How it works\n\nThis workflow creates an intelligent AI assistant that combines RAG (Retrieval-Augmented Generation) with Cohere's reranking technology for more accurate responses:\n\n1. **Chat Interface**: Users interact with the AI through a chat interface\n2. **Document Processing**: PDFs from Google Drive are automatically extracted and converted into searchable vectors\n3. **Smart Search**: When users ask questions, the system searches through vectorized documents using semantic search\n4. **Reranking**: Cohere's reranker ensures the most relevant information is prioritized\n5. **AI Response**: OpenAI generates contextual answers based on the retrieved information\n6. **Memory**: Conversation history is maintained for context-aware interactions\n\n## Setup steps\n\n### Prerequisites\n- n8n instance (self-hosted or cloud)\n- OpenAI API key\n- Supabase account with vector extension enabled\n- Google Drive access\n- Cohere API key\n\n### 1. Configure Supabase Vector Store\n\nFirst, create a table in Supabase with vector support:\n\n```sql\nCREATE TABLE cafeina (\n  id SERIAL PRIMARY KEY,\n  content TEXT,\n  metadata JSONB,\n  embedding VECTOR(1536)\n);\n\n-- Create a function for similarity search\nCREATE OR REPLACE FUNCTION match_cafeina(\n  query_embedding VECTOR(1536),\n  match_count INT DEFAULT 10\n)\nRETURNS TABLE(\n  id INT,\n  content TEXT,\n  metadata JSONB,\n  similarity FLOAT\n)\nLANGUAGE plpgsql\nAS $$\nBEGIN\n  RETURN QUERY\n  SELECT\n    cafeina.id,\n    cafeina.content,\n    cafeina.metadata,\n    1 - (cafeina.embedding &lt;=&gt; query_embedding) AS similarity\n  FROM cafeina\n  ORDER BY cafeina.embedding &lt;=&gt; query_embedding\n  LIMIT match_count;\nEND;\n$$;\n```\n\n### 2. Set up credentials\n\nAdd the following credentials in n8n:\n\n- **OpenAI**: Add your OpenAI API key\n- **Supabase**: Add your Supabase URL and service role key\n- **Google Drive**: Connect your Google account\n- **Cohere**: Add your Cohere API key\n\n### 3. Configure the workflow\n\n1. In the \"Download file\" node, replace `URL DO ARQUIVO` with your Google Drive file URL\n2. Adjust the table name in both Supabase Vector Store nodes if needed\n3. Customize the agent's tool description in the \"searchCafeina\" node\n\n### 4. Load your documents\n\n1. Execute the bottom workflow (starting with \"When clicking 'Execute workflow'\")\n2. This will download your PDF, extract text, and store it in Supabase\n3. You can repeat this process for multiple documents\n\n### 5. Start chatting\n\nOnce documents are loaded, activate the main workflow and start chatting with your AI assistant through the chat interface.\n\n## How to customize\n\n- **Different document types**: Replace the Google Drive node with other sources (Dropbox, S3, local files)\n- **Multiple knowledge bases**: Create separate vector stores for different topics\n- **Custom prompts**: Modify the agent's system message for specific use cases\n- **Language models**: Switch between different OpenAI models or use other LLM providers\n- **Reranking settings**: Adjust the top-k parameter for more or fewer search results\n- **Memory window**: Configure the conversation memory buffer size\n\n## Tips for best results\n\n- Use high-quality, well-structured documents for better search accuracy\n- Keep document chunks reasonably sized for optimal retrieval\n- Regularly update your vector store with new information\n- Monitor token usage to optimize costs\n- Test different reranking thresholds for your use case\n\n## Common use cases\n\n- **Customer Support**: Create bots that answer questions from product documentation\n- **HR Assistant**: Build assistants that help employees find information in company policies\n- **Educational Tutor**: Develop tutors that answer questions from course materials\n- **Research Assistant**: Create tools that help researchers find relevant information in papers\n- **Legal Helper**: Build assistants that search through legal documents and contracts",
+  "featuredImage": "/data/workflows/6401/6401.webp",
+  "author": {
+    "id": 101,
+    "slug": "andersonadelino",
+    "name": "Anderson Adelino",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1332,
+  "downloads": 133,
+  "createdAt": "2025-07-25T00:14:32.167Z",
+  "updatedAt": "2026-01-16T08:44:49.613Z",
+  "publishedAt": "2025-07-25T00:14:32.167Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6401"
+}

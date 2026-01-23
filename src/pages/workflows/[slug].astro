@@ -7,6 +7,7 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import WorkflowDetailedView from '../../components/workflow/WorkflowDetailedView.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import AdRow from '../../components/ui/AdRow.astro';
 import { getWorkflows, getWorkflowBySlug, getWorkflowDetailedById } from '../../lib/services/workflows';
 import { generateWorkflowSchema, generateBreadcrumbSchema, combineSchemas } from '../../lib/utils/schema';
 import type { Workflow, WorkflowDetailed } from '../../lib/types/workflow';
@@ -27,6 +28,19 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 let { workflow } = Astro.props;
+
+// 如果 workflow 不存在（例如在 SSR 模式下），尝试按 slug 获取
+if (!workflow && slug) {
+  const result = await getWorkflowBySlug(slug);
+  if (result) {
+    workflow = result;
+  }
+}
+
+// 如果仍然没有找到工作流，重定向到 404
+if (!workflow) {
+  return Astro.redirect('/404');
+}
 
 // 获取详细工作流信息（含结构化内容）
 let workflowDetailed: WorkflowDetailed = workflow as WorkflowDetailed;
@@ -71,13 +85,77 @@ const workflowSchema = generateWorkflowSchema(workflow, siteUrl);
 const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems, siteUrl);
 const combinedSchema = combineSchemas(workflowSchema, breadcrumbSchema);
 
+// 验证工作流 JSON 是否有效
+function validateWorkflowJson(json: any): boolean {
+  if (!json) return false;
+  if (!json.name || typeof json.name !== 'string') return false;
+  if (!json.nodes || !Array.isArray(json.nodes)) return false;
+  if (!json.connections || typeof json.connections !== 'object') return false;
+  if (json.nodes.length === 0) return false;
+  return true;
+}
+
 // 读取工作流 JSON 数据
 let workflowJson = null;
 try {
-  const workflowJsonPath = `/data/workflows/${slug}/${workflow.id}.json`;
-  const response = await fetch(new URL(workflowJsonPath, Astro.url.origin));
-  if (response.ok) {
-    workflowJson = await response.json();
+  // 尝试从多个可能的路径读取工作流 JSON
+  const possiblePaths = [
+    `/data/workflows/${slug}/${workflow.id}.json`,
+    `/data/workflows/${workflow.id}/${workflow.id}.json`,
+    `/data/workflows/${slug}/${slug}.json`
+  ];
+  
+  for (const path of possiblePaths) {
+    const response = await fetch(new URL(path, Astro.url.origin));
+    if (response.ok) {
+      const fullData = await response.json();
+      
+      // 万能提取公式：处理 api.n8n.io 的双重嵌套、标准嵌套、字符串化嵌套及扁平结构
+      const extractWorkflow = (data: any) => {
+        let workflowObj = data;
+        
+        // 处理第一层嵌套
+        if (data.workflow) {
+          if (typeof data.workflow === 'object') {
+            workflowObj = data.workflow;
+          } else if (typeof data.workflow === 'string') {
+            try { workflowObj = JSON.parse(data.workflow); } catch (e) {}
+          }
+        }
+
+        // 处理第二层嵌套 (api.n8n.io 格式)
+        let core = workflowObj;
+        if (workflowObj.workflow) {
+          if (typeof workflowObj.workflow === 'object') {
+            core = workflowObj.workflow;
+          } else if (typeof workflowObj.workflow === 'string') {
+            try { core = JSON.parse(workflowObj.workflow); } catch (e) {}
+          }
+        }
+
+        // 严格按照主站逻辑构建，确保字段完整
+        return {
+          name: data.name || workflowObj.name || core.name || workflow.title,
+          nodes: core.nodes || workflowObj.nodes || data.nodes || [],
+          connections: core.connections || workflowObj.connections || data.connections || {},
+          settings: core.settings || workflowObj.settings || data.settings || {},
+          active: false,
+          id: data.id || workflowObj.id || core.id,
+          createdAt: data.createdAt || workflowObj.createdAt || core.createdAt,
+          updatedAt: data.updatedAt || workflowObj.updatedAt || core.updatedAt || data.createdAt || workflowObj.createdAt || core.createdAt
+        };
+      };
+
+      workflowJson = extractWorkflow(fullData);
+      
+      // 验证 JSON 格式
+      if (validateWorkflowJson(workflowJson)) {
+        break;
+      } else {
+        console.error(`Invalid workflow JSON structure at ${path}:`, workflowJson);
+        workflowJson = null;
+      }
+    }
   }
 } catch (error) {
   console.error('Error loading workflow JSON:', error);
@@ -141,17 +219,28 @@ const seoConfig = {
             <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2.0.0/webcomponents-loader.js" crossorigin="anonymous" data-cfasync="false"></script>
             <script src="https://www.unpkg.com/lit@2.0.0-rc.2/polyfill-support.js" crossorigin="anonymous" data-cfasync="false"></script>
             <script type="module" src="https://cdn.jsdelivr.net/npm/@n8n_io/n8n-demo-component/n8n-demo.bundled.js" crossorigin="anonymous" data-cfasync="false"></script>
-            <script type="4994abcb98f644aea97c64c4-text/javascript">
-              document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                  const footers = document.querySelectorAll('.workflow-canvas-footer');
-                  footers.forEach(function(footer) {
-                    footer.style.display = 'none';
-                  });
-                }, 1000);
-              });
+            
+            {/* 直接在 HTML 属性中传递 workflow JSON */}
+            <n8n-demo 
+              workflow={JSON.stringify(workflowJson)}
+              theme="light" 
+              frame="false" 
+              clicktointeract="true" 
+              disableinteractivity="false" 
+              hidecanvaserrors="true" 
+              collapseformobile="true" 
+              data-astro-cid-k6bappp3="true">
+            </n8n-demo>
+            
+            <script is:inline>
+              // 隐藏底部页脚
+              setTimeout(function() {
+                const footers = document.querySelectorAll('.workflow-canvas-footer');
+                footers.forEach(function(footer) {
+                  footer.style.display = 'none';
+                });
+              }, 1000);
             </script>
-            <n8n-demo workflow={JSON.stringify(workflowJson)} theme="light" frame="false" clicktointeract="true" disableinteractivity="false" hidecanvaserrors="true" collapseformobile="true" data-astro-cid-k6bappp3="true"></n8n-demo>
           </div>
         ) : (
           <img
@@ -163,75 +252,7 @@ const seoConfig = {
       </div>
 
       {/* Promo/Ads Row */}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-        <a href="https://s.n8nworkflows.xyz/sYhvf" target="_blank" rel="noopener noreferrer" class="group block rounded-lg border border-primary-200 dark:border-primary-700 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 px-4 py-3 hover:shadow-md transition">
-          <div class="flex flex-col items-center justify-center text-center gap-[20px] h-full">
-            <span class="inline-flex items-center justify-center bg-white dark:bg-white border border-gray-200 dark:border-gray-300 rounded px-2 py-1 shadow-sm">
-              <img src="/n8n_logo.png" alt="n8n" class="ad-logo-n8n h-[1.25rem] md:h-[1.375rem] w-auto object-contain align-middle" loading="lazy" decoding="async">
-            </span>
-            <div>
-              <div class="font-bold text-[16px] text-gray-900 dark:text-white">$20/month : Unlimited workflows</div>
-              <div class="text-[15px] text-gray-600 dark:text-gray-300">2500 executions/month</div>
-            </div>
-            <span class="inline-flex items-center gap-1 text-[13px] md:text-[13px] font-medium text-white bg-primary-500 group-hover:bg-primary-600 rounded-md px-2.5 py-1">
-              Try for free
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M13 7l5 5-5 5M6 12h12"></path>
-              </svg>
-            </span>
-          </div>
-        </a>
-        <a href="https://s.n8nworkflows.xyz/MVX4S" target="_blank" rel="noopener noreferrer" class="group block rounded-lg border border-blue-200 dark:border-blue-700 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 px-4 py-3 hover:shadow-md transition">
-          <div class="flex flex-col items-center justify-center text-center gap-[20px] h-full">
-            <span class="inline-flex items-center justify-center bg-white dark:bg-white border border-gray-200 dark:border-gray-300 rounded px-2 py-1 shadow-sm">
-              <img src="/brightdata.png" alt="Bright Data" class="h-5 w-auto" loading="lazy" decoding="async">
-            </span>
-            <div>
-              <div class="font-bold text-[16px] text-gray-900 dark:text-white">THE #1 IN WEB SCRAPING</div>
-              <div class="text-[15px] text-gray-700 dark:text-gray-300">Scrape any website without limits</div>
-            </div>
-            <span class="inline-flex items-center gap-1 text-[13px] md:text-[13px] font-medium text-white rounded-md px-2.5 py-1" style="background-color:#0057FF;">
-              Try for free
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M13 7l5 5-5 5M6 12h12"></path>
-              </svg>
-            </span>
-          </div>
-        </a>
-        <a href="https://s.n8nworkflows.xyz/uhyV1" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-center rounded-lg border border-purple-200 dark:border-purple-700 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 px-4 py-3 hover:shadow-md transition">
-          <div class="flex flex-col items-center justify-center text-center gap-[20px] min-w-0 w-full h-full">
-            <span class="text-[10px] font-bold px-2 py-1 rounded" style="background-color:#673DE6;color:white;">HOSTINGER</span>
-            <span class="text-[13px] font-bold px-4 py-2 rounded text-white text-center" style="background-color:#673DE6;">🎉 Early Black Friday Deal<br>DISCOUNT 20%</span>
-            <div>
-              <div class="font-bold text-[16px] text-gray-900 dark:text-white">Self-hosted n8n</div>
-              <div class="text-[15px] text-gray-600 dark:text-gray-300">Unlimited workflows - from $4.99/mo</div>
-            </div>
-            <span class="inline-flex items-center gap-1 text-[13px] md:text-[13px] font-medium text-white rounded-md px-2.5 py-1" style="background-color:#673DE6;">
-              Try for free
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M13 7l5 5-5 5M6 12h12"></path>
-              </svg>
-            </span>
-          </div>
-        </a>
-        <a href="https://s.n8nworkflows.xyz/apify" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-center rounded-lg border border-amber-200 dark:border-amber-700 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 px-4 py-3 hover:shadow-md transition">
-          <div class="flex flex-col items-center justify-center text-center gap-[20px] min-w-0 w-full h-full">
-            <span class="inline-flex items-center justify-center bg-white dark:bg-white border border-gray-200 dark:border-gray-300 rounded px-2.5 py-1 shadow-sm">
-              <img src="/apifylogo.svg" alt="Apify" class="h-5 w-auto" loading="lazy" decoding="async">
-            </span>
-            <div>
-              <div class="font-bold text-[16px] text-gray-900 dark:text-white">#1 hub for scraping, AI & automation</div>
-              <div class="text-[15px] text-gray-600 dark:text-gray-300">6000+ actors - $5 credits/mo</div>
-            </div>
-            <span class="inline-flex items-center gap-1 text-[13px] md:text-[13px] font-medium text-white rounded-md px-2.5 py-1" style="background-color:#FF8A00;">
-              Try for free
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M13 7l5 5-5 5M6 12h12"></path>
-              </svg>
-            </span>
-          </div>
-        </a>
-      </div>
+      <AdRow variant="detailed" />
 
       {/* Detailed Content Section */}
       <WorkflowDetailedView workflow={workflowDetailed} relatedWorkflows={relatedWorkflows} />

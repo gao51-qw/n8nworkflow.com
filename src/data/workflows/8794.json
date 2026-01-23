@@ -1,0 +1,128 @@
+{
+  "id": 8794,
+  "slug": "8794",
+  "title": "Recover failed Stripe payments with AI emails (by FlyCode)",
+  "description": "# ⚙️ Automated Stripe Failed Payment Recovery (with Postmark + AI Email Generator) \n#### Recover failed Stripe subscription payments with AI-personalized emails sent via Postmark.\n\n## 📝 Template Description\n\nRecover failed subscription payments automatically with Stripe, Postmark, and AI.  \n\nThis workflow listens for Stripe **`invoice.payment_failed`** webhooks, checks that the event is related to an auto-charged subscription, and then automatically sends a **personalized email** (generated with AI) to the customer. The email is polite, branded, but also urgent — encouraging the customer to pay quickly and avoid service cancellation.\n\n---\n\n## 🛠️ How it works\n1. **📣 Webhook**  \n   Listens for Stripe webhook events. Make sure to connect it in your Stripe dashboard (see setup below).\n\n2. **🧹 Filter (Guard)**  \n   Ensures the event is indeed an **invoice** event and filters out unrelated webhooks.\n\n3. **💡 Code Node**  \n   Extracts useful fields (firstName, lastName, customer email, amount, currency, invoice number, hosted invoice URL, subscription description, account name).\n\n4. **✅ If Node**  \n   Verifies that:  \n   - Event type = `invoice.payment_failed`  \n   - Billing reason = `subscription_cycle`  \n   - Collection method = `charge_automatically`  \n\n   👉 This ensures only **recurring subscription invoices** with auto-payment are processed.\n\n5. **🤖 AI Agent + OpenAI**  \n   Generates a **ready-to-send email JSON** (to, subject, HTML body) using the extracted Stripe data.  \n   ✍️ You can **customize the prompt** here to match your brand’s tone of voice and style.\n\n6. **🧩 Code Parser**  \n   Parses the AI model’s JSON output into fields (`to_email`, `email_subject`, `email_body`).\n\n7. **📧 HTTP Request (Postmark)**  \n   Sends the email using Postmark’s API.  \n   You’ll need your own **Postmark Server Token**, From address, and Message Stream.\n\n---\n\n## 🚀 Setup Instructions\n\n### 1. Stripe Webhook\n- Go to [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/test/webhooks).  \n- Click **+ Add endpoint**.  \n- Use your n8n Webhook URL (from the Webhook node) as the endpoint.  \n- Select event type: **`invoice.payment_failed`**.  \n- Save and deploy.  \n\n👉 Example docs: [Stripe: Listen to events with webhooks](https://stripe.com/docs/webhooks).\n\n### 2. Disable Stripe’s Default Failed Payment Emails  \n- In Stripe, go to **Billing → Settings → Customer emails → Manage failed payments**.  \n- Turn off **“Failed payment”** emails under the **Revenue Recovery** section.  \n- This prevents customers from receiving duplicate or conflicting emails.\n\n### 3. Postmark Setup\n- Create a [Postmark account](https://postmarkapp.com).  \n- Add a **Server** and copy the **Server API Token**.  \n- In n8n, add **Postmark credentials** with this token.  \n- Configure:  \n  - **From** = your verified sending email (must be verified in Postmark).  \n  - **MessageStream** = typically `\"outbound\"` (or any custom stream you set up).  \n\nDocs: [Postmark API overview](https://postmarkapp.com/developer/api/overview).\n\n### 4. OpenAI Setup\n- Add your OpenAI credentials in n8n.  \n- Attach them to the OpenAI Chat Model node.  \n- You can modify the prompt in the **AI Agent node** to fit your company’s style.\n\n---\n\n## ✨ Customization Tips\n- Update the **AI prompt** with your brand’s **tone of voice** (friendly, formal, playful, etc.).  \n- Adjust the **HTML email design** inside the prompt (button colors, footer, etc.).  \n- Add extra guard conditions (e.g., only trigger if `invoice_amount &gt; 0`).  \n- Change the sending service: replace Postmark with Gmail, SMTP, or another provider.  \n- 💬 Or talk to our **Billing Recovery Experts** at [flycode.com](https://flycode.com) for hands-on help.\n\n\n---\n\n## ✅ Outcome\nWhenever a customer’s subscription payment fails, this workflow:  \n- Detects it instantly via Stripe  \n- Generates a polite but urgent recovery email  \n- Sends it automatically via Postmark  \n\nResult: **Fewer cancellations, higher recovered revenue, and a smoother customer experience.** 💸💌\n",
+  "featuredImage": "/data/workflows/8794/8794.webp",
+  "author": {
+    "id": 101,
+    "slug": "flycode",
+    "name": "FlyCode",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 23,
+  "downloads": 2,
+  "createdAt": "2025-09-21T09:05:38.375Z",
+  "updatedAt": "2026-01-16T08:57:43.164Z",
+  "publishedAt": "2025-09-21T09:05:38.375Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8794",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Recover failed Stripe payments with AI emails (by FlyCode)",
+    "workflowName": "Recover failed Stripe payments with AI emails (by FlyCode)",
+    "description": "# ⚙️ Automated Stripe Failed Payment Recovery (with Postmark + AI Email Generator) \n#### Recover failed Stripe subscription payments with AI-personalized emails sent via Postmark.\n\n## 📝 Template Description\n\nRecover failed subscription payments automatically with Stripe, Postmark, and AI.  \n\nThis workflow listens for Stripe **`invoice.payment_failed`** webhooks, checks that the event is related to an auto-charged subscription, and then automatically sends a **personalized email** (generated with AI) to the customer. The email is polite, branded, but also urgent — encouraging the customer to pay quickly and avoid service cancellation.\n\n---\n\n## 🛠️ How it works\n1. **📣 Webhook**  \n   Listens for Stripe webhook events. Make sure to connect it in your Stripe dashboard (see setup below).\n\n2. **🧹 Filter (Guard)**  \n   Ensures the event is indeed an **invoice** event and filters out unrelated webhooks.\n\n3. **💡 Code Node**  \n   Extracts useful fields (firstName, lastName, customer email, amount, currency, invoice number, hosted invoice URL, subscription description, account name).\n\n4. **✅ If Node**  \n   Verifies that:  \n   - Event type = `invoice.payment_failed`  \n   - Billing reason = `subscription_cycle`  \n   - Collection method = `charge_automatically`  \n\n   👉 This ensures only **recurring subscription invoices** with auto-payment are processed.\n\n5. **🤖 AI Agent + OpenAI**  \n   Generates a **ready-to-send email JSON** (to, subject, HTML body) using the extracted Stripe data.  \n   ✍️ You can **customize the prompt** here to match your brand’s tone of voice and style.\n\n6. **🧩 Code Parser**  \n   Parses the AI model’s JSON output into fields (`to_email`, `email_subject`, `email_body`).\n\n7. **📧 HTTP Request (Postmark)**  \n   Sends the email using Postmark’s API.  \n   You’ll need your own **Postmark Server Token**, From address, and Message Stream.\n\n---\n\n## 🚀 Setup Instructions\n\n### 1. Stripe Webhook\n- Go to [Stripe Dashboard → Developers → Webhooks](https://dashboard.stripe.com/test/webhooks).  \n- Click **+ Add endpoint**.  \n- Use your n8n Webhook URL (from the Webhook node) as the endpoint.  \n- Select event type: **`invoice.payment_failed`**.  \n- Save and deploy.  \n\n👉 Example docs: [Stripe: Listen to events with webhooks](https://stripe.com/docs/webhooks).\n\n### 2. Disable Stripe’s Default Failed Payment Emails  \n- In Stripe, go to **Billing → Settings → Customer emails → Manage failed payments**.  \n- Turn off **“Failed payment”** emails under the **Revenue Recovery** section.  \n- This prevents customers from receiving duplicate or conflicting emails.\n\n### 3. Postmark Setup\n- Create a [Postmark account](https://postmarkapp.com).  \n- Add a **Server** and copy the **Server API Token**.  \n- In n8n, add **Postmark credentials** with this token.  \n- Configure:  \n  - **From** = your verified sending email (must be verified in Postmark).  \n  - **MessageStream** = typically `\"outbound\"` (or any custom stream you set up).  \n\nDocs: [Postmark API overview](https://postmarkapp.com/developer/api/overview).\n\n### 4. OpenAI Setup\n- Add your OpenAI credentials in n8n.  \n- Attach them to the OpenAI Chat Model node.  \n- You can modify the prompt in the **AI Agent node** to fit your company’s style.\n\n---\n\n## ✨ Customization Tips\n- Update the **AI prompt** with your brand’s **tone of voice** (friendly, formal, playful, etc.).  \n- Adjust the **HTML email design** inside the prompt (button colors, footer, etc.).  \n- Add extra guard conditions (e.g., only trigger if `invoice_amount &gt; 0`).  \n- Change the sending service: replace Postmark with Gmail, SMTP, or another provider.  \n- 💬 Or talk to our **Billing Recovery Experts** at [flycode.com](https://flycode.com) for hands-on help.\n\n\n---\n\n## ✅ Outcome\nWhenever a customer’s subscription payment fails, this workflow:  \n- Detects it instantly via Stripe  \n- Generates a polite but urgent recovery email  \n- Sends it automatically via Postmark  \n\nResult: **Fewer cancellations, higher recovered revenue, and a smoother customer experience.** 💸💌",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Code in JavaScript1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

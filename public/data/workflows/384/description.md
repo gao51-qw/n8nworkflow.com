@@ -1,0 +1,1 @@
+With this workflow, you can collect the data from Typeform with the Typeform Trigger node every time someone submits a response and save it to Airtable with the Airtable node.

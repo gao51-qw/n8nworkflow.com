@@ -1,0 +1,181 @@
+{
+  "id": 6760,
+  "slug": "6760",
+  "title": "Automated Twitter following with hashtag targeting, Phantombuster, and GPT-4o",
+  "description": "## Who’s it for  \nGrowth marketers, community managers, and personal-brand builders who want to steadily grow their Twitter (X) network by following new, relevant accounts on autopilot—while respecting daily limits.\n\n## How it works / What it does  \n1. **Schedule Trigger** fires every hour at a specified minute.  \n2. **Select Cookie** picks a rotating Twitter session-cookie based on time slices.  \n3. **AI Agent** creates a realistic AI/BPA hashtag.  \n4. **Phantombuster Hashtag Agent** scrapes recent tweets → extracts profile handles.  \n5. **Set Item** builds a small CSV with one profile; **Launch AF Agent** instructs the Phantombuster Auto-follow agent to follow it.  \n6. Rate-limit nodes cap follows to roughly 50-80 per day.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `twitter_session_cookies.txt` – one cookie per line.  \n3. Adjust schedule or search parameters as needed.  \n4. Activate the workflow; it will run hourly and follow 1 new profile each launch.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account \n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Change niche: edit hashtag prompt in **AI Agent**.  \n- Follow more accounts: raise `numberOfAddsPerLaunch` and schedule frequency.  \n- Use Google Drive/Dropbox instead of SharePoint: swap the cookie download node.",
+  "featuredImage": "/data/workflows/6760/6760.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 49,
+  "downloads": 4,
+  "createdAt": "2025-08-01T07:51:31.757Z",
+  "updatedAt": "2026-01-16T08:46:57.767Z",
+  "publishedAt": "2025-08-01T07:51:31.757Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6760",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated Twitter following with hashtag targeting, Phantombuster, and GPT-4o",
+    "workflowName": "Automated Twitter following with hashtag targeting, Phantombuster, and GPT-4o",
+    "description": "## Who’s it for  \nGrowth marketers, community managers, and personal-brand builders who want to steadily grow their Twitter (X) network by following new, relevant accounts on autopilot—while respecting daily limits.\n\n## How it works / What it does  \n1. **Schedule Trigger** fires every hour at a specified minute.  \n2. **Select Cookie** picks a rotating Twitter session-cookie based on time slices.  \n3. **AI Agent** creates a realistic AI/BPA hashtag.  \n4. **Phantombuster Hashtag Agent** scrapes recent tweets → extracts profile handles.  \n5. **Set Item** builds a small CSV with one profile; **Launch AF Agent** instructs the Phantombuster Auto-follow agent to follow it.  \n6. Rate-limit nodes cap follows to roughly 50-80 per day.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `twitter_session_cookies.txt` – one cookie per line.  \n3. Adjust schedule or search parameters as needed.  \n4. Activate the workflow; it will run hourly and follow 1 new profile each launch.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account \n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Change niche: edit hashtag prompt in **AI Agent**.  \n- Follow more accounts: raise `numberOfAddsPerLaunch` and schedule frequency.  \n- Use Google Drive/Dropbox instead of SharePoint: swap the cookie download node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Response",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Autofollow Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait for result",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set ENV Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Launch AF Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Hashtag Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Launch Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Item",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Available Session Cookies",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Cookies",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Cookie",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Profiles",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

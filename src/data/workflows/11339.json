@@ -1,0 +1,170 @@
+{
+  "id": 11339,
+  "slug": "11339",
+  "title": "Record transactions & generate budget reports with Gemini AI, Telegram & Firefly III",
+  "description": "## Who this is for\nAnybody using Firefly III, especially home/self-hosted users, who want to add some level of automation to their transaction tracking, either in addition to or because they can't or don't want to use the [dataimporter](https://github.com/firefly-iii/data-importer)\n\n## How it works - posting transactions\n1. User sends a transaction screenshot/image or statement to a Telegram bot\n2. Gemini analyzes it based on the user's requirements (asset account IDs & categories)\n3. The transaction information is parsed to create a suitable POST to a Firefly instance\n4. The transaction(s) are posted to Firefly via its API, using an OAuth2 credential\n\n## How it works - requesting budget reports \n1. User sends the word 'Report' via telegram\n2. A 'GET' API request is sent to Firefly for all budgets between the beginning of the month and the request date, including remaining amounts for each\n3. This is converted to a CSV file\n4. The CSV is sent to the user via Telegram\n\n## Prerequisites\n1. Telegram, and knowledge of how to set up a bot (search for `BotFather` in Telegram)\n2. An existing instance of [Firefly III](https://docs.firefly-iii.org/) with admin access for creating OAuth2 credentials\n\n## How to set it up - Credentials\n1. Open Telegram, and search for `BotFather`\n2. Create a new bot by following the instructions\n3. Save the API key provided\n4. In n8n, create a new `Telegram` credential using the info for the new bot\n5. Create an OAuth client in Firefly, using the redirect URL found in n8n's `OAuth2 API` credential creator \n6. Fill the n8n `OAuth2 API` credential form as `Authorization Code`, filling in the remaining parameters from the info created in Firefly \n7. Create a Gemini credential following the instructions in n8n\n\n## How to set it up - the workflow\n1. Set the credential in each Telegram node\n2. Set the Firefly credential in each http node\n3. Set the correct base URL for the Firefly instance in each http node\n4. Set the desired Gemini credential and model in each AI node\n5. Set the correct Bank IDs (as per Firefly) and preferred categories in the AI node system message\n\n\n## Customization options\nThe user can specify all types of asset and expense accounts, as well as a specific list of categories and descriptions for Gemini to use. Gemini can also be swapped out for any other AI/LLM. \n\nAdditionally, anyone can build on this by reviewing the [Firefly API documents](https://api-docs.firefly-iii.org/) to automate almost any other part of the Firefly software.\n\n",
+  "featuredImage": "/data/workflows/11339/11339.webp",
+  "author": {
+    "id": 101,
+    "slug": "pts",
+    "name": "PTS",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 116,
+  "downloads": 11,
+  "createdAt": "2025-11-28T20:33:03.486Z",
+  "updatedAt": "2026-01-16T09:08:25.977Z",
+  "publishedAt": "2025-11-28T20:33:03.486Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11339",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Record transactions & generate budget reports with Gemini AI, Telegram & Firefly III",
+    "workflowName": "Record transactions & generate budget reports with Gemini AI, Telegram & Firefly III",
+    "description": "## Who this is for\nAnybody using Firefly III, especially home/self-hosted users, who want to add some level of automation to their transaction tracking, either in addition to or because they can't or don't want to use the [dataimporter](https://github.com/firefly-iii/data-importer)\n\n## How it works - posting transactions\n1. User sends a transaction screenshot/image or statement to a Telegram bot\n2. Gemini analyzes it based on the user's requirements (asset account IDs & categories)\n3. The transaction information is parsed to create a suitable POST to a Firefly instance\n4. The transaction(s) are posted to Firefly via its API, using an OAuth2 credential\n\n## How it works - requesting budget reports \n1. User sends the word 'Report' via telegram\n2. A 'GET' API request is sent to Firefly for all budgets between the beginning of the month and the request date, including remaining amounts for each\n3. This is converted to a CSV file\n4. The CSV is sent to the user via Telegram\n\n## Prerequisites\n1. Telegram, and knowledge of how to set up a bot (search for `BotFather` in Telegram)\n2. An existing instance of [Firefly III](https://docs.firefly-iii.org/) with admin access for creating OAuth2 credentials\n\n## How to set it up - Credentials\n1. Open Telegram, and search for `BotFather`\n2. Create a new bot by following the instructions\n3. Save the API key provided\n4. In n8n, create a new `Telegram` credential using the info for the new bot\n5. Create an OAuth client in Firefly, using the redirect URL found in n8n's `OAuth2 API` credential creator \n6. Fill the n8n `OAuth2 API` credential form as `Authorization Code`, filling in the remaining parameters from the info created in Firefly \n7. Create a Gemini credential following the instructions in n8n\n\n## How to set it up - the workflow\n1. Set the credential in each Telegram node\n2. Set the Firefly credential in each http node\n3. Set the correct base URL for the Firefly instance in each http node\n4. Set the desired Gemini credential and model in each AI node\n5. Set the correct Bank IDs (as per Firefly) and preferred categories in the AI node system message\n\n\n## Customization options\nThe user can specify all types of asset and expense accounts, as well as a specific list of categories and descriptions for Gemini to use. Gemini can also be swapped out for any other AI/LLM. \n\nAdditionally, anyone can build on this by reviewing the [Firefly API documents](https://api-docs.firefly-iii.org/) to automate almost any other part of the Firefly software.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get file from server",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Analyze the image or pdf",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Make it pretty",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get image from server",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Post to Firefly",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Analyzer Scraper",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop for Multiple Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Confirmation Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Remaining Budget",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Pull required fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Make CSV",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send CSV",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Transaction Image or PDF Received",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Parse details & add category",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

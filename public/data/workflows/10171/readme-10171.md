@@ -1,0 +1,125 @@
+# Role-based access control (RBAC) for Telegram automations
+
+> # 🔐 n8n Workflow: Role-Based Access Control (RBAC) for Telegram Automations
+This n8n workflow lets you control access to your internal Telegram bots and automation systems based on user roles and departments.
+It ensures that only authorized team members — defined in your employee database — can interact with specific parts of your workflow.
+Perfect for agencies, internal tools, or multi-team organizations where permissions differ across roles (e.g., Marketing, Sales, Administration).
+
+## 📌 Section 1: Trigger & Input
+⚡ Receive Message (Telegram Trigger)
+Purpose: Captures incoming messages from users interacting with your Telegram bot.
+
+### How it works:
+When a user sends any message to the bot, the workflow retrieves their Telegram username and triggers the process.
+
+### Benefit:
+Provides a secure and instant entry point for validating user identity before running any internal logic.
+
+## 📌 Section 2: Role Lookup
+📋 Employee Database (Data Table Node)
+Purpose: Fetches user details such as Position and Type from your internal employee table.
+
+Structure Example:
+
+UserName===Position===Type
+User_1===Marketing===SEO
+User_2===Administration===Manager
+User_3===Marketing===Target
+
+### Benefit:
+Centralized employee management — you can update access levels (roles or departments) directly in the data table without editing the workflow.
+
+## 📌 Section 3: Position & Role Check
+### 🧩 Choose Position (Switch Node)
+Purpose: Determines the user’s department or role level (e.g., Marketing, Sales, Administration).
+
+### 🧩 Check Role Type (Switch Node)
+Purpose: Performs a second-level check — filters users by Type (e.g., SEO, SMM, Target).
+
+### Logic:
+Marketing → SEO → Send to SEO workflow branch
+Marketing → Target → Send to Ads branch
+Administration → Manager → Grant full access
+Sales → Employee → Limited access
+
+### Benefit:
+Allows multi-level, role-based logic with different automation paths for each team or position.
+
+## 📌 Section 4: Action Routing
+💬 No Operation Nodes (Placeholders)
+Purpose: Represent different action branches — each can later be replaced with the logic specific to that department.
+
+### Examples:
+“Target” branch → connect to ad performance automation
+“SEO” branch → connect to Google Search Console reports
+“Sales” branch → connect to CRM updates
+
+### Benefit:
+A flexible access framework — ready to integrate with any process per department.
+
+📊 Workflow Overview Table
+
+Section	Node Name	Purpose
+1. Trigger	Telegram Trigger	Captures user messages
+2. Lookup	Employee Database	Fetches user position and type
+3. Check	Choose Position / Role Switch	Defines access path based on role
+4. Routing	No Operation Nodes	Separate workflows per department
+
+## 🎯 Key Benefits
+
+🔐 Granular Access Control: Multi-level permission logic (Position + Role).
+⚙️ Dynamic Role Management: Update access directly in your data table — no redeployment needed.
+🧱 Modular Design: Add or replace department branches without affecting core logic.
+🚀 Scalable Foundation: Perfect base for enterprise-grade permission systems or multi-team bots.
+📈 Cross-Platform Ready: Can be adapted for Slack, Discord, or internal chat tools.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 10171
+- **Complexity:** advanced
+- **Node Count:** 28
+- **Views:** 127
+- **Downloads:** 12
+- **Created:** 2025/10/25
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/10171)
+
+## 👤 Author
+
+- **Name:** Yehor EGMS
+- **Username:** @egm-systems
+
+## 🏷️ Categories
+
+- Miscellaneous
+
+## 🔗 Nodes Used
+
+- **telegramTrigger** 
+- **noOp** (×5)
+- **switch** (×2)
+- **dataTable** 
+- **stickyNote** (×11)
+- **slackTrigger** 
+- **googleSheets** 
+- **airtable** 
+- **notion** 
+- **if** 
+- **filter** 
+- **formTrigger** 
+- **scheduleTrigger** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 28 nodes with 4 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

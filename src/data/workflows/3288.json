@@ -1,0 +1,410 @@
+{
+  "id": 3288,
+  "slug": "3288",
+  "title": "Youtube RAG search with frontend using Apify, Qdrant and AI",
+  "description": "### Ever wanted to build your own RAG search over Youtube videos? Well, now you can! This n8n template shows how you can build a very capable Youtube search engine powered by Apify, Qdrant and your LLM of choice to quickly and efficiently browse over many videos for research.\n\nI originally started to template to ask questions on the \"n8n @ scale office-hours\" livestream videos but then extended it to include the latest videos on the official channel.\n\n**Check out a demo here**: [https://jimleuk.app.n8n.cloud/webhook/n8n_videos](https://jimleuk.app.n8n.cloud/webhook/n8n_videos)\n\n## How it works\n* Stage 1 is to collect the Youtube video transcripts and push them into a vector database. For this, I've used Apify to scrape Youtube and Qdrant to store the embeddings.\n* Transcripts are broken down into smaller chunks and carefully tagged with metadata to assist in later search and filtering.\n* Stage 2 is to build a web frontend for the user to query the vectorised transcripts. I'm using a webhook to serve a simple web app and API to dynamically fetch the results.\n* When searching for a video, I've opted to use Qdrant's search groups API which in this use-case, performs better as it returns a wider range of videos results.\n* In the web frontend, when the user clicks on the results, the matching Youtube video plays in an embedded video player.\n\n## How to use\n* Once credentials are all set, first run steps 1 - 3 to populate your vector store.\n* Next, set the workflow to active to expose the web frontend. Visit the webhook URL in your browser to use it.\n* If only for personal use, you may want to remove the rate limiting mechanism in step 4.\n\n## Requirements\n* Apify for Youtube Channel and Video Scraping\n* Qdrant for Vector store\n* OpenAI for LLM and Embeddings\n\n## Customising the template\n* Not interested in official n8n videos? Swap to a different channel - this template will work on many as long as videos are not private or set to prevent embeds.\n* Technically any vector store should work but may not have the same grouping API. Use the simple vector store node and revert back to basic searching instead.",
+  "featuredImage": "/data/workflows/3288/3288.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 4285,
+  "downloads": 428,
+  "createdAt": "2025-03-22T22:04:12.727Z",
+  "updatedAt": "2026-01-16T08:29:01.716Z",
+  "publishedAt": "2025-03-22T22:04:12.727Z",
+  "nodes": 62,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3288",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Youtube RAG search with frontend using Apify, Qdrant and AI",
+    "workflowName": "Youtube RAG search with frontend using Apify, Qdrant and AI",
+    "description": "### Ever wanted to build your own RAG search over Youtube videos? Well, now you can! This n8n template shows how you can build a very capable Youtube search engine powered by Apify, Qdrant and your LLM of choice to quickly and efficiently browse over many videos for research.\n\nI originally started to template to ask questions on the \"n8n @ scale office-hours\" livestream videos but then extended it to include the latest videos on the official channel.\n\n**Check out a demo here**: [https://jimleuk.app.n8n.cloud/webhook/n8n_videos](https://jimleuk.app.n8n.cloud/webhook/n8n_videos)\n\n## How it works\n* Stage 1 is to collect the Youtube video transcripts and push them into a vector database. For this, I've used Apify to scrape Youtube and Qdrant to store the embeddings.\n* Transcripts are broken down into smaller chunks and carefully tagged with metadata to assist in later search and filtering.\n* Stage 2 is to build a web frontend for the user to query the vectorised transcripts. I'm using a webhook to serve a simple web app and API to dynamically fetch the results.\n* When searching for a video, I've opted to use Qdrant's search groups API which in this use-case, performs better as it returns a wider range of videos results.\n* In the web frontend, when the user clicks on the results, the matching Youtube video plays in an embedded video player.\n\n## How to use\n* Once credentials are all set, first run steps 1 - 3 to populate your vector store.\n* Next, set the workflow to active to expose the web frontend. Visit the webhook URL in your browser to use it.\n* If only for personal use, you may want to remove the rate limiting mechanism in step 4.\n\n## Requirements\n* Apify for Youtube Channel and Video Scraping\n* Qdrant for Vector store\n* OpenAI for LLM and Embeddings\n\n## Customising the template\n* Not interested in official n8n videos? Swap to a different channel - this template will work on many as long as videos are not private or set to prevent embeds.\n* Technically any vector store should work but may not have the same grouping API. Use the simple vector store node and revert back to basic searching instead.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Video Subtitles",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Chunk Subtitles",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "For Each Video",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Video Ref",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "For Each Chunk",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Clean Up Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sort By Video ID",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract Results",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SEARCH API",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Query",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Template",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Answer Query",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Has Results?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Generate Empty Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Incr Rate Limit",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "10req/min",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Vectorise Subworkflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Vectorise Subworkflow1",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "WEB UI",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Qdrant Groups Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "For Each Group",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Group Ref",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine Results",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Transcripts to Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Respond to Webhook3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Ignore Already Seen",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Latest Youtube Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chunks to Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "429 Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Render Page",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Generate Webpage",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Has Results?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Generate Empty Response1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Respond to Webhook4",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Groups to Items1",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

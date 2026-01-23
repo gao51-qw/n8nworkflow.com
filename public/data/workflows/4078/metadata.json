@@ -1,0 +1,27 @@
+{
+  "id": 4078,
+  "slug": "4078",
+  "title": "Convert Markdown content to Contentful rich text with AI formatting",
+  "description": "# Workflow: Publish to Contentful with Rich Text Formatting\n\n## ⚡ About the Creators\nThis workflow was created by **Varritech** Technologies, an innovative agency that leverages AI to engineer, design, and deliver software development projects 500% faster than traditional agencies. Based in New York City, we specialize in custom software development, web applications, and digital transformation solutions. If you need assistance implementing this workflow or have questions about content management solutions, please reach out to our team.\n\n## 🏗️ Architecture Overview  \nThis workflow takes a JSON article payload, splits its markdown content into logical chunks, converts each chunk into Contentful Rich Text JSON via an AI agent, merges the resulting rich text nodes back into a single document, formats the entire entry according to Contentful's field schema, and finally publishes it to Contentful.\n\n1. **Trigger** → Executes when called by another workflow  \n2. **Split by Headings** → Breaks markdown into `##`-delimited chunks  \n3. **Markdown → Rich Text** → AI agent converts each chunk to Contentful Rich Text JSON  \n4. **Combine Rich Text Objects** → Aggregates all chunk outputs into one document  \n5. **Format Entry** → Wraps metadata and rich-text content into Contentful schema  \n6. **Publish Entry** → HTTP POST to Contentful API  \n\n---\n\n## 📦 Node-by-Node Breakdown\n\n```mermaid\nflowchart LR\n  A[When Executed by Another Workflow] --&gt; B[Split by Headings]\n  B --&gt; C[Markdown to Contentful format]\n  C --&gt; D[Combine Rich Text Objects]\n  D --&gt; E[Merge1]\n  E --&gt; F[Format1]\n  F --&gt; G[Create newly formatted Contentful Entry]\n```\n\n### 1. When Executed by Another Workflow\n**Type:** Execute Workflow Trigger\n\n**Input Example:**\n- title, slug, category.id, description, keywords, content, metaTitle, metaDescription, readingTime, difficulty\n\n**Purpose:** Receives the JSON payload from the upstream workflow.\n\n### 2. Split by Headings\n**Type:** Code\n\n**Logic:**\n- Splits input.content into an array of markdown chunks at each second-level heading (##).\n- Emits one item per chunk with index, slug, title, and contentChunk.\n\n### 3. Markdown to Contentful format\n**Type:** LangChain Agent (+ OpenAI Chat model)\n\n**System Prompt:**\n- Defines rules for generating valid Contentful Rich Text JSON (must include nodeType, data:{}, content:[], etc.).\n- Provides examples for paragraphs, headings, lists, links, and images.\n\n**User Prompt:**\n\nHere is the markdown content to convert:\n```{{ $json.contentChunk }}```\n\n**Purpose:** Converts each markdown chunk into an array of rich-text nodes.\n\n### 4. Combine Rich Text Objects\n**Type:** Code\n\n**Logic:**\n- Parses and merges all content arrays returned by the AI agent into one combined content array under a document root.\n\n### 5. Merge1\n**Type:** Merge\n\n**Purpose:** Joins the original item (with metadata) and the combined rich-text document into a single data stream.\n\n### 6. Format1\n**Type:** Code\n\n**Logic:**\n- Maps workflow data into the Contentful entry schema by setting each field (title, slug, category link, description, keywords, rich-text content, metaTitle, metaDescription, readingTime, difficulty) under the appropriate locale and structure required by Contentful.\n\n### 7. Create newly formatted Contentful Entry\n**Type:** HTTP Request\n\n**Method:** POST\n\n**URL:**\nhttps://api.contentful.com/spaces\n\n**Headers:**\n- Authorization: Bearer token for Contentful Management API\n- Content-Type: application/vnd.contentful.management.v1+json\n- X-Contentful-Version: entry version number\n- X-Contentful-Content-Type: content type ID\n\n**Body:** The formatted fields object produced by the previous node\n\n**Purpose:** Publishes the new entry with rich-text content to Contentful.\n\n## 🔍 Design Rationale & Best Practices\n### Chunked Conversion\nSplitting by headings prevents AI context limits and keeps conversions modular.\n\n### Strict Rich Text Schema\nEnforcing nodeType, data, and content structure avoids validation errors on Contentful.\n\n### Two-Phase Merge\nSeparating \"combine AI outputs\" and \"format entry\" keeps transformations clear and testable.\n\n### Idempotent Publish\nUses explicit versioning and content type headers to ensure correct entry creation.",
+  "featuredImage": "/data/workflows/4078/4078.webp",
+  "author": {
+    "id": 101,
+    "slug": "varritech",
+    "name": "Varritech",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 887,
+  "downloads": 88,
+  "createdAt": "2025-05-15T18:02:32.245Z",
+  "updatedAt": "2026-01-16T08:32:56.312Z",
+  "publishedAt": "2025-05-15T18:02:32.245Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4078"
+}

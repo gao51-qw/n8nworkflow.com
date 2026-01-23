@@ -1,0 +1,116 @@
+{
+  "id": 8972,
+  "slug": "8972",
+  "title": "Automated voice appointment booking with Vapi AI and Google Calendar",
+  "description": "## What this template does\n\nConnect a Vapi AI voice agent to Google Calendar to capture contact details and auto-book appointments.\nThe agent asks for name, address, service type, and a preferred time. The workflow checks availability and either proposes times or books the slot—no code needed.\n\n## How it works (node map)\n\n- Webhook: Production URL = VAPI Server URL — receives tool calls from Vapi and returns results.\n- **1. CONFIGURATION (EDIT ME)** — your timezone, work hours, meeting length, buffers, and cadence.\n- **Route by Tool Name** — routes Vapi tool calls:\n\t- `checkAvailability` → calendar lookup path\n\t- `bookAppointment` → create event path\n- **2. Get Calendar Events (EDIT ME)** — reads events for the requested day.\n- **Calculate Potential Slots / Filter for Available Slots** — builds conflict-free options with buffers.\n- Respond with Available Times — returns formatted slots to Vapi.\n- **3. Book Appointment in Calendar (EDIT ME)** — creates the calendar event with details.\n- **Booking Confirmation** — returns success back to Vapi.\n\n&gt; Sticky notes in the canvas show exactly what to edit (required by n8n).\nNo API keys are hardcoded; Google uses OAuth credentials.\n\n## Requirements\n\n- n8n (Cloud or self-hosted)\n- Google account with Calendar (OAuth credential in n8n)\n- Vapi account + one Assistant\n\n## Setup (5 minutes)\n### A) Vapi → n8n connection\n\n1. Open the **Webhook** node and copy the **Production URL**.\n2. In **Vapi** → **Assistant** → **Messaging**, set **Server URL** = that Production URL.\n3. In **Server Messages**, enable **only** `toolCalls`.\n\n### B) Vapi tools (names must match exactly)\n\nCreate two **Custom Tools** in Vapi and attach them to the assistant:\n\n**Tool 1:** `checkAvailability`\n\n- **Arguments**\n\t- `initialSearchDateTime` (string, ISO-8601 with timezone offset, e.g. `2025-09-09T09:00:00-05:00`)\n\n**Tool 2:** ```bookAppointment```\n\n- **Arguments**\n\t- `startDateTime` (string, ISO-8601 with tz)\n\t- `endDateTime` (string, ISO-8601 with tz)\n\t- `clientName` (string)\n\t- `propertyAddress` (string)\n\t- `serviceType` (string)\n\n&gt; The Switch node routes based on ```message.toolCalls[0].function.name```. If the names differ, nothing will run.\n\n### C) Configure availability\n\nOpen **1. CONFIGURATION (EDIT ME)** and set:\n\n- ```timeZone``` (e.g. ```America/New_York```)\n- ```workdayStartHour``` / ```workdayEndHour``` (24h integers)\n- ```meetingDurationMinutes``` (e.g. ```30``` or ```60```)\n- ```bufferBeforeMinutes``` / ```bufferAfterMinutes``` (e.g. ```15```)\n- ```bookingCadenceMinutes``` (e.g. ```30```)\n\n### D) Connect Google Calendar\n\n1. Open **2. Get Calendar Events (EDIT ME)** → Credentials: select/create Google Calendar OAuth.\nThen choose the calendar to check availability.\n2. Open **3. Book Appointment in Calendar (EDIT ME)** → use the same credential and same calendar to book.\n\n### E) Activate & test\n\n- Toggle the workflow **Active**.\n- Call your Vapi number (or start a session) and book a test slot.\n- Verify the event appears with description fields (client, address, service type, call id).\n\n### Customising\n\n- Change summary/description format in **3. Book Appointment**.\n- Add SMS/Email confirmations, CRM sync, rescheduling, or analytics as follow-ups (see sticky note “I’m a note”).\n\n### Troubleshooting\n\n- **No response back to Vapi** → confirm Vapi is set to send toolCalls only and the Server URL matches the Production URL.\n- **Switch doesn’t route** → tool names must be exactly checkAvailability and bookAppointment.\n- **No times returned** → ensure timezone + work hours + cadence generate at least one future slot; confirm Google credential and calendar selection.\n- **Event not created** → use the same Google credential & calendar in both nodes; check OAuth scopes/consent.\n\n### Security & privacy\n\n- Google uses OAuth; credentials live in n8n.\n- No API keys hardcoded.\n- Webhook receives only the fields needed to check times or book.",
+  "featuredImage": "/data/workflows/8972/8972.webp",
+  "author": {
+    "id": 101,
+    "slug": "soyfrico",
+    "name": "Francisco Rivera",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 2937,
+  "downloads": 293,
+  "createdAt": "2025-09-26T16:08:34.144Z",
+  "updatedAt": "2026-01-16T08:58:37.251Z",
+  "publishedAt": "2025-09-26T16:08:34.144Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8972",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated voice appointment booking with Vapi AI and Google Calendar",
+    "workflowName": "Automated voice appointment booking with Vapi AI and Google Calendar",
+    "description": "## What this template does\n\nConnect a Vapi AI voice agent to Google Calendar to capture contact details and auto-book appointments.\nThe agent asks for name, address, service type, and a preferred time. The workflow checks availability and either proposes times or books the slot—no code needed.\n\n## How it works (node map)\n\n- Webhook: Production URL = VAPI Server URL — receives tool calls from Vapi and returns results.\n- **1. CONFIGURATION (EDIT ME)** — your timezone, work hours, meeting length, buffers, and cadence.\n- **Route by Tool Name** — routes Vapi tool calls:\n\t- `checkAvailability` → calendar lookup path\n\t- `bookAppointment` → create event path\n- **2. Get Calendar Events (EDIT ME)** — reads events for the requested day.\n- **Calculate Potential Slots / Filter for Available Slots** — builds conflict-free options with buffers.\n- Respond with Available Times — returns formatted slots to Vapi.\n- **3. Book Appointment in Calendar (EDIT ME)** — creates the calendar event with details.\n- **Booking Confirmation** — returns success back to Vapi.\n\n&gt; Sticky notes in the canvas show exactly what to edit (required by n8n).\nNo API keys are hardcoded; Google uses OAuth credentials.\n\n## Requirements\n\n- n8n (Cloud or self-hosted)\n- Google account with Calendar (OAuth credential in n8n)\n- Vapi account + one Assistant\n\n## Setup (5 minutes)\n### A) Vapi → n8n connection\n\n1. Open the **Webhook** node and copy the **Production URL**.\n2. In **Vapi** → **Assistant** → **Messaging**, set **Server URL** = that Production URL.\n3. In **Server Messages**, enable **only** `toolCalls`.\n\n### B) Vapi tools (names must match exactly)\n\nCreate two **Custom Tools** in Vapi and attach them to the assistant:\n\n**Tool 1:** `checkAvailability`\n\n- **Arguments**\n\t- `initialSearchDateTime` (string, ISO-8601 with timezone offset, e.g. `2025-09-09T09:00:00-05:00`)\n\n**Tool 2:** ```bookAppointment```\n\n- **Arguments**\n\t- `startDateTime` (string, ISO-8601 with tz)\n\t- `endDateTime` (string, ISO-8601 with tz)\n\t- `clientName` (string)\n\t- `propertyAddress` (string)\n\t- `serviceType` (string)\n\n&gt; The Switch node routes based on ```message.toolCalls[0].function.name```. If the names differ, nothing will run.\n\n### C) Configure availability\n\nOpen **1. CONFIGURATION (EDIT ME)** and set:\n\n- ```timeZone``` (e.g. ```America/New_York```)\n- ```workdayStartHour``` / ```workdayEndHour``` (24h integers)\n- ```meetingDurationMinutes``` (e.g. ```30``` or ```60```)\n- ```bufferBeforeMinutes``` / ```bufferAfterMinutes``` (e.g. ```15```)\n- ```bookingCadenceMinutes``` (e.g. ```30```)\n\n### D) Connect Google Calendar\n\n1. Open **2. Get Calendar Events (EDIT ME)** → Credentials: select/create Google Calendar OAuth.\nThen choose the calendar to check availability.\n2. Open **3. Book Appointment in Calendar (EDIT ME)** → use the same credential and same calendar to book.\n\n### E) Activate & test\n\n- Toggle the workflow **Active**.\n- Call your Vapi number (or start a session) and book a test slot.\n- Verify the event appears with description fields (client, address, service type, call id).\n\n### Customising\n\n- Change summary/description format in **3. Book Appointment**.\n- Add SMS/Email confirmations, CRM sync, rescheduling, or analytics as follow-ups (see sticky note “I’m a note”).\n\n### Troubleshooting\n\n- **No response back to Vapi** → confirm Vapi is set to send toolCalls only and the Server URL matches the Production URL.\n- **Switch doesn’t route** → tool names must be exactly checkAvailability and bookAppointment.\n- **No times returned** → ensure timezone + work hours + cadence generate at least one future slot; confirm Google credential and calendar selection.\n- **Event not created** → use the same Google credential & calendar in both nodes; check OAuth scopes/consent.\n\n### Security & privacy\n\n- Google uses OAuth; credentials live in n8n.\n- No API keys hardcoded.\n- Webhook receives only the fields needed to check times or book.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "1. CONFIGURATION (EDIT ME)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Webhook: Production URL = VAPI Server URL",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Route by Tool Name",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Calculate Potential Slots (do not change)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter for Available Slots (do not change)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond with Available Times (do not change)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "I'm a note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "3. Book Appointment in Calendar (EDIT ME)",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "2. Get Calendar Events (EDIT ME)",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Booking Confirmation (do not change)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "id": 8562,
+  "slug": "8562",
+  "title": "AI Shopify product descriptions: GPT-4o Vision + Claude + Analytics",
+  "description": "# Complete AI Product Description Generator\n## Transforms product images into high-converting copy with GPT-4o Vision + Claude 3.5\nThe Shopify AI Product Description Factory is a **production-grade n8n workflow** that converts product images and metadata into refined, SEO-aware descriptions—fully automated and region-agnostic. It blends GPT-4o vision for visible attribute extraction, Claude 3.5 Sonnet for premium copy, Perplexity research for verified brand context, Google Sheets for orchestration and audit trails, **plus automated daily sales analytics enrichment**. Link-header pagination and structured output enforcement ensure reliable scale.\n\n![generatedimage 3.png](fileId:2627)\n\n*To refine according to your usecase connect via my profile*\n[@connect](https://kumarshivam.link/)\n\n## Key Advantages\n\n### Vision-first copywriting\nUses **gpt-4o** to identify only visible physical attributes (closure, heel, materials, sole) from product images—no guesses.\n\n### Premium copy generation\n**anthropic/claude-3.5-sonnet** crafts concise, benefit-led descriptions with consistent tone, length control, and clean formatting.\n\n### Research-assisted accuracy\n**perplexityTool** verifies vendor/brand context from official sources to avoid speculation or fabricated claims.\n\n### Pagination you can trust\nAutomates Shopify REST pagination via Link headers and persists `page_info` for resumable runs.\n\n### Google Sheets orchestration\nCentralized staging, status tracking, and QA in Products, with ProcessingState for batch/page markers, and Error_log for diagnostics.\n\n### Bulletproof error feedback\n**errorTrigger + AI diagnosis** logs clear, non-technical and technical explanations to Error_log for fast recovery.\n\n### Automated sales analytics\n**Daily sales tracking** automatically captures and enriches total sales data for comprehensive business intelligence and performance monitoring.\n\n## How It Works\n\n### Intake and filtering\n- `httpRequest` fetches `/admin/api/2024-04/products.json?limit=200&{page_info}`\n- `code` filters only items with:\n  - Image present\n  - Empty `body_html`\n  - The `currSeas:SS2025` tag\n- Extracts tag metadata such as `x-styleCode`, `country_of_origin`, and `gender` when available\n\n### Pagination controller\n- `code` parses Link headers for `rel=\"next\"` and extracts `page_info`\n- `googleSheets` updates ProcessingState with `page_info_next` and increments the batch number for resumable polling\n\n### Generation pipeline\n- `googleSheets` pulls rows with Status = Ready for AI Description; limit throttles batch size\n- `openAi` Analyze image (model **gpt-4o**) returns strictly visible features\n- `lmChatOpenRouter` (**Claude 3.5**) composes the SEO description, optionally blending verified vendor context from `perplexityTool`\n- `outputParserStructured` guarantees strict JSON: `product_id`, `product_title` (normalized), `generated_description`, `status`\n- `googleSheets` writes results back to Products for review/publish\n\n### Sales analytics enrichment\n- **Schedule Trigger** runs daily at 2:01 PM to capture previous day's sales\n- `httpRequest` fetches paid orders from Shopify REST API with date range filtering\n- `splitOut` and `summarize` nodes calculate total daily sales\n- Automatic Google Sheets logging with date stamps and totals\n- Zero-sale days are properly recorded for complete analytics continuity\n\n### Reliability and insight\n`errorTrigger` routes failures to an AI agent that explains the root cause and appends a concise note to Error_log.\n\n## What's Inside (Node Map)\n\n### Data + API\n- `httpRequest` (Shopify REST 2024-04 for products and orders)\n- `googleSheets` (multiple sheet operations)\n- `googleSheetsTool` (error logging)\n\n### AI models\n- `openAi` (gpt-4o vision analysis)\n- `lmChatOpenRouter` (anthropic/claude-3.5-sonnet for content generation)\n- **AI Agent** (intelligent error diagnosis)\n\n### Analytics & Processing\n- `splitOut` (order data processing)\n- `summarize` (sales totals calculation)\n- `set` nodes (data field mapping)\n\n### Tools and guards\n- `perplexityTool` (brand research)\n- `outputParserStructured` (JSON validation)\n- `memoryBufferWindow` (conversation context)\n\n### Control & Scheduling\n- `scheduleTrigger` (multiple time-based triggers)\n- `cron` (periodic execution)\n- `limit` (batch size control)\n- `if` (conditional logic)\n- `code` (custom filtering and pagination logic)\n\n### Observability\n- `errorTrigger` + AI diagnosis to Error_log\n- Processing state tracking\n- Sales analytics logging\n\n## Content & Compliance Rules\n\n- **Locale-agnostic copy**; brand voice is configurable per store\n- **Only image-verifiable attributes** (no guesses); clean HTML suitable for Shopify themes\n- Optional normalization rules (e.g., color/branding cleanup, title sanitization)\n- Style code inclusion supported when `x-styleCode` is present\n- Gender-aware content generation when `gender` tag is present\n- **Strict JSON output** and schema consistency for safe downstream publishing\n\n## Setup Steps\n\n### Core integrations\n- **Shopify Access Token** — Products read + Orders read (REST 2024-04)\n- **OpenAI API** — gpt-4o vision\n- **OpenRouter API** — Claude Sonnet (3.5)\n- **Perplexity API** — vendor/market verification via perplexityTool\n- **Google Sheets OAuth** — Products, ProcessingState, Error_log, Sales analytics\n\n### Configure sheets\n- **ProcessingState** with fields:\n  - batch number\n  - `page_info_next`\n- **Products** with:\n  - Product ID\n  - Product Title\n  - Product Type\n  - Vendor\n  - Image url\n  - Status\n  - country of origin\n  - x_style_code\n  - gender\n  - Generated Description\n- **Error_log** with:\n  - timestamp\n  - Reason of Error\n- **Sales Analytics Sheet** with:\n  - Date\n  - Total Sales\n\n## Workflow Capabilities\n\n### Discovery and staging\nAuto-paginate Shopify; stage eligible products in Sheets with reasons and timestamps.\n\n### Vision-grounded copywriting\nDescriptions reflect only visible attributes plus verified brand context; concise, mobile-friendly structure with gender-aware tone.\n\n### Metadata awareness\nAuto-injects `x-styleCode`, `country_of_origin`, and `gender` when present; natural SEO for brand and product type.\n\n### Sales intelligence\n**Automated daily sales tracking** with Melbourne timezone support, handles zero-sale days, and maintains complete historical records.\n\n### Error analytics\nLayman + technical diagnosis logged to Error_log to shorten MTTR.\n\n### Safe output\nStructured JSON via `outputParserStructured` for predictable row updates.\n\n## Credentials Required\n\n- **Shopify Access Token** (Products + Orders read permissions)\n- **OpenAI API Key** (GPT-4o vision)\n- **OpenRouter API Key** (Claude Sonnet)\n- **Perplexity API Key**\n- **Google Sheets OAuth**\n\n## Ideal For\n\n- **E-commerce teams** scaling compliant, on-brand product copy with comprehensive sales insights\n- **Agencies and SEO specialists** standardizing image-grounded descriptions with performance tracking and analytics\n- **Stores** needing resumable pagination, auditable content operations, and automated daily sales reporting in Sheets\n\n## Advanced Features\n\n- **Dual-workflow architecture**: Content generation + Sales analytics in one system\n- Link-header pagination with `page_info` persistence in ProcessingState\n- Title/content normalization (e.g., color removal) configurable per brand\n- **Gender-aware copywriting** based on product tags\n- Memory windows (`memoryBufferWindow`) to keep multi-step prompts consistent\n- **Melbourne timezone support** for accurate daily sales cutoffs\n- **Zero-sales handling** ensures complete analytics continuity\n- Structured Output enforcement for downstream safety\n- **AI-powered error diagnosis** with technical and layman explanations\n\n## Time & Scheduling (Universal)\n\nThe workflow includes **two independent schedules**:\n- **Content Generation**: Every 5 minutes (configurable) for product processing\n- **Sales Analytics**: Daily at 2:01 PM Melbourne time for previous day's sales\n\nFor globally distributed teams, schedule triggers and timestamps can be standardized on UTC to avoid regional drift.\n\n## Pro Tip\n\nStart with small batches (`limit` set to 10 or fewer) to validate both copy generation and sales tracking flows. The workflow handles **dual operations** independently - content generation failures won't affect sales analytics and vice versa. Monitor the Error_log sheet for any issues and use the ProcessingState sheet to track pagination progress.",
+  "featuredImage": "/data/workflows/8562/8562.webp",
+  "author": {
+    "id": 101,
+    "slug": "shivam840708",
+    "name": "Kumar Shivam",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 978,
+  "downloads": 97,
+  "createdAt": "2025-09-13T20:07:15.240Z",
+  "updatedAt": "2026-01-16T08:56:30.514Z",
+  "publishedAt": "2025-09-13T20:07:15.240Z",
+  "nodes": 43,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8562",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI Shopify product descriptions: GPT-4o Vision + Claude + Analytics",
+    "workflowName": "AI Shopify product descriptions: GPT-4o Vision + Claude + Analytics",
+    "description": "# Complete AI Product Description Generator\n## Transforms product images into high-converting copy with GPT-4o Vision + Claude 3.5\nThe Shopify AI Product Description Factory is a **production-grade n8n workflow** that converts product images and metadata into refined, SEO-aware descriptions—fully automated and region-agnostic. It blends GPT-4o vision for visible attribute extraction, Claude 3.5 Sonnet for premium copy, Perplexity research for verified brand context, Google Sheets for orchestration and audit trails, **plus automated daily sales analytics enrichment**. Link-header pagination and structured output enforcement ensure reliable scale.\n\n![generatedimage 3.png](fileId:2627)\n\n*To refine according to your usecase connect via my profile*\n[@connect](https://kumarshivam.link/)\n\n## Key Advantages\n\n### Vision-first copywriting\nUses **gpt-4o** to identify only visible physical attributes (closure, heel, materials, sole) from product images—no guesses.\n\n### Premium copy generation\n**anthropic/claude-3.5-sonnet** crafts concise, benefit-led descriptions with consistent tone, length control, and clean formatting.\n\n### Research-assisted accuracy\n**perplexityTool** verifies vendor/brand context from official sources to avoid speculation or fabricated claims.\n\n### Pagination you can trust\nAutomates Shopify REST pagination via Link headers and persists `page_info` for resumable runs.\n\n### Google Sheets orchestration\nCentralized staging, status tracking, and QA in Products, with ProcessingState for batch/page markers, and Error_log for diagnostics.\n\n### Bulletproof error feedback\n**errorTrigger + AI diagnosis** logs clear, non-technical and technical explanations to Error_log for fast recovery.\n\n### Automated sales analytics\n**Daily sales tracking** automatically captures and enriches total sales data for comprehensive business intelligence and performance monitoring.\n\n## How It Works\n\n### Intake and filtering\n- `httpRequest` fetches `/admin/api/2024-04/products.json?limit=200&{page_info}`\n- `code` filters only items with:\n  - Image present\n  - Empty `body_html`\n  - The `currSeas:SS2025` tag\n- Extracts tag metadata such as `x-styleCode`, `country_of_origin`, and `gender` when available\n\n### Pagination controller\n- `code` parses Link headers for `rel=\"next\"` and extracts `page_info`\n- `googleSheets` updates ProcessingState with `page_info_next` and increments the batch number for resumable polling\n\n### Generation pipeline\n- `googleSheets` pulls rows with Status = Ready for AI Description; limit throttles batch size\n- `openAi` Analyze image (model **gpt-4o**) returns strictly visible features\n- `lmChatOpenRouter` (**Claude 3.5**) composes the SEO description, optionally blending verified vendor context from `perplexityTool`\n- `outputParserStructured` guarantees strict JSON: `product_id`, `product_title` (normalized), `generated_description`, `status`\n- `googleSheets` writes results back to Products for review/publish\n\n### Sales analytics enrichment\n- **Schedule Trigger** runs daily at 2:01 PM to capture previous day's sales\n- `httpRequest` fetches paid orders from Shopify REST API with date range filtering\n- `splitOut` and `summarize` nodes calculate total daily sales\n- Automatic Google Sheets logging with date stamps and totals\n- Zero-sale days are properly recorded for complete analytics continuity\n\n### Reliability and insight\n`errorTrigger` routes failures to an AI agent that explains the root cause and appends a concise note to Error_log.\n\n## What's Inside (Node Map)\n\n### Data + API\n- `httpRequest` (Shopify REST 2024-04 for products and orders)\n- `googleSheets` (multiple sheet operations)\n- `googleSheetsTool` (error logging)\n\n### AI models\n- `openAi` (gpt-4o vision analysis)\n- `lmChatOpenRouter` (anthropic/claude-3.5-sonnet for content generation)\n- **AI Agent** (intelligent error diagnosis)\n\n### Analytics & Processing\n- `splitOut` (order data processing)\n- `summarize` (sales totals calculation)\n- `set` nodes (data field mapping)\n\n### Tools and guards\n- `perplexityTool` (brand research)\n- `outputParserStructured` (JSON validation)\n- `memoryBufferWindow` (conversation context)\n\n### Control & Scheduling\n- `scheduleTrigger` (multiple time-based triggers)\n- `cron` (periodic execution)\n- `limit` (batch size control)\n- `if` (conditional logic)\n- `code` (custom filtering and pagination logic)\n\n### Observability\n- `errorTrigger` + AI diagnosis to Error_log\n- Processing state tracking\n- Sales analytics logging\n\n## Content & Compliance Rules\n\n- **Locale-agnostic copy**; brand voice is configurable per store\n- **Only image-verifiable attributes** (no guesses); clean HTML suitable for Shopify themes\n- Optional normalization rules (e.g., color/branding cleanup, title sanitization)\n- Style code inclusion supported when `x-styleCode` is present\n- Gender-aware content generation when `gender` tag is present\n- **Strict JSON output** and schema consistency for safe downstream publishing\n\n## Setup Steps\n\n### Core integrations\n- **Shopify Access Token** — Products read + Orders read (REST 2024-04)\n- **OpenAI API** — gpt-4o vision\n- **OpenRouter API** — Claude Sonnet (3.5)\n- **Perplexity API** — vendor/market verification via perplexityTool\n- **Google Sheets OAuth** — Products, ProcessingState, Error_log, Sales analytics\n\n### Configure sheets\n- **ProcessingState** with fields:\n  - batch number\n  - `page_info_next`\n- **Products** with:\n  - Product ID\n  - Product Title\n  - Product Type\n  - Vendor\n  - Image url\n  - Status\n  - country of origin\n  - x_style_code\n  - gender\n  - Generated Description\n- **Error_log** with:\n  - timestamp\n  - Reason of Error\n- **Sales Analytics Sheet** with:\n  - Date\n  - Total Sales\n\n## Workflow Capabilities\n\n### Discovery and staging\nAuto-paginate Shopify; stage eligible products in Sheets with reasons and timestamps.\n\n### Vision-grounded copywriting\nDescriptions reflect only visible attributes plus verified brand context; concise, mobile-friendly structure with gender-aware tone.\n\n### Metadata awareness\nAuto-injects `x-styleCode`, `country_of_origin`, and `gender` when present; natural SEO for brand and product type.\n\n### Sales intelligence\n**Automated daily sales tracking** with Melbourne timezone support, handles zero-sale days, and maintains complete historical records.\n\n### Error analytics\nLayman + technical diagnosis logged to Error_log to shorten MTTR.\n\n### Safe output\nStructured JSON via `outputParserStructured` for predictable row updates.\n\n## Credentials Required\n\n- **Shopify Access Token** (Products + Orders read permissions)\n- **OpenAI API Key** (GPT-4o vision)\n- **OpenRouter API Key** (Claude Sonnet)\n- **Perplexity API Key**\n- **Google Sheets OAuth**\n\n## Ideal For\n\n- **E-commerce teams** scaling compliant, on-brand product copy with comprehensive sales insights\n- **Agencies and SEO specialists** standardizing image-grounded descriptions with performance tracking and analytics\n- **Stores** needing resumable pagination, auditable content operations, and automated daily sales reporting in Sheets\n\n## Advanced Features\n\n- **Dual-workflow architecture**: Content generation + Sales analytics in one system\n- Link-header pagination with `page_info` persistence in ProcessingState\n- Title/content normalization (e.g., color removal) configurable per brand\n- **Gender-aware copywriting** based on product tags\n- Memory windows (`memoryBufferWindow`) to keep multi-step prompts consistent\n- **Melbourne timezone support** for accurate daily sales cutoffs\n- **Zero-sales handling** ensures complete analytics continuity\n- Structured Output enforcement for downstream safety\n- **AI-powered error diagnosis** with technical and layman explanations\n\n## Time & Scheduling (Universal)\n\nThe workflow includes **two independent schedules**:\n- **Content Generation**: Every 5 minutes (configurable) for product processing\n- **Sales Analytics**: Daily at 2:01 PM Melbourne time for previous day's sales\n\nFor globally distributed teams, schedule triggers and timestamps can be standardized on UTC to avoid regional drift.\n\n## Pro Tip\n\nStart with small batches (`limit` set to 10 or fewer) to validate both copy generation and sales tracking flows. The workflow handles **dual operations** independently - content generation failures won't affect sales analytics and vice versa. Monitor the Error_log sheet for any issues and use the ProcessingState sheet to track pagination progress.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Session Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenRouter Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "OpenRouter Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message a model in Perplexity",
+      "type": "n8n-nodes-base.perplexityTool",
+      "role": "perplexityTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message a model in Perplexity1",
+      "type": "n8n-nodes-base.perplexityTool",
+      "role": "perplexityTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Shopify Content Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get row(s) in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.cron",
+      "role": "cron",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Shopify Products",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get row(s) in sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Code5",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Limit2",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append row in sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "If3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Append row in sheet in Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Append row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

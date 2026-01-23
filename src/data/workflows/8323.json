@@ -1,0 +1,218 @@
+{
+  "id": 8323,
+  "slug": "8323",
+  "title": "AI-powered WhatsApp customer support for Shopify brands with LLM agents",
+  "description": "\n#  🚀 AI-Powered WhatsApp Customer Support for Shopify Brands\n\n\nThis n8n template builds a WhatsApp support copilot that answers **order\nstatus** and **product availability** from Shopify using LLM \"agents,\"\nthen replies to the customer in WhatsApp or routes to human support.\n\n------------------------------------------------------------------------\n\n## Use cases\n\n-   \"Where is my order?\" → live status + tracking link\n-   \"What are your best-selling T-shirts?\" → in-stock sizes & variants\n-   Greetings / small talk → welcome message\n-   Anything unclear → handoff to support channel\n\n------------------------------------------------------------------------\n\n## Good to know\n\n-   WhatsApp Business conversations are billed by Meta/Twilio/Exotel;\n    plan accordingly.\n-   Shopify Admin API has rate limits (leaky bucket) --- stagger\n    requests.\n-   LLM usage incurs token costs; cap max tokens and enable caching\n    where possible.\n-   Avoid sending PII to the model; only pass minimal order/product\n    fields.\n\n------------------------------------------------------------------------\n\n## How it works\n\n1.  **WhatsApp Trigger**\\\n    Receives an incoming message (e.g., \"Where is my order?\").\n\n2.  **Get Customer from Shopify → Customer Details → Normalize Input**\\\n    Looks up the customer by phone, formats the query (lower-case, emoji\n    & punctuation normalization).\n\n3.  **Switch (intent router)**\\\n    Classifies into `welcome`, `orderStatusQuery`, `productQuery`, or\n    `supportQuery`.\n\n4.  **Welcome path**\\\n    **Welcome message** → polite greeting → (noop placeholder).\n\n5.  **Order status path (Orders Agent)**\n\n    -   **Orders Agent (LLM + Memory)** interprets the user request and\n        extracts needed fields.\n    -   **Get Customer Orders (HTTP to Shopify)** fetches the user's\n        latest order(s).\n    -   **Structured Output Parser** cleans the agent's output into a\n        strict schema.\n    -   **Send Order Status (WhatsApp message)** returns status, ETA,\n        and tracking link.\n\n6.  **Products path (Products Agent)**\n\n    -   **Products Agent (LLM + Memory)** turns the ask into a product\n        query.\n    -   **Get Products from Shopify (HTTP)** pulls best sellers /\n        inventory & sizes.\n    -   **Structured Output Parser** formats name, price, sizes, stock.\n    -   **Send Products message (WhatsApp)** sends a tidy,\n        human-readable reply\n\n7.  **Support path**\n    **Send a message to support** posts the transcript/context to your\n    agent/helpdesk channel and informs the user a human will respond\n\n------------------------------------------------------------------------\n\n## How to use\n\n-   Replace the **manual/WhatsApp trigger** with your live WhatsApp\n    number/webhook.\n-   Set env vars/credentials: Shopify domain + Admin API token, WhatsApp\n    provider keys, LLM key (OpenAI/OpenRouter), and (optionally) your\n    support channel webhook.\n-   Edit message templates for tone, add your brand name, and localize\n    if needed.\n-   Test with samples: \"Where is my order?\", \"Show best sellers\", \"Hi\".\n\n------------------------------------------------------------------------\n\n## Requirements\n\n-   WhatsApp Business API (Meta/Twilio/Exotel)\n-   Shopify store + Admin API access\n-   LLM provider (OpenAI/OpenRouter etc.)\n-   Slack webhook for human handoff\n\n------------------------------------------------------------------------\n\n## Prerequisites\n\n-   Active **WhatsApp Business Account** connected via API provider\n    (Meta, Twilio, or Exotel).\n-   **Shopify Admin API credentials** (API key, secret, store domain).\n-   **Slack OAuth app** or webhook for human support escalation.\n-   API key for your LLM provider (OpenAI, OpenRouter, etc.).\n\n------------------------------------------------------------------------\n\n## Customising this workflow\n\n-   Add intents: returns/exchanges, COD confirmation, address changes.\n-   Enrich product replies with images, price ranges, and \"Buy\" deep\n    links.\n-   Add multilingual support by detecting locale and templating\n    responses.\n-   Log all interactions to a DB/Sheet for analytics and quality\n    review.\n-   Guardrails: confidence thresholds → fallback to support; redact PII;\n    retry on API errors.\n\n",
+  "featuredImage": "/data/workflows/8323/8323.webp",
+  "author": {
+    "id": 101,
+    "slug": "ruthwik",
+    "name": "Ruthwik",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 947,
+  "downloads": 94,
+  "createdAt": "2025-09-06T08:48:06.578Z",
+  "updatedAt": "2026-01-16T08:55:15.647Z",
+  "publishedAt": "2025-09-06T08:48:06.578Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8323",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered WhatsApp customer support for Shopify brands with LLM agents",
+    "workflowName": "AI-powered WhatsApp customer support for Shopify brands with LLM agents",
+    "description": "#  🚀 AI-Powered WhatsApp Customer Support for Shopify Brands\n\n\nThis n8n template builds a WhatsApp support copilot that answers **order\nstatus** and **product availability** from Shopify using LLM \"agents,\"\nthen replies to the customer in WhatsApp or routes to human support.\n\n------------------------------------------------------------------------\n\n## Use cases\n\n-   \"Where is my order?\" → live status + tracking link\n-   \"What are your best-selling T-shirts?\" → in-stock sizes & variants\n-   Greetings / small talk → welcome message\n-   Anything unclear → handoff to support channel\n\n------------------------------------------------------------------------\n\n## Good to know\n\n-   WhatsApp Business conversations are billed by Meta/Twilio/Exotel;\n    plan accordingly.\n-   Shopify Admin API has rate limits (leaky bucket) --- stagger\n    requests.\n-   LLM usage incurs token costs; cap max tokens and enable caching\n    where possible.\n-   Avoid sending PII to the model; only pass minimal order/product\n    fields.\n\n------------------------------------------------------------------------\n\n## How it works\n\n1.  **WhatsApp Trigger**\\\n    Receives an incoming message (e.g., \"Where is my order?\").\n\n2.  **Get Customer from Shopify → Customer Details → Normalize Input**\\\n    Looks up the customer by phone, formats the query (lower-case, emoji\n    & punctuation normalization).\n\n3.  **Switch (intent router)**\\\n    Classifies into `welcome`, `orderStatusQuery`, `productQuery`, or\n    `supportQuery`.\n\n4.  **Welcome path**\\\n    **Welcome message** → polite greeting → (noop placeholder).\n\n5.  **Order status path (Orders Agent)**\n\n    -   **Orders Agent (LLM + Memory)** interprets the user request and\n        extracts needed fields.\n    -   **Get Customer Orders (HTTP to Shopify)** fetches the user's\n        latest order(s).\n    -   **Structured Output Parser** cleans the agent's output into a\n        strict schema.\n    -   **Send Order Status (WhatsApp message)** returns status, ETA,\n        and tracking link.\n\n6.  **Products path (Products Agent)**\n\n    -   **Products Agent (LLM + Memory)** turns the ask into a product\n        query.\n    -   **Get Products from Shopify (HTTP)** pulls best sellers /\n        inventory & sizes.\n    -   **Structured Output Parser** formats name, price, sizes, stock.\n    -   **Send Products message (WhatsApp)** sends a tidy,\n        human-readable reply\n\n7.  **Support path**\n    **Send a message to support** posts the transcript/context to your\n    agent/helpdesk channel and informs the user a human will respond\n\n------------------------------------------------------------------------\n\n## How to use\n\n-   Replace the **manual/WhatsApp trigger** with your live WhatsApp\n    number/webhook.\n-   Set env vars/credentials: Shopify domain + Admin API token, WhatsApp\n    provider keys, LLM key (OpenAI/OpenRouter), and (optionally) your\n    support channel webhook.\n-   Edit message templates for tone, add your brand name, and localize\n    if needed.\n-   Test with samples: \"Where is my order?\", \"Show best sellers\", \"Hi\".\n\n------------------------------------------------------------------------\n\n## Requirements\n\n-   WhatsApp Business API (Meta/Twilio/Exotel)\n-   Shopify store + Admin API access\n-   LLM provider (OpenAI/OpenRouter etc.)\n-   Slack webhook for human handoff\n\n------------------------------------------------------------------------\n\n## Prerequisites\n\n-   Active **WhatsApp Business Account** connected via API provider\n    (Meta, Twilio, or Exotel).\n-   **Shopify Admin API credentials** (API key, secret, store domain).\n-   **Slack OAuth app** or webhook for human support escalation.\n-   API key for your LLM provider (OpenAI, OpenRouter, etc.).\n\n------------------------------------------------------------------------\n\n## Customising this workflow\n\n-   Add intents: returns/exchanges, COD confirmation, address changes.\n-   Enrich product replies with images, price ranges, and \"Buy\" deep\n    links.\n-   Add multilingual support by detecting locale and templating\n    responses.\n-   Log all interactions to a DB/Sheet for analytics and quality\n    review.\n-   Guardrails: confidence thresholds → fallback to support; redact PII;\n    retry on API errors.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "role": "whatsAppTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Products from Shopify",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Orders Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Products Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Customer from Shopify",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Customer Details",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Customer Orders",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send a message to support",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Welcome message",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Order Status",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Products message",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing2",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing3",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

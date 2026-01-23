@@ -1,0 +1,146 @@
+{
+  "id": 9397,
+  "slug": "9397",
+  "title": "Automated compliance control scoring with CyberPulse, GPT-4o & Google Sheets",
+  "description": "**What this template does**\n\nBatch-evaluates compliance controls from Google Sheets using the CyberPulse Compliance API. Each control is scored, mapped to selected frameworks, enriched with crosswalk mappings, and summarized with AI-generated findings and recommendations.\n\n**How it works**\n\nRead from Sheets → Build control text (response_text + implementation_notes) → CyberPulse Compliance (scoring, mapping, AI summary) → Normalize → Append results to Sheets.\n\n**Setup (5–10 min)**\n\nAdd Google Sheets + CyberPulse HTTP Header Auth credentials.\n\nReplace YOUR_SHEET_ID and sheet names.\n\nProvide your Crosswalk JSON URL (raw GitHub or API endpoint) or use this url: https://www.cyberpulsesolutions.com/xw.json\n\nSelect frameworks to evaluate against.\n\nRun a small test, then full batch.\n\n**CyberPulse API (required for production)**\n\nUse hosted scoring/mapping (no local ML code).\n\nCreate a CyberPulse HTTP Header Auth credential with API Key.\n\nIn the node: paste Crosswalk URL, select frameworks, set credential.\n\nFor large sheets, add a short Wait or reduce batch size.\n\n**Input columns**\n\ncontrol_id\n\ncontrol_description\n\nresponse_text\n\nimplementation_notes \n\nevidence_url_1 … evidence_url_4 \n\n**Output columns**\n\nstatus\n\nevaluation\n\nscore\n\nconfidence\n\nrationale\n\ncategories\n\nevidence_count\n\nmapped_count\n\nmapping_flat\n\nframeworks_selected\n\nengine_version\n\nai_summary\n\nai_findings (3 per control)\n\nai_recommendations (3 per control)\n\n**Troubleshooting**\n\nNo rows → check sheet ID and range.\n\nEmpty mappings → verify Crosswalk URL.\n\nWrite errors → confirm results sheet + permissions.\n\n**Learn more about CyberPulse Compliance Agent:**\n\nhttps://www.cyberpulsesolutions.com/solutions/compliance-agent\n\n**Start free:**\n\nhttps://www.cyberpulsesolutions.com/pricing\n\nEmail: info@cyberpulsesolutions.com",
+  "featuredImage": "/data/workflows/9397/9397.webp",
+  "author": {
+    "id": 101,
+    "slug": "adnantariq",
+    "name": "Adnan Tariq",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 53,
+  "downloads": 5,
+  "createdAt": "2025-10-09T06:42:43.975Z",
+  "updatedAt": "2026-01-16T09:00:20.815Z",
+  "publishedAt": "2025-10-09T06:42:43.975Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9397",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated compliance control scoring with CyberPulse, GPT-4o & Google Sheets",
+    "workflowName": "Automated compliance control scoring with CyberPulse, GPT-4o & Google Sheets",
+    "description": "**What this template does**\n\nBatch-evaluates compliance controls from Google Sheets using the CyberPulse Compliance API. Each control is scored, mapped to selected frameworks, enriched with crosswalk mappings, and summarized with AI-generated findings and recommendations.\n\n**How it works**\n\nRead from Sheets → Build control text (response_text + implementation_notes) → CyberPulse Compliance (scoring, mapping, AI summary) → Normalize → Append results to Sheets.\n\n**Setup (5–10 min)**\n\nAdd Google Sheets + CyberPulse HTTP Header Auth credentials.\n\nReplace YOUR_SHEET_ID and sheet names.\n\nProvide your Crosswalk JSON URL (raw GitHub or API endpoint) or use this url: https://www.cyberpulsesolutions.com/xw.json\n\nSelect frameworks to evaluate against.\n\nRun a small test, then full batch.\n\n**CyberPulse API (required for production)**\n\nUse hosted scoring/mapping (no local ML code).\n\nCreate a CyberPulse HTTP Header Auth credential with API Key.\n\nIn the node: paste Crosswalk URL, select frameworks, set credential.\n\nFor large sheets, add a short Wait or reduce batch size.\n\n**Input columns**\n\ncontrol_id\n\ncontrol_description\n\nresponse_text\n\nimplementation_notes \n\nevidence_url_1 … evidence_url_4 \n\n**Output columns**\n\nstatus\n\nevaluation\n\nscore\n\nconfidence\n\nrationale\n\ncategories\n\nevidence_count\n\nmapped_count\n\nmapping_flat\n\nframeworks_selected\n\nengine_version\n\nai_summary\n\nai_findings (3 per control)\n\nai_recommendations (3 per control)\n\n**Troubleshooting**\n\nNo rows → check sheet ID and range.\n\nEmpty mappings → verify Crosswalk URL.\n\nWrite errors → confirm results sheet + permissions.\n\n**Learn more about CyberPulse Compliance Agent:**\n\nhttps://www.cyberpulsesolutions.com/solutions/compliance-agent\n\n**Start free:**\n\nhttps://www.cyberpulsesolutions.com/pricing\n\nEmail: info@cyberpulsesolutions.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Explain & Recommend",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Parse + attach to each item",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "CyberPulse Compliance (Dev)",
+      "type": "n8n-nodes-cyberpulse-compliance-dev.cyberPulseCompliance",
+      "role": "cyberPulseCompliance",
+      "configDescription": "Version 6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

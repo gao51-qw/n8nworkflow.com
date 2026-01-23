@@ -1,0 +1,326 @@
+{
+  "id": 9735,
+  "slug": "9735",
+  "title": "Subdomain enumeration with Subfinder, HTTPX & GPT-4-Mini for security reconnaissance",
+  "description": "Generates a wordlist of 1,000–15,000 subdomains created by an AI agent by correlating detected technologies and recurring patterns.\n## **Objective**\nAssist security researchers, bug bounty hunters, and web pentesters in the reconnaissance phase by incorporating an AI agent that generates additional potential subdomains. This enables discovery of assets outside the scope of traditional scans and expands the analyzable attack surface.\n## **How it works**\n1. The user uploads a list of domains to scan (scope).\n2. The workflow performs a passive, comprehensive scan using four sources (subfinder, assetfinder, crt.sh, Wayback Machine).\n3. The scan results and detected technologies are passed to an AI agent.\n4. The agent runs in a loop up to 20 iterations, generating new subdomains each pass (average output depends on input and model).\n5. Generated subdomains are validated and deduplicated. Syntax is checked and availability is tested (host active / httpx).\n### Requirements\n- SSH access with a root user and the following tools:\n\n1. [Subfinder](https://github.com/projectdiscovery/subfinder)\n2. [Assetfinder](https://github.com/tomnomnom/assetfinder)\n3. [HTTPX](https://github.com/projectdiscovery/httpx)\n\nIt is recommended to use a VPS with SSH because if the scope is very large the workflow will take a long time.",
+  "featuredImage": "/data/workflows/9735/9735.webp",
+  "author": {
+    "id": 101,
+    "slug": "pyus3r",
+    "name": "Javier Rieiro",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1212,
+  "downloads": 121,
+  "createdAt": "2025-10-15T21:41:48.165Z",
+  "updatedAt": "2026-01-16T09:01:40.464Z",
+  "publishedAt": "2025-10-15T21:41:48.165Z",
+  "nodes": 48,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9735",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Subdomain enumeration with Subfinder, HTTPX & GPT-4-Mini for security reconnaissance",
+    "workflowName": "Subdomain enumeration with Subfinder, HTTPX & GPT-4-Mini for security reconnaissance",
+    "description": "Generates a wordlist of 1,000–15,000 subdomains created by an AI agent by correlating detected technologies and recurring patterns.\n## **Objective**\nAssist security researchers, bug bounty hunters, and web pentesters in the reconnaissance phase by incorporating an AI agent that generates additional potential subdomains. This enables discovery of assets outside the scope of traditional scans and expands the analyzable attack surface.\n## **How it works**\n1. The user uploads a list of domains to scan (scope).\n2. The workflow performs a passive, comprehensive scan using four sources (subfinder, assetfinder, crt.sh, Wayback Machine).\n3. The scan results and detected technologies are passed to an AI agent.\n4. The agent runs in a loop up to 20 iterations, generating new subdomains each pass (average output depends on input and model).\n5. Generated subdomains are validated and deduplicated. Syntax is checked and availability is tested (host active / httpx).\n### Requirements\n- SSH access with a root user and the following tools:\n\n1. [Subfinder](https://github.com/projectdiscovery/subfinder)\n2. [Assetfinder](https://github.com/tomnomnom/assetfinder)\n3. [HTTPX](https://github.com/projectdiscovery/httpx)\n\nIt is recommended to use a VPS with SSH because if the scope is very large the workflow will take a long time.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "SSH Subfinder",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SSH Assetfinder",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WayBack Machine",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter Subdomains WayBack Machine",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter Subdomains Assetfinder",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter Subdomains Subfinder",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "TXT to JSON",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SSH HTTPX",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Subdomain Generator AI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Subdomain Format Validation",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Convert Subdomains to TXT",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "SSH create subdomains.txt into /tmp/reconAI",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prettify File Content",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "crt.sh",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split AI Response",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Subdomain Format Validation",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Rename crt.sh Content",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge all Results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Unique Subdomains",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append all Loop Items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Convert Subdomains to TXT",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI SSH create subdomains.txt into /tmp/reconAI",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI SSH HTTPX",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rename AI Results",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Rename Passive Results",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge AI & Passive Results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Loop Over Domains",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Split HTTPX Results (400 Items max)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over 30 Subdomains",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Append 30 Subdomains",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prettify Results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

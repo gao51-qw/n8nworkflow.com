@@ -1,0 +1,218 @@
+{
+  "id": 9145,
+  "slug": "9145",
+  "title": "Narrative chaining: AI-generated video scene extensions with Veo3",
+  "description": "## Structured Setup Guide: Narrative Chaining with N8N + AI\n\n## 1. Input Setup\nUse a Google Sheet as the control panel.\nFields required:\nVideo URL (starting clip, ends with .mp4)\nNumber of clips to extend (e.g., 2 extra scenes)\nAspect ratio (horizontal, vertical, etc.)\nModel (V3 or V3 Fast)\nNarrative theme (guidance for story flow)\nSpecial requests (scene-by-scene instructions)\nStatus column (e.g., \"For Production\", \"Done\")\n👉 Example scene inputs:\nScene 1: Naruto walks out with ramen is his hands\nScene 2: Joker joins with chips\n## 2. Workflow in N8N\nStep 1: Fetch Input\nGet rows in sheet → fetch the next row where status = For Production.\nClear sheet 2 → reset the sheet that stores generated scenes.\nEdit fields (Initial Values):\nVideo URL = starting clip\nStep = 1\nComplete = total number of scenes requested\nStep 2: Looping Logic\nLooper Node:\nRuns until step = complete.\nCarries over current video URL → feeds into next generation.\nStep 3: Analyze Current Clip\nSend video URL to File.AI Video Understanding API.\nRequest: Describe last frame + audio + scene details.\nOutput: Detailed video analysis text.\nStep 4: Generate Prompt\nAI Agent creates the next scene prompt using:\nContext from video analysis\nNarrative theme (from sheet)\nScene instructions (from sheet)\nAspect ratio, model preference, etc.\n👉 Output = video prompt for next scene\nStep 5: Extract Last Frame\nCall File.AI Extract Frame API.\nParameters:\nInput video URL\nFrame = last\nOutput = JPG image (last frame of current clip).\nStep 6: Generate New Scene\nUse Key.AI (V3 Fast) for economical video generation.\nPOST request includes:\nPrompt (from AI Agent)\nAspect ratio + model\nImage URL (last frame) → ensures seamless chaining\nWait for generation to complete.\n👉 Output = New clip URL (MP4)\nStep 7: Store & Increment\nLog new clip URL into Sheet 2.\nIncrement Step by +1.\nReplace Video URL with the new clip.\nLoop back if Step &lt; Complete.\n## 3. Output Section\nOnce all clips are generated:\nGather all scene URLs from Sheet 2.\nUse File.AI Merge Videos API to stitch clips together:\nOriginal clip + all generated scenes.\nSave final MP4 output.\nUpdate Sheet 1 row with:\nFinal video URL\nStatus = Done\n## 4. Costs\nVideo analysis: ~$0.015 per 8s clip\nFrame extraction: ~0.002¢ (almost free)\nClip merging: negligible (via ffmpeg backend)\nV3 Fast video generation (Key.AI): ~$0.30 per 8s clip",
+  "featuredImage": "/data/workflows/9145/9145.webp",
+  "author": {
+    "id": 101,
+    "slug": "denizdinc",
+    "name": "Deniz",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 688,
+  "downloads": 68,
+  "createdAt": "2025-10-01T08:23:03.444Z",
+  "updatedAt": "2026-01-16T08:59:11.332Z",
+  "publishedAt": "2025-10-01T08:23:03.444Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9145",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Narrative chaining: AI-generated video scene extensions with Veo3",
+    "workflowName": "Narrative chaining: AI-generated video scene extensions with Veo3",
+    "description": "## Structured Setup Guide: Narrative Chaining with N8N + AI\n\n## 1. Input Setup\nUse a Google Sheet as the control panel.\nFields required:\nVideo URL (starting clip, ends with .mp4)\nNumber of clips to extend (e.g., 2 extra scenes)\nAspect ratio (horizontal, vertical, etc.)\nModel (V3 or V3 Fast)\nNarrative theme (guidance for story flow)\nSpecial requests (scene-by-scene instructions)\nStatus column (e.g., \"For Production\", \"Done\")\n👉 Example scene inputs:\nScene 1: Naruto walks out with ramen is his hands\nScene 2: Joker joins with chips\n## 2. Workflow in N8N\nStep 1: Fetch Input\nGet rows in sheet → fetch the next row where status = For Production.\nClear sheet 2 → reset the sheet that stores generated scenes.\nEdit fields (Initial Values):\nVideo URL = starting clip\nStep = 1\nComplete = total number of scenes requested\nStep 2: Looping Logic\nLooper Node:\nRuns until step = complete.\nCarries over current video URL → feeds into next generation.\nStep 3: Analyze Current Clip\nSend video URL to File.AI Video Understanding API.\nRequest: Describe last frame + audio + scene details.\nOutput: Detailed video analysis text.\nStep 4: Generate Prompt\nAI Agent creates the next scene prompt using:\nContext from video analysis\nNarrative theme (from sheet)\nScene instructions (from sheet)\nAspect ratio, model preference, etc.\n👉 Output = video prompt for next scene\nStep 5: Extract Last Frame\nCall File.AI Extract Frame API.\nParameters:\nInput video URL\nFrame = last\nOutput = JPG image (last frame of current clip).\nStep 6: Generate New Scene\nUse Key.AI (V3 Fast) for economical video generation.\nPOST request includes:\nPrompt (from AI Agent)\nAspect ratio + model\nImage URL (last frame) → ensures seamless chaining\nWait for generation to complete.\n👉 Output = New clip URL (MP4)\nStep 7: Store & Increment\nLog new clip URL into Sheet 2.\nIncrement Step by +1.\nReplace Video URL with the new clip.\nLoop back if Step &lt; Complete.\n## 3. Output Section\nOnce all clips are generated:\nGather all scene URLs from Sheet 2.\nUse File.AI Merge Videos API to stitch clips together:\nOriginal clip + all generated scenes.\nSave final MP4 output.\nUpdate Sheet 1 row with:\nFinal video URL\nStatus = Done\n## 4. Costs\nVideo analysis: ~$0.015 per 8s clip\nFrame extraction: ~0.002¢ (almost free)\nClip merging: negligible (via ffmpeg backend)\nV3 Fast video generation (Key.AI): ~$0.30 per 8s clip",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Think",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "role": "toolThink",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GPT",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Analyze Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Looper",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If ",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Combine Clips",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Final Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get input",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Initial Values",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Request last",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get last",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Add scene",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Increment step",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If complete",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait 2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait 1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait ",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get scenes",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Wait 3",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Update log",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Structured Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clear scenes",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extend AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    }
+  ]
+}

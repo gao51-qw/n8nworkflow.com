@@ -1,0 +1,181 @@
+{
+  "id": 8220,
+  "slug": "8220",
+  "title": "Answer questions about documentation with BigQuery RAG and OpenAI",
+  "description": "# BigQuery RAG with OpenAI Embeddings\n\nThis workflow demonstrates how to use **Retrieval-Augmented Generation (RAG)** with **BigQuery** and **OpenAI**.  \nBy default, you cannot directly use OpenAI Cloud Models within BigQuery.\n\n### Try it\n\n*This template comes with access to a **public BigQuery table** that stores part of the n8n documentation (about nodes and triggers), allowing you to try the workflow right away:  \n[`n8n-docs-rag.n8n_docs.n8n_docs_embeddings`](https://console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sn8n-docs-rag!2sn8n_docs!3sn8n_docs_embeddings)*\n\n*⚠️ **Important:** BigQuery uses the *requester pays* model.*\n*The table is small (~40 MB), and BigQuery provides **1 TB of free processing per month**. Running 3–4 queries for testing should remain within the free tier, unless your project has already consumed its quota.  \nMore info here: [BigQuery Pricing](https://cloud.google.com/bigquery/pricing?hl=en)*\n\n\n## Why this workflow?\n\nMany organizations already use BigQuery to store enterprise data, and OpenAI for LLM use cases.  \nWhen it comes to RAG, the common approach is to rely on dedicated vector databases such as **Qdrant**, **Pinecone**, **Weaviate**, or PostgreSQL with **pgvector**.  \nThose are good choices, but in cases where an organization already uses and is familiar with BigQuery, it can be more efficient to leverage its built-in vector capabilities for RAG.\n\nThen comes the question of the LLM. If OpenAI is the chosen provider, teams are often frustrated that it is not directly compatible with BigQuery.  \nThis workflow solves that limitation.\n\n## Prerequisites\n\nTo use this workflow, you will need:\n* A good understanding of BigQuery and its vector capabilities  \n* A BigQuery table containing documents and an embeddings column  \n  * The embeddings column must be of type **FLOAT** and mode **REPEATED** (to store arrays)  \n* A data pipeline that **generates embeddings with the OpenAI API** and stores them in BigQuery\n\nThis template comes with a public table that stores part of the **n8n documentation** (about nodes and triggers), so you can try it out:  \n`n8n-docs-rag.n8n_docs.n8n_docs_embeddings`\n\n## How it works\n\nThe system consists of two workflows:\n* **Main workflow** → Hosts the AI Agent, which connects to a subworkflow for RAG  \n* **Subworkflow** → Queries the BigQuery vector table. The retrieved documents are then used by the AI Agent to generate an answer for the user.\n\n\n",
+  "featuredImage": "/data/workflows/8220/8220.webp",
+  "author": {
+    "id": 101,
+    "slug": "dataki",
+    "name": "Dataki",
+    "avatar": ""
+  },
+  "categories": [
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 351,
+  "downloads": 35,
+  "createdAt": "2025-09-03T14:07:49.001Z",
+  "updatedAt": "2026-01-16T08:54:44.561Z",
+  "publishedAt": "2025-09-03T14:07:49.001Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8220",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Answer questions about documentation with BigQuery RAG and OpenAI",
+    "workflowName": "Answer questions about documentation with BigQuery RAG and OpenAI",
+    "description": "# BigQuery RAG with OpenAI Embeddings\n\nThis workflow demonstrates how to use **Retrieval-Augmented Generation (RAG)** with **BigQuery** and **OpenAI**.  \nBy default, you cannot directly use OpenAI Cloud Models within BigQuery.\n\n### Try it\n\n*This template comes with access to a **public BigQuery table** that stores part of the n8n documentation (about nodes and triggers), allowing you to try the workflow right away:  \n[`n8n-docs-rag.n8n_docs.n8n_docs_embeddings`](https://console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sn8n-docs-rag!2sn8n_docs!3sn8n_docs_embeddings)*\n\n*⚠️ **Important:** BigQuery uses the *requester pays* model.*\n*The table is small (~40 MB), and BigQuery provides **1 TB of free processing per month**. Running 3–4 queries for testing should remain within the free tier, unless your project has already consumed its quota.  \nMore info here: [BigQuery Pricing](https://cloud.google.com/bigquery/pricing?hl=en)*\n\n\n## Why this workflow?\n\nMany organizations already use BigQuery to store enterprise data, and OpenAI for LLM use cases.  \nWhen it comes to RAG, the common approach is to rely on dedicated vector databases such as **Qdrant**, **Pinecone**, **Weaviate**, or PostgreSQL with **pgvector**.  \nThose are good choices, but in cases where an organization already uses and is familiar with BigQuery, it can be more efficient to leverage its built-in vector capabilities for RAG.\n\nThen comes the question of the LLM. If OpenAI is the chosen provider, teams are often frustrated that it is not directly compatible with BigQuery.  \nThis workflow solves that limitation.\n\n## Prerequisites\n\nTo use this workflow, you will need:\n* A good understanding of BigQuery and its vector capabilities  \n* A BigQuery table containing documents and an embeddings column  \n  * The embeddings column must be of type **FLOAT** and mode **REPEATED** (to store arrays)  \n* A data pipeline that **generates embeddings with the OpenAI API** and stores them in BigQuery\n\nThis template comes with a public table that stores part of the **n8n documentation** (about nodes and triggers), so you can try it out:  \n`n8n-docs-rag.n8n_docs.n8n_docs_embeddings`\n\n## How it works\n\nThe system consists of two workflows:\n* **Main workflow** → Hosts the AI Agent, which connects to a subworkflow for RAG  \n* **Subworkflow** → Queries the BigQuery vector table. The retrieved documents are then used by the AI Agent to generate an answer for the user.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "BigQuery RAG OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set field - question",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI - Create Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "BigQuery - Vector Retriever - n8n docs",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Documents retrieved",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Field - Embedding",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

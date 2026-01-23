@@ -1,0 +1,1 @@
+To notify by Slack and mail all modification on a Google Sheet

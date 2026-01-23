@@ -1,0 +1,188 @@
+{
+  "id": 5378,
+  "slug": "5378",
+  "title": "Automating SAP B1 journal entries using JSON, Google Sheets, and GPT-4o",
+  "description": "## HOW IT WORKS:\nThis workflow automates the creation of Journal Entries in SAP Business One (SAP B1). Depending on the source of the input data, it dynamically transforms and sends accounting records in the appropriate format using the Service Layer API.\n\nIt supports three input types:\n\n- 📦 JSON payloads\n- 📊 Google Sheets data\n- 🧑‍💻 Manual structured entries (via prompt + LLM)\n\nEach transaction is logged to Google Sheets for traceability.\n\n### 🔹 1. Webhook Input Reception\n\nA Webhook node waits for a POST request containing accounting data and metadata:\n\nThe origen field determines the data source (JSON, GoogleSheets, or Manual)\n\nThe sap_url, username, password, and companydb are used to connect to SAP B1\n\nPayload can be a JSON list or tabular data (e.g., from Google Sheets)\n\n### 🔹 2. SAP B1 Login\n\nCredentials are securely injected from the request body.\nA login request is sent to SAP B1's Service Layer to retrieve a valid session cookie (B1SESSION).\n\n### 🔹 3. Dynamic Branching via Switch Node\n\nDepending on the value of origen, one of the following branches is activated:\n\n- JSON: Sends the JSON payload directly to SAP after restructuring\n\n- GoogleSheets: Loads rows, builds JSON, and merges context\n\n- Manual: Transforms data via OpenAI LLM prompt and generates SAP-compatible format\n\n### 🔹 4. Data Transformation via LLM\n\nIn Manual and GoogleSheets flows, the workflow uses an OpenAI node to:\n\nParse line entries and convert them to JournalEntryLines[]\n\nFormat the final JSON structure required by SAP\n\nLLM prompts are carefully crafted to return only clean JSON — no code blocks, comments, or explanations.\n\n### 🔹 5. POST to SAP B1\n\nData is sent to {{SAP_URL}}/JournalEntries using the Service Layer's POST method with the B1SESSION cookie attached.\nThe body includes all JournalEntryLines.\n\n### 🔹 6. Logging Success & Errors\n\nEach result (success or failure) is logged into a centralized Google Sheets log document:\n\n- ✅ Success: Includes HTTP status, source URL, and JSON payload\n\n- ❌ Failure: Logs the error code and message for review and traceability\n\n## SETUP STEPS:\n#### 1.  Create Required Credentials:\n- Google Sheets OAuth2 API (to log all responses and fetch data)\n\n- OpenAI API Key (used with the LangChain OpenAI node)\n\n- SAP Service Layer login data is passed securely via body parameters.\n\n#### 2. Use These Environment Variables (Recommended) or replace the data in the corresponding container:\n- SAP_USER, SAP_PASSWORD, SAP_COMPANY_DB\n\n- SAP_URL\n\n#### 3. Prepare Google Sheets:\n- 📄 Sheet 1: For source entries (e.g., for GoogleSheets origin)\n\n- 🧾 Sheet 2: For logging execution results\n\nMake sure the logging spreadsheet contains these columns:\n\nworkflow,\tmethod,\turl,\tjson,\tstatus_code,\tmessage\n\n## EXTRA NOTES:\n🧠 Uses OpenAI GPT-4o for natural language transformation of accounting rows\n\n🧩 Modular logic with error-handling for all branches\n\n📁 Can be reused across multiple accounting integrations by changing the data source",
+  "featuredImage": "/data/workflows/5378/5378.webp",
+  "author": {
+    "id": 101,
+    "slug": "raquelgiugliano",
+    "name": "Raquel Giugliano",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 308,
+  "downloads": 30,
+  "createdAt": "2025-06-26T14:55:17.710Z",
+  "updatedAt": "2026-01-16T08:39:17.944Z",
+  "publishedAt": "2025-06-26T14:55:17.710Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5378",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automating SAP B1 journal entries using JSON, Google Sheets, and GPT-4o",
+    "workflowName": "Automating SAP B1 journal entries using JSON, Google Sheets, and GPT-4o",
+    "description": "## HOW IT WORKS:\nThis workflow automates the creation of Journal Entries in SAP Business One (SAP B1). Depending on the source of the input data, it dynamically transforms and sends accounting records in the appropriate format using the Service Layer API.\n\nIt supports three input types:\n\n- 📦 JSON payloads\n- 📊 Google Sheets data\n- 🧑‍💻 Manual structured entries (via prompt + LLM)\n\nEach transaction is logged to Google Sheets for traceability.\n\n### 🔹 1. Webhook Input Reception\n\nA Webhook node waits for a POST request containing accounting data and metadata:\n\nThe origen field determines the data source (JSON, GoogleSheets, or Manual)\n\nThe sap_url, username, password, and companydb are used to connect to SAP B1\n\nPayload can be a JSON list or tabular data (e.g., from Google Sheets)\n\n### 🔹 2. SAP B1 Login\n\nCredentials are securely injected from the request body.\nA login request is sent to SAP B1's Service Layer to retrieve a valid session cookie (B1SESSION).\n\n### 🔹 3. Dynamic Branching via Switch Node\n\nDepending on the value of origen, one of the following branches is activated:\n\n- JSON: Sends the JSON payload directly to SAP after restructuring\n\n- GoogleSheets: Loads rows, builds JSON, and merges context\n\n- Manual: Transforms data via OpenAI LLM prompt and generates SAP-compatible format\n\n### 🔹 4. Data Transformation via LLM\n\nIn Manual and GoogleSheets flows, the workflow uses an OpenAI node to:\n\nParse line entries and convert them to JournalEntryLines[]\n\nFormat the final JSON structure required by SAP\n\nLLM prompts are carefully crafted to return only clean JSON — no code blocks, comments, or explanations.\n\n### 🔹 5. POST to SAP B1\n\nData is sent to {{SAP_URL}}/JournalEntries using the Service Layer's POST method with the B1SESSION cookie attached.\nThe body includes all JournalEntryLines.\n\n### 🔹 6. Logging Success & Errors\n\nEach result (success or failure) is logged into a centralized Google Sheets log document:\n\n- ✅ Success: Includes HTTP status, source URL, and JSON payload\n\n- ❌ Failure: Logs the error code and message for review and traceability\n\n## SETUP STEPS:\n#### 1.  Create Required Credentials:\n- Google Sheets OAuth2 API (to log all responses and fetch data)\n\n- OpenAI API Key (used with the LangChain OpenAI node)\n\n- SAP Service Layer login data is passed securely via body parameters.\n\n#### 2. Use These Environment Variables (Recommended) or replace the data in the corresponding container:\n- SAP_USER, SAP_PASSWORD, SAP_COMPANY_DB\n\n- SAP_URL\n\n#### 3. Prepare Google Sheets:\n- 📄 Sheet 1: For source entries (e.g., for GoogleSheets origin)\n\n- 🧾 Sheet 2: For logging execution results\n\nMake sure the logging spreadsheet contains these columns:\n\nworkflow,\tmethod,\turl,\tjson,\tstatus_code,\tmessage\n\n## EXTRA NOTES:\n🧠 Uses OpenAI GPT-4o for natural language transformation of accounting rows\n\n🧩 Modular logic with error-handling for all branches\n\n📁 Can be reused across multiple accounting integrations by changing the data source",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SAP Login",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Route by Source",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Map JSON Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Post Journal (JSON)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Log Success (JSON)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Log Error (JSON)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "LLM Transform (Manual)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Post Journal (Manual)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Log Success (Manual)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Log Error (Manual)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Set SAP Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Load Sheet Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Shape Sheet Lines",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Parse Sheet JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "LLM Transform (Sheet)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Build Journal Body",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge Header & Lines",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Post Journal (Sheet)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Log Success (Sheet)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Log Error (Sheet)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

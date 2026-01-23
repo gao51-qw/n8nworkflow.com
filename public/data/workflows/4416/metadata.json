@@ -1,0 +1,26 @@
+{
+  "id": 4416,
+  "slug": "4416",
+  "title": "HubSpot contact email validation with Hunter.io",
+  "description": "# Workflow: HubSpot Contact Email Validation with Hunter.io\n\n## Overall Goal\n\nThis workflow retrieves contacts from HubSpot that have an email address but haven't yet had their email validated by Hunter. It then iterates through each of these contacts, uses Hunter.io to verify their email, updates the contact record in HubSpot with the validation status and date, and finally sends a summary email notification upon completion.\n\n## How it Works (Step-by-Step Breakdown)\n\n### Node: \"When clicking ‘Test workflow’\" (Manual Trigger)\n- **Type:** n8n-nodes-base.manualTrigger\n- **Purpose:** Start the workflow manually via the n8n interface.\n- **Output:** Triggers workflow execution.\n\n### Node: \"HubSpot\" (HubSpot)\n- **Type:** n8n-nodes-base.hubspot\n- **Purpose:** Fetch contacts from HubSpot.\n- **Configuration:**\n  - Authentication: App Token\n  - Operation: Search for contacts\n  - Return All: True\n  - Filter Groups:\n    - Contact HAS_PROPERTY email\n    - Contact NOT_HAS_PROPERTY hunter_email_validation_status\n- **Output:** List of contact objects.\n\n### Node: \"Loop Over Items\" (SplitInBatches)\n- **Type:** n8n-nodes-base.splitInBatches\n- **Purpose:** Process each contact one-by-one.\n- **Configuration:**\n  - Options &gt; Reset: false\n- **Output:**\n  - Output 1 to \"Hunter\"\n  - Output 2 to \"Send Email\"\n\n### Node: \"Hunter\" (Inside the loop)\n- **Type:** n8n-nodes-base.hunter\n- **Purpose:** Verify email with Hunter.io\n- **Configuration:**\n  - Operation: Email Verifier\n  - Email: `{{ $json.properties.email }}`\n\n### Node: \"Add Hunter Details (Contact)\" (HTTP Request - Inside the loop)\n- **Type:** n8n-nodes-base.httpRequest\n- **Purpose:** Update HubSpot contact.\n- **Configuration:**\n  - Method: PATCH\n  - URL: `https://api.hubapi.com/crm/v3/objects/contacts/{{ $('Loop Over Items').item.json.id }}`\n  - Headers: Content-Type: application/json\n  - Body (JSON):\n    ```json\n    {\n      \"properties\": {\n        \"hunter_email_validation_status\": \"{{ $json.status }}\",\n        \"hunter_verification_date\": \"{{ $now.format('yyyy-MM-dd') }}\"\n      }\n    }\n    ```\n\n### Node: \"Wait\" (Inside the loop)\n- **Type:** n8n-nodes-base.wait\n- **Purpose:** Avoid API rate limits.\n- **Configuration:** Wait for 1 second.\n\n### Node: \"Replace Me\" (NoOp - Inside the loop)\n- **Type:** n8n-nodes-base.noOp\n- **Purpose:** Junction node to complete the loop.\n\n### Node: \"Send Email\" (After the loop completes)\n- **Type:** n8n-nodes-base.emailSend\n- **Purpose:** Send summary notification.\n- **Configuration:**\n  - From Email: test@gmail.com\n  - To Email: akhilgadiraju@gmail.com\n  - Subject: \"Email Verification Completed for Your HubSpot Contacts\"\n  - HTML: Formatted confirmation message\n\n## Sticky Notes\n- \"HubSpot\": Create custom properties (`hunter_email_validation_status`, `hunter_verification_date`).\n- \"Add Hunter Details\": Ensure field names match HubSpot properties.\n- \"Wait\": Prevent API rate limits.\n\n## How to Customize It\n\n### Trigger\n- Replace Manual Trigger with Schedule Trigger (Cron) for automation.\n- Optionally use HubSpot Trigger for new contact events.\n\n### HubSpot Node\n- Create matching custom properties.\n- Adjust filters and returned properties as needed.\n\n### Hunter Node\n- Minimal customization needed.\n\n### HTTP Request Node\n- Update JSON property names if renaming in HubSpot.\n- Customize date format as needed.\n\n### Wait Node\n- Adjust wait time to balance speed and API safety.\n\n### Email Node\n- Customize email addresses, subject, and body.\n- Add dynamic contact count with a Set or Function node.\n\n## Error Handling\n- Add Error Trigger nodes.\n- Use If nodes inside loop to act on certain statuses.\n\n## Use Cases\n- Clean your email list.\n- Enrich CRM data.\n- Prep verified lists for campaigns.\n- Automate contact hygiene on a schedule.\n\n## Required Credentials\n\n### HubSpot App Token\n- Used by: HubSpot node and HTTP Request node\n- Create a Private App in HubSpot with required scopes.\n\n### Hunter API\n- Used by: Hunter node\n\n### SMTP\n- Used by: Email Send node\n- Configure host, port, username, and password.\n\n---\n\n**Made with ❤️ using n8n by Akhil.**",
+  "featuredImage": "/data/workflows/4416/4416.webp",
+  "author": {
+    "id": 101,
+    "slug": "akhilv7",
+    "name": "Akhil Varma Gadiraju",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 526,
+  "downloads": 52,
+  "createdAt": "2025-05-27T04:57:19.995Z",
+  "updatedAt": "2026-01-16T08:34:16.348Z",
+  "publishedAt": "2025-05-27T04:57:19.995Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4416"
+}

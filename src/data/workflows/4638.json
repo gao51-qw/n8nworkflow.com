@@ -1,0 +1,140 @@
+{
+  "id": 4638,
+  "slug": "4638",
+  "title": "🎙️ VoiceFlow AI: Telegram + Deepgram + OpenAI + Supabase audio assistant",
+  "description": "## 🎙️ AI Audio Assistant with Voice-to-Voice Response\n\n**Who is this for?**\nBusinesses, customer service teams, content creators, and organizations who want to provide intelligent voice-based interactions through Telegram. Perfect for accessibility-focused services, multilingual support, or hands-free customer assistance.\n\n**What problem does this solve?**\n- Enables natural voice conversations with AI\n- Breaks down language and accessibility barriers\n- Provides instant voice responses to customer queries\n- Reduces typing requirements for users\n- Offers 24/7 voice-based customer support\n- Maintains conversation context across voice interactions\n\n**What this workflow does:**\n1. Receives voice messages via Telegram bot\n2. Transcribes audio using Deepgram's advanced speech-to-text\n3. Processes transcribed text through AI agent with knowledge base access\n4. Generates intelligent responses based on conversation context\n5. Converts AI response to natural-sounding speech using Deepgram TTS\n6. Sends audio response back to user via Telegram\n7. Maintains conversation memory for contextual interactions\n\n## 🔧 Technical Architecture\n\n**Core Components:**\n- **Telegram Bot**: Receives and sends voice messages\n- **Deepgram STT**: Transcribes voice to text with high accuracy\n- **OpenAI GPT**: Processes queries and generates responses\n- **Supabase Knowledge Base**: Stores and retrieves business information\n- **Memory Management**: Maintains conversation context\n- **Deepgram TTS**: Converts text responses to natural speech\n\n**Data Flow:**\n1. Voice Message → Telegram API → File Download\n2. Audio File → Deepgram STT → Transcript\n3. Transcript → AI Agent → Response Generation\n4. Response → Deepgram TTS → Audio File\n5. Audio Response → Telegram → User\n\n## 🛠️ Setup Instructions\n\n### Prerequisites\n1. **Telegram Bot Token**\n   - Create bot via @BotFather\n   - Get bot token and configure webhook\n\n2. **Deepgram API Key**\n   - Sign up at deepgram.com\n   - Get API key for STT and TTS services\n   - Note: Currently hardcoded in workflow\n\n3. **OpenAI API Key**\n   - OpenAI account with API access\n   - Configure in OpenAI Chat Model node\n\n4. **Supabase Database**\n   - Create Supabase project\n   - Set up knowledge_base table\n   - Configure API credentials\n\n### Step-by-Step Setup\n\n1. **Configure Telegram Bot**\n   ```\n   - Update telegramToken in \"Prepare Voice Message Data\" node\n   - Set correct bot token in Telegram nodes\n   - Test bot connectivity\n   ```\n\n2. **Set Up Deepgram Integration**\n   ```\n   - Replace API key in \"Transcribe with Deepgram\" node\n   - Update TTS endpoint in \"HTTP Request\" node\n   - Test voice transcription accuracy\n   ```\n\n3. **Configure Knowledge Base**\n   ```sql\n   -- Create knowledge_base table in Supabase\n   CREATE TABLE knowledge_base (\n     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,\n     question TEXT NOT NULL,\n     answer TEXT NOT NULL,\n     category VARCHAR(100),\n     keywords TEXT[],\n     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n   );\n   ```\n\n4. **Customize AI Prompts**\n   - Update system message in \"Telegram AI Agent\" node\n   - Adjust temperature and max tokens in OpenAI model\n   - Configure memory session keys\n\n5. **Test End-to-End Flow**\n   - Send test voice message to bot\n   - Verify transcription accuracy\n   - Check AI response quality\n   - Validate audio output clarity\n\n## 🎛️ Configuration Options\n\n### Voice Recognition Settings\n- **Model**: nova-2 (Deepgram's latest model)\n- **Language**: English (en) - can be changed\n- **Smart Format**: Enabled for better punctuation\n\n### AI Response Settings\n- **Temperature**: 0.3 (conservative responses)\n- **Max Tokens**: 100 (adjust based on needs)\n- **Memory**: Session-based conversation context\n\n### Text-to-Speech Settings\n- **Model**: aura-2-thalia-en (natural female voice)\n- **Alternative voices**: Available in Deepgram TTS API\n- **Audio Format**: Optimized for Telegram\n\n## 🔒 Security Considerations\n\n### API Key Management\n```javascript\n// Current implementation has hardcoded tokens\n// Recommended: Use environment variables\nconst telegramToken = process.env.TELEGRAM_BOT_TOKEN;\nconst deepgramKey = process.env.DEEPGRAM_API_KEY;\n```\n\n### Data Privacy\n- Voice messages are processed by external APIs\n- Consider data retention policies\n- Implement user consent mechanisms\n- Ensure GDPR compliance if applicable\n\n## 📊 Monitoring & Analytics\n\n### Key Metrics to Track\n- Voice message processing time\n- Transcription accuracy rates\n- AI response quality scores\n- User engagement metrics\n- Error rates and failure points\n\n### Recommended Logging\n```javascript\n// Add to workflow for monitoring\nconsole.log({\n  timestamp: new Date().toISOString(),\n  user_id: userData.user_id,\n  transcript_confidence: transcriptData.confidence,\n  response_length: aiResponse.length,\n  processing_time: processingTime\n});\n```\n\n## 🚀 Customization Ideas\n\n### Enhanced Features\n1. **Multi-language Support**\n   - Add language detection\n   - Support multiple TTS voices\n   - Translate responses\n\n2. **Voice Commands**\n   - Implement wake words\n   - Add voice shortcuts\n   - Create voice menus\n\n3. **Advanced AI Features**\n   - Sentiment analysis\n   - Intent classification\n   - Escalation triggers\n\n4. **Integration Expansions**\n   - Connect to CRM systems\n   - Add calendar scheduling\n   - Integrate with help desk tools\n\n### Performance Optimizations\n- Implement audio preprocessing\n- Add response caching\n- Optimize API call sequences\n- Implement retry mechanisms\n\n## 🐛 Troubleshooting\n\n### Common Issues\n\n**Voice Not Transcribing**\n- Check Deepgram API key validity\n- Verify audio format compatibility\n- Test with shorter voice messages\n\n**Poor Audio Quality**\n- Adjust TTS model settings\n- Check network connectivity\n- Verify Telegram audio limits\n\n**AI Responses Too Generic**\n- Improve knowledge base content\n- Adjust system prompts\n- Increase context window\n\n**Memory Not Working**\n- Check session key configuration\n- Verify user ID extraction\n- Test conversation continuity\n\n## 💡 Best Practices\n\n### Voice Interface Design\n- Keep responses concise and clear\n- Use natural speech patterns\n- Avoid technical jargon\n- Provide clear next steps\n\n### Knowledge Base Management\n- Regular content updates\n- Clear categorization\n- Keyword optimization\n- Quality assurance testing\n\n### User Experience\n- Fast response times (&lt;5 seconds)\n- Consistent voice personality\n- Graceful error handling\n- Clear capability communication\n\n## 📈 Success Metrics\n\n### Technical KPIs\n- Response time: &lt;3 seconds average\n- Transcription accuracy: &gt;95%\n- User satisfaction: &gt;4.5/5\n- Uptime: &gt;99.5%\n\n### Business KPIs\n- Customer query resolution rate\n- Support ticket reduction\n- User engagement increase\n- Cost per interaction decrease\n\n## 🔄 Maintenance Schedule\n\n### Daily\n- Monitor error logs\n- Check API rate limits\n- Verify service uptime\n\n### Weekly\n- Review conversation quality\n- Update knowledge base\n- Analyze usage patterns\n\n### Monthly\n- Performance optimization\n- Security audit\n- Feature updates\n- User feedback review\n\n## 📚 Additional Resources\n\n### Documentation Links\n- [Deepgram STT API](https://developers.deepgram.com/reference/listen-live)\n- [Deepgram TTS API](https://developers.deepgram.com/reference/text-to-speech-api)\n- [Telegram Bot API](https://core.telegram.org/bots/api)\n- [OpenAI API](https://platform.openai.com/docs)\n- [Supabase Documentation](https://supabase.com/docs)\n\n### Community Support\n- n8n Community Forum\n- Telegram Bot Developers Group\n- Deepgram Developer Discord\n- OpenAI Developer Community\n\n---\n\n**Note**: This template requires active API subscriptions for Deepgram and OpenAI services. Costs may apply based on usage volume.",
+  "featuredImage": "/data/workflows/4638/4638.webp",
+  "author": {
+    "id": 101,
+    "slug": "redone",
+    "name": "RedOne",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1944,
+  "downloads": 194,
+  "createdAt": "2025-06-04T03:05:18.646Z",
+  "updatedAt": "2026-01-16T08:35:27.679Z",
+  "publishedAt": "2025-06-04T03:05:18.646Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4638",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "🎙️ VoiceFlow AI: Telegram + Deepgram + OpenAI + Supabase audio assistant",
+    "workflowName": "🎙️ VoiceFlow AI: Telegram + Deepgram + OpenAI + Supabase audio assistant",
+    "description": "## 🎙️ AI Audio Assistant with Voice-to-Voice Response\n\n**Who is this for?**\nBusinesses, customer service teams, content creators, and organizations who want to provide intelligent voice-based interactions through Telegram. Perfect for accessibility-focused services, multilingual support, or hands-free customer assistance.\n\n**What problem does this solve?**\n- Enables natural voice conversations with AI\n- Breaks down language and accessibility barriers\n- Provides instant voice responses to customer queries\n- Reduces typing requirements for users\n- Offers 24/7 voice-based customer support\n- Maintains conversation context across voice interactions\n\n**What this workflow does:**\n1. Receives voice messages via Telegram bot\n2. Transcribes audio using Deepgram's advanced speech-to-text\n3. Processes transcribed text through AI agent with knowledge base access\n4. Generates intelligent responses based on conversation context\n5. Converts AI response to natural-sounding speech using Deepgram TTS\n6. Sends audio response back to user via Telegram\n7. Maintains conversation memory for contextual interactions\n\n## 🔧 Technical Architecture\n\n**Core Components:**\n- **Telegram Bot**: Receives and sends voice messages\n- **Deepgram STT**: Transcribes voice to text with high accuracy\n- **OpenAI GPT**: Processes queries and generates responses\n- **Supabase Knowledge Base**: Stores and retrieves business information\n- **Memory Management**: Maintains conversation context\n- **Deepgram TTS**: Converts text responses to natural speech\n\n**Data Flow:**\n1. Voice Message → Telegram API → File Download\n2. Audio File → Deepgram STT → Transcript\n3. Transcript → AI Agent → Response Generation\n4. Response → Deepgram TTS → Audio File\n5. Audio Response → Telegram → User\n\n## 🛠️ Setup Instructions\n\n### Prerequisites\n1. **Telegram Bot Token**\n   - Create bot via @BotFather\n   - Get bot token and configure webhook\n\n2. **Deepgram API Key**\n   - Sign up at deepgram.com\n   - Get API key for STT and TTS services\n   - Note: Currently hardcoded in workflow\n\n3. **OpenAI API Key**\n   - OpenAI account with API access\n   - Configure in OpenAI Chat Model node\n\n4. **Supabase Database**\n   - Create Supabase project\n   - Set up knowledge_base table\n   - Configure API credentials\n\n### Step-by-Step Setup\n\n1. **Configure Telegram Bot**\n   ```\n   - Update telegramToken in \"Prepare Voice Message Data\" node\n   - Set correct bot token in Telegram nodes\n   - Test bot connectivity\n   ```\n\n2. **Set Up Deepgram Integration**\n   ```\n   - Replace API key in \"Transcribe with Deepgram\" node\n   - Update TTS endpoint in \"HTTP Request\" node\n   - Test voice transcription accuracy\n   ```\n\n3. **Configure Knowledge Base**\n   ```sql\n   -- Create knowledge_base table in Supabase\n   CREATE TABLE knowledge_base (\n     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,\n     question TEXT NOT NULL,\n     answer TEXT NOT NULL,\n     category VARCHAR(100),\n     keywords TEXT[],\n     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()\n   );\n   ```\n\n4. **Customize AI Prompts**\n   - Update system message in \"Telegram AI Agent\" node\n   - Adjust temperature and max tokens in OpenAI model\n   - Configure memory session keys\n\n5. **Test End-to-End Flow**\n   - Send test voice message to bot\n   - Verify transcription accuracy\n   - Check AI response quality\n   - Validate audio output clarity\n\n## 🎛️ Configuration Options\n\n### Voice Recognition Settings\n- **Model**: nova-2 (Deepgram's latest model)\n- **Language**: English (en) - can be changed\n- **Smart Format**: Enabled for better punctuation\n\n### AI Response Settings\n- **Temperature**: 0.3 (conservative responses)\n- **Max Tokens**: 100 (adjust based on needs)\n- **Memory**: Session-based conversation context\n\n### Text-to-Speech Settings\n- **Model**: aura-2-thalia-en (natural female voice)\n- **Alternative voices**: Available in Deepgram TTS API\n- **Audio Format**: Optimized for Telegram\n\n## 🔒 Security Considerations\n\n### API Key Management\n```javascript\n// Current implementation has hardcoded tokens\n// Recommended: Use environment variables\nconst telegramToken = process.env.TELEGRAM_BOT_TOKEN;\nconst deepgramKey = process.env.DEEPGRAM_API_KEY;\n```\n\n### Data Privacy\n- Voice messages are processed by external APIs\n- Consider data retention policies\n- Implement user consent mechanisms\n- Ensure GDPR compliance if applicable\n\n## 📊 Monitoring & Analytics\n\n### Key Metrics to Track\n- Voice message processing time\n- Transcription accuracy rates\n- AI response quality scores\n- User engagement metrics\n- Error rates and failure points\n\n### Recommended Logging\n```javascript\n// Add to workflow for monitoring\nconsole.log({\n  timestamp: new Date().toISOString(),\n  user_id: userData.user_id,\n  transcript_confidence: transcriptData.confidence,\n  response_length: aiResponse.length,\n  processing_time: processingTime\n});\n```\n\n## 🚀 Customization Ideas\n\n### Enhanced Features\n1. **Multi-language Support**\n   - Add language detection\n   - Support multiple TTS voices\n   - Translate responses\n\n2. **Voice Commands**\n   - Implement wake words\n   - Add voice shortcuts\n   - Create voice menus\n\n3. **Advanced AI Features**\n   - Sentiment analysis\n   - Intent classification\n   - Escalation triggers\n\n4. **Integration Expansions**\n   - Connect to CRM systems\n   - Add calendar scheduling\n   - Integrate with help desk tools\n\n### Performance Optimizations\n- Implement audio preprocessing\n- Add response caching\n- Optimize API call sequences\n- Implement retry mechanisms\n\n## 🐛 Troubleshooting\n\n### Common Issues\n\n**Voice Not Transcribing**\n- Check Deepgram API key validity\n- Verify audio format compatibility\n- Test with shorter voice messages\n\n**Poor Audio Quality**\n- Adjust TTS model settings\n- Check network connectivity\n- Verify Telegram audio limits\n\n**AI Responses Too Generic**\n- Improve knowledge base content\n- Adjust system prompts\n- Increase context window\n\n**Memory Not Working**\n- Check session key configuration\n- Verify user ID extraction\n- Test conversation continuity\n\n## 💡 Best Practices\n\n### Voice Interface Design\n- Keep responses concise and clear\n- Use natural speech patterns\n- Avoid technical jargon\n- Provide clear next steps\n\n### Knowledge Base Management\n- Regular content updates\n- Clear categorization\n- Keyword optimization\n- Quality assurance testing\n\n### User Experience\n- Fast response times (&lt;5 seconds)\n- Consistent voice personality\n- Graceful error handling\n- Clear capability communication\n\n## 📈 Success Metrics\n\n### Technical KPIs\n- Response time: &lt;3 seconds average\n- Transcription accuracy: &gt;95%\n- User satisfaction: &gt;4.5/5\n- Uptime: &gt;99.5%\n\n### Business KPIs\n- Customer query resolution rate\n- Support ticket reduction\n- User engagement increase\n- Cost per interaction decrease\n\n## 🔄 Maintenance Schedule\n\n### Daily\n- Monitor error logs\n- Check API rate limits\n- Verify service uptime\n\n### Weekly\n- Review conversation quality\n- Update knowledge base\n- Analyze usage patterns\n\n### Monthly\n- Performance optimization\n- Security audit\n- Feature updates\n- User feedback review\n\n## 📚 Additional Resources\n\n### Documentation Links\n- [Deepgram STT API](https://developers.deepgram.com/reference/listen-live)\n- [Deepgram TTS API](https://developers.deepgram.com/reference/text-to-speech-api)\n- [Telegram Bot API](https://core.telegram.org/bots/api)\n- [OpenAI API](https://platform.openai.com/docs)\n- [Supabase Documentation](https://supabase.com/docs)\n\n### Community Support\n- n8n Community Forum\n- Telegram Bot Developers Group\n- Deepgram Developer Discord\n- OpenAI Developer Community\n\n---\n\n**Note**: This template requires active API subscriptions for Deepgram and OpenAI services. Costs may apply based on usage volume.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Transcribe with Deepgram",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Download Voice File",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get File Path",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Voice Message Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare Text Message Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Knowledge base",
+      "type": "n8n-nodes-base.supabaseTool",
+      "role": "supabaseTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Has Transcript?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is Voice Message?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Generate Audio Response",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Send Audio Response",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Workflow Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Was Voice Input?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Text Response",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "id": 5142,
+  "slug": "5142",
+  "title": "AI-powered email replies with spam filtering & FAQ lookup using GPT-4o mini & Pinecone",
+  "description": "This n8n workflow automates the handling of incoming emails. It detects and filters out spam, searches a knowledge base (FAQ) stored in a Pinecone vector database, and sends a reply using Gmail — all powered by an AI model (GPT-4o mini).\n\nHow It Works\n1. Receiving Emails\n\n- The Gmail Trigger node checks a Gmail inbox every hour.\n\n- When a new email arrives, it starts the workflow.\n\n2. Fetching Full Email Content\n\n- The get_message node retrieves all the details of the message: sender, subject, text, message ID, etc.\n\n3. Spam Filtering\n\n- The Spam checker node uses GPT-4o mini to classify the email as either \"spam\" or \"no spam\".\n\n- It detects not only classic spam but also automated messages (e.g. from Google or Microsoft).\n\n- If marked as \"spam\", the workflow ends and nothing is processed.\n\n4. Conditional Filter\n\n- The If node checks the spam result.\n\n- Only \"no spam\" emails proceed to the AI Agent.\n\n5. AI-Based Reply\n\n- The AI Agent node generates a response based on:\n\n\t- The email content\n\n\t- A system prompt defining the assistant’s behavior (polite, professional, under the name “Total AI Solutions”)\n\n\t- Information retrieved from the Pinecone Vector Store, which contains FAQs\n\n- The AI is instructed to always check the vector store before replying.\n\n- The AI prepares both the subject and the body of the reply.\n\n6. Sending the Reply\n\n- The Gmail node sends the reply to the original sender.\n\n- It uses the original email's ID to keep the thread intact.\n\n7. Language Model\n\n- The OpenAI Chat Model node provides GPT-4o mini as the language engine for generating responses.\n\n8. Memory Support\n\n- The Simple Memory node maintains short-term context, helpful in multi-turn conversations.\n\n9. Knowledge Base (FAQ)\n\n- The Pinecone Vector Store node connects to a Pinecone index (faqmattabott) containing vectorized FAQ content.\n\n- Vectors are created using the Embeddings OpenAI node.",
+  "featuredImage": "/data/workflows/5142/5142.webp",
+  "author": {
+    "id": 101,
+    "slug": "mattabott",
+    "name": "Matteo",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI RAG"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1633,
+  "downloads": 163,
+  "createdAt": "2025-06-23T09:18:25.356Z",
+  "updatedAt": "2026-01-16T08:37:54.499Z",
+  "publishedAt": "2025-06-23T09:18:25.356Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5142",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered email replies with spam filtering & FAQ lookup using GPT-4o mini & Pinecone",
+    "workflowName": "AI-powered email replies with spam filtering & FAQ lookup using GPT-4o mini & Pinecone",
+    "description": "This n8n workflow automates the handling of incoming emails. It detects and filters out spam, searches a knowledge base (FAQ) stored in a Pinecone vector database, and sends a reply using Gmail — all powered by an AI model (GPT-4o mini).\n\nHow It Works\n1. Receiving Emails\n\n- The Gmail Trigger node checks a Gmail inbox every hour.\n\n- When a new email arrives, it starts the workflow.\n\n2. Fetching Full Email Content\n\n- The get_message node retrieves all the details of the message: sender, subject, text, message ID, etc.\n\n3. Spam Filtering\n\n- The Spam checker node uses GPT-4o mini to classify the email as either \"spam\" or \"no spam\".\n\n- It detects not only classic spam but also automated messages (e.g. from Google or Microsoft).\n\n- If marked as \"spam\", the workflow ends and nothing is processed.\n\n4. Conditional Filter\n\n- The If node checks the spam result.\n\n- Only \"no spam\" emails proceed to the AI Agent.\n\n5. AI-Based Reply\n\n- The AI Agent node generates a response based on:\n\n\t- The email content\n\n\t- A system prompt defining the assistant’s behavior (polite, professional, under the name “Total AI Solutions”)\n\n\t- Information retrieved from the Pinecone Vector Store, which contains FAQs\n\n- The AI is instructed to always check the vector store before replying.\n\n- The AI prepares both the subject and the body of the reply.\n\n6. Sending the Reply\n\n- The Gmail node sends the reply to the original sender.\n\n- It uses the original email's ID to keep the thread intact.\n\n7. Language Model\n\n- The OpenAI Chat Model node provides GPT-4o mini as the language engine for generating responses.\n\n8. Memory Support\n\n- The Simple Memory node maintains short-term context, helpful in multi-turn conversations.\n\n9. Knowledge Base (FAQ)\n\n- The Pinecone Vector Store node connects to a Pinecone index (faqmattabott) containing vectorized FAQ content.\n\n- Vectors are created using the Embeddings OpenAI node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "get_message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Spam checker",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    }
+  ]
+}

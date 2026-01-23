@@ -1,0 +1,152 @@
+{
+  "id": 10057,
+  "slug": "10057",
+  "title": "Generate Google ad copy automatically with Claude 3.5, Channable & Relevance AI",
+  "description": "---\n\n# 🚀 **Channable + Google Ads + Relevance AI: Scalable AI Workflow for Automated Ad Copy Generation & Publishing**\n\n---\n\n## 🧩 Overview\n\nThis workflow automates the **entire ad creation process for Google Ads** by integrating product data, AI-generated copy, compliance checks, and publication into your marketing pipeline.\n\nIt connects **n8n**, **Relevance AI**, **Google Sheets**, and optionally **Channable** to:\n\n* Fetch product data from your catalog\n* Generate Google Text Ad headlines and descriptions using Relevance AI\n* Validate character limits and ensure Google Ads compliance\n* Route non-compliant ads to a Slack review channel\n* Save compliant, ready-to-publish ads in Google Sheets\n* Notify your marketing team automatically after each generation cycle\n\n---\n\n## 🧠 Key Benefits\n\n✅ 100% automated ad copy pipeline\n✅ AI-generated, human-quality Google Ads text\n✅ Built-in compliance verification (Google Ads policy)\n✅ Google Sheet integration for team review\n✅ Daily automatic schedule (zero manual effort)\n✅ Slack alerts for QA and transparency\n✅ Modular design — extendable for Shopping and Performance Optimization\n✅ Scalable for 10 → 10,000+ product ads\n\n---\n\n## ⚙️ System Architecture\n\n### Tech Stack\n\n* **n8n** – Automation Orchestrator\n* **Relevance AI** – AI tools for copy generation and policy compliance\n* **Google Sheets** – Data storage and team collaboration\n* **Slack** – Real-time alerts and notifications\n* *(Optional)* **Channable** – Product feed integration\n\n---\n\n## 🧭 Workflow Logic\n\n```\nDaily Trigger (00:00)\n   ⬇️\n1️⃣ Get Product Feed (Channable or custom API)\n   ⬇️\n2️⃣ Split Into Batches (50 products each)\n   ⬇️\n3️⃣ Generate Ad Copy (Relevance AI tool → Claude 3.5 prompt)\n   ⬇️\n4️⃣ Validate Character Limits (JS node: max 30 headline / 90 description)\n   ⬇️\n5️⃣ Compliance Check (Relevance AI agent → Google Ads policies)\n   ⬇️\n6️⃣ IF Compliant → CSV / Google Sheets\n    ↳ ❌ Non-Compliant → Slack Alert\n   ⬇️\n7️⃣ Aggregate Batches + Generate CSV\n   ⬇️\n8️⃣ Save to Google Sheets (“Generated Ads” tab)\n   ⬇️\n9️⃣ Slack Notification → Summary Report\n```\n\n---\n\n## 📋 Environment Variables\n\nSet these in **n8n → Settings → Variables → Add Variable**\n\nCopy-paste from your `ENVIRONMENT_VARIABLES_CORRECTED.txt`.\n\nIncludes:\n\n* ✅ Relevance AI region, API key, tool & agent IDs\n* ✅ Google Ads, Merchant Center, and Sheets credentials\n* ✅ Slack channel name\n* ✅ Optional Channable endpoint\n\n### Example:\n\n```bash\nRELEVANCE_AI_API_URL=https://api-f1db6c.stack.tryrelevance.com/latest\nRELEVANCE_TOOL_AD_COPY_ID=bueQG8io04dw\nRELEVANCE_AGENT_COMPLIANCE_ID=xT29mQ4QKsl\nGOOGLE_SHEET_ID=1q2w3e4r5t6y7u8i9o0p\nSLACK_CHANNEL=#google-ads-automation\n```\n\n---\n\n## 🏗️ Node-by-Node Breakdown\n\n| Node                                   | Description                                     | Endpoint / Logic                                                              |\n| -------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------- |\n| 🕓 **Schedule Trigger**                | Runs daily at 00:00                             | Cron `0 0 * * *`                                                              |\n| 📦 **Get Product Feed**                | Pulls product data from Channable or custom API | `GET {{$env.CHANNABLE_API_URL}}/v1/projects/{{$env.PROJECT_ID}}/items`        |\n| 🧮 **Split Into Batches**              | Processes 50 products at a time                 | Avoids rate limits                                                            |\n| ✍️ **Generate Ad Copy (Relevance AI)** | Calls AI tool for each product                  | `POST {{$env.RELEVANCE_AI_API_URL}}/tools/google_text_ad_copy_generator/run`  |\n| 🔍 **Validate Character Limits**       | JS validation (≤30 headline / ≤90 description)  | Truncates smartly                                                             |\n| 🧠 **Compliance Check Agent**          | Verifies Google Ads compliance                  | `POST {{$env.RELEVANCE_AI_API_URL}}/agents/google_ads_compliance_checker/run` |\n| ⚖️ **IF Compliant**                    | Routes APPROVED vs REJECTED                     | `\"contains 'APPROVED'\"`                                                       |\n| 💾 **Format for CSV**                  | Formats compliant ads for export                | Maps ID, headline, desc, URLs                                                 |\n| 📊 **Aggregate Batches**               | Combines all results                            | Merges datasets                                                               |\n| 🧱 **Generate CSV File**               | Converts JSON → CSV                             | Escaped string-safe format                                                    |\n| 📑 **Save to Google Sheets**           | Saves reviewed ads                              | Sheet: `Generated Ads`                                                        |\n| 📢 **Slack Notification (Success)**    | Posts completion summary                        | Shows ad count, timestamp                                                     |\n| 🚨 **Slack Alert (Non-Compliant)**     | Notifies team for review                        | Includes issues, category                                                     |\n\n---\n\n## 🔑 API Authentication Setup\n\n### 🔹 Relevance AI\n\n* Create “HTTP Header Auth” credential\n\n  ```\n  Header Name: Authorization\n  Header Value: Bearer {{$env.RELEVANCE_AI_API_KEY}}\n  ```\n\n### 🔹 Google Sheets\n\n* Credential type: “Google OAuth2 API”\n* Scopes:\n\n  ```\n  https://www.googleapis.com/auth/spreadsheets\n  https://www.googleapis.com/auth/drive.file\n  ```\n\n### 🔹 Slack\n\n* Create Slack App → Add Bot Token Scopes → `chat:write`\n* Paste token in n8n “Slack API” credential.\n\n### 🔹 (Optional) Channable\n\n* Header Auth:\n\n  ```\n  Bearer {{$env.CHANNABLE_API_TOKEN}}\n  ```\n\n---\n\n## 🧩 Google Sheet Template\n\n**Sheet name:** `Generated Ads`\n\n**Columns:**\n\n```\n| product_id | headline | description | final_url | display_url | generated_at |\n```\n\nOptional: Add `compliance_status` or `notes` columns for QA.\n\n---\n\n## ⚙️ Testing Procedure\n\n1. **Manual Trigger:** Disable the schedule → click “Execute Workflow”.\n2. **Batch Size:** Start small (3 products).\n3. **Expected Output:**\n\n   * ✅ Ad copy generated\n   * ✅ Character limits validated\n   * ✅ Slack alerts for rejects\n   * ✅ Google Sheet filled\n\nCheck logs in **Executions** for errors.\nRe-enable the cron trigger after successful validation.\n\n---\n\n## 🧾 Example Output\n\n| product_id | headline           | description                                   | final_url                                        | display_url | generated_at         |\n| ---------- | ------------------ | --------------------------------------------- | ------------------------------------------------ | ----------- | -------------------- |\n| 12243      | “Eco Bamboo Socks” | “Soft, breathable comfort for everyday wear.” | [https://shop.com/socks](https://shop.com/socks) | shop.com    | 2025-10-22T00:00:00Z |\n\n---\n\n## 📬 Slack Alert Templates\n\n**✅ Success Notification**\n\n```\n✅ *Google Ads Generation Complete*\n\n📊 *Summary:*\n• Total Ads Generated: 50\n• Saved to Google Sheets: Generated Ads\n• Timestamp: 2025-10-22T00:00:00Z\n```\n\n**⚠️ Non-Compliant Alert**\n\n```\n⚠️ Non-Compliant Ad Flagged\n\nProduct: Bamboo Socks\nIssues:\n- Contains “Free Shipping”\n- Headline too long\n\nTimestamp: 2025-10-22T00:00:00Z\n```\n\n---\n\n## 🧰 Maintenance & Monitoring\n\n| Frequency | Task                             |\n| --------- | -------------------------------- |\n| Daily     | Check Slack alerts for rejects   |\n| Weekly    | Review ad performance metrics    |\n| Monthly   | Update Relevance AI prompts      |\n| Quarterly | Refresh API tokens and variables |\n\n---\n\n## 📊 Success Metrics\n\n* ✅ Compliance approval rate: **&gt;85%**\n* 🚫 Disapproval rate: **&lt;5%**\n* 📈 CTR improvement: **+15–25%**\n* ⏱️ Time saved: **10–15 hours/week**\n* 🌐 Scalable: **1,000+ ads/day**\n\n---\n\n## 🪜 Next Steps\n\n1. Deploy and monitor for 7 days.\n2. After 30 days → activate **Workflow 2: Performance Optimization Loop**.\n3. Extend to **Shopping Feed Optimization**.\n4. Add **multi-language generation** using Relevance AI.\n5. Integrate **Google Ads API publishing** (full automation).\n\n---\n\n## 🔗 Resources\n\n* [n8n Docs](https://docs.n8n.io)\n* [Relevance AI Docs](https://relevanceai.com/docs)\n* [Google Ads API](https://developers.google.com/google-ads/api)\n* [Merchant API](https://developers.google.com/merchant/api)\n* [Channable Help](https://help.channable.com)\n\n---\n\n## 🎉 Conclusion\n\nYou now have a **production-ready, scalable AI-powered ad generation system** integrating\n**Channable**, **Google Ads**, and **Relevance AI** — built entirely on **n8n**.\n\nThis delivers:\n\n* 💡 AI creativity at scale\n* ✅ Google Ads policy compliance\n* ⚙️ Hands-free daily automation\n* 📊 Transparent reporting and collaboration\n\n&gt; Start small → validate → scale to 10,000+ ads per day.\n&gt; Within weeks, you’ll have a **self-learning, always-on ad pipeline** driving consistent performance.\n\n---",
+  "featuredImage": "/data/workflows/10057/10057.webp",
+  "author": {
+    "id": 101,
+    "slug": "nikkannoora",
+    "name": "Nikan Noorafkan",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 141,
+  "downloads": 14,
+  "createdAt": "2025-10-22T19:27:35.821Z",
+  "updatedAt": "2026-01-16T09:03:09.589Z",
+  "publishedAt": "2025-10-22T19:27:35.821Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10057",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate Google ad copy automatically with Claude 3.5, Channable & Relevance AI",
+    "workflowName": "Generate Google ad copy automatically with Claude 3.5, Channable & Relevance AI",
+    "description": "---\n\n# 🚀 **Channable + Google Ads + Relevance AI: Scalable AI Workflow for Automated Ad Copy Generation & Publishing**\n\n---\n\n## 🧩 Overview\n\nThis workflow automates the **entire ad creation process for Google Ads** by integrating product data, AI-generated copy, compliance checks, and publication into your marketing pipeline.\n\nIt connects **n8n**, **Relevance AI**, **Google Sheets**, and optionally **Channable** to:\n\n* Fetch product data from your catalog\n* Generate Google Text Ad headlines and descriptions using Relevance AI\n* Validate character limits and ensure Google Ads compliance\n* Route non-compliant ads to a Slack review channel\n* Save compliant, ready-to-publish ads in Google Sheets\n* Notify your marketing team automatically after each generation cycle\n\n---\n\n## 🧠 Key Benefits\n\n✅ 100% automated ad copy pipeline\n✅ AI-generated, human-quality Google Ads text\n✅ Built-in compliance verification (Google Ads policy)\n✅ Google Sheet integration for team review\n✅ Daily automatic schedule (zero manual effort)\n✅ Slack alerts for QA and transparency\n✅ Modular design — extendable for Shopping and Performance Optimization\n✅ Scalable for 10 → 10,000+ product ads\n\n---\n\n## ⚙️ System Architecture\n\n### Tech Stack\n\n* **n8n** – Automation Orchestrator\n* **Relevance AI** – AI tools for copy generation and policy compliance\n* **Google Sheets** – Data storage and team collaboration\n* **Slack** – Real-time alerts and notifications\n* *(Optional)* **Channable** – Product feed integration\n\n---\n\n## 🧭 Workflow Logic\n\n```\nDaily Trigger (00:00)\n   ⬇️\n1️⃣ Get Product Feed (Channable or custom API)\n   ⬇️\n2️⃣ Split Into Batches (50 products each)\n   ⬇️\n3️⃣ Generate Ad Copy (Relevance AI tool → Claude 3.5 prompt)\n   ⬇️\n4️⃣ Validate Character Limits (JS node: max 30 headline / 90 description)\n   ⬇️\n5️⃣ Compliance Check (Relevance AI agent → Google Ads policies)\n   ⬇️\n6️⃣ IF Compliant → CSV / Google Sheets\n    ↳ ❌ Non-Compliant → Slack Alert\n   ⬇️\n7️⃣ Aggregate Batches + Generate CSV\n   ⬇️\n8️⃣ Save to Google Sheets (“Generated Ads” tab)\n   ⬇️\n9️⃣ Slack Notification → Summary Report\n```\n\n---\n\n## 📋 Environment Variables\n\nSet these in **n8n → Settings → Variables → Add Variable**\n\nCopy-paste from your `ENVIRONMENT_VARIABLES_CORRECTED.txt`.\n\nIncludes:\n\n* ✅ Relevance AI region, API key, tool & agent IDs\n* ✅ Google Ads, Merchant Center, and Sheets credentials\n* ✅ Slack channel name\n* ✅ Optional Channable endpoint\n\n### Example:\n\n```bash\nRELEVANCE_AI_API_URL=https://api-f1db6c.stack.tryrelevance.com/latest\nRELEVANCE_TOOL_AD_COPY_ID=bueQG8io04dw\nRELEVANCE_AGENT_COMPLIANCE_ID=xT29mQ4QKsl\nGOOGLE_SHEET_ID=1q2w3e4r5t6y7u8i9o0p\nSLACK_CHANNEL=#google-ads-automation\n```\n\n---\n\n## 🏗️ Node-by-Node Breakdown\n\n| Node                                   | Description                                     | Endpoint / Logic                                                              |\n| -------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------- |\n| 🕓 **Schedule Trigger**                | Runs daily at 00:00                             | Cron `0 0 * * *`                                                              |\n| 📦 **Get Product Feed**                | Pulls product data from Channable or custom API | `GET {{$env.CHANNABLE_API_URL}}/v1/projects/{{$env.PROJECT_ID}}/items`        |\n| 🧮 **Split Into Batches**              | Processes 50 products at a time                 | Avoids rate limits                                                            |\n| ✍️ **Generate Ad Copy (Relevance AI)** | Calls AI tool for each product                  | `POST {{$env.RELEVANCE_AI_API_URL}}/tools/google_text_ad_copy_generator/run`  |\n| 🔍 **Validate Character Limits**       | JS validation (≤30 headline / ≤90 description)  | Truncates smartly                                                             |\n| 🧠 **Compliance Check Agent**          | Verifies Google Ads compliance                  | `POST {{$env.RELEVANCE_AI_API_URL}}/agents/google_ads_compliance_checker/run` |\n| ⚖️ **IF Compliant**                    | Routes APPROVED vs REJECTED                     | `\"contains 'APPROVED'\"`                                                       |\n| 💾 **Format for CSV**                  | Formats compliant ads for export                | Maps ID, headline, desc, URLs                                                 |\n| 📊 **Aggregate Batches**               | Combines all results                            | Merges datasets                                                               |\n| 🧱 **Generate CSV File**               | Converts JSON → CSV                             | Escaped string-safe format                                                    |\n| 📑 **Save to Google Sheets**           | Saves reviewed ads                              | Sheet: `Generated Ads`                                                        |\n| 📢 **Slack Notification (Success)**    | Posts completion summary                        | Shows ad count, timestamp                                                     |\n| 🚨 **Slack Alert (Non-Compliant)**     | Notifies team for review                        | Includes issues, category                                                     |\n\n---\n\n## 🔑 API Authentication Setup\n\n### 🔹 Relevance AI\n\n* Create “HTTP Header Auth” credential\n\n  ```\n  Header Name: Authorization\n  Header Value: Bearer {{$env.RELEVANCE_AI_API_KEY}}\n  ```\n\n### 🔹 Google Sheets\n\n* Credential type: “Google OAuth2 API”\n* Scopes:\n\n  ```\n  https://www.googleapis.com/auth/spreadsheets\n  https://www.googleapis.com/auth/drive.file\n  ```\n\n### 🔹 Slack\n\n* Create Slack App → Add Bot Token Scopes → `chat:write`\n* Paste token in n8n “Slack API” credential.\n\n### 🔹 (Optional) Channable\n\n* Header Auth:\n\n  ```\n  Bearer {{$env.CHANNABLE_API_TOKEN}}\n  ```\n\n---\n\n## 🧩 Google Sheet Template\n\n**Sheet name:** `Generated Ads`\n\n**Columns:**\n\n```\n| product_id | headline | description | final_url | display_url | generated_at |\n```\n\nOptional: Add `compliance_status` or `notes` columns for QA.\n\n---\n\n## ⚙️ Testing Procedure\n\n1. **Manual Trigger:** Disable the schedule → click “Execute Workflow”.\n2. **Batch Size:** Start small (3 products).\n3. **Expected Output:**\n\n   * ✅ Ad copy generated\n   * ✅ Character limits validated\n   * ✅ Slack alerts for rejects\n   * ✅ Google Sheet filled\n\nCheck logs in **Executions** for errors.\nRe-enable the cron trigger after successful validation.\n\n---\n\n## 🧾 Example Output\n\n| product_id | headline           | description                                   | final_url                                        | display_url | generated_at         |\n| ---------- | ------------------ | --------------------------------------------- | ------------------------------------------------ | ----------- | -------------------- |\n| 12243      | “Eco Bamboo Socks” | “Soft, breathable comfort for everyday wear.” | [https://shop.com/socks](https://shop.com/socks) | shop.com    | 2025-10-22T00:00:00Z |\n\n---\n\n## 📬 Slack Alert Templates\n\n**✅ Success Notification**\n\n```\n✅ *Google Ads Generation Complete*\n\n📊 *Summary:*\n• Total Ads Generated: 50\n• Saved to Google Sheets: Generated Ads\n• Timestamp: 2025-10-22T00:00:00Z\n```\n\n**⚠️ Non-Compliant Alert**\n\n```\n⚠️ Non-Compliant Ad Flagged\n\nProduct: Bamboo Socks\nIssues:\n- Contains “Free Shipping”\n- Headline too long\n\nTimestamp: 2025-10-22T00:00:00Z\n```\n\n---\n\n## 🧰 Maintenance & Monitoring\n\n| Frequency | Task                             |\n| --------- | -------------------------------- |\n| Daily     | Check Slack alerts for rejects   |\n| Weekly    | Review ad performance metrics    |\n| Monthly   | Update Relevance AI prompts      |\n| Quarterly | Refresh API tokens and variables |\n\n---\n\n## 📊 Success Metrics\n\n* ✅ Compliance approval rate: **&gt;85%**\n* 🚫 Disapproval rate: **&lt;5%**\n* 📈 CTR improvement: **+15–25%**\n* ⏱️ Time saved: **10–15 hours/week**\n* 🌐 Scalable: **1,000+ ads/day**\n\n---\n\n## 🪜 Next Steps\n\n1. Deploy and monitor for 7 days.\n2. After 30 days → activate **Workflow 2: Performance Optimization Loop**.\n3. Extend to **Shopping Feed Optimization**.\n4. Add **multi-language generation** using Relevance AI.\n5. Integrate **Google Ads API publishing** (full automation).\n\n---\n\n## 🔗 Resources\n\n* [n8n Docs](https://docs.n8n.io)\n* [Relevance AI Docs](https://relevanceai.com/docs)\n* [Google Ads API](https://developers.google.com/google-ads/api)\n* [Merchant API](https://developers.google.com/merchant/api)\n* [Channable Help](https://help.channable.com)\n\n---\n\n## 🎉 Conclusion\n\nYou now have a **production-ready, scalable AI-powered ad generation system** integrating\n**Channable**, **Google Ads**, and **Relevance AI** — built entirely on **n8n**.\n\nThis delivers:\n\n* 💡 AI creativity at scale\n* ✅ Google Ads policy compliance\n* ⚙️ Hands-free daily automation\n* 📊 Transparent reporting and collaboration\n\n&gt; Start small → validate → scale to 10,000+ ads per day.\n&gt; Within weeks, you’ll have a **self-learning, always-on ad pipeline** driving consistent performance.\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Product Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Format for CSV",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Alert - Non-Compliant",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Aggregate Batches",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Schedule Trigger - Daily1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Into Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Generate Ad Copy - Relevance AI1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Validate Character Limits1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Compliance Check Agent1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "IF Compliant1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate CSV File1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Success Notification1",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

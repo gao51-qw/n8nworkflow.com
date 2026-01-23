@@ -1,0 +1,1 @@
+In this workflow, we'll automate the export of all the submissions which have a total score greater than 15 for a final review on Trello. The workflow will also generate social media assets for the organizers and add them to the Trello card.

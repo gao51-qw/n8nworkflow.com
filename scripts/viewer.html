@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n8n Workflow Viewer</title>
+  <script src="lib/webcomponents-loader.js"></script>
+  <script src="lib/polyfill-support.js"></script>
+  <script type="module" src="lib/n8n-demo.bundled.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #container {
+      width: 1200px;
+      height: 800px;
+      background: white;
+      border: 1px solid #eee;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    n8n-demo {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    /* 隐藏组件自带的控制按钮，让截图更纯净 */
+    n8n-demo::part(controls) {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <n8n-demo id="workflow" theme="light" frame="false" clicktointeract="false" disableinteractivity="true" src="https://n8n.io/workflow-preview/"></n8n-demo>
+  </div>
+  <script>
+    window.renderWorkflow = (data) => {
+      console.log('Starting render for workflow:', data.name || 'unnamed');
+      const viz = document.getElementById('workflow');
+      
+      try {
+        // n8n-demo 组件需要的是 workflow 字段中的内容，或者如果已经是工作流格式则直接使用
+        const workflowData = data.workflow || data;
+        // 注入工作流数据，使用属性赋值比 setAttribute 更可靠
+        viz.workflow = workflowData;
+      } catch (e) {
+        console.error('Failed to set workflow data:', e);
+        return Promise.reject(e);
+      }
+      
+      // 监控 iframe 加载
+      const checkIframe = setInterval(() => {
+        const shadow = viz.shadowRoot;
+        if (shadow) {
+          const iframe = shadow.getElementById('int_iframe');
+          if (iframe) {
+            console.log('Iframe found, src:', iframe.src);
+            clearInterval(checkIframe);
+          }
+        }
+      }, 1000);
+
+      // 返回一个 Promise，以便 Puppeteer 等待渲染完成
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          console.error('Render timeout reached for:', data.name || 'unnamed');
+          reject(new Error('Render timeout in viewer.html'));
+        }, 45000); // 增加到 45 秒
+
+        const checkRender = () => {
+          const shadow = viz.shadowRoot;
+          if (shadow) {
+            const svg = shadow.querySelector('svg');
+            const canvas = shadow.querySelector('.workflow-canvas');
+            if (svg || canvas) {
+              console.log('Render detected (SVG or Canvas found)');
+              clearTimeout(timeout);
+              setTimeout(resolve, 3000);
+              return;
+            }
+          }
+          setTimeout(checkRender, 500);
+        };
+        checkRender();
+      });
+    };
+  </script>
+</body>
+</html>

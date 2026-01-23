@@ -1,0 +1,1 @@
+Store the data received from the CocktailDB API in JSON

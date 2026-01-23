@@ -1,0 +1,182 @@
+{
+  "id": 6043,
+  "slug": "6043",
+  "title": "Analyze search intent for keywords with Google scraping, Bright Data, and Gemini AI",
+  "description": "## What it does\nThis workflow scrapes the top 10 pages on SERP and conducts an in-depth analysis of the keyword intent for each ranking keyword, saving the information to a Google Sheet for further analysis.\n\n\n## How does this workflow work?\n\n- We add our keywords and country code to a Google sheet that we need to monitor and research on\n- Run the system\n- Scrape the top 10 pages\n- Analyze the intents of the top 10 and update to a Google sheet\n\n## Technical Setup\n1. Make a copy of this [G sheet](https://docs.google.com/spreadsheets/d/1QU9rwawCZLiYW8nlYYRMj-9OvAUNZoe2gP49KbozQqw/edit?usp=sharing)\n2. Add your desired keywords to the Google sheet\n3. Map keyword and country code \n4. Update the Zone name to match your zone on Bright Data\n5. Run the scraper\n\nUpon successful scraping, we run an intent classifier to determine the intents for each ranking page and update the G sheet.\n\n## Setting up the Serp Scraper in Bright Data\n\n1. On Bright Data, go to the [Proxies & Scraping](https://brightdata.com/cp/zones) tab\n2. Under SERP API, create a new zone\n3. Give it a suitable name and description. The default is `serp_api`\n3. Add this to your account\n4. Add your credentials as a header credential",
+  "featuredImage": "/data/workflows/6043/6043.webp",
+  "author": {
+    "id": 101,
+    "slug": "imperolq",
+    "name": "Zacharia Kimotho",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 927,
+  "downloads": 92,
+  "createdAt": "2025-07-16T04:47:05.378Z",
+  "updatedAt": "2026-01-16T08:42:50.410Z",
+  "publishedAt": "2025-07-16T04:47:05.378Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6043",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Analyze search intent for keywords with Google scraping, Bright Data, and Gemini AI",
+    "workflowName": "Analyze search intent for keywords with Google scraping, Bright Data, and Gemini AI",
+    "description": "## What it does\nThis workflow scrapes the top 10 pages on SERP and conducts an in-depth analysis of the keyword intent for each ranking keyword, saving the information to a Google Sheet for further analysis.\n\n\n## How does this workflow work?\n\n- We add our keywords and country code to a Google sheet that we need to monitor and research on\n- Run the system\n- Scrape the top 10 pages\n- Analyze the intents of the top 10 and update to a Google sheet\n\n## Technical Setup\n1. Make a copy of this [G sheet](https://docs.google.com/spreadsheets/d/1QU9rwawCZLiYW8nlYYRMj-9OvAUNZoe2gP49KbozQqw/edit?usp=sharing)\n2. Add your desired keywords to the Google sheet\n3. Map keyword and country code \n4. Update the Zone name to match your zone on Bright Data\n5. Run the scraper\n\nUpon successful scraping, we run an intent classifier to determine the intents for each ranking page and update the G sheet.\n\n## Setting up the Serp Scraper in Bright Data\n\n1. On Bright Data, go to the [Proxies & Scraping](https://brightdata.com/cp/zones) tab\n2. Under SERP API, create a new zone\n3. Give it a suitable name and description. The default is `serp_api`\n3. Add this to your account\n4. Add your credentials as a header credential",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Google Search Results JSON",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Keywords",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "format fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "append ranking result",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Intent Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "informational",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Navigational",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Commercial",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Transactional",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Mixed",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge intents",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "set keyword",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

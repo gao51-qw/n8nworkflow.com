@@ -1,0 +1,130 @@
+# Generate & publish professional video ads with Veo 3, Gemini & Creatomate
+
+> # Professional AI-Powered Ad Generator
+
+Creating high-quality video ads has traditionally been one of the biggest challenges for small businesses and marketers. It usually requires a production team, editing software, and days of effort before anything is ready to publish. That makes consistency almost impossible — especially if you want to publish new ads every day.
+
+This workflow changes the process entirely. Built in **n8n**, the **Professional AI-Powered Ad Generator** combines **AI and automation** to handle everything from script creation to video rendering and social media publishing. The goal is simple: allow you to create and distribute short, engaging video ads in minutes, without relying on a studio, editors, or complicated tools.
+
+---
+
+## Why This Workflow Matters
+
+Most businesses know the importance of consistent advertising, but producing daily video content has always felt out of reach. This workflow makes it practical by:
+
+- **Automating creative tasks** that normally require a writer or video editor.  
+- **Integrating multiple AI tools** into one connected system.  
+- **Publishing directly to social media** so your ads reach people without extra steps.
+
+Instead of spending hours editing or outsourcing to agencies, you can now go from idea to published ad in the same amount of time it takes to write a short post.
+
+---
+
+## How It Works
+
+The process starts with a simple form where you enter your business details: name, service, offer, and call-to-action. From there, the workflow runs automatically:
+
+### 1. Script Planning  
+AI generates a short, two-part script that feels natural and relatable.  
+- Part one introduces a **problem**.  
+- Part two presents your **business as the solution**, ending with a strong CTA.
+
+### 2. Video Generation with **Google Veo 3**  
+Each part of the script is turned into an **8-second cinematic video clip**, visually optimized for vertical platforms.
+
+### 3. Character Consistency with **Google Gemini**  
+Characters are analyzed and matched across both clips, creating a smooth narrative with **visual continuity**.
+
+### 4. Assembly with **Creatomate**  
+Both clips are merged into a **16-second vertical ad**, automatically formatted for TikTok, Instagram, and YouTube Shorts.
+
+### 5. Automated Publishing with **Postiz**  
+The final video is scheduled and posted to your connected social accounts.  
+- **Captions and titles** are generated automatically.  
+- No manual uploads or extra steps.
+
+---
+
+## What You Gain
+
+- ✅ **Daily publishing at scale** – Generate and release multiple ads per day.  
+- ⏱️ **Time savings** – Go from idea to ad in just minutes.  
+- 📈 **Consistency** – Maintain a professional, frequent social presence.  
+- 💰 **Cost efficiency** – No production crew, no software, no outsourcing.  
+- 🧩 **Flexibility** – Ideal for local businesses, service providers, and agencies.
+
+---
+
+## Honest Advantage
+
+This workflow doesn’t replace creativity — it **makes it practical**. You still define the message:  
+- The service  
+- The offer  
+- The story  
+
+But the **heavy lifting** — scripting, video production, visual continuity, and publishing — is automated. You focus on ideas, while the system handles execution.
+
+---
+
+## Conclusion
+
+The **Professional AI-Powered Ad Generator** is not a promise of magic. It’s a dependable system that helps small teams and solo entrepreneurs consistently create and publish professional ads — without the usual bottlenecks.
+
+&gt; From a simple brief to a polished, published ad — all in one automated flow.  
+
+**Advertising, simplified. Automation, scaled.**
+
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 8263
+- **Complexity:** advanced
+- **Node Count:** 66
+- **Views:** 152
+- **Downloads:** 15
+- **Created:** 2025/9/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/8263)
+
+## 👤 Author
+
+- **Name:** LukaszB
+- **Username:** @lukaszb
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **set** (×2)
+- **convertToFile** (×2)
+- **switch** (×4)
+- **httpRequest** (×20)
+- **wait** (×4)
+- **jwt** 
+- **@n8n/n8n-nodes-langchain.chainLlm** (×5)
+- **@n8n/n8n-nodes-langchain.outputParserStructured** (×3)
+- **code** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** (×3)
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** (×5)
+- **merge** (×2)
+- **stickyNote** (×13)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 66 nodes with 49 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

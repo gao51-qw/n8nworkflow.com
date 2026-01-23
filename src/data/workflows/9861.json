@@ -1,0 +1,146 @@
+{
+  "id": 9861,
+  "slug": "9861",
+  "title": "Generate and manage short links with GPT-4.1 and data storage",
+  "description": "This AI Agent helps you create short links from your original URLs.  \nEach generated short link is automatically stored in a database table for easy management and tracking.\n\n---\n\n## How It Works\n\n1. Provide a long URL to the Agent.  \n2. The Agent saves your original link in the database.  \n3. It generates a short link in the following format:\n\n```\nShort link:  https://{webhook_url}/webhook/shortLink?q={shortLinkId}\n```\n\nWhen users open the short link, they are automatically redirected to your original link.\n\n---\n\n## How to Use\n\n- Send your link to the Agent.  \n- The Agent will respond with a generated short link.  \n\n---\n\n## Requirements\n\n- Add your `your_webhook_url` to the **Config Node**.  \n- OpenAI account\n- Create a database table named `ShortLink` with the following columns:\n\n| Column Name   | Description                  |\n|----------------|------------------------------|\n| `originalLink` | Stores the full original URL. |\n| `shortLinkId`  | Stores the unique short link ID. |\n\n---\n\n## Customization Options\n\n- Add traffic tracking or analytics for each short link.  \n- Customize the redirect page to display your logo, message, or branding.\n",
+  "featuredImage": "/data/workflows/9861/9861.webp",
+  "author": {
+    "id": 101,
+    "slug": "nghiaaidev",
+    "name": "Nghia Nguyen",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 572,
+  "downloads": 57,
+  "createdAt": "2025-10-18T13:18:23.514Z",
+  "updatedAt": "2026-01-16T09:02:20.532Z",
+  "publishedAt": "2025-10-18T13:18:23.514Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9861",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate and manage short links with GPT-4.1 and data storage",
+    "workflowName": "Generate and manage short links with GPT-4.1 and data storage",
+    "description": "This AI Agent helps you create short links from your original URLs.  \nEach generated short link is automatically stored in a database table for easy management and tracking.\n\n---\n\n## How It Works\n\n1. Provide a long URL to the Agent.  \n2. The Agent saves your original link in the database.  \n3. It generates a short link in the following format:\n\n```\nShort link:  https://{webhook_url}/webhook/shortLink?q={shortLinkId}\n```\n\nWhen users open the short link, they are automatically redirected to your original link.\n\n---\n\n## How to Use\n\n- Send your link to the Agent.  \n- The Agent will respond with a generated short link.  \n\n---\n\n## Requirements\n\n- Add your `your_webhook_url` to the **Config Node**.  \n- OpenAI account\n- Create a database table named `ShortLink` with the following columns:\n\n| Column Name   | Description                  |\n|----------------|------------------------------|\n| `originalLink` | Stores the full original URL. |\n| `shortLinkId`  | Stores the unique short link ID. |\n\n---\n\n## Customization Options\n\n- Add traffic tracking or analytics for each short link.  \n- Customize the redirect page to display your logo, message, or branding.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Insert row",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate shorlinkId",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get row(s)",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "GenerateShortLink",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate ShortLink",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Call 'Create Short Link'",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Page Redirect",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "ShortLink API",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

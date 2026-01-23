@@ -1,0 +1,212 @@
+{
+  "id": 10168,
+  "slug": "10168",
+  "title": "Automate news intelligence with Gemini AI for RSS feeds to Notion and Slack",
+  "description": "**Who’s it for**\n\nTeams that monitor multiple news sources and want an automated, tagged, and prioritized briefing—PMM, PR/Comms, Sales/CS, founders, and research ops.\n\n**What it does / How it works**\n\nEach morning the workflow reads your RSS feeds, summarizes articles with an LLM, assigns tags from a maintained dictionary, saves structured records to Notion, and posts a concise Slack digest of top items. Core steps: Daily Morning Trigger → Workflow Configuration (Set) → Read RSS Feeds → Get Tag Dictionary → AI Summarizer and Tagger → Parse AI Output → Write to Notion Database → Sort by Priority → Top 3 Headlines → Format Slack Message → Post to Slack.\n\n**How to set up**\n\nOpen Workflow Configuration (Set) and edit: rssFeeds (array of URLs), notionDatabaseId, slackChannel.\n\nConnect your own credentials in n8n for Notion, Slack, Google Sheets (if used for the tag dictionary), and your LLM provider.\n\nAdjust the trigger time in Daily Morning Trigger (e.g., weekdays at 09:00).\n\n**Requirements**\n\nn8n (Cloud or self-hosted)\n\nSlack app with chat:write to the target channel\n\nNotion database with properties: summary (rich_text), tags (multi_select), priority (number), url (url), publishedDate (date)\n\nOptional Google Sheet for the tag dictionary (or replace with another source)\n\n**How to customize the workflow**\n\nScoring & selection: Change priority rules, increase “Top N” items, or sort by recency.\n\nTaxonomy: Extend the tag dictionary; refine the AI prompt for stricter tagging.\n\nOutputs: Post per-tag Slack threads, send DMs, or create Notion relations to initiatives.\n\nSources: Add more feeds or mix in APIs/newsletters.\n\nSecurity: Do not hardcode API keys in HTTP nodes; keep credentials in n8n.",
+  "featuredImage": "/data/workflows/10168/10168.webp",
+  "author": {
+    "id": 101,
+    "slug": "takuya",
+    "name": "Takuya Ojima",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 432,
+  "downloads": 43,
+  "createdAt": "2025-10-25T13:20:23.067Z",
+  "updatedAt": "2026-01-16T09:03:48.171Z",
+  "publishedAt": "2025-10-25T13:20:23.067Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10168",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate news intelligence with Gemini AI for RSS feeds to Notion and Slack",
+    "workflowName": "Automate news intelligence with Gemini AI for RSS feeds to Notion and Slack",
+    "description": "**Who’s it for**\n\nTeams that monitor multiple news sources and want an automated, tagged, and prioritized briefing—PMM, PR/Comms, Sales/CS, founders, and research ops.\n\n**What it does / How it works**\n\nEach morning the workflow reads your RSS feeds, summarizes articles with an LLM, assigns tags from a maintained dictionary, saves structured records to Notion, and posts a concise Slack digest of top items. Core steps: Daily Morning Trigger → Workflow Configuration (Set) → Read RSS Feeds → Get Tag Dictionary → AI Summarizer and Tagger → Parse AI Output → Write to Notion Database → Sort by Priority → Top 3 Headlines → Format Slack Message → Post to Slack.\n\n**How to set up**\n\nOpen Workflow Configuration (Set) and edit: rssFeeds (array of URLs), notionDatabaseId, slackChannel.\n\nConnect your own credentials in n8n for Notion, Slack, Google Sheets (if used for the tag dictionary), and your LLM provider.\n\nAdjust the trigger time in Daily Morning Trigger (e.g., weekdays at 09:00).\n\n**Requirements**\n\nn8n (Cloud or self-hosted)\n\nSlack app with chat:write to the target channel\n\nNotion database with properties: summary (rich_text), tags (multi_select), priority (number), url (url), publishedDate (date)\n\nOptional Google Sheet for the tag dictionary (or replace with another source)\n\n**How to customize the workflow**\n\nScoring & selection: Change priority rules, increase “Top N” items, or sort by recency.\n\nTaxonomy: Extend the tag dictionary; refine the AI prompt for stricter tagging.\n\nOutputs: Post per-tag Slack threads, send DMs, or create Notion relations to initiatives.\n\nSources: Add more feeds or mix in APIs/newsletters.\n\nSecurity: Do not hardcode API keys in HTTP nodes; keep credentials in n8n.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Daily Morning Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Read RSS Feeds",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Summarizer and Tagger",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Tag Dictionary",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Parse AI Output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Write to Notion Database",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sort by Priority",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Top 3 Headlines",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Slack Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Aggregate Tags",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Daily Morning Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Workflow Configuration",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Code in JavaScript",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Read RSS Feeds",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Get Tag Dictionary",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Aggregate Tags",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Google Gemini Chat Model",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: AI Summarizer and Tagger",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Parse AI Output",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Write to Notion Database",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Sort by Priority",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Top 3 Headlines",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Format Slack Message",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Post to Slack",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Template Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

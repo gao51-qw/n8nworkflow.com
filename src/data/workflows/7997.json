@@ -1,0 +1,128 @@
+{
+  "id": 7997,
+  "slug": "7997",
+  "title": "Crypto RSI alert system with EODHD, Telegram and TradingView charts",
+  "description": "**How it works**\n\nRuns on a schedule and iterates a watchlist of symbols (e.g., BTC/ETH/SOL).\n\nFor each symbol, request intraday 1h OHLCV from EODHD.\n\nA Code node computes Wilder’s RSI(14) and detects 30/70 crossings.\n\nWhen a signal appears, the bot sends a Telegram alert (HTML message) with price, RSI (prev → now), timestamp, and a “View chart” button that opens the pair on TradingView (BINANCE/USD).\n\n**Set up steps (≈10–15 min)**\n\nPrereqs: n8n (cloud or self-hosted), EODHD API key, Telegram bot + your chat_id.\n\nEnv vars: set EODHD_TOKEN and TELEGRAM_CHAT_ID on your n8n instance.\n\nCredentials: add your Telegram credential (bot token).\n\nImport the workflow JSON.\n\nEdit Fields node: adjust the symbol array to your watchlist.\n\nSchedule Trigger: choose how often to run (e.g., every 5–10 min).\n\nTest: temporarily flip the Code node’s FORCE_ALERT flag to true to verify Telegram delivery, then set it back to false.\n\nEODHD API [Access the EODHD API with a 10% discount](https://eodhd.com/pricing-special-10?via=kmg&ref1=Meneses)",
+  "featuredImage": "/data/workflows/7997/7997.webp",
+  "author": {
+    "id": 101,
+    "slug": "pythonia-kevin",
+    "name": "Kevin Meneses ",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1181,
+  "downloads": 118,
+  "createdAt": "2025-08-28T13:22:22.827Z",
+  "updatedAt": "2026-01-16T08:53:28.028Z",
+  "publishedAt": "2025-08-28T13:22:22.827Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7997",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Crypto RSI alert system with EODHD, Telegram and TradingView charts",
+    "workflowName": "Crypto RSI alert system with EODHD, Telegram and TradingView charts",
+    "description": "**How it works**\n\nRuns on a schedule and iterates a watchlist of symbols (e.g., BTC/ETH/SOL).\n\nFor each symbol, request intraday 1h OHLCV from EODHD.\n\nA Code node computes Wilder’s RSI(14) and detects 30/70 crossings.\n\nWhen a signal appears, the bot sends a Telegram alert (HTML message) with price, RSI (prev → now), timestamp, and a “View chart” button that opens the pair on TradingView (BINANCE/USD).\n\n**Set up steps (≈10–15 min)**\n\nPrereqs: n8n (cloud or self-hosted), EODHD API key, Telegram bot + your chat_id.\n\nEnv vars: set EODHD_TOKEN and TELEGRAM_CHAT_ID on your n8n instance.\n\nCredentials: add your Telegram credential (bot token).\n\nImport the workflow JSON.\n\nEdit Fields node: adjust the symbol array to your watchlist.\n\nSchedule Trigger: choose how often to run (e.g., every 5–10 min).\n\nTest: temporarily flip the Code node’s FORCE_ALERT flag to true to verify Telegram delivery, then set it back to false.\n\nEODHD API [Access the EODHD API with a 10% discount](https://eodhd.com/pricing-special-10?via=kmg&ref1=Meneses)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note — Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields (watchlist)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note — Watchlist",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note — Split Out",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note — Loop",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request (EODHD intraday 1h)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note — HTTP",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code (RSI + message)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note — Code",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IF (has signal?)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note — Telegram",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

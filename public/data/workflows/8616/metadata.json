@@ -1,0 +1,27 @@
+{
+  "id": 8616,
+  "slug": "8616",
+  "title": "Automated job hunt with Tavily",
+  "description": "# Automated Job Hunt with Tavily — Setup & Run Guide\n\n### What this template does?\n\nAutomatically searches for recent job postings (example: “Software Engineering Intern”), extracts structured details from each posting using an AI agent + Tavily, bundles results, and emails a single weekly digest. \n\nEstimated setup time: ~30 minutes\n\n#### 1. Required credentials\n\nBefore you import or run the workflow, create/configure these credentials in your n8n instance:\n\n**OpenAI (Chat model)** — used by the OpenAI Chat Model and Message a model nodes. Add an OpenAI credential (name it e.g. OpenAi account) and paste your [OpenAi API key](https://platform.openai.com/api-keys).\n\n**Tavily API** — used by the Search in Tavily node. Add a Tavily credential (name it e.g. Tavily account) and add your [Tavily API key](https://app.tavily.com/home).\n\n**Gmail (OAuth2)** — used by the Send a message node to deliver the digest email.\nConfigure Gmail OAuth2 credential and select it for the Gmail node (e.g. Gmail account.\n\n#### 2. Node-by-node configuration (what to check/change)\n\n**Schedule Trigger**\n\nNode name: Schedule Trigger\n\nConfigure interval: daily or weekly (example: weekly, trigger at 08:00).\n\nNote: This is the workflow start. Adjust to your preferred cadence.\n\n**AI Agent**\n\nNode name: AI Agent\n\nImportant: First step — set the agent’s prompt / system message.\n\n**Search in Tavily (Tavily Tool node)**\n\nNode name: Tavily\n\nQuery: user-editable field (example default: Roles posted this week for Software Engineering)\n\nAdvice: keep query under 400 chars; change to target role/location keywords.\n\nOptions recommended:\n\nSearch Depth: advanced (optional, better extraction)\n\nMax Results: 15\n\nTime Range: week (limit to past week)\n\nInclude Raw Content: true (fetch full page content for better extraction)\n\nInclude Domains: indeed.com, glassdoor.com,linkedin.com — prioritize trusted sources\n\n**Edit Fields / Set (bundle)**\n\nNode name: Edit Fields (Set)\n\nPurpose: Collect the agent output into one field (e.g., $json.output or Response) for downstream processing.\n\n**Message a Model (OpenAI formatting step)**\n\nNode name: Message a model\n\nUses OpenAI (the openAiApi credential).\n\nThis node can be used to reformat or normalize the agent output into consistent blocks if needed. Use the same system rules you used for the agent (the prompt/system message earlier). You can also leave this minimal if the agent already outputs structured blocks.\n\n**Code Node (Parsing & structuring)**\n\nNode name: Code\n\nPurpose: Split the agent/LLM text into separate job postings and extract fields with regex.\n\n**Aggregate Node**\n\nNode name: Aggregate\n\nMode: aggregateAllItemData (this combines all parsed postings into a single data array so the Gmail node can loop over them)\n\n**Gmail node (Send a message)**\n\nNode name: Send a message\n\nsendTo: set to recipient(s) (e.g., your inbox)\n\nsubject: e.g. New Jobs for this week!\n\nemailType: text (or html if you build HTML content)\n\nmessage (body): use the expression that loops through data and formats every posting.\n\n#### 3. How to test (quick steps)\n\nSet credentials in n8n (OpenAI, Tavily, Gmail).\n\nRun the Schedule Trigger manually (use the “Execute Workflow” or manually trigger nodes).\n\nInspect the Search in Tavily node output — confirm it returns results.\n\nInspect the AI Agent and Message a model outputs — ensure formatted postings are produced and separated by --- END JOB POSTING ---.\n\nRun the Code node — confirm it returns structured items with posting_number, job_title, requirements[], etc.\n\nCheck Aggregate output: you should see a single item with data array.\n\nIn Gmail node, run a test send — confirm the email receives one combined message with all postings.\n\n#### 4. Troubleshooting tips\n\nGmail body shows [Array: …]: Avoid dragging the array raw — use the expression that maps data to formatted strings.\n\nCode node split error: Occurs when raw is undefined. Ensure previous node returns message.content or adjust to use $input.all() and join contents safely.\n\nMissing fields after parsing: Check LLM/agent output labels match the Code node’s regex (e.g., Job Title:). If labels differ, update regex or LLM formatting.\n\n#### 5. Customization ideas\n\nFilter by location or remote-only roles, or add keyword filters (seniority, stack).\n\nSend results to Google Sheets or Slack instead of/in addition to Gmail.\n\nAdd an LLM summarization step to create a 1-line highlight per posting.",
+  "featuredImage": "/data/workflows/8616/8616.webp",
+  "author": {
+    "id": 101,
+    "slug": "may-kroitero",
+    "name": "May Ramati Kroitero",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 683,
+  "downloads": 68,
+  "createdAt": "2025-09-15T19:22:05.196Z",
+  "updatedAt": "2026-01-16T08:56:50.814Z",
+  "publishedAt": "2025-09-15T19:22:05.196Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8616"
+}

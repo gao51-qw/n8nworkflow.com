@@ -1,0 +1,187 @@
+{
+  "id": 6495,
+  "slug": "6495",
+  "title": "Sync Shopify customer order data to Airtable with auto-updates",
+  "description": "Shopify Order Data to Airtable\n\nThis n8n template demonstrates how to capture incoming Shopify order webhooks, transform the data into a structured format, and insert each product line item as a separate record in an Airtable sheet. It provides both high-level order information and detailed product-level metrics, making it ideal for analytics, reporting, inventory management, and customer insights.\n\nGood to Know\n\nAirtable API Rate Limits: By default, Airtable allows 5 requests per second per base. Consider batching or adding delays if you process high volumes of orders.\n\nShopify Webhook Configuration: Ensure you have configured the orders/create webhook in your Shopify Admin to point to the n8n webhook node.\n\nField Mapping: The template maps standard Shopify fields; if your store uses custom order or line item properties, update the Function nodes accordingly.\n\nHow It Works\n\nWebhook Trigger: A Shopify orders/create webhook fires when a new order is placed.\n\nNormalize Order Data: The Function node extracts core order, customer, shipping, and billing details and computes financial totals (subtotal, tax, shipping, discounts).\n\nLine Item Breakdown: A second Function node builds an array of objects—one per line item—calculating per-item totals, tax/shipping allocation, and product attributes (color, size, material).\n\nCheck Customer Record: Optionally check against an Airtable \"Customers\" sheet to flag new vs existing customers.\n\nAuto-Increment Record ID: A Function node generates a running serial number for each Airtable record.\n\nInsert Records: The Airtable node writes each line item object into the target base and table, creating rich records with both order-level and product-level details.\n\nHow to Use\n\nClone the Template: Click \"Use Template\" in your n8n instance to import this workflow.\n\nConfigure Credentials:\n\nShopify Trigger: Add your Shopify store domain and webhook secret.\n\nAirtable Node: Set up your Airtable API key and select the base and table.\n\nReview Field Names: Match the field names in the Function nodes to the columns in your Airtable table.\n\nActivate Workflow: Turn on the workflow and place a test order in your Shopify store.\n\nVerify Records: Check your Airtable sheet to see the new order and its line items.\n\nRequirements\n\nn8n@latest\n\nShopify Store with orders/create webhook configured\n\nAirtable Account with a base and table ready to receive records\n\nCustomizing This Workflow\n\nAdd Custom Fields: Extend the Functions to include additional Shopify metafields, discounts, or customer tags.\n\nAlternative Destinations: Replace the Airtable node with Google Sheets, Supabase, or another database by swapping in the corresponding node.\n\nError Handling: Insert If/Wait nodes to retry on API failures or send notifications on errors.\n\nMulti-Currency Support: Adapt the currency logic to convert totals based on dynamic exchange rates.\n\nShopify Customer Append/Update to Airtable\n\nThis n8n template shows how to take incoming Shopify customer webhooks (create or update), check if the customer exists in your Airtable \"Customers\" sheet, append new details or update existing records, and maintain a clean customer database.\n\nGood to Know\n\nAirtable API Rate Limits: Airtable limits to 5 requests per second. Use batch lookups or add delays for high throughput.\n\nShopify Webhook Events: Configure both customers/create and customers/update webhooks in Shopify Admin.\n\nUnique Identifier: Ensure the \"Customer ID\" field in Airtable matches the Shopify customer.id for reliable updates.\n\nHow It Works\n\nWebhook Trigger: Fires on Shopify customers/create or customers/update events.\n\nExtract Customer Data: A Function node normalizes name, email, phone, and address fields from the webhook payload.\n\nFetch Existing Records: The Airtable node lists all records from the \"Customers\" table to find a matching Customer ID.\n\nIdentify Match: A Function node compares the incoming customer.id to existing records and flags found vs. not found.\n\nReturn Last Row: Ensures serial numbering continuity by grabbing the last record's serial in Airtable.\n\nAuto-Increment Serial: A Function node increments the serial number (S No) for new records.\n\nUpsert Record: Depending on match result, the Airtable node either updates the existing record or creates a new one with full details.\n\nHow to Use\n\nImport the Workflow: Click \"Use Template\" in n8n.\n\nSet Credentials:\n\nShopify: Add store domain and webhook secret.\n\nAirtable: Provide API key and select base/table.\n\nEnsure Field Alignment: The Airtable table must have fields: Customer ID, Name, Email, Phone, Address, and S No.\n\nActivate: Enable the workflow and test by creating or updating a customer in Shopify.\n\nVerify: Your Airtable sheet will show appended or updated customer records with correct serial numbering.\n\nRequirements\n\nn8n@latest\n\nShopify Store with customers/create and customers/update webhooks\n\nAirtable Account with a \"Customers\" table\n\nCustomizing This Workflow\n\nExtra Fields: Modify the Function nodes to include Shopify metafields or tags.\n\nAlternative Databases: Swap in Google Sheets, Supabase, or SQL nodes.\n\nError Notification: Add a Slack or email node to alert on webhook or API errors.\n\nBatch Processing: Use the SplitInBatches node to handle large customer syncs.",
+  "featuredImage": "/data/workflows/6495/6495.webp",
+  "author": {
+    "id": 101,
+    "slug": "mohammedabid",
+    "name": "Mohammed Abid",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 219,
+  "downloads": 21,
+  "createdAt": "2025-07-26T17:18:44.237Z",
+  "updatedAt": "2026-01-16T08:45:16.854Z",
+  "publishedAt": "2025-07-26T17:18:44.237Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6495",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sync Shopify customer order data to Airtable with auto-updates",
+    "workflowName": "Sync Shopify customer order data to Airtable with auto-updates",
+    "description": "Shopify Order Data to Airtable\n\nThis n8n template demonstrates how to capture incoming Shopify order webhooks, transform the data into a structured format, and insert each product line item as a separate record in an Airtable sheet. It provides both high-level order information and detailed product-level metrics, making it ideal for analytics, reporting, inventory management, and customer insights.\n\nGood to Know\n\nAirtable API Rate Limits: By default, Airtable allows 5 requests per second per base. Consider batching or adding delays if you process high volumes of orders.\n\nShopify Webhook Configuration: Ensure you have configured the orders/create webhook in your Shopify Admin to point to the n8n webhook node.\n\nField Mapping: The template maps standard Shopify fields; if your store uses custom order or line item properties, update the Function nodes accordingly.\n\nHow It Works\n\nWebhook Trigger: A Shopify orders/create webhook fires when a new order is placed.\n\nNormalize Order Data: The Function node extracts core order, customer, shipping, and billing details and computes financial totals (subtotal, tax, shipping, discounts).\n\nLine Item Breakdown: A second Function node builds an array of objects—one per line item—calculating per-item totals, tax/shipping allocation, and product attributes (color, size, material).\n\nCheck Customer Record: Optionally check against an Airtable \"Customers\" sheet to flag new vs existing customers.\n\nAuto-Increment Record ID: A Function node generates a running serial number for each Airtable record.\n\nInsert Records: The Airtable node writes each line item object into the target base and table, creating rich records with both order-level and product-level details.\n\nHow to Use\n\nClone the Template: Click \"Use Template\" in your n8n instance to import this workflow.\n\nConfigure Credentials:\n\nShopify Trigger: Add your Shopify store domain and webhook secret.\n\nAirtable Node: Set up your Airtable API key and select the base and table.\n\nReview Field Names: Match the field names in the Function nodes to the columns in your Airtable table.\n\nActivate Workflow: Turn on the workflow and place a test order in your Shopify store.\n\nVerify Records: Check your Airtable sheet to see the new order and its line items.\n\nRequirements\n\nn8n@latest\n\nShopify Store with orders/create webhook configured\n\nAirtable Account with a base and table ready to receive records\n\nCustomizing This Workflow\n\nAdd Custom Fields: Extend the Functions to include additional Shopify metafields, discounts, or customer tags.\n\nAlternative Destinations: Replace the Airtable node with Google Sheets, Supabase, or another database by swapping in the corresponding node.\n\nError Handling: Insert If/Wait nodes to retry on API failures or send notifications on errors.\n\nMulti-Currency Support: Adapt the currency logic to convert totals based on dynamic exchange rates.\n\nShopify Customer Append/Update to Airtable\n\nThis n8n template shows how to take incoming Shopify customer webhooks (create or update), check if the customer exists in your Airtable \"Customers\" sheet, append new details or update existing records, and maintain a clean customer database.\n\nGood to Know\n\nAirtable API Rate Limits: Airtable limits to 5 requests per second. Use batch lookups or add delays for high throughput.\n\nShopify Webhook Events: Configure both customers/create and customers/update webhooks in Shopify Admin.\n\nUnique Identifier: Ensure the \"Customer ID\" field in Airtable matches the Shopify customer.id for reliable updates.\n\nHow It Works\n\nWebhook Trigger: Fires on Shopify customers/create or customers/update events.\n\nExtract Customer Data: A Function node normalizes name, email, phone, and address fields from the webhook payload.\n\nFetch Existing Records: The Airtable node lists all records from the \"Customers\" table to find a matching Customer ID.\n\nIdentify Match: A Function node compares the incoming customer.id to existing records and flags found vs. not found.\n\nReturn Last Row: Ensures serial numbering continuity by grabbing the last record's serial in Airtable.\n\nAuto-Increment Serial: A Function node increments the serial number (S No) for new records.\n\nUpsert Record: Depending on match result, the Airtable node either updates the existing record or creates a new one with full details.\n\nHow to Use\n\nImport the Workflow: Click \"Use Template\" in n8n.\n\nSet Credentials:\n\nShopify: Add store domain and webhook secret.\n\nAirtable: Provide API key and select base/table.\n\nEnsure Field Alignment: The Airtable table must have fields: Customer ID, Name, Email, Phone, Address, and S No.\n\nActivate: Enable the workflow and test by creating or updating a customer in Shopify.\n\nVerify: Your Airtable sheet will show appended or updated customer records with correct serial numbering.\n\nRequirements\n\nn8n@latest\n\nShopify Store with customers/create and customers/update webhooks\n\nAirtable Account with a \"Customers\" table\n\nCustomizing This Workflow\n\nExtra Fields: Modify the Function nodes to include Shopify metafields or tags.\n\nAlternative Databases: Swap in Google Sheets, Supabase, or SQL nodes.\n\nError Notification: Add a Slack or email node to alert on webhook or API errors.\n\nBatch Processing: Use the SplitInBatches node to handle large customer syncs.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Code17",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BTSD",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Code19",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If7",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Edit Fields15",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Code20",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields16",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Code21",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields18",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "CCUST",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "CustomerSheet",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "CustomerSheet4",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "PRDSHEET4",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "customerCreate",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

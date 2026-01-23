@@ -1,0 +1,27 @@
+{
+  "id": 4012,
+  "slug": "4012",
+  "title": "Generate knowledge base articles with GPT & Perplexity AI for Contentful CMS",
+  "description": "## Workflow: Auto Knowledge Base Article Generator\n\n### ⚡ About the Creators\nThis workflow was created by [Varritech Technologies](https://varritech.com), an innovative agency that leverages AI to engineer, design, and deliver software development projects 500% faster than traditional agencies. Based in New York City, we specialize in custom software development, web applications, and digital transformation solutions. If you need assistance implementing this workflow or have questions about content management solutions, please reach out to our team.\n\n### 🏗️ Architecture Overview  \nThis workflow automates the end-to-end creation of a structured knowledge-base article from a simple chat prompt:\n\n1. **Chat Trigger** → Receives user request  \n2. **AI Drafting Loop** → Generates & refines JSON article via AI agents  \n3. **Perplexity Research Call** → Deep-dive content generation  \n4. **Editorial Loop** → Up to 3 AI-driven revisions  \n5. **Contentful Publish** → Pushes final JSON into CMS  \n\n---\n\n### 📦 Node-by-Node Breakdown\n\n```mermaid\nflowchart LR\n  A[Webhook: Chat Trigger] --&gt; B[AI Writer Agent]\n  B --&gt; C[HTTP Request: Perplexity Content]\n  C --&gt; D[Function: Format Output & Citations]\n  D --&gt; E[Loop Start: Initialize Count]\n  E --&gt; F[AI Editor Agent]\n  F --&gt; G{action == \"rewrite\"?}\n  G -- yes --&gt; H[Function: Merge Improvements]\n  H --&gt; I[Increment Count] --&gt; F\n  G -- no --&gt; J[Stop Loop]\n  J --&gt; K[HTTP Request: Publish to Contentful]\n```\n\n### Webhook: Chat Trigger\n\n**Type**: HTTP Webhook (POST /webhook/knowledge-article)\n\n**Payload**:\n\n```\n{ \n\t\"chatInput\": \"What topics should I write about?\" \n}\n```\n\n**Purpose**: Kicks off the workflow on that chat prompt.\n\n### AI Writer Agent\n\n**Inputs**: chatInput or existing article JSON\n\n**Outputs**:\n\n```\n{\n  \"title\": \"...\",\n  \"slug\": \"...\",\n  \"category.id\": \"...\",\n  \"description\": \"...\",\n  \"keywords\": [...],\n  \"content\": \"...\",\n  \"metaTitle\": \"...\",\n  \"metaDescription\": \"...\",\n  \"readingTime\": 5,\n  \"difficulty\": \"intermediate\"\n}\n```\n\n**Purpose**: Generates the article skeleton (metadata + initial content).\n\n# HTTP Request: Perplexity Content\n\n**Method:** POST\n\n**URL:** https://api.perplexity.ai/research\n\n**Body:**\n```json\n{\n  \"model\": \"sonar-deep-research\",\n  \"query\": \"{{ $json.title }}\",\n  \"length\": 1000\n}\n```\n\n**Purpose:** Retrieves a long-form, deeply researched draft for the article body.\n\n## Function: Format Output & Citations\n\n**Logic:**\n\n- Parse raw Perplexity response\n- Extract source URIs\n- Append them under a sources markdown list\n\n## Editorial Loop\n\n1. Initialize Counter to 0\n2. AI Editor Agent\n   - Reads draft JSON\n   - Returns either:\n     - `action: \"rewrite\" + improvements: [...]`\n     - or `action: \"submit\"`\n3. Merge Improvements (if rewriting)\n   - Applies suggested updates to JSON fields\n4. Limit Check\n   - Stops after 3 iterations or on \"submit\"\n\n## HTTP Request: Publish to Contentful\n\n**Method:** PUT\n\n**URL:** https://cdn.contentful.com/spaces/{space}/environments/master/entries/{entryId}\n\n**Headers:**\n- Authorization: Bearer &lt;token&gt;\n- Content-Type: application/vnd.contentful.management.v1+json\n\n**Body:** Maps JSON → Contentful entry fields\n\n**Outcome:** Publishes the finalized article live.\n\n## 🔍 Design Rationale & Best Practices\n\n### Separation of Concerns\nWriter vs. Editor agents isolate creative drafting from quality review.\n\n### Idempotent Loop\nCounter + action flags prevent infinite retries.\n\n### Extensibility\nSwap in different research APIs or CMS targets with minimal changes.\n\n### Structured JSON\nEnsures predictable input/output for each node.",
+  "featuredImage": "/data/workflows/4012/4012.webp",
+  "author": {
+    "id": 101,
+    "slug": "varritech",
+    "name": "Varritech",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5869,
+  "downloads": 586,
+  "createdAt": "2025-05-13T11:31:19.601Z",
+  "updatedAt": "2026-01-16T08:32:35.946Z",
+  "publishedAt": "2025-05-13T11:31:19.601Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4012"
+}

@@ -1,0 +1,133 @@
+{
+  "id": 8443,
+  "slug": "8443",
+  "title": "Daily competitor WordPress analysis with charts, Gemini & Telegram reporting",
+  "description": "## What this workflow does\nEvery night at 22:00 (Asia/Ho_Chi_Minh), the workflow fetches the latest posts from multiple competitor WordPress RSS feeds, upserts them into Google Sheets, captures a dashboard screenshot (via ApiFlash), has Gemini Vision analyze the chart, and sends a concise insight report to Telegram.\n\n## Details\n- Schedule (22:00) → runs daily.\n- Fetch RSS → HTTP Request (or RSS Read) pulls each competitor’s /feed/ (standard WordPress RSS).\n- Normalize & limit → parse XML → JSON, keep the most recent 5 per site for the digest (you can raise/lower this).\n- Upsert to Google Sheets → match on link to avoid duplicates; store fields like guid, site, link, title, excerpt/description, content (if available), pubDate, updated.\n- Screenshot the dashboard → ApiFlash captures the Google Sheets dashboard (specific gid) with your line chart of monthly post counts.\n- Vision analysis → Gemini 1.5-Flash analyzes the chart image and returns a short executive summary, a Markdown table of values (≈ when estimated), insights, and recommended next steps.\n- Telegram push → posts the AI summary (and optionally the screenshot) to your channel/group.\n\n\n## Who it’s for\n- SEO/Content/Marketing teams tracking competitor publishing cadence.\n- Founders/PMs who want a nightly snapshot.\n- Competitive intelligence and analytics roles.\n## Requirements\n1. n8n (cloud or self-hosted).\n2. Google Sheets OAuth2, Telegram Bot, ApiFlash (access key), Google Gemini access.\n3. A Google Sheet with columns similar to: id/guid, site, link, title, excerpt, content, pubDate, updated.\n4. Setup\n5. Import the workflow JSON into n8n.\n6. Switch to RSS:\n- Option A (simple): replace HTTP nodes with RSS Read and paste each competitor’s https://{domain}/feed/.\n- Option B (keep HTTP): keep HTTP Request nodes, set Response: XML, then parse with XML node.\n7. Mapping to Sheets: point to your documentId and sheetName; set matching column = link for upsert.\n8. ApiFlash: add access_key and the Sheet URL with the correct gid that shows your chart; set scale_factor=2 (or higher for clarity).\n9. Gemini Vision: use model gemini-1.5-flash-latest with the included prompt (English output; Markdown table + insights + recommendations).\n10. Telegram: set bot credentials and chatId.\n11. Schedule: confirm 22:00 Asia/Ho_Chi_Minh (adjust as needed).\n12. Test: run once → verify rows append/update → see dashboard render → receive AI summary in Telegram.\n\n\n## Extending to more competitors\n- Clone an HTTP/RSS node for each additional competitor, update the /feed/ URL, and connect it to the Merge node.\n- No other changes are required—new data will be normalized, upserted, included in charts and in the AI summary automatically.\n- Tips & gotchas\n- WordPress RSS typically includes title, link, pubDate, guid, description, and sometimes content:encoded. If content:encoded is absent, fall back to description.\n- Keep the Sheet chart source range dynamic (e.g., open-ended ranges) so new rows are reflected automatically.\n- If a site’s RSS limits items, you can run multiple feeds (e.g., category feeds) or capture more history on the first run.\n\n\n## 💡 About Margin AI\n[Margin Ai](http://marginai.co/) is an AI-services agency that acts as your AI Service Companion. We design intelligent, human-centric automation solutions—turning your team’s best practices into scalable workflows and tools. Industries like marketing, sales, and operations benefit from our tailored AI consulting, automation tools, and chatbot development.",
+  "featuredImage": "/data/workflows/8443/8443.webp",
+  "author": {
+    "id": 101,
+    "slug": "cong-nguyen",
+    "name": "Cong Nguyen",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 55,
+  "downloads": 5,
+  "createdAt": "2025-09-10T08:46:11.816Z",
+  "updatedAt": "2026-01-16T08:55:50.165Z",
+  "publishedAt": "2025-09-10T08:46:11.816Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8443",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Daily competitor WordPress analysis with charts, Gemini & Telegram reporting",
+    "workflowName": "Daily competitor WordPress analysis with charts, Gemini & Telegram reporting",
+    "description": "## What this workflow does\nEvery night at 22:00 (Asia/Ho_Chi_Minh), the workflow fetches the latest posts from multiple competitor WordPress RSS feeds, upserts them into Google Sheets, captures a dashboard screenshot (via ApiFlash), has Gemini Vision analyze the chart, and sends a concise insight report to Telegram.\n\n## Details\n- Schedule (22:00) → runs daily.\n- Fetch RSS → HTTP Request (or RSS Read) pulls each competitor’s /feed/ (standard WordPress RSS).\n- Normalize & limit → parse XML → JSON, keep the most recent 5 per site for the digest (you can raise/lower this).\n- Upsert to Google Sheets → match on link to avoid duplicates; store fields like guid, site, link, title, excerpt/description, content (if available), pubDate, updated.\n- Screenshot the dashboard → ApiFlash captures the Google Sheets dashboard (specific gid) with your line chart of monthly post counts.\n- Vision analysis → Gemini 1.5-Flash analyzes the chart image and returns a short executive summary, a Markdown table of values (≈ when estimated), insights, and recommended next steps.\n- Telegram push → posts the AI summary (and optionally the screenshot) to your channel/group.\n\n\n## Who it’s for\n- SEO/Content/Marketing teams tracking competitor publishing cadence.\n- Founders/PMs who want a nightly snapshot.\n- Competitive intelligence and analytics roles.\n## Requirements\n1. n8n (cloud or self-hosted).\n2. Google Sheets OAuth2, Telegram Bot, ApiFlash (access key), Google Gemini access.\n3. A Google Sheet with columns similar to: id/guid, site, link, title, excerpt, content, pubDate, updated.\n4. Setup\n5. Import the workflow JSON into n8n.\n6. Switch to RSS:\n- Option A (simple): replace HTTP nodes with RSS Read and paste each competitor’s https://{domain}/feed/.\n- Option B (keep HTTP): keep HTTP Request nodes, set Response: XML, then parse with XML node.\n7. Mapping to Sheets: point to your documentId and sheetName; set matching column = link for upsert.\n8. ApiFlash: add access_key and the Sheet URL with the correct gid that shows your chart; set scale_factor=2 (or higher for clarity).\n9. Gemini Vision: use model gemini-1.5-flash-latest with the included prompt (English output; Markdown table + insights + recommendations).\n10. Telegram: set bot credentials and chatId.\n11. Schedule: confirm 22:00 Asia/Ho_Chi_Minh (adjust as needed).\n12. Test: run once → verify rows append/update → see dashboard render → receive AI summary in Telegram.\n\n\n## Extending to more competitors\n- Clone an HTTP/RSS node for each additional competitor, update the /feed/ URL, and connect it to the Merge node.\n- No other changes are required—new data will be normalized, upserted, included in charts and in the AI summary automatically.\n- Tips & gotchas\n- WordPress RSS typically includes title, link, pubDate, guid, description, and sometimes content:encoded. If content:encoded is absent, fall back to description.\n- Keep the Sheet chart source range dynamic (e.g., open-ended ranges) so new rows are reflected automatically.\n- If a site’s RSS limits items, you can run multiple feeds (e.g., category feeds) or capture more history on the first run.\n\n\n## 💡 About Margin AI\n[Margin Ai](http://marginai.co/) is an AI-services agency that acts as your AI Service Companion. We design intelligent, human-centric automation solutions—turning your team’s best practices into scalable workflows and tools. Industries like marketing, sales, and operations benefit from our tailored AI consulting, automation tools, and chatbot development.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit2",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "APIFlash",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "RSS opponent 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "RSS opponent 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "RSS opponent 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

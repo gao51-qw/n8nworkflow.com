@@ -1,0 +1,128 @@
+{
+  "id": 3631,
+  "slug": "3631",
+  "title": "Build your own PostgreSQL MCP server",
+  "description": "### This n8n demonstrates how to build a simple PostgreSQL MCP server to manage your PostgreSQL database such as HR, Payroll, Sale, Inventory and More!\n\nThis MCP example is based off an official MCP reference implementation which can be found here -[https://github.com/modelcontextprotocol/servers/tree/main/src/postgres](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres)\n\n### How it works\n* A MCP server trigger is used and connected to 5 tools: 2 postgreSQL and 3 custom workflow.\n* The 2 postgreSQL tools are simple read-only queries and as such, the postgreSQL tool can be simply used.\n* The 3 custom workflow tools are used for select, insert and update queries as these are operations which require a bit more discretion.\n* Whilst it may be easier to allow the agent to use raw SQL queries, we may find it a little safer to just allow for the parameters instead. The custom workflow tool allows us to define this restricted schema for tool input which we'll use to construct the SQL statement ourselves.\n* All 3 custom workflow tools trigger the same \"Execute workflow\" trigger in this very template which has a switch to route the operation to the correct handler.\n* Finally, we use our standard PostgreSQL node to handle select, insert and update operations. The responses are then sent back to the the MCP client.\n\n### How to use\n* This PostgreSQL MCP server allows any compatible MCP client to manage a PostgreSQL database by supporting select, create and update operations. You will need to have a database available before you can use this server.\n* Connect your MCP client by following the n8n guidelines here - https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.mcptrigger/#integrating-with-claude-desktop\n* Try the following queries in your MCP client:\n  * \"Please help me check if Alex has an entry in the users table. If not, please help me create a record for her.\"\n  * \"What was the top selling product in the last week?\"\n  * \"How many high priority support tickets are still open this morning?\"\n\n### Requirements\n* PostgreSQL for database. This can be an external database such as Supabase or one you can host internally.\n* MCP Client or Agent for usage such as Claude Desktop - https://claude.ai/download\n\n### Customising this workflow\n* If the scope of schemas or tables is too open, try restrict it so the MCP serves a specific purpose for business operations. eg. Confine the querying and editing to HR only tables before providing access to people in that department.\n* Remember to set the MCP server to require credentials before going to production and sharing this MCP server with others!",
+  "featuredImage": "/data/workflows/3631/3631.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8804,
+  "downloads": 880,
+  "createdAt": "2025-04-21T10:09:09.689Z",
+  "updatedAt": "2026-01-16T08:30:44.742Z",
+  "publishedAt": "2025-04-21T10:09:09.689Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3631",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build your own PostgreSQL MCP server",
+    "workflowName": "Build your own PostgreSQL MCP server",
+    "description": "### This n8n demonstrates how to build a simple PostgreSQL MCP server to manage your PostgreSQL database such as HR, Payroll, Sale, Inventory and More!\n\nThis MCP example is based off an official MCP reference implementation which can be found here -[https://github.com/modelcontextprotocol/servers/tree/main/src/postgres](https://github.com/modelcontextprotocol/servers/tree/main/src/postgres)\n\n### How it works\n* A MCP server trigger is used and connected to 5 tools: 2 postgreSQL and 3 custom workflow.\n* The 2 postgreSQL tools are simple read-only queries and as such, the postgreSQL tool can be simply used.\n* The 3 custom workflow tools are used for select, insert and update queries as these are operations which require a bit more discretion.\n* Whilst it may be easier to allow the agent to use raw SQL queries, we may find it a little safer to just allow for the parameters instead. The custom workflow tool allows us to define this restricted schema for tool input which we'll use to construct the SQL statement ourselves.\n* All 3 custom workflow tools trigger the same \"Execute workflow\" trigger in this very template which has a switch to route the operation to the correct handler.\n* Finally, we use our standard PostgreSQL node to handle select, insert and update operations. The responses are then sent back to the the MCP client.\n\n### How to use\n* This PostgreSQL MCP server allows any compatible MCP client to manage a PostgreSQL database by supporting select, create and update operations. You will need to have a database available before you can use this server.\n* Connect your MCP client by following the n8n guidelines here - https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.mcptrigger/#integrating-with-claude-desktop\n* Try the following queries in your MCP client:\n  * \"Please help me check if Alex has an entry in the users table. If not, please help me create a record for her.\"\n  * \"What was the top selling product in the last week?\"\n  * \"How many high priority support tickets are still open this morning?\"\n\n### Requirements\n* PostgreSQL for database. This can be an external database such as Supabase or one you can host internally.\n* MCP Client or Agent for usage such as Claude Desktop - https://claude.ai/download\n\n### Customising this workflow\n* If the scope of schemas or tables is too open, try restrict it so the MCP serves a specific purpose for business operations. eg. Confine the querying and editing to HR only tables before providing access to people in that department.\n* Remember to set the MCP server to require credentials before going to production and sharing this MCP server with others!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "GetTableSchema",
+      "type": "n8n-nodes-base.postgresTool",
+      "role": "postgresTool",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "ListTables",
+      "type": "n8n-nodes-base.postgresTool",
+      "role": "postgresTool",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "CreateTableRecords",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "ReadTableRecord",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Operation",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "UpdateTableRecord",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "UpdateTableRecords",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "CreateTableRecord",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "ReadTableRows",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "PostgreSQL MCP Server",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "role": "mcpTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

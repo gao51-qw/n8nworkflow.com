@@ -1,0 +1,152 @@
+{
+  "id": 4712,
+  "slug": "4712",
+  "title": "Simple eval for legal benchmarking",
+  "description": "This workflow demonstrates a simple way to run evals on a set of test cases stored in a Google Sheet.\n\nThe example we are using comes from an info extraction task dataset, where we tested 6 different LLMs on 18 different test cases.\n\nYou can see our sample data in this spreadsheet [here](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) to get started.\n\nOnce you have this working for our dataset, you can plug in your own test cases matching different LLMs to see how it works with your own data.\n\n## How it works:\n- It loads test cases from Google Sheets. \n- For each row in our Google Sheet, it grabs the source document, converting it to text.\n- Our \"LLM judge\" passes the input/output of each LLM to GPT-4.1 to evaluate each test case (Pass/Fail + Reason).\n- It logs the outcome to a Google Sheet.\n- A 0.5s pause between each request gets around OpenAI's API rate limits.\n\n## Set up steps:\n- Add your credentials for Google Sheets, Google Drive, and [OpenRouter](https://openrouter.ai/).\n- Make a copy of the [original data spreadsheet](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) so that you can edit it yourself. You will need to plug your version in the Update Results node to see the spreadsheet update on each run of the loop.",
+  "featuredImage": "/data/workflows/4712/4712.webp",
+  "author": {
+    "id": 101,
+    "slug": "adamjanes",
+    "name": "Adam Janes",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 666,
+  "downloads": 66,
+  "createdAt": "2025-06-06T01:08:26.025Z",
+  "updatedAt": "2026-01-16T08:35:45.587Z",
+  "publishedAt": "2025-06-06T01:08:26.025Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4712",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Simple eval for legal benchmarking",
+    "workflowName": "Simple eval for legal benchmarking",
+    "description": "This workflow demonstrates a simple way to run evals on a set of test cases stored in a Google Sheet.\n\nThe example we are using comes from an info extraction task dataset, where we tested 6 different LLMs on 18 different test cases.\n\nYou can see our sample data in this spreadsheet [here](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) to get started.\n\nOnce you have this working for our dataset, you can plug in your own test cases matching different LLMs to see how it works with your own data.\n\n## How it works:\n- It loads test cases from Google Sheets. \n- For each row in our Google Sheet, it grabs the source document, converting it to text.\n- Our \"LLM judge\" passes the input/output of each LLM to GPT-4.1 to evaluate each test case (Pass/Fail + Reason).\n- It logs the outcome to a Google Sheet.\n- A 0.5s pause between each request gets around OpenAI's API rate limits.\n\n## Set up steps:\n- Add your credentials for Google Sheets, Google Drive, and [OpenRouter](https://openrouter.ai/).\n- Make a copy of the [original data spreadsheet](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) so that you can edit it yourself. You will need to plug your version in the Update Results node to see the spreadsheet update on each run of the loop.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Tests",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "LLM Judge",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is PDF?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Is a file?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "id": 7924,
+  "slug": "7924",
+  "title": "Automate code reviews for GitLab MRs with Gemini AI and JIRA context",
+  "description": "### What it does\n\nAutomates code review by listening for a comment trigger on GitLab merge requests, summarising the diff, and using an LLM to post constructive, line‑specific feedback. If a JIRA ticket ID is found in the MR description, the ticket’s summary is used to inform the AI review.\n\n### Use cases\n\n- Quickly obtain high‑quality feedback on MRs without waiting for peers.\n- Highlight logic, security or performance issues that might slip through cursory reviews.\n- Incorporate project context by pulling in related JIRA ticket summaries.\n\n### Good to know\n\n- Triggered by commenting `ai-review` on a merge request.\n- The LLM returns only high‑value findings; if nothing critical is detected, the workflow posts an “all clear” message.\n- You can swap out the LLM (Gemini, OpenAI, etc.) or adjust the prompt to fit your team’s guidelines.\n- AI usage may incur costs or be geo‑restricted depending on your provider n8n.io.\n\n### How it works\n- **Webhook listener:** A Webhook node captures GitLab note events and filters for the trigger phrase.\n\n- **Fetch & parse:** The workflow retrieves MR details and diffs, splitting each change into “original” and “new” code blocks.\n\n- **Optional JIRA context:** If your MR description includes a JIRA key (e.g., PROJ-123), the workflow fetches the ticket (and parent ticket for subtasks) and composes a brief context summary.\n\n- **LLM review:** The parsed diff and optional context are sent to an LLM with instructions to identify logic, security or performance issues and suggest improvements.\n\n- **Post results:** Inline comments are posted back to the MR at the appropriate file/line positions; if no issues are found, a single “all clear” note is posted.\n\n### How to use\n\n- Import the template JSON and open the Webhook node. Replace the `REPLACE_WITH_UNIQUE_PATH` placeholder with your desired path and configure a GitLab project webhook to send MR comments to that URL.\n- Select your LLM credentials in the Gemini (or other LLM) node, and optionally add JIRA credentials in the JIRA nodes.\n- Activate the workflow and comment `ai-review` on any merge request to test it.\n- For each review, the workflow posts status updates (“AI review initiated…”) and final comments.\n\n### Requirements\n\n- A GitLab project with a generate Personal Access Token (PAT) stored as an environment variable (`GITLAB_TOKEN`).\n- LLM credentials (e.g., Google Gemini) and optional JIRA credentials.\n\n### Customising this workflow\n\n- Change the trigger phrase in the Trigger Phrase Filter node.\n- Modify the LLM prompt to focus on different aspects (e.g., style, documentation).\n- Filter out certain file types or directories before sending diffs to the LLM.\n- Integrate other services (Slack, email) to notify teams when reviews are complete.",
+  "featuredImage": "/data/workflows/7924/7924.webp",
+  "author": {
+    "id": 101,
+    "slug": "jenyok",
+    "name": "Evgeny Agronsky",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 899,
+  "downloads": 89,
+  "createdAt": "2025-08-26T22:07:57.203Z",
+  "updatedAt": "2026-01-16T08:53:04.509Z",
+  "publishedAt": "2025-08-26T22:07:57.203Z",
+  "nodes": 41,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7924",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate code reviews for GitLab MRs with Gemini AI and JIRA context",
+    "workflowName": "Automate code reviews for GitLab MRs with Gemini AI and JIRA context",
+    "description": "### What it does\n\nAutomates code review by listening for a comment trigger on GitLab merge requests, summarising the diff, and using an LLM to post constructive, line‑specific feedback. If a JIRA ticket ID is found in the MR description, the ticket’s summary is used to inform the AI review.\n\n### Use cases\n\n- Quickly obtain high‑quality feedback on MRs without waiting for peers.\n- Highlight logic, security or performance issues that might slip through cursory reviews.\n- Incorporate project context by pulling in related JIRA ticket summaries.\n\n### Good to know\n\n- Triggered by commenting `ai-review` on a merge request.\n- The LLM returns only high‑value findings; if nothing critical is detected, the workflow posts an “all clear” message.\n- You can swap out the LLM (Gemini, OpenAI, etc.) or adjust the prompt to fit your team’s guidelines.\n- AI usage may incur costs or be geo‑restricted depending on your provider n8n.io.\n\n### How it works\n- **Webhook listener:** A Webhook node captures GitLab note events and filters for the trigger phrase.\n\n- **Fetch & parse:** The workflow retrieves MR details and diffs, splitting each change into “original” and “new” code blocks.\n\n- **Optional JIRA context:** If your MR description includes a JIRA key (e.g., PROJ-123), the workflow fetches the ticket (and parent ticket for subtasks) and composes a brief context summary.\n\n- **LLM review:** The parsed diff and optional context are sent to an LLM with instructions to identify logic, security or performance issues and suggest improvements.\n\n- **Post results:** Inline comments are posted back to the MR at the appropriate file/line positions; if no issues are found, a single “all clear” note is posted.\n\n### How to use\n\n- Import the template JSON and open the Webhook node. Replace the `REPLACE_WITH_UNIQUE_PATH` placeholder with your desired path and configure a GitLab project webhook to send MR comments to that URL.\n- Select your LLM credentials in the Gemini (or other LLM) node, and optionally add JIRA credentials in the JIRA nodes.\n- Activate the workflow and comment `ai-review` on any merge request to test it.\n- For each review, the workflow posts status updates (“AI review initiated…”) and final comments.\n\n### Requirements\n\n- A GitLab project with a generate Personal Access Token (PAT) stored as an environment variable (`GITLAB_TOKEN`).\n- LLM credentials (e.g., Google Gemini) and optional JIRA credentials.\n\n### Customising this workflow\n\n- Change the trigger phrase in the Trigger Phrase Filter node.\n- Modify the LLM prompt to focus on different aspects (e.g., style, documentation).\n- Filter out certain file types or directories before sending diffs to the LLM.\n- Integrate other services (Slack, email) to notify teams when reviews are complete.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Need Review",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Skip File Changes",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract the JIRA Issue ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get JIRA issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format JIRA Context",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract MR Details",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If JIRA Subtask",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get JIRA Parent Issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format JIRA Parent Context",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get MR Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Code Changes",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge LLM Output with Input",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Filter Irrelevant Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Any Issues Found?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Split Out Changes",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out Comments",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Request Without Position",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set workflow execution information",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post Review Started",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Listen For Gitlab Comments",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Diff",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post No Issues Found",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post Error Occurred",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Static Context Including Error",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Static Context",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Cleanup Static Context",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process Comments",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post Gitlab MR Comments",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Try It Out!",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 1: Listen & Capture",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 2: Prepare & Review",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 3: Post & Fallback",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Static Context & Error Handling",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Need Help & Customise",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post Gitlab MR Comments WIthout Position",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

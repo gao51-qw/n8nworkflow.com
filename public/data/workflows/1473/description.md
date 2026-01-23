@@ -1,0 +1,1 @@
+This is the second workflow for the Mattermost Standup Bot. This workflow is called by the 'Standup Bot - Worker' workflow and will read and return the configuration options.

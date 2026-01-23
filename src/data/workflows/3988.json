@@ -1,0 +1,254 @@
+{
+  "id": 3988,
+  "slug": "3988",
+  "title": "Access control for AI agents (RBAC) using Airtable and Telegram",
+  "description": "## Purpose\n\nThis workflow allows granular control over the access to tools connected to AI Agents (including Multi-Agent setups) using **R**ole **B**ased **A**ccess **C**ontrol.\n\n## Demo & Explanation\n\n[![demo video](https://img.youtube.com/vi/eNgik9NR0wg/0.jpg)](https://youtu.be/eNgik9NR0wg)\n\n## How it works\n\n- User permissions are managed in Airtable where every restricted AI tool is listed by name and connected via roles to users\n- Requests to the Main Agent can be sent through a Telegram message (can be replaced by Whatsapp, IMAP or similar)\n- On every request the Telegram username is used to query a list of all allowed tools which are linked in Airtable\n- A LangChain Code node is used to compare that list against the connected tools\n- Every tool which is not permitted to be used is being replaced by a tool, which has a status response, telling the Agent to return a message to the user, that he is not authorized to use the tool\n- Otherwise allowed tools are passed through to the Agent, as if they were connected directly to the Agent\n- The parameters can also be passed to a sub-agent called as a sub-workflow where permissions can be checked the same way\n- Every response is sent back to the same Telegram conversation\n\n## Setup\n\n- Clone the workflow and select the belonging credentials. You'll need an OpenAI and Airtable Account as well as a Telegram Bot (refer to the docs for the [Telegram credentials](https://docs.n8n.io/integrations/builtin/credentials/telegram/)).\n- Copy [this Airtable Template](https://airtable.com/appi5nijuvzQbZLJJ/shr8OkLysG1VtlCiz) into your workspace\n- Follow the instructions given in the yellow sticky notes\n- Activate the workflow\n\n## How to use\n\nTry this example:\n\n- Create a new line in Airtable under “Users” containing your Telegram username and your full name\n- Set the roles “basic” and “info”\n- *Consider temporarily disconnecting or resetting the chat memories so they do not remember previous confirmations*\n- Start a new chat, asking about your permitted roles - you should get a list of those\n- Ask about the current weather in your city - you should be informed, that you do not have permission to access that information\n- Back in Airtable add the role “weather” to your user\n- Now ask the Agent the same question again - It should give you a proper answer this time\n\nFrom here on you can add tools and create roles to your likings.\n\n## Disclaimer\n\nPlease note, that this workflow can only run on self-hosted n8n instances, since it requires the LangChain Code Node.",
+  "featuredImage": "/data/workflows/3988/3988.webp",
+  "author": {
+    "id": 101,
+    "slug": "octionic",
+    "name": "Mario",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1575,
+  "downloads": 157,
+  "createdAt": "2025-05-11T20:09:38.591Z",
+  "updatedAt": "2026-01-16T08:32:32.211Z",
+  "publishedAt": "2025-05-11T20:09:38.591Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3988",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Access control for AI agents (RBAC) using Airtable and Telegram",
+    "workflowName": "Access control for AI agents (RBAC) using Airtable and Telegram",
+    "description": "## Purpose\n\nThis workflow allows granular control over the access to tools connected to AI Agents (including Multi-Agent setups) using **R**ole **B**ased **A**ccess **C**ontrol.\n\n## Demo & Explanation\n\n[![demo video](https://img.youtube.com/vi/eNgik9NR0wg/0.jpg)](https://youtu.be/eNgik9NR0wg)\n\n## How it works\n\n- User permissions are managed in Airtable where every restricted AI tool is listed by name and connected via roles to users\n- Requests to the Main Agent can be sent through a Telegram message (can be replaced by Whatsapp, IMAP or similar)\n- On every request the Telegram username is used to query a list of all allowed tools which are linked in Airtable\n- A LangChain Code node is used to compare that list against the connected tools\n- Every tool which is not permitted to be used is being replaced by a tool, which has a status response, telling the Agent to return a message to the user, that he is not authorized to use the tool\n- Otherwise allowed tools are passed through to the Agent, as if they were connected directly to the Agent\n- The parameters can also be passed to a sub-agent called as a sub-workflow where permissions can be checked the same way\n- Every response is sent back to the same Telegram conversation\n\n## Setup\n\n- Clone the workflow and select the belonging credentials. You'll need an OpenAI and Airtable Account as well as a Telegram Bot (refer to the docs for the [Telegram credentials](https://docs.n8n.io/integrations/builtin/credentials/telegram/)).\n- Copy [this Airtable Template](https://airtable.com/appi5nijuvzQbZLJJ/shr8OkLysG1VtlCiz) into your workspace\n- Follow the instructions given in the yellow sticky notes\n- Activate the workflow\n\n## How to use\n\nTry this example:\n\n- Create a new line in Airtable under “Users” containing your Telegram username and your full name\n- Set the roles “basic” and “info”\n- *Consider temporarily disconnecting or resetting the chat memories so they do not remember previous confirmations*\n- Start a new chat, asking about your permitted roles - you should get a list of those\n- Ask about the current weather in your city - you should be informed, that you do not have permission to access that information\n- Back in Airtable add the role “weather” to your user\n- Now ask the Agent the same question again - It should give you a proper answer this time\n\nFrom here on you can add tools and create roles to your likings.\n\n## Disclaimer\n\nPlease note, that this workflow can only run on self-hosted n8n instances, since it requires the LangChain Code Node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check permissions",
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get user permissions",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Check permissions1",
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "list_granted_roles",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "list_allowed_tools",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "role": "toolWikipedia",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_coordinates",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "role": "toolHttpRequest",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "get_weather",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "role": "toolHttpRequest",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "weather_agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Weather Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Unknown user",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Reply: unknown user",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Reply with results",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Main Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

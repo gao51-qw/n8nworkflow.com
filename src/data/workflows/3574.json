@@ -1,0 +1,170 @@
+{
+  "id": 3574,
+  "slug": "3574",
+  "title": "Create a Paul Graham essay Q&A system with OpenAI and Milvus vector database",
+  "description": "### Create a Paul Graham Essay Q&A System with OpenAI and Milvus Vector Database\n#### How It Works\n\nThis workflow creates a question-answering system based on Paul Graham essays. It has two main steps:\n\n1. **Data Collection & Processing**: \n   - Scrapes [Paul Graham essays](http://www.paulgraham.com/articles.html)\n   - Extracts text content\n   - Loads them into a [Milvus](https://milvus.io/) vector store\n\n2. **Chat Interaction**:\n   - Provides a question-answering interface using the stored vector embeddings\n   - Utilizes [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) for semantic search\n\n#### Set Up Steps\n\n1. Set up a Milvus server following the [official guide](https://milvus.io/docs/install_standalone-docker.md)\n2. Create a collection named \"my_collection\"\n3. Run the workflow to scrape and load Paul Graham essays\n4. Start chatting with the QA system\n\nThe workflow handles the entire process from fetching essays, extracting content, generating embeddings via OpenAI, storing vectors in Milvus, and providing retrieval for question answering.",
+  "featuredImage": "/data/workflows/3574/3574.webp",
+  "author": {
+    "id": 101,
+    "slug": "zc277584121",
+    "name": "Cheney Zhang",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1144,
+  "downloads": 114,
+  "createdAt": "2025-04-16T13:00:23.190Z",
+  "updatedAt": "2026-01-16T08:30:24.360Z",
+  "publishedAt": "2025-04-16T13:00:23.190Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3574",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create a Paul Graham essay Q&A system with OpenAI and Milvus vector database",
+    "workflowName": "Create a Paul Graham essay Q&A system with OpenAI and Milvus vector database",
+    "description": "### Create a Paul Graham Essay Q&A System with OpenAI and Milvus Vector Database\n#### How It Works\n\nThis workflow creates a question-answering system based on Paul Graham essays. It has two main steps:\n\n1. **Data Collection & Processing**: \n   - Scrapes [Paul Graham essays](http://www.paulgraham.com/articles.html)\n   - Extracts text content\n   - Loads them into a [Milvus](https://milvus.io/) vector store\n\n2. **Chat Interaction**:\n   - Provides a question-answering interface using the stored vector embeddings\n   - Utilizes [OpenAI embeddings](https://platform.openai.com/docs/guides/embeddings) for semantic search\n\n#### Set Up Steps\n\n1. Set up a Milvus server following the [official guide](https://milvus.io/docs/install_standalone-docker.md)\n2. Create a collection named \"my_collection\"\n3. Run the workflow to scrape and load Paul Graham essays\n4. Start chatting with the QA system\n\nThe workflow handles the entire process from fetching essays, extracting content, generating embeddings via OpenAI, storing vectors in Milvus, and providing retrieval for question answering.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Essay List",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract essay names",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split out into items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch essay texts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Limit to first 3",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Text Only",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Milvus Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMilvus",
+      "role": "vectorStoreMilvus",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Milvus Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMilvus",
+      "role": "vectorStoreMilvus",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Q&A Chain to Retrieve from Milvus and Answer Question",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "role": "chainRetrievalQa",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Milvus Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "role": "retrieverVectorStore",
+      "configDescription": "Version 1"
+    }
+  ]
+}

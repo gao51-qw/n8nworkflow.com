@@ -1,0 +1,206 @@
+{
+  "id": 2809,
+  "slug": "2809",
+  "title": "Microsoft Outlook AI email assistant with contact support from Monday and Airtable",
+  "description": "# Microsoft Outlook AI Email Assistant\n\n## **Prerequisites**\n\n### **1. Microsoft 365 Login Credentials**\n- Provide your Office 365 credentials to connect Outlook.\n\n### **2. Monday.com**\n- Generate an API token and have a board with your contact details.\n\n### **3. Airtable**\n- Obtain an API key (or personal access token) and set up a base to store:\n  - **Contacts** (populated by the Monday.com sync).\n  - **Rules & Categories** (used by the AI Email Assistant).\n- Use this Airtable base as the template: [Airtable AI Email Assistant Template](https://airtable.com/appuffxqy5HlNYAXJ/shrhb2T92ZMF8FezS/tblP9SIola8yglSc0/viwxAIMM6TvWoahfM?blocks=hide). Define your own rules, categories, and delete rules.\n\n### **4. OpenAI API Key**\n- Sign up for OpenAI if you don’t already have an account.\n- Generate a new API key at [OpenAI API Keys](https://platform.openai.com/api-keys).\n\n---\n\n## **What the System Does**\n\n### **1. Daily Contact Sync (Monday.com → Airtable)**\n- Runs **once a day** to pull the latest contacts from Monday.com and store or update them in Airtable.\n\n### **2. AI Email Categorisation & Prioritisation**\n- Fetches **Outlook emails** with filters.\n- Cleans and processes email content.\n- Matches emails with known contacts from Airtable.\n- Uses an **AI agent** to classify, categorise, and prioritise emails.\n- Updates **Outlook categories and importance** based on AI results.\n- Runs in parallel with **Airtable rules & categories retrieval** for real-time decision-making.\n\n---\n\n# **Workflow 1: Daily Contact Sync (Monday.com → Airtable)**\n\n### **Purpose**\nKeep Airtable’s **Contacts** table up to date by pulling new or updated contact data from Monday.com **daily**.\n\n### **Steps**\n1. **Schedule Trigger**  \n   - Runs at a set interval (daily) to initiate contact syncing.\n\n2. **Monday.com: Get Contacts**  \n   - Reads the specified **board/columns** from Monday.com where you store contact details.\n\n3. **Airtable - Contacts**  \n   - **Upserts** (adds or updates) the fetched Monday.com data into Airtable’s **Contacts** table.\n   - Ensures **daily updates** reflect changes from Monday.com.\n\n### **Result**\nA **consolidated contact list** in Airtable, ready for AI email categorisation.\n\n---\n\n# **Workflow 2: Categorise & Prioritise Outlook Emails**\n\n### **Purpose**\nFetches **Outlook emails**, cleans and processes their content, **matches senders** with known contacts, and uses AI to categorise and prioritise them.\n\n### **Steps**\n\n#### **1. Get Outlook Emails with Filters**\n- **Trigger**: Either scheduled (`Check Mail Schedule Trigger`) or manual (`Test Workflow`).\n- **Outlook Filters**:\n  - **Not flagged** (`flag/flagStatus == 'notFlagged'`).\n  - **Not categorised** (`not categories/any()`).\n\n**🔹 Result**: A batch of **fresh, unprocessed emails** ready for processing.\n\n---\n\n#### **2. Sanitise Email**\n- **Convert to Markdown**: Strips **HTML tags** and normalises formatting.\n- **Email Messages Processing**: Allows manual removal of **signatures, disclaimers, or extra content**.\n\n**🔹 Result**: A **clean, AI-friendly email** for categorisation.\n\n---\n\n#### **3. Match Contact**\n- **Loop Over Emails**: Iterates over each email.\n- **Contact Lookup**: Checks Airtable’s **Contacts** table (updated daily).\n- **Merge Data**: Enriches emails with known **client, supplier, or internal team** info.\n\n**🔹 Result**: Enhanced email context **for AI processing**.\n\n---\n\n#### **4. AI Agent to Categorise & Prioritise**\n- **Retrieve Rules & Categories**  \n  - Reads **Rules, Categories, and Delete Rules** from Airtable in parallel.\n- **AI: Analyse Email (Tools Agent)**  \n  - Uses **email text, sender info, and rules** to build a **structured AI prompt**.\n- **OpenAI Chat Model**  \n  - Processes the AI prompt and outputs:\n    - **Category**\n    - **Subcategory (optional)**\n    - **Priority level**\n    - **Short rationale**\n- **Structured Output Parser**  \n  - Ensures AI response is valid **JSON format**.\n\n**🔹 Result**:  \nEach email is **labelled, categorised, and prioritised** with AI-driven logic.\n\n---\n\n#### **5. Set Outlook Category & Importance**\n- **Set Category**: Updates Outlook with the assigned **category**.\n- **Check Priority Conditions** (`If` Node):  \n  - If **Action Required** or from a VIP, mark as **High Priority**.\n- **Set Importance**: Updates the email's **importance flag** in Outlook.\n\n**🔹 Result**:  \nOutlook is updated with **categories & importance** based on AI recommendations.\n\n---\n\n## **Parallel Processing: Retrieve Rules & Categories**\n- Runs **alongside** the email categorisation workflow.\n- Ensures **Airtable-based rules** are available before AI processing.\n\n### **Steps**\n1. **Airtable: Get Rules & Categories**  \n   - Fetches **Rules, Categories, and Delete Rules** from Airtable.\n2. **Delete Rules (Optional)**  \n   - If a delete rule matches, the email is removed.\n\n**🔹 Result**:  \nA dynamic, **updatable rule system** ensuring emails are handled properly.\n\n---\n\n## **Final Outcome**\n- **Daily Contact Sync** keeps contacts up to date.\n- **AI-driven email workflow** ensures smart categorisation.\n- **Outlook automatically updated** with AI-generated categories and importance.\n\n---\n\nThis **automated system** saves time, ensures **efficient inbox management**, and allows for **customisable rules** via Airtable.\n",
+  "featuredImage": "/data/workflows/2809/2809.webp",
+  "author": {
+    "id": 101,
+    "slug": "cognitivecreators",
+    "name": "Cognitive Creators",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 6880,
+  "downloads": 688,
+  "createdAt": "2025-01-28T05:04:49.156Z",
+  "updatedAt": "2026-01-16T08:26:37.972Z",
+  "publishedAt": "2025-01-28T05:04:49.156Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2809",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Microsoft Outlook AI email assistant with contact support from Monday and Airtable",
+    "workflowName": "Microsoft Outlook AI email assistant with contact support from Monday and Airtable",
+    "description": "# Microsoft Outlook AI Email Assistant\n\n## **Prerequisites**\n\n### **1. Microsoft 365 Login Credentials**\n- Provide your Office 365 credentials to connect Outlook.\n\n### **2. Monday.com**\n- Generate an API token and have a board with your contact details.\n\n### **3. Airtable**\n- Obtain an API key (or personal access token) and set up a base to store:\n  - **Contacts** (populated by the Monday.com sync).\n  - **Rules & Categories** (used by the AI Email Assistant).\n- Use this Airtable base as the template: [Airtable AI Email Assistant Template](https://airtable.com/appuffxqy5HlNYAXJ/shrhb2T92ZMF8FezS/tblP9SIola8yglSc0/viwxAIMM6TvWoahfM?blocks=hide). Define your own rules, categories, and delete rules.\n\n### **4. OpenAI API Key**\n- Sign up for OpenAI if you don’t already have an account.\n- Generate a new API key at [OpenAI API Keys](https://platform.openai.com/api-keys).\n\n---\n\n## **What the System Does**\n\n### **1. Daily Contact Sync (Monday.com → Airtable)**\n- Runs **once a day** to pull the latest contacts from Monday.com and store or update them in Airtable.\n\n### **2. AI Email Categorisation & Prioritisation**\n- Fetches **Outlook emails** with filters.\n- Cleans and processes email content.\n- Matches emails with known contacts from Airtable.\n- Uses an **AI agent** to classify, categorise, and prioritise emails.\n- Updates **Outlook categories and importance** based on AI results.\n- Runs in parallel with **Airtable rules & categories retrieval** for real-time decision-making.\n\n---\n\n# **Workflow 1: Daily Contact Sync (Monday.com → Airtable)**\n\n### **Purpose**\nKeep Airtable’s **Contacts** table up to date by pulling new or updated contact data from Monday.com **daily**.\n\n### **Steps**\n1. **Schedule Trigger**  \n   - Runs at a set interval (daily) to initiate contact syncing.\n\n2. **Monday.com: Get Contacts**  \n   - Reads the specified **board/columns** from Monday.com where you store contact details.\n\n3. **Airtable - Contacts**  \n   - **Upserts** (adds or updates) the fetched Monday.com data into Airtable’s **Contacts** table.\n   - Ensures **daily updates** reflect changes from Monday.com.\n\n### **Result**\nA **consolidated contact list** in Airtable, ready for AI email categorisation.\n\n---\n\n# **Workflow 2: Categorise & Prioritise Outlook Emails**\n\n### **Purpose**\nFetches **Outlook emails**, cleans and processes their content, **matches senders** with known contacts, and uses AI to categorise and prioritise them.\n\n### **Steps**\n\n#### **1. Get Outlook Emails with Filters**\n- **Trigger**: Either scheduled (`Check Mail Schedule Trigger`) or manual (`Test Workflow`).\n- **Outlook Filters**:\n  - **Not flagged** (`flag/flagStatus == 'notFlagged'`).\n  - **Not categorised** (`not categories/any()`).\n\n**🔹 Result**: A batch of **fresh, unprocessed emails** ready for processing.\n\n---\n\n#### **2. Sanitise Email**\n- **Convert to Markdown**: Strips **HTML tags** and normalises formatting.\n- **Email Messages Processing**: Allows manual removal of **signatures, disclaimers, or extra content**.\n\n**🔹 Result**: A **clean, AI-friendly email** for categorisation.\n\n---\n\n#### **3. Match Contact**\n- **Loop Over Emails**: Iterates over each email.\n- **Contact Lookup**: Checks Airtable’s **Contacts** table (updated daily).\n- **Merge Data**: Enriches emails with known **client, supplier, or internal team** info.\n\n**🔹 Result**: Enhanced email context **for AI processing**.\n\n---\n\n#### **4. AI Agent to Categorise & Prioritise**\n- **Retrieve Rules & Categories**  \n  - Reads **Rules, Categories, and Delete Rules** from Airtable in parallel.\n- **AI: Analyse Email (Tools Agent)**  \n  - Uses **email text, sender info, and rules** to build a **structured AI prompt**.\n- **OpenAI Chat Model**  \n  - Processes the AI prompt and outputs:\n    - **Category**\n    - **Subcategory (optional)**\n    - **Priority level**\n    - **Short rationale**\n- **Structured Output Parser**  \n  - Ensures AI response is valid **JSON format**.\n\n**🔹 Result**:  \nEach email is **labelled, categorised, and prioritised** with AI-driven logic.\n\n---\n\n#### **5. Set Outlook Category & Importance**\n- **Set Category**: Updates Outlook with the assigned **category**.\n- **Check Priority Conditions** (`If` Node):  \n  - If **Action Required** or from a VIP, mark as **High Priority**.\n- **Set Importance**: Updates the email's **importance flag** in Outlook.\n\n**🔹 Result**:  \nOutlook is updated with **categories & importance** based on AI recommendations.\n\n---\n\n## **Parallel Processing: Retrieve Rules & Categories**\n- Runs **alongside** the email categorisation workflow.\n- Ensures **Airtable-based rules** are available before AI processing.\n\n### **Steps**\n1. **Airtable: Get Rules & Categories**  \n   - Fetches **Rules, Categories, and Delete Rules** from Airtable.\n2. **Delete Rules (Optional)**  \n   - If a delete rule matches, the email is removed.\n\n**🔹 Result**:  \nA dynamic, **updatable rule system** ensuring emails are handled properly.\n\n---\n\n## **Final Outcome**\n- **Daily Contact Sync** keeps contacts up to date.\n- **AI-driven email workflow** ensures smart categorisation.\n- **Outlook automatically updated** with AI-generated categories and importance.\n\n---\n\nThis **automated system** saves time, ensures **efficient inbox management**, and allows for **customisable rules** via Airtable.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Microsoft Outlook23",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Category",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set Importance",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI: Analyse Email",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Mail Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Contacts Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Monday.com - Get Contacts",
+      "type": "n8n-nodes-base.mondayCom",
+      "role": "mondayCom",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airtable - Contacts",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Convert to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email Messages",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Rules",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Categories",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Delete Rules",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Contact",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

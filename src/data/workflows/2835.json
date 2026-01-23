@@ -1,0 +1,133 @@
+{
+  "id": 2835,
+  "slug": "2835",
+  "title": "Docker registry cleanup workflow",
+  "description": "# Docker Registry Cleanup Template\n\nThis template is designed to automatically clean up old image tags in the Docker registry and perform garbage collection.\n\n## Features\n- List all images in the registry\n- Preserve the last 10 tags for each image (latest tag is always preserved)\n- Delete old tags\n- Email notification for Successful/Excused cancellation\n- Registry garbage collection automation\n- Failure notification in error conditions\n\n## Prerequisites\n1. Docker Registry v2 API access\n2. Basic Authentication credentials\n3. SMTP email settings (for notifications)\n4. SSH node installed on n8n (for garbage collection)\n\n## Installation\n\n### 1. Identity Information\nAdd the following credentials in n8n:\n- **HTTP Basic Auth**: For Registry access\n- **SSH Private Key**: For Garbage collection command\n- **Email SMTP**: For notifications\n\n### 2. Set Variables\nReplace `your-registry-url` with your actual registry URL on all nodes:\n```json\n‘url\": ‘https://your.registry.com/v2/_catalog’.\n```\n\n### Customisation\n#### Retention Policy: \nSet the number of tags to be retained by changing the **slice(0, 10)** value in the  **Identify Tags to Remove** node\n#### Schedule:\nChange the frequency of operation at the Trigger node\n#### Notification Content: \nCustomise email templates according to your needs\n\n### Notes\n- Check DELETE operations before running in a test environment\n\n- Make sure that the registry is not in read-only mode\n\n- The registry may need to be put into maintenance mode for garbage collection\n\n### Step Details:\n- **Retrieving image information:** The workflow starts by fetching a list of images and their associated tags from the Docker registry.\n- **Filtering and sorting:** The retrieved tags are then filtered and sorted based on specific criteria, such as creation date and tag name.\n- **Deleting old tags:** The workflow identifies old or unused tags and attempts to delete them from the registry.\n- **Sending notifications:** The workflow sends email notifications to inform the user about the status of the cleanup process, including any errors or successes.\n- **Executing additional cleanup tasks:** Finally, the workflow executes an SSH command on the Docker registry server to perform additional cleanup tasks, such as garbage collection.\n\n### TL;DR\nIn summary, this n8n template provides a robust and automated solution for managing and cleaning up Docker registries. By regularly running this workflow, users can ensure that their registry remains organized and efficient, and avoid running out of storage space.- ",
+  "featuredImage": "/data/workflows/2835/2835.webp",
+  "author": {
+    "id": 101,
+    "slug": "victorious",
+    "name": "Muzaffer AKYIL",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3659,
+  "downloads": 365,
+  "createdAt": "2025-02-01T23:26:03.445Z",
+  "updatedAt": "2026-01-16T08:26:46.668Z",
+  "publishedAt": "2025-02-01T23:26:03.445Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2835",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Docker registry cleanup workflow",
+    "workflowName": "Docker registry cleanup workflow",
+    "description": "# Docker Registry Cleanup Template\n\nThis template is designed to automatically clean up old image tags in the Docker registry and perform garbage collection.\n\n## Features\n- List all images in the registry\n- Preserve the last 10 tags for each image (latest tag is always preserved)\n- Delete old tags\n- Email notification for Successful/Excused cancellation\n- Registry garbage collection automation\n- Failure notification in error conditions\n\n## Prerequisites\n1. Docker Registry v2 API access\n2. Basic Authentication credentials\n3. SMTP email settings (for notifications)\n4. SSH node installed on n8n (for garbage collection)\n\n## Installation\n\n### 1. Identity Information\nAdd the following credentials in n8n:\n- **HTTP Basic Auth**: For Registry access\n- **SSH Private Key**: For Garbage collection command\n- **Email SMTP**: For notifications\n\n### 2. Set Variables\nReplace `your-registry-url` with your actual registry URL on all nodes:\n```json\n‘url\": ‘https://your.registry.com/v2/_catalog’.\n```\n\n### Customisation\n#### Retention Policy: \nSet the number of tags to be retained by changing the **slice(0, 10)** value in the  **Identify Tags to Remove** node\n#### Schedule:\nChange the frequency of operation at the Trigger node\n#### Notification Content: \nCustomise email templates according to your needs\n\n### Notes\n- Check DELETE operations before running in a test environment\n\n- Make sure that the registry is not in read-only mode\n\n- The registry may need to be put into maintenance mode for garbage collection\n\n### Step Details:\n- **Retrieving image information:** The workflow starts by fetching a list of images and their associated tags from the Docker registry.\n- **Filtering and sorting:** The retrieved tags are then filtered and sorted based on specific criteria, such as creation date and tag name.\n- **Deleting old tags:** The workflow identifies old or unused tags and attempts to delete them from the registry.\n- **Sending notifications:** The workflow sends email notifications to inform the user about the status of the cleanup process, including any errors or successes.\n- **Executing additional cleanup tasks:** Finally, the workflow executes an SSH command on the Docker registry server to perform additional cleanup tasks, such as garbage collection.\n\n### TL;DR\nIn summary, this n8n template provides a robust and automated solution for managing and cleaning up Docker registries. By regularly running this workflow, users can ensure that their registry remains organized and efficient, and avoid running out of storage space.-",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Fetch Manifest Digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Remove Old Tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Retrieve Image Tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "List Images",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract Image Names",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Identify Tags to Remove",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scheduled Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Split Tags",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Valid Tags",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Fetch Manifest Digest for Blob",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Group Tags by Image",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sort by Creation Date",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Failure Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Execute Garbage Collection",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    }
+  ]
+}

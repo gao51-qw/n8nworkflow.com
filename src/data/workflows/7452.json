@@ -1,0 +1,176 @@
+{
+  "id": 7452,
+  "slug": "7452",
+  "title": "Multi-tool personal assistant with Telegram, Grok-4, Gmail, Calendar & Memory",
+  "description": "## Summary\nChat with your AI agent in Telegram. It remembers important facts about you in Airtable, can transcribe your voice messages, search the web, read and manage Google Calendar, fetch Gmail, and query Notion. Responses are grounded in your recent memories and tool outputs, then sent back to Telegram.\n\n## What this workflow does\n-  Listens to your Telegram messages (text or voice)\n-  Maintains short-term chat memory per user and long-term memory in Airtable\n-  Decides when to save new facts about you (auto “Save Memory” without telling you)\n-  Uses tools on demand:\n  \t- Web search via SerpAPI\n  \t- Google Calendar: list/create/update/delete events\n  \t- Gmail: list and read messages\n  \t- Notion: fetch database info\n-  Transcribes Telegram voice notes with OpenAI and feeds them to the agent\n-  Combines live tool results + recent memories and replies in Telegram\n\n## Apps and credentials\n-  Telegram Bot API: personal_bot\n-  xAI Grok: Grok-4 model for chat\n-  OpenAI: speech-to-text (transcribe audio)\n-  Airtable: store long-term memories\n-  Google Calendar: calendar actions\n-  Gmail: email actions\n-  Notion: knowledge and reading lists\n-  SerpAPI: web search\n\n## Typical use cases\n-  Personal assistant that remembers preferences, decisions, and tasks\n-  Create/update meetings by chatting, and get upcoming events\n-  Ask “what did I say I’m reading?” or “what’s our plan from last week?”\n-  Voice-first capture: send a voice note → get a transcribed, actionable reply\n-  Fetch recent emails or look up info on the web without leaving Telegram\n-  Query a Notion database (e.g., “show me the Neurocracy entries”)\n\n## How it works (node-by-node)\n-  Telegram Trigger\n  \t- Receives messages from your Telegram chat (text and optional voice).\n-  Text vs Message Router\n  \t- Routes based on message contents:\n    \t\t- Text path → goes directly to the Agent (AI).\n    \t\t- Voice path → downloads the file and transcribes before AI.\n    \t\t- Always also fetches recent Airtable memories for context.\n-  Get a file (Telegram)\n  \t- Downloads the voice file (voice.file_id) when present.\n-  Transcribe a recording (OpenAI)\n  \t- Converts audio to text so the agent can use it like a normal message.\n-  Get memories (Airtable)\n  \t- Searches your “Agent Memories” base/table, filtered by user, sorted by Created.\n-  Aggregate (Aggregate)\n  \t- Bundles recent memory records into a single array “Memories” with text + timestamp.\n-  Merge (Merge)\n  \t- Combines current input (text or transcript) with the memory bundle before the agent.\n-  Simple Memory (Agent memory window)\n  \t- Short-term session memory keyed by Telegram chat ID; keeps the recent 30 turns.\n-  Tools wired into the agent\n  \t- SerpAPI\n  \t- Google Calendar tools:\n    \t\t- Get many events in Google Calendar\n    \t\t- Create an event in Google Calendar\n    \t\t- Update an event in Google Calendar\n    \t\t- Delete an event in Google Calendar\n  \t- Gmail tools:\n    \t\t- Get many messages in Gmail\n    \t\t- Get a message in Gmail\n  \t- Notion tool:\n   \t\t- Get a database in Notion\n  \t\t- Airtable tool:\n    \t- Save Memory (stores distilled facts about the user)\n-  Agent\n  \t- System prompt defines role, tone, and rules:\n    \t\t- Be a friendly assistant.\n    \t\t- On each message, decide if it contains user info worth saving.\n    \t\t- If yes, call “Save Memory” to persist a short summary in Airtable.\n    \t\t- Don’t announce memory saves—just continue helping.\n    \t\t- Use tools when needed (web, calendar, Gmail, Notion).\n    \t\t- Think with the provided memory context block.\n  \t\t- Uses xAI Grok Chat Model for reasoning and tool-calling.\n  \t\t- Can call Save Memory, Calendar, Gmail, Notion, and SerpAPI tools as needed.\n-  Save Memory (Airtable)\n  \t- Persists Memory and User fields to “Agent Memories” base; auto timestamp by Airtable.\n-  Send a text message (Telegram)\n  \t- Sends the agent’s final answer back to the same Telegram chat ID.\n\n## Node map\n| Node | Type | Purpose |\n|---|---|---|\n| Telegram Trigger | Trigger | Receive text/voice from Telegram |\n| Text vs voice router | Flow control | Route text vs voice; also trigger memories fetch |\n| Get a file | Telegram | Download voice audio |\n| Transcribe a recording | OpenAI | Speech-to-text for voice notes |\n| Get memories | Airtable | Load recent user memories |\n| Aggregate | Aggregate | Pack memory records into “Memories” array |\n| Merge | Merge | Combine input and memories before agent call |\n| Simple Memory | Agent memory | Short-term chat memory per chat ID |\n| xAI Grok Chat Model | LLM | Core reasoning model for the Agent |\n| Search Web with SerpAPI | Tool | Web search |\n| Google Calendar tools | Tool | List/create/update/delete events |\n| Gmail tools | Tool | Search and read email |\n| Notion tool | Tool | Query a Notion database |\n| Save Memory | Airtable Tool | Persist distilled user facts |\n| AI Agent | Agent | Orchestrates tools + memory, produces the answer |\n| Send a text message | Telegram | Reply to the user in Telegram |\n\n## Before you start\n-  Create a Telegram bot and get your token (via @BotFather).\n-  Put your Telegram user ID into the Telegram Trigger node (chatIds).\n-  Connect credentials:\n  \t- xAI Grok (model: grok-4-0709)\n  \t- OpenAI (for audio transcription)\n  \t- Airtable (Agent Memories base and table)\n  \t- Google Calendar OAuth\n  \t- Gmail OAuth\n  \t- Notion API\n  \t- SerpAPI key\n-  Adjust the Airtable “User” value and the filterByFormula to match your name or account.\n\n## Setup instructions\n1) Telegram\n-  Telegram Trigger:\n  \t- additionalFields.chatIds = your_telegram_id\n  \t- download = true to allow voice handling\n-  Send a text message:\n  \t- chatId = {{ $('Telegram Trigger').item.json.message.chat.id }}\n\n2) Memory\n-  Airtable base/table must exist with fields: Memory, User, Created (Created auto-managed).\n-  In Save Memory and Get memories nodes, align Base, Table, and filterByFormula with your setup.\n-  Simple Memory:\n  \t- sessionKey = {{ $('If').item.json.message.chat.id }}\n  \t- contextWindowLength = 30 (adjust as needed)\n\n3) Tools\n-  Google Calendar: choose your calendar, test get/create/update/delete.\n-  Gmail: set “returnAll/simplify/messageId” via $fromAI or static defaults.\n-  Notion: set your databaseId.\n-  SerpAPI: ensure the key is valid.\n\n4) Agent (AI node)\n-  SystemMessage: customize role, name, and any constraints.\n-  Text input: concatenates transcript or text into one prompt: {{ $json.text }}{{ $json.message.text }}\n\n## How to use\n-  Send a text or voice message to your bot in Telegram.\n-  The agent replies in the same chat, optionally performing tool actions.\n-  New personal facts you mention are silently summarized and stored in Airtable for future context.\n\n## Customization ideas\n-  Replace Grok with another LLM if desired.\n-  Add more tools: Google Drive, Slack, Jira, GitHub, etc.\n-  Expand memory schema (e.g., tags, categories, confidence).\n-  Add guardrails: profanity filters, domain limits, or cost control.\n-  Multi-user support: store chat-to-user mapping and separate memories by user.\n-  Add summaries: a daily recap message created from new memories.\n\n## Limits and notes\n-  Tool latency: calls to Calendar, Gmail, Notion, and SerpAPI add response time.\n-  Audio size/format: OpenAI transcription works best with common formats and short clips.\n-  Memory growth: periodically archive old Airtable entries, or change Aggregate window.\n-  Timezone awareness: Calendar operations depend on your Google Calendar settings.\n\n## Privacy and safety\n-  Sensitive info may be saved to Airtable; restrict access to the base.\n-  Tool actions operate under your connected accounts; review scopes and permissions.\n-  The agent may call external APIs (SerpAPI, OpenAI); ensure this aligns with your policies.\n\n## Example interactions\n-  “Schedule a 30‑min catch‑up with Alex next Tuesday afternoon.”\n-  “What meetings do I have in the next 4 weeks?”\n-  “Summarize my latest emails from Product Updates.”\n-  “What did I say I’m reading?” (agent recalls from memories)\n-  Voice note: “Remind me to call the dentist this Friday morning.” → agent transcribes and creates an event.\n\n## Tags\n-  telegram, agent, memory, grok, openai, airtable, google-calendar, gmail, notion, serpapi, voice, automation\n\n## Changelog\n-  v1: First release with Telegram agent, short/long-term memory, voice transcription, and tool integrations for web, calendar, email, and Notion.\n\n",
+  "featuredImage": "/data/workflows/7452/7452.webp",
+  "author": {
+    "id": 101,
+    "slug": "vladzima",
+    "name": "Vlad Arbatov",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1222,
+  "downloads": 122,
+  "createdAt": "2025-08-15T18:45:26.716Z",
+  "updatedAt": "2026-01-16T08:50:24.086Z",
+  "publishedAt": "2025-08-15T18:45:26.716Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7452",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Multi-tool personal assistant with Telegram, Grok-4, Gmail, Calendar & Memory",
+    "workflowName": "Multi-tool personal assistant with Telegram, Grok-4, Gmail, Calendar & Memory",
+    "description": "## Summary\nChat with your AI agent in Telegram. It remembers important facts about you in Airtable, can transcribe your voice messages, search the web, read and manage Google Calendar, fetch Gmail, and query Notion. Responses are grounded in your recent memories and tool outputs, then sent back to Telegram.\n\n## What this workflow does\n-  Listens to your Telegram messages (text or voice)\n-  Maintains short-term chat memory per user and long-term memory in Airtable\n-  Decides when to save new facts about you (auto “Save Memory” without telling you)\n-  Uses tools on demand:\n  \t- Web search via SerpAPI\n  \t- Google Calendar: list/create/update/delete events\n  \t- Gmail: list and read messages\n  \t- Notion: fetch database info\n-  Transcribes Telegram voice notes with OpenAI and feeds them to the agent\n-  Combines live tool results + recent memories and replies in Telegram\n\n## Apps and credentials\n-  Telegram Bot API: personal_bot\n-  xAI Grok: Grok-4 model for chat\n-  OpenAI: speech-to-text (transcribe audio)\n-  Airtable: store long-term memories\n-  Google Calendar: calendar actions\n-  Gmail: email actions\n-  Notion: knowledge and reading lists\n-  SerpAPI: web search\n\n## Typical use cases\n-  Personal assistant that remembers preferences, decisions, and tasks\n-  Create/update meetings by chatting, and get upcoming events\n-  Ask “what did I say I’m reading?” or “what’s our plan from last week?”\n-  Voice-first capture: send a voice note → get a transcribed, actionable reply\n-  Fetch recent emails or look up info on the web without leaving Telegram\n-  Query a Notion database (e.g., “show me the Neurocracy entries”)\n\n## How it works (node-by-node)\n-  Telegram Trigger\n  \t- Receives messages from your Telegram chat (text and optional voice).\n-  Text vs Message Router\n  \t- Routes based on message contents:\n    \t\t- Text path → goes directly to the Agent (AI).\n    \t\t- Voice path → downloads the file and transcribes before AI.\n    \t\t- Always also fetches recent Airtable memories for context.\n-  Get a file (Telegram)\n  \t- Downloads the voice file (voice.file_id) when present.\n-  Transcribe a recording (OpenAI)\n  \t- Converts audio to text so the agent can use it like a normal message.\n-  Get memories (Airtable)\n  \t- Searches your “Agent Memories” base/table, filtered by user, sorted by Created.\n-  Aggregate (Aggregate)\n  \t- Bundles recent memory records into a single array “Memories” with text + timestamp.\n-  Merge (Merge)\n  \t- Combines current input (text or transcript) with the memory bundle before the agent.\n-  Simple Memory (Agent memory window)\n  \t- Short-term session memory keyed by Telegram chat ID; keeps the recent 30 turns.\n-  Tools wired into the agent\n  \t- SerpAPI\n  \t- Google Calendar tools:\n    \t\t- Get many events in Google Calendar\n    \t\t- Create an event in Google Calendar\n    \t\t- Update an event in Google Calendar\n    \t\t- Delete an event in Google Calendar\n  \t- Gmail tools:\n    \t\t- Get many messages in Gmail\n    \t\t- Get a message in Gmail\n  \t- Notion tool:\n   \t\t- Get a database in Notion\n  \t\t- Airtable tool:\n    \t- Save Memory (stores distilled facts about the user)\n-  Agent\n  \t- System prompt defines role, tone, and rules:\n    \t\t- Be a friendly assistant.\n    \t\t- On each message, decide if it contains user info worth saving.\n    \t\t- If yes, call “Save Memory” to persist a short summary in Airtable.\n    \t\t- Don’t announce memory saves—just continue helping.\n    \t\t- Use tools when needed (web, calendar, Gmail, Notion).\n    \t\t- Think with the provided memory context block.\n  \t\t- Uses xAI Grok Chat Model for reasoning and tool-calling.\n  \t\t- Can call Save Memory, Calendar, Gmail, Notion, and SerpAPI tools as needed.\n-  Save Memory (Airtable)\n  \t- Persists Memory and User fields to “Agent Memories” base; auto timestamp by Airtable.\n-  Send a text message (Telegram)\n  \t- Sends the agent’s final answer back to the same Telegram chat ID.\n\n## Node map\n| Node | Type | Purpose |\n|---|---|---|\n| Telegram Trigger | Trigger | Receive text/voice from Telegram |\n| Text vs voice router | Flow control | Route text vs voice; also trigger memories fetch |\n| Get a file | Telegram | Download voice audio |\n| Transcribe a recording | OpenAI | Speech-to-text for voice notes |\n| Get memories | Airtable | Load recent user memories |\n| Aggregate | Aggregate | Pack memory records into “Memories” array |\n| Merge | Merge | Combine input and memories before agent call |\n| Simple Memory | Agent memory | Short-term chat memory per chat ID |\n| xAI Grok Chat Model | LLM | Core reasoning model for the Agent |\n| Search Web with SerpAPI | Tool | Web search |\n| Google Calendar tools | Tool | List/create/update/delete events |\n| Gmail tools | Tool | Search and read email |\n| Notion tool | Tool | Query a Notion database |\n| Save Memory | Airtable Tool | Persist distilled user facts |\n| AI Agent | Agent | Orchestrates tools + memory, produces the answer |\n| Send a text message | Telegram | Reply to the user in Telegram |\n\n## Before you start\n-  Create a Telegram bot and get your token (via @BotFather).\n-  Put your Telegram user ID into the Telegram Trigger node (chatIds).\n-  Connect credentials:\n  \t- xAI Grok (model: grok-4-0709)\n  \t- OpenAI (for audio transcription)\n  \t- Airtable (Agent Memories base and table)\n  \t- Google Calendar OAuth\n  \t- Gmail OAuth\n  \t- Notion API\n  \t- SerpAPI key\n-  Adjust the Airtable “User” value and the filterByFormula to match your name or account.\n\n## Setup instructions\n1) Telegram\n-  Telegram Trigger:\n  \t- additionalFields.chatIds = your_telegram_id\n  \t- download = true to allow voice handling\n-  Send a text message:\n  \t- chatId = {{ $('Telegram Trigger').item.json.message.chat.id }}\n\n2) Memory\n-  Airtable base/table must exist with fields: Memory, User, Created (Created auto-managed).\n-  In Save Memory and Get memories nodes, align Base, Table, and filterByFormula with your setup.\n-  Simple Memory:\n  \t- sessionKey = {{ $('If').item.json.message.chat.id }}\n  \t- contextWindowLength = 30 (adjust as needed)\n\n3) Tools\n-  Google Calendar: choose your calendar, test get/create/update/delete.\n-  Gmail: set “returnAll/simplify/messageId” via $fromAI or static defaults.\n-  Notion: set your databaseId.\n-  SerpAPI: ensure the key is valid.\n\n4) Agent (AI node)\n-  SystemMessage: customize role, name, and any constraints.\n-  Text input: concatenates transcript or text into one prompt: {{ $json.text }}{{ $json.message.text }}\n\n## How to use\n-  Send a text or voice message to your bot in Telegram.\n-  The agent replies in the same chat, optionally performing tool actions.\n-  New personal facts you mention are silently summarized and stored in Airtable for future context.\n\n## Customization ideas\n-  Replace Grok with another LLM if desired.\n-  Add more tools: Google Drive, Slack, Jira, GitHub, etc.\n-  Expand memory schema (e.g., tags, categories, confidence).\n-  Add guardrails: profanity filters, domain limits, or cost control.\n-  Multi-user support: store chat-to-user mapping and separate memories by user.\n-  Add summaries: a daily recap message created from new memories.\n\n## Limits and notes\n-  Tool latency: calls to Calendar, Gmail, Notion, and SerpAPI add response time.\n-  Audio size/format: OpenAI transcription works best with common formats and short clips.\n-  Memory growth: periodically archive old Airtable entries, or change Aggregate window.\n-  Timezone awareness: Calendar operations depend on your Google Calendar settings.\n\n## Privacy and safety\n-  Sensitive info may be saved to Airtable; restrict access to the base.\n-  Tool actions operate under your connected accounts; review scopes and permissions.\n-  The agent may call external APIs (SerpAPI, OpenAI); ensure this aligns with your policies.\n\n## Example interactions\n-  “Schedule a 30‑min catch‑up with Alex next Tuesday afternoon.”\n-  “What meetings do I have in the next 4 weeks?”\n-  “Summarize my latest emails from Product Updates.”\n-  “What did I say I’m reading?” (agent recalls from memories)\n-  Voice note: “Remind me to call the dentist this Friday morning.” → agent transcribes and creates an event.\n\n## Tags\n-  telegram, agent, memory, grok, openai, airtable, google-calendar, gmail, notion, serpapi, voice, automation\n\n## Changelog\n-  v1: First release with Telegram agent, short/long-term memory, voice transcription, and tool integrations for web, calendar, email, and Notion.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Save Memory",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get memories",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Search Web with SerpAPI",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "role": "toolSerpApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get many events in Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create an event in Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Update an event in Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Delete an event in Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get many messages in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "xAI Grok Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "role": "lmChatXAiGrok",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Text vs Voice Router",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Transcribe a recording",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Get a file",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get a database in Notion",
+      "type": "n8n-nodes-base.notionTool",
+      "role": "notionTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

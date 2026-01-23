@@ -1,0 +1,188 @@
+{
+  "id": 11660,
+  "slug": "11660",
+  "title": "Generate consensus answers with multiple AI models & peer review system",
+  "description": "## AI Council: Multi-Model Consensus with Peer Review\n\n**Inspired by [Andrej Karpathy's LLM Council](https://github.com/karpathy/llm-council)**, but rebuilt in n8n.\n\nThis workflow creates a \"council\" of AI models that independently answer your question, then peer-review each other's responses before a final arbiter synthesizes the best answer.\n\n---\n\n## Who is this for?\n\n- If you want to prepare for an upcoming meeting with different people and prep for their different views\n- find any \"blind spots\" in your view on a certain subject\n- Researchers wanting more robust AI-generated answers\n- Developers exploring multi-model architectures\n- Anyone seeking higher-quality responses through AI consensus, potentially with faster/cheaper models.\n- Teams evaluating different LLM capabilities side-by-side\n\n---\n\n## How it works\n\n1. **Ask a Question** — Submit your query via the Chat Trigger\n2. **Individual Answers** — Four different models (Gemini, Llama, Gemma, Mistral) independently generate responses\n3. **Peer Review** — Each model reviews ALL answers, identifying pros, cons, and overall assessment\n4. **Final Synthesis** — DeepSeek R1 analyzes all peer reviews and produces a refined, consensus-based final answer\n\n---\n\n## Setup Instructions\n\n### Prerequisites\n- Access to an LLM (e.g. [OpenRouter](https://openrouter.ai/) account with API credits)\n\n### Steps\n1. **Create OpenRouter credentials** in n8n:\n   - Go to *Settings → Credentials → Add Credential*\n   - Select \"OpenRouter\" and paste your API key\n2. **Connect all model nodes** to your OpenRouter credential. In this example I used Gemini, Llama, Gemma, Mistral and Deepseek, but you can use whatever you want. You can also use the same models, but change their parameters. Play around to find out what suits you best.\n3. **Activate the workflow** and open the Chat interface to test\n\n---\n\n## Customization Ideas\n\n- You can add as many answer and review models as you want. Do note that each AI node is executed in series, so each will add to the total duration.\n- Swap models via OpenRouter's model selector (e.g., use Claude, GPT-4, etc.)\n- Adjust the peer review prompt to represent a certain persona or with domain-specific evaluation criteria\n- Add memory nodes for multi-turn conversations\n- Connect to Slack/Discord instead of the Chat Trigger\n",
+  "featuredImage": "/data/workflows/11660/11660.webp",
+  "author": {
+    "id": 101,
+    "slug": "gxjansen",
+    "name": "Guido X Jansen",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 415,
+  "downloads": 41,
+  "createdAt": "2025-12-10T14:51:09.954Z",
+  "updatedAt": "2026-01-16T09:09:34.870Z",
+  "publishedAt": "2025-12-10T14:51:09.954Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11660",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate consensus answers with multiple AI models & peer review system",
+    "workflowName": "Generate consensus answers with multiple AI models & peer review system",
+    "description": "## AI Council: Multi-Model Consensus with Peer Review\n\n**Inspired by [Andrej Karpathy's LLM Council](https://github.com/karpathy/llm-council)**, but rebuilt in n8n.\n\nThis workflow creates a \"council\" of AI models that independently answer your question, then peer-review each other's responses before a final arbiter synthesizes the best answer.\n\n---\n\n## Who is this for?\n\n- If you want to prepare for an upcoming meeting with different people and prep for their different views\n- find any \"blind spots\" in your view on a certain subject\n- Researchers wanting more robust AI-generated answers\n- Developers exploring multi-model architectures\n- Anyone seeking higher-quality responses through AI consensus, potentially with faster/cheaper models.\n- Teams evaluating different LLM capabilities side-by-side\n\n---\n\n## How it works\n\n1. **Ask a Question** — Submit your query via the Chat Trigger\n2. **Individual Answers** — Four different models (Gemini, Llama, Gemma, Mistral) independently generate responses\n3. **Peer Review** — Each model reviews ALL answers, identifying pros, cons, and overall assessment\n4. **Final Synthesis** — DeepSeek R1 analyzes all peer reviews and produces a refined, consensus-based final answer\n\n---\n\n## Setup Instructions\n\n### Prerequisites\n- Access to an LLM (e.g. [OpenRouter](https://openrouter.ai/) account with API credits)\n\n### Steps\n1. **Create OpenRouter credentials** in n8n:\n   - Go to *Settings → Credentials → Add Credential*\n   - Select \"OpenRouter\" and paste your API key\n2. **Connect all model nodes** to your OpenRouter credential. In this example I used Gemini, Llama, Gemma, Mistral and Deepseek, but you can use whatever you want. You can also use the same models, but change their parameters. Play around to find out what suits you best.\n3. **Activate the workflow** and open the Chat interface to test\n\n---\n\n## Customization Ideas\n\n- You can add as many answer and review models as you want. Do note that each AI node is executed in series, so each will add to the total duration.\n- Swap models via OpenRouter's model selector (e.g., use Claude, GPT-4, etc.)\n- Adjust the peer review prompt to represent a certain persona or with domain-specific evaluation criteria\n- Add memory nodes for multi-turn conversations\n- Connect to Slack/Discord instead of the Chat Trigger",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Gemini Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Answers",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Aggregate Answers",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Reviews",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Aggregate Reviews",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Final Analysis Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mistral Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gemma Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Llama Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Answer Agent #4",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Answer Agent #3",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Answer Agent #2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Answer Agent #1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Review Agent #1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Review Agent #2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Review Agent #3",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Review Agent #4",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Deepseek R1 model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

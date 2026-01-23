@@ -1,0 +1,27 @@
+{
+  "id": 8859,
+  "slug": "8859",
+  "title": "Generate AI product ad images from Google Sheets using Fal.ai and OpenAI",
+  "description": "⚠️ **Note:** All sensitive credentials should be set via **n8n Credentials** or environment variables. Do **not** hardcode API keys in nodes.\n\n---\n\n## Who’s it for\n\nMarketers, creators, and automation builders who want to generate **UGC-style ad images** automatically from a Google Sheet. Ideal for e‑commerce SKUs, agencies, or teams that need many variations quickly.\n\n---\n\n## What it does (Overview)\n\nThis template turns a spreadsheet row into **ad images** ready for campaigns.\n\n* **Zone 1 — Create Ad Image**: Reads product rows, downloads image, analyzes it, generates prompts, appends results back into Google Sheet.\n* **Zone 2 — Create Image (Fal nano‑banana)**: Generates ad image variations, polls Fal.ai API until done, uploads to Drive, and updates sheet with output URLs.\n\n---\n\n## Requirements\n\n* **Fal.ai API key** (env: FAL\\_KEY)\n* **Google Sheets / Google Drive** OAuth2 credentials\n* **OpenAI (Vision/Chat)** for image analysis\n* A Google Sheet with columns for product and output\n* Google Drive files set to **Anyone with link → Viewer** so APIs can fetch them\n\n---\n\n## How to set up\n\n1. **Credentials**: Add Google Sheets + Google Drive (OAuth2), Fal.ai (Header Auth with Authorization: Key {{\\$env.FAL\\_KEY}}), and OpenAI.\n2. **Google Sheet**: Create sheets with the following headers.\n\n### Sheet: `product`\n\n```\nproduct_id | product_name | product_image_url | product_description | campaign | brand_notes | constraints | num_variations | aspect_ratio | model_target | status\n```\n\n### Sheet: `ad_image`\n\n```\nscene_ref | product_name | prompt | status | output_url\n```\n\n3. **Import the workflow**: Use the provided JSON. Confirm node credentials resolve.\n4. **Run**: Start with Zone 0 to verify prompt-only flow, then test Zone 1 for image generation.\n\n---\n\n## Zone 1 — Create Ad Image (Prompt-only)\n\nReads product row, normalizes Drive link, analyzes image, generates structured ad prompts, appends to `ad_image` sheet.\n\n---\n\n## Zone 2 — Create Image (Fal nano‑banana)\n\nReads product row, converts Drive link, generates image(s) with Fal nano‑banana, polls until complete, uploads to Drive, updates sheet.\n\n---\n\n## Node settings (high‑level)\n\n**Drive Link Parser (Set)**\n\n```js\n{{ (() =&gt; {\n  const u = $json.product || '';\n  const q = u.match(/[?&]id=([\\-\\w]{25,})/);\n  const d = u.match(/\\/d\\/([\\-\\w]{25,})/);\n  const any = u.match(/[\\-\\w]{25,}/);\n  const id = q?.[1] || d?.[1] || (any ? any[0] : '');\n  return id ? 'https://drive.google.com/uc?export=view&id=' + id : '';\n})() }}\n```\n\n---\n\n## How to customize the workflow\n\n* Adjust **AI prompts** to change ad style (luxury, cozy, techy).\n* Change **aspect ratio** for TikTok/IG/Shorts (`9:16`, `1:1`, `16:9`).\n* Extend Sheet schema for campaign labels, audiences, hashtags.\n* Add distribution (Slack/LINE/Telegram) after Drive upload.\n\n---\n\n## Troubleshooting\n\n* **JSON parameter needs to be valid JSON** → Ensure expressions return objects, not strings.\n* **403 on images** → Make Drive files public (Viewer) and convert links.\n* **Job never completes** → Check `status_url`, retry with `*-fast` models or off‑peak times.\n\n---\n\n## Template metadata\n\n* **Uses:** Google Sheets, Google Drive, HTTP Request, Wait/If/Switch, Code, OpenAI Vision/Chat, Fal.ai models (nano‑banana)\n\n---\n\n## Visuals\n\n### Workflow Diagram\n\n![Workflow Diagram](https://drive.google.com/thumbnail?id=1rxWxNznX2R8k9HbG1t9Gxb47UN0-oTbQ&sz=w1200)\n\n### Example Product Image\n\n![Alt text](https://drive.google.com/thumbnail?id=1hyFmGf4MEWcOwOqYwYpJj1ZJurui5BCm\\&sz=w300)\n\n## Product Image - nano Banana\n![Alt text](https://drive.google.com/thumbnail?id=1Vzqb9HVfQYcj1HKk_-lU6ETULtO8eOn3&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1tSEd8Di4aKT2jL9GSeDO32mBNkllV5aV&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1gS0wIAIikbxCcFSQsBQDefMP0PY50zWW&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1eHTDoroLkD94fhUqW2OLHcvEwMWl5Wk5&sz=w300)\n",
+  "featuredImage": "/data/workflows/8859/8859.webp",
+  "author": {
+    "id": 101,
+    "slug": "jaruphatj",
+    "name": "Jaruphat J.",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 354,
+  "downloads": 35,
+  "createdAt": "2025-09-23T10:04:43.211Z",
+  "updatedAt": "2026-01-16T08:57:58.287Z",
+  "publishedAt": "2025-09-23T10:04:43.211Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8859"
+}

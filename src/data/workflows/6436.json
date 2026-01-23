@@ -1,0 +1,151 @@
+{
+  "id": 6436,
+  "slug": "6436",
+  "title": "Automate workflow & credentials backup to S3 with retention management",
+  "description": "This n8n template automates daily backups of workflows and credentials to S3-compatible storage with automatic retention management. Designed for self-hosted n8n instances requiring disaster recovery protection.\n\nThe workflow has three tasks: backs up all workflows via n8n API, exports and stores credentials securely, and automatically deletes outdated backups based on configurable retention policies. Perfect for administrators needing automated backup solutions with storage cost management.\n\n## Target Audience\n\n- **n8n Administrators**: Managing production n8n instances requiring reliable backup solutions\n- **DevOps Teams**: Implementing disaster recovery strategies for automation infrastructure  \n- **IT Managers**: Ensuring business continuity and compliance for critical automation workflows\n- **System Administrators**: Maintaining secure, automated backup processes for workflow management platforms\n\n## How it works\n\nThe workflow operates through three synchronized branches that execute automatically on a daily schedule:\n\n**Workflow Backup Process**: The schedule trigger initiates daily backups, retrieving all workflows via the n8n API and storing them as timestamped JSON files in your S3 bucket.\n\n**Retention Management**: Simultaneously, the system lists existing backup files, extracts dates from filenames, applies retention policies to identify outdated backups, and automatically deletes files beyond the configured retention period.\n\n**Credential Backup**: In parallel, the workflow exports all n8n credentials to a temporary file, uploads the encrypted credential data to S3 storage, and securely removes temporary files from the local system.\n\n## Prerequisites\n\nBefore implementing this template, ensure you have the following requirements in place:\n\n**Self-Hosted n8n Instance**: This template requires a self-hosted n8n installation with file system access for credential export functionality. Cloud-hosted n8n instances cannot export credentials due to security restrictions.\n\n**S3-Compatible Storage**: Set up an S3 bucket (AWS S3, MinIO, DigitalOcean Spaces, or any S3-compatible service) with read/write permissions configured for your backup storage needs.\n\n**Access Credentials**: Obtain S3 access credentials (Access Key ID and Secret Access Key) with appropriate bucket permissions for file operations (create, delete, list).\n\n**System Permissions**: Ensure your n8n instance has command-line access and file system permissions for credential export and temporary file management operations.\n\n## Setup Instructions\n\n### Step 1: S3 Bucket Configuration\n\nCreate and configure your S3-compatible storage bucket:\n\n1. Create a new S3 bucket in your preferred region\n2. Configure bucket policies for read/write access\n3. Generate access credentials (Access Key ID and Secret Access Key)\n4. Note the bucket name, region, and endpoint URL for configuration\n\n### Step 2: Import and Configure Template\n\n1. Import this workflow template into your n8n instance\n2. Navigate to the **Config** node (Manual Trigger) to customize settings\n3. Configure the following parameters:\n   - Bucket name and region\n   - Retention period (default: 7 days)\n   - Backup file naming conventions\n   - Folder structure preferences\n\n### Step 3: Set Up S3 Credentials\n\nConfigure S3 credentials in all storage-related nodes.\n\n### Step 4: Set Up N8N Credentials\nCreate an API key for n8n via the n8n settings of your n8n instance.\n\nSet this API key in the n8n node configuration. These credentials are neccesary to retrieve all workflows.\n\n### Step 5: Configure Backup Schedule\n\nCustomize the **Daily Backup** schedule trigger:\n- Daily at 2:00 AM: `0 2 * * *`\n- Daily at midnight: `0 0 * * *`\n- Twice daily: `0 0,12 * * *`\n- Custom schedule: Modify cron expression as needed\n\n### Step 6: Test and Validate\n\n1. Execute the **Config** node manually to verify settings\n2. Run the complete workflow to test all three backup branches\n3. Verify files appear in your S3 bucket with correct naming\n4. Confirm retention policies work by checking cleanup operations\n5. Test credential backup and temporary file removal\n\n## Retention Settings\n\nThe retention management system automatically maintains your backup storage:\n\n**Configurable Retention Period**: Set how many days of backups to retain (default: 31 days). The system automatically calculates cutoff dates and removes older files.\n\n**Date-Based Cleanup**: The **Extract Date** node processes backup filenames to determine file age, while the **Keep Outdated Backups** filter identifies files beyond the retention period.\n\n**Automatic Deletion**: Outdated files are automatically removed from S3 storage, preventing unlimited storage growth and managing costs effectively.",
+  "featuredImage": "/data/workflows/6436/6436.webp",
+  "author": {
+    "id": 101,
+    "slug": "tobim",
+    "name": "Tobias Mende",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 404,
+  "downloads": 40,
+  "createdAt": "2025-07-25T12:09:08.067Z",
+  "updatedAt": "2026-01-16T08:45:00.254Z",
+  "publishedAt": "2025-07-25T12:09:08.067Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6436",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate workflow & credentials backup to S3 with retention management",
+    "workflowName": "Automate workflow & credentials backup to S3 with retention management",
+    "description": "This n8n template automates daily backups of workflows and credentials to S3-compatible storage with automatic retention management. Designed for self-hosted n8n instances requiring disaster recovery protection.\n\nThe workflow has three tasks: backs up all workflows via n8n API, exports and stores credentials securely, and automatically deletes outdated backups based on configurable retention policies. Perfect for administrators needing automated backup solutions with storage cost management.\n\n## Target Audience\n\n- **n8n Administrators**: Managing production n8n instances requiring reliable backup solutions\n- **DevOps Teams**: Implementing disaster recovery strategies for automation infrastructure  \n- **IT Managers**: Ensuring business continuity and compliance for critical automation workflows\n- **System Administrators**: Maintaining secure, automated backup processes for workflow management platforms\n\n## How it works\n\nThe workflow operates through three synchronized branches that execute automatically on a daily schedule:\n\n**Workflow Backup Process**: The schedule trigger initiates daily backups, retrieving all workflows via the n8n API and storing them as timestamped JSON files in your S3 bucket.\n\n**Retention Management**: Simultaneously, the system lists existing backup files, extracts dates from filenames, applies retention policies to identify outdated backups, and automatically deletes files beyond the configured retention period.\n\n**Credential Backup**: In parallel, the workflow exports all n8n credentials to a temporary file, uploads the encrypted credential data to S3 storage, and securely removes temporary files from the local system.\n\n## Prerequisites\n\nBefore implementing this template, ensure you have the following requirements in place:\n\n**Self-Hosted n8n Instance**: This template requires a self-hosted n8n installation with file system access for credential export functionality. Cloud-hosted n8n instances cannot export credentials due to security restrictions.\n\n**S3-Compatible Storage**: Set up an S3 bucket (AWS S3, MinIO, DigitalOcean Spaces, or any S3-compatible service) with read/write permissions configured for your backup storage needs.\n\n**Access Credentials**: Obtain S3 access credentials (Access Key ID and Secret Access Key) with appropriate bucket permissions for file operations (create, delete, list).\n\n**System Permissions**: Ensure your n8n instance has command-line access and file system permissions for credential export and temporary file management operations.\n\n## Setup Instructions\n\n### Step 1: S3 Bucket Configuration\n\nCreate and configure your S3-compatible storage bucket:\n\n1. Create a new S3 bucket in your preferred region\n2. Configure bucket policies for read/write access\n3. Generate access credentials (Access Key ID and Secret Access Key)\n4. Note the bucket name, region, and endpoint URL for configuration\n\n### Step 2: Import and Configure Template\n\n1. Import this workflow template into your n8n instance\n2. Navigate to the **Config** node (Manual Trigger) to customize settings\n3. Configure the following parameters:\n   - Bucket name and region\n   - Retention period (default: 7 days)\n   - Backup file naming conventions\n   - Folder structure preferences\n\n### Step 3: Set Up S3 Credentials\n\nConfigure S3 credentials in all storage-related nodes.\n\n### Step 4: Set Up N8N Credentials\nCreate an API key for n8n via the n8n settings of your n8n instance.\n\nSet this API key in the n8n node configuration. These credentials are neccesary to retrieve all workflows.\n\n### Step 5: Configure Backup Schedule\n\nCustomize the **Daily Backup** schedule trigger:\n- Daily at 2:00 AM: `0 2 * * *`\n- Daily at midnight: `0 0 * * *`\n- Twice daily: `0 0,12 * * *`\n- Custom schedule: Modify cron expression as needed\n\n### Step 6: Test and Validate\n\n1. Execute the **Config** node manually to verify settings\n2. Run the complete workflow to test all three backup branches\n3. Verify files appear in your S3 bucket with correct naming\n4. Confirm retention policies work by checking cleanup operations\n5. Test credential backup and temporary file removal\n\n## Retention Settings\n\nThe retention management system automatically maintains your backup storage:\n\n**Configurable Retention Period**: Set how many days of backups to retain (default: 31 days). The system automatically calculates cutoff dates and removes older files.\n\n**Date-Based Cleanup**: The **Extract Date** node processes backup filenames to determine file age, while the **Keep Outdated Backups** filter identifies files beyond the retention period.\n\n**Automatic Deletion**: Outdated files are automatically removed from S3 storage, preventing unlimited storage growth and managing costs effectively.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get many workflows",
+      "type": "n8n-nodes-base.n8n",
+      "role": "n8n",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Date",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Keep Outdated Backups",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Delete Outdated Backups",
+      "type": "n8n-nodes-base.s3",
+      "role": "s3",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Export Credentials",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Load Credentials",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete Temporary File",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Credentials Backup",
+      "type": "n8n-nodes-base.s3",
+      "role": "s3",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Workflow Backup",
+      "type": "n8n-nodes-base.s3",
+      "role": "s3",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily Backup",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Existing Backups",
+      "type": "n8n-nodes-base.s3",
+      "role": "s3",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

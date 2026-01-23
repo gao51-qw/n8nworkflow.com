@@ -1,0 +1,26 @@
+{
+  "id": 4464,
+  "slug": "4464",
+  "title": "Export AI agent conversation logs from Postgres to Google Sheets",
+  "description": "## Overview\nThis n8n workflow retrieves AI agent chat memory logs stored in Postgres and pushes them to Google Sheets, creating one sheet per session. It’s useful for teams building chat-based products or agents and needing to review or analyze session logs in a collaborative format.\n\n## Who is it for\n* Anyone with an AI Agent in Production storing the conversation logs in Postgres (or Supabase) who wants to see transcript and have control\n* Product teams building AI agents or assistants.\n* Teams that want to centralize conversation history for analysis or support.\n* Anyone managing AI chat memory and needing to explore it in a spreadsheet.\n\n## Prerequisites\n* A Postgres database with a `n8n_chat_histories` table with an AI Agent connected to it. If you need an example, you can follow [this tutorial](https://www.youtube.com/watch?v=JjBofKJnYIU)\n* Once done, you need to run the Postgresql query to add the `created_at` column (see Setup &gt; Add a datetime column)\n* Google Sheets access and OAuth credentials connected to n8n.\n* A Google Sheets document set up as a template (see below).\n\n## Google Sheets Template\nThis workflow expects a Google Sheets file where each session will be stored in its own tab. \nA basic tab layout is duplicated and renamed with the session ID.\n👉 [Use this template as a starting point](https://docs.google.com/spreadsheets/d/14bKI5J0h18Nv48jbe1IXpZWma6EtqYLFWnpKoCB5Bgc/edit?usp=sharing)\nNote: You can hide the template after the first tabs have been created\n\n## How it works\n1. **Trigger**\n   The workflow can be launched manually or on a schedule (e.g. daily at noon).\n\n2. **Retrieve sessions**\n   Runs a SQL query to get distinct `session_id` values from the `n8n_chat_histories` table.\n\n3. **Loop over sessions**\nFor each session:\n   * Clears the corresponding sheet (if it exists).\n   * Duplicates the template tab.\n   * Renames it with the current `session_id`.\n\n4. **Fetch messages**\n   Selects all messages linked to the session from Postgres.\n\n5. **Append to sheet**\n   Adds each message to the Google Sheet with columns:\n\n   * **Who**: speaker role (`user`, `assistant`, etc.)\n   * **Message**: text content\n   * **Date**: timestamp from `created_at`, formatted `yyyy-MM-dd hh:mm:ss`\n\n## Notes\n* The sheet is **cleared and rebuilt** each run to ensure logs are up-to-date.\n* If a sheet for a session doesn’t exist, it will be created by duplicating the first tab (template)\n* You can group sessions under a persistent ID (like `user_id`) by overriding `session_id` in your memory config.\n* Works perfectly with Supabase by using PG credentials from the connection pooler.\n\n#### 👉 If you're looking for a solution to better visualize and analyse conversations, [reach out to us!](mailto:hello@agentstudio.io)",
+  "featuredImage": "/data/workflows/4464/4464.webp",
+  "author": {
+    "id": 101,
+    "slug": "agentstudio",
+    "name": "Agent Studio",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1000,
+  "downloads": 100,
+  "createdAt": "2025-05-28T16:04:09.907Z",
+  "updatedAt": "2026-01-16T08:34:30.942Z",
+  "publishedAt": "2025-05-28T16:04:09.907Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4464"
+}

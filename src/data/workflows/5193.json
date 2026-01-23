@@ -1,0 +1,158 @@
+{
+  "id": 5193,
+  "slug": "5193",
+  "title": "Pinterest keyword-based content scraper with AI agent & BrightData automation",
+  "description": "# Pinterest Keyword-Based Content Scraper with AI Agent & BrightData Automation\n\n## Overview\n\nThis n8n workflow automates Pinterest content scraping based on user-provided keywords using BrightData's API and Claude Sonnet 4 AI agent. The system intelligently processes keywords, initiates scraping jobs, monitors progress, and formats the extracted data into structured outputs.\n\n## Architecture Components\n\n### 🧠 AI-Powered Controller\n- **Claude Sonnet 4 Model**: Processes and understands keywords before initiating scrape\n- **AI Agent**: Acts as the intelligent controller coordinating all scraping steps\n\n### 📥 Data Input\n- **Form Trigger**: User-friendly keyword input interface\n- **Keywords Field**: Required input field for Pinterest search terms\n\n### 🚀 Scraping Pipeline\n1. **Launch Scraping Job**: Sends keywords to BrightData API\n2. **Status Monitoring**: Continuously checks scraping progress\n3. **Data Retrieval**: Downloads completed scraped content\n4. **Data Processing**: Formats and structures the raw data\n5. **Storage**: Saves results to Google Sheets\n\n## Workflow Nodes\n\n### 1. Pinterest Keyword Input\n- **Type**: Form Trigger\n- **Purpose**: Entry point for user keyword submission\n- **Configuration**: \n  - Form title: \"Pinterest\"\n  - Required field: \"Keywords\"\n\n### 2. Anthropic Chat Model\n- **Type**: Language Model (Claude Sonnet 4)\n- **Model**: `claude-sonnet-4-20250514`\n- **Purpose**: AI-powered keyword processing and workflow orchestration\n\n### 3. Keyword-based Scraping Agent\n- **Type**: AI Agent\n- **Purpose**: Orchestrates the entire scraping process\n- **Instructions**:\n  - Initiates Pinterest scraping with provided keywords\n  - Monitors scraping status until completion\n  - Downloads final scraped data\n  - Presents raw scraped data as output\n\n### 4. BrightData Pinterest Scraping\n- **Type**: HTTP Request Tool\n- **Method**: POST\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/trigger`\n- **Parameters**:\n  - `dataset_id`: `gd_lk0sjs4d21kdr7cnlv`\n  - `include_errors`: `true`\n  - `type`: `discover_new`\n  - `discover_by`: `keyword`\n  - `limit_per_input`: `2`\n- **Purpose**: Creates new scraping snapshot based on keywords\n\n### 5. Check Scraping Status\n- **Type**: HTTP Request Tool\n- **Method**: GET\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/progress/{snapshot_id}`\n- **Purpose**: Monitors scraping job progress\n- **Returns**: Status values like \"running\" or \"ready\"\n\n### 6. Fetch Pinterest Snapshot Data\n- **Type**: HTTP Request Tool\n- **Method**: GET\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}`\n- **Purpose**: Downloads completed scraped data\n- **Trigger**: Executes when status is \"ready\"\n\n### 7. Format & Extract Pinterest Content\n- **Type**: Code Node (JavaScript)\n- **Purpose**: Parses and structures raw scraped data\n- **Extracted Fields**:\n  - URL\n  - Post ID\n  - Title\n  - Content\n  - Date Posted\n  - User\n  - Likes & Comments\n  - Media\n  - Image URL\n  - Categories\n  - Hashtags\n\n### 8. Save Pinterest Data to Google Sheets\n- **Type**: Google Sheets Node\n- **Operation**: Append\n- **Mapped Columns**:\n  - Post URL\n  - Title\n  - Content\n  - Image URL\n\n### 9. Wait for 1 Minute (Disabled)\n- **Type**: Code Tool\n- **Purpose**: Adds delay between status checks (currently disabled)\n- **Duration**: 60 seconds\n\n## Setup Requirements\n\n### Required Credentials\n\n1. **Anthropic API**\n   - Credential ID: `ANTHROPIC_CREDENTIAL_ID`\n   - Required for Claude Sonnet 4 access\n\n2. **BrightData API**\n   - API Key: `BRIGHT_DATA_API_KEY`\n   - Required for Pinterest scraping service\n\n3. **Google Sheets OAuth2**\n   - Credential ID: `GOOGLE_SHEETS_CREDENTIAL_ID`\n   - Required for data storage\n\n### Configuration Placeholders\n\nReplace the following placeholders with actual values:\n\n- `WEBHOOK_ID_PLACEHOLDER`: Form trigger webhook ID\n- `GOOGLE_SHEET_ID_PLACEHOLDER`: Target Google Sheets document ID\n- `WORKFLOW_VERSION_ID`: n8n workflow version\n- `INSTANCE_ID_PLACEHOLDER`: n8n instance identifier\n- `WORKFLOW_ID_PLACEHOLDER`: Unique workflow identifier\n\n## Data Flow\n\n```\nUser Input (Keywords) \n    ↓\nAI Agent Processing (Claude)\n    ↓\nBrightData Scraping Job Creation\n    ↓\nStatus Monitoring Loop\n    ↓\nData Retrieval (when ready)\n    ↓\nContent Formatting & Extraction\n    ↓\nGoogle Sheets Storage\n```\n\n## Output Data Structure\n\nEach scraped Pinterest pin contains:\n\n- **URL**: Direct link to Pinterest pin\n- **Post ID**: Unique Pinterest identifier\n- **Title**: Pin title/heading\n- **Content**: Pin description text\n- **Date Posted**: Publication timestamp\n- **User**: Pinterest username\n- **Engagement**: Likes and comments count\n- **Media**: Media type information\n- **Image URL**: Direct image link\n- **Categories**: Pin categorization tags\n- **Hashtags**: Associated hashtags\n- **Comments**: User comments text\n\n## Usage Instructions\n\n1. **Initial Setup**:\n   - Configure all required API credentials\n   - Replace placeholder values with actual IDs\n   - Create target Google Sheets document\n\n2. **Running the Workflow**:\n   - Access the form trigger URL\n   - Enter desired Pinterest keywords\n   - Submit the form to initiate scraping\n\n3. **Monitoring Progress**:\n   - The AI agent will automatically handle status monitoring\n   - No manual intervention required during scraping\n\n4. **Accessing Results**:\n   - Structured data will be automatically saved to Google Sheets\n   - Each run appends new data to existing sheet\n\n## Technical Notes\n\n- **Rate Limiting**: BrightData API has built-in rate limiting\n- **Data Limits**: Current configuration limits 2 pins per keyword\n- **Status Polling**: Automatic status checking until completion\n- **Error Handling**: Includes error capture in scraping requests\n- **Async Processing**: Supports long-running scraping jobs\n\n## Customization Options\n\n- **Adjust Data Limits**: Modify `limit_per_input` parameter\n- **Enable Wait Timer**: Activate the disabled wait node for longer jobs\n- **Custom Data Fields**: Modify the formatting code for additional fields\n- **Alternative Storage**: Replace Google Sheets with other storage options\n\n## Sample Google Sheets Template\n\nCreate a copy of the sample sheet structure:\n```\nhttps://docs.google.com/spreadsheets/d/SAMPLE_SHEET_ID/edit\n```\n\nRequired columns:\n- Post URL\n- Title  \n- Content\n- Image URL\n\n## Troubleshooting\n\n- **Authentication Errors**: Verify all API credentials are correctly configured\n- **Scraping Failures**: Check BrightData API status and rate limits\n- **Data Formatting Issues**: Review the JavaScript formatting code for parsing errors\n- **Google Sheets Errors**: Ensure proper OAuth2 permissions and sheet access\n\n\nFor any questions or support, please contact: [Email](mailto:info@incrementors.com) or\n[fill out this form](https://www.incrementors.com/contact-us/)",
+  "featuredImage": "/data/workflows/5193/5193.webp",
+  "author": {
+    "id": 101,
+    "slug": "shivgupta",
+    "name": "Shiv Gupta",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1743,
+  "downloads": 174,
+  "createdAt": "2025-06-24T08:38:03.685Z",
+  "updatedAt": "2026-01-16T08:38:11.985Z",
+  "publishedAt": "2025-06-24T08:38:03.685Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5193",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Pinterest keyword-based content scraper with AI agent & BrightData automation",
+    "workflowName": "Pinterest keyword-based content scraper with AI agent & BrightData automation",
+    "description": "# Pinterest Keyword-Based Content Scraper with AI Agent & BrightData Automation\n\n## Overview\n\nThis n8n workflow automates Pinterest content scraping based on user-provided keywords using BrightData's API and Claude Sonnet 4 AI agent. The system intelligently processes keywords, initiates scraping jobs, monitors progress, and formats the extracted data into structured outputs.\n\n## Architecture Components\n\n### 🧠 AI-Powered Controller\n- **Claude Sonnet 4 Model**: Processes and understands keywords before initiating scrape\n- **AI Agent**: Acts as the intelligent controller coordinating all scraping steps\n\n### 📥 Data Input\n- **Form Trigger**: User-friendly keyword input interface\n- **Keywords Field**: Required input field for Pinterest search terms\n\n### 🚀 Scraping Pipeline\n1. **Launch Scraping Job**: Sends keywords to BrightData API\n2. **Status Monitoring**: Continuously checks scraping progress\n3. **Data Retrieval**: Downloads completed scraped content\n4. **Data Processing**: Formats and structures the raw data\n5. **Storage**: Saves results to Google Sheets\n\n## Workflow Nodes\n\n### 1. Pinterest Keyword Input\n- **Type**: Form Trigger\n- **Purpose**: Entry point for user keyword submission\n- **Configuration**: \n  - Form title: \"Pinterest\"\n  - Required field: \"Keywords\"\n\n### 2. Anthropic Chat Model\n- **Type**: Language Model (Claude Sonnet 4)\n- **Model**: `claude-sonnet-4-20250514`\n- **Purpose**: AI-powered keyword processing and workflow orchestration\n\n### 3. Keyword-based Scraping Agent\n- **Type**: AI Agent\n- **Purpose**: Orchestrates the entire scraping process\n- **Instructions**:\n  - Initiates Pinterest scraping with provided keywords\n  - Monitors scraping status until completion\n  - Downloads final scraped data\n  - Presents raw scraped data as output\n\n### 4. BrightData Pinterest Scraping\n- **Type**: HTTP Request Tool\n- **Method**: POST\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/trigger`\n- **Parameters**:\n  - `dataset_id`: `gd_lk0sjs4d21kdr7cnlv`\n  - `include_errors`: `true`\n  - `type`: `discover_new`\n  - `discover_by`: `keyword`\n  - `limit_per_input`: `2`\n- **Purpose**: Creates new scraping snapshot based on keywords\n\n### 5. Check Scraping Status\n- **Type**: HTTP Request Tool\n- **Method**: GET\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/progress/{snapshot_id}`\n- **Purpose**: Monitors scraping job progress\n- **Returns**: Status values like \"running\" or \"ready\"\n\n### 6. Fetch Pinterest Snapshot Data\n- **Type**: HTTP Request Tool\n- **Method**: GET\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}`\n- **Purpose**: Downloads completed scraped data\n- **Trigger**: Executes when status is \"ready\"\n\n### 7. Format & Extract Pinterest Content\n- **Type**: Code Node (JavaScript)\n- **Purpose**: Parses and structures raw scraped data\n- **Extracted Fields**:\n  - URL\n  - Post ID\n  - Title\n  - Content\n  - Date Posted\n  - User\n  - Likes & Comments\n  - Media\n  - Image URL\n  - Categories\n  - Hashtags\n\n### 8. Save Pinterest Data to Google Sheets\n- **Type**: Google Sheets Node\n- **Operation**: Append\n- **Mapped Columns**:\n  - Post URL\n  - Title\n  - Content\n  - Image URL\n\n### 9. Wait for 1 Minute (Disabled)\n- **Type**: Code Tool\n- **Purpose**: Adds delay between status checks (currently disabled)\n- **Duration**: 60 seconds\n\n## Setup Requirements\n\n### Required Credentials\n\n1. **Anthropic API**\n   - Credential ID: `ANTHROPIC_CREDENTIAL_ID`\n   - Required for Claude Sonnet 4 access\n\n2. **BrightData API**\n   - API Key: `BRIGHT_DATA_API_KEY`\n   - Required for Pinterest scraping service\n\n3. **Google Sheets OAuth2**\n   - Credential ID: `GOOGLE_SHEETS_CREDENTIAL_ID`\n   - Required for data storage\n\n### Configuration Placeholders\n\nReplace the following placeholders with actual values:\n\n- `WEBHOOK_ID_PLACEHOLDER`: Form trigger webhook ID\n- `GOOGLE_SHEET_ID_PLACEHOLDER`: Target Google Sheets document ID\n- `WORKFLOW_VERSION_ID`: n8n workflow version\n- `INSTANCE_ID_PLACEHOLDER`: n8n instance identifier\n- `WORKFLOW_ID_PLACEHOLDER`: Unique workflow identifier\n\n## Data Flow\n\n```\nUser Input (Keywords) \n    ↓\nAI Agent Processing (Claude)\n    ↓\nBrightData Scraping Job Creation\n    ↓\nStatus Monitoring Loop\n    ↓\nData Retrieval (when ready)\n    ↓\nContent Formatting & Extraction\n    ↓\nGoogle Sheets Storage\n```\n\n## Output Data Structure\n\nEach scraped Pinterest pin contains:\n\n- **URL**: Direct link to Pinterest pin\n- **Post ID**: Unique Pinterest identifier\n- **Title**: Pin title/heading\n- **Content**: Pin description text\n- **Date Posted**: Publication timestamp\n- **User**: Pinterest username\n- **Engagement**: Likes and comments count\n- **Media**: Media type information\n- **Image URL**: Direct image link\n- **Categories**: Pin categorization tags\n- **Hashtags**: Associated hashtags\n- **Comments**: User comments text\n\n## Usage Instructions\n\n1. **Initial Setup**:\n   - Configure all required API credentials\n   - Replace placeholder values with actual IDs\n   - Create target Google Sheets document\n\n2. **Running the Workflow**:\n   - Access the form trigger URL\n   - Enter desired Pinterest keywords\n   - Submit the form to initiate scraping\n\n3. **Monitoring Progress**:\n   - The AI agent will automatically handle status monitoring\n   - No manual intervention required during scraping\n\n4. **Accessing Results**:\n   - Structured data will be automatically saved to Google Sheets\n   - Each run appends new data to existing sheet\n\n## Technical Notes\n\n- **Rate Limiting**: BrightData API has built-in rate limiting\n- **Data Limits**: Current configuration limits 2 pins per keyword\n- **Status Polling**: Automatic status checking until completion\n- **Error Handling**: Includes error capture in scraping requests\n- **Async Processing**: Supports long-running scraping jobs\n\n## Customization Options\n\n- **Adjust Data Limits**: Modify `limit_per_input` parameter\n- **Enable Wait Timer**: Activate the disabled wait node for longer jobs\n- **Custom Data Fields**: Modify the formatting code for additional fields\n- **Alternative Storage**: Replace Google Sheets with other storage options\n\n## Sample Google Sheets Template\n\nCreate a copy of the sample sheet structure:\n```\nhttps://docs.google.com/spreadsheets/d/SAMPLE_SHEET_ID/edit\n```\n\nRequired columns:\n- Post URL\n- Title  \n- Content\n- Image URL\n\n## Troubleshooting\n\n- **Authentication Errors**: Verify all API credentials are correctly configured\n- **Scraping Failures**: Check BrightData API status and rate limits\n- **Data Formatting Issues**: Review the JavaScript formatting code for parsing errors\n- **Google Sheets Errors**: Ensure proper OAuth2 permissions and sheet access\n\n\nFor any questions or support, please contact: [Email](mailto:info@incrementors.com) or\n[fill out this form](https://www.incrementors.com/contact-us/)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "BrightData Pinterest Scraping",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Check Scraping Status",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fetch Pinterest Snapshot Data",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Pinterest Keyword Input",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait for 1 Minute",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Keyword-based Scraping Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format & Extract Pinterest Content",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Save Pinterest Data to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

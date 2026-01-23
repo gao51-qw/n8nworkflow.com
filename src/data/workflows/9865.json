@@ -1,0 +1,301 @@
+{
+  "id": 9865,
+  "slug": "9865",
+  "title": "Monitor PKI certificates & CRLs for expiration with Telegram & SMS alerts",
+  "description": "# PKI Certificate & CRL Monitor - Auto Expiration Alert System\n\n## Overview\nThis n8n workflow provides automated monitoring of Public Key Infrastructure (PKI) components including CA certificates, Certificate Revocation Lists (CRLs), and associated web services. It extracts certificate information from the TSL (Trusted Service List) -- the Hungarian is the example list as default in the workflow -- , monitors expiration dates, and sends alerts via Telegram and SMS when critical thresholds are reached.\n\n## Features\n- Automated extraction of certificate URLs from TSL XML\n- CA certificate expiration monitoring\n- CRL expiration tracking\n- Website availability monitoring with retry mechanism\n- Multi-channel alerting (Telegram and SMS)\n- Scheduled execution every 12 hours\n- 17-hour warning threshold for expirations\n\n## Setup Instructions\n\n### Prerequisites\n1. **n8n Instance**: Running n8n installation with Linux environment\n2. **Telegram Bot**: Created via @BotFather\n3. **Textbelt API Key**: For SMS notifications (optional)\n4. **Network Access**: To reach TSL source and certificate URLs\n5. **Linux Tools**: OpenSSL, curl, libxml2-utils, jq (auto-installed)\n\n### Configuration Steps\n\n#### 1. Telegram Setup\n**Create Telegram Bot:**\n- Open Telegram and search for @BotFather\n- Send `/newbot` and follow prompts\n- Save the bot token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)\n\n**Create Alert Channel:**\n- Create a new Telegram channel for alerts\n- Add your bot as administrator\n- Get channel ID:\n  - Send a test message to the channel\n  - Visit: `https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates`\n  - Find `\"chat\":{\"id\":-100XXXXXXXXXX}` - this is your channel ID\n\n#### 2. SMS Setup (Optional)\n**Textbelt Configuration:**\n- Register at https://textbelt.com\n- Purchase credits and obtain API key\n- Note: Free tier allows 1 SMS/day for testing\n\n#### 3. Configure Alert Nodes\nUpdate these nodes with your credentials:\n\n**CRL Alert Node:**\n- Open **CRL Alert --- Telegram & SMS** node\n- Replace `YOUR-TELEGRAM-BOT-TOKEN` with your bot token\n- Replace `YOUR-TELEGRAM-CHANNEL-ID` with your channel ID\n- Replace `+36301234567` with target phone number(s)\n- Replace `YOUR-TEXTBELT-API-KEY` with your Textbelt key\n\n**CA Alert Node:**\n- Open **CA Alert --- Telegram & SMS** node\n- Apply same replacements as above\n\n**Website Down Alert Node:**\n- Open **Send Website Down - Telegram & SMS** node\n- Apply same replacements as above\n\n#### 4. TSL Source Configuration\nThe workflow defaults to Hungarian TSL:\n- URL: `http://www.nmhh.hu/tl/pub/HU_TL.xml`\n- To change, edit the **Collect Checking URL list** node\n- Trust list references: https://ec.europa.eu/tools/lotl/eu-lotl.xml (to find more TSL list to change the default), and  https://www.etsi.org/deliver/etsi_ts/119600_119699/119615/01.02.01_60/ts_119615v010201p.pdf (to Technical Specification of the Trust Lists) \n\n#### 5. Threshold Configuration\nDefault warning threshold: 17 hours before expiration\n- To modify CRL threshold: Edit **nextUpdate - TimeFilter** node\n- To modify CA threshold: Edit **nextUpdate - TimeFilter1** node\n- Change value in condition: `if (diffHours &lt; 17)`\n\n### Activation\n1. Save all configuration changes\n2. Test with **Execute With Manual Start** trigger\n3. Verify alerts are received\n4. Toggle workflow to **Active** status for scheduled operation\n\n## How to Use\n\n### Automatic Operation\nOnce activated, the workflow runs automatically:\n- **Frequency**: Every 12 hours\n- **Process**: \n  1. Downloads TSL XML\n  2. Extracts all certificate URLs\n  3. Checks each URL type (CRL, CA, or other)\n  4. Validates expiration dates\n  5. Sends alerts for critical items\n\n### Manual Execution\nFor immediate checks:\n1. Open the workflow\n2. Click **Execute With Manual Start** node\n3. Click \"Execute Node\"\n4. Monitor execution progress\n\n### Understanding Alerts\n\n#### CRL Expiration Alert\n**Message Format:**\n```\nALERT! with [Issuer CN] !!!CRL EXPIRATION!!! Will be under 17 hour ([Next Update Time])! Last updated: [Last Update Time]\n```\n\n**Trigger Conditions:**\n- CRL expires in less than 17 hours\n- CRL download successful but expiration imminent\n\n#### CA Certificate Alert\n**Message Format:**\n```\nALERT!/EXPIRED! with [Subject CN] !!!CA EXPIRATION PROBLEM!!! The expiration time: ([Not After Date]) Last updated: ([Not Before Date])\n```\n\n**Trigger Conditions:**\n- Certificate expires in less than 17 hours (ALERT!)\n- Certificate already expired (EXPIRED!)\n\n#### Website Down Alert\n**Message Format:**\n```\nALERT! The [URL] !!!NOT AVAILABLE!!! Service outage probable! Intervention required!\n```\n\n**Trigger Conditions:**\n- Initial HTTP request fails\n- Retry after wait period also fails\n- HTTP status code not 200\n\n### Monitoring Dashboard\n\n#### Execution History\n- Navigate to n8n Executions tab\n- Filter by workflow name\n- Review successful/failed runs\n\n#### Alert History\nCheck Telegram channel for:\n- Alert timestamps\n- Affected certificates/services\n- Expiration details\n\n### Troubleshooting\n\n#### No Alerts Received\n1. **Check Telegram Bot:**\n   - Verify bot is admin in channel\n   - Test with manual message via API\n   - Confirm channel ID is correct\n\n2. **Check Workflow Execution:**\n   - Review execution logs in n8n\n   - Look for error nodes (red indicators)\n   - Verify TSL URL is accessible\n\n#### False Positives\n- Verify system time is correct\n- Check timezone settings\n- Review threshold values\n\n#### Missing Certificates\n- Some certificates may not have URLs\n- TSL may be temporarily unavailable\n- Check XML parsing in logs\n\n#### Performance Issues\n**Slow Execution:**\n- Large TSL files take time to parse\n- Network latency affects URL checks\n- Consider increasing timeout values\n\n**Memory Issues:**\n- Workflow processes many URLs sequentially\n- Monitor n8n server resources\n- Consider increasing batch intervals\n\n### Advanced Configuration\n\n#### Modify Check Frequency\nEdit **Execute With Scheduled Start** node:\n- Change interval type (hours/days/weeks)\n- Adjust interval value\n- Consider peak/off-peak scheduling\n\n#### Add Custom TSL Sources\nIn **Collect Checking URL list** node:\n```bash\nURL=\"https://your-tsl-source.com/tsl.xml\"\n```\n\n#### Customize Alert Messages\nEdit alert nodes to modify message templates:\n- Add organization name\n- Include escalation contacts\n- Add remediation instructions\n\n#### Filter Certificate Types\nModify URL detection patterns:\n- **Is this CRL?** node: Adjust CRL detection\n- **Is this CA?** node: Adjust CA detection\n- Add new patterns as needed\n\n#### Adjust Retry Logic\n**Wait B4 Retry** node:\n- Default: Immediate retry\n- Can add delay (seconds/minutes)\n- Useful for transient network issues\n\n## Maintenance\n\n### Regular Tasks\n- **Weekly**: Review alert frequency\n- **Monthly**: Validate phone numbers/channels\n- **Quarterly**: Update TSL source URLs\n- **Annually**: Review threshold values\n\n### Log Management\n- Clear old execution logs periodically\n- Archive alert history from Telegram\n- Document false positives for tuning\n\n### Updates\n- Keep n8n updated for security patches\n- Monitor OpenSSL versions for compatibility\n- Update notification service APIs as needed\n\n## Security Considerations\n- Store API keys in n8n credentials manager\n- Use environment variables for sensitive data\n- Restrict workflow edit access\n- Monitor for unauthorized changes\n- Regularly rotate API keys\n- Use HTTPS for TSL sources when available\n\n## Compliance Notes\n- Ensure monitoring aligns with PKI policies\n- Document alert response procedures\n- Maintain audit trail of certificate issues\n- Consider regulatory requirements for uptime\n\n## Integration Options\n- Connect to ticketing systems for alert tracking\n- Add database logging for compliance\n- Integrate with monitoring dashboards\n- Create escalation workflows for critical alerts\n\n## Best Practices\n1. Test alerts monthly to ensure delivery\n2. Maintain multiple notification channels\n3. Document response procedures for each alert type\n4. Set up redundant monitoring if critical\n5. Review and tune thresholds based on operational needs\n6. Keep contact lists updated\n7. Consider time zones for global operations",
+  "featuredImage": "/data/workflows/9865/9865.webp",
+  "author": {
+    "id": 101,
+    "slug": "vighsandor",
+    "name": "Vigh Sandor",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8,
+  "downloads": 0,
+  "createdAt": "2025-10-18T16:21:19.762Z",
+  "updatedAt": "2026-01-16T09:02:22.609Z",
+  "publishedAt": "2025-10-18T16:21:19.762Z",
+  "nodes": 44,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9865",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor PKI certificates & CRLs for expiration with Telegram & SMS alerts",
+    "workflowName": "Monitor PKI certificates & CRLs for expiration with Telegram & SMS alerts",
+    "description": "# PKI Certificate & CRL Monitor - Auto Expiration Alert System\n\n## Overview\nThis n8n workflow provides automated monitoring of Public Key Infrastructure (PKI) components including CA certificates, Certificate Revocation Lists (CRLs), and associated web services. It extracts certificate information from the TSL (Trusted Service List) -- the Hungarian is the example list as default in the workflow -- , monitors expiration dates, and sends alerts via Telegram and SMS when critical thresholds are reached.\n\n## Features\n- Automated extraction of certificate URLs from TSL XML\n- CA certificate expiration monitoring\n- CRL expiration tracking\n- Website availability monitoring with retry mechanism\n- Multi-channel alerting (Telegram and SMS)\n- Scheduled execution every 12 hours\n- 17-hour warning threshold for expirations\n\n## Setup Instructions\n\n### Prerequisites\n1. **n8n Instance**: Running n8n installation with Linux environment\n2. **Telegram Bot**: Created via @BotFather\n3. **Textbelt API Key**: For SMS notifications (optional)\n4. **Network Access**: To reach TSL source and certificate URLs\n5. **Linux Tools**: OpenSSL, curl, libxml2-utils, jq (auto-installed)\n\n### Configuration Steps\n\n#### 1. Telegram Setup\n**Create Telegram Bot:**\n- Open Telegram and search for @BotFather\n- Send `/newbot` and follow prompts\n- Save the bot token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)\n\n**Create Alert Channel:**\n- Create a new Telegram channel for alerts\n- Add your bot as administrator\n- Get channel ID:\n  - Send a test message to the channel\n  - Visit: `https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates`\n  - Find `\"chat\":{\"id\":-100XXXXXXXXXX}` - this is your channel ID\n\n#### 2. SMS Setup (Optional)\n**Textbelt Configuration:**\n- Register at https://textbelt.com\n- Purchase credits and obtain API key\n- Note: Free tier allows 1 SMS/day for testing\n\n#### 3. Configure Alert Nodes\nUpdate these nodes with your credentials:\n\n**CRL Alert Node:**\n- Open **CRL Alert --- Telegram & SMS** node\n- Replace `YOUR-TELEGRAM-BOT-TOKEN` with your bot token\n- Replace `YOUR-TELEGRAM-CHANNEL-ID` with your channel ID\n- Replace `+36301234567` with target phone number(s)\n- Replace `YOUR-TEXTBELT-API-KEY` with your Textbelt key\n\n**CA Alert Node:**\n- Open **CA Alert --- Telegram & SMS** node\n- Apply same replacements as above\n\n**Website Down Alert Node:**\n- Open **Send Website Down - Telegram & SMS** node\n- Apply same replacements as above\n\n#### 4. TSL Source Configuration\nThe workflow defaults to Hungarian TSL:\n- URL: `http://www.nmhh.hu/tl/pub/HU_TL.xml`\n- To change, edit the **Collect Checking URL list** node\n- Trust list references: https://ec.europa.eu/tools/lotl/eu-lotl.xml (to find more TSL list to change the default), and  https://www.etsi.org/deliver/etsi_ts/119600_119699/119615/01.02.01_60/ts_119615v010201p.pdf (to Technical Specification of the Trust Lists) \n\n#### 5. Threshold Configuration\nDefault warning threshold: 17 hours before expiration\n- To modify CRL threshold: Edit **nextUpdate - TimeFilter** node\n- To modify CA threshold: Edit **nextUpdate - TimeFilter1** node\n- Change value in condition: `if (diffHours &lt; 17)`\n\n### Activation\n1. Save all configuration changes\n2. Test with **Execute With Manual Start** trigger\n3. Verify alerts are received\n4. Toggle workflow to **Active** status for scheduled operation\n\n## How to Use\n\n### Automatic Operation\nOnce activated, the workflow runs automatically:\n- **Frequency**: Every 12 hours\n- **Process**: \n  1. Downloads TSL XML\n  2. Extracts all certificate URLs\n  3. Checks each URL type (CRL, CA, or other)\n  4. Validates expiration dates\n  5. Sends alerts for critical items\n\n### Manual Execution\nFor immediate checks:\n1. Open the workflow\n2. Click **Execute With Manual Start** node\n3. Click \"Execute Node\"\n4. Monitor execution progress\n\n### Understanding Alerts\n\n#### CRL Expiration Alert\n**Message Format:**\n```\nALERT! with [Issuer CN] !!!CRL EXPIRATION!!! Will be under 17 hour ([Next Update Time])! Last updated: [Last Update Time]\n```\n\n**Trigger Conditions:**\n- CRL expires in less than 17 hours\n- CRL download successful but expiration imminent\n\n#### CA Certificate Alert\n**Message Format:**\n```\nALERT!/EXPIRED! with [Subject CN] !!!CA EXPIRATION PROBLEM!!! The expiration time: ([Not After Date]) Last updated: ([Not Before Date])\n```\n\n**Trigger Conditions:**\n- Certificate expires in less than 17 hours (ALERT!)\n- Certificate already expired (EXPIRED!)\n\n#### Website Down Alert\n**Message Format:**\n```\nALERT! The [URL] !!!NOT AVAILABLE!!! Service outage probable! Intervention required!\n```\n\n**Trigger Conditions:**\n- Initial HTTP request fails\n- Retry after wait period also fails\n- HTTP status code not 200\n\n### Monitoring Dashboard\n\n#### Execution History\n- Navigate to n8n Executions tab\n- Filter by workflow name\n- Review successful/failed runs\n\n#### Alert History\nCheck Telegram channel for:\n- Alert timestamps\n- Affected certificates/services\n- Expiration details\n\n### Troubleshooting\n\n#### No Alerts Received\n1. **Check Telegram Bot:**\n   - Verify bot is admin in channel\n   - Test with manual message via API\n   - Confirm channel ID is correct\n\n2. **Check Workflow Execution:**\n   - Review execution logs in n8n\n   - Look for error nodes (red indicators)\n   - Verify TSL URL is accessible\n\n#### False Positives\n- Verify system time is correct\n- Check timezone settings\n- Review threshold values\n\n#### Missing Certificates\n- Some certificates may not have URLs\n- TSL may be temporarily unavailable\n- Check XML parsing in logs\n\n#### Performance Issues\n**Slow Execution:**\n- Large TSL files take time to parse\n- Network latency affects URL checks\n- Consider increasing timeout values\n\n**Memory Issues:**\n- Workflow processes many URLs sequentially\n- Monitor n8n server resources\n- Consider increasing batch intervals\n\n### Advanced Configuration\n\n#### Modify Check Frequency\nEdit **Execute With Scheduled Start** node:\n- Change interval type (hours/days/weeks)\n- Adjust interval value\n- Consider peak/off-peak scheduling\n\n#### Add Custom TSL Sources\nIn **Collect Checking URL list** node:\n```bash\nURL=\"https://your-tsl-source.com/tsl.xml\"\n```\n\n#### Customize Alert Messages\nEdit alert nodes to modify message templates:\n- Add organization name\n- Include escalation contacts\n- Add remediation instructions\n\n#### Filter Certificate Types\nModify URL detection patterns:\n- **Is this CRL?** node: Adjust CRL detection\n- **Is this CA?** node: Adjust CA detection\n- Add new patterns as needed\n\n#### Adjust Retry Logic\n**Wait B4 Retry** node:\n- Default: Immediate retry\n- Can add delay (seconds/minutes)\n- Useful for transient network issues\n\n## Maintenance\n\n### Regular Tasks\n- **Weekly**: Review alert frequency\n- **Monthly**: Validate phone numbers/channels\n- **Quarterly**: Update TSL source URLs\n- **Annually**: Review threshold values\n\n### Log Management\n- Clear old execution logs periodically\n- Archive alert history from Telegram\n- Document false positives for tuning\n\n### Updates\n- Keep n8n updated for security patches\n- Monitor OpenSSL versions for compatibility\n- Update notification service APIs as needed\n\n## Security Considerations\n- Store API keys in n8n credentials manager\n- Use environment variables for sensitive data\n- Restrict workflow edit access\n- Monitor for unauthorized changes\n- Regularly rotate API keys\n- Use HTTPS for TSL sources when available\n\n## Compliance Notes\n- Ensure monitoring aligns with PKI policies\n- Document alert response procedures\n- Maintain audit trail of certificate issues\n- Consider regulatory requirements for uptime\n\n## Integration Options\n- Connect to ticketing systems for alert tracking\n- Add database logging for compliance\n- Integrate with monitoring dashboards\n- Create escalation workflows for critical alerts\n\n## Best Practices\n1. Test alerts monthly to ensure delivery\n2. Maintain multiple notification channels\n3. Document response procedures for each alert type\n4. Set up redundant monitoring if critical\n5. Review and tune thresholds based on operational needs\n6. Keep contact lists updated\n7. Consider time zones for global operations",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Write Binary - TempFile : crlfile.der",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "role": "writeBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "B64 Encode : crlfile.der",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenSSL Parse CRL : crlfile.der",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Data OpenSSL output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get CRL URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "nextUpdate - TimeFilter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Good Or Evil",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is this CRL ?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute With Manual Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute With Scheduled Start",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Url From List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items -- Process Checking",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Website Available?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait B4 Retry",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Website Available Now?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Website Down - Telegram & SMS",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respose Extend With Requested URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Is this CA?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Non-CRL/CA URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Retry to Non-CRL/CA URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "nextUpdate - TimeFilter1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get CA URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Write Binary - TempFile : cacertfile.crt",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "role": "writeBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "B64 Encode : cacertfile.crt",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenSSL Parse CA Cert : cacertfile.crt",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Data OpenSSL CA output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Alive?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set-Info for CA Alert",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set-Info for CRL Alert",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "CRL Alert --- Telegam & SMS",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Collect Checking URL list",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Checking URL list to URL objects",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "CRL Available?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "CA Available?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "CA Alert --- Telegam & SMS",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

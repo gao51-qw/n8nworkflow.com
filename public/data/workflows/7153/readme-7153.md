@@ -1,0 +1,84 @@
+# Auto-publish NASA APOD to LinkedIn with AI translation and hashtags
+
+> # Auto-publish NASA APOD to LinkedIn with AI translation and hashtags
+Transform NASA's daily astronomical wonders into engaging LinkedIn content automatically. This workflow fetches NASA's Astronomy Picture of the Day, translates it to Brazilian Portuguese using AI, generates strategic hashtags, and publishes everything to your LinkedIn profile with the stunning space image attached.
+
+## Who's it for
+Content creators, astronomy enthusiasts, science communicators, and anyone wanting to share high-quality educational content consistently on LinkedIn. Perfect for Portuguese-speaking professionals who want to engage their network with fascinating space discoveries while building their personal brand as a science advocate.
+
+## How it works
+The workflow runs on a daily schedule and handles the complete content pipeline automatically. It fetches the latest NASA APOD through the official API, including both the image and detailed explanation. The English description gets professionally translated to selected language using Google Gemini 2.5 Flash, while maintaining scientific accuracy and terminology.
+
+Smart hashtag generation combines fixed branding tags with content-specific ones, mixing Portuguese and English for maximum reach. The final post includes the NASA image, translated description, and strategic hashtags, then gets published to your LinkedIn profile automatically.
+
+## How to set up
+You'll need accounts for Google AI Studio (free), LinkedIn Developer (free), and a Telegram bot for notifications. The setup takes about 15 minutes and uses only free services and APIs.
+
+First, create your Google AI Studio account and get an API key for the AI translation services. Then set up a LinkedIn OAuth2 application to enable posting permissions. Create a Telegram bot through BotFather and get your chat ID for notifications.
+
+Configure the Settings node with your Telegram chat ID and preferred language. The workflow comes with all prompts and configurations ready to use. Test each component individually before activating the daily automation.
+
+## Requirements
+- LinkedIn account with posting permissions
+- Google AI Studio API key (free tier available)
+- Telegram bot token and your chat ID
+- Basic understanding of OAuth2 setup for LinkedIn
+- NASA API key (optional - demo key included)
+
+All services used have generous free tiers, making this workflow completely free to operate indefinitely.
+
+## How to customize the workflow
+The centralized Settings node makes customization simple. Change the target language from Brazilian Portuguese to any other language by updating the translate_to_language variable. Modify the posting schedule in the CRON trigger to match your preferred timing.
+
+Customize the post template in the "Create Final Post Text" node to match your personal brand voice. Adjust the hashtag strategy by editing the AI prompt in the "Generate Hashtags" node. Add additional social platforms by duplicating the LinkedIn publisher with different credentials.
+
+The AI prompts can be fine-tuned for different writing styles or specific astronomical topics. You can also extend the workflow to include additional content processing, image enhancements, or cross-posting to multiple platforms while maintaining the core NASA APOD automation.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7153
+- **Complexity:** advanced
+- **Node Count:** 18
+- **Views:** 279
+- **Downloads:** 27
+- **Created:** 2025/8/8
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7153)
+
+## 👤 Author
+
+- **Name:** Vitorio Magalhães
+- **Username:** @vikthyr
+
+## 🏷️ Categories
+
+- Social Media
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.chainLlm** (×2)
+- **nasa** 
+- **set** (×2)
+- **merge** 
+- **telegram** 
+- **scheduleTrigger** 
+- **stickyNote** (×6)
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **linkedIn** (×2)
+- **if** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 18 nodes with 11 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

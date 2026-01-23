@@ -1,0 +1,151 @@
+{
+  "id": 9788,
+  "slug": "9788",
+  "title": "Compare flight prices across multiple booking platforms with email reports",
+  "description": "This workflow automates flight price comparison across multiple booking platforms (Kayak, Skyscanner, Expedia, Google Flights). It accepts natural language queries, extracts flight details using NLP, scrapes prices in parallel, identifies the best deals, and sends professional email reports with comprehensive price breakdowns and booking links.\n\n## 📦 What You'll Get\n\nA **fully functional, production-ready** n8n workflow that:\n\n✅ Compares flight prices across 4 major platforms (Kayak, Skyscanner, Expedia, Google Flights)  \n✅ Accepts natural language requests (\"Flight from NYC to London on March 25\")  \n✅ Sends beautiful email reports with best deals  \n✅ Returns real-time JSON responses for web apps  \n✅ Handles errors gracefully with helpful messages  \n✅ Includes detailed documentation with sticky notes\n\n---\n\n## 🚀 Quick Setup (3 Steps)\n\n### Step 1: Import Workflow to n8n\n\n1. **Copy the JSON** from the first artifact (workflow file)\n2. **Open n8n** → Go to **Workflows**\n3. **Click \"Import from File\"** → **Paste JSON** → Click **Import**\n4. ✅ Workflow imported successfully!\n\n### Step 2: Setup Python Scraper\n\n**On your server (where n8n SSH nodes will connect):**\n\n```bash\n# Navigate to your scripts directory\ncd /home/oneclick-server2/\n\n# Create the scraper file\nnano flight_scraper.py\n\n# Copy the entire Python script from the second artifact\n# Save with Ctrl+X, then Y, then Enter\n\n# Make it executable\nchmod +x flight_scraper.py\n\n# Install required packages\npip3 install selenium\n\n# Install Chrome and ChromeDriver\nsudo apt update\nsudo apt install -y chromium-browser chromium-chromedriver\n\n# Test the scraper\npython3 flight_scraper.py JFK LHR 2025-03-25 2025-03-30 round-trip 1 economy kayak\n```\n\n**Expected Output:**\n```\nDelta|$450|7h 30m|0|10:00 AM|6:30 PM|https://kayak.com/...\nBritish Airways|$485|7h 45m|0|11:30 AM|8:15 PM|https://kayak.com/...\n...\n```\n\n### Step 3: Configure n8n Credentials\n\n**A. Setup SMTP (for sending emails):**\n\n1. In n8n: **Credentials** → **Add Credential** → **SMTP**\n2. Fill in details:\n   ```\n   Host: smtp.gmail.com\n   Port: 587\n   User: your-email@gmail.com\n   Password: [Your App Password]\n   ```\n\n**For Gmail Users:**\n- Enable 2FA: https://myaccount.google.com/security\n- Create App Password: https://myaccount.google.com/apppasswords\n- Use the 16-character password in n8n\n\n**B. Setup SSH (already configured if you used existing credentials):**\n\n1. In workflow, SSH nodes use: `ilPh8oO4GfSlc0Qy`\n2. Verify credential exists and points to correct server\n3. Update path if needed: `/home/oneclick-server2/`\n\n**C. Activate Workflow:**\n\n1. Click the workflow **toggle** → **Active** ✅\n2. Webhook is now live!\n\n---\n\n## 🎯 How to Use\n\n### Method 1: Direct Webhook Call\n\n```bash\ncurl -X POST https://your-n8n-domain.com/webhook/flight-price-compare \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"message\": \"Flight from Mumbai to Dubai on 15th March, round-trip returning 20th March\",\n    \"email\": \"user@example.com\",\n    \"name\": \"John Doe\"\n  }'\n```\n\n**Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Flight comparison sent to user@example.com\",\n  \"route\": \"BOM → DXB\",\n  \"bestPrice\": 450,\n  \"airline\": \"Emirates\",\n  \"totalResults\": 18\n}\n```\n\n### Method 2: Natural Language Queries\n\nThe workflow understands various formats:\n\n**✅ All these work:**\n- \"Flight from New York to London on 25th March, one-way\"\n- \"NYC to LHR March 25 round-trip return March 30\"\n- \"I need a flight from Mumbai to Dubai departing 15th March\"\n- \"JFK LHR 2025-03-25 2025-03-30 round-trip\"\n\n**Supported cities (auto-converts to airport codes):**\n- New York → JFK\n- London → LHR\n- Mumbai → BOM\n- Dubai → DXB\n- Singapore → SIN\n- And 20+ more cities\n\n### Method 3: Structured JSON\n\n```json\n{\n  \"from\": \"JFK\",\n  \"to\": \"LHR\",\n  \"departure_date\": \"2025-03-25\",\n  \"return_date\": \"2025-03-30\",\n  \"trip_type\": \"round-trip\",\n  \"passengers\": 1,\n  \"class\": \"economy\",\n  \"email\": \"user@example.com\",\n  \"name\": \"John\"\n}\n```\n\n---\n\n## 📧 Email Report Example\n\nUsers receive an email like this:\n\n```\nFLIGHT PRICE COMPARISON\n==================================================\n\nRoute: JFK → LHR\nDeparture: 25 Mar 2025\nReturn: 30 Mar 2025\nTrip Type: round-trip\nPassengers: 1\n\n🏆 BEST DEAL\n--------------------------------------------------\nBritish Airways\nPrice: $450\nDuration: 7h 30m\nStops: Non-stop\nPlatform: Kayak\n\n💰 Save $85 vs highest price!\n\n📊 ALL RESULTS (Top 10)\n--------------------------------------------------\n1. British Airways - $450 (Non-stop) - Kayak\n2. Delta - $475 (Non-stop) - Google Flights\n3. American Airlines - $485 (Non-stop) - Expedia\n4. Virgin Atlantic - $495 (Non-stop) - Skyscanner\n5. United - $520 (1 stop) - Kayak\n...\n\nAverage Price: $495\nTotal Results: 23\n\nPrices subject to availability.\nHappy travels! ✈️\n```\n\n---\n\n## 🔧 Customization Options\n\n### Change Scraping Platforms\n\n**Add more platforms:**\n\n1. Duplicate an SSH scraping node\n2. Change platform parameter: `kayak` → `new-platform`\n3. Add scraping logic in `flight_scraper.py`\n4. Connect to \"Aggregate & Analyze Prices\" node\n\n**Remove platforms:**\n\n1. Delete unwanted SSH node\n2. Workflow continues with remaining platforms\n\n### Modify Email Format\n\nEdit the \"Format Email Report\" node:\n\n```javascript\n// Change to HTML format\nconst html = `\n&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;body&gt;\n  <h1>Flight Deals</h1>\n  <p>Best price: ${bestDeal.currency}${bestDeal.price}</p>\n&lt;/body&gt;\n&lt;/html&gt;\n`;\n\nreturn [{\n  json: {\n    subject: \"...\",\n    html: html,  // Instead of text\n    ...data\n  }\n}];\n```\n\nThen update \"Send Email Report\" node:\n- Change `emailFormat` to `html`\n- Use `{{$json.html}}` instead of `{{$json.text}}`\n\n### Add More Cities/Airports\n\nEdit \"Parse & Validate Flight Request\" node:\n\n```javascript\nconst airportCodes = {\n  ...existing codes...,\n  'berlin': 'BER',\n  'rome': 'FCO',\n  'barcelona': 'BCN',\n  // Add your cities here\n};\n```\n\n### Change Timeout Settings\n\nIn each SSH node, add:\n\n```javascript\n\"timeout\": 30000  // 30 seconds\n```\n\n---\n\n## 🐛 Troubleshooting\n\n### Issue: \"No flights found\"\n\n**Possible causes:**\n1. Scraper script not working\n2. Website structure changed\n3. Dates in past\n4. Invalid airport codes\n\n**Solutions:**\n```bash\n# Test scraper manually\ncd /home/oneclick-server2/\npython3 flight_scraper.py JFK LHR 2025-03-25 \"\" one-way 1 economy kayak\n\n# Check if output shows flights\n# If no output, check Chrome/ChromeDriver installation\n```\n\n### Issue: \"Connection refused\" (SSH)\n\n**Solutions:**\n1. Verify SSH credentials in n8n\n2. Check server is accessible: `ssh user@your-server`\n3. Verify path exists: `/home/oneclick-server2/`\n4. Check Python installed: `which python3`\n\n### Issue: \"Email not sending\"\n\n**Solutions:**\n1. Verify SMTP credentials\n2. Check email in spam folder\n3. For Gmail: Confirm App Password is used (not regular password)\n4. Test SMTP connection:\n   ```bash\n   telnet smtp.gmail.com 587\n   ```\n\n### Issue: \"Webhook not responding\"\n\n**Solutions:**\n1. Ensure workflow is **Active** (toggle on)\n2. Check webhook path: `/webhook/flight-price-compare`\n3. Test with curl command (see \"How to Use\" section)\n4. Check n8n logs: Settings → Log Streaming\n\n### Issue: \"Scraper timing out\"\n\n**Solutions:**\n```python\n# In flight_scraper.py, increase wait times\ntime.sleep(10)  # Instead of time.sleep(5)\n\n# Or increase WebDriverWait timeout\nWebDriverWait(driver, 30)  # Instead of 20\n```\n\n---\n\n## 📊 Understanding the Workflow\n\n### Node-by-Node Explanation\n\n**1. Webhook - Receive Flight Request**\n- Entry point for all requests\n- Accepts POST requests\n- Path: `/webhook/flight-price-compare`\n\n**2. Parse & Validate Flight Request**\n- Extracts flight details from natural language\n- Converts city names to airport codes\n- Validates required fields\n- Returns helpful errors if data missing\n\n**3. Check If Request Valid**\n- Routes to scraping if valid\n- Routes to error response if invalid\n\n**4-7. Scrape [Platform] (4 nodes)**\n- Run in parallel for speed\n- Each calls Python script with platform parameter\n- Continue on failure (don't break workflow)\n- Return pipe-delimited flight data\n\n**8. Aggregate & Analyze Prices**\n- Collects all scraper results\n- Parses flight data\n- Finds best overall deal\n- Finds best non-stop flight\n- Calculates statistics\n- Sorts by price\n\n**9. Format Email Report**\n- Creates readable text report\n- Includes route details\n- Highlights best deal\n- Lists top 10 results\n- Shows statistics\n\n**10. Send Email Report**\n- Sends formatted email to user\n- Uses SMTP credentials\n\n**11. Webhook Response (Success)**\n- Returns JSON response immediately\n- Includes best price summary\n- Confirms email sent\n\n**12. Webhook Response (Error)**\n- Returns helpful error message\n- Guides user on what's missing\n\n---\n\n## 🎨 Workflow Features\n\n### ✅ Included Features\n\n- **Natural Language Processing**: Understands flexible input formats\n- **Multi-Platform Comparison**: 4 major booking sites\n- **Parallel Scraping**: All platforms scraped simultaneously\n- **Error Handling**: Graceful failures, helpful messages\n- **Email Reports**: Professional format with all details\n- **Real-Time Responses**: Instant webhook feedback\n- **Sticky Notes**: Detailed documentation in workflow\n- **Airport Code Mapping**: Auto-converts 20+ cities\n\n### 🚧 Not Included (Easy to Add)\n\n- **Price Alerts**: Monitor price drops (add Google Sheets)\n- **Analytics Dashboard**: Track searches (add Google Sheets)\n- **SMS Notifications**: Send via Twilio\n- **Slack Integration**: Post to channels\n- **Database Logging**: Store searches in PostgreSQL\n- **Multi-Currency**: Show prices in the user's currency\n\n---\n\n## 💡 Pro Tips\n\n### Tip 1: Speed Up Scraping\n\nUse faster scraping service (like ScraperAPI):\n\n```javascript\n// Replace SSH nodes with HTTP Request nodes\n{\n  \"url\": \"http://api.scraperapi.com\",\n  \"qs\": {\n    \"api_key\": \"YOUR_KEY\",\n    \"url\": \"https://kayak.com/flights/...\"\n  }\n}\n```\n\n### Tip 2: Cache Results\n\nAdd caching to avoid duplicate scraping:\n\n```javascript\n// In Parse node, check cache first\nconst cacheKey = `${origin}-${dest}-${departureDate}`;\nconst cached = await $cache.get(cacheKey);\n\nif (cached && Date.now() - cached.time &lt; 3600000) {\n  return cached.data; // Use 1-hour cache\n}\n```\n\n### Tip 3: Add More Platforms\n\nEasy to add Momondo, CheapOair, etc.:\n\n1. Add function in `flight_scraper.py`\n2. Add SSH node in workflow\n3. Connect to aggregator\n\n### Tip 4: Improve Date Parsing\n\nHandle more formats:\n\n```javascript\n// Add to Parse node\nconst formats = [\n  'DD/MM/YYYY',\n  'MM-DD-YYYY',\n  'YYYY.MM.DD',\n  // Add your formats\n];\n```\n\n\n",
+  "featuredImage": "/data/workflows/9788/9788.webp",
+  "author": {
+    "id": 101,
+    "slug": "oneclick-ai",
+    "name": "Oneclick AI Squad",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 534,
+  "downloads": 53,
+  "createdAt": "2025-10-16T15:15:14.462Z",
+  "updatedAt": "2026-01-16T09:02:00.132Z",
+  "publishedAt": "2025-10-16T15:15:14.462Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9788",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Compare flight prices across multiple booking platforms with email reports",
+    "workflowName": "Compare flight prices across multiple booking platforms with email reports",
+    "description": "This workflow automates flight price comparison across multiple booking platforms (Kayak, Skyscanner, Expedia, Google Flights). It accepts natural language queries, extracts flight details using NLP, scrapes prices in parallel, identifies the best deals, and sends professional email reports with comprehensive price breakdowns and booking links.\n\n## 📦 What You'll Get\n\nA **fully functional, production-ready** n8n workflow that:\n\n✅ Compares flight prices across 4 major platforms (Kayak, Skyscanner, Expedia, Google Flights)  \n✅ Accepts natural language requests (\"Flight from NYC to London on March 25\")  \n✅ Sends beautiful email reports with best deals  \n✅ Returns real-time JSON responses for web apps  \n✅ Handles errors gracefully with helpful messages  \n✅ Includes detailed documentation with sticky notes\n\n---\n\n## 🚀 Quick Setup (3 Steps)\n\n### Step 1: Import Workflow to n8n\n\n1. **Copy the JSON** from the first artifact (workflow file)\n2. **Open n8n** → Go to **Workflows**\n3. **Click \"Import from File\"** → **Paste JSON** → Click **Import**\n4. ✅ Workflow imported successfully!\n\n### Step 2: Setup Python Scraper\n\n**On your server (where n8n SSH nodes will connect):**\n\n```bash\n# Navigate to your scripts directory\ncd /home/oneclick-server2/\n\n# Create the scraper file\nnano flight_scraper.py\n\n# Copy the entire Python script from the second artifact\n# Save with Ctrl+X, then Y, then Enter\n\n# Make it executable\nchmod +x flight_scraper.py\n\n# Install required packages\npip3 install selenium\n\n# Install Chrome and ChromeDriver\nsudo apt update\nsudo apt install -y chromium-browser chromium-chromedriver\n\n# Test the scraper\npython3 flight_scraper.py JFK LHR 2025-03-25 2025-03-30 round-trip 1 economy kayak\n```\n\n**Expected Output:**\n```\nDelta|$450|7h 30m|0|10:00 AM|6:30 PM|https://kayak.com/...\nBritish Airways|$485|7h 45m|0|11:30 AM|8:15 PM|https://kayak.com/...\n...\n```\n\n### Step 3: Configure n8n Credentials\n\n**A. Setup SMTP (for sending emails):**\n\n1. In n8n: **Credentials** → **Add Credential** → **SMTP**\n2. Fill in details:\n   ```\n   Host: smtp.gmail.com\n   Port: 587\n   User: your-email@gmail.com\n   Password: [Your App Password]\n   ```\n\n**For Gmail Users:**\n- Enable 2FA: https://myaccount.google.com/security\n- Create App Password: https://myaccount.google.com/apppasswords\n- Use the 16-character password in n8n\n\n**B. Setup SSH (already configured if you used existing credentials):**\n\n1. In workflow, SSH nodes use: `ilPh8oO4GfSlc0Qy`\n2. Verify credential exists and points to correct server\n3. Update path if needed: `/home/oneclick-server2/`\n\n**C. Activate Workflow:**\n\n1. Click the workflow **toggle** → **Active** ✅\n2. Webhook is now live!\n\n---\n\n## 🎯 How to Use\n\n### Method 1: Direct Webhook Call\n\n```bash\ncurl -X POST https://your-n8n-domain.com/webhook/flight-price-compare \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"message\": \"Flight from Mumbai to Dubai on 15th March, round-trip returning 20th March\",\n    \"email\": \"user@example.com\",\n    \"name\": \"John Doe\"\n  }'\n```\n\n**Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Flight comparison sent to user@example.com\",\n  \"route\": \"BOM → DXB\",\n  \"bestPrice\": 450,\n  \"airline\": \"Emirates\",\n  \"totalResults\": 18\n}\n```\n\n### Method 2: Natural Language Queries\n\nThe workflow understands various formats:\n\n**✅ All these work:**\n- \"Flight from New York to London on 25th March, one-way\"\n- \"NYC to LHR March 25 round-trip return March 30\"\n- \"I need a flight from Mumbai to Dubai departing 15th March\"\n- \"JFK LHR 2025-03-25 2025-03-30 round-trip\"\n\n**Supported cities (auto-converts to airport codes):**\n- New York → JFK\n- London → LHR\n- Mumbai → BOM\n- Dubai → DXB\n- Singapore → SIN\n- And 20+ more cities\n\n### Method 3: Structured JSON\n\n```json\n{\n  \"from\": \"JFK\",\n  \"to\": \"LHR\",\n  \"departure_date\": \"2025-03-25\",\n  \"return_date\": \"2025-03-30\",\n  \"trip_type\": \"round-trip\",\n  \"passengers\": 1,\n  \"class\": \"economy\",\n  \"email\": \"user@example.com\",\n  \"name\": \"John\"\n}\n```\n\n---\n\n## 📧 Email Report Example\n\nUsers receive an email like this:\n\n```\nFLIGHT PRICE COMPARISON\n==================================================\n\nRoute: JFK → LHR\nDeparture: 25 Mar 2025\nReturn: 30 Mar 2025\nTrip Type: round-trip\nPassengers: 1\n\n🏆 BEST DEAL\n--------------------------------------------------\nBritish Airways\nPrice: $450\nDuration: 7h 30m\nStops: Non-stop\nPlatform: Kayak\n\n💰 Save $85 vs highest price!\n\n📊 ALL RESULTS (Top 10)\n--------------------------------------------------\n1. British Airways - $450 (Non-stop) - Kayak\n2. Delta - $475 (Non-stop) - Google Flights\n3. American Airlines - $485 (Non-stop) - Expedia\n4. Virgin Atlantic - $495 (Non-stop) - Skyscanner\n5. United - $520 (1 stop) - Kayak\n...\n\nAverage Price: $495\nTotal Results: 23\n\nPrices subject to availability.\nHappy travels! ✈️\n```\n\n---\n\n## 🔧 Customization Options\n\n### Change Scraping Platforms\n\n**Add more platforms:**\n\n1. Duplicate an SSH scraping node\n2. Change platform parameter: `kayak` → `new-platform`\n3. Add scraping logic in `flight_scraper.py`\n4. Connect to \"Aggregate & Analyze Prices\" node\n\n**Remove platforms:**\n\n1. Delete unwanted SSH node\n2. Workflow continues with remaining platforms\n\n### Modify Email Format\n\nEdit the \"Format Email Report\" node:\n\n```javascript\n// Change to HTML format\nconst html = `\n&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;body&gt;\n  <h1>Flight Deals</h1>\n  <p>Best price: ${bestDeal.currency}${bestDeal.price}</p>\n&lt;/body&gt;\n&lt;/html&gt;\n`;\n\nreturn [{\n  json: {\n    subject: \"...\",\n    html: html,  // Instead of text\n    ...data\n  }\n}];\n```\n\nThen update \"Send Email Report\" node:\n- Change `emailFormat` to `html`\n- Use `{{$json.html}}` instead of `{{$json.text}}`\n\n### Add More Cities/Airports\n\nEdit \"Parse & Validate Flight Request\" node:\n\n```javascript\nconst airportCodes = {\n  ...existing codes...,\n  'berlin': 'BER',\n  'rome': 'FCO',\n  'barcelona': 'BCN',\n  // Add your cities here\n};\n```\n\n### Change Timeout Settings\n\nIn each SSH node, add:\n\n```javascript\n\"timeout\": 30000  // 30 seconds\n```\n\n---\n\n## 🐛 Troubleshooting\n\n### Issue: \"No flights found\"\n\n**Possible causes:**\n1. Scraper script not working\n2. Website structure changed\n3. Dates in past\n4. Invalid airport codes\n\n**Solutions:**\n```bash\n# Test scraper manually\ncd /home/oneclick-server2/\npython3 flight_scraper.py JFK LHR 2025-03-25 \"\" one-way 1 economy kayak\n\n# Check if output shows flights\n# If no output, check Chrome/ChromeDriver installation\n```\n\n### Issue: \"Connection refused\" (SSH)\n\n**Solutions:**\n1. Verify SSH credentials in n8n\n2. Check server is accessible: `ssh user@your-server`\n3. Verify path exists: `/home/oneclick-server2/`\n4. Check Python installed: `which python3`\n\n### Issue: \"Email not sending\"\n\n**Solutions:**\n1. Verify SMTP credentials\n2. Check email in spam folder\n3. For Gmail: Confirm App Password is used (not regular password)\n4. Test SMTP connection:\n   ```bash\n   telnet smtp.gmail.com 587\n   ```\n\n### Issue: \"Webhook not responding\"\n\n**Solutions:**\n1. Ensure workflow is **Active** (toggle on)\n2. Check webhook path: `/webhook/flight-price-compare`\n3. Test with curl command (see \"How to Use\" section)\n4. Check n8n logs: Settings → Log Streaming\n\n### Issue: \"Scraper timing out\"\n\n**Solutions:**\n```python\n# In flight_scraper.py, increase wait times\ntime.sleep(10)  # Instead of time.sleep(5)\n\n# Or increase WebDriverWait timeout\nWebDriverWait(driver, 30)  # Instead of 20\n```\n\n---\n\n## 📊 Understanding the Workflow\n\n### Node-by-Node Explanation\n\n**1. Webhook - Receive Flight Request**\n- Entry point for all requests\n- Accepts POST requests\n- Path: `/webhook/flight-price-compare`\n\n**2. Parse & Validate Flight Request**\n- Extracts flight details from natural language\n- Converts city names to airport codes\n- Validates required fields\n- Returns helpful errors if data missing\n\n**3. Check If Request Valid**\n- Routes to scraping if valid\n- Routes to error response if invalid\n\n**4-7. Scrape [Platform] (4 nodes)**\n- Run in parallel for speed\n- Each calls Python script with platform parameter\n- Continue on failure (don't break workflow)\n- Return pipe-delimited flight data\n\n**8. Aggregate & Analyze Prices**\n- Collects all scraper results\n- Parses flight data\n- Finds best overall deal\n- Finds best non-stop flight\n- Calculates statistics\n- Sorts by price\n\n**9. Format Email Report**\n- Creates readable text report\n- Includes route details\n- Highlights best deal\n- Lists top 10 results\n- Shows statistics\n\n**10. Send Email Report**\n- Sends formatted email to user\n- Uses SMTP credentials\n\n**11. Webhook Response (Success)**\n- Returns JSON response immediately\n- Includes best price summary\n- Confirms email sent\n\n**12. Webhook Response (Error)**\n- Returns helpful error message\n- Guides user on what's missing\n\n---\n\n## 🎨 Workflow Features\n\n### ✅ Included Features\n\n- **Natural Language Processing**: Understands flexible input formats\n- **Multi-Platform Comparison**: 4 major booking sites\n- **Parallel Scraping**: All platforms scraped simultaneously\n- **Error Handling**: Graceful failures, helpful messages\n- **Email Reports**: Professional format with all details\n- **Real-Time Responses**: Instant webhook feedback\n- **Sticky Notes**: Detailed documentation in workflow\n- **Airport Code Mapping**: Auto-converts 20+ cities\n\n### 🚧 Not Included (Easy to Add)\n\n- **Price Alerts**: Monitor price drops (add Google Sheets)\n- **Analytics Dashboard**: Track searches (add Google Sheets)\n- **SMS Notifications**: Send via Twilio\n- **Slack Integration**: Post to channels\n- **Database Logging**: Store searches in PostgreSQL\n- **Multi-Currency**: Show prices in the user's currency\n\n---\n\n## 💡 Pro Tips\n\n### Tip 1: Speed Up Scraping\n\nUse faster scraping service (like ScraperAPI):\n\n```javascript\n// Replace SSH nodes with HTTP Request nodes\n{\n  \"url\": \"http://api.scraperapi.com\",\n  \"qs\": {\n    \"api_key\": \"YOUR_KEY\",\n    \"url\": \"https://kayak.com/flights/...\"\n  }\n}\n```\n\n### Tip 2: Cache Results\n\nAdd caching to avoid duplicate scraping:\n\n```javascript\n// In Parse node, check cache first\nconst cacheKey = `${origin}-${dest}-${departureDate}`;\nconst cached = await $cache.get(cacheKey);\n\nif (cached && Date.now() - cached.time &lt; 3600000) {\n  return cached.data; // Use 1-hour cache\n}\n```\n\n### Tip 3: Add More Platforms\n\nEasy to add Momondo, CheapOair, etc.:\n\n1. Add function in `flight_scraper.py`\n2. Add SSH node in workflow\n3. Connect to aggregator\n\n### Tip 4: Improve Date Parsing\n\nHandle more formats:\n\n```javascript\n// Add to Parse node\nconst formats = [\n  'DD/MM/YYYY',\n  'MM-DD-YYYY',\n  'YYYY.MM.DD',\n  // Add your formats\n];\n```",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook - Receive Flight Request",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Parse & Validate Flight Request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check If Request Valid",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scrape Kayak",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scrape Skyscanner",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scrape Expedia",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scrape Google Flights",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate & Analyze Prices",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Email Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Webhook Response (Success)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Webhook Response (Error)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

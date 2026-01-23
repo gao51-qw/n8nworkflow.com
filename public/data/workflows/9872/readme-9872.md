@@ -1,0 +1,82 @@
+# Automated UPSC current affairs digest from The Hindu to Google Sheets with Gemini AI
+
+> This template sets up a scheduled automation that scrapes the latest news from The Hindu website, uses a Google Gemini AI Agent to filter and analyze the content for relevance to the **Competitive Exams like UPSC Civil Services Examination (CSE) syllabus**, and compiles a structured daily digest directly into a Google Sheet. It **saves hours of manual reading and note-taking** by providing concise summaries, subject categorization, and explicit UPSC importance notes.
+
+## Who’s it for
+This workflow is essential for:
+1. **UPSC/CSE Aspirants** who require a curated, focused, and systematic daily current affairs digest.
+2. **Coaching Institutes** aiming to instantly generate structured, high-quality study material for their students.
+3. **Educators and Content Creators** focused on Governance, Economy, International Relations, and Science & Technology.
+
+## How it works / What it does
+This workflow runs automatically every morning (scheduled for 7 AM by default) to generate a ready-to-study current affairs document.
+1. **Scraping**: The Schedule Trigger fires an HTTP Request to fetch the latest news links from The Hindu's front page.
+2. **Data Curation:** The HTML and Code in JavaScript nodes work together to extract and pair every article URL with its title.
+3. **Content Retrieval:** For each identified link, a second HTTP Request node fetches the entire article body.
+4. **AI Analysis and Filtering:** The AI Agent uses a detailed prompt and the Google Gemini Chat Model to perform two critical tasks:
+	1. **Filter:** It filters out all irrelevant articles (e.g., sports results, local crime) to keep only the 5-6 most important UPSC-relevant pieces (Polity, Economy, IR, etc.).
+	6. **Analyze:** For the selected articles, it generates a **Brief Summary**, identifies the Main Subject, and clearly articulates Why it is Important for the UPSC Exam.
+7. **Storage:** The AI Agent calls the integrated Google Sheets Tool to **automatically append** the structured, analyzed data into your designated Google Sheet, creating your daily ready-made notes.
+
+## Requirements
+To deploy this workflow, you need:
+
+1. **n8n Account:** (Cloud or self-hosted).
+2. **Google Gemini API Key:** For connecting the Google Gemini Chat Model and powering the AI Agent.
+3. **Google Sheets Credentials:** For reading/writing the final compiled digest.
+4. **Target Google Sheet:** A spreadsheet with the following columns: Date, URL, Subject, Brief Summary, and What is Important.
+
+## How to set up
+- **Credentials Setup:** Connect your Google Gemini and Google Sheets accounts via the n8n Credentials Manager.
+- **Google Sheet Linking:** In the **Append row in sheet and Append row in sheet in Google Sheets1 nodes**, replace the **placeholder IDs and GIDs** with the actual ID and sheet name of your dedicated UPSC notes spreadsheet.
+- **Scheduling:** Adjust the time in the **Schedule Trigger: Daily at 7 AM node** if you want the daily analysis to run at a different hour.
+- **AI Customization (Optional):** You can refine the System Message in the **AI Agent: Filter & Analyze UPSC News node** to focus the analysis on specific exam phases (e.g., Prelims only) or adjust the priority of subjects.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9872
+- **Complexity:** advanced
+- **Node Count:** 20
+- **Views:** 82
+- **Downloads:** 8
+- **Created:** 2025/10/19
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9872)
+
+## 👤 Author
+
+- **Name:** Pawan
+- **Username:** @gladiator
+
+## 🏷️ Categories
+
+- Market Research
+- AI RAG
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **httpRequest** (×2)
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **html** (×2)
+- **googleSheets** 
+- **googleSheetsTool** 
+- **code** 
+- **scheduleTrigger** 
+- **stickyNote** (×9)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 20 nodes with 10 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

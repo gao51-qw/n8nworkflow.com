@@ -1,0 +1,332 @@
+{
+  "id": 1898,
+  "slug": "1898",
+  "title": "Send a ChatGPT email reply and save responses to Google Sheets",
+  "description": "This workflow sends a OpenAI GPT reply when an email is received from specific email recipients. It then saves the initial email and the GPT response to an automatically generated Google spreadsheet. Subsequent GPT responses will be added to the same spreadsheet.\n\nAdditionally, when feedback is given for any of the GPT responses, it will be recorded to the spreasheet, which can then be used later to fine-tune the GPT model.\n\n## Prerequisites\n\n- [OpenAI credentials](https://docs.n8n.io/integrations/builtin/credentials/openai/)\n- [Google credentials](https://docs.n8n.io/integrations/builtin/credentials/google/)\n\n## How it works\n\nThis workflow is essentially a two-in-one workflow. It triggers off from two different nodes and have very different functionality from each trigger.\n\nThe flow triggered from `On email received` node is as follows:\n\n1. Triggers off on the `On email received` node.\n2. Extract the email body from the email.\n3. Generate a response from the email body using the `OpenAI` node.\n4. Reply to the email sender using the `Send reply to recipient` node. A feedback link is also included in the email body which will trigger the `On feedback given` node. This is used to fine-tune the GPT model.\n5. Save the email body and OpenAI response to a Google Sheet. If a sheet does not exist, it will be created.\n\nThe flow triggered from `On feedback given` node is as follows:\n\n1. Triggers off when a feedback link is clicked in the emailed GPT response.\n2. The feedback, either positive or negative, for that specific GPT response is then recorded to the Google Sheet.",
+  "featuredImage": "/data/workflows/1898/1898.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8n-team",
+    "name": "n8n Team",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 18721,
+  "downloads": 1872,
+  "createdAt": "2023-03-10T15:30:33.270Z",
+  "updatedAt": "2026-01-16T08:22:13.410Z",
+  "publishedAt": "2023-03-10T15:30:33.270Z",
+  "nodes": 49,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/1898",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Send a ChatGPT email reply and save responses to Google Sheets",
+    "workflowName": "Send a ChatGPT email reply and save responses to Google Sheets",
+    "description": "This workflow sends a OpenAI GPT reply when an email is received from specific email recipients. It then saves the initial email and the GPT response to an automatically generated Google spreadsheet. Subsequent GPT responses will be added to the same spreadsheet.\n\nAdditionally, when feedback is given for any of the GPT responses, it will be recorded to the spreasheet, which can then be used later to fine-tune the GPT model.\n\n## Prerequisites\n\n- [OpenAI credentials](https://docs.n8n.io/integrations/builtin/credentials/openai/)\n- [Google credentials](https://docs.n8n.io/integrations/builtin/credentials/google/)\n\n## How it works\n\nThis workflow is essentially a two-in-one workflow. It triggers off from two different nodes and have very different functionality from each trigger.\n\nThe flow triggered from `On email received` node is as follows:\n\n1. Triggers off on the `On email received` node.\n2. Extract the email body from the email.\n3. Generate a response from the email body using the `OpenAI` node.\n4. Reply to the email sender using the `Send reply to recipient` node. A feedback link is also included in the email body which will trigger the `On feedback given` node. This is used to fine-tune the GPT model.\n5. Save the email body and OpenAI response to a Google Sheet. If a sheet does not exist, it will be created.\n\nThe flow triggered from `On feedback given` node is as follows:\n\n1. Triggers off when a feedback link is clicked in the emailed GPT response.\n2. The feedback, either positive or negative, for that specific GPT response is then recorded to the Google Sheet.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Generate reply",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On email received",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only continue for specific emails",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configure",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send reply to recipient",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate UUID",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Thanks for your response!",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract message content (advanced)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If spreadsheet doesn't exist",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Successfully created or updated row",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Store spreadsheet ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Paste data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If no sheet IDs",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create or update rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get data from `Format data`",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get data from `Format data` node",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send email reply",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On feedback given",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send feedback for fine-tuned data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Show HTML page",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get sheet IDs #1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If no spreadsheet in configuration #2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store specific sheet IDs #2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get sheet IDs #2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If no spreadsheet in configuration #1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store specific sheet IDs #1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email template",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Record feedback",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fallback route",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Identify trigger #2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Identify trigger #1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Do not send unfinished email reply",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If reply is complete",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Do not send email to this recipient",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send reply to database",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Determine which trigger ran",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is text within token limit?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

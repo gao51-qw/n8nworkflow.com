@@ -1,0 +1,248 @@
+{
+  "id": 4827,
+  "slug": "4827",
+  "title": "AI-powered WhatsApp chatbot for text, voice, images, and PDF with RAG",
+  "description": "### Who is this for?\nThis template is designed for internal support teams, product specialists, and knowledge managers in technology companies who want to automate ingestion of product documentation and enable AI-driven, retrieval-augmented question answering via WhatsApp.\n\n### What problem is this workflow solving?\nSupport agents often spend too much time manually searching through lengthy documentation, leading to inconsistent or delayed answers. This solution automates importing, chunking, and indexing product manuals, then uses retrieval-augmented generation (RAG) to answer user queries accurately and quickly with AI via WhatsApp messaging.\n\n### What these workflows do\n\n#### Workflow 1: Document Ingestion & Indexing\n\n- Manually triggered to import product documentation from Google Docs.\n- Automatically splits large documents into chunks for efficient searching.\n- Generates vector embeddings for each chunk using OpenAI embeddings.\n- Inserts the embedded chunks and metadata into a MongoDB Atlas vector store, enabling fast semantic search.\n\n#### Workflow 2: AI-Powered Query & Response via WhatsApp\n\n- Listens for incoming WhatsApp user messages, supporting various types:\n\t- Text messages: Plain text queries from users.\n\t- Audio messages: Voice notes transcribed into text for processing.\n\t- Image messages: Photos or screenshots analyzed to provide contextual answers.\n\t- Document messages: PDFs, spreadsheets, or other files parsed for relevant content.\n- Converts incoming queries to vector embeddings and performs similarity search on the MongoDB vector store.\n- Uses OpenAI’s GPT-4o-mini model with retrieval-augmented generation to produce concise, context-aware answers.\n- Maintains conversation context across multiple turns using a memory buffer node.\n- Routes different message types to appropriate processing nodes to maximize answer quality.\n\n### Setup\n\n#### Setting up vector embeddings\n\n1. Authenticate Google Docs and connect your Google Docs URL containing the product documentation you want to index.\n2. Authenticate MongoDB Atlas and connect the collection where you want to store the vector embeddings. Create a search index on this collection to support vector similarity queries.\n3. Ensure the index name matches the one configured in n8n (data_index).\n4. See the example MongoDB search index template below for reference.\n\n#### Setting up chat\n\n1. Authenticate the WhatsApp node with your Meta account credentials to enable message receiving and sending.\n2. Connect the MongoDB collection containing embedded product documentation to the MongoDB Vector Search node used for similarity queries.\n3. Set up the system prompt in the Knowledge Base Agent node to reflect your company’s tone, answering style, and any business rules, ensuring it references the connected MongoDB collection for context retrieval.\n\n### Make sure\n\nBoth MongoDB nodes (in ingestion and chat workflows) are connected to the same collection with:\n\nAn embedding field storing vector data,\n\nRelevant metadata fields (e.g., document ID, source), and\n\nThe same vector index name configured (e.g., data_index).\n\n### Search Index Example:\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"_id\": { \"type\": \"string\" },\n      \"text\": { \"type\": \"string\" },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"source\": { \"type\": \"string\" },\n      \"doc_id\": { \"type\": \"string\" }\n    }\n  }\n}",
+  "featuredImage": "/data/workflows/4827/4827.webp",
+  "author": {
+    "id": 101,
+    "slug": "thomasgpt",
+    "name": "NovaNode",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 151719,
+  "downloads": 15171,
+  "createdAt": "2025-06-09T22:22:54.378Z",
+  "updatedAt": "2026-01-16T08:36:24.130Z",
+  "publishedAt": "2025-06-09T22:22:54.378Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4827",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered WhatsApp chatbot for text, voice, images, and PDF with RAG",
+    "workflowName": "AI-powered WhatsApp chatbot for text, voice, images, and PDF with RAG",
+    "description": "### Who is this for?\nThis template is designed for internal support teams, product specialists, and knowledge managers in technology companies who want to automate ingestion of product documentation and enable AI-driven, retrieval-augmented question answering via WhatsApp.\n\n### What problem is this workflow solving?\nSupport agents often spend too much time manually searching through lengthy documentation, leading to inconsistent or delayed answers. This solution automates importing, chunking, and indexing product manuals, then uses retrieval-augmented generation (RAG) to answer user queries accurately and quickly with AI via WhatsApp messaging.\n\n### What these workflows do\n\n#### Workflow 1: Document Ingestion & Indexing\n\n- Manually triggered to import product documentation from Google Docs.\n- Automatically splits large documents into chunks for efficient searching.\n- Generates vector embeddings for each chunk using OpenAI embeddings.\n- Inserts the embedded chunks and metadata into a MongoDB Atlas vector store, enabling fast semantic search.\n\n#### Workflow 2: AI-Powered Query & Response via WhatsApp\n\n- Listens for incoming WhatsApp user messages, supporting various types:\n\t- Text messages: Plain text queries from users.\n\t- Audio messages: Voice notes transcribed into text for processing.\n\t- Image messages: Photos or screenshots analyzed to provide contextual answers.\n\t- Document messages: PDFs, spreadsheets, or other files parsed for relevant content.\n- Converts incoming queries to vector embeddings and performs similarity search on the MongoDB vector store.\n- Uses OpenAI’s GPT-4o-mini model with retrieval-augmented generation to produce concise, context-aware answers.\n- Maintains conversation context across multiple turns using a memory buffer node.\n- Routes different message types to appropriate processing nodes to maximize answer quality.\n\n### Setup\n\n#### Setting up vector embeddings\n\n1. Authenticate Google Docs and connect your Google Docs URL containing the product documentation you want to index.\n2. Authenticate MongoDB Atlas and connect the collection where you want to store the vector embeddings. Create a search index on this collection to support vector similarity queries.\n3. Ensure the index name matches the one configured in n8n (data_index).\n4. See the example MongoDB search index template below for reference.\n\n#### Setting up chat\n\n1. Authenticate the WhatsApp node with your Meta account credentials to enable message receiving and sending.\n2. Connect the MongoDB collection containing embedded product documentation to the MongoDB Vector Search node used for similarity queries.\n3. Set up the system prompt in the Knowledge Base Agent node to reflect your company’s tone, answering style, and any business rules, ensuring it references the connected MongoDB collection for context retrieval.\n\n### Make sure\n\nBoth MongoDB nodes (in ingestion and chat workflows) are connected to the same collection with:\n\nAn embedding field storing vector data,\n\nRelevant metadata fields (e.g., document ID, source), and\n\nThe same vector index name configured (e.g., data_index).\n\n### Search Index Example:\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"_id\": { \"type\": \"string\" },\n      \"text\": { \"type\": \"string\" },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"source\": { \"type\": \"string\" },\n      \"doc_id\": { \"type\": \"string\" }\n    }\n  }\n}",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Knowledge Base Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "MongoDB Vector Search",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Document Section Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Document Chunker",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "MongoDB Vector Store Inserter",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Embeddings Generator",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Docs Importer",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "role": "whatsAppTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Extract from PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from XLS",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from XLSX",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Map JSON",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map file extensions",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map document prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map image prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map text prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Gets WhatsApp Voicemail Source URL",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gets WhatsApp Image Source URL",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gets WhatsApp Document Source URL",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download Voicemail",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Document",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Route Types",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Route Document Types",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send Unsupported Response",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Response",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "id": 4904,
+  "slug": "4904",
+  "title": "Pyragogy AI-driven handbook generator with multi-agent orchestration",
+  "description": "# AI-Driven Handbook Generator with Multi-Agent Orchestration (Pyragogy AI Village)\n\nThis n8n workflow is a **modular, multi-agent AI orchestration system** designed for the **collaborative generation of Markdown-based handbooks**. Inspired by peer learning and open publishing workflows, it simulates a content pipeline where specialized AI agents act in defined roles, enabling true **AI–human co-creation** and **iterative refinement**.\n\nThis project is a core component of [**Pyragogy**](https://pyragogy.org), an open framework dedicated to **ethical cognitive co-creation**, **peer AI–human learning**, and **human-in-the-loop automation** for open knowledge systems. It implements the master orchestration architecture for the Pyragogy AI Village, managing a complex sequence of AI agents to process input, perform review, synthesis, and archiving, with a crucial human oversight step for final approval.\n\n## How It Works: A Deep Dive into the Workflow's Architecture\n\nThe workflow orchestrates a sophisticated content generation and review process, ideal for creating AI-driven knowledge bases or handbooks with human oversight.\n\n* **Webhook Trigger & Input:** The process begins when the workflow receives a JSON input via a **Webhook** (specifically at `/webhook/pyragogy/process`). This input typically includes details like the handbook's title, initial text, and relevant tags.\n\n* **Database Verification:** It first verifies the connection to a **PostgreSQL database** to ensure data persistence.\n\n* **Meta-Orchestrator:** A powerful **Meta-Orchestrator** (powered by `gpt-4o` from OpenAI) analyzes the initial request. Its role is to dynamically determine and activate the optimal sequence of specialized AI agents required to fulfill the input, ensuring tasks are dynamically routed and assigned based on each agent’s responsibility.\n\n* **Agent Execution & Iteration:** Each activated agent executes its step using OpenAI or custom endpoints. This involves:\n\n    * **Content Generation:** Agents like the Summarizer and the Synthesizer generate new content or refine existing text.\n\n    * **Peer Review Board:** A crucial aspect is the **Peer Review Board**, comprised of AI agents like the Peer Reviewer, the Sensemaking Agent, and the Prompt Engineer. This board evaluates the output for quality, coherence, and accuracy.\n\n    * **Reprocessing & Redrafting:** If the review agents flag a `major_issue`, they trigger **redrafting loops** by generating specific feedback for the Synthesizer. This mechanism ensures iterative refinement until the content meets the required standards.\n\n* **Human-in-the-Loop (HITL) Review:** For final approval, particularly for the Archivist agent's output, a **human review process** is initiated. An email is sent to a human reviewer, prompting them to approve, reject, or comment via a \"Wait for Webhook\" node. This ensures **human oversight** and quality control.\n\n* **Content Persistence & Versioning:** If the content is approved by the human reviewer:\n\n    * It's saved to a **PostgreSQL database** (specifically to the `handbook_entries` and `agent_contributions` tables).\n\n    * Optionally, the content can be committed to a **GitHub repository** for version control, provided the necessary environment variables are configured.\n\n* **Notifications:** The final output and the sequence of executed agents can be sent as a notification to **Slack**, if configured.\n\nObserve the dynamic loop: `orchestrate → assign → generate → review (AI/human) → store`\n\n## Included AI Agents\n\nThis workflow leverages a suite of specialized AI agents, each with a distinct role in the content pipeline:\n\n* **Meta-Orchestrator:** Determines the optimal sequence of agents to execute based on the input.\n\n* **Summarizer Agent:** Summarizes text into key points (e.g., 3 key points).\n\n* **Synthesizer Agent:** Synthesizes new text and effectively incorporates reprocessing feedback from review agents.\n\n* **Peer Reviewer Agent:** Reviews generated text, highlighting strengths, weaknesses, and suggestions, and indicates `major_issue` flags.\n\n* **Sensemaking Agent:** Analyzes input within existing context, identifying patterns, gaps, and areas for improvement.\n\n* **Prompt Engineer Agent:** Refines or generates prompts for subsequent agents, optimizing their output.\n\n* **Onboarding/Explainer Agent:** Provides explanations of the process or offers guidance to users.\n\n* **Archivist Agent:** Prepares content for the handbook, manages the human review process, and handles archiving to the database and GitHub.\n\n## Setup Steps & Prerequisites\n\nTo get this powerful workflow up and running, follow these steps:\n\n1.  **Import the Workflow:** Import the `pyragogy_master_workflow.json` (or `generate-collaborative-handbooks-with-gpt4o-multi-agent-orchestration-human-review.json`) into your n8n instance.\n\n2.  **Connect Credentials:**\n\n    * **Postgres:** Set up a `Postgres Pyragogy DB` credential (ID: `pyragogy-postgres`).\n\n    * **OpenAI:** Configure an `OpenAI Pyragogy` credential (ID: `pyragogy-openai`) for all OpenAI agents. GPT-4o is highly suggested for optimal performance.\n\n    * **Email Send:** Set up a configured email credential (e.g., for sending human review requests).\n\n3.  **Define Environment Variables:** Define essential **environment variables** (an `.env.template` is included in the repository). These include:\n\n    * API base for OpenAI.\n\n    * Database connection details.\n\n    * **(Optional) GitHub:** For content persistence and versioning, configure `GITHUB_ACCESS_TOKEN`, `GITHUB_REPOSITORY_OWNER`, and `GITHUB_REPOSITORY_NAME`.\n\n    * **(Optional) Slack:** For notifications, configure `SLACK_WEBHOOK_URL`.\n\n**Send a sample payload to your webhook URL (`/webhook/pyragogy/process`):**\n\n{\n\"title\": \"History of Peer Learning\",\n\"text\": \"Peer learning is an educational approach where students learn from and with each other...\",\n\"tags\": [\"education\", \"pedagogy\"],\n\"requireHitl\": true\n}\n\n\n## Ideal For\n\nThis workflow is perfectly suited for:\n\n* Educators and researchers exploring **AI-assisted publishing** and **co-authoring with AI**.\n\n* Knowledge teams looking to **automate content pipelines** for internal or external documentation.\n\n* Anyone building **collaborative Markdown-driven tools** or AI-powered knowledge bases.\n\n## Documentation & Contributions: An Open Source and Collaborative Project\n\nThis workflow is an **open-source project** and community-driven. Its development is transparent and open to everyone.\n\n**We warmly invite you to:**\n\n* **Review it:** Contribute your analysis, identify potential improvements, or report issues.\n\n* **Remix it:** Adapt it to your specific needs, integrate new features, or modify it for a different use case.\n\n* **Improve it:** Propose and implement changes that enhance its efficiency, robustness, or capabilities.\n\n* **Share it back:** Return your contributions to the community, either through pull requests or by sharing your implementations.\n\nEvery contribution is welcome and valued! All relevant information for verification, improvement, and collaboration can be found in the official repository:\n\n🔗 [**GitHub – pyragogy-handbook-n8n-workflow**](https://github.com/pyragogy/pyragogy-handbook-n8n-workflow)\n",
+  "featuredImage": "/data/workflows/4904/4904.webp",
+  "author": {
+    "id": 101,
+    "slug": "org",
+    "name": "Fabrizio Terzi",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2395,
+  "downloads": 239,
+  "createdAt": "2025-06-12T15:46:54.341Z",
+  "updatedAt": "2026-01-16T08:36:51.356Z",
+  "publishedAt": "2025-06-12T15:46:54.341Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4904",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Pyragogy AI-driven handbook generator with multi-agent orchestration",
+    "workflowName": "Pyragogy AI-driven handbook generator with multi-agent orchestration",
+    "description": "# AI-Driven Handbook Generator with Multi-Agent Orchestration (Pyragogy AI Village)\n\nThis n8n workflow is a **modular, multi-agent AI orchestration system** designed for the **collaborative generation of Markdown-based handbooks**. Inspired by peer learning and open publishing workflows, it simulates a content pipeline where specialized AI agents act in defined roles, enabling true **AI–human co-creation** and **iterative refinement**.\n\nThis project is a core component of [**Pyragogy**](https://pyragogy.org), an open framework dedicated to **ethical cognitive co-creation**, **peer AI–human learning**, and **human-in-the-loop automation** for open knowledge systems. It implements the master orchestration architecture for the Pyragogy AI Village, managing a complex sequence of AI agents to process input, perform review, synthesis, and archiving, with a crucial human oversight step for final approval.\n\n## How It Works: A Deep Dive into the Workflow's Architecture\n\nThe workflow orchestrates a sophisticated content generation and review process, ideal for creating AI-driven knowledge bases or handbooks with human oversight.\n\n* **Webhook Trigger & Input:** The process begins when the workflow receives a JSON input via a **Webhook** (specifically at `/webhook/pyragogy/process`). This input typically includes details like the handbook's title, initial text, and relevant tags.\n\n* **Database Verification:** It first verifies the connection to a **PostgreSQL database** to ensure data persistence.\n\n* **Meta-Orchestrator:** A powerful **Meta-Orchestrator** (powered by `gpt-4o` from OpenAI) analyzes the initial request. Its role is to dynamically determine and activate the optimal sequence of specialized AI agents required to fulfill the input, ensuring tasks are dynamically routed and assigned based on each agent’s responsibility.\n\n* **Agent Execution & Iteration:** Each activated agent executes its step using OpenAI or custom endpoints. This involves:\n\n    * **Content Generation:** Agents like the Summarizer and the Synthesizer generate new content or refine existing text.\n\n    * **Peer Review Board:** A crucial aspect is the **Peer Review Board**, comprised of AI agents like the Peer Reviewer, the Sensemaking Agent, and the Prompt Engineer. This board evaluates the output for quality, coherence, and accuracy.\n\n    * **Reprocessing & Redrafting:** If the review agents flag a `major_issue`, they trigger **redrafting loops** by generating specific feedback for the Synthesizer. This mechanism ensures iterative refinement until the content meets the required standards.\n\n* **Human-in-the-Loop (HITL) Review:** For final approval, particularly for the Archivist agent's output, a **human review process** is initiated. An email is sent to a human reviewer, prompting them to approve, reject, or comment via a \"Wait for Webhook\" node. This ensures **human oversight** and quality control.\n\n* **Content Persistence & Versioning:** If the content is approved by the human reviewer:\n\n    * It's saved to a **PostgreSQL database** (specifically to the `handbook_entries` and `agent_contributions` tables).\n\n    * Optionally, the content can be committed to a **GitHub repository** for version control, provided the necessary environment variables are configured.\n\n* **Notifications:** The final output and the sequence of executed agents can be sent as a notification to **Slack**, if configured.\n\nObserve the dynamic loop: `orchestrate → assign → generate → review (AI/human) → store`\n\n## Included AI Agents\n\nThis workflow leverages a suite of specialized AI agents, each with a distinct role in the content pipeline:\n\n* **Meta-Orchestrator:** Determines the optimal sequence of agents to execute based on the input.\n\n* **Summarizer Agent:** Summarizes text into key points (e.g., 3 key points).\n\n* **Synthesizer Agent:** Synthesizes new text and effectively incorporates reprocessing feedback from review agents.\n\n* **Peer Reviewer Agent:** Reviews generated text, highlighting strengths, weaknesses, and suggestions, and indicates `major_issue` flags.\n\n* **Sensemaking Agent:** Analyzes input within existing context, identifying patterns, gaps, and areas for improvement.\n\n* **Prompt Engineer Agent:** Refines or generates prompts for subsequent agents, optimizing their output.\n\n* **Onboarding/Explainer Agent:** Provides explanations of the process or offers guidance to users.\n\n* **Archivist Agent:** Prepares content for the handbook, manages the human review process, and handles archiving to the database and GitHub.\n\n## Setup Steps & Prerequisites\n\nTo get this powerful workflow up and running, follow these steps:\n\n1.  **Import the Workflow:** Import the `pyragogy_master_workflow.json` (or `generate-collaborative-handbooks-with-gpt4o-multi-agent-orchestration-human-review.json`) into your n8n instance.\n\n2.  **Connect Credentials:**\n\n    * **Postgres:** Set up a `Postgres Pyragogy DB` credential (ID: `pyragogy-postgres`).\n\n    * **OpenAI:** Configure an `OpenAI Pyragogy` credential (ID: `pyragogy-openai`) for all OpenAI agents. GPT-4o is highly suggested for optimal performance.\n\n    * **Email Send:** Set up a configured email credential (e.g., for sending human review requests).\n\n3.  **Define Environment Variables:** Define essential **environment variables** (an `.env.template` is included in the repository). These include:\n\n    * API base for OpenAI.\n\n    * Database connection details.\n\n    * **(Optional) GitHub:** For content persistence and versioning, configure `GITHUB_ACCESS_TOKEN`, `GITHUB_REPOSITORY_OWNER`, and `GITHUB_REPOSITORY_NAME`.\n\n    * **(Optional) Slack:** For notifications, configure `SLACK_WEBHOOK_URL`.\n\n**Send a sample payload to your webhook URL (`/webhook/pyragogy/process`):**\n\n{\n\"title\": \"History of Peer Learning\",\n\"text\": \"Peer learning is an educational approach where students learn from and with each other...\",\n\"tags\": [\"education\", \"pedagogy\"],\n\"requireHitl\": true\n}\n\n\n## Ideal For\n\nThis workflow is perfectly suited for:\n\n* Educators and researchers exploring **AI-assisted publishing** and **co-authoring with AI**.\n\n* Knowledge teams looking to **automate content pipelines** for internal or external documentation.\n\n* Anyone building **collaborative Markdown-driven tools** or AI-powered knowledge bases.\n\n## Documentation & Contributions: An Open Source and Collaborative Project\n\nThis workflow is an **open-source project** and community-driven. Its development is transparent and open to everyone.\n\n**We warmly invite you to:**\n\n* **Review it:** Contribute your analysis, identify potential improvements, or report issues.\n\n* **Remix it:** Adapt it to your specific needs, integrate new features, or modify it for a different use case.\n\n* **Improve it:** Propose and implement changes that enhance its efficiency, robustness, or capabilities.\n\n* **Share it back:** Return your contributions to the community, either through pull requests or by sharing your implementations.\n\nEvery contribution is welcome and valued! All relevant information for verification, improvement, and collaboration can be found in the official repository:\n\n🔗 [**GitHub – pyragogy-handbook-n8n-workflow**](https://github.com/pyragogy/pyragogy-handbook-n8n-workflow)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "role": "start",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check DB Connection",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Meta-Orchestrator",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Orchestration Plan",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "More Agents to Run?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Agent Input",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Route Agents with Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarizer Agent",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Synthesizer Agent",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Peer Reviewer Agent",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sensemaking Agent",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prompt Engineer Agent",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Onboarding/Explainer Agent",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add Handbook Metadata",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Content for Review",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Review ID",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Review Request Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait for Human Approval",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Human Decision Split",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save to handbook_entries",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Approved Contribution Data",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save Agent Contribution (Approved)",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate GitHub File Path",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GitHub Enabled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Commit to GitHub (Approved)",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Human Rejection",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Archivist Paths",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Evaluate Board Consensus",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Redraft Needed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Handle Redraft",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Agent Output",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Enabled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Final Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version undefined"
+    }
+  ]
+}

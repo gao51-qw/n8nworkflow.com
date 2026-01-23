@@ -1,0 +1,15 @@
+## AI Chat Bot workflow for WordPress & Webhook Live Chats
+### This workflow powers a versatile AI chatbot that can be integrated into any live chat interface, such as our free Forerunner™ AI Chat Bot for WordPress. It's designed to automate customer support and lead generation by handling a variety of user queries independently.
+
+The setup process is straightforward and typically takes less than five minutes. This involves connecting your preferred Large Language Model (LLM) and a live chat platform to the workflow via webhooks.
+
+How the Workflow Works
+The core of this workflow is an AI Agent that acts as the brain of the chatbot. It processes user input and generates responses based on predefined rules and your chosen language model.
+
+User Input: When a user sends a message through your live chat, it's sent to the workflow via a webhook. This message is then passed to the AI Agent for processing.
+
+AI Response Generation: The AI Agent analyzes the message, retrieves relevant conversational history from the Simple Memory node to maintain context, and uses the selected Large Language Model (e.g., OpenAI, Gemini, or Claude) to formulate a response.
+
+Conditional Logic: After the response is generated, the workflow uses an If node to check if the conversation should end. If the response contains the specific tag [END_OF_CONVERSATION], the workflow prepares to end the chat. Otherwise, the conversation continues.
+
+Send to Client: The final response is then sent back to the live chat interface, where it is displayed to the user. This completes the loop, allowing the chatbot to engage in a continuous conversation until the task is complete.

@@ -1,0 +1,146 @@
+{
+  "id": 8652,
+  "slug": "8652",
+  "title": "Extract meeting tasks from transcripts with AI and sync to Trello",
+  "description": "## Who’s it for\nTeams and project managers who want to turn meeting transcripts into actionable Trello tasks automatically, without worrying about duplicate cards.\n\n## What it does\nThis workflow receives a transcript file in `.txt` format and processes it with AI to extract clear, concise tasks. Each task includes a short title, a description, an assignee (if mentioned), and a deadline (if available).  \nThe workflow then checks Trello for duplicates across **all lists**, comparing both card titles (`name`) and descriptions (`desc`). If a matching card already exists, the workflow returns the existing Trello card ID. If not, it creates a new card in the predefined default list.  \nFinally, the workflow generates a **user-friendly summary**: how many tasks were found, how many already existed, how many new cards were created, and how many tasks had no assignee or deadline.\n\n## Requirements\n- A Trello account with API credentials configured in n8n (no hardcoded keys).\n- An OpenAI (or compatible) LLM account connected in n8n.\n\n## How to customize\n- Adjust similarity thresholds for title/description matching in the Trello Sub-Agent.\n- Modify the summary text to always return in your preferred language.\n- Extend the Trello card creation step with labels, members, or due dates.\n",
+  "featuredImage": "/data/workflows/8652/8652.webp",
+  "author": {
+    "id": 101,
+    "slug": "gabrielhmsantos",
+    "name": "Gabriel Santos",
+    "avatar": ""
+  },
+  "categories": [
+    "Project Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 309,
+  "downloads": 30,
+  "createdAt": "2025-09-16T14:50:16.636Z",
+  "updatedAt": "2026-01-16T08:57:01.387Z",
+  "publishedAt": "2025-09-16T14:50:16.636Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8652",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract meeting tasks from transcripts with AI and sync to Trello",
+    "workflowName": "Extract meeting tasks from transcripts with AI and sync to Trello",
+    "description": "## Who’s it for\nTeams and project managers who want to turn meeting transcripts into actionable Trello tasks automatically, without worrying about duplicate cards.\n\n## What it does\nThis workflow receives a transcript file in `.txt` format and processes it with AI to extract clear, concise tasks. Each task includes a short title, a description, an assignee (if mentioned), and a deadline (if available).  \nThe workflow then checks Trello for duplicates across **all lists**, comparing both card titles (`name`) and descriptions (`desc`). If a matching card already exists, the workflow returns the existing Trello card ID. If not, it creates a new card in the predefined default list.  \nFinally, the workflow generates a **user-friendly summary**: how many tasks were found, how many already existed, how many new cards were created, and how many tasks had no assignee or deadline.\n\n## Requirements\n- A Trello account with API credentials configured in n8n (no hardcoded keys).\n- An OpenAI (or compatible) LLM account connected in n8n.\n\n## How to customize\n- Adjust similarity thresholds for title/description matching in the Trello Sub-Agent.\n- Modify the summary text to always return in your preferred language.\n- Extend the Trello card creation step with labels, members, or due dates.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Transcription",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Receive Transcript file",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Trello Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Create a card in Trello",
+      "type": "n8n-nodes-base.trelloTool",
+      "role": "trelloTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get many lists in Trello",
+      "type": "n8n-nodes-base.trelloTool",
+      "role": "trelloTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get all cards in a list in Trello",
+      "type": "n8n-nodes-base.trelloTool",
+      "role": "trelloTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Form",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

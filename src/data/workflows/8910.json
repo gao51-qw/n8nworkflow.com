@@ -1,0 +1,169 @@
+{
+  "id": 8910,
+  "slug": "8910",
+  "title": "Automate Zoom attendee segmentation in KlickTipp based on participation",
+  "description": "![Zoom Meeting participants transfer to KlickTipp.png](fileId:2686)\n\n**Community Node Disclaimer**: This workflow uses KlickTipp community nodes.\n\n### Introduction  \nThis workflow automates the end-to-end integration between **Zoom** and **KlickTipp**.  \nIt listens to Zoom webinar events (specifically `meeting.ended`), validates incoming webhooks, retrieves participant data from Zoom, and applies segmentation in KlickTipp by subscribing and tagging participants based on their attendance duration.  \n\nThis enables precise, automated campaign targeting without manual effort.  \n\n---\n\n### How It Works  \n\n1. **Zoom Webhook Listener**  \n   - Captures `meeting.ended` events from Zoom.  \n   - Validates initial webhook registration via **HMAC** before processing.  \n\n2. **Webhook Response Handling**  \n   - Distinguishes between Zoom’s URL validation requests and actual event data.  \n   - Sends appropriate responses (`plainToken` + `encryptedToken` for validation, or simple `status: ok` for regular events).  \n\n3. **Data Retrieval**  \n   - Waits briefly (1 second) to ensure meeting data is available.  \n   - Pulls the participant list from Zoom’s `past_meetings/{uuid}/participants` endpoint.  \n\n4. **Participant Processing**  \n   - Splits the list into individual participant items.  \n   - Filters out internal users (like the host).  \n   - Routes participants based on the **meeting topic** (e.g., *Anfänger* vs. *Experten* webinar).  \n\n5. **Attendance Segmentation**  \n   - Subscribes each participant to KlickTipp with mapped fields (first name, last name, email).  \n   - Uses conditions to check attendance thresholds:  \n     - **≥ 90% of total meeting duration → Full attendance**  \n     - Otherwise → General attendance  \n   - Applies corresponding KlickTipp tags per meeting type.  \n\n---\n\n### Key Features  \n\n- ✅ **Webhook Validation & Security** with HMAC (SHA256).  \n- ✅ **Automated Attendance Calculation** using participant `duration` vs. meeting `duration`.  \n- ✅ **Dynamic Routing** by meeting topic for multiple webinars.  \n- ✅ **KlickTipp Integration** with:  \n  - Subscriber creation or update.  \n  - Tagging for full vs. general attendance.  \n- ✅ **Scalable Structure** for adding more webinars by extending the Switch and tagging branches.  \n\n---\n\n### Setup Instructions  \n\n**Zoom Setup**  \n- Enable **Zoom API access** and OAuth2 app credentials.  \n- Configure webhook event `meeting.ended`.  \n- Grant scopes:  \n  - `meeting:read:meeting`  \n  - `meeting:read:list_past_participants`  \n\n**KlickTipp Setup**  \n- Prepare custom fields:  \n  - `Zoom | meeting selection` (Text)  \n  - `Zoom | meeting start` (Date & Time)  \n  - `Zoom | Join URL` (URL)  \n  - `Zoom | Registration ID` (Text)  \n  - `Zoom | Duration meeting` (Text)  \n- Create tags for each meeting variation:  \n  - `attended`, `attended fully`, `not attended` per meeting name.  \n\n**n8n Setup**  \n- Add Zoom webhook node (`Listen to ending Zoom meetings`).  \n- Configure validation nodes (`Crypto`, `Build Validation Body`).  \n- Set up HTTP Request node with Zoom OAuth2 credentials.  \n- Connect KlickTipp nodes with your KlickTipp API credentials.  \n\n---\n\n### Testing & Deployment  \n\n1. End a test Zoom meeting connected to this workflow.  \n2. Verify that:  \n   - The webhook triggers correctly.  \n   - Participant list is fetched.  \n   - Internal users are excluded.  \n   - Participants are subscribed and tagged in KlickTipp.  \n3. Check contact records in KlickTipp for tag and field updates.  \n\n💡 *Pro Tip*: Use test emails and manipulate `duration` values to confirm segmentation logic.  \n\n---\n\n### Customization Ideas  \n\n- Adjust attendance thresholds (e.g., 80% instead of 90%).  \n- Add additional meeting topics via the Switch node.  \n- Trigger email campaigns in KlickTipp based on attendance tags.  \n- Expand segmentation with more granular ranges (e.g., 0–30%, 30–60%, 60–90%).  \n- Add error handling for missing Zoom data or API failures.\n\n**Resources:**  \n- [Use KlickTipp Community Node in n8n](https://www.klicktipp.com/support/knowledge-base/install-klicktipp-node-n8n/)\n- [Automate Workflows: KlickTipp Integration in n8n](https://www.klicktipp.com/support/knowledge-base/klicktipp-integration-n8n/)\n",
+  "featuredImage": "/data/workflows/8910/8910.webp",
+  "author": {
+    "id": 101,
+    "slug": "KlickTipp",
+    "name": "KlickTipp",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 55,
+  "downloads": 5,
+  "createdAt": "2025-09-25T06:01:39.209Z",
+  "updatedAt": "2026-01-16T08:58:21.232Z",
+  "publishedAt": "2025-09-25T06:01:39.209Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8910",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate Zoom attendee segmentation in KlickTipp based on participation",
+    "workflowName": "Automate Zoom attendee segmentation in KlickTipp based on participation",
+    "description": "![Zoom Meeting participants transfer to KlickTipp.png](fileId:2686)\n\n**Community Node Disclaimer**: This workflow uses KlickTipp community nodes.\n\n### Introduction  \nThis workflow automates the end-to-end integration between **Zoom** and **KlickTipp**.  \nIt listens to Zoom webinar events (specifically `meeting.ended`), validates incoming webhooks, retrieves participant data from Zoom, and applies segmentation in KlickTipp by subscribing and tagging participants based on their attendance duration.  \n\nThis enables precise, automated campaign targeting without manual effort.  \n\n---\n\n### How It Works  \n\n1. **Zoom Webhook Listener**  \n   - Captures `meeting.ended` events from Zoom.  \n   - Validates initial webhook registration via **HMAC** before processing.  \n\n2. **Webhook Response Handling**  \n   - Distinguishes between Zoom’s URL validation requests and actual event data.  \n   - Sends appropriate responses (`plainToken` + `encryptedToken` for validation, or simple `status: ok` for regular events).  \n\n3. **Data Retrieval**  \n   - Waits briefly (1 second) to ensure meeting data is available.  \n   - Pulls the participant list from Zoom’s `past_meetings/{uuid}/participants` endpoint.  \n\n4. **Participant Processing**  \n   - Splits the list into individual participant items.  \n   - Filters out internal users (like the host).  \n   - Routes participants based on the **meeting topic** (e.g., *Anfänger* vs. *Experten* webinar).  \n\n5. **Attendance Segmentation**  \n   - Subscribes each participant to KlickTipp with mapped fields (first name, last name, email).  \n   - Uses conditions to check attendance thresholds:  \n     - **≥ 90% of total meeting duration → Full attendance**  \n     - Otherwise → General attendance  \n   - Applies corresponding KlickTipp tags per meeting type.  \n\n---\n\n### Key Features  \n\n- ✅ **Webhook Validation & Security** with HMAC (SHA256).  \n- ✅ **Automated Attendance Calculation** using participant `duration` vs. meeting `duration`.  \n- ✅ **Dynamic Routing** by meeting topic for multiple webinars.  \n- ✅ **KlickTipp Integration** with:  \n  - Subscriber creation or update.  \n  - Tagging for full vs. general attendance.  \n- ✅ **Scalable Structure** for adding more webinars by extending the Switch and tagging branches.  \n\n---\n\n### Setup Instructions  \n\n**Zoom Setup**  \n- Enable **Zoom API access** and OAuth2 app credentials.  \n- Configure webhook event `meeting.ended`.  \n- Grant scopes:  \n  - `meeting:read:meeting`  \n  - `meeting:read:list_past_participants`  \n\n**KlickTipp Setup**  \n- Prepare custom fields:  \n  - `Zoom | meeting selection` (Text)  \n  - `Zoom | meeting start` (Date & Time)  \n  - `Zoom | Join URL` (URL)  \n  - `Zoom | Registration ID` (Text)  \n  - `Zoom | Duration meeting` (Text)  \n- Create tags for each meeting variation:  \n  - `attended`, `attended fully`, `not attended` per meeting name.  \n\n**n8n Setup**  \n- Add Zoom webhook node (`Listen to ending Zoom meetings`).  \n- Configure validation nodes (`Crypto`, `Build Validation Body`).  \n- Set up HTTP Request node with Zoom OAuth2 credentials.  \n- Connect KlickTipp nodes with your KlickTipp API credentials.  \n\n---\n\n### Testing & Deployment  \n\n1. End a test Zoom meeting connected to this workflow.  \n2. Verify that:  \n   - The webhook triggers correctly.  \n   - Participant list is fetched.  \n   - Internal users are excluded.  \n   - Participants are subscribed and tagged in KlickTipp.  \n3. Check contact records in KlickTipp for tag and field updates.  \n\n💡 *Pro Tip*: Use test emails and manipulate `duration` values to confirm segmentation logic.  \n\n---\n\n### Customization Ideas  \n\n- Adjust attendance thresholds (e.g., 80% instead of 90%).  \n- Add additional meeting topics via the Switch node.  \n- Trigger email campaigns in KlickTipp based on attendance tags.  \n- Expand segmentation with more granular ranges (e.g., 0–30%, 30–60%, 60–90%).  \n- Add error handling for missing Zoom data or API failures.\n\n**Resources:**  \n- [Use KlickTipp Community Node in n8n](https://www.klicktipp.com/support/knowledge-base/install-klicktipp-node-n8n/)\n- [Automate Workflows: KlickTipp Integration in n8n](https://www.klicktipp.com/support/knowledge-base/klicktipp-integration-n8n/)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Crypto",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Build Validation Body",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook (Validation)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Build Normal Event Body",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook (Events)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "URL Validation check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Tag participant with full attendance1",
+      "type": "CUSTOM.klicktipp",
+      "role": "klicktipp",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Tag participant for full attendance",
+      "type": "CUSTOM.klicktipp",
+      "role": "klicktipp",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter internal users",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Split webinar participants",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Route by webinar name",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Check full attendance",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check full attendance1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait 1 second",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Listen to ending Zoom meetings",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get past Zoom meeting participants",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Subscribe participant",
+      "type": "n8n-nodes-klicktipp.klicktipp",
+      "role": "klicktipp",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Subscribe participant1",
+      "type": "n8n-nodes-klicktipp.klicktipp",
+      "role": "klicktipp",
+      "configDescription": "Version 3"
+    }
+  ]
+}

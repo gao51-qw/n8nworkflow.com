@@ -1,0 +1,248 @@
+{
+  "id": 2873,
+  "slug": "2873",
+  "title": "Author and publish blog posts from Google Sheets",
+  "description": "### What it is:\n\n* An automation to plan→draft→finalize and publish your textual blog post ideas to your wordpress blog\n* Works in stages and hand back control to you in between those\n* You can use a Google Spreadsheet for planning topics and configuring LLM models and prompts\n\n### What it does:\n\n* plans→drafts→finalizes blog post topics you specify in a Google Spreadsheet using an LLM with prompts that also ar configured in that spreadsheet (even which model to use)\n* savs the results in the corresponding \ncolumns of the \"Schedule\" sheet in the spreadsheet\n* hands control back to the user for inspecting or changing the results and for setting the next \"Action\" for th workflow\n* Finally publishes the blog post to your Wordpress instance\n\n### Limitations\n* Probably _slightly_ over-engineered ;-)\n* No media generation yet\n* some LLM models don't work because of their output format\n\n### How it works:\n\n* The Workflow is triggered manually or scheduled every hour\n* It ingests a [Google Spreadsheet](https://docs.google.com/spreadsheets/d/1Kg1-U6mJF4bahH1jCw8kT48MiKz1UMC5n-9q77BHM3Q/edit?usp=sharing) to get\n  * Config for prompts/context tc\n  * Blog-Topics and their status and next action\n* Depending on each blog topics \"Status\" and \"Action\" it then either uses an LLM for th next action (\"plan\"→\"draft\"→\"final\" actions) or publishes the written content to your Wordpress instance (\"publish\" actions)\n\n### Set up steps:\n\n* Import the workflow\n* Make your own copy of the [Google Spreadsheet](https://docs.google.com/spreadsheets/d/1Kg1-U6mJF4bahH1jCw8kT48MiKz1UMC5n-9q77BHM3Q/edit?usp=sharing)\n* Update the credentials using your individual credentials for:\n  * Google Spreadsheets\n  * OpenRouter\n* Edit the \"Settings\" node and enter your individual values for\n  * Your spreadsheet copy URL\n  * Your wordpress blog URL\n  * Your wordpress blog username\n  * Your wordpress blog _app_ password (a 4x4 alphanumeric sequence), that you probably have to create first, for which your wordpress user has to have 2-factor-authentication enabled.\n* In your own copy of the spreadsheet:\n  * individualize the \"Config\" sheet's \"Value\" column for the prompts/context/etc\n  * Populate the \"Schedule\" sheet with at least one line in which you specify\n    * a \"Topic\"\n    * a \"Schedulded\" date (YYYY-MM-DD HH:mm:ss)\n    * a \"Status\" of \"idea\"\n    * an \"Action\" of \"plan\" (to kick off that action)\n",
+  "featuredImage": "/data/workflows/2873/2873.webp",
+  "author": {
+    "id": 101,
+    "slug": "dnolde",
+    "name": "Daniel Nolde",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 7138,
+  "downloads": 713,
+  "createdAt": "2025-02-10T12:01:15.051Z",
+  "updatedAt": "2026-01-16T08:27:01.890Z",
+  "publishedAt": "2025-02-10T12:01:15.051Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2873",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Author and publish blog posts from Google Sheets",
+    "workflowName": "Author and publish blog posts from Google Sheets",
+    "description": "### What it is:\n\n* An automation to plan→draft→finalize and publish your textual blog post ideas to your wordpress blog\n* Works in stages and hand back control to you in between those\n* You can use a Google Spreadsheet for planning topics and configuring LLM models and prompts\n\n### What it does:\n\n* plans→drafts→finalizes blog post topics you specify in a Google Spreadsheet using an LLM with prompts that also ar configured in that spreadsheet (even which model to use)\n* savs the results in the corresponding \ncolumns of the \"Schedule\" sheet in the spreadsheet\n* hands control back to the user for inspecting or changing the results and for setting the next \"Action\" for th workflow\n* Finally publishes the blog post to your Wordpress instance\n\n### Limitations\n* Probably _slightly_ over-engineered ;-)\n* No media generation yet\n* some LLM models don't work because of their output format\n\n### How it works:\n\n* The Workflow is triggered manually or scheduled every hour\n* It ingests a [Google Spreadsheet](https://docs.google.com/spreadsheets/d/1Kg1-U6mJF4bahH1jCw8kT48MiKz1UMC5n-9q77BHM3Q/edit?usp=sharing) to get\n  * Config for prompts/context tc\n  * Blog-Topics and their status and next action\n* Depending on each blog topics \"Status\" and \"Action\" it then either uses an LLM for th next action (\"plan\"→\"draft\"→\"final\" actions) or publishes the written content to your Wordpress instance (\"publish\" actions)\n\n### Set up steps:\n\n* Import the workflow\n* Make your own copy of the [Google Spreadsheet](https://docs.google.com/spreadsheets/d/1Kg1-U6mJF4bahH1jCw8kT48MiKz1UMC5n-9q77BHM3Q/edit?usp=sharing)\n* Update the credentials using your individual credentials for:\n  * Google Spreadsheets\n  * OpenRouter\n* Edit the \"Settings\" node and enter your individual values for\n  * Your spreadsheet copy URL\n  * Your wordpress blog URL\n  * Your wordpress blog username\n  * Your wordpress blog _app_ password (a 4x4 alphanumeric sequence), that you probably have to create first, for which your wordpress user has to have 2-factor-authentication enabled.\n* In your own copy of the spreadsheet:\n  * individualize the \"Config\" sheet's \"Value\" column for the prompts/context/etc\n  * Populate the \"Schedule\" sheet with at least one line in which you specify\n    * a \"Topic\"\n    * a \"Schedulded\" date (YYYY-MM-DD HH:mm:ss)\n    * a \"Status\" of \"idea\"\n    * an \"Action\" of \"plan\" (to kick off that action)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "ScheduleTrigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "ManualTrigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "fetchConfig",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "AgentLLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "IfScheduledNow",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "PreparedData",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "RecombinedDataRow",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "SaveBackToSheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "IfActionPublish",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "IfTakeAction",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "IfPromptExists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "CreatePost",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "SetToPublish",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "PrepareXmlPost",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "HandleXMLRPCResponse",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "PostingSuccessful",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "LogStatus",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "LogPublished",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

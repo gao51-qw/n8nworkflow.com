@@ -1,0 +1,236 @@
+{
+  "id": 2333,
+  "slug": "2333",
+  "title": "Recipe recommendations with Qdrant and Mistral",
+  "description": "This n8n workflow demonstrates creating a recipe recommendation chatbot using the Qdrant vector store recommendation API.\n\nUse this example to build recommendation features in your AI Agents for your users.\n\n## How it works\n\n* For our recipes, we'll use HelloFresh's weekly course and recipes for data. We'll scrape the website for this data.\n* Each recipe is split, vectorised and inserted into a Qdrant Collection using Mistral Embeddings\n* Additionally the whole recipe is stored in a SQLite database for later retrieval.\n* Our AI Agent is setup to recommend recipes from our Qdrant vector store. However, instead of the default similarity search, we'll use the Recommendation API instead.\n* Qdrant's Recommendation API allows you to provide a negative prompt; in our case, the user can specify recipes or ingredients to avoid.\n* The AI Agent is now able to suggest a recipe recommendation better suited for the user and increase customer satisfaction.\n\n## Requirements\n\n* Qdrant vector store instance to save the recipes\n* Mistral.ai account for embeddings and LLM agent\n\n## Customising the workflow\n\nThis workflow can work for a variety of different audiences. Try different sets of data such as clothes, sports shoes, vehicles or even holidays.",
+  "featuredImage": "/data/workflows/2333/2333.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 6999,
+  "downloads": 699,
+  "createdAt": "2024-07-10T13:30:56.749Z",
+  "updatedAt": "2026-01-16T08:24:07.426Z",
+  "publishedAt": "2024-07-10T13:30:56.749Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2333",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Recipe recommendations with Qdrant and Mistral",
+    "workflowName": "Recipe recommendations with Qdrant and Mistral",
+    "description": "This n8n workflow demonstrates creating a recipe recommendation chatbot using the Qdrant vector store recommendation API.\n\nUse this example to build recommendation features in your AI Agents for your users.\n\n## How it works\n\n* For our recipes, we'll use HelloFresh's weekly course and recipes for data. We'll scrape the website for this data.\n* Each recipe is split, vectorised and inserted into a Qdrant Collection using Mistral Embeddings\n* Additionally the whole recipe is stored in a SQLite database for later retrieval.\n* Our AI Agent is setup to recommend recipes from our Qdrant vector store. However, instead of the default similarity search, we'll use the Recommendation API instead.\n* Qdrant's Recommendation API allows you to provide a negative prompt; in our case, the user can specify recipes or ingredients to avoid.\n* The AI Agent is now able to suggest a recipe recommendation better suited for the user and increase customer satisfaction.\n\n## Requirements\n\n* Qdrant vector store instance to save the recipes\n* Mistral.ai account for embeddings and LLM agent\n\n## Customising the workflow\n\nThis workflow can work for a variety of different audiences. Try different sets of data such as clothes, sports shoes, vehicles or even holidays.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get This Week's Menu",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Available Courses",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract Server Data",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Course Metadata",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Get Recipe",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Embeddings Mistral Cloud",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Course & Recipe",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Prepare Documents",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Recipe Details",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Qdrant Recommend API",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "role": "lmChatMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Tool Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Wait for Rate Limits",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Mistral Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Use Qdrant Recommend API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Recipes From DB",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Save Recipes to DB",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

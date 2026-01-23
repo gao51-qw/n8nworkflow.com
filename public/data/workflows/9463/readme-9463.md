@@ -1,0 +1,105 @@
+# Generate AI-powered end-of-day reports from ClickUp & GoHighLevel to multi-channel
+
+> ## Description
+Automatically generate and distribute detailed End-of-Day (EOD) reports combining task progress from ClickUp and opportunity data from GoHighLevel. This workflow uses AI to analyze daily performance, summarize key metrics, identify blockers, and deliver polished reports directly to Slack, Email, and Google Drive. ⚙️📊💬
+
+## What This Template Does
+- Triggers automatically every weekday at 6:00 PM (Mon–Fri). ⏰
+- Fetches all completed ClickUp tasks and won GoHighLevel opportunities for the day. 📥
+- Merges and transforms both datasets into a unified structure. 🔄
+- Uses Azure OpenAI GPT-4 to analyze performance and generate structured summaries. 🤖
+- Formats three output versions — Slack (Markdown), Email (HTML), and Google Drive (Text). 🧾
+- Routes and sends reports automatically to connected channels. 📤
+- Uploads the generated text report to Google Drive with timestamped filenames. ☁️
+
+## Key Benefits
+✅ Saves time by automating daily performance reporting.
+ ✅ Unifies task and deal data into a single AI-generated summary.
+ ✅ Provides real-time visibility into productivity and outcomes.
+ ✅ Delivers beautifully formatted, channel-specific reports.
+ ✅ Maintains historical reports in Google Drive for reference.
+ ✅ Helps managers identify wins, blockers, and next steps quickly.
+
+## Features
+- Automated scheduling via cron (Mon–Fri, 6 PM).
+- ClickUp task and GHL opportunity integration for daily data sync.
+- AI-powered analysis for contextual, actionable summaries.
+- Dynamic formatting for Slack, Email, and Drive outputs.
+- Parallel routing for simultaneous delivery across platforms.
+- No manual steps — runs fully hands-free after setup.
+
+## Requirements
+- ClickUp OAuth2 credentials for task retrieval.
+- GoHighLevel OAuth2 credentials for deal data.
+- Azure OpenAI GPT-4 API credentials.
+- Slack Bot credentials for message posting.
+- SMTP (Gmail/Outlook) credentials for email reports.
+- Google Drive OAuth2 credentials for report upload.
+
+## Target Audience
+🎯 Sales, marketing, and operations teams tracking daily performance.
+ 📈 Project managers monitoring team productivity and blockers.
+ 🤝 Client success teams summarizing EOD outcomes for leadership.
+ 🧠 Business automation teams seeking end-of-day visibility.
+
+## Step-by-Step Setup Instructions
+- Connect ClickUp, GoHighLevel, Slack, Gmail/SMTP, and Google Drive credentials. 🔑
+- Set your team, space, folder, and list IDs in the ClickUp node. 📋
+- Update your Slack channel ID in the Slack node configuration. 💬
+- Configure your email sender and recipients in the email node. 📧
+- (Optional) Modify the cron expression for different reporting times. ⏰
+- Test the workflow manually once, then activate for automated EOD execution. ✅
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9463
+- **Complexity:** advanced
+- **Node Count:** 29
+- **Views:** 251
+- **Downloads:** 25
+- **Created:** 2025/10/10
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9463)
+
+## 👤 Author
+
+- **Name:** Rahul Joshi
+- **Username:** @rahul08
+
+## 🏷️ Categories
+
+- Document Extraction
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×12)
+- **scheduleTrigger** 
+- **merge** 
+- **code** (×2)
+- **if** (×3)
+- **slack** 
+- **emailSend** 
+- **googleDrive** 
+- **highLevel** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **@n8n/n8n-nodes-langchain.lmChatAzureOpenAi** 
+- **@n8n/n8n-nodes-langchain.memoryBufferWindow** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **clickUp** 
+- **convertToFile** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 29 nodes with 14 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

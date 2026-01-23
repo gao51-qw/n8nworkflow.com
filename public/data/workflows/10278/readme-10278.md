@@ -1,0 +1,130 @@
+# Automated cold email campaigns with random templates & Google Sheets tracking
+
+> # 📊 Google Sheets Leads → 🎲 Random Templates → ✉️ Personalized Emails → 📝 Status Tracking
+
+## What this workflow does
+
+- 📊 Reads leads list from Google Sheets (Name, Email, Send Status)
+- 🔍 Filters out already-contacted leads (skips "SENT" status)
+- 🎲 Randomly selects email template from template library
+- ✏️ Personalizes subject and body with lead's name
+- 📧 Sends emails one-by-one with delays between sends
+- ✅ Updates Google Sheet with send status and timestamp
+- 🔁 Loops through all unsent leads automatically
+
+## Why it's useful
+
+- ⚡ Automate cold outreach without manual copy-paste
+- 🎯 Avoid duplicate sends—tracks who's been contacted
+- 📝 Rotate email templates for A/B testing and variety
+- 👤 Personalization makes emails feel human, not spammy
+- ⏱️ Built-in delays prevent spam flags and rate limits
+- 📊 Full audit trail of who received what and when
+
+## How it works
+
+- 📊 Google Sheets (Leads) → reads Name, Email, Send Status
+- 🚦 IF Node → filters leads where Send Status ≠ "SENT"
+- 🔄 Loop Over Items → processes leads one-by-one
+- 📧 Google Sheets (Templates) → fetches Subject + Body templates
+- 🎲 Code Node → picks random template
+- 🔀 Merge → combines lead data with template
+- ✏️ Edit Fields → replaces [Name] with actual lead name
+- 📨 Send Email → delivers personalized message
+- ⏳ Wait → adds delay between sends (avoids spam flags)
+- ✅ Google Sheets (Update) → marks as "SENT" with timestamp
+
+## What you'll need
+
+- 📊 Google Sheet #1: Leads (columns: Name, Email, Send Status, Time)
+- 📧 Google Sheet #2: Templates (columns: Subject, Body)
+- 📬 SMTP credentials (SendGrid, Mailgun, etc.)
+- 🔐 Google Sheets OAuth
+
+## Setup steps
+
+- 📊 Create "Leads" sheet with columns: Name | Email | Send Status | Time
+- 📧 Create "Templates" sheet with columns: Subject | Body (use [Name] placeholder)
+- 🔗 Connect Google Sheets OAuth credentials
+- 📬 Add SMTP email credentials
+- 🧭 Update both Google Sheets node IDs to point to your sheets
+- ⚙️ Set "From Email" in Send Email node
+- 🧪 Test with 2-3 test leads first
+
+## Customization ideas
+
+- ⏱️ Adjust Wait time (30s-5min) to control send rate
+- 📊 Add click tracking with UTM parameters
+- 🔔 Send Slack/Telegram notification when campaign completes 
+- 🎯 Add lead scoring—prioritize high-value leads first
+- 📈 Log opens/replies to separate tracking sheet
+
+## Who it's for
+
+- 🧑‍💻 Freelancers doing cold outreach to agencies
+- 📈 Sales teams running lead generation campaigns
+- 🚀 Startups reaching out to potential customers
+- 🎯 Marketers testing email copy variations
+- 💼 Business developers nurturing prospect lists
+
+## Quick Setup Guide
+
+- Before You Start - What You Need:
+📊 Google account for Sheets access
+- 📧 SMTP email account (Gmail, custom domain, or email service)
+- 📝 List of leads (names + emails)
+- ✉️ Email templates ready (with [Name] placeholders)
+
+## Want help customizing?
+
+📧 anirpoke@gmail.com
+🔗 LinkedIn
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 10278
+- **Complexity:** advanced
+- **Node Count:** 20
+- **Views:** 599
+- **Downloads:** 59
+- **Created:** 2025/10/29
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/10278)
+
+## 👤 Author
+
+- **Name:** Anir Agram
+- **Username:** @not0lucky
+
+## 🏷️ Categories
+
+- Lead Nurturing
+
+## 🔗 Nodes Used
+
+- **googleSheets** (×3)
+- **if** 
+- **splitInBatches** 
+- **code** 
+- **merge** (×2)
+- **set** 
+- **wait** 
+- **stickyNote** (×8)
+- **manualTrigger** 
+- **emailSend** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 20 nodes with 11 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

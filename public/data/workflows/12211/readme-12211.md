@@ -1,0 +1,173 @@
+# Generate client proposals with OpenAI, Google Sheets, Slides, Gmail, and Drive
+
+> ## 🧾 AI Proposal Generator Engine
+
+An n8n-based automation that generates client proposals from a form, lets you review everything in one place, and sends the proposal only when you approve it.
+
+---
+
+## ⚙️ What It Does
+
+The AI Proposal Generator Engine creates proposals directly from an **n8n Form**.
+All proposal content and a draft email are generated automatically using OpenAI.
+
+**Google Sheets is used only as a database**, where you:
+
+* Review the generated proposal
+* Review the draft email
+* Control when the proposal is sent by updating the status
+
+No proposal is sent until it is manually marked as `READY`.
+
+---
+
+## 💡 Use Cases
+
+| Use Case              | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| Sales Calls           | Generate proposals immediately after a call using the form |
+| Freelancers           | Create clean, repeatable proposals without manual writing  |
+| Agencies              | Standardize proposals while keeping them client-specific   |
+| Approval Flow         | Review proposal and email before sending                   |
+| Fast Turnaround Deals | Reduce proposal creation time from hours to minutes        |
+| Team Workflows        | Use Sheets as a simple approval and tracking layer         |
+
+---
+
+## 🔧 Setup
+
+### 1️⃣ Google Credentials
+
+Go to Google Cloud Console and create a Web App (OAuth).
+
+Enable these APIs:
+
+* Google Sheets
+* Google Drive
+* Gmail
+
+In n8n, select this Google credential inside:
+
+* Google Sheets nodes
+* Google Drive nodes
+* Gmail nodes
+
+Use the same credential everywhere.
+
+---
+
+### 2️⃣ Google Drive Structure
+
+Create this folder setup in Google Drive. You can use the provided templates or your own.
+
+```
+Proposal Generator Engine/
+├── Template 1 (Slides)
+├── Template 2 (Slides)
+├── Template 3 (Slides)
+├── Proposal Generation Tracker (Sheets)
+└── Generated Proposals/
+```
+
+---
+
+### 3️⃣ Google Sheets Node
+
+Open the **Proposal Generation Tracker** and copy the Sheet ID from the URL.
+
+Paste this ID into the Google Sheets node in n8n.
+This sheet is used only to:
+
+* Store generated proposal links
+* Store email drafts
+* Control send status
+
+---
+
+### 4️⃣ Slides and Drive Nodes
+
+Copy the Slides template ID you want to use and paste it into the **Copy Template** node.
+
+Copy the folder ID of **Generated Proposals** and paste it into the **Move File / Folder** field.
+
+---
+
+### 5️⃣ OpenAI Key
+
+Create an OpenAI credential in n8n using your API key.
+
+Select this credential in all GPT nodes.
+You can edit prompts to match your proposal style and tone.
+
+---
+
+## 🔁 Workflow Summary
+
+1. Proposal details are collected using an **n8n Form**
+2. OpenAI generates structured proposal content
+3. A Google Slides template is copied and filled
+4. A proposal email draft is generated
+5. Proposal link and email draft are saved in Google Sheets with status `WAITING`
+6. You review the proposal and email
+7. Status is changed to `READY`
+8. Proposal is converted to PDF and sent via Gmail
+9. Proposal is stored in Google Drive and status is updated to `SENT`
+
+---
+
+## 📞 Support & Contact
+
+📧 **Email:** [atharvapj5@gmail.com](mailto:atharvapj5@gmail.com)
+🔗 **LinkedIn:** [https://www.linkedin.com/in/atharva-jaiswal/](https://www.linkedin.com/in/atharva-jaiswal/)
+📅 **Book a support call:** [https://calendly.com/atharvapj5/30min](https://calendly.com/atharvapj5/30min)
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 12211
+- **Complexity:** advanced
+- **Node Count:** 26
+- **Views:** 74
+- **Downloads:** 7
+- **Created:** 2025/12/27
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/12211)
+
+## 👤 Author
+
+- **Name:** Atharva
+- **Username:** @atharva-dragon
+
+## 🏷️ Categories
+
+- Document Extraction
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **formTrigger** 
+- **stickyNote** (×11)
+- **googleSheetsTrigger** 
+- **splitInBatches** 
+- **@n8n/n8n-nodes-langchain.openAi** (×2)
+- **code** (×2)
+- **googleDrive** (×3)
+- **googleSlides** 
+- **googleSheets** (×2)
+- **filter** 
+- **gmail** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 26 nodes with 14 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

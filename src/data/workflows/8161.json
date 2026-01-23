@@ -1,0 +1,128 @@
+{
+  "id": 8161,
+  "slug": "8161",
+  "title": "Automated FTP file migration with smart cleanup and email notifications",
+  "description": "# Automated FTP File Migration with Smart Cleanup and Email Notifications\n\n## Overview\nThis n8n workflow automates the secure transfer of files between FTP servers on a scheduled basis, providing enterprise-grade reliability with comprehensive error handling and dual notification systems (email + webhook). Perfect for data migrations, automated backups, and multi-server file synchronization.\n\n## What it does\nThis workflow automatically discovers, filters, transfers, and safely removes files between FTP servers while maintaining complete audit trails and sending detailed notifications about every operation.\n\n**Key Features:**\n- **Scheduled Execution**: Configurable timing (daily, hourly, weekly, or custom cron expressions)\n- **Smart File Filtering**: Regex-based filtering by file type, size, date, or name patterns  \n- **Safe Transfer Protocol**: Downloads → Uploads → Validates → Cleans up source\n- **Dual Notifications**: Email alerts + webhook integration for both success and errors\n- **Comprehensive Logging**: Detailed audit trail of all operations with timestamps\n- **Error Recovery**: Automatic retry logic with exponential backoff for network issues\n- **Production Ready**: Built-in safety measures and extensive documentation\n\n## Use Cases\n\n### 🏢 Enterprise & IT Operations\n- **Data Center Migration**: Moving files between different hosting environments\n- **Backup Automation**: Scheduled transfers to secondary storage locations  \n- **Multi-Site Synchronization**: Keeping files in sync across geographic locations\n- **Legacy System Integration**: Bridging old and new systems through automated transfers\n\n### 📊 Business Operations  \n- **Document Management**: Automated transfer of contracts, reports, and business documents\n- **Media Asset Distribution**: Moving images, videos, and marketing materials between systems\n- **Data Pipeline**: Part of larger ETL processes for business intelligence\n- **Compliance Archiving**: Moving files to compliance-approved storage systems\n\n### 🔧 Development & DevOps\n- **Build Artifact Distribution**: Deploying compiled applications across environments  \n- **Configuration Management**: Synchronizing config files between servers\n- **Log File Aggregation**: Collecting logs from multiple servers for analysis\n- **Automated Deployment**: Moving release packages to production servers\n\n## How it works\n\n### 📋 Workflow Steps\n1. **Schedule Trigger** → Initiates workflow at specified intervals\n2. **File Discovery** → Lists files from source FTP server with optional recursion\n3. **Smart Filtering** → Applies customizable filters (type, size, date, name patterns)\n4. **Secure Download** → Retrieves files to temporary n8n storage with retry logic\n5. **Safe Upload** → Transfers files to destination with directory auto-creation\n6. **Transfer Validation** → Verifies successful upload before proceeding\n7. **Source Cleanup** → Removes original files only after confirmed success\n8. **Comprehensive Logging** → Records all operations with detailed metadata\n9. **Dual Notifications** → Sends email + webhook notifications for success/failure\n\n### 🔄 Error Handling Flow\n- **Network Issues** → Automatic retry with exponential backoff (3 attempts)\n- **Authentication Problems** → Immediate email alert with troubleshooting steps  \n- **Permission Errors** → Detailed logging with recommended actions\n- **Disk Space Issues** → Safe failure with source file preservation\n- **File Corruption** → Integrity validation with rollback capability\n\n## Setup Requirements\n\n### 🔑 Credentials Needed\n1. **Source FTP Server**\n   - Host, port, username, password\n   - Read permissions required\n   - SFTP recommended for security\n\n2. **Destination FTP Server**  \n   - Host, port, username, password\n   - Write permissions required\n   - Directory creation permissions\n\n3. **SMTP Email Server**\n   - SMTP host and port (e.g., smtp.gmail.com:587)\n   - Authentication credentials\n   - For success and error notifications\n\n4. **Monitoring API** (Optional)\n   - Webhook URL for system integration\n   - Authentication tokens if required\n\n### ⚙️ Configuration Steps\n1. **Import Workflow** → Load the JSON template into your n8n instance\n2. **Configure Credentials** → Set up all required FTP and SMTP connections\n3. **Customize Schedule** → Adjust cron expression for your timing needs\n4. **Set File Filters** → Configure regex patterns for your file types\n5. **Configure Paths** → Set source and destination directory structures\n6. **Test Thoroughly** → Run with test files before production deployment\n7. **Enable Monitoring** → Activate email notifications and logging\n\n## Customization Options\n\n### 📅 Scheduling Examples\n```cron\n0 2 * * *     # Daily at 2 AM\n0 */6 * * *   # Every 6 hours  \n0 8 * * 1-5   # Weekdays at 8 AM\n0 0 1 * *     # Monthly on 1st\n*/15 * * * *  # Every 15 minutes\n```\n\n### 🔍 File Filter Patterns\n```regex\n# Documents\n\\\\.(pdf|doc|docx|xls|xlsx)$\n\n# Images  \n\\\\.(jpg|jpeg|png|gif|svg)$\n\n# Data Files\n\\\\.(csv|json|xml|sql)$\n\n# Archives\n\\\\.(zip|rar|7z|tar|gz)$\n\n# Size-based (add as condition)\n{{ $json.size &gt; 1048576 }}  # Files &gt; 1MB\n\n# Date-based (recent files only)\n{{ $json.date &gt; $now.minus({days: 7}) }}\n```\n\n### 📁 Directory Organization\n```javascript\n// Date-based structure\n/files/{{ $now.format('YYYY/MM/DD') }}/\n\n// Type-based structure  \n/files/{{ $json.name.split('.').pop() }}/\n\n// User-based structure\n/users/{{ $json.owner || 'system' }}/\n\n// Hybrid approach\n/{{ $now.format('YYYY-MM') }}/{{ $json.type }}/\n```\n\n## Template Features\n\n### 🛡️ Safety & Security\n- **Transfer Validation**: Confirms successful upload before source deletion\n- **Error Preservation**: Source files remain intact on any failure\n- **Audit Trail**: Complete logging of all operations with timestamps\n- **Credential Security**: Secure storage using n8n's credential system\n- **SFTP Support**: Encrypted transfers when available\n- **Retry Logic**: Automatic recovery from transient network issues\n\n### 📧 Notification System\n**Success Notifications:**\n- Confirmation email with transfer details\n- File metadata (name, size, transfer time)\n- Next scheduled execution information\n- Webhook payload for monitoring systems\n\n**Error Notifications:**\n- Immediate email alerts with error details\n- Troubleshooting steps and recommendations\n- Failed file information for manual intervention\n- Webhook integration for incident management\n\n### 📊 Monitoring & Analytics\n- **Execution Logs**: Detailed history of all workflow runs\n- **Performance Metrics**: Transfer speeds and success rates\n- **Error Tracking**: Categorized failure analysis\n- **Audit Reports**: Compliance-ready activity logs\n\n## Production Considerations\n\n### 🚀 Performance Optimization\n- **File Size Limits**: Configure timeouts based on expected file sizes\n- **Batch Processing**: Handle multiple files efficiently\n- **Network Optimization**: Schedule transfers during off-peak hours\n- **Resource Monitoring**: Track n8n server CPU, memory, and disk usage\n\n### 🔧 Maintenance\n- **Regular Testing**: Validate credentials and connectivity\n- **Log Review**: Monitor for patterns in errors or performance\n- **Credential Rotation**: Update passwords and keys regularly\n- **Documentation Updates**: Keep configuration notes current\n\n\n## Testing Protocol\n\n### 🧪 Pre-Production Testing\n1. **Phase 1**: Test with 1-2 small files (&lt; 1MB)\n2. **Phase 2**: Test error scenarios (invalid credentials, network issues)\n3. **Phase 3**: Test with representative file sizes and volumes\n4. **Phase 4**: Validate email notifications and logging\n5. **Phase 5**: Full production deployment with monitoring\n\n### ⚠️ Important Testing Notes\n- **Disable Source Deletion** during initial testing\n- Use **test directories** to avoid production data impact\n- **Monitor execution logs** carefully during testing\n- **Validate email delivery** to ensure notifications work\n- **Test rollback procedures** before production use\n\n## Support & Documentation\n\nThis template includes:\n- **8 Comprehensive Sticky Notes** with visual documentation\n- **Detailed Node Comments** explaining every configuration option\n- **Error Handling Guide** with common troubleshooting steps\n- **Security Best Practices** for production deployment\n- **Performance Tuning** recommendations for different scenarios\n\n## Technical Specifications\n\n- **n8n Version**: 1.0.0+  \n- **Node Count**: 17 functional nodes + 8 documentation sticky notes\n- **Execution Time**: 2-10 minutes (depending on file sizes and network speed)\n- **Memory Usage**: 50-200MB (scales with file sizes)\n- **Supported Protocols**: FTP, SFTP (recommended)\n- **File Size Limit**: Up to 150MB per file (configurable)\n- **Concurrent Files**: Processes files sequentially for stability\n\n## Who is this for?\n\n### 🎯 Primary Users\n- **System Administrators** managing file transfers between servers\n- **DevOps Engineers** automating deployment and backup processes  \n- **IT Operations Teams** handling data migration projects\n- **Business Process Owners** requiring automated file management\n\n### 💼 Industries & Use Cases\n- **Healthcare**: Patient data archiving and compliance reporting\n- **Financial Services**: Secure document transfer and regulatory reporting\n- **Manufacturing**: CAD file distribution and inventory data sync\n- **E-commerce**: Product image and catalog management\n- **Media**: Asset distribution and content delivery automation\n\n",
+  "featuredImage": "/data/workflows/8161/8161.webp",
+  "author": {
+    "id": 101,
+    "slug": "dako",
+    "name": "Dariusz Koryto",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 196,
+  "downloads": 19,
+  "createdAt": "2025-09-02T12:30:02.755Z",
+  "updatedAt": "2026-01-16T08:54:26.249Z",
+  "publishedAt": "2025-09-02T12:30:02.755Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8161",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated FTP file migration with smart cleanup and email notifications",
+    "workflowName": "Automated FTP file migration with smart cleanup and email notifications",
+    "description": "# Automated FTP File Migration with Smart Cleanup and Email Notifications\n\n## Overview\nThis n8n workflow automates the secure transfer of files between FTP servers on a scheduled basis, providing enterprise-grade reliability with comprehensive error handling and dual notification systems (email + webhook). Perfect for data migrations, automated backups, and multi-server file synchronization.\n\n## What it does\nThis workflow automatically discovers, filters, transfers, and safely removes files between FTP servers while maintaining complete audit trails and sending detailed notifications about every operation.\n\n**Key Features:**\n- **Scheduled Execution**: Configurable timing (daily, hourly, weekly, or custom cron expressions)\n- **Smart File Filtering**: Regex-based filtering by file type, size, date, or name patterns  \n- **Safe Transfer Protocol**: Downloads → Uploads → Validates → Cleans up source\n- **Dual Notifications**: Email alerts + webhook integration for both success and errors\n- **Comprehensive Logging**: Detailed audit trail of all operations with timestamps\n- **Error Recovery**: Automatic retry logic with exponential backoff for network issues\n- **Production Ready**: Built-in safety measures and extensive documentation\n\n## Use Cases\n\n### 🏢 Enterprise & IT Operations\n- **Data Center Migration**: Moving files between different hosting environments\n- **Backup Automation**: Scheduled transfers to secondary storage locations  \n- **Multi-Site Synchronization**: Keeping files in sync across geographic locations\n- **Legacy System Integration**: Bridging old and new systems through automated transfers\n\n### 📊 Business Operations  \n- **Document Management**: Automated transfer of contracts, reports, and business documents\n- **Media Asset Distribution**: Moving images, videos, and marketing materials between systems\n- **Data Pipeline**: Part of larger ETL processes for business intelligence\n- **Compliance Archiving**: Moving files to compliance-approved storage systems\n\n### 🔧 Development & DevOps\n- **Build Artifact Distribution**: Deploying compiled applications across environments  \n- **Configuration Management**: Synchronizing config files between servers\n- **Log File Aggregation**: Collecting logs from multiple servers for analysis\n- **Automated Deployment**: Moving release packages to production servers\n\n## How it works\n\n### 📋 Workflow Steps\n1. **Schedule Trigger** → Initiates workflow at specified intervals\n2. **File Discovery** → Lists files from source FTP server with optional recursion\n3. **Smart Filtering** → Applies customizable filters (type, size, date, name patterns)\n4. **Secure Download** → Retrieves files to temporary n8n storage with retry logic\n5. **Safe Upload** → Transfers files to destination with directory auto-creation\n6. **Transfer Validation** → Verifies successful upload before proceeding\n7. **Source Cleanup** → Removes original files only after confirmed success\n8. **Comprehensive Logging** → Records all operations with detailed metadata\n9. **Dual Notifications** → Sends email + webhook notifications for success/failure\n\n### 🔄 Error Handling Flow\n- **Network Issues** → Automatic retry with exponential backoff (3 attempts)\n- **Authentication Problems** → Immediate email alert with troubleshooting steps  \n- **Permission Errors** → Detailed logging with recommended actions\n- **Disk Space Issues** → Safe failure with source file preservation\n- **File Corruption** → Integrity validation with rollback capability\n\n## Setup Requirements\n\n### 🔑 Credentials Needed\n1. **Source FTP Server**\n   - Host, port, username, password\n   - Read permissions required\n   - SFTP recommended for security\n\n2. **Destination FTP Server**  \n   - Host, port, username, password\n   - Write permissions required\n   - Directory creation permissions\n\n3. **SMTP Email Server**\n   - SMTP host and port (e.g., smtp.gmail.com:587)\n   - Authentication credentials\n   - For success and error notifications\n\n4. **Monitoring API** (Optional)\n   - Webhook URL for system integration\n   - Authentication tokens if required\n\n### ⚙️ Configuration Steps\n1. **Import Workflow** → Load the JSON template into your n8n instance\n2. **Configure Credentials** → Set up all required FTP and SMTP connections\n3. **Customize Schedule** → Adjust cron expression for your timing needs\n4. **Set File Filters** → Configure regex patterns for your file types\n5. **Configure Paths** → Set source and destination directory structures\n6. **Test Thoroughly** → Run with test files before production deployment\n7. **Enable Monitoring** → Activate email notifications and logging\n\n## Customization Options\n\n### 📅 Scheduling Examples\n```cron\n0 2 * * *     # Daily at 2 AM\n0 */6 * * *   # Every 6 hours  \n0 8 * * 1-5   # Weekdays at 8 AM\n0 0 1 * *     # Monthly on 1st\n*/15 * * * *  # Every 15 minutes\n```\n\n### 🔍 File Filter Patterns\n```regex\n# Documents\n\\\\.(pdf|doc|docx|xls|xlsx)$\n\n# Images  \n\\\\.(jpg|jpeg|png|gif|svg)$\n\n# Data Files\n\\\\.(csv|json|xml|sql)$\n\n# Archives\n\\\\.(zip|rar|7z|tar|gz)$\n\n# Size-based (add as condition)\n{{ $json.size &gt; 1048576 }}  # Files &gt; 1MB\n\n# Date-based (recent files only)\n{{ $json.date &gt; $now.minus({days: 7}) }}\n```\n\n### 📁 Directory Organization\n```javascript\n// Date-based structure\n/files/{{ $now.format('YYYY/MM/DD') }}/\n\n// Type-based structure  \n/files/{{ $json.name.split('.').pop() }}/\n\n// User-based structure\n/users/{{ $json.owner || 'system' }}/\n\n// Hybrid approach\n/{{ $now.format('YYYY-MM') }}/{{ $json.type }}/\n```\n\n## Template Features\n\n### 🛡️ Safety & Security\n- **Transfer Validation**: Confirms successful upload before source deletion\n- **Error Preservation**: Source files remain intact on any failure\n- **Audit Trail**: Complete logging of all operations with timestamps\n- **Credential Security**: Secure storage using n8n's credential system\n- **SFTP Support**: Encrypted transfers when available\n- **Retry Logic**: Automatic recovery from transient network issues\n\n### 📧 Notification System\n**Success Notifications:**\n- Confirmation email with transfer details\n- File metadata (name, size, transfer time)\n- Next scheduled execution information\n- Webhook payload for monitoring systems\n\n**Error Notifications:**\n- Immediate email alerts with error details\n- Troubleshooting steps and recommendations\n- Failed file information for manual intervention\n- Webhook integration for incident management\n\n### 📊 Monitoring & Analytics\n- **Execution Logs**: Detailed history of all workflow runs\n- **Performance Metrics**: Transfer speeds and success rates\n- **Error Tracking**: Categorized failure analysis\n- **Audit Reports**: Compliance-ready activity logs\n\n## Production Considerations\n\n### 🚀 Performance Optimization\n- **File Size Limits**: Configure timeouts based on expected file sizes\n- **Batch Processing**: Handle multiple files efficiently\n- **Network Optimization**: Schedule transfers during off-peak hours\n- **Resource Monitoring**: Track n8n server CPU, memory, and disk usage\n\n### 🔧 Maintenance\n- **Regular Testing**: Validate credentials and connectivity\n- **Log Review**: Monitor for patterns in errors or performance\n- **Credential Rotation**: Update passwords and keys regularly\n- **Documentation Updates**: Keep configuration notes current\n\n\n## Testing Protocol\n\n### 🧪 Pre-Production Testing\n1. **Phase 1**: Test with 1-2 small files (&lt; 1MB)\n2. **Phase 2**: Test error scenarios (invalid credentials, network issues)\n3. **Phase 3**: Test with representative file sizes and volumes\n4. **Phase 4**: Validate email notifications and logging\n5. **Phase 5**: Full production deployment with monitoring\n\n### ⚠️ Important Testing Notes\n- **Disable Source Deletion** during initial testing\n- Use **test directories** to avoid production data impact\n- **Monitor execution logs** carefully during testing\n- **Validate email delivery** to ensure notifications work\n- **Test rollback procedures** before production use\n\n## Support & Documentation\n\nThis template includes:\n- **8 Comprehensive Sticky Notes** with visual documentation\n- **Detailed Node Comments** explaining every configuration option\n- **Error Handling Guide** with common troubleshooting steps\n- **Security Best Practices** for production deployment\n- **Performance Tuning** recommendations for different scenarios\n\n## Technical Specifications\n\n- **n8n Version**: 1.0.0+  \n- **Node Count**: 17 functional nodes + 8 documentation sticky notes\n- **Execution Time**: 2-10 minutes (depending on file sizes and network speed)\n- **Memory Usage**: 50-200MB (scales with file sizes)\n- **Supported Protocols**: FTP, SFTP (recommended)\n- **File Size Limit**: Up to 150MB per file (configurable)\n- **Concurrent Files**: Processes files sequentially for stability\n\n## Who is this for?\n\n### 🎯 Primary Users\n- **System Administrators** managing file transfers between servers\n- **DevOps Engineers** automating deployment and backup processes  \n- **IT Operations Teams** handling data migration projects\n- **Business Process Owners** requiring automated file management\n\n### 💼 Industries & Use Cases\n- **Healthcare**: Patient data archiving and compliance reporting\n- **Financial Services**: Secure document transfer and regulatory reporting\n- **Manufacturing**: CAD file distribution and inventory data sync\n- **E-commerce**: Product image and catalog management\n- **Media**: Asset distribution and content delivery automation",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "File Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Security",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Performance",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configuration",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily Schedule (2 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "List Files - Source FTP",
+      "type": "n8n-nodes-base.ftp",
+      "role": "ftp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Files",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Download File",
+      "type": "n8n-nodes-base.ftp",
+      "role": "ftp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload to Destination",
+      "type": "n8n-nodes-base.ftp",
+      "role": "ftp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload Success?",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete Source File",
+      "type": "n8n-nodes-base.ftp",
+      "role": "ftp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Email Success Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

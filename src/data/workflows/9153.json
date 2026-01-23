@@ -1,0 +1,121 @@
+{
+  "id": 9153,
+  "slug": "9153",
+  "title": "Collect LinkedIn profiles with SerpAPI Google Search and Sheets",
+  "description": "# [LI] – Search Profiles\n\n&gt; **⚠️ Self-hosted disclaimer:**  \n&gt; This workflow uses the **SerpAPI community node**, which is available only on **self-hosted n8n instances**.  \n&gt; For **n8n Cloud**, you may need to use an HTTP Request node with the SerpAPI REST API instead.\n\n---\n![Screenshot From 20251020 130253.png](fileId:3020)\n\n\n---\n\n## Who’s it for\nRecruiters, talent sourcers, SDRs, and anyone who wants to **automatically gather public LinkedIn profiles** from Google search results based on keywords — across **multiple pages** — and log them to a Google Sheet for further analysis.\n\n---\n\n## What it does / How it works\nThis workflow extends the standard LinkedIn profile search to include **pagination**, allowing you to fetch results from **multiple Google result pages** in one go.\n\nHere’s the step-by-step process:\n\n1. **Form Trigger – “LinkedIn Search”**\n   - Collects:\n     - **Keywords (comma separated)** – e.g., `python, fintech, warsaw`\n     - **Pages to fetch** – number of Google pages to scrape (each page ≈ 10 results)\n   - Triggers the workflow when submitted.\n\n2. **Format Keywords (Set)**\n   - Converts the keywords into a Google-ready query string:\n     ```\n     (\"python\") (\"fintech\") (\"warsaw\")\n     ```\n   - These parentheses improve relevance in Google searches.\n\n3. **Build Page List (Code)**\n   - Creates a **list of pages** to iterate through.\n   - For example, if “Pages to fetch” = 3, it generates 3 search batches with proper `start` offsets (`0`, `10`, `20`).\n   - Keeps track of:\n     - Grouped keywords (`keywordsGrouped`)\n     - Raw keywords\n     - Submission timestamp\n\n4. **Loop Over Items (Split In Batches)**\n   - Loops through the page list one batch at a time.\n   - Sends each batch to **SerpAPI Search** and continues until all pages are processed.\n\n5. **SerpAPI Search**\n   - Queries Google with:\n     ```\n     site:pl.linkedin.com/in/ (\"keyword1\") (\"keyword2\") (\"keyword3\")\n     ```\n   - Fixed to the **Warsaw, Masovian Voivodeship, Poland** location.\n   - The `start` parameter controls pagination.\n\n6. **Check how many results are returned (Switch)**\n   - If **no results** → Triggers **No profiles found**.\n   - If **results found** → Passes data forward.\n\n7. **Split Out**\n   - Extracts each LinkedIn result from the `organic_results` array.\n\n8. **Get Full Name to property of object (Code)**\n   - Extracts a clean full name from the search result title (text before “–” or “|”).\n\n9. **Append profile in sheet (Google Sheets)**\n   - Saves the following fields into your connected sheet:\n     | Column | Description |\n     |---------|-------------|\n     | **Date** | Submission timestamp |\n     | **Profile** | Public LinkedIn profile URL |\n     | **Full name** | Extracted candidate name |\n     | **Keywords** | Original keywords from the form |\n\n10. **Loop Over Items (continue)**\n    - After writing each batch, it loops to the next Google page until all pages are complete.\n\n11. **Form Response (final step)**\n    - Sends a confirmation back to the user after all pages are processed:\n      ```\n      Check linked file\n      ```\n\n---\n\n## 🧾 Google Sheets Setup\n\nBefore using the workflow, prepare your Google Sheet with these columns in **row 1**:\n\n| Column Name | Description |\n|--------------|-------------|\n| **Date** | Automatically filled with the form submission time |\n| **Profile** | LinkedIn profile link |\n| **Full name** | Extracted name from search results |\n| **Keywords** | Original search input |\n\n&gt; You can expand the sheet to include optional fields like **Snippet**, **Job Title**, or **Notes** if you modify the mapping in the `Append profile in sheet` node.\n\n---\n\n## Requirements\n- **SerpAPI account** – with API key stored securely in **n8n Credentials**.  \n- **Google Sheets OAuth2 credentials** – connected to your target sheet with edit access.  \n- **n8n instance (Cloud or self-hosted)**  \n  &gt; Note: SerpAPI node is part of the **Community package** and may require **self-hosted n8n**.\n\n---\n\n## How to set up\n1. Import the `[LI] - Search profiles` workflow into n8n.  \n2. Connect your credentials:\n   - **SerpAPI** – use your API key.\n   - **Google Sheets OAuth2** – ensure you have write permissions.\n3. Update the **Google Sheets node** to point to your own spreadsheet and worksheet.\n4. (Optional) Edit the `location` field in **SerpAPI Search** for different regions.\n5. Activate the workflow and open the public form (via webhook URL).\n6. Enter your keywords and specify the number of pages to fetch.\n\n---\n\n## How to customize the workflow\n- **Change search region:** Modify the `location` in the SerpAPI node or change the domain to `site:linkedin.com/in/` for global searches.  \n- **Add pagination beyond 3–4 pages:** Increase “Pages to fetch” — but note that excessive pages may trigger Google rate limits.  \n- **Avoid duplicates:** Add a **Google Sheets → Read** + **IF** node before appending new URLs.  \n- **Add notifications:** Add **Slack**, **Discord**, or **Email nodes** after Google Sheets to alert your team when new data arrives.  \n- **Capture more data:** Map additional fields like `title`, `snippet`, or `position` into your Sheet.\n\n---\n\n## Security notes\n- Never store API keys directly in nodes — always use **n8n Credentials**.  \n- Keep your Google Sheet **private** and limit edit access.  \n- Remove identifying data before sharing your workflow publicly.\n\n---\n\n## 💡 Improvement suggestions\n\n| Area | Recommendation | Benefit |\n|-------|----------------|----------|\n| **Dynamic location** | Add a “Location” field to the form and feed it to SerpAPI dynamically. | Broader and location-specific searches |\n| **Rate limiting** | Add a short **Wait** node (e.g., 1–2s) between page fetches. | Prevents API throttling |\n| **De-duplication** | Check for existing URLs before appending. | Prevents duplicates |\n| **Logging** | Add a second sheet or log file with timestamps per run. | Easier debugging and tracking |\n| **Data enrichment** | Add a LinkedIn or People Data API enrichment step. | Collect richer candidate data |\n\n---\n\n✅ **Summary:**  \nThis workflow automates the process of searching public LinkedIn profiles from Google across multiple pages. It formats user-entered keywords into advanced Google queries, iterates through paginated SerpAPI results, extracts profile data, and stores it neatly in a Google Sheet — all through a single, user-friendly form.",
+  "featuredImage": "/data/workflows/9153/9153.webp",
+  "author": {
+    "id": 101,
+    "slug": "argone",
+    "name": "Piotr Sikora",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 163,
+  "downloads": 16,
+  "createdAt": "2025-10-01T12:12:54.838Z",
+  "updatedAt": "2026-01-16T08:59:14.871Z",
+  "publishedAt": "2025-10-01T12:12:54.838Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9153",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Collect LinkedIn profiles with SerpAPI Google Search and Sheets",
+    "workflowName": "Collect LinkedIn profiles with SerpAPI Google Search and Sheets",
+    "description": "# [LI] – Search Profiles\n\n&gt; **⚠️ Self-hosted disclaimer:**  \n&gt; This workflow uses the **SerpAPI community node**, which is available only on **self-hosted n8n instances**.  \n&gt; For **n8n Cloud**, you may need to use an HTTP Request node with the SerpAPI REST API instead.\n\n---\n![Screenshot From 20251020 130253.png](fileId:3020)\n\n\n---\n\n## Who’s it for\nRecruiters, talent sourcers, SDRs, and anyone who wants to **automatically gather public LinkedIn profiles** from Google search results based on keywords — across **multiple pages** — and log them to a Google Sheet for further analysis.\n\n---\n\n## What it does / How it works\nThis workflow extends the standard LinkedIn profile search to include **pagination**, allowing you to fetch results from **multiple Google result pages** in one go.\n\nHere’s the step-by-step process:\n\n1. **Form Trigger – “LinkedIn Search”**\n   - Collects:\n     - **Keywords (comma separated)** – e.g., `python, fintech, warsaw`\n     - **Pages to fetch** – number of Google pages to scrape (each page ≈ 10 results)\n   - Triggers the workflow when submitted.\n\n2. **Format Keywords (Set)**\n   - Converts the keywords into a Google-ready query string:\n     ```\n     (\"python\") (\"fintech\") (\"warsaw\")\n     ```\n   - These parentheses improve relevance in Google searches.\n\n3. **Build Page List (Code)**\n   - Creates a **list of pages** to iterate through.\n   - For example, if “Pages to fetch” = 3, it generates 3 search batches with proper `start` offsets (`0`, `10`, `20`).\n   - Keeps track of:\n     - Grouped keywords (`keywordsGrouped`)\n     - Raw keywords\n     - Submission timestamp\n\n4. **Loop Over Items (Split In Batches)**\n   - Loops through the page list one batch at a time.\n   - Sends each batch to **SerpAPI Search** and continues until all pages are processed.\n\n5. **SerpAPI Search**\n   - Queries Google with:\n     ```\n     site:pl.linkedin.com/in/ (\"keyword1\") (\"keyword2\") (\"keyword3\")\n     ```\n   - Fixed to the **Warsaw, Masovian Voivodeship, Poland** location.\n   - The `start` parameter controls pagination.\n\n6. **Check how many results are returned (Switch)**\n   - If **no results** → Triggers **No profiles found**.\n   - If **results found** → Passes data forward.\n\n7. **Split Out**\n   - Extracts each LinkedIn result from the `organic_results` array.\n\n8. **Get Full Name to property of object (Code)**\n   - Extracts a clean full name from the search result title (text before “–” or “|”).\n\n9. **Append profile in sheet (Google Sheets)**\n   - Saves the following fields into your connected sheet:\n     | Column | Description |\n     |---------|-------------|\n     | **Date** | Submission timestamp |\n     | **Profile** | Public LinkedIn profile URL |\n     | **Full name** | Extracted candidate name |\n     | **Keywords** | Original keywords from the form |\n\n10. **Loop Over Items (continue)**\n    - After writing each batch, it loops to the next Google page until all pages are complete.\n\n11. **Form Response (final step)**\n    - Sends a confirmation back to the user after all pages are processed:\n      ```\n      Check linked file\n      ```\n\n---\n\n## 🧾 Google Sheets Setup\n\nBefore using the workflow, prepare your Google Sheet with these columns in **row 1**:\n\n| Column Name | Description |\n|--------------|-------------|\n| **Date** | Automatically filled with the form submission time |\n| **Profile** | LinkedIn profile link |\n| **Full name** | Extracted name from search results |\n| **Keywords** | Original search input |\n\n&gt; You can expand the sheet to include optional fields like **Snippet**, **Job Title**, or **Notes** if you modify the mapping in the `Append profile in sheet` node.\n\n---\n\n## Requirements\n- **SerpAPI account** – with API key stored securely in **n8n Credentials**.  \n- **Google Sheets OAuth2 credentials** – connected to your target sheet with edit access.  \n- **n8n instance (Cloud or self-hosted)**  \n  &gt; Note: SerpAPI node is part of the **Community package** and may require **self-hosted n8n**.\n\n---\n\n## How to set up\n1. Import the `[LI] - Search profiles` workflow into n8n.  \n2. Connect your credentials:\n   - **SerpAPI** – use your API key.\n   - **Google Sheets OAuth2** – ensure you have write permissions.\n3. Update the **Google Sheets node** to point to your own spreadsheet and worksheet.\n4. (Optional) Edit the `location` field in **SerpAPI Search** for different regions.\n5. Activate the workflow and open the public form (via webhook URL).\n6. Enter your keywords and specify the number of pages to fetch.\n\n---\n\n## How to customize the workflow\n- **Change search region:** Modify the `location` in the SerpAPI node or change the domain to `site:linkedin.com/in/` for global searches.  \n- **Add pagination beyond 3–4 pages:** Increase “Pages to fetch” — but note that excessive pages may trigger Google rate limits.  \n- **Avoid duplicates:** Add a **Google Sheets → Read** + **IF** node before appending new URLs.  \n- **Add notifications:** Add **Slack**, **Discord**, or **Email nodes** after Google Sheets to alert your team when new data arrives.  \n- **Capture more data:** Map additional fields like `title`, `snippet`, or `position` into your Sheet.\n\n---\n\n## Security notes\n- Never store API keys directly in nodes — always use **n8n Credentials**.  \n- Keep your Google Sheet **private** and limit edit access.  \n- Remove identifying data before sharing your workflow publicly.\n\n---\n\n## 💡 Improvement suggestions\n\n| Area | Recommendation | Benefit |\n|-------|----------------|----------|\n| **Dynamic location** | Add a “Location” field to the form and feed it to SerpAPI dynamically. | Broader and location-specific searches |\n| **Rate limiting** | Add a short **Wait** node (e.g., 1–2s) between page fetches. | Prevents API throttling |\n| **De-duplication** | Check for existing URLs before appending. | Prevents duplicates |\n| **Logging** | Add a second sheet or log file with timestamps per run. | Easier debugging and tracking |\n| **Data enrichment** | Add a LinkedIn or People Data API enrichment step. | Collect richer candidate data |\n\n---\n\n✅ **Summary:**  \nThis workflow automates the process of searching public LinkedIn profiles from Google across multiple pages. It formats user-entered keywords into advanced Google queries, iterates through paginated SerpAPI results, extracts profile data, and stores it neatly in a Google Sheet — all through a single, user-friendly form.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Format Keywords",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Build Page List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "SerpAPI Search",
+      "type": "n8n-nodes-serpapi.serpApi",
+      "role": "serpApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check how many results are returned",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "No profiles found",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Full Name to property of object",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append profile in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Form Response",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

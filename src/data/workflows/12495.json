@@ -1,0 +1,224 @@
+{
+  "id": 12495,
+  "slug": "12495",
+  "title": "Audit SharePoint Online external sharing and anonymous links with Microsoft Graph",
+  "description": "## Audit external sharing in SharePoint to ensure compliance\n\nThis workflow audits your **SharePoint Online** environment for **external sharing risks** by identifying files and folders that are shared with **anonymous links** or **external/guest users**. It is designed to **traverse SharePoint recursively**, giving you full visibility into sharing across all sites, document libraries, folders and files.\n\n### What it does\n\n* Scans **all SharePoint sites** in the tenant.\n* **Traverses SharePoint recursively** through every folder and file, starting at the root of each drive.\n* Fetches **permissions for every item** (files and folders).\n* Detects and flags:\n\n  * **Anonymous sharing links** (anyone links)\n  * **External or guest users**, identified by:\n\n    * SharePoint guest login markers (`#ext#`, `urn:spo:guest`)\n    * Email domains not matching your internal tenant domains\n* Outputs **only items that are externally shared**, including detailed metadata and permission evidence.\n\n### How it works\n\n* In the **Set Variables** node you define your internal `tenantDomains`, used to distinguish internal users from external ones.\n\n* **Microsoft Graph** is used to:\n  * Fetch all SharePoint sites\n  * Retrieve drives (document libraries) per site\n* Each drive triggers a **recursive subworkflow** that:\n  * Starts at the root level\n  * Determines whether an item is a folder or a file\n  * If a folder, drills down into its children\n  * Keeps both folders and files, since both can have unique permissions\n\n* For every discovered item:\n  * Permissions are retrieved via Microsoft Graph\n  * Item metadata and permissions are merged\n* A custom **filtering step** analyzes permissions and:\n\n  * Flags anonymous links and external principals\n  * Drops items with no external exposure\n* The final output is a clean, normalized list of **externally shared SharePoint items**, enriched with:\n\n  * Item name, type, URL and last modified date\n  * Site, drive, and parent identifiers\n  * Detailed lists of anonymous links and external users found\n\n### Setup\n\n* Create a **Microsoft Entra ID (Azure AD) App Registration**.\n* Grant **Microsoft Graph – Application permissions**:\n  * `Sites.Read.All`\n\n* Configure an **OAuth2 Client Credentials** credential in n8n and assign it to all HTTP Request nodes.\n\n* Update the **Set Variables** node:\n\n  * Add all internal tenant domains (e.g. `yourDomain.onmicrosoft.com`, `yourDomain.com`)\n* Run the workflow manually or attach a **Schedule Trigger** for recurring audits.\n\n### Notes\n\n* The workflow **traverses SharePoint recursively**, ensuring no nested folder or file is missed.\n* Both folders and files are included because **permissions can be broken at any level**.\n* External users are detected defensively using **both login-name patterns and email domain checks**.",
+  "featuredImage": "/data/workflows/12495/12495.webp",
+  "author": {
+    "id": 101,
+    "slug": "alexschnabl",
+    "name": "Alexander Schnabl",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2,
+  "downloads": 0,
+  "createdAt": "2026-01-05T17:27:56.667Z",
+  "updatedAt": "2026-01-16T09:12:32.893Z",
+  "publishedAt": "2026-01-05T17:27:56.667Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12495",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Audit SharePoint Online external sharing and anonymous links with Microsoft Graph",
+    "workflowName": "Audit SharePoint Online external sharing and anonymous links with Microsoft Graph",
+    "description": "## Audit external sharing in SharePoint to ensure compliance\n\nThis workflow audits your **SharePoint Online** environment for **external sharing risks** by identifying files and folders that are shared with **anonymous links** or **external/guest users**. It is designed to **traverse SharePoint recursively**, giving you full visibility into sharing across all sites, document libraries, folders and files.\n\n### What it does\n\n* Scans **all SharePoint sites** in the tenant.\n* **Traverses SharePoint recursively** through every folder and file, starting at the root of each drive.\n* Fetches **permissions for every item** (files and folders).\n* Detects and flags:\n\n  * **Anonymous sharing links** (anyone links)\n  * **External or guest users**, identified by:\n\n    * SharePoint guest login markers (`#ext#`, `urn:spo:guest`)\n    * Email domains not matching your internal tenant domains\n* Outputs **only items that are externally shared**, including detailed metadata and permission evidence.\n\n### How it works\n\n* In the **Set Variables** node you define your internal `tenantDomains`, used to distinguish internal users from external ones.\n\n* **Microsoft Graph** is used to:\n  * Fetch all SharePoint sites\n  * Retrieve drives (document libraries) per site\n* Each drive triggers a **recursive subworkflow** that:\n  * Starts at the root level\n  * Determines whether an item is a folder or a file\n  * If a folder, drills down into its children\n  * Keeps both folders and files, since both can have unique permissions\n\n* For every discovered item:\n  * Permissions are retrieved via Microsoft Graph\n  * Item metadata and permissions are merged\n* A custom **filtering step** analyzes permissions and:\n\n  * Flags anonymous links and external principals\n  * Drops items with no external exposure\n* The final output is a clean, normalized list of **externally shared SharePoint items**, enriched with:\n\n  * Item name, type, URL and last modified date\n  * Site, drive, and parent identifiers\n  * Detailed lists of anonymous links and external users found\n\n### Setup\n\n* Create a **Microsoft Entra ID (Azure AD) App Registration**.\n* Grant **Microsoft Graph – Application permissions**:\n  * `Sites.Read.All`\n\n* Configure an **OAuth2 Client Credentials** credential in n8n and assign it to all HTTP Request nodes.\n\n* Update the **Set Variables** node:\n\n  * Add all internal tenant domains (e.g. `yourDomain.onmicrosoft.com`, `yourDomain.com`)\n* Run the workflow manually or attach a **Schedule Trigger** for recurring audits.\n\n### Notes\n\n* The workflow **traverses SharePoint recursively**, ensuring no nested folder or file is missed.\n* Both folders and files are included because **permissions can be broken at any level**.\n* External users are detected defensively using **both login-name patterns and email domain checks**.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sharepoint - Get Sites",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Split Out - Sites",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SharePoint - Get Drives",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Split Out - Drives",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SharePoint - Get Item Permissions",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Filter Items based on permissions",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "SharePoint - Get Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Split Out - Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Item is not a folder",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "If Input is a Folder",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "SharePoint - Get Child Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Call 'Audit SharePoint for externally shared Items and anonymous permissions'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Subworkflow - Get Items",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Recursive call Get Items",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Return All Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Keept Items and Folders",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Rename Output for Permissions",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Rename Output for Item",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter sites",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "id": 10267,
+  "slug": "10267",
+  "title": "Generate news cards from Spotify emotions with LLM, Google News and APITemplate.io",
+  "description": "## 📄 Workflow Overview\n\nTitle: Spotify Emotion-to-News Card Generator (APITemplate.io + Slack)\n\n## What it does:\nThis workflow analyzes the emotion of your recently played Spotify track using OpenRouter (LLM), fetches a related trending Google News article, generates a visual news card with APITemplate.io, and posts it to Slack.\n\n## 👥 Who’s it for\n\nMusic lovers, marketers, and developers who want to automatically turn their listening mood into a visual daily digest or Slack update.\n\n## ⚙️ How it works\n\nSpotify Trigger — Fetch your recently played tracks.\n\nLLM (Emotion Analyzer) — Infer the main emotion from the track title and artist.\n\nGoogle News Query — Build an RSS URL based on the emotion keyword.\n\nRSS Reader — Retrieve trending news headlines.\n\nAPITemplate.io — Render the top article into an image card.\n\nSlack — Post title, link, and card image into your channel.\n\n## 🧰 Requirements\n\nSpotify API credentials\n\nOpenRouter API key\n\nAPITemplate.io account (with template ID)\n\nSlack OAuth2 connection\n\n## 🪄 How to customize\n\nReplace the APITemplate.io template ID with your own.\n\nAdjust the RSS URL language (hl=en-US → hl=ja-JP for Japanese news).\n\nModify the Slack message text for your preferred channel tone.\n\n## ⚠️ Disclaimer\n\nIf you use community nodes (LangChain), this template is for self-hosted n8n only.",
+  "featuredImage": "/data/workflows/10267/10267.webp",
+  "author": {
+    "id": 101,
+    "slug": "shusaku",
+    "name": "noda",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 61,
+  "downloads": 6,
+  "createdAt": "2025-10-29T08:07:52.734Z",
+  "updatedAt": "2026-01-16T09:04:12.140Z",
+  "publishedAt": "2025-10-29T08:07:52.734Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10267",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate news cards from Spotify emotions with LLM, Google News and APITemplate.io",
+    "workflowName": "Generate news cards from Spotify emotions with LLM, Google News and APITemplate.io",
+    "description": "Title: Spotify Emotion-to-News Card Generator (APITemplate.io + Slack)\n\n## What it does:\nThis workflow analyzes the emotion of your recently played Spotify track using OpenRouter (LLM), fetches a related trending Google News article, generates a visual news card with APITemplate.io, and posts it to Slack.\n\n## 👥 Who’s it for\n\nMusic lovers, marketers, and developers who want to automatically turn their listening mood into a visual daily digest or Slack update.\n\n## ⚙️ How it works\n\nSpotify Trigger — Fetch your recently played tracks.\n\nLLM (Emotion Analyzer) — Infer the main emotion from the track title and artist.\n\nGoogle News Query — Build an RSS URL based on the emotion keyword.\n\nRSS Reader — Retrieve trending news headlines.\n\nAPITemplate.io — Render the top article into an image card.\n\nSlack — Post title, link, and card image into your channel.\n\n## 🧰 Requirements\n\nSpotify API credentials\n\nOpenRouter API key\n\nAPITemplate.io account (with template ID)\n\nSlack OAuth2 connection\n\n## 🪄 How to customize\n\nReplace the APITemplate.io template ID with your own.\n\nAdjust the RSS URL language (hl=en-US → hl=ja-JP for Japanese news).\n\nModify the Slack message text for your preferred channel tone.\n\n## ⚠️ Disclaimer\n\nIf you use community nodes (LangChain), this template is for self-hosted n8n only.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Emotion Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Start on Schedule (Cron)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Spotify Recently Played",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "LLM: Infer Emotion from Track",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "For Each Track (Batch)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Build Google News RSS Query",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fetch Google News RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Pick Top News & Format",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate News Card (APITemplate)",
+      "type": "n8n-nodes-base.apiTemplateIo",
+      "role": "apiTemplateIo",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to Slack (Title + Link + Card URL)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+# URL and IP lookups through Greynoise and VirusTotal
+
+> This n8n workflow serves as a powerful cybersecurity and threat intelligence tool to look up URLs or IP addresses through industry standard threat intelligence vendors. It starts with either a form submission or a webhook trigger, allowing users to input data, URLs or IPs that require analysis. The workflow then splits into two paths depending on whether the input data is an IP or URL. If an IP was given, it sets the ip variable to the IP; however if a URL was given the workflow will perform a DNS lookup using Google Public DNS and sets the ip variable based on the results from Google.
+
+The workflow then checks the obtained IP addresses against GreyNoise services, with one branch utilizing GreyNoise RIOT IP Lookup to assess IP reputation and association with known benign services, and the other using GreyNoise IP Context to evaluate potential threats. The results from both GreyNoise services are merged to create a comprehensive analysis which includes the IP, classification (benign, malicious, or unknown), IP location, tags to identify activity or malware, category, and trust level. 
+
+In parallel, a VirusTotal scan is initiated for the URL/IP to identify if it is malicious. A 5-second wait ensures proper processing, and the workflow subsequently polls the scan result to determine when the analysis is complete. The workflow then summarizes the analysis including the overall security vendor analysis results, blockList analysis, OpenPhish analysis, the URL, and the IP.
+
+Finally, the workflow combines the summarized intelligence from both GreyNoise and VirusTotal to provide a thorough analysis of the URL/IP. This summarized intelligence can then be emailed to the user that filled out the form via Gmail or it can be sent to the user via a Slack message.
+
+Setting up this workflow may require proper configuration of the form submission or webhook trigger, and ensuring that the GreyNoise and VirusTotal API credentials are correctly integrated. Users should also consider the potential volume of data and API rate limits, as excessive requests could lead to issues. Proper documentation and validation of input data are crucial to ensure accurate and meaningful results in the final report.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 1971
+- **Complexity:** advanced
+- **Node Count:** 29
+- **Views:** 9668
+- **Downloads:** 966
+- **Created:** 2023/11/7
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/1971)
+
+## 👤 Author
+
+- **Name:** n8n Team
+- **Username:** @n8n-team
+
+## 🏷️ Categories
+
+- SecOps
+
+## 🔗 Nodes Used
+
+- **httpRequest** (×5)
+- **code** (×2)
+- **set** (×4)
+- **merge** (×3)
+- **if** (×2)
+- **wait** 
+- **webhook** 
+- **itemLists** 
+- **slack** 
+- **gmail** 
+- **filter** 
+- **stickyNote** (×6)
+- **formTrigger** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 29 nodes with 21 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

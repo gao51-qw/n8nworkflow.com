@@ -1,0 +1,134 @@
+{
+  "id": 11585,
+  "slug": "11585",
+  "title": "E-commerce price tracker with ScrapeGraphAI, MongoDB, and Mailgun alerts",
+  "description": "# Product Price Monitor with Mailgun and MongoDB\n\n![Workflow Preview Image](https://via.placeholder.com/800x400/4B5BD5/FFFFFF?text=Product%20Price%20Monitor%20Workflow%20Preview)\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes multiple e-commerce sites, records weekly product prices in MongoDB, analyzes seasonal trends, and emails a concise report to retail stakeholders via Mailgun. It helps retailers make informed inventory and pricing decisions by providing up-to-date pricing intelligence.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted, desktop, or n8n.cloud)\n- ScrapeGraphAI community node installed and activated\n- MongoDB database (Atlas or self-hosted)\n- Mailgun account with a verified domain\n- Publicly reachable n8n Webhook URL (if self-hosted)\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping across target sites\n- **MongoDB Credentials** – Connection string (MongoDB URI) with read/write access  \n- **Mailgun API Key & Domain** – To send summary emails\n\n### MongoDB Collection Schema\n| Field           | Type     | Example Value             | Notes                                       |\n|-----------------|----------|---------------------------|---------------------------------------------|\n| productId       | String   | `SKU-12345`               | Unique identifier you define                |\n| productName     | String   | `Women's Winter Jacket`   | Human-readable name                         |\n| timestamp       | Date     | `2024-09-15T00:00:00Z`    | Ingest date (automatically added)           |\n| price           | Number   | `79.99`                   | Scraped price                               |\n| source          | String   | `example-shop.com`        | Domain where price was scraped              |\n\n## How it works\n\nThis workflow automatically scrapes multiple e-commerce sites, records weekly product prices in MongoDB, analyzes seasonal trends, and emails a concise report to retail stakeholders via Mailgun. It helps retailers make informed inventory and pricing decisions by providing up-to-date pricing intelligence.\n\n## Key Steps:\n- **Webhook Trigger**: Starts the workflow on a scheduled HTTP call or manual trigger.\n- **Code (Prepare Products)**: Defines the list of SKUs/URLs to monitor.\n- **Split In Batches**: Processes products in manageable chunks to respect rate limits.\n- **ScrapeGraphAI (Scrape Price)**: Extracts price, availability, and currency from each product URL.\n- **Merge (Combine Results)**: Re-assembles all batch outputs into one dataset.\n- **MongoDB (Upsert Price History)**: Stores each price point for historical analysis.\n- **If (Seasonal Trend Check)**: Compares current price against historical average to detect anomalies.\n- **Set (Email Payload)**: Formats the trend report for email.\n- **Mailgun (Send Email)**: Emails weekly summary to specified recipients.\n- **Respond to Webhook**: Returns “200 OK – Report Sent” response for logging.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install Community Node**  \n   In n8n, go to “Settings → Community Nodes” and install **@n8n-community/nodes-scrapegraphai**.\n2. **Create Credentials**  \n   - Add ScrapeGraphAI API key under Credentials.  \n   - Add MongoDB credentials (type: MongoDB).  \n   - Add Mailgun credentials (type: Mailgun).\n3. **Import Workflow**  \n   Download the JSON template, then in n8n click “Import” and select the file.\n4. **Configure Product List**  \n   Open the **Code (Prepare Products)** node and replace the example array with your product objects `{ id, name, url }`.\n5. **Adjust Cron/Schedule**  \n   If you prefer a fully automated schedule, replace the Webhook with a **Cron** node (e.g., every Monday at 09:00).\n6. **Verify MongoDB Collection**  \n   Ensure the collection (default: `productPrices`) exists or let n8n create it on first run.\n7. **Set Recipients**  \n   In the **Mailgun** node, update the `to`, `from`, and `subject` fields.\n8. **Execute Test Run**  \n   Manually trigger the Webhook URL or run the workflow once to verify data flow and email delivery.\n9. **Activate**  \n   Toggle the workflow to “Active” so it runs automatically each week.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Webhook** – Entry point that accepts a GET/POST call to start the job.\n- **Code (Prepare Products)** – Outputs an array of products to monitor.\n- **Split In Batches** – Limits scraping to N products per request to avoid banning.\n- **ScrapeGraphAI** – Scrapes the HTML of a product page and parses pricing data.\n- **Merge** – Re-combines batch results for streamlined processing.\n- **MongoDB** – Inserts or updates each product’s price history document.\n- **If** – Determines whether price deviates &gt; X% from the season average.\n- **Set** – Builds an HTML/text email body containing the findings.\n- **Mailgun** – Sends the email via Mailgun REST API.\n- **Respond to Webhook** – Returns an HTTP response for logging/monitoring.\n- **Sticky Notes** – Provide in-workflow documentation (no execution).\n\n### Data Flow:\n1. **Webhook** → **Code** → **Split In Batches**  \n2. **Split In Batches** → **ScrapeGraphAI** → **Merge**  \n3. **Merge** → **MongoDB** → **If**  \n4. **If (true)** → **Set** → **Mailgun** → **Respond to Webhook**  \n\n## Customization Examples\n\n### Change Scraping Frequency (Cron)\n```javascript\n// Cron node settings\n{\n  \"mode\": \"custom\",\n  \"cronExpression\": \"0 6 * * 1,4\" // Monday & Thursday 06:00\n}\n```\n\n### Extend Data Points (Reviews Count, Stock)\n```javascript\n// In ScrapeGraphAI extraction config\n{\n  \"price\": \"css:span.price\",\n  \"inStock\": \"css:div.availability\",\n  \"reviewCount\": \"regex:\\\"(\\\\d+) reviews\\\"\"\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"productId\": \"SKU-12345\",\n  \"productName\": \"Women's Winter Jacket\",\n  \"timestamp\": \"2024-09-15T00:00:00Z\",\n  \"price\": 79.99,\n  \"currency\": \"USD\",\n  \"source\": \"example-shop.com\",\n  \"trend\": \"5% below 3-month average\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty data** – Confirm selectors/XPath are correct; test with ScrapeGraphAI playground.  \n2. **MongoDB connection fails** – Verify IP-whitelisting for Atlas or network connectivity for self-hosted instance.  \n3. **Mail not delivered** – Check Mailgun logs for bounce or spam rejection, and ensure `from` domain is verified.\n\n### Performance Tips\n- Use smaller batch sizes (e.g., 5 URLs) to avoid target site rate-limit blocks.\n- Cache static product info; scrape only fields that change (price, stock).\n\n**Pro Tips:**\n- Integrate the **IF** node with n8n’s Slack node to push urgent price drops to a channel.  \n- Add a **Function** node to calculate moving averages for deeper analysis.  \n- Store raw HTML snapshots in S3/MinIO for auditability and debugging.",
+  "featuredImage": "/data/workflows/11585/11585.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 86,
+  "downloads": 8,
+  "createdAt": "2025-12-08T00:59:23.569Z",
+  "updatedAt": "2026-01-16T09:09:11.711Z",
+  "publishedAt": "2025-12-08T00:59:23.569Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11585",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "E-commerce price tracker with ScrapeGraphAI, MongoDB, and Mailgun alerts",
+    "workflowName": "E-commerce price tracker with ScrapeGraphAI, MongoDB, and Mailgun alerts",
+    "description": "# Product Price Monitor with Mailgun and MongoDB\n\n![Workflow Preview Image](https://via.placeholder.com/800x400/4B5BD5/FFFFFF?text=Product%20Price%20Monitor%20Workflow%20Preview)\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes multiple e-commerce sites, records weekly product prices in MongoDB, analyzes seasonal trends, and emails a concise report to retail stakeholders via Mailgun. It helps retailers make informed inventory and pricing decisions by providing up-to-date pricing intelligence.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted, desktop, or n8n.cloud)\n- ScrapeGraphAI community node installed and activated\n- MongoDB database (Atlas or self-hosted)\n- Mailgun account with a verified domain\n- Publicly reachable n8n Webhook URL (if self-hosted)\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping across target sites\n- **MongoDB Credentials** – Connection string (MongoDB URI) with read/write access  \n- **Mailgun API Key & Domain** – To send summary emails\n\n### MongoDB Collection Schema\n| Field           | Type     | Example Value             | Notes                                       |\n|-----------------|----------|---------------------------|---------------------------------------------|\n| productId       | String   | `SKU-12345`               | Unique identifier you define                |\n| productName     | String   | `Women's Winter Jacket`   | Human-readable name                         |\n| timestamp       | Date     | `2024-09-15T00:00:00Z`    | Ingest date (automatically added)           |\n| price           | Number   | `79.99`                   | Scraped price                               |\n| source          | String   | `example-shop.com`        | Domain where price was scraped              |\n\n## How it works\n\nThis workflow automatically scrapes multiple e-commerce sites, records weekly product prices in MongoDB, analyzes seasonal trends, and emails a concise report to retail stakeholders via Mailgun. It helps retailers make informed inventory and pricing decisions by providing up-to-date pricing intelligence.\n\n## Key Steps:\n- **Webhook Trigger**: Starts the workflow on a scheduled HTTP call or manual trigger.\n- **Code (Prepare Products)**: Defines the list of SKUs/URLs to monitor.\n- **Split In Batches**: Processes products in manageable chunks to respect rate limits.\n- **ScrapeGraphAI (Scrape Price)**: Extracts price, availability, and currency from each product URL.\n- **Merge (Combine Results)**: Re-assembles all batch outputs into one dataset.\n- **MongoDB (Upsert Price History)**: Stores each price point for historical analysis.\n- **If (Seasonal Trend Check)**: Compares current price against historical average to detect anomalies.\n- **Set (Email Payload)**: Formats the trend report for email.\n- **Mailgun (Send Email)**: Emails weekly summary to specified recipients.\n- **Respond to Webhook**: Returns “200 OK – Report Sent” response for logging.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install Community Node**  \n   In n8n, go to “Settings → Community Nodes” and install **@n8n-community/nodes-scrapegraphai**.\n2. **Create Credentials**  \n   - Add ScrapeGraphAI API key under Credentials.  \n   - Add MongoDB credentials (type: MongoDB).  \n   - Add Mailgun credentials (type: Mailgun).\n3. **Import Workflow**  \n   Download the JSON template, then in n8n click “Import” and select the file.\n4. **Configure Product List**  \n   Open the **Code (Prepare Products)** node and replace the example array with your product objects `{ id, name, url }`.\n5. **Adjust Cron/Schedule**  \n   If you prefer a fully automated schedule, replace the Webhook with a **Cron** node (e.g., every Monday at 09:00).\n6. **Verify MongoDB Collection**  \n   Ensure the collection (default: `productPrices`) exists or let n8n create it on first run.\n7. **Set Recipients**  \n   In the **Mailgun** node, update the `to`, `from`, and `subject` fields.\n8. **Execute Test Run**  \n   Manually trigger the Webhook URL or run the workflow once to verify data flow and email delivery.\n9. **Activate**  \n   Toggle the workflow to “Active” so it runs automatically each week.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Webhook** – Entry point that accepts a GET/POST call to start the job.\n- **Code (Prepare Products)** – Outputs an array of products to monitor.\n- **Split In Batches** – Limits scraping to N products per request to avoid banning.\n- **ScrapeGraphAI** – Scrapes the HTML of a product page and parses pricing data.\n- **Merge** – Re-combines batch results for streamlined processing.\n- **MongoDB** – Inserts or updates each product’s price history document.\n- **If** – Determines whether price deviates &gt; X% from the season average.\n- **Set** – Builds an HTML/text email body containing the findings.\n- **Mailgun** – Sends the email via Mailgun REST API.\n- **Respond to Webhook** – Returns an HTTP response for logging/monitoring.\n- **Sticky Notes** – Provide in-workflow documentation (no execution).\n\n### Data Flow:\n1. **Webhook** → **Code** → **Split In Batches**  \n2. **Split In Batches** → **ScrapeGraphAI** → **Merge**  \n3. **Merge** → **MongoDB** → **If**  \n4. **If (true)** → **Set** → **Mailgun** → **Respond to Webhook**  \n\n## Customization Examples\n\n### Change Scraping Frequency (Cron)\n```javascript\n// Cron node settings\n{\n  \"mode\": \"custom\",\n  \"cronExpression\": \"0 6 * * 1,4\" // Monday & Thursday 06:00\n}\n```\n\n### Extend Data Points (Reviews Count, Stock)\n```javascript\n// In ScrapeGraphAI extraction config\n{\n  \"price\": \"css:span.price\",\n  \"inStock\": \"css:div.availability\",\n  \"reviewCount\": \"regex:\\\"(\\\\d+) reviews\\\"\"\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"productId\": \"SKU-12345\",\n  \"productName\": \"Women's Winter Jacket\",\n  \"timestamp\": \"2024-09-15T00:00:00Z\",\n  \"price\": 79.99,\n  \"currency\": \"USD\",\n  \"source\": \"example-shop.com\",\n  \"trend\": \"5% below 3-month average\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty data** – Confirm selectors/XPath are correct; test with ScrapeGraphAI playground.  \n2. **MongoDB connection fails** – Verify IP-whitelisting for Atlas or network connectivity for self-hosted instance.  \n3. **Mail not delivered** – Check Mailgun logs for bounce or spam rejection, and ensure `from` domain is verified.\n\n### Performance Tips\n- Use smaller batch sizes (e.g., 5 URLs) to avoid target site rate-limit blocks.\n- Cache static product info; scrape only fields that change (price, stock).\n\n**Pro Tips:**\n- Integrate the **IF** node with n8n’s Slack node to push urgent price drops to a channel.  \n- Add a **Function** node to calculate moving averages for deeper analysis.  \n- Store raw HTML snapshots in S3/MinIO for auditability and debugging.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Trigger & URL Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Parallel Scraping",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Aggregation & Analysis",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Storage & Alerts",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Incoming Monitor Request",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Define Product Sources",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split URLs",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Product Page",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine Scraped Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Analyze Price Movement",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store to MongoDB",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Significant Price Change?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Alert Email",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Mailgun Alert",
+      "type": "n8n-nodes-base.mailgun",
+      "role": "mailgun",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    }
+  ]
+}

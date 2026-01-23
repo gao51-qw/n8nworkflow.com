@@ -1,0 +1,254 @@
+{
+  "id": 5808,
+  "slug": "5808",
+  "title": "Create custom PDF documents from templates with Gemini & Google Drive",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## 1 — What Does It Do / Which Problem Does It Solve?\n\nThis workflow turns Google Docs-based contract & form templates into **ready-to-sign PDFs in minutes**—all from a single chat flow.\n\n- **Automates repetitive document creation.** Instead of copying a rental, sales, or NDA template and filling it by hand every time, the bot asks for the required values and fills them in.\n- **Eliminates human error.** It lists every mandatory field so nothing is missed, and removes unnecessary clauses via conditional blocks.\n- **Speeds up approvals.** The final draft arrives as a direct PDF link—one click to send for signing.\n- **One template → unlimited variations.** Every new template you drop in Drive is auto-listed with **zero workflow edits—**it scales effortlessly.\n- **100 % no-code.** Runs on n8n + Google Apps Script—no extra backend, self-hosted or cloud.\n\n---\n\n## 2 — How It Works (Detailed Flow)\n\n1. 📝 **Template Discovery**\n    \n    📂 The **TemplateList** node scans the Drive folder you specify via the `?mode=meta` endpoint and returns an `id / title / desc` list. The bot shows this list in chat.\n    \n2. 🎯 **Selection & Metadata Fetch**\n    \n    The user types a template name.\n    \n    🔍 **GetMetaData** opens the chosen Doc, extracts `META_JSON`, placeholders, and conditional blocks, then lists mandatory & optional fields.\n    \n3. 🗣 **Data-Collection Loop**\n    - The bot asks for every **placeholder** value.\n    - For each **conditional block** it asks 🟢 **Yes** / 🔴 **No**.\n        \n        Answers are accumulated in a `data` JSON object.\n        \n4. ✅ **Final Confirmation**\n    \n    The bot summarizes the inputs → when the user clicks **Confirm**, the *DocProcess* sub-workflow starts.\n    \n5. ⚙️ **DocProcess Sub-Workflow**\n    \n    \n    | 🔧 Step | Node | Task |\n    | --- | --- | --- |\n    | 1 | **User Choice Match Check** | Verifies name–ID match; throws if wrong |\n    | 2 | **GetMetaData (renew)** | Gets the latest placeholder list |\n    | 3 | **Validate JSON Format** | Checks for missing / unknown fields |\n    | 4 | **CopyTemplate** | Copies the Doc via Drive API |\n    | 5 | **FillDocument** | Apps Script fills placeholders & removes blocks |\n    | 6 | **Generate PDF Link** | Builds an `export?format=pdf` URL |\n6. 📎 **Delivery**\n    \n    The master agent sends **🔗 Download PDF** & **✏️ Open Google Doc** links.\n    \n7. 🚫 **Error Paths**\n    - `status:\"ERROR\", missing:[…]` → bot lists missing fields and re-asks.\n    - `unknown:[…]` → template list is outdated; rerun *TemplateList*.\n    - Any Apps Script error → the returned `message` is shown verbatim in chat.\n\n---\n\n## 3 — 🚀 Setup Steps (Full Checklist)\n\n&gt; Goal: Get a flawless PDF on the first run.\n&gt; \n&gt; \n&gt; Mentally **tick** the ☑️ in front of every line as you go.\n&gt; \n\n### ☁️ A. Google Drive Preparation\n\n| Step | Do This | Watch Out For |\n| --- | --- | --- |\n| 1 | Create a `Templates/` folder → put every template Doc inside | Exactly **one** folder; **no** sub-folders |\n| 2 | Placeholders in every Doc are **`{{UPPER_CASE}}`** | No Turkish chars or spaces |\n| 3 | Wrap optional clauses with **`[[BLOCK_NAME:START]]…[[BLOCK_NAME:END]]`** | The `START` tag must have a **blank line above** |\n| 4 | Add a `META_JSON` block at the very end | Script deletes it automatically after fill |\n| 5 | Right-click Doc &gt; **Details ▸ Description** = 1-line human description | Shown by the bot in the list |\n| 6 | Create a second `Generated/` folder (for copies) | Keeps Drive tidy |\n\n&gt; 🔑 Folder ID (long alphanumerical) = &lt;TEMPLATE_PARENT_ID&gt;\n&gt; \n&gt; \n&gt; We’ll paste this into the TemplateList node next.\n&gt; \n\n[Simple sample template → Template Link](https://www.notion.so/Simple-sample-template-Template-Link-22b3f8a1e57f8070beacd034ba6f557f?pvs=21)\n\n---\n\n### 🛠 B. Import the Workflow into n8n\n\n```bash\nSettings ▸ Import Workflow ▸ DocAgent.json\n\n```\n\nIf nodes look **Broken** afterwards → no community-node problem; you only need to select credentials.\n\n---\n\n### 📑 C. Customize the TemplateList Node\n\n1. Open **Template List** node ⚙️ → replace\n    \n    `'%3CYOUR_PARENT_ID%3E' in parents`\n    \n    with the real **folder ID** in the **URL**.\n    \n2. Right-click node &gt; **Execute Node**.\n3. Copy the entire JSON response.\n4. In the editor paste it into:\n    - **DocAgent** → *System Prompt* (top)\n    - **User Choice Match Check** → *System Prompt* (top)\n        \n        Save.\n        \n\n&gt; ⚠️ Why manual? Caching the list saves LLM tokens. Whenever you add a template, rerun the node and update the prompts.\n&gt; \n\n---\n\n### 🔗 D. Deploy the Apps Script\n\n| Step | Screen | Note |\n| --- | --- | --- |\n| 1 | Open Gist files **GetMetaData.gs** + **FillDocument.gs** → *File ▸ Make a copy* | Both files may live in one project |\n| 2 | *Project Settings* &gt; enable **Google Docs API** ✔️ & **Google Drive API** ✔️ | Otherwise you’ll see 403 errors |\n| 3 | *Deploy ▸ New deployment ▸ Web app* |  |\n| • Execute as | **Me** |  |\n| • Who has access | **Anyone** |  |\n| 4 | On the consent screen allow scopes:• `…/auth/documents`• `…/auth/drive` | Click **Advanced › Go** if Google warns |\n| 5 | Copy the **Web App URL** (e.g. `https://script.google.com/macros/s/ABC123/exec`) | If this URL changes, update n8n |\n\n[Apps Script source code → Notion Link](https://www.notion.so/Apps-Script-source-code-Notion-Link-22b3f8a1e57f8015a280d90de16c031f?pvs=21)\n\n---\n\n### 🔧 E. Wire the Script URL in n8n\n\n| Node | Field | Action |\n| --- | --- | --- |\n| **GetMetaData** | *URL* | `&lt;WEB_APP_URL&gt;?mode=meta&id={{ $json[\"id\"] }}` |\n| **FillDocument** | *URL* | `&lt;WEB_APP_URL&gt;` |\n\n&gt; 💡 Prefer using an .env file? Add GAS_WEBAPP_URL=… and reference it as {{ $env.GAS_WEBAPP_URL }}.\n&gt; \n\n---\n\n### 🔐 F. Add Credentials\n\n- **Google Drive OAuth2** → *Drive API (v3) Full Access*\n- **Google Docs OAuth2** → same account\n- **LLM key** (OpenAI / Gemini)\n- (Optional) **Postgres Chat Memory** credential for the corresponding node\n\n---\n\n### 🧪 G. First Run (Smoke Test)\n\n1. Switch the workflow **Active**.\n2. In the chat panel type `/start`.\n3. Bot lists templates → pick one.\n4. Fill mandatory fields, optionally toggle blocks → **Confirm**.\n5. **🔗 Download PDF** link appears → ☑️ setup complete.\n\n---\n\n### ❌ H. Common Errors & Fixes\n\n| 🆘 Error | Likely Cause | Remedy |\n| --- | --- | --- |\n| `403: Apps Script permission denied` | Web app access set to *User* | Redeploy as **Anyone**, re-authorize scopes |\n| `placeholder validation failed` | Missing required field | Provide the listed values → rerun DocProcess |\n| `unknown placeholders: …` | Template vs. agent mismatch | Check placeholder spelling (UPPER_CASE ASCII) |\n| `Template ID not found` | Prompt list is old | Rerun **TemplateList** → update both prompts |\n| `Cannot find META_JSON` | No meta block / wrong tag | Add `[[META_JSON_START]] … [[META_JSON_END]]`, retry |\n\n---\n\n### ✅ Final Checklist\n\n- [ ]  Drive folder structure & template rules ready\n- [ ]  Workflow imported, folder ID set in node\n- [ ]  TemplateList output pasted into both prompts\n- [ ]  Apps Script deployed, URL set in nodes\n- [ ]  OAuth credentials & LLM key configured\n- [ ]  `/start` test passes, PDF link received\n\n---\n\n## 🙋‍♂️ Need Help with Customizations?\n\nReach out for consulting & support on LinkedIn: [**Özgür Karateke**](https://www.notion.so/DocAgent-Documentation-22b3f8a1e57f8085baa9c70cdead41cd?source=copy_link)\n\n[Full Documentation → Notion](https://www.notion.so/Simple-sample-template-Template-Link-22b3f8a1e57f8070beacd034ba6f557f?pvs=21)\n\n[Simple sample template → Template Link](https://www.notion.so/Simple-sample-template-Template-Link-22b3f8a1e57f8070beacd034ba6f557f?pvs=21)\n\n[Apps Script source code → Notion Link](https://www.notion.so/Apps-Script-source-code-Notion-Link-22b3f8a1e57f8015a280d90de16c031f?pvs=21)",
+  "featuredImage": "/data/workflows/5808/5808.webp",
+  "author": {
+    "id": 101,
+    "slug": "ozgur4864",
+    "name": "Ozgur Karateke",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8541,
+  "downloads": 854,
+  "createdAt": "2025-07-09T08:17:53.245Z",
+  "updatedAt": "2026-01-16T08:41:31.435Z",
+  "publishedAt": "2025-07-09T08:17:53.245Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5808",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create custom PDF documents from templates with Gemini & Google Drive",
+    "workflowName": "Create custom PDF documents from templates with Gemini & Google Drive",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## 1 — What Does It Do / Which Problem Does It Solve?\n\nThis workflow turns Google Docs-based contract & form templates into **ready-to-sign PDFs in minutes**—all from a single chat flow.\n\n- **Automates repetitive document creation.** Instead of copying a rental, sales, or NDA template and filling it by hand every time, the bot asks for the required values and fills them in.\n- **Eliminates human error.** It lists every mandatory field so nothing is missed, and removes unnecessary clauses via conditional blocks.\n- **Speeds up approvals.** The final draft arrives as a direct PDF link—one click to send for signing.\n- **One template → unlimited variations.** Every new template you drop in Drive is auto-listed with **zero workflow edits—**it scales effortlessly.\n- **100 % no-code.** Runs on n8n + Google Apps Script—no extra backend, self-hosted or cloud.\n\n---\n\n## 2 — How It Works (Detailed Flow)\n\n1. 📝 **Template Discovery**\n    \n    📂 The **TemplateList** node scans the Drive folder you specify via the `?mode=meta` endpoint and returns an `id / title / desc` list. The bot shows this list in chat.\n    \n2. 🎯 **Selection & Metadata Fetch**\n    \n    The user types a template name.\n    \n    🔍 **GetMetaData** opens the chosen Doc, extracts `META_JSON`, placeholders, and conditional blocks, then lists mandatory & optional fields.\n    \n3. 🗣 **Data-Collection Loop**\n    - The bot asks for every **placeholder** value.\n    - For each **conditional block** it asks 🟢 **Yes** / 🔴 **No**.\n        \n        Answers are accumulated in a `data` JSON object.\n        \n4. ✅ **Final Confirmation**\n    \n    The bot summarizes the inputs → when the user clicks **Confirm**, the *DocProcess* sub-workflow starts.\n    \n5. ⚙️ **DocProcess Sub-Workflow**\n    \n    \n    | 🔧 Step | Node | Task |\n    | --- | --- | --- |\n    | 1 | **User Choice Match Check** | Verifies name–ID match; throws if wrong |\n    | 2 | **GetMetaData (renew)** | Gets the latest placeholder list |\n    | 3 | **Validate JSON Format** | Checks for missing / unknown fields |\n    | 4 | **CopyTemplate** | Copies the Doc via Drive API |\n    | 5 | **FillDocument** | Apps Script fills placeholders & removes blocks |\n    | 6 | **Generate PDF Link** | Builds an `export?format=pdf` URL |\n6. 📎 **Delivery**\n    \n    The master agent sends **🔗 Download PDF** & **✏️ Open Google Doc** links.\n    \n7. 🚫 **Error Paths**\n    - `status:\"ERROR\", missing:[…]` → bot lists missing fields and re-asks.\n    - `unknown:[…]` → template list is outdated; rerun *TemplateList*.\n    - Any Apps Script error → the returned `message` is shown verbatim in chat.\n\n---\n\n## 3 — 🚀 Setup Steps (Full Checklist)\n\n&gt; Goal: Get a flawless PDF on the first run.\n&gt; \n&gt; \n&gt; Mentally **tick** the ☑️ in front of every line as you go.\n&gt; \n\n### ☁️ A. Google Drive Preparation\n\n| Step | Do This | Watch Out For |\n| --- | --- | --- |\n| 1 | Create a `Templates/` folder → put every template Doc inside | Exactly **one** folder; **no** sub-folders |\n| 2 | Placeholders in every Doc are **`{{UPPER_CASE}}`** | No Turkish chars or spaces |\n| 3 | Wrap optional clauses with **`[[BLOCK_NAME:START]]…[[BLOCK_NAME:END]]`** | The `START` tag must have a **blank line above** |\n| 4 | Add a `META_JSON` block at the very end | Script deletes it automatically after fill |\n| 5 | Right-click Doc &gt; **Details ▸ Description** = 1-line human description | Shown by the bot in the list |\n| 6 | Create a second `Generated/` folder (for copies) | Keeps Drive tidy |\n\n&gt; 🔑 Folder ID (long alphanumerical) = &lt;TEMPLATE_PARENT_ID&gt;\n&gt; \n&gt; \n&gt; We’ll paste this into the TemplateList node next.\n&gt; \n\n[Simple sample template → Template Link](https://www.notion.so/Simple-sample-template-Template-Link-22b3f8a1e57f8070beacd034ba6f557f?pvs=21)\n\n---\n\n### 🛠 B. Import the Workflow into n8n\n\n```bash\nSettings ▸ Import Workflow ▸ DocAgent.json\n\n```\n\nIf nodes look **Broken** afterwards → no community-node problem; you only need to select credentials.\n\n---\n\n### 📑 C. Customize the TemplateList Node\n\n1. Open **Template List** node ⚙️ → replace\n    \n    `'%3CYOUR_PARENT_ID%3E' in parents`\n    \n    with the real **folder ID** in the **URL**.\n    \n2. Right-click node &gt; **Execute Node**.\n3. Copy the entire JSON response.\n4. In the editor paste it into:\n    - **DocAgent** → *System Prompt* (top)\n    - **User Choice Match Check** → *System Prompt* (top)\n        \n        Save.\n        \n\n&gt; ⚠️ Why manual? Caching the list saves LLM tokens. Whenever you add a template, rerun the node and update the prompts.\n&gt; \n\n---\n\n### 🔗 D. Deploy the Apps Script\n\n| Step | Screen | Note |\n| --- | --- | --- |\n| 1 | Open Gist files **GetMetaData.gs** + **FillDocument.gs** → *File ▸ Make a copy* | Both files may live in one project |\n| 2 | *Project Settings* &gt; enable **Google Docs API** ✔️ & **Google Drive API** ✔️ | Otherwise you’ll see 403 errors |\n| 3 | *Deploy ▸ New deployment ▸ Web app* |  |\n| • Execute as | **Me** |  |\n| • Who has access | **Anyone** |  |\n| 4 | On the consent screen allow scopes:• `…/auth/documents`• `…/auth/drive` | Click **Advanced › Go** if Google warns |\n| 5 | Copy the **Web App URL** (e.g. `https://script.google.com/macros/s/ABC123/exec`) | If this URL changes, update n8n |\n\n[Apps Script source code → Notion Link](https://www.notion.so/Apps-Script-source-code-Notion-Link-22b3f8a1e57f8015a280d90de16c031f?pvs=21)\n\n---\n\n### 🔧 E. Wire the Script URL in n8n\n\n| Node | Field | Action |\n| --- | --- | --- |\n| **GetMetaData** | *URL* | `&lt;WEB_APP_URL&gt;?mode=meta&id={{ $json[\"id\"] }}` |\n| **FillDocument** | *URL* | `&lt;WEB_APP_URL&gt;` |\n\n&gt; 💡 Prefer using an .env file? Add GAS_WEBAPP_URL=… and reference it as {{ $env.GAS_WEBAPP_URL }}.\n&gt; \n\n---\n\n### 🔐 F. Add Credentials\n\n- **Google Drive OAuth2** → *Drive API (v3) Full Access*\n- **Google Docs OAuth2** → same account\n- **LLM key** (OpenAI / Gemini)\n- (Optional) **Postgres Chat Memory** credential for the corresponding node\n\n---\n\n### 🧪 G. First Run (Smoke Test)\n\n1. Switch the workflow **Active**.\n2. In the chat panel type `/start`.\n3. Bot lists templates → pick one.\n4. Fill mandatory fields, optionally toggle blocks → **Confirm**.\n5. **🔗 Download PDF** link appears → ☑️ setup complete.\n\n---\n\n### ❌ H. Common Errors & Fixes\n\n| 🆘 Error | Likely Cause | Remedy |\n| --- | --- | --- |\n| `403: Apps Script permission denied` | Web app access set to *User* | Redeploy as **Anyone**, re-authorize scopes |\n| `placeholder validation failed` | Missing required field | Provide the listed values → rerun DocProcess |\n| `unknown placeholders: …` | Template vs. agent mismatch | Check placeholder spelling (UPPER_CASE ASCII) |\n| `Template ID not found` | Prompt list is old | Rerun **TemplateList** → update both prompts |\n| `Cannot find META_JSON` | No meta block / wrong tag | Add `[[META_JSON_START]] … [[META_JSON_END]]`, retry |\n\n---\n\n### ✅ Final Checklist\n\n- [ ]  Drive folder structure & template rules ready\n- [ ]  Workflow imported, folder ID set in node\n- [ ]  TemplateList output pasted into both prompts\n- [ ]  Apps Script deployed, URL set in nodes\n- [ ]  OAuth credentials & LLM key configured\n- [ ]  `/start` test passes, PDF link received\n\n---\n\n## 🙋‍♂️ Need Help with Customizations?\n\nReach out for consulting & support on LinkedIn: [**Özgür Karateke**](https://www.notion.so/DocAgent-Documentation-22b3f8a1e57f8085baa9c70cdead41cd?source=copy_link)\n\n[Full Documentation → Notion](https://www.notion.so/Simple-sample-template-Template-Link-22b3f8a1e57f8070beacd034ba6f557f?pvs=21)\n\n[Simple sample template → Template Link](https://www.notion.so/Simple-sample-template-Template-Link-22b3f8a1e57f8070beacd034ba6f557f?pvs=21)\n\n[Apps Script source code → Notion Link](https://www.notion.so/Apps-Script-source-code-Notion-Link-22b3f8a1e57f8015a280d90de16c031f?pvs=21)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GetMetaData",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "DocAgent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "DocProcess",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Template List",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Other Errors",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "CopyTemplate",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "FillDocument",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "User Choice Matching Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "User Choice Match Correct",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "User Choice Match Check",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "GetMetaData2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Format Control",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Formatting Correction",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Cop. Document ID Matching Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "if",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Generate Download Link",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Link Format",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Incomplete Information Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Template Technical Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+{
+  "id": 5013,
+  "slug": "5013",
+  "title": "Track n8n workflow changes over time with compare dataset & Google Sheets",
+  "description": "### This n8n template runs daily to track and report on any changes made to workflows  on any n8n instance.\n\nUseful if a team is working within a single instance and you want to be notified of what workflows have changed since you last visited them. Another use-case might be monitoring your managed instances for clients and being alerted when changes are made without your knowledge.\n\nSee a sample Gsheet here: [https://docs.google.com/spreadsheets/d/1dOHSfeE0W_qPyEWj5Zz0JBJm8Vrf_cWp-02OBrA_ZYc/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1dOHSfeE0W_qPyEWj5Zz0JBJm8Vrf_cWp-02OBrA_ZYc/edit?usp=sharing)\n\n### How it works\n* A scheduled trigger is set to run once a day to review all available workflows.\n* An n8n node imports the workflows as json.\n* The workflows are brought into a loop where each is first checked to see if it exists in the designated google sheet.\n* If not, a new entry is created and skipped.\n* If the workflow has been captured before, then the comparison subworkflow can be executed using the previous and current versions of the workflow json data.\n* The subworkflow uses the compare dataset tool to calculate the changes to nodes and connections for the given workflow.\n* The results are then recorded back to the google sheet for review.\n\n### How to use\n* Start with the n8n node and try to filter by the workflows you're interested in tracking.\n* Set the scheduled trigger interval to match the frequency to suit how often your workflows are being edited.\n\n### Customising the workflow\n* Want to get fancy? Add in an AI agent to help determine changes between the previous and current versions of the workflow. Add contextual explanations to reveal the impact of the changes.",
+  "featuredImage": "/data/workflows/5013/5013.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1289,
+  "downloads": 128,
+  "createdAt": "2025-06-17T22:43:15.197Z",
+  "updatedAt": "2026-01-16T08:37:12.525Z",
+  "publishedAt": "2025-06-17T22:43:15.197Z",
+  "nodes": 43,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5013",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Track n8n workflow changes over time with compare dataset & Google Sheets",
+    "workflowName": "Track n8n workflow changes over time with compare dataset & Google Sheets",
+    "description": "### This n8n template runs daily to track and report on any changes made to workflows  on any n8n instance.\n\nUseful if a team is working within a single instance and you want to be notified of what workflows have changed since you last visited them. Another use-case might be monitoring your managed instances for clients and being alerted when changes are made without your knowledge.\n\nSee a sample Gsheet here: [https://docs.google.com/spreadsheets/d/1dOHSfeE0W_qPyEWj5Zz0JBJm8Vrf_cWp-02OBrA_ZYc/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1dOHSfeE0W_qPyEWj5Zz0JBJm8Vrf_cWp-02OBrA_ZYc/edit?usp=sharing)\n\n### How it works\n* A scheduled trigger is set to run once a day to review all available workflows.\n* An n8n node imports the workflows as json.\n* The workflows are brought into a loop where each is first checked to see if it exists in the designated google sheet.\n* If not, a new entry is created and skipped.\n* If the workflow has been captured before, then the comparison subworkflow can be executed using the previous and current versions of the workflow json data.\n* The subworkflow uses the compare dataset tool to calculate the changes to nodes and connections for the given workflow.\n* The results are then recorded back to the google sheet for review.\n\n### How to use\n* Start with the n8n node and try to filter by the workflows you're interested in tracking.\n* Set the scheduled trigger interval to match the frequency to suit how often your workflows are being edited.\n\n### Customising the workflow\n* Want to get fancy? Add in an AI agent to help determine changes between the previous and current versions of the workflow. Add contextual explanations to reveal the impact of the changes.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Row Exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create New Entry",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Compare Datasets",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Current State",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Previous State",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Added Nodes",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Same Nodes",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Different Nodes",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Removed Nodes",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Report Nodes",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Compare Datasets1",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Added Connections",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Same Connections",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Different Connections",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Removed Connections",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Report Connections",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge Nodes Diff",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge Connections Diff",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge Reports",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Has UpdatedAt Changed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Split Conn Previous",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Conn Current",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Nodes Current",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Nodes Previous",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculate Template Diffs",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Entry",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Get Values",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "set non-update response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Has Node or Connection Updates?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "GSheets Rate Limit",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get All Workflows",
+      "type": "n8n-nodes-base.n8n",
+      "role": "n8n",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

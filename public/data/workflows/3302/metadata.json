@@ -1,0 +1,27 @@
+{
+  "id": 3302,
+  "slug": "3302",
+  "title": "Transform press releases (PDF & Word) into polished articles with Gmail & OpenAI",
+  "description": "This n8n workflow automates the transformation of press releases into polished articles. It converts the content of an email and its attachments (PDF or Word documents) into an AI-written article/blog post. \n\n## What does it do?\nThis workflow assists editors and journalists in managing incoming press-releases from governments, companies, NGOs, or individuals. The result is a draft article that can easily be reviewed by the editor, who receives it in a reply email containing both the original input and the output, plus an AI-generated self-assessment. This self-assessment represents an additional feedback loop where the AI compares the input with the output to evaluate the quality and accuracy of its transformation.\n\n## How does it work?\nTriggered by incoming emails in Google, it first filters attachments, retaining only Word and PDF files while removing other formats like JPGs. The workflow then follows one of three paths:\n\n    - If no attachments remain, it processes the inline email message directly.\n    - For PDF attachments, it uses an extractor to obtain the document content.\n    - For Word attachments, it extracts the text content by a http request.\n\nIn each case, the extracted content is then passed to an AI agent that converts the press release into a well-structured article according to predefined prompts. A separate AI evaluation step provides a self-assessment by comparing the output with the original input to ensure quality and accuracy. Finally, the workflow generates a reply email to the sender containing three components: the original input, the AI-generated article, and the self-assessment. This streamlined process helps editors and journalists efficiently manage incoming press releases, delivering draft articles that require minimal additional editing.\"  \n\n## How to set it up\n### 1. Configure Gmail Connection: \n- Create or use an existing Gmail address\n- Connect it through the n8n credentials manager\n- Configure polling frequency according to your needs\n- Set the trigger event to \"Message Received\"\n        Optional: Filter incoming emails by specifying authorized senders\n- Enable the \"Download Attachments\" option\n\n### 2. Set Up AI Integration:\n- Create an OpenAI account if you don't have one\n- Create a new AI assistant or use an existing one\n- Customize the assistant with specific instructions, style guidelines, or response templates\n- Configure your API credentials in n8n to enable the connection\n\n### 3. Configure Google Drive Integration:\n- Connect your Google Drive credentials in n8n\n- Set the operation mode to \"Upload\"\n- Configure the input data field name as \"data\"\n-Set the file naming format to dynamic: {{ $json.fileName }}\n\n### 4. Configure HTTP Request Node:\n- Set request method to \"POST\"\n- Enter the appropriate Google API endpoint URL\n- Include all required authorization headers\n- Structure the request body according to API specifications\n- Ensure proper error handling for API responses\n\n### 5. Configure HTTP Request Node 2:\n\n- Set request method to \"GET\"\n- Enter the appropriate Google API endpoint URL\n- Include all required authorization headers\n- Configure query parameters as needed\n- Implement response validation and error handling\n\n\n\n### 6.  Configure Self-Assessment Node:\n\n- Set operation to \"Message a Model\"\n- Select an appropriate AI model (e.g., GPT-4, Claude)\n- Configure the following prompt in the Message field:\n\n\n\nPlease analyze and compare the following input and output content:\n\n(for example)\n\nOriginal Input:\n{{ $('HTTP Request3').item.json.data }}\n{{ $('Gmail Trigger').item.json.text }}\n\nGenerated Output:\n{{ $json.output }}\n\nProvide a detailed self-assessment that evaluates:\n1. Content accuracy and completeness\n2. Structure and readability improvements\n3. Tone and style appropriateness\n4. Any information that may have been omitted or misrepresented\n5. Overall quality of the transformation\n\n### 7. Configure Reply Email Node:\n\n- Set operation to \"Send\" and select your Gmail account\n- Configure the \"To\" field to respond to the original sender: {{ $('Gmail Trigger').item.json.from }}\n- Set an appropriate subject line: RE: {{ $('Gmail Trigger').item.json.subject }}\n- Structure the email body with clear sections using the following template:\n\nhandlebars\n\n***EDITED ARTICLE***   \n\n{{ $('AI Article Writer 2').item.json.output }}\n\n***SELF-ASSESSMENT***\nRating: 1 (poor) to 5 (excellent)\n{{ $json.message.content }}\n\n***ORIGINAL MESSAGE***\n\n{{ $('Gmail Trigger').item.json.text }}\n\n***ATTACHMENT CONTENT***\n\n{{ $('HTTP Request3').item.json.data }}\n\n    Note: Adjust the template fields according to the input source (PDF, Word document, or inline message). For inline messages, you may not need the \"ATTACHMENT CONTENT\" section.\n",
+  "featuredImage": "/data/workflows/3302/3302.webp",
+  "author": {
+    "id": 101,
+    "slug": "julianreich",
+    "name": "Julian Reich ",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2911,
+  "downloads": 291,
+  "createdAt": "2025-03-24T08:01:17.609Z",
+  "updatedAt": "2026-01-16T08:29:05.544Z",
+  "publishedAt": "2025-03-24T08:01:17.609Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3302"
+}

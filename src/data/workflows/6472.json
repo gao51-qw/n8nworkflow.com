@@ -1,0 +1,194 @@
+{
+  "id": 6472,
+  "slug": "6472",
+  "title": "Generate weekly animal rights action briefings from U.S. House bills with Gemini AI",
+  "description": "## 🐾 Who’s it for\n\nAnimal advocates & campaigners who want a **weekly briefing on animal-related bills** with clear, actionable steps—no manual research needed.\n\n## ⏱ What it does\n\nEvery Monday at 8 AM, this workflow:\n\n1. **Fetches all House bills** scheduled for the week.\n2. **Cleans and downloads bill PDFs.**\n3. **Analyzes each bill with Gemini** (relevance, urgency, stance, key action points).\n4. **Filters irrelevant bills** using built-in thresholds.\n5. **Runs a research subworkflow** for lobbying, sponsor, and coalition intel.\n6. **Generates a ready-to-send HTML action email** with scripts, contacts, and deadlines.\n\n## ⚙️ How to set up\n\n1. **Import this workflow** into n8n.\n2. **Download & import** the [Research Subworkflow](https://n8n.io/workflows/5588-multi-tool-research-agent-for-animal-advocacy-with-openrouter-serper-and-open-paws-db/) and select it in the “Research” node.\n3. **Add email credentials** (SMTP, Gmail, etc.) in the Email node.\n4. (Optional) **Adjust Gemini prompt or thresholds** for your priorities.\n\n## 🔑 Requirements\n\n* **Gemini API key** (via Google AI Studio or Vertex AI).\n* **Email provider credentials**.\n* **Research subworkflow** (linked above).\n\n## 🎛 How to customize\n\n* **Edit the Gemini prompt** to focus on specific issues (e.g., wildlife, farmed animals).\n* **Change relevance/urgency thresholds** to include more or fewer bills.\n* **Tweak the HTML email design** or call-to-action style.",
+  "featuredImage": "/data/workflows/6472/6472.webp",
+  "author": {
+    "id": 101,
+    "slug": "openpaws",
+    "name": "Open Paws",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 244,
+  "downloads": 24,
+  "createdAt": "2025-07-26T03:15:42.838Z",
+  "updatedAt": "2026-01-16T08:45:09.064Z",
+  "publishedAt": "2025-07-26T03:15:42.838Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6472",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate weekly animal rights action briefings from U.S. House bills with Gemini AI",
+    "workflowName": "Generate weekly animal rights action briefings from U.S. House bills with Gemini AI",
+    "description": "## 🐾 Who’s it for\n\nAnimal advocates & campaigners who want a **weekly briefing on animal-related bills** with clear, actionable steps—no manual research needed.\n\n## ⏱ What it does\n\nEvery Monday at 8 AM, this workflow:\n\n1. **Fetches all House bills** scheduled for the week.\n2. **Cleans and downloads bill PDFs.**\n3. **Analyzes each bill with Gemini** (relevance, urgency, stance, key action points).\n4. **Filters irrelevant bills** using built-in thresholds.\n5. **Runs a research subworkflow** for lobbying, sponsor, and coalition intel.\n6. **Generates a ready-to-send HTML action email** with scripts, contacts, and deadlines.\n\n## ⚙️ How to set up\n\n1. **Import this workflow** into n8n.\n2. **Download & import** the [Research Subworkflow](https://n8n.io/workflows/5588-multi-tool-research-agent-for-animal-advocacy-with-openrouter-serper-and-open-paws-db/) and select it in the “Research” node.\n3. **Add email credentials** (SMTP, Gmail, etc.) in the Email node.\n4. (Optional) **Adjust Gemini prompt or thresholds** for your priorities.\n\n## 🔑 Requirements\n\n* **Gemini API key** (via Google AI Studio or Vertex AI).\n* **Email provider credentials**.\n* **Research subworkflow** (linked above).\n\n## 🎛 How to customize\n\n* **Edit the Gemini prompt** to focus on specific issues (e.g., wildlife, farmed animals).\n* **Change relevance/urgency thresholds** to include more or fewer bills.\n* **Tweak the HTML email design** or call-to-action style.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Weekly Bills",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Clean PDF Links",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Out Links",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Convert PDF to Base64 String",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract PDF Links",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze Bill with Gemini",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Set Analysis",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check If Response Needed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Research Bills",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenRouter Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Write Email Alert",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Send email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

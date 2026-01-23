@@ -1,0 +1,27 @@
+{
+  "id": 9809,
+  "slug": "9809",
+  "title": "Analyze customer survey feedback with AI, Google Sheets & Slack reports",
+  "description": "Here’s a clean, English-only **template description** you can paste into the n8n “Description” field.\n\n---\n\n## Overview\n\nThis workflow analyzes customer survey responses, groups them by sentiment (positive / neutral / negative), generates themes and insights with an AI agent, and delivers a consolidated report to your destinations (Google Sheets, Slack). It runs on a daily schedule and uses batch-based AI analysis for accuracy.\n\n**Flow:** Schedule → Fetch from Sheets → Group & batch (Code) → AI analysis → Aggregate → Save/Notify (Sheets, Slack)\n\n## What You’ll Need\n\n* A survey data source (Google Sheets recommended)\n* AI model credentials (e.g., OpenAI or OpenRouter)\n* Optional destinations: Google Sheets (summary sheet), Slack channel\n\n## Setup\n\n1. **Data source (Google Sheets)**\n\n   * In **Get Survey Responses**, replace `YOUR_SHEET_ID` and `YOUR_SHEET_NAME` with your sheet details.\n   * Ensure the sheet includes columns like: `満足度 (Rating)`, `自由記述コメント (Comment)`, `回答日時 (Timestamp)`.\n2. **AI model**\n\n   * Add credentials to your preferred LLM node (OpenAI/OpenRouter).\n   * Keep the prompt’s **JSON-only** requirement so the structured parser can consume it reliably.\n3. **Destinations**\n\n   * **Save to Sheet**: set your output `documentId` / `sheetName`.\n   * **Slack**: set the target `channelId` on the Slack node.\n\n## How It Works\n\n1. **Daily Schedule Trigger** — starts the workflow at your chosen time.\n2. **Get Survey Responses (Sheets)** — reads survey data.\n3. **Group & Prepare Data (Code)** — classifies by rating (`&gt;=4: positive`, `=3: neutral`, `&lt;3: negative`) and creates batches (max 50 per batch).\n4. **Loop Over Batches** — feeds each sentiment batch to the AI separately for cleaner signals.\n5. **Analyze Survey Batch (AI Agent)** — returns structured JSON: themes, insights, recommendations.\n6. **Add Metadata (Code)** — attaches original sentiment and item counts to each AI result.\n7. **Aggregate Results (Code)** — merges all batches; outputs Top Themes, Key Insights, Priority Recommendations, and an Executive Summary.\n8. **Save to Sheet / Slack** — appends the summary to a sheet and posts highlights to Slack.\n\n## Data Assumptions (Columns)\n\nYour source should include at least:\n\n* `満足度 (Rating)` — integer 1–5\n* `自由記述コメント (Comment)` — string\n* `回答日時 (Timestamp)` — ISO string or date\n\n## Outputs\n\n* **Consolidated summary** containing:\n\n  * Top themes (with example quotes)\n  * Key insights\n  * Priority recommendations\n  * Executive summary\n* **Destinations**: Google Sheets (one row per run) and Slack (high-level highlights)\n\n## Customize\n\n* Adjust sentiment thresholds (e.g., require `&gt;=5` for positive) or batch size (default 50) in the Code node.\n* Tailor the AI prompt or the output JSON schema to your domain.\n* Add more outputs (CSV export, database insert, additional channels) in parallel after the Aggregate step.\n\n## Before You Run (Checklist)\n\n* [ ] Add credentials for Sheets / AI / Slack in **Credentials**\n* [ ] Update `documentId`, `sheetName`, and Slack `channelId`\n* [ ] Confirm your column names match the Code node references\n* [ ] Verify schedule time and timezone (e.g., Asia/Tokyo)\n\n## Troubleshooting\n\n* **Parser errors on AI output**: ensure the model response is **JSON-only**; reduce temperature or simplify schema if needed.\n* **Only some batches run**: check batch size in Loop and ensure each sentiment bucket actually contains responses.\n* **No output to Sheets/Slack**: verify credentials, IDs, and required fields; confirm permissions.\n\n## Security & Template Notes\n\n* Do **not** include credentials in the template file. Users add their own after import.\n* Use Sticky Notes to document Overview, Setup, Processing Logic, and Output choices. This template already includes guideline-friendly notes.\n",
+  "featuredImage": "/data/workflows/9809/9809.webp",
+  "author": {
+    "id": 101,
+    "slug": "minami",
+    "name": "Toshiya Minami",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 105,
+  "downloads": 10,
+  "createdAt": "2025-10-17T02:48:39.395Z",
+  "updatedAt": "2026-01-16T09:02:03.142Z",
+  "publishedAt": "2025-10-17T02:48:39.395Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9809"
+}

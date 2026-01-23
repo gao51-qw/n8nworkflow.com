@@ -1,0 +1,374 @@
+{
+  "id": 11483,
+  "slug": "11483",
+  "title": "Generate automated content performance reports from YouTube, TikTok and Skool with AI",
+  "description": "This n8n template acts as your automated social media data analyst. Instead of manually checking your analytics across different dashboards every week, this workflow scrapes your latest stats, calculates your week-over-week growth, and uses AI to write a strategic performance report delivered straight to your inbox.\n\n**Use cases are many:** Perfect for content creators tracking growth, agencies managing client reporting, or community managers monitoring Skool engagement alongside social channels.\n\n## Good to know\n* **First Run Setup:** Since this workflow calculates *growth* (Current vs. Last Week), it needs a baseline to start. You will need to manually add one row to the linked Airtable template with your current stats before the first scheduled run.\n* **Cost:** This uses the Apify API for scraping TikTok and OpenRouter for the LLM analysis. Costs are generally very low (pennies per run), but you will need active accounts for both.\n\n## How it works\n1. **Data Collection:** Every Sunday, the workflow triggers and pulls your live follower counts from YouTube, TikTok, and Skool. It also grabs the transcripts and stats for every video you posted in the last 7 days.\n2. **Growth Calculation:** It searches your Airtable database for the previous week's record and compares it against the live numbers to calculate exactly how many subscribers and followers you gained.\n3. **AI Analysis:** The data and video transcripts are fed into an LLM (via OpenRouter). The AI analyzes *why* certain videos performed well based on the content, identifying trends and engagement patterns.\n4. **Reporting:** The LLM generates a clean, formatted HTML report.\n5. **Delivery & Archiving:** The workflow emails the report to you and saves the new raw data into Airtable to serve as the baseline for next week.\n\n## How to use\n* The workflow is set to run weekly (Sundays), but you can change the **Schedule Trigger** to whatever day you prefer to receive reports.\n* You will need to configure the **CONFIG** node at the start with your specific profile URLs and Channel IDs so the scrapers know where to look.\n* Link to the required Airtable template is included in the workflow sticky notes.\n\n## Requirements\n* **n8n** (Self-hosted recommended)\n* **Apify** account (for TikTok and Skool scraping)\n* **Google Cloud** project (for YouTube Data API)\n* **OpenRouter** or OpenAI API key\n* **Airtable** account\n* **Gmail** account\n\n## Customising this workflow\nYou can easily swap out the LLM model in the OpenRouter node if you prefer a specific model (like Claude 3.5 Sonnet or GPT-4o) for the analysis. You could also add more platforms like LinkedIn or Instagram if you have the appropriate Apify actors or API credentials.",
+  "featuredImage": "/data/workflows/11483/11483.webp",
+  "author": {
+    "id": 101,
+    "slug": "jordan-ai-16",
+    "name": "Jordan",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 250,
+  "downloads": 25,
+  "createdAt": "2025-12-04T06:48:02.737Z",
+  "updatedAt": "2026-01-16T09:08:54.702Z",
+  "publishedAt": "2025-12-04T06:48:02.737Z",
+  "nodes": 56,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11483",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate automated content performance reports from YouTube, TikTok and Skool with AI",
+    "workflowName": "Generate automated content performance reports from YouTube, TikTok and Skool with AI",
+    "description": "This n8n template acts as your automated social media data analyst. Instead of manually checking your analytics across different dashboards every week, this workflow scrapes your latest stats, calculates your week-over-week growth, and uses AI to write a strategic performance report delivered straight to your inbox.\n\n**Use cases are many:** Perfect for content creators tracking growth, agencies managing client reporting, or community managers monitoring Skool engagement alongside social channels.\n\n## Good to know\n* **First Run Setup:** Since this workflow calculates *growth* (Current vs. Last Week), it needs a baseline to start. You will need to manually add one row to the linked Airtable template with your current stats before the first scheduled run.\n* **Cost:** This uses the Apify API for scraping TikTok and OpenRouter for the LLM analysis. Costs are generally very low (pennies per run), but you will need active accounts for both.\n\n## How it works\n1. **Data Collection:** Every Sunday, the workflow triggers and pulls your live follower counts from YouTube, TikTok, and Skool. It also grabs the transcripts and stats for every video you posted in the last 7 days.\n2. **Growth Calculation:** It searches your Airtable database for the previous week's record and compares it against the live numbers to calculate exactly how many subscribers and followers you gained.\n3. **AI Analysis:** The data and video transcripts are fed into an LLM (via OpenRouter). The AI analyzes *why* certain videos performed well based on the content, identifying trends and engagement patterns.\n4. **Reporting:** The LLM generates a clean, formatted HTML report.\n5. **Delivery & Archiving:** The workflow emails the report to you and saves the new raw data into Airtable to serve as the baseline for next week.\n\n## How to use\n* The workflow is set to run weekly (Sundays), but you can change the **Schedule Trigger** to whatever day you prefer to receive reports.\n* You will need to configure the **CONFIG** node at the start with your specific profile URLs and Channel IDs so the scrapers know where to look.\n* Link to the required Airtable template is included in the workflow sticky notes.\n\n## Requirements\n* **n8n** (Self-hosted recommended)\n* **Apify** account (for TikTok and Skool scraping)\n* **Google Cloud** project (for YouTube Data API)\n* **OpenRouter** or OpenAI API key\n* **Airtable** account\n* **Gmail** account\n\n## Customising this workflow\nYou can easily swap out the LLM model in the OpenRouter node if you prefer a specific model (like Claude 3.5 Sonnet or GPT-4o) for the analysis. You could also add more platforms like LinkedIn or Instagram if you have the appropriate Apify actors or API credentials.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get skool members",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get channel stats",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Search records",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Video Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get last weeks vids",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Transcripts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get tiktok data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "combine items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "last 7 days?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "last weeks lable",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "add up metrics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "last weeks lable1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Search records1",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "current metrics",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "calculate metrics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Markdown1",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get skool members2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Extract member count1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get channel stats1",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search records2",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get week lable",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get tiktok followers",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "extract current tiktok followers",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Channel stats",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Format youtube sub count",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Skool member count",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map out all 3 counts for each social platform",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "combine the data",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract follower count for tiktok",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate analysis report",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Send html style report to your email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Format youtube video stats",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

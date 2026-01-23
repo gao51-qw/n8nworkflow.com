@@ -1,0 +1,176 @@
+{
+  "id": 6169,
+  "slug": "6169",
+  "title": "Gmail assistant with full Gmail history RAG using OpenAI",
+  "description": "# 🧠 RAG with Full Gmail history + Real time email updates in RAG using OpenAI & Qdrant\n\n&gt; **Summary:**  \n&gt; This workflow listens for new Gmail messages, extracts and cleans email content, generates embeddings via OpenAI, stores them in a Qdrant vector database, and then enables a Retrieval‑Augmented‑Generation (RAG) agent to answer user queries against those stored emails. It’s designed for teams or bots that need conversational access to past emails.\n\n---\n\n## 🧑‍🤝‍🧑 Who’s it for\n- **Support teams** who want to surface past customer emails in chatbots or help‑desk portals  \n- **Sales ops** that need AI‑powered summaries and quick lookup of email histories  \n- **Developers** building RAG agents over email archives  \n\n---\n\n## ⚙️ How it works / What it does\n1. **Trigger**  \n   - **Gmail Trigger** polls every minute for new messages.  \n2. **Fetch & Clean**  \n   - **Get Mail Data** pulls full message metadata and body.  \n   - **Code node** normalizes the body (removes line breaks, collapses spaces).  \n3. **Embed & Store**  \n   - **Embeddings OpenAI** node computes vector embeddings.  \n   - **Qdrant Vector Store** inserts embeddings + metadata into the `emails_history` collection.  \n4. **Batch Processing**  \n   - **SplitInBatches** handles large inbox loads in chunks of 50.  \n5. **RAG Interaction**  \n   - **When chat message received** → **RAG Agent** → uses **Qdrant Email Vector Store** as a tool to retrieve relevant email snippets before responding.  \n6. **Memory**  \n   - **Simple Memory** buffer ensures the agent retains recent context.  \n\n---\n\n## 🛠️ How to set up\n1. **n8n Instance**  \n   - Deploy n8n (self‑hosted or via Coolify/Docker).  \n2. **Credentials**  \n   - Create an **OAuth2** credential in n8n for Gmail (with Gmail API scopes).  \n   - Add your **OpenAI API key** in n8n credentials.  \n3. **Qdrant**  \n   - Stand up a Qdrant instance (self‑hosted or Qdrant Cloud).  \n   - Note your host, port, and API key (if any).  \n4. **Import Workflow**  \n   - In n8n, go to **Workflows → Import** → paste the JSON you provided.  \n   - Ensure each credential reference (Gmail & OpenAI) matches your n8n credential IDs.  \n5. **Test**  \n   - Click **Execute Workflow** or send a test email to your Gmail.  \n   - Monitor n8n logs: you should see new points in Qdrant and RAG responses.  \n\n---\n\n## 📋 Requirements\n- **n8n** (Self-hosted or Cloud)  \n- **Gmail API** enabled on a Google Cloud project  \n- **OpenAI API** access (with Embedding & Chat endpoints)  \n- **Qdrant** (hosted or cloud) with a collection named `emails_history`  \n\n---\n\n## 🎨 How to customize the workflow\n- **Change Collection Name**  \n  - Update the `qdrantCollection.value` in all Qdrant nodes if you prefer a different collection.  \n- **Adjust Polling Frequency**  \n  - In the Gmail Trigger node, switch from `everyMinute` to `everyFiveMinutes` or a webhook‑style trigger.  \n- **Metadata Tags**  \n  - In **Enhanced Default Data Loader**, tweak the `metadataValues` to tag by folder, label, or sender domain.  \n- **Batch Size**  \n  - In **SplitInBatches**, change `batchSize` to suit your inbox volume.  \n- **RAG Agent Prompt**  \n  - Customize the `systemMessage` in the **RAG Agent** node to set the assistant’s tone, instruct on date handling, or add additional tools.  \n- **Additional Tools**  \n  - Chain other n8n nodes (e.g., Slack, Discord) after the RAG Agent to broadcast AI answers to team channels.  \n",
+  "featuredImage": "/data/workflows/6169/6169.webp",
+  "author": {
+    "id": 101,
+    "slug": "zain104",
+    "name": "Zain Ali",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1277,
+  "downloads": 127,
+  "createdAt": "2025-07-19T08:43:11.786Z",
+  "updatedAt": "2026-01-16T08:43:32.234Z",
+  "publishedAt": "2025-07-19T08:43:11.786Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6169",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Gmail assistant with full Gmail history RAG using OpenAI",
+    "workflowName": "Gmail assistant with full Gmail history RAG using OpenAI",
+    "description": "# 🧠 RAG with Full Gmail history + Real time email updates in RAG using OpenAI & Qdrant\n\n&gt; **Summary:**  \n&gt; This workflow listens for new Gmail messages, extracts and cleans email content, generates embeddings via OpenAI, stores them in a Qdrant vector database, and then enables a Retrieval‑Augmented‑Generation (RAG) agent to answer user queries against those stored emails. It’s designed for teams or bots that need conversational access to past emails.\n\n---\n\n## 🧑‍🤝‍🧑 Who’s it for\n- **Support teams** who want to surface past customer emails in chatbots or help‑desk portals  \n- **Sales ops** that need AI‑powered summaries and quick lookup of email histories  \n- **Developers** building RAG agents over email archives  \n\n---\n\n## ⚙️ How it works / What it does\n1. **Trigger**  \n   - **Gmail Trigger** polls every minute for new messages.  \n2. **Fetch & Clean**  \n   - **Get Mail Data** pulls full message metadata and body.  \n   - **Code node** normalizes the body (removes line breaks, collapses spaces).  \n3. **Embed & Store**  \n   - **Embeddings OpenAI** node computes vector embeddings.  \n   - **Qdrant Vector Store** inserts embeddings + metadata into the `emails_history` collection.  \n4. **Batch Processing**  \n   - **SplitInBatches** handles large inbox loads in chunks of 50.  \n5. **RAG Interaction**  \n   - **When chat message received** → **RAG Agent** → uses **Qdrant Email Vector Store** as a tool to retrieve relevant email snippets before responding.  \n6. **Memory**  \n   - **Simple Memory** buffer ensures the agent retains recent context.  \n\n---\n\n## 🛠️ How to set up\n1. **n8n Instance**  \n   - Deploy n8n (self‑hosted or via Coolify/Docker).  \n2. **Credentials**  \n   - Create an **OAuth2** credential in n8n for Gmail (with Gmail API scopes).  \n   - Add your **OpenAI API key** in n8n credentials.  \n3. **Qdrant**  \n   - Stand up a Qdrant instance (self‑hosted or Qdrant Cloud).  \n   - Note your host, port, and API key (if any).  \n4. **Import Workflow**  \n   - In n8n, go to **Workflows → Import** → paste the JSON you provided.  \n   - Ensure each credential reference (Gmail & OpenAI) matches your n8n credential IDs.  \n5. **Test**  \n   - Click **Execute Workflow** or send a test email to your Gmail.  \n   - Monitor n8n logs: you should see new points in Qdrant and RAG responses.  \n\n---\n\n## 📋 Requirements\n- **n8n** (Self-hosted or Cloud)  \n- **Gmail API** enabled on a Google Cloud project  \n- **OpenAI API** access (with Embedding & Chat endpoints)  \n- **Qdrant** (hosted or cloud) with a collection named `emails_history`  \n\n---\n\n## 🎨 How to customize the workflow\n- **Change Collection Name**  \n  - Update the `qdrantCollection.value` in all Qdrant nodes if you prefer a different collection.  \n- **Adjust Polling Frequency**  \n  - In the Gmail Trigger node, switch from `everyMinute` to `everyFiveMinutes` or a webhook‑style trigger.  \n- **Metadata Tags**  \n  - In **Enhanced Default Data Loader**, tweak the `metadataValues` to tag by folder, label, or sender domain.  \n- **Batch Size**  \n  - In **SplitInBatches**, change `batchSize` to suit your inbox volume.  \n- **RAG Agent Prompt**  \n  - Customize the `systemMessage` in the **RAG Agent** node to set the assistant’s tone, instruct on date handling, or add additional tools.  \n- **Additional Tools**  \n  - Chain other n8n nodes (e.g., Slack, Discord) after the RAG Agent to broadcast AI answers to team channels.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RAG Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Embeddings OpenAI5",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI11",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Email Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Store Emails in Vector DB",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "New Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get new Email Body",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get all emails",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Refactor Email Body data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop over all emails",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Store Emails in Vector DB1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set proper metadata",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split emails",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set proper metadata1",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split emails1",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.1"
+    }
+  ]
+}

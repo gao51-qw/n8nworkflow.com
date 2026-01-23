@@ -1,0 +1,242 @@
+{
+  "id": 2568,
+  "slug": "2568",
+  "title": "Upsert huge documents in a vector store with Supabase and Notion",
+  "description": "## Purpose\n\nThis workflow adds the capability to build a RAG on living data. In this case Notion is used as a Knowledge Base. Whenever a page is updated, the embeddings get upserted in a Supabase Vector Store.\n\nIt can also be fairly easily adapted to PGVector, Pinecone, or Qdrant by using a custom HTTP request for the latter two.\n\n## Demo\n\n[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/ELAxebGmspY/0.jpg)](https://youtu.be/ELAxebGmspY)\n\n## How it works\n\n- A trigger checks every minute for changes in the Notion Database. The manual polling approach improves accuracy and prevents changes from being lost between cached polling intervals.\n- Afterwards every updated page is processed sequentially\n- The Vector Database is searched using the Notion Page ID stored in the metadata of each embedding. If old entries exist, they are deleted.\n- All blocks of the Notion Database Page are retrieved and combined into a single string\n- The content is embedded and split into chunks if necessary. Metadata, including the Notion Page ID, is added during storage for future reference.\n- A simple Question and Answer Chain enables users to ask questions about the embedded content through the integrated chat function\n\n## Prerequisites\n\n- To setup a new Vector Store in Supabase, follow [this guide](https://supabase.com/docs/guides/ai/vector-columns)\n- Prepare a simple Database in Notion with each Database Page containing at least a title and some content in the blocks section. You can of course also connect this to an existing Database of your choice.\n\n## Setup\n\n- Select your credentials in the nodes which require those\n- If you are on an n8n cloud plan, switch to the native Notion Trigger by activating it and deactivating the Schedule Trigger along with its subsequent Notion Node\n- Choose your Notion Database in the first Node related to Notion\n- Adjust the chunk size and overlap in the Token Splitter to your preference\n- Activate the workflow\n\n## How to use\n\nPopulate your Notion Database with useful information and use the chat mode of this workflow to ask questions about it. Updates to a Notion Page should quickly reflect in future conversations.",
+  "featuredImage": "/data/workflows/2568/2568.webp",
+  "author": {
+    "id": 101,
+    "slug": "octionic",
+    "name": "Mario",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 13937,
+  "downloads": 1393,
+  "createdAt": "2024-11-24T18:37:24.868Z",
+  "updatedAt": "2026-01-16T08:25:27.663Z",
+  "publishedAt": "2024-11-24T18:37:24.868Z",
+  "nodes": 34,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2568",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Upsert huge documents in a vector store with Supabase and Notion",
+    "workflowName": "Upsert huge documents in a vector store with Supabase and Notion",
+    "description": "## Purpose\n\nThis workflow adds the capability to build a RAG on living data. In this case Notion is used as a Knowledge Base. Whenever a page is updated, the embeddings get upserted in a Supabase Vector Store.\n\nIt can also be fairly easily adapted to PGVector, Pinecone, or Qdrant by using a custom HTTP request for the latter two.\n\n## Demo\n\n[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/ELAxebGmspY/0.jpg)](https://youtu.be/ELAxebGmspY)\n\n## How it works\n\n- A trigger checks every minute for changes in the Notion Database. The manual polling approach improves accuracy and prevents changes from being lost between cached polling intervals.\n- Afterwards every updated page is processed sequentially\n- The Vector Database is searched using the Notion Page ID stored in the metadata of each embedding. If old entries exist, they are deleted.\n- All blocks of the Notion Database Page are retrieved and combined into a single string\n- The content is embedded and split into chunks if necessary. Metadata, including the Notion Page ID, is added during storage for future reference.\n- A simple Question and Answer Chain enables users to ask questions about the embedded content through the integrated chat function\n\n## Prerequisites\n\n- To setup a new Vector Store in Supabase, follow [this guide](https://supabase.com/docs/guides/ai/vector-columns)\n- Prepare a simple Database in Notion with each Database Page containing at least a title and some content in the blocks section. You can of course also connect this to an existing Database of your choice.\n\n## Setup\n\n- Select your credentials in the nodes which require those\n- If you are on an n8n cloud plan, switch to the native Notion Trigger by activating it and deactivating the Schedule Trigger along with its subsequent Notion Node\n- Choose your Notion Database in the first Node related to Notion\n- Adjust the chunk size and overlap in the Token Splitter to your preference\n- Activate the workflow\n\n## How to use\n\nPopulate your Notion Database with useful information and use the chat mode of this workflow to ask questions about it. Updates to a Notion Page should quickly reflect in future conversations.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Token Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "role": "textSplitterTokenSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Question and Answer Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "role": "chainRetrievalQa",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "role": "retrieverVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete old embeddings if exist",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get page blocks",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Input Reference",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Notion Trigger",
+      "type": "n8n-nodes-base.notionTrigger",
+      "role": "notionTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get updated pages",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note26",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note27",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Supabase Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note30",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note31",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note32",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note29",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note34",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note35",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Concatenate to single string",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1"
+    }
+  ]
+}

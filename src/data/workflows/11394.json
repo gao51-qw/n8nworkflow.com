@@ -1,0 +1,170 @@
+{
+  "id": 11394,
+  "slug": "11394",
+  "title": "Transform Shopify products into SEO blog content with DeepSeek AI and Google Sheets",
+  "description": "## **Overview**\n\nStop struggling with content creation for your e-commerce store. This workflow acts as your automated AI Content Marketer, instantly transforming your Shopify product details into high-quality, SEO-optimized blog posts. It handles everything from reading product data to writing the article and uploading it directly to your store as a draft.\n\n#### What this workflow does\n\n- Fetches Product Data: Automatically pulls product titles and descriptions directly from your Shopify store (configurable limit).\n- Data Logging: Backs up the raw product data into Google Sheets for record-keeping before processing.\n- AI SEO Writing: Uses a powerful LLM (via OpenRouter/DeepSeek) to write a complete, engaging blog post based on the product's features. It generates an SEO-friendly title and formats the body content in clean HTML (headings, bullet points, etc.).\n- Smart Parsing: A custom Code node ensures the AI's output is strictly formatted as JSON, separating the Blog Title from the Blog Content to prevent errors.\n- Auto-Drafting in Shopify: Uploads the generated article directly to your specific Shopify Blog ID as a \"Draft\" (so you can review it before publishing).\n- Email Notification: Sends a confirmation email via Gmail to let you know your new blog posts are ready for review.\n\n#### Setup Requirements\nTo run this workflow, you will need to set up credentials in n8n for the following services:\n\n- Shopify Admin API: To fetch products and create articles. (You will need your Shop Name and an Access Token).\n- OpenRouter (or OpenAI): To power the AI Agent. The template is configured for DeepSeek via OpenRouter, but can be swapped for OpenAI.\n- Google Sheets: To log product data and generated blog content.\n- Gmail: To send the completion notification.\n\n#### How to use\n- Configure Variables: Double-click the \"Variables\" node (Set node) at the start of the workflow. Enter your shop name (e.g., my-store from my-store.myshopify.com) and your blogId (found in the URL when viewing your blog in Shopify Admin).\n- Connect Google Sheets: Open the Google Sheets nodes and map them to a sheet in your Drive. Ensure your sheet has columns for ID, Title, and Description.\n- Select AI Model: In the Chat Model node, ensure your API key is connected (OpenRouter is used by default for cost-efficiency).\n- Run: Execute the workflow. It will process your products and populate your Shopify Blog with new drafts automatically.\n\n#### Video Tutorial\nWatch the full setup guide here: [Guide](https://www.youtube.com/watch?v=RCwFc57V6oo)\n",
+  "featuredImage": "/data/workflows/11394/11394.webp",
+  "author": {
+    "id": 101,
+    "slug": "websensepro",
+    "name": "Websensepro",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 542,
+  "downloads": 54,
+  "createdAt": "2025-12-01T10:23:18.211Z",
+  "updatedAt": "2026-01-16T09:08:34.158Z",
+  "publishedAt": "2025-12-01T10:23:18.211Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11394",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Transform Shopify products into SEO blog content with DeepSeek AI and Google Sheets",
+    "workflowName": "Transform Shopify products into SEO blog content with DeepSeek AI and Google Sheets",
+    "description": "**\n\nStop struggling with content creation for your e-commerce store. This workflow acts as your automated AI Content Marketer, instantly transforming your Shopify product details into high-quality, SEO-optimized blog posts. It handles everything from reading product data to writing the article and uploading it directly to your store as a draft.\n\n#### What this workflow does\n\n- Fetches Product Data: Automatically pulls product titles and descriptions directly from your Shopify store (configurable limit).\n- Data Logging: Backs up the raw product data into Google Sheets for record-keeping before processing.\n- AI SEO Writing: Uses a powerful LLM (via OpenRouter/DeepSeek) to write a complete, engaging blog post based on the product's features. It generates an SEO-friendly title and formats the body content in clean HTML (headings, bullet points, etc.).\n- Smart Parsing: A custom Code node ensures the AI's output is strictly formatted as JSON, separating the Blog Title from the Blog Content to prevent errors.\n- Auto-Drafting in Shopify: Uploads the generated article directly to your specific Shopify Blog ID as a \"Draft\" (so you can review it before publishing).\n- Email Notification: Sends a confirmation email via Gmail to let you know your new blog posts are ready for review.\n\n#### Setup Requirements\nTo run this workflow, you will need to set up credentials in n8n for the following services:\n\n- Shopify Admin API: To fetch products and create articles. (You will need your Shop Name and an Access Token).\n- OpenRouter (or OpenAI): To power the AI Agent. The template is configured for DeepSeek via OpenRouter, but can be swapped for OpenAI.\n- Google Sheets: To log product data and generated blog content.\n- Gmail: To send the completion notification.\n\n#### How to use\n- Configure Variables: Double-click the \"Variables\" node (Set node) at the start of the workflow. Enter your shop name (e.g., my-store from my-store.myshopify.com) and your blogId (found in the URL when viewing your blog in Shopify Admin).\n- Connect Google Sheets: Open the Google Sheets nodes and map them to a sheet in your Drive. Ensure your sheet has columns for ID, Title, and Description.\n- Select AI Model: In the Chat Model node, ensure your API key is connected (OpenRouter is used by default for cost-efficiency).\n- Run: Execute the workflow. It will process your products and populate your Shopify Blog with new drafts automatically.\n\n#### Video Tutorial\nWatch the full setup guide here: [Guide](https://www.youtube.com/watch?v=RCwFc57V6oo)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Shopify",
+      "type": "n8n-nodes-base.shopify",
+      "role": "shopify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Product Data in Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Blog As Draft",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

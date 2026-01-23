@@ -11,6 +11,9 @@ import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import EmptyState from '../../components/ui/EmptyState.astro';
 import SortDropdown from '../../components/ui/SortDropdown.astro';
 import { getWorkflows } from '../../lib/services/workflows';
+import type { Workflow, ComplexityLevel } from '../../lib/types/workflow';
+
+export const prerender = false;
 
 // 复杂度级别定义
 export const complexityLevels = {
@@ -48,6 +51,12 @@ export async function getStaticPaths() {
 }
 
 const { level } = Astro.params;
+
+// 处理 'all' 级别，重定向到列表页
+if (level === 'all') {
+  return Astro.redirect('/complexity');
+}
+
 const levelInfo = complexityLevels[level as keyof typeof complexityLevels];
 
 if (!levelInfo) {
@@ -56,24 +65,34 @@ if (!levelInfo) {
 
 // 获取分页参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const categoryFilter = Astro.url.searchParams.get('category') || undefined;
+const priceFilter = Astro.url.searchParams.get('price') as 'free' | 'paid' | undefined;
+
 const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
 // 获取该复杂度级别的工作流
-let workflows = [];
+let workflows: Workflow[] = [];
 let totalCount = 0;
 
 try {
   const result = await getWorkflows({
-    complexity: level,
+    complexity: level as ComplexityLevel,
     limit: pageSize,
     offset: offset,
+    category: categoryFilter,
+    price: priceFilter,
   });
   workflows = result.workflows;
   totalCount = result.total;
 } catch (error) {
   console.error('Error fetching workflows:', error);
 }
+
+// 构建基础 URL，保留现有的筛选参数（除了 page）
+const baseUrlObj = new URL(Astro.url);
+baseUrlObj.searchParams.delete('page');
+const paginationBaseUrl = baseUrlObj.pathname + (baseUrlObj.search ? baseUrlObj.search : '');
 
 // SEO 配置
 const seoConfig = {
@@ -135,7 +154,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            baseUrl={`/complexity/${level}`}
+            baseUrl={paginationBaseUrl}
           />
         )}
       </>
@@ -144,7 +163,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
         title="No workflows found"
         description={`There are currently no ${levelInfo.name.toLowerCase()} workflows. Check back later or explore other complexity levels.`}
         icon="workflows"
-        actionText="Browse All Complexity Levels"
+        actionText="Browse All Complexity_levels"
         actionHref="/complexity"
       />
     )}

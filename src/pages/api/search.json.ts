@@ -7,16 +7,18 @@ import type { APIRoute } from 'astro';
 import type { SearchResponse } from '../../lib/types/workflow';
 import { searchWorkflows } from '../../lib/services/workflows';
 
-export const GET: APIRoute = async ({ request }) => {
+export const prerender = false;
+
+export const GET: APIRoute = async ({ request, url: astroUrl }) => {
   try {
-    // 解析查询参数
     const url = new URL(request.url);
-    const query = url.searchParams.get('q') || '';
-    const category = url.searchParams.get('category') || undefined;
-    const complexity = (url.searchParams.get('complexity') as any) || undefined;
-    const price = (url.searchParams.get('price') as any) || 'all';
-    const offset = parseInt(url.searchParams.get('offset') || '0', 10);
-    const limit = parseInt(url.searchParams.get('limit') || '12', 10);
+    // 解析查询参数
+    const query = url.searchParams.get('q') || astroUrl.searchParams.get('q') || '';
+    const category = url.searchParams.get('category') || astroUrl.searchParams.get('category') || undefined;
+    const complexity = (url.searchParams.get('complexity') || astroUrl.searchParams.get('complexity') || undefined) as any;
+    const price = (url.searchParams.get('price') || astroUrl.searchParams.get('price') || 'all') as any;
+    const offset = parseInt(url.searchParams.get('offset') || astroUrl.searchParams.get('offset') || '0', 10);
+    const limit = parseInt(url.searchParams.get('limit') || astroUrl.searchParams.get('limit') || '12', 10);
 
     // 验证查询参数
     if (!query || query.trim().length === 0) {

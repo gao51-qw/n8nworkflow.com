@@ -1,0 +1,26 @@
+{
+  "id": 8045,
+  "slug": "8045",
+  "title": "Keyboard interest checker: GeekHack forum to Discord notifications",
+  "description": "# Geekhack Discord Updater\n\n## How It Works\n\nThis n8n workflow automatically monitors GeekHack forum RSS feeds every hour for new keyboard posts in Interest Checks and Group Buys sections. When it finds a new thread (not replies), it:\n\n1. **Monitors RSS Feeds**: Checks two GeekHack RSS feeds for new posts (50 items each)\n2. **Filters New Threads**: Removes reply posts by checking for \"Re:\" prefix in titles\n3. **Prevents Duplicates**: Queries PostgreSQL database to skip already-processed threads\n4. **Scrapes Content**: Fetches the full thread page and extracts the original post\n5. **Extracts Images**: Uses regex to find all images in the post content\n6. **Creates Discord Embed**: Formats the post data into a rich Discord embed with up to 4 images\n7. **Sends to Multiple Webhooks**: Retrieves all webhook URLs from database and sends to each one\n8. **Logs Processing**: Records the thread as processed to prevent duplicates\n\nThe workflow includes a **webhook management system** with a web form to add/remove Discord webhooks dynamically, allowing you to send notifications to multiple Discord servers or channels.\n\n## Steps to Set Up\n\n### Prerequisites\n- n8n instance running\n- PostgreSQL database\n- Discord webhook URL(s)\n\n### 1. Database Setup\nCreate PostgreSQL tables:\n\n**Processed threads table:**\n```sql\nCREATE TABLE processed_threads (\n    topic_id VARCHAR PRIMARY KEY,\n    title TEXT,\n    processed_at TIMESTAMP DEFAULT NOW()\n);\n```\n\n**Webhooks table:**\n```sql\nCREATE TABLE webhooks (\n    id SERIAL PRIMARY KEY,\n    url TEXT NOT NULL,\n    created_at TIMESTAMP DEFAULT NOW()\n);\n```\n\n### 2. n8n Configuration\n\n#### Import Workflow\n1. Copy the workflow JSON\n2. Go to n8n → Workflows → Import from JSON\n3. Paste the JSON and import\n\n#### Configure Credentials\n1. **PostgreSQL**: Create new PostgreSQL credential with your database connection details\n2. All PostgreSQL nodes should use the same credential\n\n### 3. Node Configuration\n\n#### Schedule Trigger\n- Already configured for 1-hour intervals\n- Modify if different timing needed\n\n#### PostgreSQL Nodes\n- Ensure all PostgreSQL nodes use your PostgreSQL credential:\n  - \"Check if Processed\"\n  - \"Update entry\" \n  - \"Insert rows in a table\"\n  - \"Select rows from a table\"\n- Database schema should be \"public\"\n- Table names: \"processed_threads\" and \"webhooks\"\n\n#### RSS Feed Limits\n- Both RSS feeds are set to limit=50 items\n- Adjust if you need more/fewer items per check\n\n### 4. Webhook Management\n\n#### Adding Webhooks via Web Form\n1. The workflow creates a form trigger for adding webhooks\n2. Access the form URL from the \"On form submission\" node\n3. Submit Discord webhook URLs through the form\n4. Webhooks are automatically stored in the database\n\n#### Manual Webhook Addition\nAlternatively, insert webhooks directly into the database:\n```sql\nINSERT INTO webhooks (url) VALUES ('https://discord.com/api/webhooks/YOUR_WEBHOOK_URL');\n```\n\n### 5. Testing\n\n#### Test the Main Workflow\n1. Ensure you have at least one webhook in the database\n2. Activate the workflow\n3. Use \"Execute Workflow\" to test manually\n4. Check Discord channels for test messages\n\n#### Test Webhook Form\n1. Get the form URL from \"On form submission\" node\n2. Submit a test webhook URL\n3. Verify it appears in the webhooks table\n\n### 6. Monitoring\n- Check execution history for errors\n- Monitor both database tables for entries\n- Verify all registered webhooks receive notifications\n- Adjust schedule timing if needed\n\n### 7. Managing Webhooks\n- Use the web form to add new webhook URLs\n- Remove webhooks by deleting from the database:\n  ```sql\n  DELETE FROM webhooks WHERE url = 'webhook_url_to_remove';\n  ```\n\nThe workflow will now automatically post new GeekHack threads to all registered Discord webhooks every hour, with the ability to dynamically manage webhook destinations through the web form interface.",
+  "featuredImage": "/data/workflows/8045/8045.webp",
+  "author": {
+    "id": 101,
+    "slug": "anurag4884",
+    "name": "Anurag Patil",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 63,
+  "downloads": 6,
+  "createdAt": "2025-08-30T06:58:21.053Z",
+  "updatedAt": "2026-01-16T08:53:49.881Z",
+  "publishedAt": "2025-08-30T06:58:21.053Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8045"
+}

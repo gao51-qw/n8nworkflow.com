@@ -1,0 +1,1 @@
+This is a proof of concept workflow showing how you would connect n8n to a Bubble data collection. 

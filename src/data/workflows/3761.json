@@ -1,0 +1,194 @@
+{
+  "id": 3761,
+  "slug": "3761",
+  "title": "Email assistant: convert natural language to SQL queries with Phi4-mini and PostgreSQL",
+  "description": "# Who is this for?\n\n🧑🏻🫱🏻‍🫲🏻🤖 **Humans** and **Robots** alike.\n\nThis workflow can be used as a *Chat Trigger*, as well as a *Workflow Trigger*.\n\nIt will take a natural language request, and then generate a `SQL` query. The resulting `query` parameter will contain the query, and a `sqloutput` parameter will contain the results of executing such query.\n\n## What's the use case?\n\nThis template is most useful paired with other workflows that extract e-mail information and store it in a structured Postgres table, and use LLMs to understand inquiries about information contained in an e-mail inbox and formulate questions that needs answering.\n\nPlus, the prompt can be easily adapted to formulate SQL queries over any kind of structured database.\n\n## Privacy and Economics\n\nAs LLM provider I'm using **Ollama** locally, as I consider my e-mail extremely sensitive information. As model, [`phi4-mini`](https://ollama.com/library/phi4-mini) does an excellent job balancing quality and efficiency.\n\n## Setup\n\nUpon running for the first time, this workflow will *automatically* trigger a sub-section to read all tables and extract their schema into a local file.\n\nThen, either by *chatting* with the workflow in n8n's interface or by using it as a *sub-workflow*, you will get a `query` and a `sqloutput` response.\n\n## Customizations\n\nIf you want to work with just one particular table yet keep edits at bay, append a condition to the `List all tables in a database` step, like so:\n\n```sql\nWHERE table_schema='public' AND table_name='my_emails_table_name'\n```\n\nTo repurpose this workflow to work with any other data corpus in a structured database, inspect the `AI Agent` *user* and *system* prompts and edit them accordingly.\n",
+  "featuredImage": "/data/workflows/3761/3761.webp",
+  "author": {
+    "id": 101,
+    "slug": "acorretti",
+    "name": "Alfonso Corretti",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2864,
+  "downloads": 286,
+  "createdAt": "2025-04-27T14:46:07.274Z",
+  "updatedAt": "2026-01-16T08:31:20.438Z",
+  "publishedAt": "2025-04-27T14:46:07.274Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3761",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Email assistant: convert natural language to SQL queries with Phi4-mini and PostgreSQL",
+    "workflowName": "Email assistant: convert natural language to SQL queries with Phi4-mini and PostgreSQL",
+    "description": "# Who is this for?\n\n🧑🏻🫱🏻‍🫲🏻🤖 **Humans** and **Robots** alike.\n\nThis workflow can be used as a *Chat Trigger*, as well as a *Workflow Trigger*.\n\nIt will take a natural language request, and then generate a `SQL` query. The resulting `query` parameter will contain the query, and a `sqloutput` parameter will contain the results of executing such query.\n\n## What's the use case?\n\nThis template is most useful paired with other workflows that extract e-mail information and store it in a structured Postgres table, and use LLMs to understand inquiries about information contained in an e-mail inbox and formulate questions that needs answering.\n\nPlus, the prompt can be easily adapted to formulate SQL queries over any kind of structured database.\n\n## Privacy and Economics\n\nAs LLM provider I'm using **Ollama** locally, as I consider my e-mail extremely sensitive information. As model, [`phi4-mini`](https://ollama.com/library/phi4-mini) does an excellent job balancing quality and efficiency.\n\n## Setup\n\nUpon running for the first time, this workflow will *automatically* trigger a sub-section to read all tables and extract their schema into a local file.\n\nThen, either by *chatting* with the workflow in n8n's interface or by using it as a *sub-workflow*, you will get a `query` and a `sqloutput` response.\n\n## Customizations\n\nIf you want to work with just one particular table yet keep edits at bay, append a condition to the `List all tables in a database` step, like so:\n\n```sql\nWHERE table_schema='public' AND table_name='my_emails_table_name'\n```\n\nTo repurpose this workflow to work with any other data corpus in a structured database, inspect the `AI Agent` *user* and *system* prompts and edit them accordingly.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Add table name to output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert data to binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Save file locally",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract data from file",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine schema data and chat input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Load the schema from the local file",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract SQL query",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check if query exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Format query results",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Combine query result and chat answer",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "List all columns in a table",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "List all tables in a database",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "role": "lmChatOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Add trailing semicolon",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check for trailing semicolon",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "WorkflowTrigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If ran manually",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If file exists or already retried generating it",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Format empty output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

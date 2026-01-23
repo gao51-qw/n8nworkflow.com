@@ -1,0 +1,290 @@
+{
+  "id": 10251,
+  "slug": "10251",
+  "title": "Cross-platform brand monitoring & analysis with AnySite API and GPT",
+  "description": "![Screenshot 20251031 at 11.45.25.png](fileId:3153)\n## Overview\n\nThis n8n workflow automates **brand monitoring across social media platforms** (Reddit, LinkedIn, X, and Instagram) using the **AnySite API**.  \nIt searches posts mentioning your defined keywords, stores results in n8n Data Tables, analyzes engagement and sentiment, and generates a detailed **AI-powered social media report** automatically sent to your email.\n\n---\n\n## Key Features\n\n- **Multi-Platform Monitoring:** Reddit, LinkedIn, X (Twitter), and Instagram  \n- **Automated Post Collection:** Searches for new posts containing tracked keywords  \n- **Data Persistence:** Saves all posts and comments in structured Data Tables  \n- **AI-Powered Reporting:** Uses GPT (OpenAI API) to summarize and analyze trends, engagement, and risks  \n- **Automated Email Delivery:** Sends comprehensive daily/weekly reports via Gmail  \n- **Comment Extraction:** Collects and formats post comments for deeper sentiment analysis  \n- **Scheduling Support:** Can be executed manually or automatically (e.g., every night)\n\n---\n\n## How It Works\n\n### Triggers\n\nThe workflow runs:\n- Automatically (via **Schedule Trigger**) — e.g., once daily  \n- Manually (via **Manual Trigger**) — for testing or on-demand analysis\n\n### Data Collection Process\n\n1. **Keyword Loading:**  \n   Reads all keywords from the Data Table **“Brand Monitoring Words”**\n\n2. **Social Media Search:**  \n   For each keyword, the workflow calls the **AnySite API** endpoints:  \n   - `api/reddit/search/posts`  \n   - `api/linkedin/search/posts`  \n   - `api/twitter/search/posts` (X)  \n   - `api/instagram/search/posts`\n\n3. **Deduplication:**  \n   Before saving, checks if a post already exists in the **“Brand Monitoring Posts”** table.\n\n4. **Data Storage:**  \n   Inserts new posts into the Data Table with fields like `type`, `title`, `url`, `vote_count`, `comment_count`, etc.\n\n5. **Comments Enrichment:**  \n   For Reddit and LinkedIn, retrieves and formats comments into JSON strings, then updates the record.\n\n6. **AI Analysis & Report Generation:**  \n   The **AI Agent** (OpenAI GPT model) aggregates posts, analyzes sentiment, engagement, risks, and generates a structured **HTML email report**.\n\n7. **Email Sending:**  \n   Sends the final report via Gmail using your connected account.\n\n---\n\n## Setup Instructions\n\n### Requirements\n\n- Self-hosted or cloud **n8n instance**  \n- **AnySite API key** – [https://AnySite.io](https://AnySite.io)  \n- **OpenAI API key** (GPT-4o or later)  \n- Connected **Gmail** account (for report delivery)\n\n---\n\n### Installation Steps\n\n1. **Import the workflow**  \n   Import the provided file:  \n   `Social Media Monitoring.json`\n\n2. **Configure credentials**\n   - **AnySite API:** Add `access-token` header with your API key  \n   - **OpenAI:** Add your OpenAI API key in the “OpenAI Chat Model” node  \n   - **Gmail:** Connect your Gmail account (OAuth2) in the “Send a message in Gmail” node\n\n3. **Create required Data Tables**\n\n---\n\n### 1️⃣ Brand Monitoring Words\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `word` | string | Keyword or brand name to monitor |\n\n&gt; Each row represents a single keyword to be tracked.\n\n---\n\n### 2️⃣ Brand Monitoring Posts\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `type` | string | Platform type (e.g., reddit, linkedin, x, instagram) |\n| `title` | string | Post title or headline |\n| `url` | string | Direct link to post |\n| `created_at` | string | Post creation date/time |\n| `subreddit_id` | string | (Reddit only) subreddit ID |\n| `subreddit_alias` | string | (Reddit only) subreddit alias |\n| `subreddit_url` | string | (Reddit only) subreddit URL |\n| `subreddit_description` | string | (Reddit only) subreddit description |\n| `comment_count` | number | Number of comments |\n| `vote_count` | number | Votes, likes, or reactions count |\n| `subreddit_member_count` | number | (Reddit only) member count |\n| `post_id` | string | Unique post identifier |\n| `text` | string | Post body text |\n| `comments` | string | Serialized comments (JSON string) |\n| `word` | string | Matched keyword that triggered capture |\n\n---\n\n## AI Reporting Logic\n\n- Collects all posts gathered during the run  \n- Aggregates by keyword and platform  \n- Evaluates sentiment, engagement, and risk signals  \n- Summarizes findings with an executive summary and key metrics  \n- Sends the **Social Media Intelligence Report** to your configured email\n\n---\n\n## Customization Options\n\n- **Schedule:** Adjust the trigger frequency (daily, hourly, etc.)  \n- **Keywords:** Add or remove keywords in the **Brand Monitoring Words** table  \n- **Report Depth:** Modify system prompts in the “AI Agent” node to customize tone and analysis focus  \n- **Email Recipient:** Change the target email address in the “Send a message in Gmail” node\n\n---\n\n## Troubleshooting\n\n| Issue | Solution |\n|-------|-----------|\n| No posts found | Check AnySite API key and keyword relevance |\n| Duplicate posts | Verify Data Table deduplication setup |\n| Report not sent | Confirm Gmail OAuth2 connection |\n| AI Agent error | Ensure OpenAI API key and model selection are correct |\n\n---\n\n## Best Practices\n\n- Use **specific brand or product names** in keywords for better precision  \n- Run the workflow daily to maintain fresh insights  \n- Periodically review and clean Data Tables  \n- Adjust AI prompt parameters to refine analytical tone  \n- Review AI-generated reports to ensure data quality\n\n---\n\n## Author Notes\n\nCreated for **automated cross-platform brand reputation monitoring**, enabling real-time insights into how your brand is discussed online.",
+  "featuredImage": "/data/workflows/10251/10251.webp",
+  "author": {
+    "id": 101,
+    "slug": "kulia",
+    "name": "Andrey",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 75,
+  "downloads": 7,
+  "createdAt": "2025-10-28T15:29:39.149Z",
+  "updatedAt": "2026-01-16T09:04:08.695Z",
+  "publishedAt": "2025-10-28T15:29:39.149Z",
+  "nodes": 42,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10251",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Cross-platform brand monitoring & analysis with AnySite API and GPT",
+    "workflowName": "Cross-platform brand monitoring & analysis with AnySite API and GPT",
+    "description": "![Screenshot 20251031 at 11.45.25.png](fileId:3153)\n## Overview\n\nThis n8n workflow automates **brand monitoring across social media platforms** (Reddit, LinkedIn, X, and Instagram) using the **AnySite API**.  \nIt searches posts mentioning your defined keywords, stores results in n8n Data Tables, analyzes engagement and sentiment, and generates a detailed **AI-powered social media report** automatically sent to your email.\n\n---\n\n## Key Features\n\n- **Multi-Platform Monitoring:** Reddit, LinkedIn, X (Twitter), and Instagram  \n- **Automated Post Collection:** Searches for new posts containing tracked keywords  \n- **Data Persistence:** Saves all posts and comments in structured Data Tables  \n- **AI-Powered Reporting:** Uses GPT (OpenAI API) to summarize and analyze trends, engagement, and risks  \n- **Automated Email Delivery:** Sends comprehensive daily/weekly reports via Gmail  \n- **Comment Extraction:** Collects and formats post comments for deeper sentiment analysis  \n- **Scheduling Support:** Can be executed manually or automatically (e.g., every night)\n\n---\n\n## How It Works\n\n### Triggers\n\nThe workflow runs:\n- Automatically (via **Schedule Trigger**) — e.g., once daily  \n- Manually (via **Manual Trigger**) — for testing or on-demand analysis\n\n### Data Collection Process\n\n1. **Keyword Loading:**  \n   Reads all keywords from the Data Table **“Brand Monitoring Words”**\n\n2. **Social Media Search:**  \n   For each keyword, the workflow calls the **AnySite API** endpoints:  \n   - `api/reddit/search/posts`  \n   - `api/linkedin/search/posts`  \n   - `api/twitter/search/posts` (X)  \n   - `api/instagram/search/posts`\n\n3. **Deduplication:**  \n   Before saving, checks if a post already exists in the **“Brand Monitoring Posts”** table.\n\n4. **Data Storage:**  \n   Inserts new posts into the Data Table with fields like `type`, `title`, `url`, `vote_count`, `comment_count`, etc.\n\n5. **Comments Enrichment:**  \n   For Reddit and LinkedIn, retrieves and formats comments into JSON strings, then updates the record.\n\n6. **AI Analysis & Report Generation:**  \n   The **AI Agent** (OpenAI GPT model) aggregates posts, analyzes sentiment, engagement, risks, and generates a structured **HTML email report**.\n\n7. **Email Sending:**  \n   Sends the final report via Gmail using your connected account.\n\n---\n\n## Setup Instructions\n\n### Requirements\n\n- Self-hosted or cloud **n8n instance**  \n- **AnySite API key** – [https://AnySite.io](https://AnySite.io)  \n- **OpenAI API key** (GPT-4o or later)  \n- Connected **Gmail** account (for report delivery)\n\n---\n\n### Installation Steps\n\n1. **Import the workflow**  \n   Import the provided file:  \n   `Social Media Monitoring.json`\n\n2. **Configure credentials**\n   - **AnySite API:** Add `access-token` header with your API key  \n   - **OpenAI:** Add your OpenAI API key in the “OpenAI Chat Model” node  \n   - **Gmail:** Connect your Gmail account (OAuth2) in the “Send a message in Gmail” node\n\n3. **Create required Data Tables**\n\n---\n\n### 1️⃣ Brand Monitoring Words\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `word` | string | Keyword or brand name to monitor |\n\n&gt; Each row represents a single keyword to be tracked.\n\n---\n\n### 2️⃣ Brand Monitoring Posts\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `type` | string | Platform type (e.g., reddit, linkedin, x, instagram) |\n| `title` | string | Post title or headline |\n| `url` | string | Direct link to post |\n| `created_at` | string | Post creation date/time |\n| `subreddit_id` | string | (Reddit only) subreddit ID |\n| `subreddit_alias` | string | (Reddit only) subreddit alias |\n| `subreddit_url` | string | (Reddit only) subreddit URL |\n| `subreddit_description` | string | (Reddit only) subreddit description |\n| `comment_count` | number | Number of comments |\n| `vote_count` | number | Votes, likes, or reactions count |\n| `subreddit_member_count` | number | (Reddit only) member count |\n| `post_id` | string | Unique post identifier |\n| `text` | string | Post body text |\n| `comments` | string | Serialized comments (JSON string) |\n| `word` | string | Matched keyword that triggered capture |\n\n---\n\n## AI Reporting Logic\n\n- Collects all posts gathered during the run  \n- Aggregates by keyword and platform  \n- Evaluates sentiment, engagement, and risk signals  \n- Summarizes findings with an executive summary and key metrics  \n- Sends the **Social Media Intelligence Report** to your configured email\n\n---\n\n## Customization Options\n\n- **Schedule:** Adjust the trigger frequency (daily, hourly, etc.)  \n- **Keywords:** Add or remove keywords in the **Brand Monitoring Words** table  \n- **Report Depth:** Modify system prompts in the “AI Agent” node to customize tone and analysis focus  \n- **Email Recipient:** Change the target email address in the “Send a message in Gmail” node\n\n---\n\n## Troubleshooting\n\n| Issue | Solution |\n|-------|-----------|\n| No posts found | Check AnySite API key and keyword relevance |\n| Duplicate posts | Verify Data Table deduplication setup |\n| Report not sent | Confirm Gmail OAuth2 connection |\n| AI Agent error | Ensure OpenAI API key and model selection are correct |\n\n---\n\n## Best Practices\n\n- Use **specific brand or product names** in keywords for better precision  \n- Run the workflow daily to maintain fresh insights  \n- Periodically review and clean Data Tables  \n- Adjust AI prompt parameters to refine analytical tone  \n- Review AI-generated reports to ensure data quality\n\n---\n\n## Author Notes\n\nCreated for **automated cross-platform brand reputation monitoring**, enabling real-time insights into how your brand is discussed online.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AnySite Get Reddit Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AnySite Search Reddit Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AnySite Get Reddit Post Comment",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get word's list",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AnySite Search LinkedIn Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AnySite Get LinkedIn Post Comments",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AnySite Search Instagram Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AnySite Search X Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "If LinkedIn post does not exist1",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Reddit post does not exist",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If X post does not exist3",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Instagram post does not exist2",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert Reddit post ",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert LinkedIn post ",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert Instagram post",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert X post",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Reddit post details",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert comments to the string",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Reddit post comments",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert LN comments to the string",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update LN comments",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get post_id for all new posts",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Posts Info",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AnySite.io Attribution",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Customization Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Triggers & Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Testing Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Cross-Platform Search",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Deduplication Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Data Extraction",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setup Required - AI & Gmail",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Analysis & Alerts",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Monitoring Best Practices",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setup Required - AnySite",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setup Required - Database",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

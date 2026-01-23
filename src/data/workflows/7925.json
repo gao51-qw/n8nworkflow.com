@@ -1,0 +1,266 @@
+{
+  "id": 7925,
+  "slug": "7925",
+  "title": "Voice-to-task manager with Telegram, GPT-4o & Notion database",
+  "description": "📌 How it works\n\nThis workflow turns voice or text messages from Telegram into structured tasks in Notion, using AI-powered intent detection and task generation.\n\nIt supports:\n- 🆕 Task creation\n- ✏️ Task updates (like changing priority, title, or deadline)\n- 🧠 Task analysis (e.g., workload, goal alignment, emotional fatigue)\n\nThe assistant uses OpenAI to:\n- Detect intent (create, update, or analyze)\n- Extract or update task fields (title, priority, due date, etc.)\n- Auto-format list-style descriptions with bullet points\n- Detect relevant tags like health, money, sport, etc.\n\n⚙️ Setup steps\n1. Clone the [GitHub repo](https://github.com/YahorDubrouski/ai-planner) or import the .json into n8n manually.\n2. Configure:\n- OpenAI credentials\n- Telegram Bot Token\n- Notion credentials\n3. Use Telegram to send messages like:\n- “Create a task to call mom tomorrow”\n- “Update the grocery task to add milk”\n- “Am I overbooked today?”",
+  "featuredImage": "/data/workflows/7925/7925.webp",
+  "author": {
+    "id": 101,
+    "slug": "yahordubrouski",
+    "name": "Yahor Dubrouski",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 775,
+  "downloads": 77,
+  "createdAt": "2025-08-26T22:55:39.274Z",
+  "updatedAt": "2026-01-16T08:53:03.018Z",
+  "publishedAt": "2025-08-26T22:55:39.274Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7925",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Voice-to-task manager with Telegram, GPT-4o & Notion database",
+    "workflowName": "Voice-to-task manager with Telegram, GPT-4o & Notion database",
+    "description": "📌 How it works\n\nThis workflow turns voice or text messages from Telegram into structured tasks in Notion, using AI-powered intent detection and task generation.\n\nIt supports:\n- 🆕 Task creation\n- ✏️ Task updates (like changing priority, title, or deadline)\n- 🧠 Task analysis (e.g., workload, goal alignment, emotional fatigue)\n\nThe assistant uses OpenAI to:\n- Detect intent (create, update, or analyze)\n- Extract or update task fields (title, priority, due date, etc.)\n- Auto-format list-style descriptions with bullet points\n- Detect relevant tags like health, money, sport, etc.\n\n⚙️ Setup steps\n1. Clone the [GitHub repo](https://github.com/YahorDubrouski/ai-planner) or import the .json into n8n manually.\n2. Configure:\n- OpenAI credentials\n- Telegram Bot Token\n- Notion credentials\n3. Use Telegram to send messages like:\n- “Create a task to call mom tomorrow”\n- “Update the grocery task to add milk”\n- “Am I overbooked today?”",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Receive Telegram Messages",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Voice or Text?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Fetch Voice Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Transcribe Voice to Text",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Prepare for LLM",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Confirmation",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Detect Intent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Wrap Intent",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare Unified Text",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Route by Intent",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Create Task Fields",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Wrap Intent + Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Task Prompt",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Find Matching Task",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Prepare Match Prompt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Search String",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Prepare Update Prompt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "to task object",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Analysis Prompt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Analyze Tasks",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Send Analysis Result",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a database page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Notion Tasks (analyze)",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Notion Tasks (update)",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update a database page",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "OpenAI Chat Model (Detect Intent)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Create Task (Prompt)",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Create Task Prompt (Model)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Search String Prompt (Model)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Find Matching Task Prompt (Model)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Task Prompt (Model)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Alalyze Task Prompt (Model)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Confirmation (update)",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

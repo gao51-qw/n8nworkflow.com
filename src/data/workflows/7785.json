@@ -1,0 +1,80 @@
+{
+  "id": 7785,
+  "slug": "7785",
+  "title": "Automate security incident triage with GPT-4o-mini and Gmail notifications",
+  "description": "What this workflow does\n-----------------------\n\nAutomatically triages inbound security findings (e.g., from AWS Security Hub via EventBridge → SNS → Webhook), classifies them with an LLM, generates a 3-step remediation plan, and emails a compact incident brief.\n\n**Pipeline:** Webhook → Clean_Finding (normalize) → Classify (LLM) → Plan (LLM) → Gmail (email). You can substitute Microsoft Teams, Slack, etc.\n\n-   Normalizes the incoming finding JSON (title, description, account, resource id/type, updated_at).\n\n-   Uses an LLM to assign **incident_type**, **severity (P0--P3)**, **urgency**, **short_title**, and **why** (concise rationale).\n\n-   Produces a **3-step remediation plan** with **owner_hint** and **success_criteria**---kept atomic and practical.\n\n-   Sends a clean HTML email with all details (subject line includes short title, resource, and account).\n\n**Category:** Security / Cloud / Incident Management\\\n**Time to set up:** ~10--15 minutes\\\n**Difficulty:** Beginner--Intermediate\\\n**Cost:** Mostly free (n8n CE; OpenAI usage + Gmail/SMTP as used)\n\n* * * * *\n\nWhat you'll need\n----------------\n\n-   An n8n instance reachable over **HTTP** (for the Webhook node).\n\n-   OpenAI (or compatible) credentials set in n8n.\n\n-   Gmail OAuth2 credentials (or swap Gmail node for SMTP).\n\n-   A source that can POST a Security-Hub-style finding to your webhook (EventBridge/SNS, a SIEM, or curl).\n\n**Output (Email)**\n\n-   Subject: `&lt;short_title&gt; - &lt;resource_id&gt; in &lt;account_id&gt;`\n\n-   Body: HTML summary with **Type**, **Account**, **Urgency**, **Why**, **Next Actions (3 steps)**, **Owner**, **Success criteria**.\n",
+  "featuredImage": "/data/workflows/7785/7785.webp",
+  "author": {
+    "id": 101,
+    "slug": "ca7ai",
+    "name": "Calistus Christian",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 206,
+  "downloads": 20,
+  "createdAt": "2025-08-24T13:32:18.984Z",
+  "updatedAt": "2026-01-16T08:52:21.909Z",
+  "publishedAt": "2025-08-24T13:32:18.984Z",
+  "nodes": 7,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7785",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate security incident triage with GPT-4o-mini and Gmail notifications",
+    "workflowName": "Automate security incident triage with GPT-4o-mini and Gmail notifications",
+    "description": "What this workflow does\n-----------------------\n\nAutomatically triages inbound security findings (e.g., from AWS Security Hub via EventBridge → SNS → Webhook), classifies them with an LLM, generates a 3-step remediation plan, and emails a compact incident brief.\n\n**Pipeline:** Webhook → Clean_Finding (normalize) → Classify (LLM) → Plan (LLM) → Gmail (email). You can substitute Microsoft Teams, Slack, etc.\n\n-   Normalizes the incoming finding JSON (title, description, account, resource id/type, updated_at).\n\n-   Uses an LLM to assign **incident_type**, **severity (P0--P3)**, **urgency**, **short_title**, and **why** (concise rationale).\n\n-   Produces a **3-step remediation plan** with **owner_hint** and **success_criteria**---kept atomic and practical.\n\n-   Sends a clean HTML email with all details (subject line includes short title, resource, and account).\n\n**Category:** Security / Cloud / Incident Management\\\n**Time to set up:** ~10--15 minutes\\\n**Difficulty:** Beginner--Intermediate\\\n**Cost:** Mostly free (n8n CE; OpenAI usage + Gmail/SMTP as used)\n\n* * * * *\n\nWhat you'll need\n----------------\n\n-   An n8n instance reachable over **HTTP** (for the Webhook node).\n\n-   OpenAI (or compatible) credentials set in n8n.\n\n-   Gmail OAuth2 credentials (or swap Gmail node for SMTP).\n\n-   A source that can POST a Security-Hub-style finding to your webhook (EventBridge/SNS, a SIEM, or curl).\n\n**Output (Email)**\n\n-   Subject: `&lt;short_title&gt; - &lt;resource_id&gt; in &lt;account_id&gt;`\n\n-   Body: HTML summary with **Type**, **Account**, **Urgency**, **Why**, **Next Actions (3 steps)**, **Owner**, **Success criteria**.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Classify",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Plan",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Clean_Finding",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

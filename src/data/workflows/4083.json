@@ -1,0 +1,386 @@
+{
+  "id": 4083,
+  "slug": "4083",
+  "title": "AI sales agent: WhatsApp, FB, IG, OpenAI, Airtable, Supabase auto-booking",
+  "description": "\n**This workflow automates multi-channel AI-driven sales engagement for lead qualification, service information delivery, and consultation booking. It integrates WhatsApp, Facebook Messenger, Instagram DM, and an n8n chat interface with a backend CRM (Airtable), a knowledge base (Supabase), and conversational AI (OpenAI), all orchestrated by n8n.**\n\n# Tools & Services Used\n\nMessaging Platforms: WhatsApp, Facebook Messenger, Instagram DM, n8n Built-in Chat\n\nAI Core & Processing: OpenAI (GPT-4o for main agent logic, Whisper for audio transcription)\n\nCRM & Data Management: Airtable (for initial WhatsApp lead lookup, lead form submissions, and as the backend for the crmAgent sub-workflow operations)\n\nKnowledge Base: Supabase (Vector Store for technical_and_sales_knowledge tool)\n\nChat Memory: PostgreSQL (for the main AI Agent's conversation history)\n\nOrchestration & Automation: n8n (Self-hosted, utilizing Langchain community nodes)\n\nCalendar Service: Integrated via the calendarAgent sub-workflow\n\nCRM Service: Integrated via the crmAgent sub-workflow (interacting with Airtable)\n\n# Workflow Overview\n\n## This automation performs the following steps:\n\nTrigger: A new interaction is initiated through one of the following channels:\n\nA new message is received via the WhatsApp Trigger.\n\nA new message is received via the Facebook Trigger (Webhook).\n\nA new message is received via the Instagram Trigger (Webhook).\n\nA new message is received via the n8n Chat Trigger.\n\nAlternatively, a new lead is submitted via the Airtable Form Submitted Webhook.\n\nChannel-Specific Ingestion & Pre-processing:\n\n## For WhatsApp:\n\nThe system attempts to find an existing lead in Airtable using the sender's phone number.\n\nIncoming messages are routed by the Handle Message Types switch:\n\nText messages are passed to the Edit Fields - chat1 node to prepare input for the AI Agent, including any found lead information.\n\nAudio messages are processed: the WhatsApp Business Cloud node gets the media URL, the HTTP Request node downloads the audio, OpenAI transcribes it to text, and Edit Fields - chat2 prepares this transcribed text and lead information for the AI Agent.\n\nUnsupported message types trigger the Reply To User1 node to send a notification that the message type cannot be processed.\n\n## For Facebook Messenger:\n\nThe system responds to webhook verification (Respond to Webhook - facebook get) and acknowledges new messages (Respond to Webhook - facebook post).\n\nThe If is not echo - facebook node filters out messages sent by the page.\n\nThe Sales Agent Demo - typing_on node sends a typing indicator.\n\nThe Edit Fields - facebook node prepares the message text, sender ID, and Facebook-specific context for the AI Agent.\n\n## For Instagram DM:\n\nThe system responds to webhook verification (Respond to Webhook - instagram get) and acknowledges new messages (Respond to Webhook - instagram post).\n\nThe If is not echo - instagram node filters out messages sent by the business account.\n\nThe Edit Fields - instagram node prepares the message text, sender ID, and Instagram-specific context for the AI Agent.\n\n## For n8n Chat:\n\nThe Edit Fields - chat node prepares the user's input and session information for the AI Agent.\n\n## Input Aggregation for AI Agent:\n\nProcessed data from all active messaging channels (WhatsApp text/audio, Facebook, Instagram, n8n Chat) is funneled through the No Operation, do nothing node to the main AI Agent.\n\n## AI Sales Conversation & Tool Utilization:\n\nThe AI Agent (using OpenAI Chat Model - GPT-4o, and Postgres Chat Memory) engages the user according to its system prompt, aiming to qualify them for Paint Protection Film (PPF), Ceramic Coating, or Window Tint.\n\nThe AI Agent uses the technical_and_sales_knowledge tool (which queries the Demo Supabase vector store via Embeddings OpenAI and OpenAI Chat Model1) to provide service details and answer questions.\n\nThe AI Agent uses the crmAgent tool (a sub-workflow) to log contact details (Name, Email, service interest) and update opportunity statuses in Airtable.\n\nThe AI Agent uses the calendarAgent tool (a sub-workflow) to book consultation appointments once preferred dates/times are provided. This occurs after contact details are logged in the CRM.\n\n## Response Delivery:\n\nThe AI Agent's final textual response is passed to the Switch node.\n\nThe Switch node routes the response to the appropriate node for delivery on the original channel:\n\nReply To User for WhatsApp.\n\nFacebook Graph API - Sales Agent Demo for Facebook Messenger.\n\nInstagram Graph API - smb.sales.agent.demo for Instagram DM.\n\nOutput - chat for the n8n Chat interface.\n\n## Airtable Form Submission Processing (Separate Branch):\n\nWhen the Airtable Form Submitted webhook receives data, the Airtable node fetches the full record.\n\nThe Create Contact node creates a new contact in the Airtable 'Contacts' table.\n\nThe Edit Fields - form node prepares data for a notification.\n\nThe WhatsApp Business Cloud2 node sends a templated WhatsApp message to the lead, confirming their form submission.",
+  "featuredImage": "/data/workflows/4083/4083.webp",
+  "author": {
+    "id": 101,
+    "slug": "samyassine",
+    "name": "Sam Yassine",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 7519,
+  "downloads": 751,
+  "createdAt": "2025-05-15T19:39:14.260Z",
+  "updatedAt": "2026-01-16T08:32:57.781Z",
+  "publishedAt": "2025-05-15T19:39:14.260Z",
+  "nodes": 58,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4083",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI sales agent: WhatsApp, FB, IG, OpenAI, Airtable, Supabase auto-booking",
+    "workflowName": "AI sales agent: WhatsApp, FB, IG, OpenAI, Airtable, Supabase auto-booking",
+    "description": "**This workflow automates multi-channel AI-driven sales engagement for lead qualification, service information delivery, and consultation booking. It integrates WhatsApp, Facebook Messenger, Instagram DM, and an n8n chat interface with a backend CRM (Airtable), a knowledge base (Supabase), and conversational AI (OpenAI), all orchestrated by n8n.**\n\n# Tools & Services Used\n\nMessaging Platforms: WhatsApp, Facebook Messenger, Instagram DM, n8n Built-in Chat\n\nAI Core & Processing: OpenAI (GPT-4o for main agent logic, Whisper for audio transcription)\n\nCRM & Data Management: Airtable (for initial WhatsApp lead lookup, lead form submissions, and as the backend for the crmAgent sub-workflow operations)\n\nKnowledge Base: Supabase (Vector Store for technical_and_sales_knowledge tool)\n\nChat Memory: PostgreSQL (for the main AI Agent's conversation history)\n\nOrchestration & Automation: n8n (Self-hosted, utilizing Langchain community nodes)\n\nCalendar Service: Integrated via the calendarAgent sub-workflow\n\nCRM Service: Integrated via the crmAgent sub-workflow (interacting with Airtable)\n\n# Workflow Overview\n\n## This automation performs the following steps:\n\nTrigger: A new interaction is initiated through one of the following channels:\n\nA new message is received via the WhatsApp Trigger.\n\nA new message is received via the Facebook Trigger (Webhook).\n\nA new message is received via the Instagram Trigger (Webhook).\n\nA new message is received via the n8n Chat Trigger.\n\nAlternatively, a new lead is submitted via the Airtable Form Submitted Webhook.\n\nChannel-Specific Ingestion & Pre-processing:\n\n## For WhatsApp:\n\nThe system attempts to find an existing lead in Airtable using the sender's phone number.\n\nIncoming messages are routed by the Handle Message Types switch:\n\nText messages are passed to the Edit Fields - chat1 node to prepare input for the AI Agent, including any found lead information.\n\nAudio messages are processed: the WhatsApp Business Cloud node gets the media URL, the HTTP Request node downloads the audio, OpenAI transcribes it to text, and Edit Fields - chat2 prepares this transcribed text and lead information for the AI Agent.\n\nUnsupported message types trigger the Reply To User1 node to send a notification that the message type cannot be processed.\n\n## For Facebook Messenger:\n\nThe system responds to webhook verification (Respond to Webhook - facebook get) and acknowledges new messages (Respond to Webhook - facebook post).\n\nThe If is not echo - facebook node filters out messages sent by the page.\n\nThe Sales Agent Demo - typing_on node sends a typing indicator.\n\nThe Edit Fields - facebook node prepares the message text, sender ID, and Facebook-specific context for the AI Agent.\n\n## For Instagram DM:\n\nThe system responds to webhook verification (Respond to Webhook - instagram get) and acknowledges new messages (Respond to Webhook - instagram post).\n\nThe If is not echo - instagram node filters out messages sent by the business account.\n\nThe Edit Fields - instagram node prepares the message text, sender ID, and Instagram-specific context for the AI Agent.\n\n## For n8n Chat:\n\nThe Edit Fields - chat node prepares the user's input and session information for the AI Agent.\n\n## Input Aggregation for AI Agent:\n\nProcessed data from all active messaging channels (WhatsApp text/audio, Facebook, Instagram, n8n Chat) is funneled through the No Operation, do nothing node to the main AI Agent.\n\n## AI Sales Conversation & Tool Utilization:\n\nThe AI Agent (using OpenAI Chat Model - GPT-4o, and Postgres Chat Memory) engages the user according to its system prompt, aiming to qualify them for Paint Protection Film (PPF), Ceramic Coating, or Window Tint.\n\nThe AI Agent uses the technical_and_sales_knowledge tool (which queries the Demo Supabase vector store via Embeddings OpenAI and OpenAI Chat Model1) to provide service details and answer questions.\n\nThe AI Agent uses the crmAgent tool (a sub-workflow) to log contact details (Name, Email, service interest) and update opportunity statuses in Airtable.\n\nThe AI Agent uses the calendarAgent tool (a sub-workflow) to book consultation appointments once preferred dates/times are provided. This occurs after contact details are logged in the CRM.\n\n## Response Delivery:\n\nThe AI Agent's final textual response is passed to the Switch node.\n\nThe Switch node routes the response to the appropriate node for delivery on the original channel:\n\nReply To User for WhatsApp.\n\nFacebook Graph API - Sales Agent Demo for Facebook Messenger.\n\nInstagram Graph API - smb.sales.agent.demo for Instagram DM.\n\nOutput - chat for the n8n Chat interface.\n\n## Airtable Form Submission Processing (Separate Branch):\n\nWhen the Airtable Form Submitted webhook receives data, the Airtable node fetches the full record.\n\nThe Create Contact node creates a new contact in the Airtable 'Contacts' table.\n\nThe Edit Fields - form node prepares data for a notification.\n\nThe WhatsApp Business Cloud2 node sends a templated WhatsApp message to the lead, confirming their form submission.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Facebook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields - facebook",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Respond to Webhook - facebook post",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Respond to Webhook - facebook get",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Instagram Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook - instagram get",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Respond to Webhook - instagram post",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Edit Fields - instagram",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If is not echo - facebook",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If is not echo - instagram",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Demo Supabase",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calendar Agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "CRM Agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "sales_technique_knowledge",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "role": "toolVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Handle Message Types",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Reply To User1",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields - chat1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Reply To  User",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "role": "whatsAppTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp Business Cloud",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Edit Fields - chat2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Edit Fields - form",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Airtable Form Submitted",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sales Agent Demo - typing_on",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Facebook Graph API - Sales Agent Demo",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Instagram Graph API - smb.sales.agent.demo",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Demo Supabase1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Postgres Chat Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "sales_technique_knowledge1",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "role": "toolVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Calendar Agent1",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Edit Fields - chat",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Output - chat",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "WhatsApp Business Cloud2",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Lead",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create Contact",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

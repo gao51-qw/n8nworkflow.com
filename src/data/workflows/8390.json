@@ -1,0 +1,151 @@
+{
+  "id": 8390,
+  "slug": "8390",
+  "title": "Automate job post expiry reminders with Google Sheets, HTTP checks & Gmail",
+  "description": "## Job post expiry & refresh reminders from Google Sheets using HTTP Last‑Modified checks\n\nThis workflow checks each job URL in your Google Sheet and identifies listings that look **stale** based on the page’s **Last‑Modified** date. At **10:00 Asia/Kolkata** every day, it requests each URL (HEAD, then GET if needed), calculates the **age in days**, and sends a **polite email reminder** to the recruiter when age ≥ a configurable threshold (default **30 days**). It includes a **DRY_RUN** mode to preview who would be emailed, and conservative rate limits for both HTTP requests and email sends.\n\n## Who’s it for\n\n- Recruitment teams maintaining job links on external boards/career sites.\n- Coordinators who want a daily, hands‑off nudge to **refresh** or **unlist** outdated posts.\n- Teams using **Google Sheets** to store job URLs and owner contacts.\n\n## How it works\n\n1. **Cron (10:00 IST)** triggers daily.\n2. **Google Sheets** reads the `Job Posts` tab (`job_url, recruiter_name, recruiter_email`).\n3. **Validate rows** (URL + email format, weekend rule via config).\n4. **HTTP HEAD** to fetch headers; if `Last-Modified` missing, **HTTP GET** and parse common meta tags (`article:modified_time`, `og:updated_time`, `lastmod`, `dateModified`).\n5. **Compute age** (days since last modified in your configured timezone). If `age_days ≥ THRESHOLD_DAYS`, prepare a personalized email using templates.\n6. **DRY_RUN?** If true, output a preview; if false, **rate‑limit** and send emails via SMTP.\n\n## How to set up\n\n1. **Create the Sheet**\n\t- Tab name: **`Job Posts`**\n\t- Columns: `job_url, recruiter_name, recruiter_email`\n2. **Credentials in n8n**\n\t- **Google Sheets (OAuth)**\n\t- **SMTP (Gmail)** (use an app password if 2FA)\n3. **Open “Set: Config”** and set:\n\t- `SPREADSHEET_ID` = your Sheet ID\n\t- `SOURCE_SHEET` = `Job Posts`\n\t- `TIMEZONE` = `Asia/Kolkata`\n\t- `THRESHOLD_DAYS` = `30` (change if needed)\n\t- `USER_AGENT` = `n8n-job-checker/1.0`\n\t- `HTTP_TIMEOUT_SECONDS` = `10`\n\t- `HTTP_RETRIES` = `2`\n\t- `RATE_LIMIT_HTTP_SECONDS` = `5`\n\t- `RATE_LIMIT_EMAIL_SECONDS` = `2`\n\t- `SMTP_FROM` = sender email (e.g., `hiring-ops@company.com`)\n\t- `SUBJECT_TEMPLATE`, `HTML_TEMPLATE`, `TEXT_TEMPLATE` (placeholders: `{{recruiter_name}}`, `{{job_url}}`, `{{age_days}}`, `{{last_modified}}`)\n\t- `INCLUDE_WEEKENDS` = `true`\n\t- `DRY_RUN` = `false` (set `true` to preview)\n4. **Activate** the workflow.\n\n## Requirements\n\n- Google Sheet with `Job Posts` tab and required columns.\n- SMTP (Gmail) account to send emails.\n- n8n (cloud or self‑hosted) with Google Sheets + SMTP credentials.\n\n## How to customize\n\n- **Threshold:** Change `THRESHOLD_DAYS` (e.g., 15, 45).\n- **Schedule:** Adjust the Cron time from 10:00 IST to your preferred hour.\n- **Templates:** Edit `SUBJECT_TEMPLATE`, `HTML_TEMPLATE`, and `TEXT_TEMPLATE`.\n- **Rate limits:** Tune `RATE_LIMIT_HTTP_SECONDS` and `RATE_LIMIT_EMAIL_SECONDS` for your environment.\n- **Weekend behavior:** Toggle `INCLUDE_WEEKENDS`.\n- **Preview runs:** Use `DRY_RUN=true` to check recipients before real sends.\n\n## Add‑ons\n\n- **Helper columns:** Write back `last_modified_http`, `age_days`, `reminder_sent_at`, `last_checked_at`, `notes` to the sheet.\n- **Per‑row override:** Add `threshold_days` column to override the global threshold per job.\n- **Slack notifications:** DM the recruiter or a channel in addition to (or instead of) email.\n- **One‑time reminders:** Email only once until the page updates (track `reminder_sent_at`).\n- **Robots/backoff:** Respect robots.txt or add exponential backoff for high‑traffic sites.\n\n## Use Case Examples\n\n- **Career site posts** that haven’t been updated in 30+ days. Remind owners to refresh copy or close the listing.\n- **Third‑party boards** (e.g., niche communities) where Last‑Modified is available — automate hygiene checks.\n- **Agency partnership links** — ensure outdated roles aren’t left live, protecting brand experience.\n\n## Common troubleshooting\n\n| Issue | Possible Cause | Solution |\n| --- | --- | --- |\n| No emails sent | `DRY_RUN` is `true` | Set `DRY_RUN=false` to actually send. |\n| Rows skipped | Invalid/missing `job_url` or `recruiter_email` | Fix the row values; ensure valid URL and email. |\n| “Stale” not detected | Page has no `Last-Modified` header and no recognizable meta tags | Add manual review; consider the **Helper columns** add‑on to log missing dates, or track `first_seen_at`. |\n| Wrong time math | Timezone mismatch | Confirm `TIMEZONE=Asia/Kolkata` (or your TZ) in Set: Config. |\n| Too many requests | Sites rate‑limit frequent checks | Increase `RATE_LIMIT_HTTP_SECONDS`; consider running less frequently. |\n| Emails fail to send | SMTP auth or quota issues | Verify SMTP credentials, sender address, and provider limits; try a different sender or schedule. |\n\n\n## Need Help?\nIf you’d like help tailoring the templates, adding Slack notifications or writing back helper columns for audit, just message us at WeblineIndia and we will be happy to help you get this running smoothly.",
+  "featuredImage": "/data/workflows/8390/8390.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "HR"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 228,
+  "downloads": 22,
+  "createdAt": "2025-09-08T18:56:51.977Z",
+  "updatedAt": "2026-01-16T08:55:33.423Z",
+  "publishedAt": "2025-09-08T18:56:51.977Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8390",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate job post expiry reminders with Google Sheets, HTTP checks & Gmail",
+    "workflowName": "Automate job post expiry reminders with Google Sheets, HTTP checks & Gmail",
+    "description": "## Job post expiry & refresh reminders from Google Sheets using HTTP Last‑Modified checks\n\nThis workflow checks each job URL in your Google Sheet and identifies listings that look **stale** based on the page’s **Last‑Modified** date. At **10:00 Asia/Kolkata** every day, it requests each URL (HEAD, then GET if needed), calculates the **age in days**, and sends a **polite email reminder** to the recruiter when age ≥ a configurable threshold (default **30 days**). It includes a **DRY_RUN** mode to preview who would be emailed, and conservative rate limits for both HTTP requests and email sends.\n\n## Who’s it for\n\n- Recruitment teams maintaining job links on external boards/career sites.\n- Coordinators who want a daily, hands‑off nudge to **refresh** or **unlist** outdated posts.\n- Teams using **Google Sheets** to store job URLs and owner contacts.\n\n## How it works\n\n1. **Cron (10:00 IST)** triggers daily.\n2. **Google Sheets** reads the `Job Posts` tab (`job_url, recruiter_name, recruiter_email`).\n3. **Validate rows** (URL + email format, weekend rule via config).\n4. **HTTP HEAD** to fetch headers; if `Last-Modified` missing, **HTTP GET** and parse common meta tags (`article:modified_time`, `og:updated_time`, `lastmod`, `dateModified`).\n5. **Compute age** (days since last modified in your configured timezone). If `age_days ≥ THRESHOLD_DAYS`, prepare a personalized email using templates.\n6. **DRY_RUN?** If true, output a preview; if false, **rate‑limit** and send emails via SMTP.\n\n## How to set up\n\n1. **Create the Sheet**\n\t- Tab name: **`Job Posts`**\n\t- Columns: `job_url, recruiter_name, recruiter_email`\n2. **Credentials in n8n**\n\t- **Google Sheets (OAuth)**\n\t- **SMTP (Gmail)** (use an app password if 2FA)\n3. **Open “Set: Config”** and set:\n\t- `SPREADSHEET_ID` = your Sheet ID\n\t- `SOURCE_SHEET` = `Job Posts`\n\t- `TIMEZONE` = `Asia/Kolkata`\n\t- `THRESHOLD_DAYS` = `30` (change if needed)\n\t- `USER_AGENT` = `n8n-job-checker/1.0`\n\t- `HTTP_TIMEOUT_SECONDS` = `10`\n\t- `HTTP_RETRIES` = `2`\n\t- `RATE_LIMIT_HTTP_SECONDS` = `5`\n\t- `RATE_LIMIT_EMAIL_SECONDS` = `2`\n\t- `SMTP_FROM` = sender email (e.g., `hiring-ops@company.com`)\n\t- `SUBJECT_TEMPLATE`, `HTML_TEMPLATE`, `TEXT_TEMPLATE` (placeholders: `{{recruiter_name}}`, `{{job_url}}`, `{{age_days}}`, `{{last_modified}}`)\n\t- `INCLUDE_WEEKENDS` = `true`\n\t- `DRY_RUN` = `false` (set `true` to preview)\n4. **Activate** the workflow.\n\n## Requirements\n\n- Google Sheet with `Job Posts` tab and required columns.\n- SMTP (Gmail) account to send emails.\n- n8n (cloud or self‑hosted) with Google Sheets + SMTP credentials.\n\n## How to customize\n\n- **Threshold:** Change `THRESHOLD_DAYS` (e.g., 15, 45).\n- **Schedule:** Adjust the Cron time from 10:00 IST to your preferred hour.\n- **Templates:** Edit `SUBJECT_TEMPLATE`, `HTML_TEMPLATE`, and `TEXT_TEMPLATE`.\n- **Rate limits:** Tune `RATE_LIMIT_HTTP_SECONDS` and `RATE_LIMIT_EMAIL_SECONDS` for your environment.\n- **Weekend behavior:** Toggle `INCLUDE_WEEKENDS`.\n- **Preview runs:** Use `DRY_RUN=true` to check recipients before real sends.\n\n## Add‑ons\n\n- **Helper columns:** Write back `last_modified_http`, `age_days`, `reminder_sent_at`, `last_checked_at`, `notes` to the sheet.\n- **Per‑row override:** Add `threshold_days` column to override the global threshold per job.\n- **Slack notifications:** DM the recruiter or a channel in addition to (or instead of) email.\n- **One‑time reminders:** Email only once until the page updates (track `reminder_sent_at`).\n- **Robots/backoff:** Respect robots.txt or add exponential backoff for high‑traffic sites.\n\n## Use Case Examples\n\n- **Career site posts** that haven’t been updated in 30+ days. Remind owners to refresh copy or close the listing.\n- **Third‑party boards** (e.g., niche communities) where Last‑Modified is available — automate hygiene checks.\n- **Agency partnership links** — ensure outdated roles aren’t left live, protecting brand experience.\n\n## Common troubleshooting\n\n| Issue | Possible Cause | Solution |\n| --- | --- | --- |\n| No emails sent | `DRY_RUN` is `true` | Set `DRY_RUN=false` to actually send. |\n| Rows skipped | Invalid/missing `job_url` or `recruiter_email` | Fix the row values; ensure valid URL and email. |\n| “Stale” not detected | Page has no `Last-Modified` header and no recognizable meta tags | Add manual review; consider the **Helper columns** add‑on to log missing dates, or track `first_seen_at`. |\n| Wrong time math | Timezone mismatch | Confirm `TIMEZONE=Asia/Kolkata` (or your TZ) in Set: Config. |\n| Too many requests | Sites rate‑limit frequent checks | Increase `RATE_LIMIT_HTTP_SECONDS`; consider running less frequently. |\n| Emails fail to send | SMTP auth or quota issues | Verify SMTP credentials, sender address, and provider limits; try a different sender or schedule. |\n\n\n## Need Help?\nIf you’d like help tailoring the templates, adding Slack notifications or writing back helper columns for audit, just message us at WeblineIndia and we will be happy to help you get this running smoothly.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Fetch Job URLs",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Filter Invalid Rows",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait Before HTTP",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Is Age ≥ THRESHOLD_DAYS?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "calculate Age",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log Invalid Rows",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check Weekend",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Weekend Filter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Log weekend skip",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "configuration sheet",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "configure mapping",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "id": 7766,
+  "slug": "7766",
+  "title": "Send automated recruitment rejection email at end-of-day (Google Sheets | Gmail)",
+  "description": "# Send Automated Recruitment Rejection Emails with Google Sheets and Gmail at End-of-Day.\n\nAutomatically reads a “Candidate Status” tab in Google Sheets every day at 18:00 Asia/Kolkata, filters rows with exact (case-sensitive) rejection statuses and sends one personalized rejection email per candidate via SMTP (Gmail). It rate-limits sends, supports DRY\\_RUN previews and writes a timestamp back to `rejection_sent_at` to avoid duplicates.\n\n## Who’s it for\n\n* Recruiters needing consistent, respectful closure at day end.\n* Teams tracking hiring outcomes in Google Sheets.\n* Coordinators who prefer a scheduled, hands-off workflow with safeguards.\n\n## How it works\n\n1. **Cron (18:00 IST)** triggers daily\n2. **Google Sheets Read** → loads **Candidate Status** tab\n3. **Filter** → keep rows where `status` `REJECT_STATUS_CSV` (exact match), with valid `candidate_email` and empty `rejection_sent_at`\n4. **DRY\\RUN?** If true → output preview only; if false → proceed\n5. **Rate limit** → wait `RATE_LIMIT_SECONDS` (default 10s) between emails\n6. **SMTP (Gmail)** → send personalized email per row using templates\n7. **Mark as sent** → write current timestamp to `rejection_sent_at`\n\n## How to set up\n\n* **Sheet & Columns**: Create “Candidate Status” tab with:\n`candidate_name, candidate_email, role, status, recruiter_name, recruiter_email, company_name, interview_feedback (optional), template_variant (optional), language (optional), rejection_sent_at`\n* **Credentials**: Connect **Google Sheets (OAuth)** and **SMTP (Gmail)** in n8n (use App Password if 2FA)\n* **Config (Set node)**:\n\t* `SPREADSHEET_ID`\n\t* `SOURCE_SHEET` = `Candidate Status`\n\t* `TIMEZONE` = `Asia/Kolkata`\n\t* `REJECT_STATUS_CSV` = e.g., `Rejected`\n\t* `SMTP_FROM` = e.g., `careers@company.com`\n\t* `SUBJECT_TEMPLATE` = `Regarding your application for {{role}} at {{company_name}}`\n\t* `HTML_TEMPLATE` / `TEXT_TEMPLATE`\n\t* `RATE_LIMIT_SECONDS` = `10`\n\t* `INCLUDE_WEEKENDS` = `true`\n\t* `DRY_RUN` = `false`\n* **Activate**: Enable the workflow\n\n## Requirements\n\n* Google Sheet with the “Candidate Status” tab and columns above.\n* SMTP (Gmail) account for sending.\n* n8n (cloud or self-hosted) with Google Sheets + SMTP credentials.\n\n## How to customize\n\n* **Statuses**: `REJECT_STATUS_CSV` supports comma-separated exact values (e.g., `Rejected,Not Selected`)\n* **Templates**: Edit `SUBJECT_TEMPLATE`, `HTML_TEMPLATE`, `TEXT_TEMPLATE`\n\n* **Variables:** `{{candidate_name}}`, `{{role}}`, `{{company_name}}`, `{{recruiter_name}}`, and optional `{{feedback_text}}`/`{{feedback_html}}` from `interview_feedback`\n* **Schedule**: Change Cron time from 18:00 to your preferred hour\n* **Rate limit**: Tune `RATE_LIMIT_SECONDS` for SMTP policy\n* **Preview**: Set `DRY_RUN=true` for a safe, no-send preview\n\n## Add-ons\n\n* **Dynamic Reply-To** per `recruiter_email`\n* **Localization/Variants** via `language` or `template_variant` columns\n* **Daily summary** email: sent/skip/error counts\n* **Validation & logging**: log invalid emails to another tab\n* **Gmail API**: swap SMTP with Gmail nodes if preferred\n\n## Use Case Examples\n\n* **Daily round-up**: 18:00 IST closure emails for all candidates marked `Rejected` today\n* **Multi-brand hiring**: Switch `company_name` per row and personalize subject lines\n* **Compliance/logging**: DRY\\RUN each afternoon, review, then flip to live sends\n\n## Common troubleshooting\n\n* **No emails sent**: Ensure `status` exactly matches `REJECT_STATUS_CSV` (case-sensitive) and `candidate_email` is present\n* **Duplicates**: Verify `rejection_sent_at` is blank before run; workflow sets it after sending\n* **Blank variables**: Fill `candidate_name`, `role`, `company_name`, `recruiter_name` in the sheet\n* **SMTP errors**: Check credentials, sender permissions, and daily limits\n* **Timing**: Confirm workflow timezone `Asia/Kolkata` and Cron = 18:00\n\n### Need Help?\n\nWant us to tailor the template, add a summary report or wire up company-based variants? Contact our [n8n automation engineers](https://www.weblineindia.com/hire-n8n-developers/) at WeblineIndia and we’ll plug it in.",
+  "featuredImage": "/data/workflows/7766/7766.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 327,
+  "downloads": 32,
+  "createdAt": "2025-08-23T11:21:11.807Z",
+  "updatedAt": "2026-01-16T08:52:17.757Z",
+  "publishedAt": "2025-08-23T11:21:11.807Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7766",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Send automated recruitment rejection email at end-of-day (Google Sheets | Gmail)",
+    "workflowName": "Send automated recruitment rejection email at end-of-day (Google Sheets | Gmail)",
+    "description": "# Send Automated Recruitment Rejection Emails with Google Sheets and Gmail at End-of-Day.\n\nAutomatically reads a “Candidate Status” tab in Google Sheets every day at 18:00 Asia/Kolkata, filters rows with exact (case-sensitive) rejection statuses and sends one personalized rejection email per candidate via SMTP (Gmail). It rate-limits sends, supports DRY\\_RUN previews and writes a timestamp back to `rejection_sent_at` to avoid duplicates.\n\n## Who’s it for\n\n* Recruiters needing consistent, respectful closure at day end.\n* Teams tracking hiring outcomes in Google Sheets.\n* Coordinators who prefer a scheduled, hands-off workflow with safeguards.\n\n## How it works\n\n1. **Cron (18:00 IST)** triggers daily\n2. **Google Sheets Read** → loads **Candidate Status** tab\n3. **Filter** → keep rows where `status` `REJECT_STATUS_CSV` (exact match), with valid `candidate_email` and empty `rejection_sent_at`\n4. **DRY\\RUN?** If true → output preview only; if false → proceed\n5. **Rate limit** → wait `RATE_LIMIT_SECONDS` (default 10s) between emails\n6. **SMTP (Gmail)** → send personalized email per row using templates\n7. **Mark as sent** → write current timestamp to `rejection_sent_at`\n\n## How to set up\n\n* **Sheet & Columns**: Create “Candidate Status” tab with:\n`candidate_name, candidate_email, role, status, recruiter_name, recruiter_email, company_name, interview_feedback (optional), template_variant (optional), language (optional), rejection_sent_at`\n* **Credentials**: Connect **Google Sheets (OAuth)** and **SMTP (Gmail)** in n8n (use App Password if 2FA)\n* **Config (Set node)**:\n\t* `SPREADSHEET_ID`\n\t* `SOURCE_SHEET` = `Candidate Status`\n\t* `TIMEZONE` = `Asia/Kolkata`\n\t* `REJECT_STATUS_CSV` = e.g., `Rejected`\n\t* `SMTP_FROM` = e.g., `careers@company.com`\n\t* `SUBJECT_TEMPLATE` = `Regarding your application for {{role}} at {{company_name}}`\n\t* `HTML_TEMPLATE` / `TEXT_TEMPLATE`\n\t* `RATE_LIMIT_SECONDS` = `10`\n\t* `INCLUDE_WEEKENDS` = `true`\n\t* `DRY_RUN` = `false`\n* **Activate**: Enable the workflow\n\n## Requirements\n\n* Google Sheet with the “Candidate Status” tab and columns above.\n* SMTP (Gmail) account for sending.\n* n8n (cloud or self-hosted) with Google Sheets + SMTP credentials.\n\n## How to customize\n\n* **Statuses**: `REJECT_STATUS_CSV` supports comma-separated exact values (e.g., `Rejected,Not Selected`)\n* **Templates**: Edit `SUBJECT_TEMPLATE`, `HTML_TEMPLATE`, `TEXT_TEMPLATE`\n\n* **Variables:** `{{candidate_name}}`, `{{role}}`, `{{company_name}}`, `{{recruiter_name}}`, and optional `{{feedback_text}}`/`{{feedback_html}}` from `interview_feedback`\n* **Schedule**: Change Cron time from 18:00 to your preferred hour\n* **Rate limit**: Tune `RATE_LIMIT_SECONDS` for SMTP policy\n* **Preview**: Set `DRY_RUN=true` for a safe, no-send preview\n\n## Add-ons\n\n* **Dynamic Reply-To** per `recruiter_email`\n* **Localization/Variants** via `language` or `template_variant` columns\n* **Daily summary** email: sent/skip/error counts\n* **Validation & logging**: log invalid emails to another tab\n* **Gmail API**: swap SMTP with Gmail nodes if preferred\n\n## Use Case Examples\n\n* **Daily round-up**: 18:00 IST closure emails for all candidates marked `Rejected` today\n* **Multi-brand hiring**: Switch `company_name` per row and personalize subject lines\n* **Compliance/logging**: DRY\\RUN each afternoon, review, then flip to live sends\n\n## Common troubleshooting\n\n* **No emails sent**: Ensure `status` exactly matches `REJECT_STATUS_CSV` (case-sensitive) and `candidate_email` is present\n* **Duplicates**: Verify `rejection_sent_at` is blank before run; workflow sets it after sending\n* **Blank variables**: Fill `candidate_name`, `role`, `company_name`, `recruiter_name` in the sheet\n* **SMTP errors**: Check credentials, sender permissions, and daily limits\n* **Timing**: Confirm workflow timezone `Asia/Kolkata` and Cron = 18:00\n\n### Need Help?\n\nWant us to tailor the template, add a summary report or wire up company-based variants? Contact our [n8n automation engineers](https://www.weblineindia.com/hire-n8n-developers/) at WeblineIndia and we’ll plug it in.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set: Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check Weekend Policy",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Weekend Skip Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Candidates for Rejection",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Is Dry Run?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Dry Run Preview",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process Email Template",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Has Candidates to Email?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No Candidates Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Rate Limit Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Log Success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Mark as Sent in Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Send Rejection Email1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Fetch Candidate Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "id": 2335,
+  "slug": "2335",
+  "title": "Build a financial documents assistant using Qdrant and Mistral.ai",
+  "description": "This n8n workflow demonstrates how to manage your Qdrant vector store when there is a need to keep it in sync with local files. It covers creating, updating and deleting vector store records ensuring our chatbot assistant is never outdated or misleading.\n\n## Disclaimer\nThis workflow depends on local files accessed through the local filesystem and so will only work on a self-hosted version of n8n at this time. It is possible to amend this workflow to work on n8n cloud by replacing the local file trigger and read file nodes.\n\n## How it works\n* A local directory where bank statements are downloaded to is monitored via a local file trigger. The trigger watches for the file create, file changed and file deleted events.\n* When a file is created, its contents are uploaded to the vector store.\n* When a file is updated, its previous records are replaced.\n* When the file is deleted, the corresponding records are also removed from the vector store.\n* A simple Question and Answer Chatbot is setup to answer any questions about the bank statements in the system.\n\n## Requirements\n* A self-hosted version of n8n. Some of the nodes used in this workflow only work with the local filesystem.\n* Qdrant instance to store the records.\n\n## Customising the workflow\n\nThis workflow can also work with remote data. Try integrating accounting or CRM software to build a managed system for payroll, invoices and more.\n\n## Want to go fully local?\n\nA version of this workflow is available which uses Ollama instead. You can download this template here: https://drive.google.com/file/d/189F1fNOiw6naNSlSwnyLVEm_Ho_IFfdM/view?usp=sharing",
+  "featuredImage": "/data/workflows/2335/2335.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 18963,
+  "downloads": 1896,
+  "createdAt": "2024-07-10T15:09:06.891Z",
+  "updatedAt": "2026-01-16T08:24:05.940Z",
+  "publishedAt": "2024-07-10T15:09:06.891Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2335",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a financial documents assistant using Qdrant and Mistral.ai",
+    "workflowName": "Build a financial documents assistant using Qdrant and Mistral.ai",
+    "description": "This n8n workflow demonstrates how to manage your Qdrant vector store when there is a need to keep it in sync with local files. It covers creating, updating and deleting vector store records ensuring our chatbot assistant is never outdated or misleading.\n\n## Disclaimer\nThis workflow depends on local files accessed through the local filesystem and so will only work on a self-hosted version of n8n at this time. It is possible to amend this workflow to work on n8n cloud by replacing the local file trigger and read file nodes.\n\n## How it works\n* A local directory where bank statements are downloaded to is monitored via a local file trigger. The trigger watches for the file create, file changed and file deleted events.\n* When a file is created, its contents are uploaded to the vector store.\n* When a file is updated, its previous records are replaced.\n* When the file is deleted, the corresponding records are also removed from the vector store.\n* A simple Question and Answer Chatbot is setup to answer any questions about the bank statements in the system.\n\n## Requirements\n* A self-hosted version of n8n. Some of the nodes used in this workflow only work with the local filesystem.\n* Qdrant instance to store the records.\n\n## Customising the workflow\n\nThis workflow can also work with remote data. Try integrating accounting or CRM software to build a managed system for payroll, invoices and more.\n\n## Want to go fully local?\n\nA version of this workflow is available which uses Ollama instead. You can download this template here: https://drive.google.com/file/d/189F1fNOiw6naNSlSwnyLVEm_Ho_IFfdM/view?usp=sharing",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Local File Trigger",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "role": "localFileTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Read File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Mistral Cloud",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Embedding Document",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Question and Answer Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "role": "chainRetrievalQa",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "role": "lmChatMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "role": "retrieverVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Mistral Cloud1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remap for File_Added Flow",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Search For Existing Point",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Has Existing Point?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete Existing Point",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Search For Existing Point1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Has Existing Point?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete Existing Point1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Handle File Event",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    }
+  ]
+}

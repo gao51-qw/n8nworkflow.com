@@ -1,0 +1,236 @@
+{
+  "id": 10189,
+  "slug": "10189",
+  "title": "Employee time tracking system with GPT-4o reports & Gmail notifications",
+  "description": "### Overview\nThis workflow acts as an **AI-powered smart time tracker** for employees or personal use.  \nIt records work sessions via a webhook, logs start/end/break times into n8n Data Tables,  \nand uses **OpenAI** to automatically summarize working patterns and send reminders or monthly reports via Gmail.\n\n---\n\n### How It Works\n1. **Webhook `/track-time`** → Receives a `POST` request with a `method` (`start`, `break`, or `end`) and duration if applicable.  \n2. **Switch Logic** → Directs the request to create or update the appropriate record in your Data Table.  \n3. **Data Tables** → Store timestamps, break durations, and worker IDs in a secure local table.  \n4. **Schedule Triggers**  \n   - **Daily (10:00)** → Checks if today’s shift was not started and sends a reminder.  \n   - **Monthly (Day 1, 06:00)** → Compiles last month’s working data and sends an AI report to management.  \n5. **OpenAI Analysis**  \n   - Summarizes working hours and productivity trends.  \n   - Detects missed clock-ins or irregular patterns.  \n6. **Gmail Integration** → Sends formatted daily or monthly reports to both employees and supervisors.\n\n---\n\n### Example Webhook Requests\n```json\n# Start work\nPOST /track-time\n{\n  \"method\": \"start\",\n  \"headers\": { \"id\": \"EMP001\" }\n}\n\n# Log a break\nPOST /track-time\n{\n  \"method\": \"break\",\n  \"duration\": 15,\n  \"headers\": { \"id\": \"EMP001\" }\n}\n\n# End work\nPOST /track-time\n{\n  \"method\": \"end\",\n  \"headers\": { \"id\": \"EMP001\" }\n}\n\n# Example Email Output\n\nSubject: “Workday Summary – EMP001”\n\n🕒 Workday completed successfully  \nStart: 09:00  \nBreak: 15 minutes  \nEnd: 17:45  \n\nAI Summary:\nConsistent work pattern detected this week. Consider shorter but more frequent breaks.\n",
+  "featuredImage": "/data/workflows/10189/10189.webp",
+  "author": {
+    "id": 101,
+    "slug": "j4ssn3o",
+    "name": "Jose Castillo",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 207,
+  "downloads": 20,
+  "createdAt": "2025-10-26T07:06:26.641Z",
+  "updatedAt": "2026-01-16T09:03:54.259Z",
+  "publishedAt": "2025-10-26T07:06:26.641Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10189",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Employee time tracking system with GPT-4o reports & Gmail notifications",
+    "workflowName": "Employee time tracking system with GPT-4o reports & Gmail notifications",
+    "description": "This workflow acts as an **AI-powered smart time tracker** for employees or personal use.  \nIt records work sessions via a webhook, logs start/end/break times into n8n Data Tables,  \nand uses **OpenAI** to automatically summarize working patterns and send reminders or monthly reports via Gmail.\n\n---\n\n### How It Works\n1. **Webhook `/track-time`** → Receives a `POST` request with a `method` (`start`, `break`, or `end`) and duration if applicable.  \n2. **Switch Logic** → Directs the request to create or update the appropriate record in your Data Table.  \n3. **Data Tables** → Store timestamps, break durations, and worker IDs in a secure local table.  \n4. **Schedule Triggers**  \n   - **Daily (10:00)** → Checks if today’s shift was not started and sends a reminder.  \n   - **Monthly (Day 1, 06:00)** → Compiles last month’s working data and sends an AI report to management.  \n5. **OpenAI Analysis**  \n   - Summarizes working hours and productivity trends.  \n   - Detects missed clock-ins or irregular patterns.  \n6. **Gmail Integration** → Sends formatted daily or monthly reports to both employees and supervisors.\n\n---\n\n### Example Webhook Requests\n```json\n# Start work\nPOST /track-time\n{\n  \"method\": \"start\",\n  \"headers\": { \"id\": \"EMP001\" }\n}\n\n# Log a break\nPOST /track-time\n{\n  \"method\": \"break\",\n  \"duration\": 15,\n  \"headers\": { \"id\": \"EMP001\" }\n}\n\n# End work\nPOST /track-time\n{\n  \"method\": \"end\",\n  \"headers\": { \"id\": \"EMP001\" }\n}\n\n# Example Email Output\n\nSubject: “Workday Summary – EMP001”\n\n🕒 Workday completed successfully  \nStart: 09:00  \nBreak: 15 minutes  \nEnd: 17:45  \n\nAI Summary:\nConsistent work pattern detected this week. Consider shorter but more frequent breaks.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Set Break Duration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook - Track Time",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get row(s)",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update row(s)",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ERROR",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Insert row",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get row(s)2",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update row(s)1",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ERROR1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "end",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message a model1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ANALYZE TIME ENTRIES",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ANALYZE ENTIRE MONTH",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "EVERY DAY",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "EVERY MONTH",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "EMAIL TO EMPLOYEE",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "EMAIL TO MANAGEMENT",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "MESSAGE",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "MESSAGE1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "MESSAGE2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

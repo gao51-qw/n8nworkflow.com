@@ -1,0 +1,212 @@
+{
+  "id": 6894,
+  "slug": "6894",
+  "title": "Chat with internal documents using Ollama, Supabase Vector DB & Google Drive",
+  "description": "# 📚 Chat with Internal Documents (RAG AI Agent)\n## ✅ Features\n- Answers should given only within provided text.\n- Chat interface powered by LLM (Ollama)\n- Retrieval-Augmented Generation (RAG) using Supabase Vector DB\n- Multi-format file support (PDF, Excel, Google Docs, text files)\n- Automated file ingestion from Google Drive\n- Real-time document update handling\n- Embedding generation via Ollama for semantic search\n- Memory-enabled agent using PostgreSQL\n- Custom tools for document lookup with context-aware chat\n\n## ⚙️ How It Works\n### 📥 Document Ingestion & Vectorization\nWatches a Google Drive folder for new or updated files.\n\nDeletes old vector entries for the file.\n\nUses conditional logic to extract content from PDFs, Excel, Docs, or text\n\nSummarizes and preprocesses content. (if needed)\n\nSplits and embeds the text via Ollama.\n\nStores embeddings in Supabase Vector DB\n\n### 💬 RAG Chat Agent\nChat is initiated via Webhook or built-in chat interface.\n\nUser input is passed to the RAG Agent.\n\nAgent queries the User_documents tool (Supabase vector store) using the Ollama model to fetch relevant content.\n\nIf context is found, it answers directly.\n\nOtherwise, it can call tools or request clarification.\n\nResponses are returned to the user, with memory stored in PostgreSQL for continuity.\n\n## 🛠 Supabase Database Configuration\n1. Create a Supabase project at https://supabase.com and go to the SQL editor.\n\n2. Create a documents table with the following schema:\n- id - int8\n- content\t- text\n- metadata - jsonb\n- embedding - vector\n\n3. Generate an API Key\n",
+  "featuredImage": "/data/workflows/6894/6894.webp",
+  "author": {
+    "id": 101,
+    "slug": "laki99",
+    "name": "Lakindu Siriwardana",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1625,
+  "downloads": 162,
+  "createdAt": "2025-08-02T14:57:44.198Z",
+  "updatedAt": "2026-01-16T08:47:25.413Z",
+  "publishedAt": "2025-08-02T14:57:44.198Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6894",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Chat with internal documents using Ollama, Supabase Vector DB & Google Drive",
+    "workflowName": "Chat with internal documents using Ollama, Supabase Vector DB & Google Drive",
+    "description": "# 📚 Chat with Internal Documents (RAG AI Agent)\n## ✅ Features\n- Answers should given only within provided text.\n- Chat interface powered by LLM (Ollama)\n- Retrieval-Augmented Generation (RAG) using Supabase Vector DB\n- Multi-format file support (PDF, Excel, Google Docs, text files)\n- Automated file ingestion from Google Drive\n- Real-time document update handling\n- Embedding generation via Ollama for semantic search\n- Memory-enabled agent using PostgreSQL\n- Custom tools for document lookup with context-aware chat\n\n## ⚙️ How It Works\n### 📥 Document Ingestion & Vectorization\nWatches a Google Drive folder for new or updated files.\n\nDeletes old vector entries for the file.\n\nUses conditional logic to extract content from PDFs, Excel, Docs, or text\n\nSummarizes and preprocesses content. (if needed)\n\nSplits and embeds the text via Ollama.\n\nStores embeddings in Supabase Vector DB\n\n### 💬 RAG Chat Agent\nChat is initiated via Webhook or built-in chat interface.\n\nUser input is passed to the RAG Agent.\n\nAgent queries the User_documents tool (Supabase vector store) using the Ollama model to fetch relevant content.\n\nIf context is found, it answers directly.\n\nOtherwise, it can call tools or request clarification.\n\nResponses are returned to the user, with memory stored in PostgreSQL for continuity.\n\n## 🛠 Supabase Database Configuration\n1. Create a Supabase project at https://supabase.com and go to the SQL editor.\n\n2. Create a documents table with the following schema:\n- id - int8\n- content\t- text\n- metadata - jsonb\n- embedding - vector\n\n3. Generate an API Key",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "File Created",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "File Updated",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Document Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete Old Doc Rows",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set File ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RAG AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Insert into Supabase Vectorstore",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from Excel",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Ollama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "role": "embeddingsOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Ollama1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "role": "embeddingsOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Ollama Model",
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "role": "lmOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "role": "lmChatOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "User_documents",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "role": "toolVectorStore",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "id": 3811,
+  "slug": "3811",
+  "title": "Create and send multi-item PayPal invoices via email",
+  "description": "### Who Is This For?  \nSmall businesses, consultants, agencies… anyone who bills with PayPal.\n\n### What Problem Does It Solve?  \nAutomates itemized invoicing and delivery via PayPal’s Invoicing API with support for an “Add more items?” loop.\n\n### What This Workflow Does  \n1. Collects your PayPal credentials & invoice data via a form  \n2. Dynamically generates a timestamp + random 4 digit number for the invoice_number  \n3. Calls PayPal to create and then send the invoice  \n4. Supports endless line-items via a Switch + Merge loop.\n\n### Setup  \n1. Grab a PayPal REST App’s Client ID & Secret.  \n2. Toggle “Live or Test” to point at production vs sandbox.  \n3. **PayPal Credentials**  \n   - If you select **Test**, this workflow points at PayPal’s **sandbox** (`api-m.sandbox.paypal.com`) and **requires your sandbox** Client ID & Secret.  \n   - If you select **Live**, it points at PayPal’s **production** endpoint (`api-m.paypal.com`) and **requires your live** Client ID & Secret.  \n4. (Optional) Customize your logo, currency, default notes.\n\n### How to Customize  \n– Change the currency dropdown  \n– Tweak the invoice-number format in the “Set Invoice Number and Date” code node  \n– Swap out or style the n8n Form nodes for your own UX\n",
+  "featuredImage": "/data/workflows/3811/3811.webp",
+  "author": {
+    "id": 101,
+    "slug": "licoricewhip",
+    "name": "Andrew",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 129,
+  "downloads": 12,
+  "createdAt": "2025-05-01T02:23:34.149Z",
+  "updatedAt": "2026-01-16T08:31:34.379Z",
+  "publishedAt": "2025-05-01T02:23:34.149Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3811",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create and send multi-item PayPal invoices via email",
+    "workflowName": "Create and send multi-item PayPal invoices via email",
+    "description": "### Who Is This For?  \nSmall businesses, consultants, agencies… anyone who bills with PayPal.\n\n### What Problem Does It Solve?  \nAutomates itemized invoicing and delivery via PayPal’s Invoicing API with support for an “Add more items?” loop.\n\n### What This Workflow Does  \n1. Collects your PayPal credentials & invoice data via a form  \n2. Dynamically generates a timestamp + random 4 digit number for the invoice_number  \n3. Calls PayPal to create and then send the invoice  \n4. Supports endless line-items via a Switch + Merge loop.\n\n### Setup  \n1. Grab a PayPal REST App’s Client ID & Secret.  \n2. Toggle “Live or Test” to point at production vs sandbox.  \n3. **PayPal Credentials**  \n   - If you select **Test**, this workflow points at PayPal’s **sandbox** (`api-m.sandbox.paypal.com`) and **requires your sandbox** Client ID & Secret.  \n   - If you select **Live**, it points at PayPal’s **production** endpoint (`api-m.paypal.com`) and **requires your live** Client ID & Secret.  \n4. (Optional) Customize your logo, currency, default notes.\n\n### How to Customize  \n– Change the currency dropdown  \n– Tweak the invoice-number format in the “Set Invoice Number and Date” code node  \n– Swap out or style the n8n Form nodes for your own UX",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "PayPal | Encode Basic Auth Token",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Remove Client ID and Secret Key",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Invoice Number and Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add href link for Preview",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Get Preview URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Reformat JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add Another Item",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Add Decision",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Reformat newItem JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append newItem into items with currency_code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Collect Invoice Details",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Prompt for Additional Line-Item",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prompt for Additional Line-Item 1",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop: More Items?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Combine New Items Into Master List",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Fetch OAuth Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Call PayPal Create Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Dispatch Invoice via PayPal",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge Base Invoice & Add-Item Decision",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Merge Updated Items & Add-Item Decision",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Strip Add-Item Loop Metadata",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Invoice Creation Response & Preview Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

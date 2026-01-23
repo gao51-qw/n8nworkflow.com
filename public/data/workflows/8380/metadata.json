@@ -1,0 +1,26 @@
+{
+  "id": 8380,
+  "slug": "8380",
+  "title": "Daily currency rates email report with USD→EUR/NGN & BTC/ETH price tracking",
+  "description": "# 💰 Track Daily Fiat & Crypto Exchange Rates Report with ExchangeRate-API & CoinGecko\nA simple, reliable workflow that emails you a **beautiful HTML currency report** every morning at **8:00 AM** (your n8n server’s timezone).  \nIt pulls **USD→EUR** and **USD→NGN** fiat rates and **BTC/ETH** prices (+ 24h % change), then formats a clean HTML email.\n\n---\n\n\n## 📌 What It Does\n\n- ⏰ **Schedule:** Runs daily at 8:00 AM  \n- 🌍 **Fiat Rates:** USD→EUR and USD→NGN (via ExchangeRate-API, no key needed)  \n- ₿ **Crypto:** BTC & ETH prices + 24h change (via CoinGecko, no key needed)  \n- ✉️ **Email:** Sends a **mobile-friendly HTML** + plain text fallback\n\n---\n\n## 🗺️ Node Map (At a Glance)\n\n| # | Node Name | Type | Purpose |\n|---|-----------|------|---------|\n| 1 | **Daily 8AM Trigger** | `Schedule Trigger` | Fires every day at 08:00 |\n| 2 | **Get Fiat Exchange Rates** | `HTTP Request` | `https://api.exchangerate-api.com/v4/latest/USD` |\n| 3 | **Get Crypto Prices** | `HTTP Request` | CoinGecko simple price endpoint |\n| 4 | **Merge** | `Merge` | Combines fiat + crypto responses |\n| 5 | **Format Email Content** | `Code (v2)` | Builds HTML + text, sets subject & summary |\n| 6 | **Send Daily Currency Email** | `Email Send` | Sends the HTML email via SMTP |\n\n&gt; 📝 Sticky Notes in the canvas explain each section. They’re optional and safe to delete.\n\n---\n\n## ⚙️ Required Setup\n\n### 1) Schedule Time\n- Open **Daily 8AM Trigger** → set cron to **08:00 daily**.  \n  Suggested cron: `0 8 * * *` (server local time; if you’re in Lagos, ensure server timezone matches **Africa/Lagos** or adjust accordingly).\n\n### 2) SMTP Credentials\n- Open **Send Daily Currency Email** → set:\n  - **From Email**: your sender (e.g. `your-email@gmail.com`)  \n  - **To Email**: recipient address  \n  - **Credentials**: select your SMTP account  \n- **Gmail tip:** use **App Passwords** (with 2FA enabled).  \n  - Server: `smtp.gmail.com`  \n  - Port: `587` (STARTTLS) or `465` (SSL)  \n  - Auth: your full Gmail address + app password\n\n### 3) API Access\n- Both endpoints are **free** & **no API key**:\n  - Fiat (USD base): `https://api.exchangerate-api.com/v4/latest/USD`  \n  - Crypto (BTC/ETH): `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true`\n\n---\n\n## 🧩 Input Order\n\nThe **Format Email Content** node is written to **auto-detect** which input is fiat vs crypto, so the Merge order doesn’t matter. A clean pattern is:\n\n- **Get Crypto Prices** → **Merge** (Input 1)  \n- **Get Fiat Exchange Rates** → **Merge** (Input 2)  \n- **Merge** → **Format Email Content** → **Send Daily Currency Email**\n\n---\n\n## 🚀 Test It Quickly\n\n1. Run **Get Fiat Exchange Rates** → verify `rates.EUR` and `rates.NGN` exist.  \n2. Run **Get Crypto Prices** → verify BTC/ETH `usd` and `usd_24h_change`.  \n3. Run **Format Email Content** → check it outputs `subject`, `html`, `text`.  \n4. Run **Send Daily Currency Email** → confirm the styled report arrives.\n\n---\n\n## 🎛 Customize\n\n- **Currencies:** Add more fiat codes from `rates` (e.g., GBP, ZAR) and extend the HTML template.  \n- **Coins:** Add `ids=` in CoinGecko (e.g., `bitcoin,ethereum,solana`) and render extra cards.  \n- **Send time:** Adjust the cron (e.g., `30 7 * * *` for 7:30 AM).  \n- **Branding:** Edit colors, fonts, and header gradient in the HTML string.  \n- **Timezone stamp:** Change the display timezone inside the Code node if needed.\n\n---\n\n## 🧩 Common Pitfalls & Fixes\n\n- **Email not styled:** Ensure the Email node is set to **HTML** format.  \n- **Gmail auth fails:** Use an **App Password** and port **587** with STARTTLS.  \n- **Empty values:** Run the two HTTP nodes once and confirm the responses contain data.  \n- **Rate limits:** If you increase frequency, consider adding a short Wait node or caching.\n\n",
+  "featuredImage": "/data/workflows/8380/8380.webp",
+  "author": {
+    "id": 101,
+    "slug": "dae221",
+    "name": "David Olusola",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 238,
+  "downloads": 23,
+  "createdAt": "2025-09-08T17:56:44.502Z",
+  "updatedAt": "2026-01-16T08:55:30.453Z",
+  "publishedAt": "2025-09-08T17:56:44.502Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8380"
+}

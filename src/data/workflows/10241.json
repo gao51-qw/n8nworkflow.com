@@ -1,0 +1,182 @@
+{
+  "id": 10241,
+  "slug": "10241",
+  "title": "Automate ITSM ticket classification and resolution using Gemini, Qdrant and ServiceNow",
+  "description": "## Who’s it for\nThis template is ideal for IT support teams, internal helpdesk automation engineers, and developers building intelligent ticketing systems. It helps streamline ITSM workflows by automatically classifying user queries, retrieving relevant knowledge base entries, and triggering incident creation in ServiceNow.\n\n## How it works / What it does\nThis workflow uses Google Gemini and Qdrant to power an intelligent ITSM assistant. When a user submits a query via chat:\n\nThe Text Classifier categorizes the input as an Incident, Request, or Other.\nBased on the category:\n\nIncidents are automatically logged in ServiceNow.\nRequests trigger an HTTP call (e.g., for provisioning or access).\nOther queries are routed to an AI Agent that searches the FAQBase in Qdrant and responds contextually.\n\n\nThe Gemini LLM enriches responses and summaries.\nThe Qdrant Vector Store retrieves semantically similar answers from a pre-embedded FAQ knowledge base.\nThe Summarization Chain condenses incident details for better tracking.\n\nSticky notes are used throughout the workflow to document each node’s purpose and improve maintainability.\n\n### How to set up\n\nConnect your Google Gemini API, Qdrant, and ServiceNow credentials.\nPopulate the FAQBase collection in Qdrant with your ITSM knowledge base.\nDeploy the webhook to receive chat inputs.\nTest the flow using the Manual Trigger node.\nCustomize the classifier categories and Gemini prompts as needed.\n\n\n## Requirements\n\nGoogle Gemini API access\nQdrant vector database with embedded FAQ data\nServiceNow account with API access\nn8n instance with LangChain nodes installed\n\n\n## How to customize the workflow\n\nModify the Text Classifier categories to suit your organization’s ticket types.\nAdd more FAQ entries to Qdrant for broader coverage.\nReplace the HTTP Request node with integrations relevant to your ITSM tools.\nAdjust the Gemini prompts to reflect your tone and support style.\nExtend the workflow with Slack, Teams, or email notifications for ticket updates.",
+  "featuredImage": "/data/workflows/10241/10241.webp",
+  "author": {
+    "id": 101,
+    "slug": "nikitha-didikadi",
+    "name": "Nikitha",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1112,
+  "downloads": 111,
+  "createdAt": "2025-10-28T06:50:32.925Z",
+  "updatedAt": "2026-01-16T09:04:05.185Z",
+  "publishedAt": "2025-10-28T06:50:32.925Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10241",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate ITSM ticket classification and resolution using Gemini, Qdrant and ServiceNow",
+    "workflowName": "Automate ITSM ticket classification and resolution using Gemini, Qdrant and ServiceNow",
+    "description": "## Who’s it for\nThis template is ideal for IT support teams, internal helpdesk automation engineers, and developers building intelligent ticketing systems. It helps streamline ITSM workflows by automatically classifying user queries, retrieving relevant knowledge base entries, and triggering incident creation in ServiceNow.\n\n## How it works / What it does\nThis workflow uses Google Gemini and Qdrant to power an intelligent ITSM assistant. When a user submits a query via chat:\n\nThe Text Classifier categorizes the input as an Incident, Request, or Other.\nBased on the category:\n\nIncidents are automatically logged in ServiceNow.\nRequests trigger an HTTP call (e.g., for provisioning or access).\nOther queries are routed to an AI Agent that searches the FAQBase in Qdrant and responds contextually.\n\n\nThe Gemini LLM enriches responses and summaries.\nThe Qdrant Vector Store retrieves semantically similar answers from a pre-embedded FAQ knowledge base.\nThe Summarization Chain condenses incident details for better tracking.\n\nSticky notes are used throughout the workflow to document each node’s purpose and improve maintainability.\n\n### How to set up\n\nConnect your Google Gemini API, Qdrant, and ServiceNow credentials.\nPopulate the FAQBase collection in Qdrant with your ITSM knowledge base.\nDeploy the webhook to receive chat inputs.\nTest the flow using the Manual Trigger node.\nCustomize the classifier categories and Gemini prompts as needed.\n\n\n## Requirements\n\nGoogle Gemini API access\nQdrant vector database with embedded FAQ data\nServiceNow account with API access\nn8n instance with LangChain nodes installed\n\n\n## How to customize the workflow\n\nModify the Text Classifier categories to suit your organization’s ticket types.\nAdd more FAQ entries to Qdrant for broader coverage.\nReplace the HTTP Request node with integrations relevant to your ITSM tools.\nAdjust the Gemini prompts to reflect your tone and support style.\nExtend the workflow with Slack, Teams, or email notifications for ticket updates.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Text Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create an incident",
+      "type": "n8n-nodes-base.serviceNow",
+      "role": "serviceNow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Google Gemini1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Summarization Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "role": "chainSummarization",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

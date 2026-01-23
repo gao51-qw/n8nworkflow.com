@@ -1,0 +1,278 @@
+{
+  "id": 2566,
+  "slug": "2566",
+  "title": "Conversational interviews with AI agents and n8n forms",
+  "description": "This n8n template combines an AI agent with n8n's multi-page forms to create a novel interaction which allows automated question-and-answer sessions. One of the more obvious use-cases of this interaction is what I'm calling the AI interviewer.\n\n**You can read the full post here:** [https://community.n8n.io/t/build-your-own-ai-interview-agents-with-n8n-forms/62312](https://community.n8n.io/t/build-your-own-ai-interview-agents-with-n8n-forms/62312)\n\n**Live demo here:** [https://jimleuk.app.n8n.cloud/form/driving-lessons-survey](https://jimleuk.app.n8n.cloud/form/driving-lessons-survey)\n\n## How it works\n\n* A form trigger is used to start the interview and a new session is created in redis to capture the transcript.\n* An AI agent is then tasked to ask questions to the user regarding the topic of the interview. This is setup as a loop so the questions never stop unless the user wishes to end the interview.\n* Each answer is recorded in our session set up earlier between questions.\n* When the user requests to end the interview we break the loop and show the interview completion screen.\n* Finally, the session is then saved in a Google Sheet which can then be shared with team members and for the purpose of data analysis.\n\n## How to use\n\n* You'll need to be on a n8n instance that is accessible to your target audience. **Not technical enough to setup your own server? [Try out n8n cloud](https://n8n.partnerlinks.io/ee7izbliiw0n) and instantly deploy template!**\n* Remember to activate the workflow so the form trigger is published and available for users to use.\n\n## Requirements\n* Groq LLM for AI agent. Feel free to swap this out for any other LLM.\n* Redis(-compatible) storage for capturing sessions\n\n## Customising this workflow\n\n* The next step would be adding tools! AI interviews with knowledge retrieval could definitely open up other possibilities. Eg. An onboarding wizard generating questions by pulling facts from internal knowledgebase.\n",
+  "featuredImage": "/data/workflows/2566/2566.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 30439,
+  "downloads": 3043,
+  "createdAt": "2024-11-24T09:23:26.791Z",
+  "updatedAt": "2026-01-16T08:25:26.875Z",
+  "publishedAt": "2024-11-24T09:23:26.791Z",
+  "nodes": 40,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2566",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Conversational interviews with AI agents and n8n forms",
+    "workflowName": "Conversational interviews with AI agents and n8n forms",
+    "description": "This n8n template combines an AI agent with n8n's multi-page forms to create a novel interaction which allows automated question-and-answer sessions. One of the more obvious use-cases of this interaction is what I'm calling the AI interviewer.\n\n**You can read the full post here:** [https://community.n8n.io/t/build-your-own-ai-interview-agents-with-n8n-forms/62312](https://community.n8n.io/t/build-your-own-ai-interview-agents-with-n8n-forms/62312)\n\n**Live demo here:** [https://jimleuk.app.n8n.cloud/form/driving-lessons-survey](https://jimleuk.app.n8n.cloud/form/driving-lessons-survey)\n\n## How it works\n\n* A form trigger is used to start the interview and a new session is created in redis to capture the transcript.\n* An AI agent is then tasked to ask questions to the user regarding the topic of the interview. This is setup as a loop so the questions never stop unless the user wishes to end the interview.\n* Each answer is recorded in our session set up earlier between questions.\n* When the user requests to end the interview we break the loop and show the interview completion screen.\n* Finally, the session is then saved in a Google Sheet which can then be shared with team members and for the purpose of data analysis.\n\n## How to use\n\n* You'll need to be on a n8n instance that is accessible to your target audience. **Not technical enough to setup your own server? [Try out n8n cloud](https://n8n.partnerlinks.io/ee7izbliiw0n) and instantly deploy template!**\n* Remember to activate the workflow so the form trigger is published and available for users to use.\n\n## Requirements\n* Groq LLM for AI agent. Feel free to swap this out for any other LLM.\n* Redis(-compatible) storage for capturing sessions\n\n## Customising this workflow\n\n* The next step would be adding tools! AI interviews with knowledge retrieval could definitely open up other possibilities. Eg. An onboarding wizard generating questions by pulling facts from internal knowledgebase.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Stop Interview?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Generate Row",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Row1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Clear For Next Interview",
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "role": "memoryManager",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Reply To Agent",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Start Interview",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Answer",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Interview Topic",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "UUID",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Row2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create Session",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Session",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Session1",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Session2",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Valid Session?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Window Buffer Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Redirect to Completion Screen",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "404 Not Found",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Researcher",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "role": "lmChatGroq",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Show Transcript",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Save to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Session to List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Messages To JSON",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Query By Session",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Session",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    }
+  ]
+}

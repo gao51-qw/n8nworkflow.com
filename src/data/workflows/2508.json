@@ -1,0 +1,212 @@
+{
+  "id": 2508,
+  "slug": "2508",
+  "title": "Generate SQL queries from schema only - AI-powered",
+  "description": "This workflow is a modification of the previous template on how to [create an SQL agent with LangChain and SQLite](https://n8n.io/workflows/2292-talk-to-your-sqlite-database-with-a-langchain-ai-agent/).\n\n*The key difference* – the agent has access only to the database schema, not to the actual data. To achieve this, SQL queries are made outside the AI Agent node, and the results are never passed back to the agent.\n\nThis approach allows the agent to generate SQL queries based on the structure of tables and their relationships, without having to access the actual data.\n\nThis makes the process more secure and efficient, especially in cases where data confidentiality is crucial.\n\n### 🚀 Setup\n\nTo get started with this workflow, you’ll need to set up a free MySQL server and import your database (check Step 1 and 2 [in this tutorial](https://blog.n8n.io/compare-databases/)). \n\n*Of course, you can switch MySQL to another SQL database such as PostgreSQL, the principle remains the same. The key is to download the schema once and save it locally to avoid repeated remote connections.*\n\nRun the top part of the workflow once to download and store the MySQL chinook database schema file on the server.\n\nWith this approach, we avoid the need to repeatedly connect to a remote db4free database and fetch the schema every time. As a result, we reach greater processing speed and efficiency.\n\n### 🗣️ Chat with your data\n\n1. Start a chat: send a message in the chat window.\n2. The workflow loads the locally saved MySQL database schema, without having the ability to touch the actual data. The file contains the full structure of your MySQL database for analysis.\n3. The Langchain AI Agent receives the schema, your input and begins to work.\n4. The AI Agent generates SQL queries and brief comments based solely on the schema and the user’s message.\n5. An IF node checks whether the AI Agent has generated a query. When:\n- Yes: the AI Agent passes the SQL query to the next MySQL node for execution.\n- No: You get a direct answer from the Agent without further action.\n\n6. The workflow formats the results of the SQL query, ensuring they are convenient to read and easy to understand.\n7. Once formatted, you get both the Agent answer and the query result in the chat window.\n\n### 🌟 Example queries\n\nTry these sample queries to see the schema-driven AI Agent in action:\n\n1.  Would you please list me all customers from Germany?\n\n2.  What are the music genres in the database?\n\n3. What tables are available in the database?\n\n4. Please describe the relationships between tables. - In this example, the AI Agent does not need to create the SQL query.\n\nAnd if you prefer to keep the data private, you can manually execute the generated SQL query in your own environment using any database client or tool you trust 🗄️\n\n💭 The AI Agent memory node does not store the actual data as we run SQL-queries outside the agent. It contains the database schema, user questions and the initial Agent reply. Actual SQL query results are passed to the chat window, but the values are not stored in the Agent memory.\n",
+  "featuredImage": "/data/workflows/2508/2508.webp",
+  "author": {
+    "id": 101,
+    "slug": "yulia",
+    "name": "Yulia",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 51857,
+  "downloads": 5185,
+  "createdAt": "2024-10-29T21:14:34.146Z",
+  "updatedAt": "2026-01-16T08:25:06.058Z",
+  "publishedAt": "2024-10-29T21:14:34.146Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2508",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate SQL queries from schema only - AI-powered",
+    "workflowName": "Generate SQL queries from schema only - AI-powered",
+    "description": "This workflow is a modification of the previous template on how to [create an SQL agent with LangChain and SQLite](https://n8n.io/workflows/2292-talk-to-your-sqlite-database-with-a-langchain-ai-agent/).\n\n*The key difference* – the agent has access only to the database schema, not to the actual data. To achieve this, SQL queries are made outside the AI Agent node, and the results are never passed back to the agent.\n\nThis approach allows the agent to generate SQL queries based on the structure of tables and their relationships, without having to access the actual data.\n\nThis makes the process more secure and efficient, especially in cases where data confidentiality is crucial.\n\n### 🚀 Setup\n\nTo get started with this workflow, you’ll need to set up a free MySQL server and import your database (check Step 1 and 2 [in this tutorial](https://blog.n8n.io/compare-databases/)). \n\n*Of course, you can switch MySQL to another SQL database such as PostgreSQL, the principle remains the same. The key is to download the schema once and save it locally to avoid repeated remote connections.*\n\nRun the top part of the workflow once to download and store the MySQL chinook database schema file on the server.\n\nWith this approach, we avoid the need to repeatedly connect to a remote db4free database and fetch the schema every time. As a result, we reach greater processing speed and efficiency.\n\n### 🗣️ Chat with your data\n\n1. Start a chat: send a message in the chat window.\n2. The workflow loads the locally saved MySQL database schema, without having the ability to touch the actual data. The file contains the full structure of your MySQL database for analysis.\n3. The Langchain AI Agent receives the schema, your input and begins to work.\n4. The AI Agent generates SQL queries and brief comments based solely on the schema and the user’s message.\n5. An IF node checks whether the AI Agent has generated a query. When:\n- Yes: the AI Agent passes the SQL query to the next MySQL node for execution.\n- No: You get a direct answer from the Agent without further action.\n\n6. The workflow formats the results of the SQL query, ensuring they are convenient to read and easy to understand.\n7. Once formatted, you get both the Agent answer and the query result in the chat window.\n\n### 🌟 Example queries\n\nTry these sample queries to see the schema-driven AI Agent in action:\n\n1.  Would you please list me all customers from Germany?\n\n2.  What are the music genres in the database?\n\n3. What tables are available in the database?\n\n4. Please describe the relationships between tables. - In this example, the AI Agent does not need to create the SQL query.\n\nAnd if you prefer to keep the data private, you can manually execute the generated SQL query in your own environment using any database client or tool you trust 🗄️\n\n💭 The AI Agent memory node does not store the actual data as we run SQL-queries outside the agent. It contains the database schema, user questions and the initial Agent reply. Actual SQL query results are passed to the chat window, but the values are not stored in the Agent memory.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "List all tables in a database",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Extract database schema",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Add table name to output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert data to binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Save file locally",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract data from file",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine schema data and chat input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Load the schema from the local file",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract SQL query",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check if query exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format query results",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Run SQL query",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Prepare final output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Combine query result and chat answer",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    }
+  ]
+}

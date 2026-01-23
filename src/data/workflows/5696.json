@@ -1,0 +1,116 @@
+{
+  "id": 5696,
+  "slug": "5696",
+  "title": "Transform meeting notes into tasks using GPT-4.1-mini, Notion & TickTick via Telegram",
+  "description": "![Screenshot 20250721 at 23.30.52.png](fileId:1817)\n\nThis n8n template automates the transformation of raw meeting notes into structured tasks and documents using GPT (or another model) , syncing them to Notion and TickTick via a Telegram bot.\n\n## Use Cases\n- Automate note-taking and formatting for daily standups, brainstorming sessions, or client calls.\n- Reduce cognitive load by eliminating manual tracking of ideas and tedious formatting.\n- Convert discussions into actionable tasks instantly with TickTick and structured notes in Notion.\n\n## How It Works\n- Capture Notes: Send raw meeting notes to a Telegram bot.\n- AI Processing: The workflow sends the text to AI, which:\n\t- Removes duplicates and extracts key points.\n\t- Formats content into structured Markdown notes for Notion.\n\t- Identifies tasks with deadlines (e.g., \"- Prepare presentation (Responsible: John, Deadline: Friday)\").\n- Task Parsing: Extracts task titles, removing metadata like \"Responsible\" and \"Deadline.\"\n- Review & Edit: The bot returns formatted notes and tasks for review in Telegram.\n- Sync & Publish:\n\t- Notes are published to a Notion database.\n\t- Tasks are exported to TickTick via API.\n- Confirmation: A Telegram reaction (e.g., 👌 emoji) confirms successful processing.\n\n## Setup Instructions\n1. Set Up Telegram Bot:\n\t1. Create a Telegram bot via BotFather and obtain an API token.\n\t2. Add the token to the \"Telegram Trigger\" and \"Send-Edited-Notes\" nodes under credentials (telegramApi).\n2. Configure OpenAI:\n\t1. Obtain an OpenAI API key and add it to the \"Edit-Notes\" node (openAiApi credentials).\n\t2. Ensure the model is set to gpt-4.1-mini in the node parameters.\n3. Set Up Notion:\n\t1. Create a Notion database for notes (e.g., \"Meetings\").\n\t2. Add the database ID to the \"Create a Database Page\" node (databaseId).\n\t3. Configure Notion API credentials (notionApi) in the node.\n4. Set Up TickTick:\n\t1. Obtain a TickTick API key and add it to the \"Create a Task\" node (tickTickOAuth2Api credentials).\n\t2. Specify your TickTick project ID in the node (projectId).\n5. Deploy Workflow:\n\t1. Ensure your n8n instance is self-hosted to support community nodes (TickTick, Notion).\n\t2. Activate the workflow in n8n.\n6. Test:\n\t1. Send a test message to the Telegram bot (e.g., \"Discussed project timeline. Tasks: - Prepare slides (Responsible: Alice, Deadline: Friday)\").\n\t2. Verify that notes appear in Notion, tasks in TickTick, and a 👌 reaction in Telegram.\n\n## Configuration Examples\n#### Telegram Trigger:\n```\n{\n  \"parameters\": {\n    \"updates\": [\"message\"],\n    \"additionalFields\": {}\n  },\n  \"credentials\": {\n    \"telegramApi\": {\n      \"id\": \"your-telegram-api-id\",\n      \"name\": \"meeting notes\"\n    }\n  }\n}\n```\n#### OpenAI Prompt (in \"Edit-Notes\" node):\n```\nAnalyze the quick meeting notes from {{ $json.message.text }} \nGenerate meeting notes and a task list in the following format:\\nMeeting Notes:\\n- [Note 1]\\n- [Note 2]\\n\\nTasks:\\n- [Task 1] \\n- [Task 2] \n```\n#### Notion Database Page\n```\n{\n  \"parameters\": {\n    \"resource\": \"databasePage\",\n    \"databaseId\": \"your-notion-database-id\",\n    \"title\": \"MN {{ $now }}\",\n    \"blockUi\": {\n      \"blockValues\": [\n        {\n          \"textContent\": \"{{ $json.message.text }}\"\n        }\n      ]\n    }\n  }\n}\n```\n\n## Requirements\n- Requires an OpenAI API key (or another model).\n- APIs: Pre-configured Notion and TickTick API credentials are required. The template includes setup guides.\n- Setup: Uses community nodes, requiring a self-hosted n8n instance.\n\n## Customizing This Workflow\n- Replace the Telegram bot with a webhook or form for alternative inputs (e.g., mobile apps).\n- Modify the OpenAI prompt in the \"Edit-Notes\" node to customize note and task formats.\n- Add filters in the \"Split Notes and Tasks\" node to prioritize tasks (e.g., ++#urgent++).\n- Integrate Google Calendar via an additional HTTP Request node to auto-set deadlines based on text (e.g., \"by Friday\").\n\n\n",
+  "featuredImage": "/data/workflows/5696/5696.webp",
+  "author": {
+    "id": 101,
+    "slug": "zamorev",
+    "name": "Pavel Zamorev",
+    "avatar": ""
+  },
+  "categories": [
+    "Project Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 914,
+  "downloads": 91,
+  "createdAt": "2025-07-05T11:01:04.856Z",
+  "updatedAt": "2026-01-16T08:40:57.230Z",
+  "publishedAt": "2025-07-05T11:01:04.856Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5696",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Transform meeting notes into tasks using GPT-4.1-mini, Notion & TickTick via Telegram",
+    "workflowName": "Transform meeting notes into tasks using GPT-4.1-mini, Notion & TickTick via Telegram",
+    "description": "![Screenshot 20250721 at 23.30.52.png](fileId:1817)\n\nThis n8n template automates the transformation of raw meeting notes into structured tasks and documents using GPT (or another model) , syncing them to Notion and TickTick via a Telegram bot.\n\n## Use Cases\n- Automate note-taking and formatting for daily standups, brainstorming sessions, or client calls.\n- Reduce cognitive load by eliminating manual tracking of ideas and tedious formatting.\n- Convert discussions into actionable tasks instantly with TickTick and structured notes in Notion.\n\n## How It Works\n- Capture Notes: Send raw meeting notes to a Telegram bot.\n- AI Processing: The workflow sends the text to AI, which:\n\t- Removes duplicates and extracts key points.\n\t- Formats content into structured Markdown notes for Notion.\n\t- Identifies tasks with deadlines (e.g., \"- Prepare presentation (Responsible: John, Deadline: Friday)\").\n- Task Parsing: Extracts task titles, removing metadata like \"Responsible\" and \"Deadline.\"\n- Review & Edit: The bot returns formatted notes and tasks for review in Telegram.\n- Sync & Publish:\n\t- Notes are published to a Notion database.\n\t- Tasks are exported to TickTick via API.\n- Confirmation: A Telegram reaction (e.g., 👌 emoji) confirms successful processing.\n\n## Setup Instructions\n1. Set Up Telegram Bot:\n\t1. Create a Telegram bot via BotFather and obtain an API token.\n\t2. Add the token to the \"Telegram Trigger\" and \"Send-Edited-Notes\" nodes under credentials (telegramApi).\n2. Configure OpenAI:\n\t1. Obtain an OpenAI API key and add it to the \"Edit-Notes\" node (openAiApi credentials).\n\t2. Ensure the model is set to gpt-4.1-mini in the node parameters.\n3. Set Up Notion:\n\t1. Create a Notion database for notes (e.g., \"Meetings\").\n\t2. Add the database ID to the \"Create a Database Page\" node (databaseId).\n\t3. Configure Notion API credentials (notionApi) in the node.\n4. Set Up TickTick:\n\t1. Obtain a TickTick API key and add it to the \"Create a Task\" node (tickTickOAuth2Api credentials).\n\t2. Specify your TickTick project ID in the node (projectId).\n5. Deploy Workflow:\n\t1. Ensure your n8n instance is self-hosted to support community nodes (TickTick, Notion).\n\t2. Activate the workflow in n8n.\n6. Test:\n\t1. Send a test message to the Telegram bot (e.g., \"Discussed project timeline. Tasks: - Prepare slides (Responsible: Alice, Deadline: Friday)\").\n\t2. Verify that notes appear in Notion, tasks in TickTick, and a 👌 reaction in Telegram.\n\n## Configuration Examples\n#### Telegram Trigger:\n```\n{\n  \"parameters\": {\n    \"updates\": [\"message\"],\n    \"additionalFields\": {}\n  },\n  \"credentials\": {\n    \"telegramApi\": {\n      \"id\": \"your-telegram-api-id\",\n      \"name\": \"meeting notes\"\n    }\n  }\n}\n```\n#### OpenAI Prompt (in \"Edit-Notes\" node):\n```\nAnalyze the quick meeting notes from {{ $json.message.text }} \nGenerate meeting notes and a task list in the following format:\\nMeeting Notes:\\n- [Note 1]\\n- [Note 2]\\n\\nTasks:\\n- [Task 1] \\n- [Task 2] \n```\n#### Notion Database Page\n```\n{\n  \"parameters\": {\n    \"resource\": \"databasePage\",\n    \"databaseId\": \"your-notion-database-id\",\n    \"title\": \"MN {{ $now }}\",\n    \"blockUi\": {\n      \"blockValues\": [\n        {\n          \"textContent\": \"{{ $json.message.text }}\"\n        }\n      ]\n    }\n  }\n}\n```\n\n## Requirements\n- Requires an OpenAI API key (or another model).\n- APIs: Pre-configured Notion and TickTick API credentials are required. The template includes setup guides.\n- Setup: Uses community nodes, requiring a self-hosted n8n instance.\n\n## Customizing This Workflow\n- Replace the Telegram bot with a webhook or form for alternative inputs (e.g., mobile apps).\n- Modify the OpenAI prompt in the \"Edit-Notes\" node to customize note and task formats.\n- Add filters in the \"Split Notes and Tasks\" node to prioritize tasks (e.g., ++#urgent++).\n- Integrate Google Calendar via an additional HTTP Request node to auto-set deadlines based on text (e.g., \"by Friday\").",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Split Notes and Tasks",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Tasks",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Task Details",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Create a task",
+      "type": "n8n-nodes-ticktick.tickTick",
+      "role": "tickTick",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add-Notion-Page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "SuccessReaction",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Add-or-Edit",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Edit-Notes",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Send-Edited-Notes",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

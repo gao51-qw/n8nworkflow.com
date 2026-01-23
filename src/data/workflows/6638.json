@@ -1,0 +1,146 @@
+{
+  "id": 6638,
+  "slug": "6638",
+  "title": "Automate browser tasks with Airtop & GPT-4 - Reddit posting example",
+  "description": "## Overview\n\nThis n8n workflow creates an intelligent AI agent that automates browser interactions through Airtop's browser automation platform. The agent can control real browser sessions, navigate websites, interact with web elements, and maintain detailed session records - all while providing live viewing capabilities for real-time monitoring.\n\nYoutube Tutorial: https://www.youtube.com/watch?v=XoZqFY7QFps\n\n## What This Workflow Does\n\nThe AI agent acts as your virtual assistant in the browser, capable of:\n\n- **Session Management**: Creates, monitors, and terminates browser sessions with proper tracking\n- **Web Navigation**: Visits websites, clicks elements, fills forms, and performs complex interactions\n- **Multi-Window Support**: Manages multiple browser windows within sessions\n- **Live Monitoring**: Provides real-time viewing URLs so you can watch the automation\n- **Data Tracking**: Maintains comprehensive records of all browser activities\n- **Profile Integration**: Uses Airtop profiles for authenticated sessions\n- **Email Notifications**: Sends live URLs and status updates via Gmail\n\n## Demo Use Case: Automated Reddit Posting\n\nThe tutorial demonstrates the agent's capabilities by:\n\n1. **Logging into Reddit** using pre-configured Airtop profile credentials\n2. **Navigating to a specific subreddit** based on user input\n3. **Creating and publishing a new post** with title and content\n4. **Tracking the entire process** with detailed session records\n5. **Providing live viewing access** throughout the automation\n\n## Core Workflow Components\n\n### 1. Chat Interface Trigger\n- **Node Type**: Chat Trigger\n- **Purpose**: Accepts user commands for browser automation tasks\n- **Input**: Natural language instructions (e.g., \"Create a Reddit post in r/automation\")\n\n### 2. AI Agent Processing\n- **Node Type**: OpenAI GPT-4\n- **Purpose**: Interprets user requests and determines appropriate browser actions\n- **System Message**: Contains the comprehensive agent instructions from your documentation\n- **Capabilities**:\n  - Understands complex web interaction requests\n  - Plans multi-step browser workflows\n  - Manages session states intelligently\n  - Handles error scenarios gracefully\n\n### 3. Google Sheets Data Management\nMultiple Google Sheets nodes manage different aspects of session tracking:\n\n#### Browser Sessions Sheet\n- **Fields**: `session_id`, `description`, `status`, `created_date`\n- **Purpose**: Tracks active browser sessions\n- **Operations**: Create, read, update session records\n\n#### Window Sessions Sheet  \n- **Fields**: `session_id`, `window_id`, `description`, `airtop_live_view_url`, `status`\n- **Purpose**: Tracks individual browser windows within sessions\n- **Operations**: Create, read, update window records\n\n#### Airtop Profiles Sheet\n- **Fields**: `platform_name`, `platform_url`, `profile_name`\n- **Purpose**: Stores available authenticated profiles\n- **Operations**: Read available profiles for session creation\n\n### 4. Airtop Browser Automation Nodes\nMultiple specialized nodes for browser control:\n\n#### Session Management\n- **create_session**: Creates new browser sessions with optional profile authentication\n- **terminate_session**: Closes browser sessions and updates records\n- **read_airtop_profiles**: Retrieves available authentication profiles\n\n#### Window Management\n- **create_window**: Opens new browser windows with specified URLs\n- **query_page**: Analyzes page content and identifies interactive elements\n\n#### Web Interaction\n- **click_element**: Clicks specific page elements based on AI descriptions\n- **type_text**: Inputs text into form fields and input elements\n\n### 5. Gmail Integration\n- **Node Type**: Gmail Send\n- **Purpose**: Sends live viewing URLs and status updates\n- **Recipients**: User email for real-time monitoring\n- **Content**: Complete Airtop live view URLs for browser session observation\n\n### 6. Error Handling & Validation\n- **Input Validation**: Ensures required parameters are present\n- **Session State Checks**: Verifies browser session status before operations\n- **Error Recovery**: Handles failed operations gracefully\n- **Data Consistency**: Maintains accurate session records even during failures\n\n## Technical Requirements\n\n### API Credentials Needed\n1. **Airtop.ai API Key**\n   - Sign up at airtop.ai\n   - Generate API key from dashboard\n   - Required for all browser automation functions\n\n2. **OpenAI API Key**\n   - OpenAI account with GPT-4 access\n   - Required for AI agent intelligence and decision-making\n\n3. **Google Sheets Access**\n   - Google account with Google Sheets API access\n   - Copy the provided template and get your sheet URL\n   - Required for session and profile data management\n\n4. **Gmail OAuth**\n   - Google account with Gmail API access\n   - Required for sending live viewing URLs and notifications\n\n### Airtable Base Structure\nCreate three tables in your Airtable base:\n\n#### 1. Browser Details (Sessions)\n```\n- session_id (Single line text)\n- description (Single line text)\n- status (Single select: Open, Closed)\n- created_date (Date)\n```\n\n#### 2. Window Details (Windows)\n```\n- session_id (Single line text)\n- window_id (Single line text)\n- description (Single line text)\n- airtop_live_view_url (URL)\n- status (Single select: Open, Closed)\n```\n\n#### 3. Airtop Profiles\n```\n- platform_name (Single line text)\n- platform_url (URL)\n- profile_name (Single line text)\n```\n\n## Workflow Logic Flow\n\n### User Request Processing\n1. **User Input**: Natural language command via chat interface\n2. **AI Analysis**: OpenAI processes request and determines required actions\n3. **Session Check**: Agent reads current browser session status\n4. **Action Planning**: AI creates step-by-step execution plan\n\n### Browser Session Lifecycle\n1. **Session Creation**:\n   - Check for existing open sessions\n   - Ask user about profile usage if needed\n   - Create new Airtop session\n   - Record session details in Airtable\n\n2. **Window Management**:\n   - Create browser window with target URL\n   - Capture live viewing URL\n   - Record window details in Airtable\n   - Send live URL via Gmail\n\n3. **Web Interactions**:\n   - Query page content for element identification\n   - Execute clicks, form fills, navigation\n   - Monitor page state changes\n   - Handle dynamic content loading\n\n4. **Session Cleanup**:\n   - Terminate browser session when complete\n   - Update all related records to \"Closed\" status\n   - Send completion notification\n\n### Data Flow Architecture\n```\nUser Input → AI Processing → Session Management → Browser Actions → Data Recording → User Notifications\n```\n\n## Key Features & Benefits\n\n### Intelligent Automation\n- **Natural Language Control**: Users can describe tasks in plain English\n- **Context Awareness**: AI understands complex multi-step workflows\n- **Adaptive Responses**: Handles unexpected page changes and errors\n- **Profile Integration**: Seamlessly uses stored authentication credentials\n\n### Real-Time Monitoring\n- **Live View URLs**: Watch browser automation as it happens\n- **Status Updates**: Real-time notifications of task progress\n- **Session Tracking**: Complete audit trail of all browser activities\n- **Multi-Window Support**: Handle complex workflows across multiple tabs\n\n### Enterprise-Ready Features\n- **Error Recovery**: Robust handling of network issues and page failures\n- **Session Persistence**: Maintains state across workflow interruptions\n- **Data Integrity**: Consistent record-keeping even during failures\n- **Scalable Architecture**: Can handle multiple concurrent automation tasks\n\n## Use Cases Beyond Reddit\n\nThis workflow architecture supports automation for any website:\n\n### Social Media Management\n- **Multi-platform posting**: Facebook, Twitter, LinkedIn, Instagram\n- **Community engagement**: Responding to comments, messages\n- **Content scheduling**: Publishing posts at optimal times\n- **Analytics gathering**: Collecting engagement metrics\n\n### Business Process Automation\n- **CRM data entry**: Updating customer records across platforms\n- **Support ticket management**: Creating, updating, routing tickets\n- **E-commerce operations**: Product listings, inventory updates\n- **Report generation**: Gathering data from multiple web sources\n\n### Personal Productivity\n- **Travel booking**: Comparing prices, making reservations\n- **Bill management**: Paying utilities, checking statements\n- **Job applications**: Submitting applications, tracking status\n- **Research tasks**: Gathering information from multiple sources\n\n## Advanced Configuration Options\n\n### Custom Profiles\n- Create Airtop profiles for different websites\n- Store authentication credentials securely\n- Switch between different user accounts\n- Handle multi-factor authentication flows\n\n### Workflow Customization\n- Modify AI system prompts for specific use cases\n- Add custom validation rules\n- Implement retry logic for failed operations\n- Create domain-specific interaction patterns\n\n### Integration Extensions\n- Connect to additional data sources\n- Add webhook notifications\n- Implement approval workflows\n- Create audit logs and reporting\n\n## Getting Started\n\n1. **📊 [Copy the Google Sheets Template](https://docs.google.com/spreadsheets/d/1SZ_P9Ike3xodjAVEsoxfJzgk0kKyaL-EJAEQ7UVibFs/edit?usp=sharing)** - Just click and make a copy!\n2. **Set up credentials** for Airtop, OpenAI, and Gmail\n3. **Import workflow** into your n8n instance\n4. **Configure node credentials** with your API keys and Google Sheets URL\n5. **Test with simple commands** like \"Visit google.com\"\n6. **Expand to complex workflows** as you become comfortable\n\n## Best Practices\n\n### Session Management\n- Always check for existing sessions before creating new ones\n- Properly terminate sessions to avoid resource waste\n- Use descriptive names for sessions and windows\n- Regularly clean up old session records\n\n### Error Handling\n- Implement timeout handling for slow-loading pages\n- Add retry logic for network failures\n- Validate element existence before interactions\n- Log detailed error information for debugging\n\n### Security Considerations\n- Store sensitive credentials in Airtop profiles, not workflow\n- Use webhook authentication for production deployments\n- Implement rate limiting to avoid being blocked by websites\n- Regular audit of browser session activities\n\nThis workflow transforms n8n into a powerful browser automation platform, enabling you to automate virtually any web-based task while maintaining full visibility and control over the automation process.",
+  "featuredImage": "/data/workflows/6638/6638.webp",
+  "author": {
+    "id": 101,
+    "slug": "mjomba",
+    "name": "Joseph",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1224,
+  "downloads": 122,
+  "createdAt": "2025-07-29T13:20:24.335Z",
+  "updatedAt": "2026-01-16T08:46:07.183Z",
+  "publishedAt": "2025-07-29T13:20:24.335Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6638",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate browser tasks with Airtop & GPT-4 - Reddit posting example",
+    "workflowName": "Automate browser tasks with Airtop & GPT-4 - Reddit posting example",
+    "description": "This n8n workflow creates an intelligent AI agent that automates browser interactions through Airtop's browser automation platform. The agent can control real browser sessions, navigate websites, interact with web elements, and maintain detailed session records - all while providing live viewing capabilities for real-time monitoring.\n\nYoutube Tutorial: https://www.youtube.com/watch?v=XoZqFY7QFps\n\n## What This Workflow Does\n\nThe AI agent acts as your virtual assistant in the browser, capable of:\n\n- **Session Management**: Creates, monitors, and terminates browser sessions with proper tracking\n- **Web Navigation**: Visits websites, clicks elements, fills forms, and performs complex interactions\n- **Multi-Window Support**: Manages multiple browser windows within sessions\n- **Live Monitoring**: Provides real-time viewing URLs so you can watch the automation\n- **Data Tracking**: Maintains comprehensive records of all browser activities\n- **Profile Integration**: Uses Airtop profiles for authenticated sessions\n- **Email Notifications**: Sends live URLs and status updates via Gmail\n\n## Demo Use Case: Automated Reddit Posting\n\nThe tutorial demonstrates the agent's capabilities by:\n\n1. **Logging into Reddit** using pre-configured Airtop profile credentials\n2. **Navigating to a specific subreddit** based on user input\n3. **Creating and publishing a new post** with title and content\n4. **Tracking the entire process** with detailed session records\n5. **Providing live viewing access** throughout the automation\n\n## Core Workflow Components\n\n### 1. Chat Interface Trigger\n- **Node Type**: Chat Trigger\n- **Purpose**: Accepts user commands for browser automation tasks\n- **Input**: Natural language instructions (e.g., \"Create a Reddit post in r/automation\")\n\n### 2. AI Agent Processing\n- **Node Type**: OpenAI GPT-4\n- **Purpose**: Interprets user requests and determines appropriate browser actions\n- **System Message**: Contains the comprehensive agent instructions from your documentation\n- **Capabilities**:\n  - Understands complex web interaction requests\n  - Plans multi-step browser workflows\n  - Manages session states intelligently\n  - Handles error scenarios gracefully\n\n### 3. Google Sheets Data Management\nMultiple Google Sheets nodes manage different aspects of session tracking:\n\n#### Browser Sessions Sheet\n- **Fields**: `session_id`, `description`, `status`, `created_date`\n- **Purpose**: Tracks active browser sessions\n- **Operations**: Create, read, update session records\n\n#### Window Sessions Sheet  \n- **Fields**: `session_id`, `window_id`, `description`, `airtop_live_view_url`, `status`\n- **Purpose**: Tracks individual browser windows within sessions\n- **Operations**: Create, read, update window records\n\n#### Airtop Profiles Sheet\n- **Fields**: `platform_name`, `platform_url`, `profile_name`\n- **Purpose**: Stores available authenticated profiles\n- **Operations**: Read available profiles for session creation\n\n### 4. Airtop Browser Automation Nodes\nMultiple specialized nodes for browser control:\n\n#### Session Management\n- **create_session**: Creates new browser sessions with optional profile authentication\n- **terminate_session**: Closes browser sessions and updates records\n- **read_airtop_profiles**: Retrieves available authentication profiles\n\n#### Window Management\n- **create_window**: Opens new browser windows with specified URLs\n- **query_page**: Analyzes page content and identifies interactive elements\n\n#### Web Interaction\n- **click_element**: Clicks specific page elements based on AI descriptions\n- **type_text**: Inputs text into form fields and input elements\n\n### 5. Gmail Integration\n- **Node Type**: Gmail Send\n- **Purpose**: Sends live viewing URLs and status updates\n- **Recipients**: User email for real-time monitoring\n- **Content**: Complete Airtop live view URLs for browser session observation\n\n### 6. Error Handling & Validation\n- **Input Validation**: Ensures required parameters are present\n- **Session State Checks**: Verifies browser session status before operations\n- **Error Recovery**: Handles failed operations gracefully\n- **Data Consistency**: Maintains accurate session records even during failures\n\n## Technical Requirements\n\n### API Credentials Needed\n1. **Airtop.ai API Key**\n   - Sign up at airtop.ai\n   - Generate API key from dashboard\n   - Required for all browser automation functions\n\n2. **OpenAI API Key**\n   - OpenAI account with GPT-4 access\n   - Required for AI agent intelligence and decision-making\n\n3. **Google Sheets Access**\n   - Google account with Google Sheets API access\n   - Copy the provided template and get your sheet URL\n   - Required for session and profile data management\n\n4. **Gmail OAuth**\n   - Google account with Gmail API access\n   - Required for sending live viewing URLs and notifications\n\n### Airtable Base Structure\nCreate three tables in your Airtable base:\n\n#### 1. Browser Details (Sessions)\n```\n- session_id (Single line text)\n- description (Single line text)\n- status (Single select: Open, Closed)\n- created_date (Date)\n```\n\n#### 2. Window Details (Windows)\n```\n- session_id (Single line text)\n- window_id (Single line text)\n- description (Single line text)\n- airtop_live_view_url (URL)\n- status (Single select: Open, Closed)\n```\n\n#### 3. Airtop Profiles\n```\n- platform_name (Single line text)\n- platform_url (URL)\n- profile_name (Single line text)\n```\n\n## Workflow Logic Flow\n\n### User Request Processing\n1. **User Input**: Natural language command via chat interface\n2. **AI Analysis**: OpenAI processes request and determines required actions\n3. **Session Check**: Agent reads current browser session status\n4. **Action Planning**: AI creates step-by-step execution plan\n\n### Browser Session Lifecycle\n1. **Session Creation**:\n   - Check for existing open sessions\n   - Ask user about profile usage if needed\n   - Create new Airtop session\n   - Record session details in Airtable\n\n2. **Window Management**:\n   - Create browser window with target URL\n   - Capture live viewing URL\n   - Record window details in Airtable\n   - Send live URL via Gmail\n\n3. **Web Interactions**:\n   - Query page content for element identification\n   - Execute clicks, form fills, navigation\n   - Monitor page state changes\n   - Handle dynamic content loading\n\n4. **Session Cleanup**:\n   - Terminate browser session when complete\n   - Update all related records to \"Closed\" status\n   - Send completion notification\n\n### Data Flow Architecture\n```\nUser Input → AI Processing → Session Management → Browser Actions → Data Recording → User Notifications\n```\n\n## Key Features & Benefits\n\n### Intelligent Automation\n- **Natural Language Control**: Users can describe tasks in plain English\n- **Context Awareness**: AI understands complex multi-step workflows\n- **Adaptive Responses**: Handles unexpected page changes and errors\n- **Profile Integration**: Seamlessly uses stored authentication credentials\n\n### Real-Time Monitoring\n- **Live View URLs**: Watch browser automation as it happens\n- **Status Updates**: Real-time notifications of task progress\n- **Session Tracking**: Complete audit trail of all browser activities\n- **Multi-Window Support**: Handle complex workflows across multiple tabs\n\n### Enterprise-Ready Features\n- **Error Recovery**: Robust handling of network issues and page failures\n- **Session Persistence**: Maintains state across workflow interruptions\n- **Data Integrity**: Consistent record-keeping even during failures\n- **Scalable Architecture**: Can handle multiple concurrent automation tasks\n\n## Use Cases Beyond Reddit\n\nThis workflow architecture supports automation for any website:\n\n### Social Media Management\n- **Multi-platform posting**: Facebook, Twitter, LinkedIn, Instagram\n- **Community engagement**: Responding to comments, messages\n- **Content scheduling**: Publishing posts at optimal times\n- **Analytics gathering**: Collecting engagement metrics\n\n### Business Process Automation\n- **CRM data entry**: Updating customer records across platforms\n- **Support ticket management**: Creating, updating, routing tickets\n- **E-commerce operations**: Product listings, inventory updates\n- **Report generation**: Gathering data from multiple web sources\n\n### Personal Productivity\n- **Travel booking**: Comparing prices, making reservations\n- **Bill management**: Paying utilities, checking statements\n- **Job applications**: Submitting applications, tracking status\n- **Research tasks**: Gathering information from multiple sources\n\n## Advanced Configuration Options\n\n### Custom Profiles\n- Create Airtop profiles for different websites\n- Store authentication credentials securely\n- Switch between different user accounts\n- Handle multi-factor authentication flows\n\n### Workflow Customization\n- Modify AI system prompts for specific use cases\n- Add custom validation rules\n- Implement retry logic for failed operations\n- Create domain-specific interaction patterns\n\n### Integration Extensions\n- Connect to additional data sources\n- Add webhook notifications\n- Implement approval workflows\n- Create audit logs and reporting\n\n## Getting Started\n\n1. **📊 [Copy the Google Sheets Template](https://docs.google.com/spreadsheets/d/1SZ_P9Ike3xodjAVEsoxfJzgk0kKyaL-EJAEQ7UVibFs/edit?usp=sharing)** - Just click and make a copy!\n2. **Set up credentials** for Airtop, OpenAI, and Gmail\n3. **Import workflow** into your n8n instance\n4. **Configure node credentials** with your API keys and Google Sheets URL\n5. **Test with simple commands** like \"Visit google.com\"\n6. **Expand to complex workflows** as you become comfortable\n\n## Best Practices\n\n### Session Management\n- Always check for existing sessions before creating new ones\n- Properly terminate sessions to avoid resource waste\n- Use descriptive names for sessions and windows\n- Regularly clean up old session records\n\n### Error Handling\n- Implement timeout handling for slow-loading pages\n- Add retry logic for network failures\n- Validate element existence before interactions\n- Log detailed error information for debugging\n\n### Security Considerations\n- Store sensitive credentials in Airtop profiles, not workflow\n- Use webhook authentication for production deployments\n- Implement rate limiting to avoid being blocked by websites\n- Regular audit of browser session activities\n\nThis workflow transforms n8n into a powerful browser automation platform, enabling you to automate virtually any web-based task while maintaining full visibility and control over the automation process.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "create_session",
+      "type": "n8n-nodes-base.airtopTool",
+      "role": "airtopTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "terminate_session",
+      "type": "n8n-nodes-base.airtopTool",
+      "role": "airtopTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "read_airtop_profiles",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "create_window",
+      "type": "n8n-nodes-base.airtopTool",
+      "role": "airtopTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "click_element",
+      "type": "n8n-nodes-base.airtopTool",
+      "role": "airtopTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "query_page",
+      "type": "n8n-nodes-base.airtopTool",
+      "role": "airtopTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "type_text",
+      "type": "n8n-nodes-base.airtopTool",
+      "role": "airtopTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "browser_sheet_read",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "browser_sheet_write",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "windows_sheet_read",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "windows_sheet_write",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

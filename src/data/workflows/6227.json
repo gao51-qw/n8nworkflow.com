@@ -1,0 +1,127 @@
+{
+  "id": 6227,
+  "slug": "6227",
+  "title": "Real-time flight tracking with Aviation API, Slack & SendGrid/Twilio alerts",
+  "description": "This automated n8n workflow continuously monitors airline schedule changes by fetching real-time flight data, comparing it with stored schedules, and instantly notifying both internal teams and affected passengers through multiple communication channels. The system ensures stakeholders are immediately informed of any flight delays, cancellations, gate changes, or other critical updates.\n\n## **Good to Know**\n\n* Flight data accuracy depends on the aviation API provider's update frequency and reliability\n* Critical notifications (cancellations, major delays) trigger immediate passenger alerts via SMS and email\n* Internal Slack notifications keep operations teams informed in real-time\n* Database logging maintains a complete audit trail of all schedule changes\n* The system processes only confirmed schedule changes to avoid false notifications\n* Passenger notifications are sent only to those with confirmed tickets for affected flights\n\n## **How It Works**\n\n1. **Schedule Trigger** - Automatically runs every 30 minutes to check for flight schedule updates\n2. **Fetch Airline Data** - Retrieves current flight information from aviation APIs\n3. **Get Current Schedules** - Pulls existing schedule data from the internal database\n4. **Process Changes** - Compares API data with database records to identify schedule changes\n5. **Check for Changes** - Determines if any updates require processing and notifications\n6. **Update Database** - Saves schedule changes to the internal flight database\n7. **Notify Slack Channel** - Sends operational updates to the flight operations team\n8. **Check Urgent Notifications** - Identifies critical changes requiring immediate passenger alerts\n9. **Get Affected Passengers** - Retrieves contact information for passengers on changed flights\n10. **Send Email Notifications** - Dispatches detailed schedule change emails via SendGrid\n11. **Send SMS (Critical Only)** - Sends urgent text alerts for cancellations and major delays\n12. **Update Internal Systems** - Syncs changes with other airline systems via webhooks\n13. **Log Sync Activity** - Records all synchronization activities for audit and monitoring\n\n## **Data Sources**\n\nThe workflow integrates with multiple data sources and systems:\n\n1. **Aviation API (Primary Data Source)**\n   * Real-time flight status and schedule data\n   * Departure/arrival times, gates, terminals\n   * Flight status (on-time, delayed, cancelled, diverted)\n   * Aircraft and route information\n\n2. **Internal Flight Database**\n   * **flight_schedules table** - Current schedule data with columns:\n     * flight_number (text) - Flight identifier (e.g., \"AA123\")\n     * departure_time (timestamp) - Scheduled departure time\n     * arrival_time (timestamp) - Scheduled arrival time\n     * status (text) - Flight status (active, delayed, cancelled, diverted)\n     * gate (text) - Departure gate number\n     * terminal (text) - Terminal identifier\n     * airline_code (text) - Airline IATA code\n     * origin_airport (text) - Departure airport code\n     * destination_airport (text) - Arrival airport code\n     * aircraft_type (text) - Aircraft model\n     * updated_at (timestamp) - Last update timestamp\n     * created_at (timestamp) - Record creation timestamp\n   \n   * **passengers table** - Passenger contact information with columns:\n     * passenger_id (integer) - Unique passenger identifier\n     * name (text) - Full passenger name\n     * email (text) - Email address for notifications\n     * phone (text) - Mobile phone number for SMS alerts\n     * notification_preferences (json) - Communication preferences\n     * created_at (timestamp) - Registration timestamp\n     * updated_at (timestamp) - Last profile update\n   \n   * **tickets table** - Booking and ticket status with columns:\n     * ticket_id (integer) - Unique ticket identifier\n     * passenger_id (integer) - Foreign key to passengers table\n     * flight_number (text) - Flight identifier\n     * flight_date (date) - Travel date\n     * seat_number (text) - Assigned seat\n     * ticket_status (text) - Status (confirmed, cancelled, checked-in)\n     * booking_reference (text) - Booking confirmation code\n     * fare_class (text) - Ticket class (economy, business, first)\n     * created_at (timestamp) - Booking timestamp\n     * updated_at (timestamp) - Last modification timestamp\n   \n   * **sync_logs table** - Audit trail and system logs with columns:\n     * log_id (integer) - Unique log identifier\n     * workflow_name (text) - Name of the workflow that created the log\n     * total_changes (integer) - Number of schedule changes processed\n     * sync_status (text) - Status (completed, failed, partial)\n     * sync_timestamp (timestamp) - When the sync occurred\n     * details (json) - Detailed log information and changes\n     * error_message (text) - Error details if sync failed\n     * execution_time_ms (integer) - Processing time in milliseconds\n\n3. **Communication Channels**\n   * Slack - Internal team notifications\n   * SendGrid - Passenger email notifications\n   * Twilio - Critical SMS alerts\n   * Internal webhooks - System integrations\n\n## **How to Use**\n\n* Import the workflow into your n8n instance\n* Configure aviation API credentials (AviationStack, FlightAware, or airline-specific APIs)\n* Set up PostgreSQL database connection with required tables\n* Configure Slack bot token for operations team notifications\n* Set up SendGrid API key and email templates for passenger notifications\n* Configure Twilio credentials for SMS alerts (critical notifications only)\n* Test with sample flight data to verify all notification channels\n* Adjust monitoring frequency and severity thresholds based on operational needs\n* Monitor sync logs to ensure reliable data synchronization\n\n ## **Requirements**\n\n1. **API Access**\n   * Aviation data provider (AviationStack, FlightAware, etc.)\n   * SendGrid account for email delivery\n   * Twilio account for SMS notifications\n   * Slack workspace and bot token\n\n2. **Database Setup**\n   * PostgreSQL database with flight schedule tables\n   * Passenger and ticket management tables\n   * Audit logging tables for tracking changes\n\n3. **Infrastructure**\n   * n8n instance with appropriate node modules\n   * Reliable internet connection for API calls\n   * Proper credential management and security\n\n## **Customizing This Workflow**\n\nModify the **Process Changes** node to adjust change detection sensitivity, add custom business rules, or integrate additional data sources like weather or airport operational data. Customize notification templates in the email and SMS nodes to match your airline's branding and communication style. Adjust the **Schedule Trigger** frequency based on your operational requirements and API rate limits.",
+  "featuredImage": "/data/workflows/6227/6227.webp",
+  "author": {
+    "id": 101,
+    "slug": "oneclick-ai",
+    "name": "Oneclick AI Squad",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 491,
+  "downloads": 49,
+  "createdAt": "2025-07-21T12:49:54.794Z",
+  "updatedAt": "2026-01-16T08:43:55.701Z",
+  "publishedAt": "2025-07-21T12:49:54.794Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6227",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Real-time flight tracking with Aviation API, Slack & SendGrid/Twilio alerts",
+    "workflowName": "Real-time flight tracking with Aviation API, Slack & SendGrid/Twilio alerts",
+    "description": "This automated n8n workflow continuously monitors airline schedule changes by fetching real-time flight data, comparing it with stored schedules, and instantly notifying both internal teams and affected passengers through multiple communication channels. The system ensures stakeholders are immediately informed of any flight delays, cancellations, gate changes, or other critical updates.\n\n## **Good to Know**\n\n* Flight data accuracy depends on the aviation API provider's update frequency and reliability\n* Critical notifications (cancellations, major delays) trigger immediate passenger alerts via SMS and email\n* Internal Slack notifications keep operations teams informed in real-time\n* Database logging maintains a complete audit trail of all schedule changes\n* The system processes only confirmed schedule changes to avoid false notifications\n* Passenger notifications are sent only to those with confirmed tickets for affected flights\n\n## **How It Works**\n\n1. **Schedule Trigger** - Automatically runs every 30 minutes to check for flight schedule updates\n2. **Fetch Airline Data** - Retrieves current flight information from aviation APIs\n3. **Get Current Schedules** - Pulls existing schedule data from the internal database\n4. **Process Changes** - Compares API data with database records to identify schedule changes\n5. **Check for Changes** - Determines if any updates require processing and notifications\n6. **Update Database** - Saves schedule changes to the internal flight database\n7. **Notify Slack Channel** - Sends operational updates to the flight operations team\n8. **Check Urgent Notifications** - Identifies critical changes requiring immediate passenger alerts\n9. **Get Affected Passengers** - Retrieves contact information for passengers on changed flights\n10. **Send Email Notifications** - Dispatches detailed schedule change emails via SendGrid\n11. **Send SMS (Critical Only)** - Sends urgent text alerts for cancellations and major delays\n12. **Update Internal Systems** - Syncs changes with other airline systems via webhooks\n13. **Log Sync Activity** - Records all synchronization activities for audit and monitoring\n\n## **Data Sources**\n\nThe workflow integrates with multiple data sources and systems:\n\n1. **Aviation API (Primary Data Source)**\n   * Real-time flight status and schedule data\n   * Departure/arrival times, gates, terminals\n   * Flight status (on-time, delayed, cancelled, diverted)\n   * Aircraft and route information\n\n2. **Internal Flight Database**\n   * **flight_schedules table** - Current schedule data with columns:\n     * flight_number (text) - Flight identifier (e.g., \"AA123\")\n     * departure_time (timestamp) - Scheduled departure time\n     * arrival_time (timestamp) - Scheduled arrival time\n     * status (text) - Flight status (active, delayed, cancelled, diverted)\n     * gate (text) - Departure gate number\n     * terminal (text) - Terminal identifier\n     * airline_code (text) - Airline IATA code\n     * origin_airport (text) - Departure airport code\n     * destination_airport (text) - Arrival airport code\n     * aircraft_type (text) - Aircraft model\n     * updated_at (timestamp) - Last update timestamp\n     * created_at (timestamp) - Record creation timestamp\n   \n   * **passengers table** - Passenger contact information with columns:\n     * passenger_id (integer) - Unique passenger identifier\n     * name (text) - Full passenger name\n     * email (text) - Email address for notifications\n     * phone (text) - Mobile phone number for SMS alerts\n     * notification_preferences (json) - Communication preferences\n     * created_at (timestamp) - Registration timestamp\n     * updated_at (timestamp) - Last profile update\n   \n   * **tickets table** - Booking and ticket status with columns:\n     * ticket_id (integer) - Unique ticket identifier\n     * passenger_id (integer) - Foreign key to passengers table\n     * flight_number (text) - Flight identifier\n     * flight_date (date) - Travel date\n     * seat_number (text) - Assigned seat\n     * ticket_status (text) - Status (confirmed, cancelled, checked-in)\n     * booking_reference (text) - Booking confirmation code\n     * fare_class (text) - Ticket class (economy, business, first)\n     * created_at (timestamp) - Booking timestamp\n     * updated_at (timestamp) - Last modification timestamp\n   \n   * **sync_logs table** - Audit trail and system logs with columns:\n     * log_id (integer) - Unique log identifier\n     * workflow_name (text) - Name of the workflow that created the log\n     * total_changes (integer) - Number of schedule changes processed\n     * sync_status (text) - Status (completed, failed, partial)\n     * sync_timestamp (timestamp) - When the sync occurred\n     * details (json) - Detailed log information and changes\n     * error_message (text) - Error details if sync failed\n     * execution_time_ms (integer) - Processing time in milliseconds\n\n3. **Communication Channels**\n   * Slack - Internal team notifications\n   * SendGrid - Passenger email notifications\n   * Twilio - Critical SMS alerts\n   * Internal webhooks - System integrations\n\n## **How to Use**\n\n* Import the workflow into your n8n instance\n* Configure aviation API credentials (AviationStack, FlightAware, or airline-specific APIs)\n* Set up PostgreSQL database connection with required tables\n* Configure Slack bot token for operations team notifications\n* Set up SendGrid API key and email templates for passenger notifications\n* Configure Twilio credentials for SMS alerts (critical notifications only)\n* Test with sample flight data to verify all notification channels\n* Adjust monitoring frequency and severity thresholds based on operational needs\n* Monitor sync logs to ensure reliable data synchronization\n\n ## **Requirements**\n\n1. **API Access**\n   * Aviation data provider (AviationStack, FlightAware, etc.)\n   * SendGrid account for email delivery\n   * Twilio account for SMS notifications\n   * Slack workspace and bot token\n\n2. **Database Setup**\n   * PostgreSQL database with flight schedule tables\n   * Passenger and ticket management tables\n   * Audit logging tables for tracking changes\n\n3. **Infrastructure**\n   * n8n instance with appropriate node modules\n   * Reliable internet connection for API calls\n   * Proper credential management and security\n\n## **Customizing This Workflow**\n\nModify the **Process Changes** node to adjust change detection sensitivity, add custom business rules, or integrate additional data sources like weather or airport operational data. Customize notification templates in the email and SMS nodes to match your airline's branding and communication style. Adjust the **Schedule Trigger** frequency based on your operational requirements and API rate limits.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Fetch Airline Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Get Current Schedules",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Process Changes",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check for Changes",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Database",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Check Urgent Notifications",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Affected Passengers",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Send Email Notifications",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Send SMS (Critical Only)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Update Internal Systems",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Log Sync Activity",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

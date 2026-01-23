@@ -1,0 +1,277 @@
+{
+  "id": 2939,
+  "slug": "2939",
+  "title": "n8n subworkflow dependency graph & auto-tagging",
+  "description": "## How it Works\nAs n8n instances scale, teams often lose track of sub-workflows—who uses them, where they are referenced, and whether they can be safely updated. This leads to inefficiencies like unnecessary copies of workflows or reluctance to modify existing ones. This workflow solves that problem by:\n\n1. Fetching all workflows and identifying which ones execute others.\n2. Verifying that referenced subworkflows exist.\n3. Building a caller-subworkflow dependency graph for visibility.\n4. Automatically tagging sub-workflows based on their parent workflows.\n5. Providing a chart visualization to highlight the most-used sub-workflows.\n\n![n8nsubworkflowdependencygraph.png](fileId:956)\n\n\n## Set Up Steps\n*Estimated time: ~10–15 minutes*\n1. Set up n8n API credentials to allow access to workflows and tags.\n2. Replace instance_url with your n8n instance URL.\n3. Run the workflow to analyze dependencies and generate the graph.\n4. Review and validate assigned tags for sub-workflows.\n5. (Optional) Enable pie chart visualization to see the most-used sub-workflows.\n\nThis workflow is essential for enterprise teams managing large n8n instances, preventing workflow duplication, reducing uncertainty around dependencies, and allowing safe, informed updates to sub-workflows.",
+  "featuredImage": "/data/workflows/2939/2939.webp",
+  "author": {
+    "id": 101,
+    "slug": "ludwig",
+    "name": "Ludwig",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2417,
+  "downloads": 241,
+  "createdAt": "2025-02-18T23:34:10.804Z",
+  "updatedAt": "2026-01-16T08:27:17.165Z",
+  "publishedAt": "2025-02-18T23:34:10.804Z",
+  "nodes": 40,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2939",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "n8n subworkflow dependency graph & auto-tagging",
+    "workflowName": "n8n subworkflow dependency graph & auto-tagging",
+    "description": "## How it Works\nAs n8n instances scale, teams often lose track of sub-workflows—who uses them, where they are referenced, and whether they can be safely updated. This leads to inefficiencies like unnecessary copies of workflows or reluctance to modify existing ones. This workflow solves that problem by:\n\n1. Fetching all workflows and identifying which ones execute others.\n2. Verifying that referenced subworkflows exist.\n3. Building a caller-subworkflow dependency graph for visibility.\n4. Automatically tagging sub-workflows based on their parent workflows.\n5. Providing a chart visualization to highlight the most-used sub-workflows.\n\n![n8nsubworkflowdependencygraph.png](fileId:956)\n\n\n## Set Up Steps\n*Estimated time: ~10–15 minutes*\n1. Set up n8n API credentials to allow access to workflows and tags.\n2. Replace instance_url with your n8n instance URL.\n3. Run the workflow to analyze dependencies and generate the graph.\n4. Review and validate assigned tags for sub-workflows.\n5. (Optional) Enable pie chart visualization to see the most-used sub-workflows.\n\nThis workflow is essential for enterprise teams managing large n8n instances, preventing workflow duplication, reducing uncertainty around dependencies, and allowing safe, informed updates to sub-workflows.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Update workflow tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "GET all workflows",
+      "type": "n8n-nodes-base.n8n",
+      "role": "n8n",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "List callers of subworkflows",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Exclude uncalled workflows",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Exclude missing workflows",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "And every Sunday",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When this workflow is activated",
+      "type": "n8n-nodes-base.n8nTrigger",
+      "role": "n8nTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GET workflow(s)",
+      "type": "n8n-nodes-base.n8n",
+      "role": "n8n",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Count callers and identify new callers",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop through workflows",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "GET all tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Remove existing tags from new_callers list",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If any new callers",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Split out new callers as new tags",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create new tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Return original pass through values",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "GET all tags again",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create tag id:name dictionary",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Retrieve tag ids and names from dictionary",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Return dependency graph data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Combine dependency graph values into labels",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Visualize subworkflow dependency graph",
+      "type": "n8n-nodes-base.quickChart",
+      "role": "quickChart",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "SET instance_url",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When viewed in a browser",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format workflow relationship data for rendering",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Visualize dependency graph with MermaidJS",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

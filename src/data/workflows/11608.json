@@ -1,0 +1,134 @@
+{
+  "id": 11608,
+  "slug": "11608",
+  "title": "Automated product price tracking with ScrapeGraphAI, Slack alerts and Jira tickets",
+  "description": "# Product Price Monitor with Slack and Jira\n\n![Workflow Preview Image](https://via.placeholder.com/800x400/4E79A7/FFFFFF?text=Product+Price+Monitor+Workflow+Preview)\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes multiple e-commerce sites, analyses weekly seasonal price trends, and notifies your team in Slack while opening Jira tickets for items that require price adjustments. It helps retailers plan inventory and pricing by surfacing actionable insights every week.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n cloud)\n- ScrapeGraphAI community node installed\n- Slack workspace & channel for notifications\n- Jira Software project (cloud or server)\n- Basic JavaScript knowledge for optional custom code edits\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping\n- **Slack OAuth Access Token** – Required by the Slack node\n- **Jira Credentials** – Email & API token (cloud) or username & password (server)\n- (Optional) **Proxy credentials** – If target websites block direct scraping\n\n### Specific Setup Requirements\n| Resource | Purpose | Example |\n|----------|---------|---------|\n| Product URL list | Seed URLs to monitor | `https://example.com/products-winter-sale` |\n| Slack Channel | Receives trend alerts | `#pricing-alerts` |\n| Jira Project Key | Tickets are created here | `ECOM` |\n\n## How it works\n\nThis workflow automatically scrapes multiple e-commerce sites, analyses weekly seasonal price trends, and notifies your team in Slack while opening Jira tickets for items that require price adjustments. It helps retailers plan inventory and pricing by surfacing actionable insights every week.\n\n## Key Steps:\n- **Webhook Trigger**: Kicks off the workflow via a weekly schedule or manual call.\n- **Set Product URLs**: Prepares the list of product pages to analyse.\n- **SplitInBatches**: Processes URLs in manageable batches to avoid rate limits.\n- **ScrapeGraphAI**: Extracts current prices, stock, and seasonality hints from each URL.\n- **Code (Trend Logic)**: Compares scraped prices against historical averages.\n- **If (Threshold Check)**: Determines if price deviations exceed ±10%.\n- **Slack Node**: Sends a formatted message to the pricing channel for each deviation.\n- **Jira Node**: Creates/updates a ticket linking to the product for further action.\n- **Merge**: Collects all batch results for summary reporting.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install Community Nodes**: In n8n, go to *Settings → Community Nodes*, search for “ScrapeGraphAI”, and install.\n2. **Add Credentials**:  \n   a. Slack → *Credentials* → *New*, paste your Bot/User OAuth token.  \n   b. Jira → *Credentials* → *New*, enter your domain, email/username, API token/password.  \n   c. ScrapeGraphAI → *Credentials* → *New*, paste your API key.\n3. **Import Workflow**: Upload or paste the JSON template into n8n.\n4. **Edit the “Set Product URLs” Node**: Replace placeholder URLs with your real product pages.\n5. **Configure Schedule**: Replace the Webhook Trigger with a Cron node (e.g., every Monday 09:00) or keep as webhook for manual runs.\n6. **Map Jira Fields**: In the Jira node, ensure *Project Key*, *Issue Type* (e.g., Task), and *Summary* fields match your instance.\n7. **Test Run**: Execute the workflow. Confirm Slack message appears and a Jira issue is created.\n8. **Activate**: Toggle the workflow to *Active* so it runs automatically.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Webhook** – Default trigger, can be swapped with Cron for weekly automation.\n- **Set (Product URLs)** – Stores an array of product links for scraping.\n- **SplitInBatches** – Limits each ScrapeGraphAI call to five URLs to reduce load.\n- **ScrapeGraphAI** – Crawls and parses HTML, returning JSON with `title`, `price`, `availability`.\n- **Code (Trend Logic)** – Calculates percentage change vs. historical data (stored externally or hard-coded for demo).\n- **If (Threshold Check)** – Routes items above/below the set variance.\n- **Slack** – Posts a rich-format message containing product title, old vs. new price, and link.\n- **Jira** – Creates or updates a ticket with priority set to *Medium* and assigns to the *Pricing* team lead.\n- **Merge** – Recombines batch streams for optional reporting or storage.\n\n### Data Flow:\n1. **Webhook** → **Set (Product URLs)** → **SplitInBatches** → **ScrapeGraphAI** → **Code (Trend Logic)** → **If** → **Slack / Jira** → **Merge**\n\n## Customization Examples\n\n### Change Price Deviation Threshold\n```javascript\n// Code (Trend Logic) node\nconst threshold = 0.05; // 5% instead of default 10%\n```\n\n### Alter Slack Message Template\n```javascript\n{\n  \"text\": `*${item.name}* price changed from *$${item.old}* to *$${item.new}* (${item.diff}%).`,\n  \"attachments\": [\n    {\n      \"title\": \"Product Link\",\n      \"title_link\": item.url,\n      \"color\": \"#4E79A7\"\n    }\n  ]\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"product\": \"Winter Jacket\",\n  \"url\": \"https://example.com/winter-jacket\",\n  \"oldPrice\": 129.99,\n  \"newPrice\": 99.99,\n  \"change\": -23.06,\n  \"scrapedAt\": \"2023-11-04T09:00:00Z\",\n  \"status\": \"Below Threshold\",\n  \"slackMsgId\": \"A1B2C3\",\n  \"jiraIssueKey\": \"ECOM-101\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty data** – Verify selectors; many sites use dynamic rendering, require a headless browser flag.\n2. **Slack message not delivered** – Check that the OAuth token scopes include `chat:write`; also confirm channel ID.\n3. **Jira ticket creation fails** – Field mapping mismatch; ensure *Issue Type* is valid and required custom fields are supplied.\n\n### Performance Tips\n- Batch fewer URLs (e.g., 3 instead of 5) to reduce timeout risk.\n- Cache historical prices in an external DB (Postgres, Airtable) instead of reading large CSVs in the Code node.\n\n**Pro Tips:**\n- Rotate proxies/IPs within ScrapeGraphAI to bypass aggressive e-commerce anti-bot measures.\n- Add a Notion or Sheets node after Merge for historical logging.\n- Use the *Error Trigger* workflow in n8n to alert when ScrapeGraphAI fails more than X times per run.",
+  "featuredImage": "/data/workflows/11608/11608.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 20,
+  "downloads": 2,
+  "createdAt": "2025-12-08T17:13:01.923Z",
+  "updatedAt": "2026-01-16T09:09:21.405Z",
+  "publishedAt": "2025-12-08T17:13:01.923Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11608",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated product price tracking with ScrapeGraphAI, Slack alerts and Jira tickets",
+    "workflowName": "Automated product price tracking with ScrapeGraphAI, Slack alerts and Jira tickets",
+    "description": "# Product Price Monitor with Slack and Jira\n\n![Workflow Preview Image](https://via.placeholder.com/800x400/4E79A7/FFFFFF?text=Product+Price+Monitor+Workflow+Preview)\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes multiple e-commerce sites, analyses weekly seasonal price trends, and notifies your team in Slack while opening Jira tickets for items that require price adjustments. It helps retailers plan inventory and pricing by surfacing actionable insights every week.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n cloud)\n- ScrapeGraphAI community node installed\n- Slack workspace & channel for notifications\n- Jira Software project (cloud or server)\n- Basic JavaScript knowledge for optional custom code edits\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping\n- **Slack OAuth Access Token** – Required by the Slack node\n- **Jira Credentials** – Email & API token (cloud) or username & password (server)\n- (Optional) **Proxy credentials** – If target websites block direct scraping\n\n### Specific Setup Requirements\n| Resource | Purpose | Example |\n|----------|---------|---------|\n| Product URL list | Seed URLs to monitor | `https://example.com/products-winter-sale` |\n| Slack Channel | Receives trend alerts | `#pricing-alerts` |\n| Jira Project Key | Tickets are created here | `ECOM` |\n\n## How it works\n\nThis workflow automatically scrapes multiple e-commerce sites, analyses weekly seasonal price trends, and notifies your team in Slack while opening Jira tickets for items that require price adjustments. It helps retailers plan inventory and pricing by surfacing actionable insights every week.\n\n## Key Steps:\n- **Webhook Trigger**: Kicks off the workflow via a weekly schedule or manual call.\n- **Set Product URLs**: Prepares the list of product pages to analyse.\n- **SplitInBatches**: Processes URLs in manageable batches to avoid rate limits.\n- **ScrapeGraphAI**: Extracts current prices, stock, and seasonality hints from each URL.\n- **Code (Trend Logic)**: Compares scraped prices against historical averages.\n- **If (Threshold Check)**: Determines if price deviations exceed ±10%.\n- **Slack Node**: Sends a formatted message to the pricing channel for each deviation.\n- **Jira Node**: Creates/updates a ticket linking to the product for further action.\n- **Merge**: Collects all batch results for summary reporting.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install Community Nodes**: In n8n, go to *Settings → Community Nodes*, search for “ScrapeGraphAI”, and install.\n2. **Add Credentials**:  \n   a. Slack → *Credentials* → *New*, paste your Bot/User OAuth token.  \n   b. Jira → *Credentials* → *New*, enter your domain, email/username, API token/password.  \n   c. ScrapeGraphAI → *Credentials* → *New*, paste your API key.\n3. **Import Workflow**: Upload or paste the JSON template into n8n.\n4. **Edit the “Set Product URLs” Node**: Replace placeholder URLs with your real product pages.\n5. **Configure Schedule**: Replace the Webhook Trigger with a Cron node (e.g., every Monday 09:00) or keep as webhook for manual runs.\n6. **Map Jira Fields**: In the Jira node, ensure *Project Key*, *Issue Type* (e.g., Task), and *Summary* fields match your instance.\n7. **Test Run**: Execute the workflow. Confirm Slack message appears and a Jira issue is created.\n8. **Activate**: Toggle the workflow to *Active* so it runs automatically.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Webhook** – Default trigger, can be swapped with Cron for weekly automation.\n- **Set (Product URLs)** – Stores an array of product links for scraping.\n- **SplitInBatches** – Limits each ScrapeGraphAI call to five URLs to reduce load.\n- **ScrapeGraphAI** – Crawls and parses HTML, returning JSON with `title`, `price`, `availability`.\n- **Code (Trend Logic)** – Calculates percentage change vs. historical data (stored externally or hard-coded for demo).\n- **If (Threshold Check)** – Routes items above/below the set variance.\n- **Slack** – Posts a rich-format message containing product title, old vs. new price, and link.\n- **Jira** – Creates or updates a ticket with priority set to *Medium* and assigns to the *Pricing* team lead.\n- **Merge** – Recombines batch streams for optional reporting or storage.\n\n### Data Flow:\n1. **Webhook** → **Set (Product URLs)** → **SplitInBatches** → **ScrapeGraphAI** → **Code (Trend Logic)** → **If** → **Slack / Jira** → **Merge**\n\n## Customization Examples\n\n### Change Price Deviation Threshold\n```javascript\n// Code (Trend Logic) node\nconst threshold = 0.05; // 5% instead of default 10%\n```\n\n### Alter Slack Message Template\n```javascript\n{\n  \"text\": `*${item.name}* price changed from *$${item.old}* to *$${item.new}* (${item.diff}%).`,\n  \"attachments\": [\n    {\n      \"title\": \"Product Link\",\n      \"title_link\": item.url,\n      \"color\": \"#4E79A7\"\n    }\n  ]\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"product\": \"Winter Jacket\",\n  \"url\": \"https://example.com/winter-jacket\",\n  \"oldPrice\": 129.99,\n  \"newPrice\": 99.99,\n  \"change\": -23.06,\n  \"scrapedAt\": \"2023-11-04T09:00:00Z\",\n  \"status\": \"Below Threshold\",\n  \"slackMsgId\": \"A1B2C3\",\n  \"jiraIssueKey\": \"ECOM-101\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty data** – Verify selectors; many sites use dynamic rendering, require a headless browser flag.\n2. **Slack message not delivered** – Check that the OAuth token scopes include `chat:write`; also confirm channel ID.\n3. **Jira ticket creation fails** – Field mapping mismatch; ensure *Issue Type* is valid and required custom fields are supplied.\n\n### Performance Tips\n- Batch fewer URLs (e.g., 3 instead of 5) to reduce timeout risk.\n- Cache historical prices in an external DB (Postgres, Airtable) instead of reading large CSVs in the Code node.\n\n**Pro Tips:**\n- Rotate proxies/IPs within ScrapeGraphAI to bypass aggressive e-commerce anti-bot measures.\n- Add a Notion or Sheets node after Merge for historical logging.\n- Use the *Error Trigger* workflow in n8n to alert when ScrapeGraphAI fails more than X times per run.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Intake",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Scraping & Data",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Logic",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Outputs",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Incoming Product List",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Validate & Prepare Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Iterate Product List",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Product Page",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Scraped & Expected",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Compute Price Change",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Significant Price Drop?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Slack Alert",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Jira Issue",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Create an issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    }
+  ]
+}

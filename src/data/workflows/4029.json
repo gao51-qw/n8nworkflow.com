@@ -1,0 +1,398 @@
+{
+  "id": 4029,
+  "slug": "4029",
+  "title": "Create & approve POV videos with AI, ElevenLabs & multi-posting (TikTok/IG/YT)",
+  "description": "# POV Video Creator: Automating TikTok-Style Instagram Video Automation, Approval, and Multi-Platform Posting Using AI, ElevenLabs, Google Sheets, and Social Media APIs\n![POV Videos Automation.png](fileId:1313)\n## Description\n\n### What Problem Does This Solve? 🎥\nThis workflow automates the creation, rendering, approval, and posting of TikTok-style POV (Point of View) videos to Instagram, with cross-posting to Facebook and YouTube. It eliminates manual video production, approval delays, and inconsistent posting schedules. It ensures high-quality content creation and distribution for social media managers and content creators\n\n**Target audience**: Social media managers, content creators, small to medium-sized businesses, and n8n users familiar with AI tools, Google Sheets, and social media APIs\n\n### What Does It Do? 🌟\n- Generates daily POV video ideas using OpenAI\n- Creates images, videos, and audio with PIAPI.ai and ElevenLabs\n- Renders final videos with Creatomate\n- Manages approvals via email and Google Sheets\n- Posts approved videos to Instagram, Facebook, and YouTube\n- Tracks progress in a Google Sheet for transparency\n\n### Key Features \n- AI-driven idea generation and script creation\n- Automated media production with image, video, and audio synthesis\n- Email-based approval system for quality control\n- Cross-platform posting to Instagram, Facebook, and YouTube\n- Real-time tracking in Google Sheets and Google Drive\n- Error handling for rendering and posting failures\n\n## Setup Instructions\n\n### Prerequisites \n- **n8n Instance**: Self-hosted or cloud n8n instance\n- **API Credentials**:\n  - **OpenAI API**: API key for idea generation, stored in n8n credentials\n  - **PIAPI.ai API**: API key for image and video generation, stored in n8n credentials\n  - **ElevenLabs API**: API key for audio generation, stored in n8n credentials\n  - **Creatomate API**: API key for video rendering, stored in n8n credentials\n  - **Google Sheets/Drive API**: OAuth2 credentials from Google Cloud Console with Sheets and Drive scopes\n  - **Gmail API**: OAuth2 credentials from Google Cloud Console with Gmail scope\n  - **Instagram Graph API**: User Access Token with `instagram_content_publish` permission from a Facebook App\n  - **Facebook Graph API**: Access Token from the same Facebook App\n  - **YouTube API**: OAuth2 credentials for YouTube uploads\n- **Google Sheet**: A sheet named \"POV Videos\" with a tab \"Instagram\" and columns: `Timestamp`, `ID`, `Subject`, `Topic`, `Caption`, `POV_Status`, `Prompt`, `Publish_Status`, `Link`, `Final Video`, `Approval`, `row_number`\n- **Creatomate Template**: A pre-configured template with video, audio, and text elements\n\n### Installation Steps \n1. **Import the Workflow**:\n   - Copy the workflow JSON from the “Template Code” section (to be provided)\n   - Import it into n8n via “Import from File” or “Import from URL”\n2. **Configure Credentials**:\n   - Add API credentials in n8n’s Credentials section for OpenAI, PIAPI.ai, ElevenLabs, Creatomate, Google Sheets/Drive, Gmail, Instagram Graph, Facebook Graph, and YouTube\n   - Assign credentials to respective nodes. For example:\n     - In \"Text-to-Image\", use PIAPI.ai credentials: `{{ $credentials.PIAPI }}`\n     - In \"Render with Creatomate\", use Creatomate credentials: `{{ $credentials.Creatomate }}`\n     - In \"Send Approval Request\", use Gmail credentials\n3. **Set Up Nodes**:\n   - **Schedule Trigger**: Configure to run daily\n   - **Approval Email (Send Approval Request)**: Customize the HTML email template with approval/rejection links\n   - **Post to Social Media Nodes (Instagram Container, Facebook Posts, Post YouTube)**: Configure with your Instagram Business Account ID, Facebook Page ID, and YouTube channel details\n4. **Configure Google Sheet and Drive**:\n   - Create \"POV Videos\" Google Sheet with \"Instagram\" tab and specified columns\n   - Share the sheet with your Google Sheets credential email\n   - Create \"Audio\" and \"Video\" folders in Google Drive, noting their IDs\n5. **Test the Workflow**:\n   - Run manually to verify idea generation, media creation, and posting\n   - Check email notifications, Google Sheet updates, and social media posts\n6. **Schedule the Workflow**:\n   - Enable \"Schedule Trigger\" and \"Schedule Trigger1\" for daily runs\n   - Enable \"Get Latest Approved Video\" to poll at 7 PM daily\n\n## How It Works\n\n### High-Level Steps \n1. **Generate Video Ideas**: Creates daily POV video concepts with OpenAI\n2. **Create Media**: Produces images, videos, and audio using AI tools\n3. **Render Video**: Combines media into a final video with Creatomate\n4. **Manage Approvals**: Sends approval emails and processes decisions\n5. **Post to Platforms**: Publishes approved videos to Instagram, Facebook, and YouTube\n\n### Detailed Descriptions\nDetailed node descriptions are available in the sticky notes within the workflow (to be provided). Below is a summary of key actions\n\n## Node Names and Actions\n\n### Video Idea Generation and Script Creation\n- **Schedule Trigger**: Initiates daily workflow\n- **Get Title**: Fetches pending video ideas from Google Sheet\n- **Generate Topics**: Uses OpenAI to create a new video idea\n- **Format Row**: Structures the idea into a Google Sheet row\n- **Insert new Prompt, Caption and Title/Topic**: Adds the idea to Google Sheet\n- **Generate Ideas**: Produces 3 POV sequences\n- **Generate Script**: Expands a sequence into a detailed script\n- **Set Topics**: Stores the script for media creation\n\n### Media Creation\n- **Text-to-Image**: Generates an image with PIAPI.ai\n- **Get Image**: Retrieves the generated image\n- **Generate Video Prompt**: Creates a video prompt from the image\n- **Generate Video**: Produces a 5-second video with PIAPI.ai\n- **Access Videos**: Retrieves the video URL\n- **Store Video**: Updates Google Sheet with video URL\n- **Generate Sound Prompt**: Creates an audio prompt\n- **Text-to-Sound**: Generates a 20-second audio clip with ElevenLabs\n- **Store Sound**: Uploads audio to Google Drive\n- **Allow Access**: Sets audio file permissions\n\n### Video Rendering\n- **Merge**: Combines script, video, and audio data\n- **List Elements**: Formats data for Creatomate\n- **Render with Creatomate**: Renders the final video\n- **Check Video Status**: Routes based on render success/failure\n\n### Storage and Notification\n- **Google Drive**: Uploads the rendered video\n- **New Render Video Alert**: Sends success email\n- **Failed Render**: Sends failure email\n- **Render Video Link**: Updates Google Sheet with final video URL\n\n### Approval Process\n- **Approval Email**: Sends approval request email\n- **Handle Approval/Rejection1**: Processes approval/rejection via webhook\n- **Video Update1**: Updates Google Sheet with approval status\n\n### Social Media Posting\n- **Get Latest Approved Video**: Polls for approved videos\n- **Check Approval**: Routes based on approval status\n- **Instagram Container**: Creates Instagram media container\n- **Post to Instagram**: Publishes to Instagram\n- **Facebook Posts**: Posts to Facebook\n- **Download Video**: Downloads video for YouTube\n- **Post YouTube**: Uploads to YouTube\n- **Mark Rejected**: Updates status for rejected videos\n- **Update Google Sheet**: Updates publish status\n\n## Customization Tips\n- **Expand Platforms**: Add nodes to post to other platforms \n- **Modify Approval Email**: Update the Send Approval Request node to customize the HTML template\n- **Alternative Notifications**: Add nodes for Slack or Telegram alerts\n- **Adjust Video Duration**: Modify Generate Video node to change duration (default: 5 seconds)",
+  "featuredImage": "/data/workflows/4029/4029.webp",
+  "author": {
+    "id": 101,
+    "slug": "spectrabit",
+    "name": "Immanuel",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2785,
+  "downloads": 278,
+  "createdAt": "2025-05-14T00:06:42.535Z",
+  "updatedAt": "2026-01-16T08:32:40.924Z",
+  "publishedAt": "2025-05-14T00:06:42.535Z",
+  "nodes": 60,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4029",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create & approve POV videos with AI, ElevenLabs & multi-posting (TikTok/IG/YT)",
+    "workflowName": "Create & approve POV videos with AI, ElevenLabs & multi-posting (TikTok/IG/YT)",
+    "description": "# POV Video Creator: Automating TikTok-Style Instagram Video Automation, Approval, and Multi-Platform Posting Using AI, ElevenLabs, Google Sheets, and Social Media APIs\n![POV Videos Automation.png](fileId:1313)\n## Description\n\n### What Problem Does This Solve? 🎥\nThis workflow automates the creation, rendering, approval, and posting of TikTok-style POV (Point of View) videos to Instagram, with cross-posting to Facebook and YouTube. It eliminates manual video production, approval delays, and inconsistent posting schedules. It ensures high-quality content creation and distribution for social media managers and content creators\n\n**Target audience**: Social media managers, content creators, small to medium-sized businesses, and n8n users familiar with AI tools, Google Sheets, and social media APIs\n\n### What Does It Do? 🌟\n- Generates daily POV video ideas using OpenAI\n- Creates images, videos, and audio with PIAPI.ai and ElevenLabs\n- Renders final videos with Creatomate\n- Manages approvals via email and Google Sheets\n- Posts approved videos to Instagram, Facebook, and YouTube\n- Tracks progress in a Google Sheet for transparency\n\n### Key Features \n- AI-driven idea generation and script creation\n- Automated media production with image, video, and audio synthesis\n- Email-based approval system for quality control\n- Cross-platform posting to Instagram, Facebook, and YouTube\n- Real-time tracking in Google Sheets and Google Drive\n- Error handling for rendering and posting failures\n\n## Setup Instructions\n\n### Prerequisites \n- **n8n Instance**: Self-hosted or cloud n8n instance\n- **API Credentials**:\n  - **OpenAI API**: API key for idea generation, stored in n8n credentials\n  - **PIAPI.ai API**: API key for image and video generation, stored in n8n credentials\n  - **ElevenLabs API**: API key for audio generation, stored in n8n credentials\n  - **Creatomate API**: API key for video rendering, stored in n8n credentials\n  - **Google Sheets/Drive API**: OAuth2 credentials from Google Cloud Console with Sheets and Drive scopes\n  - **Gmail API**: OAuth2 credentials from Google Cloud Console with Gmail scope\n  - **Instagram Graph API**: User Access Token with `instagram_content_publish` permission from a Facebook App\n  - **Facebook Graph API**: Access Token from the same Facebook App\n  - **YouTube API**: OAuth2 credentials for YouTube uploads\n- **Google Sheet**: A sheet named \"POV Videos\" with a tab \"Instagram\" and columns: `Timestamp`, `ID`, `Subject`, `Topic`, `Caption`, `POV_Status`, `Prompt`, `Publish_Status`, `Link`, `Final Video`, `Approval`, `row_number`\n- **Creatomate Template**: A pre-configured template with video, audio, and text elements\n\n### Installation Steps \n1. **Import the Workflow**:\n   - Copy the workflow JSON from the “Template Code” section (to be provided)\n   - Import it into n8n via “Import from File” or “Import from URL”\n2. **Configure Credentials**:\n   - Add API credentials in n8n’s Credentials section for OpenAI, PIAPI.ai, ElevenLabs, Creatomate, Google Sheets/Drive, Gmail, Instagram Graph, Facebook Graph, and YouTube\n   - Assign credentials to respective nodes. For example:\n     - In \"Text-to-Image\", use PIAPI.ai credentials: `{{ $credentials.PIAPI }}`\n     - In \"Render with Creatomate\", use Creatomate credentials: `{{ $credentials.Creatomate }}`\n     - In \"Send Approval Request\", use Gmail credentials\n3. **Set Up Nodes**:\n   - **Schedule Trigger**: Configure to run daily\n   - **Approval Email (Send Approval Request)**: Customize the HTML email template with approval/rejection links\n   - **Post to Social Media Nodes (Instagram Container, Facebook Posts, Post YouTube)**: Configure with your Instagram Business Account ID, Facebook Page ID, and YouTube channel details\n4. **Configure Google Sheet and Drive**:\n   - Create \"POV Videos\" Google Sheet with \"Instagram\" tab and specified columns\n   - Share the sheet with your Google Sheets credential email\n   - Create \"Audio\" and \"Video\" folders in Google Drive, noting their IDs\n5. **Test the Workflow**:\n   - Run manually to verify idea generation, media creation, and posting\n   - Check email notifications, Google Sheet updates, and social media posts\n6. **Schedule the Workflow**:\n   - Enable \"Schedule Trigger\" and \"Schedule Trigger1\" for daily runs\n   - Enable \"Get Latest Approved Video\" to poll at 7 PM daily\n\n## How It Works\n\n### High-Level Steps \n1. **Generate Video Ideas**: Creates daily POV video concepts with OpenAI\n2. **Create Media**: Produces images, videos, and audio using AI tools\n3. **Render Video**: Combines media into a final video with Creatomate\n4. **Manage Approvals**: Sends approval emails and processes decisions\n5. **Post to Platforms**: Publishes approved videos to Instagram, Facebook, and YouTube\n\n### Detailed Descriptions\nDetailed node descriptions are available in the sticky notes within the workflow (to be provided). Below is a summary of key actions\n\n## Node Names and Actions\n\n### Video Idea Generation and Script Creation\n- **Schedule Trigger**: Initiates daily workflow\n- **Get Title**: Fetches pending video ideas from Google Sheet\n- **Generate Topics**: Uses OpenAI to create a new video idea\n- **Format Row**: Structures the idea into a Google Sheet row\n- **Insert new Prompt, Caption and Title/Topic**: Adds the idea to Google Sheet\n- **Generate Ideas**: Produces 3 POV sequences\n- **Generate Script**: Expands a sequence into a detailed script\n- **Set Topics**: Stores the script for media creation\n\n### Media Creation\n- **Text-to-Image**: Generates an image with PIAPI.ai\n- **Get Image**: Retrieves the generated image\n- **Generate Video Prompt**: Creates a video prompt from the image\n- **Generate Video**: Produces a 5-second video with PIAPI.ai\n- **Access Videos**: Retrieves the video URL\n- **Store Video**: Updates Google Sheet with video URL\n- **Generate Sound Prompt**: Creates an audio prompt\n- **Text-to-Sound**: Generates a 20-second audio clip with ElevenLabs\n- **Store Sound**: Uploads audio to Google Drive\n- **Allow Access**: Sets audio file permissions\n\n### Video Rendering\n- **Merge**: Combines script, video, and audio data\n- **List Elements**: Formats data for Creatomate\n- **Render with Creatomate**: Renders the final video\n- **Check Video Status**: Routes based on render success/failure\n\n### Storage and Notification\n- **Google Drive**: Uploads the rendered video\n- **New Render Video Alert**: Sends success email\n- **Failed Render**: Sends failure email\n- **Render Video Link**: Updates Google Sheet with final video URL\n\n### Approval Process\n- **Approval Email**: Sends approval request email\n- **Handle Approval/Rejection1**: Processes approval/rejection via webhook\n- **Video Update1**: Updates Google Sheet with approval status\n\n### Social Media Posting\n- **Get Latest Approved Video**: Polls for approved videos\n- **Check Approval**: Routes based on approval status\n- **Instagram Container**: Creates Instagram media container\n- **Post to Instagram**: Publishes to Instagram\n- **Facebook Posts**: Posts to Facebook\n- **Download Video**: Downloads video for YouTube\n- **Post YouTube**: Uploads to YouTube\n- **Mark Rejected**: Updates status for rejected videos\n- **Update Google Sheet**: Updates publish status\n\n## Customization Tips\n- **Expand Platforms**: Add nodes to post to other platforms \n- **Modify Approval Email**: Update the Send Approval Request node to customize the HTML template\n- **Alternative Notifications**: Add nodes for Slack or Telegram alerts\n- **Adjust Video Duration**: Modify Generate Video node to change duration (default: 5 seconds)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Item List Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserItemList",
+      "role": "outputParserItemList",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Approval Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Store Sound",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait for 5 Mins",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait for 1 Min",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Video",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Text-to-Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Audio Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Text-to-Sound",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait for Render",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "List Elements",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Final Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Failed Render",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "New Render Video Alert",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Render  Video Link",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Insert new Prompt, Caption and  Title/Topic",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Generate Topics",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Generate Video Prompt",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Format Row",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Access Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Rendor with Creatomate",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Handle Approval/Rejection1",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Video Update1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Check Approval",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Mark Rejected",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Reverse Rows",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Newest Row",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Latest Approved Video",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Facebook Posts",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Instagram Container",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post YouTube",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Topics",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Sound Prompt",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "2 Min Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Allow Access",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check Video Status",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Generate Ideas",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Get Title",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Generate Script",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Tiktok Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Bin Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "id": 12062,
+  "slug": "12062",
+  "title": "Control AI agent tool access with Port RBAC and Slack mentions",
+  "description": "## RBAC for AI agents with n8n and Port\n\nThis workflow implements role-based access control for AI agent tools using Port as the single source of truth for permissions. Different users get access to different tools based on their roles, without needing a separate permission database.\n\nFor example, developers might have access to PagerDuty and AWS S3, while support staff only gets Wikipedia and a calculator. The workflow checks each user's permissions in Port before letting the agent use any tools.\n\nFor the full guide with blueprint setup and detailed configuration, see [RBAC for AI Agents with n8n and Port](https://docs.port.io/guides/all/implement-rbac-for-ai-agents-with-n8n-and-port/) in the Port documentation.\n\n## How it works\nThe n8n workflow orchestrates the following steps:\n\n- Slack trigger — Listens for @mentions and extracts the user ID from the message.\n- Get user profile — Fetches the user's Slack profile to get their email address.\n- Port authentication — Requests an access token from the Port API using client credentials.\n- Permission lookup — Queries Port for the user entity (by email) and reads their allowed_tools array.\n- Unknown user check — If the user doesn't exist in Port, sends an error message and stops.\n- Permission filtering — The \"Check permissions\" node compares each connected tool against allowed_tools and replaces unauthorized ones with a stub that returns \"You are not authorized to use this tool.\"\n- AI agent — Runs with only permitted tools, using GPT-4 and chat memory.\n- Response — Posts the agent output back to the Slack channel.\n\n## Setup\n- [ ] Connect your Slack account and set the channel ID in the trigger node\n- [ ] Add your OpenAI API key\n- [ ] Register for free on [Port.io](https://www.port.io)\n- [ ] Create the rbacUser blueprint in Port (see [full guide](https://docs.port.io/guides/all/implement-rbac-for-ai-agents-with-n8n-and-port/) for blueprint setup)\n- [ ] Add user entities using email as the identifier\n- [ ] Replace YOUR_PORT_CLIENT_ID and YOUR_PORT_CLIENT_SECRET in the \"Get Port access token\" node\n- [ ] Connect credentials for any tools you want to use (PagerDuty, AWS, etc.)\n- [ ] Update the channel ID in the Slack nodes\n- [ ] Invite the bot to your Slack channel\n- [ ] You should be good to go!\n\n## Prerequisites\n- You have a Port account and have completed the onboarding process.\n- You have a working n8n instance (self-hosted) with LangChain nodes available.\n- Slack workspace with bot permissions to receive mentions and post messages.\n- OpenAI API key for the LangChain agent.\n- Port client ID and secret for API authentication.\n- (Optional) PagerDuty, AWS, or other service credentials for tools you want to control.\n\n\n⚠️ This template is intended for Self-Hosted instances only.\n",
+  "featuredImage": "/data/workflows/12062/12062.webp",
+  "author": {
+    "id": 101,
+    "slug": "portio",
+    "name": "Port IO",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 7,
+  "downloads": 0,
+  "createdAt": "2025-12-23T10:18:32.966Z",
+  "updatedAt": "2026-01-16T09:11:14.340Z",
+  "publishedAt": "2025-12-23T10:18:32.966Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12062",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Control AI agent tool access with Port RBAC and Slack mentions",
+    "workflowName": "Control AI agent tool access with Port RBAC and Slack mentions",
+    "description": "## RBAC for AI agents with n8n and Port\n\nThis workflow implements role-based access control for AI agent tools using Port as the single source of truth for permissions. Different users get access to different tools based on their roles, without needing a separate permission database.\n\nFor example, developers might have access to PagerDuty and AWS S3, while support staff only gets Wikipedia and a calculator. The workflow checks each user's permissions in Port before letting the agent use any tools.\n\nFor the full guide with blueprint setup and detailed configuration, see [RBAC for AI Agents with n8n and Port](https://docs.port.io/guides/all/implement-rbac-for-ai-agents-with-n8n-and-port/) in the Port documentation.\n\n## How it works\nThe n8n workflow orchestrates the following steps:\n\n- Slack trigger — Listens for @mentions and extracts the user ID from the message.\n- Get user profile — Fetches the user's Slack profile to get their email address.\n- Port authentication — Requests an access token from the Port API using client credentials.\n- Permission lookup — Queries Port for the user entity (by email) and reads their allowed_tools array.\n- Unknown user check — If the user doesn't exist in Port, sends an error message and stops.\n- Permission filtering — The \"Check permissions\" node compares each connected tool against allowed_tools and replaces unauthorized ones with a stub that returns \"You are not authorized to use this tool.\"\n- AI agent — Runs with only permitted tools, using GPT-4 and chat memory.\n- Response — Posts the agent output back to the Slack channel.\n\n## Setup\n- [ ] Connect your Slack account and set the channel ID in the trigger node\n- [ ] Add your OpenAI API key\n- [ ] Register for free on [Port.io](https://www.port.io)\n- [ ] Create the rbacUser blueprint in Port (see [full guide](https://docs.port.io/guides/all/implement-rbac-for-ai-agents-with-n8n-and-port/) for blueprint setup)\n- [ ] Add user entities using email as the identifier\n- [ ] Replace YOUR_PORT_CLIENT_ID and YOUR_PORT_CLIENT_SECRET in the \"Get Port access token\" node\n- [ ] Connect credentials for any tools you want to use (PagerDuty, AWS, etc.)\n- [ ] Update the channel ID in the Slack nodes\n- [ ] Invite the bot to your Slack channel\n- [ ] You should be good to go!\n\n## Prerequisites\n- You have a Port account and have completed the onboarding process.\n- You have a working n8n instance (self-hosted) with LangChain nodes available.\n- Slack workspace with bot permissions to receive mentions and post messages.\n- OpenAI API key for the LangChain agent.\n- Port client ID and secret for API authentication.\n- (Optional) PagerDuty, AWS, or other service credentials for tools you want to control.\n\n\n⚠️ This template is intended for Self-Hosted instances only.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check permissions",
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Unknown user",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "role": "slackTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Get user permission from Port",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "role": "toolWikipedia",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create an incident in PagerDuty",
+      "type": "n8n-nodes-base.pagerDutyTool",
+      "role": "pagerDutyTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a bucket in AWS S3",
+      "type": "n8n-nodes-base.awsS3Tool",
+      "role": "awsS3Tool",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get user's slack profile",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Get Port access token",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Send output message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Get Regions from Port",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    }
+  ]
+}

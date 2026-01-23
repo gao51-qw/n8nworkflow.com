@@ -1,0 +1,1 @@
+You can use the Function node to convert an array to an array of objects.

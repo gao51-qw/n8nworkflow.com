@@ -1,0 +1,152 @@
+{
+  "id": 8785,
+  "slug": "8785",
+  "title": "Automate Instagram stories publishing from Google Sheets with Meta Graph API",
+  "description": "# Automated Instagram Stories from Google Sheets\n\n## 🚀 What it Does\n\nThis workflow **automates posting Instagram Stories** directly from a list of video URLs in a Google Sheet. Simply add a video link to the sheet, and this template will schedule and post it for you. It's designed to be a \"set it and forget it\" solution for your content strategy.\n\n**Key Features:**\n\n  * **Fully Automated:** Runs on a schedule to post new content without manual intervention.\n  * **Simple Content Management:** Manage your entire video queue from one Google Sheet.\n  * **Smart & Safe:** Automatically avoids posting duplicate content by tracking what has already been published.\n  * **Randomized Posting:** Shuffles the video list to ensure varied content is posted, not just the first one on the list.\n\n-----\n\n## 📋 Pre-Setup Requirements\n\nBefore you start, you'll need a few things. This is the most important part of the setup\\!\n\n1.  **Instagram Business Account:** A personal account won't work. It must be a Business or Creator account.\n2.  **Facebook Page:** Your Instagram Business Account must be connected to a Facebook Page.\n3.  **Meta Developer Account:** This is required to create an \"App\" that gives n8n permission to post on your behalf.\n4.  **A Publicly Accessible Place to Host Videos:** This is critical. The video URLs you use must be direct links to the video file.\n      * ✅ **Good Sources:** Shopify file storage, Amazon S3, a WordPress site with a valid SSL certificate (`https://...`).\n      * ❌ **Unreliable Sources:** Google Drive and Dropbox share links **will not work** because they are not direct links to the video file itself.\n\n-----\n\n## ⚙️ Step-by-Step Setup Guide\n\nFollow these three parts carefully. Once done, you won't have to touch the configuration again.\n\n### Part 1: Meta (Facebook/Instagram) Configuration\n\nThis section generates the keys and IDs you need to allow n8n to communicate with Instagram.\n\n1.  **Create a Meta App:**\n\n      * Go to [Meta for Developers](https://developers.facebook.com/) and create a new app.\n      * **Detailed Guide:** [Meta's Official Guide to Creating an App](https://developers.facebook.com/docs/development/create-an-app/)\n\n2.  **Configure App Permissions:**\n\n      * In your new app's dashboard, add the \"**Instagram Graph API**\" product.\n      * Under \"Permissions,\" you will need to grant `instagram_basic`, `instagram_content_publish`, `pages_show_list`, and `pages_read_engagement`.\n\n3.  **Find Your Instagram Business Account ID:**\n\n      * You'll need this ID for the workflow.\n3.1. **Log in:** to your Instagram account.  \n3.2. **Click on your Profile:** in the menu on the left.  \n3.3. **Click:** \"Edit Profile\" at the top.  \n3.4. Under the **\"Settings\"** heading, click **\"See more in Accounts Center\"**.  \n3.5. **Select:** your intended Instagram profile.  \n3.6. In the URL, your Instagram Business Account ID will be displayed after `/profiles` in a numerical format.  \n\n   **Example:**  \n   `https://accountscenter.instagram.com/profiles/[YOUR_ID]/?theme=dark`\n\n\n4.  **Generate a Long-Lived Access Token:**\n\n      * An access token is like a password for n8n to use. A standard one expires quickly, so you need a long-lived one.\n      * **Official Guide:** [Meta's Guide to Generating a Long-Lived Token](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-long-lived/)\n\n-----\n\n### Part 2: Google Sheet Preparation\n\nThis is where you'll manage your video content.\n\n1.  **Create a Google Sheet:** You can make a new one or use our template to get started quickly.\n      * **Download Template:** [Instagram Videos Template.xlsx](https://imanetworks.ch/wp-content/uploads/2025/09/Instagram-Videos-Template.xlsx)\n2.  **Set Up Columns:** Your sheet **must** have these two columns with these exact names:\n      * `source_url`: This is where you will paste the direct URL to your video file.\n      * `posted_story`: Leave this column **empty**. The workflow will automatically fill it with `true` after a video is successfully posted.\n3.  **Get the Sheet ID:** In your Google Sheet URL, copy the long string of letters and numbers from the middle:\n    `https://docs.google.com/spreadsheets/d/`**`[THIS_IS_THE_SHEET_ID]`**`/edit`\n\n-----\n\n### Part 3: n8n Workflow Configuration\n\nNow, let's connect everything inside your n8n workflow.\n\n1.  **Fill the `⚙️ Configuration Hub` Node:**\n\n      * **IG\\_BUSINESS\\_ID:** Paste the Instagram ID you found in Part 1.\n      * **SHEET\\_DOC\\_ID:** Paste the Google Sheet ID you found in Part 2.\n      * **SHEET\\_TAB\\_NAME:** Enter the exact name of the tab in your Google Sheet (e.g., \"Instagram Videos\").\n\n2.  **Connect Your Credentials:**\n\n      * **Google Sheets:** In the `📊 Fetch Videos from Sheet` node, create a new credential and connect your Google Account.\n      * **Facebook Graph API:** In the `📤 Create Story Container` node, create a new credential. Use the **App ID**, **App Secret**, and the **Long-Lived Access Token** you generated in Part 1. You will use this same credential for the other Facebook/Instagram nodes.\n\n3.  **Activate the Workflow:**\n\n      * First, test it by clicking the \"Execute Workflow\" button on the `🚀 Manual Start` node.\n      * Once you confirm it works, **activate the workflow** using the toggle at the top of the screen. The `⏰ Auto Schedule` node is set to run daily by default, but you can change the time to whatever you like.\n\n-----\n\n## 🤔 Troubleshooting\n\n  * **Error: \"(\\#10) This endpoint requires the 'instagram\\_content\\_publish' permission\"**: Your Meta App is missing the correct permissions. Go back to the app settings in the Meta Developer dashboard and add it.\n  * **Error: \"Unsupported post request\" or Video Processing Fails**: This is almost always an issue with the video URL. Ensure it's a **direct link** and not from a service like Google Drive. Paste the URL into your browser—it should immediately start playing the video, not take you to a preview page.\n  * **Error: \"Sheet not found\"**: Double-check that your `SHEET_DOC_ID` and `SHEET_TAB_NAME` in the Config node are perfectly correct (it's case-sensitive\\!).\n  * **Workflow runs but doesn't post**: Make sure you have rows in your Google Sheet where the `posted_story` column is empty. If all are marked `true`, it has nothing new to post.\n\n@iMan https://imanetworks.ch/",
+  "featuredImage": "/data/workflows/8785/8785.webp",
+  "author": {
+    "id": 101,
+    "slug": "iman",
+    "name": "iMan",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 934,
+  "downloads": 93,
+  "createdAt": "2025-09-20T17:59:39.105Z",
+  "updatedAt": "2026-01-16T08:57:39.785Z",
+  "publishedAt": "2025-09-20T17:59:39.105Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8785",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate Instagram stories publishing from Google Sheets with Meta Graph API",
+    "workflowName": "Automate Instagram stories publishing from Google Sheets with Meta Graph API",
+    "description": "# Automated Instagram Stories from Google Sheets\n\n## 🚀 What it Does\n\nThis workflow **automates posting Instagram Stories** directly from a list of video URLs in a Google Sheet. Simply add a video link to the sheet, and this template will schedule and post it for you. It's designed to be a \"set it and forget it\" solution for your content strategy.\n\n**Key Features:**\n\n  * **Fully Automated:** Runs on a schedule to post new content without manual intervention.\n  * **Simple Content Management:** Manage your entire video queue from one Google Sheet.\n  * **Smart & Safe:** Automatically avoids posting duplicate content by tracking what has already been published.\n  * **Randomized Posting:** Shuffles the video list to ensure varied content is posted, not just the first one on the list.\n\n-----\n\n## 📋 Pre-Setup Requirements\n\nBefore you start, you'll need a few things. This is the most important part of the setup\\!\n\n1.  **Instagram Business Account:** A personal account won't work. It must be a Business or Creator account.\n2.  **Facebook Page:** Your Instagram Business Account must be connected to a Facebook Page.\n3.  **Meta Developer Account:** This is required to create an \"App\" that gives n8n permission to post on your behalf.\n4.  **A Publicly Accessible Place to Host Videos:** This is critical. The video URLs you use must be direct links to the video file.\n      * ✅ **Good Sources:** Shopify file storage, Amazon S3, a WordPress site with a valid SSL certificate (`https://...`).\n      * ❌ **Unreliable Sources:** Google Drive and Dropbox share links **will not work** because they are not direct links to the video file itself.\n\n-----\n\n## ⚙️ Step-by-Step Setup Guide\n\nFollow these three parts carefully. Once done, you won't have to touch the configuration again.\n\n### Part 1: Meta (Facebook/Instagram) Configuration\n\nThis section generates the keys and IDs you need to allow n8n to communicate with Instagram.\n\n1.  **Create a Meta App:**\n\n      * Go to [Meta for Developers](https://developers.facebook.com/) and create a new app.\n      * **Detailed Guide:** [Meta's Official Guide to Creating an App](https://developers.facebook.com/docs/development/create-an-app/)\n\n2.  **Configure App Permissions:**\n\n      * In your new app's dashboard, add the \"**Instagram Graph API**\" product.\n      * Under \"Permissions,\" you will need to grant `instagram_basic`, `instagram_content_publish`, `pages_show_list`, and `pages_read_engagement`.\n\n3.  **Find Your Instagram Business Account ID:**\n\n      * You'll need this ID for the workflow.\n3.1. **Log in:** to your Instagram account.  \n3.2. **Click on your Profile:** in the menu on the left.  \n3.3. **Click:** \"Edit Profile\" at the top.  \n3.4. Under the **\"Settings\"** heading, click **\"See more in Accounts Center\"**.  \n3.5. **Select:** your intended Instagram profile.  \n3.6. In the URL, your Instagram Business Account ID will be displayed after `/profiles` in a numerical format.  \n\n   **Example:**  \n   `https://accountscenter.instagram.com/profiles/[YOUR_ID]/?theme=dark`\n\n\n4.  **Generate a Long-Lived Access Token:**\n\n      * An access token is like a password for n8n to use. A standard one expires quickly, so you need a long-lived one.\n      * **Official Guide:** [Meta's Guide to Generating a Long-Lived Token](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-long-lived/)\n\n-----\n\n### Part 2: Google Sheet Preparation\n\nThis is where you'll manage your video content.\n\n1.  **Create a Google Sheet:** You can make a new one or use our template to get started quickly.\n      * **Download Template:** [Instagram Videos Template.xlsx](https://imanetworks.ch/wp-content/uploads/2025/09/Instagram-Videos-Template.xlsx)\n2.  **Set Up Columns:** Your sheet **must** have these two columns with these exact names:\n      * `source_url`: This is where you will paste the direct URL to your video file.\n      * `posted_story`: Leave this column **empty**. The workflow will automatically fill it with `true` after a video is successfully posted.\n3.  **Get the Sheet ID:** In your Google Sheet URL, copy the long string of letters and numbers from the middle:\n    `https://docs.google.com/spreadsheets/d/`**`[THIS_IS_THE_SHEET_ID]`**`/edit`\n\n-----\n\n### Part 3: n8n Workflow Configuration\n\nNow, let's connect everything inside your n8n workflow.\n\n1.  **Fill the `⚙️ Configuration Hub` Node:**\n\n      * **IG\\_BUSINESS\\_ID:** Paste the Instagram ID you found in Part 1.\n      * **SHEET\\_DOC\\_ID:** Paste the Google Sheet ID you found in Part 2.\n      * **SHEET\\_TAB\\_NAME:** Enter the exact name of the tab in your Google Sheet (e.g., \"Instagram Videos\").\n\n2.  **Connect Your Credentials:**\n\n      * **Google Sheets:** In the `📊 Fetch Videos from Sheet` node, create a new credential and connect your Google Account.\n      * **Facebook Graph API:** In the `📤 Create Story Container` node, create a new credential. Use the **App ID**, **App Secret**, and the **Long-Lived Access Token** you generated in Part 1. You will use this same credential for the other Facebook/Instagram nodes.\n\n3.  **Activate the Workflow:**\n\n      * First, test it by clicking the \"Execute Workflow\" button on the `🚀 Manual Start` node.\n      * Once you confirm it works, **activate the workflow** using the toggle at the top of the screen. The `⏰ Auto Schedule` node is set to run daily by default, but you can change the time to whatever you like.\n\n-----\n\n## 🤔 Troubleshooting\n\n  * **Error: \"(\\#10) This endpoint requires the 'instagram\\_content\\_publish' permission\"**: Your Meta App is missing the correct permissions. Go back to the app settings in the Meta Developer dashboard and add it.\n  * **Error: \"Unsupported post request\" or Video Processing Fails**: This is almost always an issue with the video URL. Ensure it's a **direct link** and not from a service like Google Drive. Paste the URL into your browser—it should immediately start playing the video, not take you to a preview page.\n  * **Error: \"Sheet not found\"**: Double-check that your `SHEET_DOC_ID` and `SHEET_TAB_NAME` in the Config node are perfectly correct (it's case-sensitive\\!).\n  * **Workflow runs but doesn't post**: Make sure you have rows in your Google Sheet where the `posted_story` column is empty. If all are marked `true`, it has nothing new to post.\n\n@iMan https://imanetworks.ch/",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "📖 SETUP GUIDE",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "⚙️ Configuration Hub",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "🚀 Manual Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "⏰ Auto Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "📊 Sheet Requirements",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📊 Fetch Videos from Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "🎲 Randomize Order",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🔄 Process Each Video",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "❓ Already Posted Check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "🎯 Prepare Video Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "📱 Video Requirements",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📤 Create Story Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "🔍 Check Processing Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "✅ Ready to Publish?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "⏰ Wait 30 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "🎉 Publish to Instagram",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "✏️ Mark as Posted",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "🔧 Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "✅ Setup Checklist",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

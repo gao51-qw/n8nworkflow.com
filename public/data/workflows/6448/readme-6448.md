@@ -1,0 +1,91 @@
+# Automated dynamic pricing with AI competitor monitoring & revenue optimization
+
+> *This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*
+
+# How it works
+
+This workflow automatically monitors competitor prices, analyzes market demand, and optimizes product pricing in real-time for maximum profitability using advanced AI algorithms.
+
+## Key Steps
+
+1. **Hourly Trigger** - Runs automatically every hour for real-time price optimization and competitive response.
+2. **Multi-Platform Competitor Monitoring** - Uses AI-powered scrapers to track prices from Amazon, Best Buy, Walmart, and Target.
+3. **Market Demand Analysis** - Analyzes Google Trends data to understand search volume trends and seasonal patterns.
+4. **Customer Sentiment Analysis** - Reviews customer feedback to assess price sensitivity and value perception.
+5. **AI Pricing Optimization** - Calculates optimal prices using weighted factors including competitor positioning, demand indicators, and inventory levels.
+6. **Automated Price Updates** - Directly updates e-commerce platform prices when significant opportunities are identified.
+7. **Comprehensive Analytics** - Logs all pricing decisions and revenue projections to Google Sheets for performance tracking.
+
+## Set up steps
+
+**Setup time: 15-20 minutes**
+
+1. **Configure ScrapeGraphAI credentials** - Add your ScrapeGraphAI API key for AI-powered competitor and market analysis.
+2. **Set up e-commerce API connection** - Connect your e-commerce platform API for automated price updates.
+3. **Configure Google Sheets** - Set up Google Sheets connections for pricing history and revenue analytics logging.
+4. **Set up Slack notifications** - Connect your Slack workspace for real-time pricing alerts and team updates.
+5. **Customize product catalog** - Modify the product configuration with your actual products, costs, and pricing constraints.
+6. **Adjust monitoring frequency** - Change the trigger timing based on your business needs (hourly, daily, etc.).
+7. **Configure competitor platforms** - Update competitor URLs and selectors for your target market.
+
+## What you get
+
+- **Real-time price optimization** with 15-25% potential revenue increase through intelligent pricing
+- **Competitive intelligence** with automated monitoring of major e-commerce platforms
+- **Market demand insights** with seasonal and trend-based pricing adjustments
+- **Customer sentiment analysis** to understand price sensitivity and value perception
+- **Automated price updates** when significant opportunities are identified (&gt;2% change, &gt;70% confidence)
+- **Comprehensive analytics** with pricing history, revenue projections, and performance tracking
+- **Team notifications** with detailed market analysis and pricing recommendations
+- **Margin protection** with intelligent constraints to maintain profitability
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6448
+- **Complexity:** advanced
+- **Node Count:** 25
+- **Views:** 571
+- **Downloads:** 57
+- **Created:** 2025/7/26
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6448)
+
+## 👤 Author
+
+- **Name:** vinci-king-01
+- **Username:** @vinci-king-01
+
+## 🏷️ Categories
+
+- Market Research
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **scheduleTrigger** 
+- **code** (×3)
+- **splitInBatches** 
+- **n8n-nodes-scrapegraphai.scrapegraphAi** (×3)
+- **merge** 
+- **if** 
+- **httpRequest** 
+- **googleSheets** (×2)
+- **slack** 
+- **emailSend** 
+- **stickyNote** (×10)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 25 nodes with 10 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

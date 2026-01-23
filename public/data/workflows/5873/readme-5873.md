@@ -1,0 +1,75 @@
+# Monitor workflow audits and failures with InfluxDB dashboard
+
+> ## Who is it for
+This workflow is for anyone who is using N8N. It's especially helpful if you are a DevOps and your N8N instance is self hosted. If you carea lot about security and number of failed executions and at the same time you are using InfluxDB to monitor status of your systems, this will perfectly fit in your stack.
+
+## How it works
+This automation is fairly simple. It uses native N8N nodes to gather data from itself. Then it is parsing this data to be compatible with InfluxDB input. And finally it is sending this data to InfluxDB for further processing.
+
+## Remember to set up
+Setup is really simple and you just need to provide just three variables. First is your InfluxDB URL, second is your InfluxDB organization, and third is your InfluxDB bucket name.
+
+Of course, to set up N8N nodes and gather data from them, you will need your instance API key.
+
+And that's all.
+
+## How it looks in InfluxDB?
+See below
+
+![N8N data in InfluxDB.png](fileId:1738)
+
+## Schedule Audits
+Audits don't need to be run often, but I would recommend it to be run on regular basis. This way you can see real data series in InfluxDB. I think that once a day should be enough, but it depends on your N8N usage of course
+
+## Thank you, perfect!
+
+Glad I could help. Visit my profile for other automations for businesses. And if you are looking for dedicated software development, do not hesitate to reach out!
+
+You can also see automations on my [Sailing Byte's GitHub N8N repository](https://github.com/lukasz-pawlowski/sailing-byte-free-business-automations). 
+
+## 📊 Basic Information
+
+- **Workflow ID:** 5873
+- **Complexity:** advanced
+- **Node Count:** 29
+- **Views:** 481
+- **Downloads:** 48
+- **Created:** 2025/7/11
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/5873)
+
+## 👤 Author
+
+- **Name:** Łukasz
+- **Username:** @lukaszpp
+
+## 🏷️ Categories
+
+- DevOps
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **stickyNote** (×5)
+- **n8n** (×7)
+- **splitOut** 
+- **set** (×8)
+- **summarize** (×3)
+- **scheduleTrigger** 
+- **merge** 
+- **httpRequest** (×2)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 29 nodes with 23 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

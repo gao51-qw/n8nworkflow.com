@@ -1,0 +1,254 @@
+{
+  "id": 5040,
+  "slug": "5040",
+  "title": "Generate deep research markdown reports with GPT, Tavily Search, and Google Sheets",
+  "description": "**This workflow generates deep researched report in markdown format and saves it in Google Sheet, that I then use for generating blogs for my website - [Architjn Blogs](https://architjn.com/blog)**\n\n## How it works\n1. User submits a search topic through a form.\n2. AI generates five deep-dive subtopics for that main topic.\n3. AI creates a research report intro, title, and table of contents based on those topics.\n4. Each subtopic is sent to a search API (Tavily) to collect top 5 sources.\n5. AI writes detailed Markdown content for each subtopic using retrieved sources.\n6. Final content, ToC, intro, and clickable sources are saved to a Google Sheet.\n\n## Set up steps\n- Requires connections to OpenRouter (AI), Tavily (search API), and Google Sheets.\n- Import into n8n and connect credentials for the above services.\n- Configure Google Sheet with proper column headers and grant edit access.\n- Estimated setup time: 20–30 minutes with working API keys.\n- Includes embedded instructions and markdown-style annotations for guidance.",
+  "featuredImage": "/data/workflows/5040/5040.webp",
+  "author": {
+    "id": 101,
+    "slug": "architjn",
+    "name": "Archit Jain",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 551,
+  "downloads": 55,
+  "createdAt": "2025-06-19T07:16:10.352Z",
+  "updatedAt": "2026-01-16T08:37:19.948Z",
+  "publishedAt": "2025-06-19T07:16:10.352Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5040",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate deep research markdown reports with GPT, Tavily Search, and Google Sheets",
+    "workflowName": "Generate deep research markdown reports with GPT, Tavily Search, and Google Sheets",
+    "description": "**This workflow generates deep researched report in markdown format and saves it in Google Sheet, that I then use for generating blogs for my website - [Architjn Blogs](https://architjn.com/blog)**\n\n## How it works\n1. User submits a search topic through a form.\n2. AI generates five deep-dive subtopics for that main topic.\n3. AI creates a research report intro, title, and table of contents based on those topics.\n4. Each subtopic is sent to a search API (Tavily) to collect top 5 sources.\n5. AI writes detailed Markdown content for each subtopic using retrieved sources.\n6. Final content, ToC, intro, and clickable sources are saved to a Google Sheet.\n\n## Set up steps\n- Requires connections to OpenRouter (AI), Tavily (search API), and Google Sheets.\n- Import into n8n and connect credentials for the above services.\n- Configure Google Sheet with proper column headers and grant edit access.\n- Estimated setup time: 20–30 minutes with working API keys.\n- Includes embedded instructions and markdown-style annotations for guidance.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Plan Topics",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "5 Topics",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Intro",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenRouter Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Topics",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Sources",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "OpenRouter Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sources",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Send Sources",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Get All Content",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Table of Contents",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Send ToC",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Send Intro",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Title, Intro, Chapters",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenRouter Chat Model8",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Tavily5",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out7",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code5",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Aggregate10",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Writer5",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Aggregate11",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge8",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate12",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Sections",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "id": 10870,
+  "slug": "10870",
+  "title": "Transcribe long audio files beyond 25MB limit with FileFlows and OpenAI Whisper",
+  "description": "## Who's it for\n\nThis template is designed for content creators, podcasters, businesses, and researchers who need to transcribe long audio recordings that exceed OpenAI Whisper's 25 MB file size limit (~20 minutes of audio).\n\n## How it works\n\nThis workflow combines n8n, FileFlows, and OpenAI Whisper API to transcribe audio files of any length:\n\n1. User uploads an MP3 file through a web form and provides an email address\n2. n8n splits the file into 4 MiB chunks and uploads them to FileFlows\n3. FileFlows uses FFmpeg to segment the audio into 15-minute chunks (safely under the 25 MB API limit)\n4. Each segment is transcribed using OpenAI's Whisper API (configured for French by default)\n5. All transcriptions are merged into a single text file\n6. The complete transcription is automatically emailed to the user\n\n**Processing time:** Typically 10-15 minutes for a 1-hour audio file.\n\n## Requirements\n\n- n8n instance (self-hosted or cloud)\n- FileFlows with Docker and FFmpeg installed\n- OpenAI API key (Whisper API access)\n- Gmail account for email delivery\n- Network access between n8n and FileFlows\n\n## Setup\n\nComplete setup instructions, including FileFlows workflow import, credentials configuration, and storage setup, are provided in the workflow's sticky notes.\n\n## Cost\n\nOpenAI Whisper API: $0.006 per minute. A 1-hour recording costs approximately $0.36.",
+  "featuredImage": "/data/workflows/10870/10870.webp",
+  "author": {
+    "id": 101,
+    "slug": "juliendelrio",
+    "name": "Julien DEL RIO",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 604,
+  "downloads": 60,
+  "createdAt": "2025-11-15T19:17:56.775Z",
+  "updatedAt": "2026-01-16T09:06:37.292Z",
+  "publishedAt": "2025-11-15T19:17:56.775Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10870",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Transcribe long audio files beyond 25MB limit with FileFlows and OpenAI Whisper",
+    "workflowName": "Transcribe long audio files beyond 25MB limit with FileFlows and OpenAI Whisper",
+    "description": "## Who's it for\n\nThis template is designed for content creators, podcasters, businesses, and researchers who need to transcribe long audio recordings that exceed OpenAI Whisper's 25 MB file size limit (~20 minutes of audio).\n\n## How it works\n\nThis workflow combines n8n, FileFlows, and OpenAI Whisper API to transcribe audio files of any length:\n\n1. User uploads an MP3 file through a web form and provides an email address\n2. n8n splits the file into 4 MiB chunks and uploads them to FileFlows\n3. FileFlows uses FFmpeg to segment the audio into 15-minute chunks (safely under the 25 MB API limit)\n4. Each segment is transcribed using OpenAI's Whisper API (configured for French by default)\n5. All transcriptions are merged into a single text file\n6. The complete transcription is automatically emailed to the user\n\n**Processing time:** Typically 10-15 minutes for a 1-hour audio file.\n\n## Requirements\n\n- n8n instance (self-hosted or cloud)\n- FileFlows with Docker and FFmpeg installed\n- OpenAI API key (Whisper API access)\n- Gmail account for email delivery\n- Network access between n8n and FileFlows\n\n## Setup\n\nComplete setup instructions, including FileFlows workflow import, credentials configuration, and storage setup, are provided in the workflow's sticky notes.\n\n## Cost\n\nOpenAI Whisper API: $0.006 per minute. A 1-hour recording costs approximately $0.36.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "GET Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Make 4MiB Chunks",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload Chunk",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Result",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If succeed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Split audio file",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Split Audio",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Segments",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Result transcription",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Chunks",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge transcription",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter temporary files",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Rate Limit Delay",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send Email with Transcription",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Error",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Error1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Chunk",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Segment",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Stage 4 Delivery",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Stage 3 Transcription",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Stage 2 Splitting",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Stage 1 Upload",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

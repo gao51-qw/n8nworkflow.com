@@ -1,0 +1,110 @@
+{
+  "id": 8000,
+  "slug": "8000",
+  "title": "Generate AI sales pitches from website URLs with GPT-4o and Google Sheets",
+  "description": "# Overview\n\nThis n8n workflow converts a simple list of website URLs in Google Sheets into a concise, consultative Context + AI pitch for each organization. It scrapes real page content (markdown preferred), feeds it to OpenAI with tight prompts to avoid fluff, and writes the result back to the same sheet row. You can run it on demand or schedule it, and it’s resume-safe—rows with existing messages are skipped. The net effect: faster, higher-quality prospect research and consistent outbound messaging without leaving your sheet.\n\n## How it works\n\n- Reads rows from Google Sheets with headers Website and Personalized Message.\n- Skips rows where Personalized Message already has content.\n- Scrapes each URL to get clean page content (prefer markdown from a scraper like Firecrawl).\n- Calls OpenAI with strict System/User prompts to produce Context + Pitch grounded in the site.\n- Writes the generated message back to the same row (upsert by Website).\n- (Optional) Adds a short delay between rows to respect rate limits.\n\n## Setup:\n\n- Sheet: Create headers Website, Personalized Message (row 1).\n- Credentials: Add Google Sheets OAuth2 and OpenAI in n8n.\n- Read node (Sheets): Select your doc/tab → Get All.\n- Scrape step: Use Firecrawl → Scrape (markdown), or fallback to HTTP Request → HTML extract.\n- OpenAI node: Model like gpt-4o-mini; paste your System/User prompts; enable Simplify Output if available.\n- Write node (Sheets): Append or Update → Column to match on = Website; map\n- Website → original URL\n- Personalized Message → OpenAI output ({{$json.content}}\n- (Optional) Add a Wait node (500–2000 ms) for throttling and stability.",
+  "featuredImage": "/data/workflows/8000/8000.webp",
+  "author": {
+    "id": 101,
+    "slug": "ajenta",
+    "name": "Zach @BrightWayAI",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 172,
+  "downloads": 17,
+  "createdAt": "2025-08-28T16:59:53.716Z",
+  "updatedAt": "2026-01-16T08:53:29.710Z",
+  "publishedAt": "2025-08-28T16:59:53.716Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8000",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate AI sales pitches from website URLs with GPT-4o and Google Sheets",
+    "workflowName": "Generate AI sales pitches from website URLs with GPT-4o and Google Sheets",
+    "description": "This n8n workflow converts a simple list of website URLs in Google Sheets into a concise, consultative Context + AI pitch for each organization. It scrapes real page content (markdown preferred), feeds it to OpenAI with tight prompts to avoid fluff, and writes the result back to the same sheet row. You can run it on demand or schedule it, and it’s resume-safe—rows with existing messages are skipped. The net effect: faster, higher-quality prospect research and consistent outbound messaging without leaving your sheet.\n\n## How it works\n\n- Reads rows from Google Sheets with headers Website and Personalized Message.\n- Skips rows where Personalized Message already has content.\n- Scrapes each URL to get clean page content (prefer markdown from a scraper like Firecrawl).\n- Calls OpenAI with strict System/User prompts to produce Context + Pitch grounded in the site.\n- Writes the generated message back to the same row (upsert by Website).\n- (Optional) Adds a short delay between rows to respect rate limits.\n\n## Setup:\n\n- Sheet: Create headers Website, Personalized Message (row 1).\n- Credentials: Add Google Sheets OAuth2 and OpenAI in n8n.\n- Read node (Sheets): Select your doc/tab → Get All.\n- Scrape step: Use Firecrawl → Scrape (markdown), or fallback to HTTP Request → HTML extract.\n- OpenAI node: Model like gpt-4o-mini; paste your System/User prompts; enable Simplify Output if available.\n- Write node (Sheets): Append or Update → Column to match on = Website; map\n- Website → original URL\n- Personalized Message → OpenAI output ({{$json.content}}\n- (Optional) Add a Wait node (500–2000 ms) for throttling and stability.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Shape output (Edit Fields)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Wait 2s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Personalize Message",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Update sheet with personalized message",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Fetch website URL from sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Loop over URLs",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scrape website and get its content",
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "role": "firecrawl",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

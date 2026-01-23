@@ -1,0 +1,266 @@
+{
+  "id": 10888,
+  "slug": "10888",
+  "title": "Predict F1 Race Winners with OpenAI GPT-4o, Historical Data & Slack Alerts",
+  "description": "## How It Works\nEvery day at 8 AM, the workflow automatically retrieves the latest F1 data—including driver standings, qualifying results, race schedules, and circuit information. All sources are merged into a unified dataset, and driver performance metrics are computed using historical trends. An AI agent, enhanced with vectorized race history, evaluates patterns and generates race-winner predictions. When the confidence score exceeds the defined threshold, the system pushes an automated Slack alert and records the full analysis in the database and Google Sheets.\n\n## Setup Steps\n1. Update the workflow configuration with: `newsApiUrl`, `weatherApiUrl`, `historicalYears`, and `confidenceThreshold`.\n2. Connect PostgreSQL using the schema:\n   **prediction_date, predicted_winner, confidence_score, prediction_source, data_version, full_analysis**.\n3. Provide the Slack channel ID for sending high-confidence alerts.\n4. Specify the Google Sheets document ID and sheet name for prediction logging.\n5. Test connectivity to the Ergast API (no authentication required).\n\n## Prerequisites\nOpenAI account (GPT-4o access), Slack workspace admin access, PostgreSQL instance, Google Sheets account, n8n instance with LangChain community nodes enabled.\n\n## Customization\nExtend by adding constructor predictions (modify AI prompt). Integrate Discord or Teams instead of Slack.\n\n## Benefits\nSaves time by automating data collection, improves accuracy using multiple performance metrics and historical patterns.\n\n",
+  "featuredImage": "/data/workflows/10888/10888.webp",
+  "author": {
+    "id": 101,
+    "slug": "cschin",
+    "name": "Cheng Siong Chin",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 91,
+  "downloads": 9,
+  "createdAt": "2025-11-16T15:50:41.830Z",
+  "updatedAt": "2026-01-16T09:06:44.914Z",
+  "publishedAt": "2025-11-16T15:50:41.830Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10888",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Predict F1 Race Winners with OpenAI GPT-4o, Historical Data & Slack Alerts",
+    "workflowName": "Predict F1 Race Winners with OpenAI GPT-4o, Historical Data & Slack Alerts",
+    "description": "## How It Works\nEvery day at 8 AM, the workflow automatically retrieves the latest F1 data—including driver standings, qualifying results, race schedules, and circuit information. All sources are merged into a unified dataset, and driver performance metrics are computed using historical trends. An AI agent, enhanced with vectorized race history, evaluates patterns and generates race-winner predictions. When the confidence score exceeds the defined threshold, the system pushes an automated Slack alert and records the full analysis in the database and Google Sheets.\n\n## Setup Steps\n1. Update the workflow configuration with: `newsApiUrl`, `weatherApiUrl`, `historicalYears`, and `confidenceThreshold`.\n2. Connect PostgreSQL using the schema:\n   **prediction_date, predicted_winner, confidence_score, prediction_source, data_version, full_analysis**.\n3. Provide the Slack channel ID for sending high-confidence alerts.\n4. Specify the Google Sheets document ID and sheet name for prediction logging.\n5. Test connectivity to the Ergast API (no authentication required).\n\n## Prerequisites\nOpenAI account (GPT-4o access), Slack workspace admin access, PostgreSQL instance, Google Sheets account, n8n instance with LangChain community nodes enabled.\n\n## Customization\nExtend by adding constructor predictions (modify AI prompt). Integrate Discord or Teams instead of Slack.\n\n## Benefits\nSaves time by automating data collection, improves accuracy using multiple performance metrics and historical patterns.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fetch Current F1 Season Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Fetch Driver Standings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Fetch Constructor Standings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Merge F1 Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "F1 Prediction Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Real-Time F1 News Tool",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Weather Data Tool",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Format Prediction Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fetch Historical Race Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Fetch Qualifying Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Fetch Circuit Information",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Historical Data Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Document Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Recursive Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Historical Data Retrieval Tool",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Calculate Driver Performance Metrics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Prediction Confidence",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Store Prediction in Database",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Send High Confidence Alert",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log to Prediction Tracker",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Aggregate Historical Data",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Statistical Analysis Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Embeddings1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "id": 4425,
+  "slug": "4425",
+  "title": "Evaluate AI agent response relevance using OpenAI and cosine similarity",
+  "description": "### This n8n template demonstrates how to calculate the evaluation metric \"Relevance\" which in this scenario, measures the relevance of the agent's response to the user's question.\n\nThe scoring approach is adapted from the open-source evaluations project [RAGAS](https://docs.ragas.io/) and you can see the source here \n[https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_relevance.py](https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_relevance.py)\n\n### How it works\n* This evaluation works best for Q&A agents.\n* For our scoring, we analyse the agent's response and ask another AI to generate a question from it. This generated question is then compared to the original question using cosine similarity.\n* A high score indicates relevance and the agent's successful ability to answer the question whereas a low score means agent may have added too much irrelevant info, went off script or hallucinated.\n\n### Requirements\n* n8n version 1.94+\n* Check out this Google Sheet for a sample data [https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing)",
+  "featuredImage": "/data/workflows/4425/4425.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1025,
+  "downloads": 102,
+  "createdAt": "2025-05-27T07:19:50.908Z",
+  "updatedAt": "2026-01-16T08:34:18.371Z",
+  "publishedAt": "2025-05-27T07:19:50.908Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4425",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Evaluate AI agent response relevance using OpenAI and cosine similarity",
+    "workflowName": "Evaluate AI agent response relevance using OpenAI and cosine similarity",
+    "description": "### This n8n template demonstrates how to calculate the evaluation metric \"Relevance\" which in this scenario, measures the relevance of the agent's response to the user's question.\n\nThe scoring approach is adapted from the open-source evaluations project [RAGAS](https://docs.ragas.io/) and you can see the source here \n[https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_relevance.py](https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_relevance.py)\n\n### How it works\n* This evaluation works best for Q&A agents.\n* For our scoring, we analyse the agent's response and ask another AI to generate a question from it. This generated question is then compared to the original question using cosine similarity.\n* A high score indicates relevance and the agent's successful ability to answer the question whereas a low score means agent may have added too much irrelevant info, went off script or hallucinated.\n\n### Requirements\n* n8n version 1.94+\n* Check out this Google Sheet for a sample data [https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When fetching a dataset row",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "role": "evaluationTrigger",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Remap Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Evaluation",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Set Input Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Update Output",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Update Metrics",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Answer Relevance",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Calculate Similarity Score",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Questions to Items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Calculate Relevance Score",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

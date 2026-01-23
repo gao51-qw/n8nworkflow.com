@@ -1,0 +1,26 @@
+{
+  "id": 9320,
+  "slug": "9320",
+  "title": "Get real-time international space station visibility alerts with N2YO and Telegram",
+  "description": "Workflow Execution Video: [https://youtu.be/VV4D2aiFXsY](https://youtu.be/VV4D2aiFXsY)\n\n### **Prerequisites & Setup**\n\nBefore you begin, you need to gather a few key pieces of information:\n\n1. **N2YO API Key:**\n    - Go to https://www.n2yo.com/login/register/ and create a free account.\n    - Once registered, find and copy your API key. This key is used to request satellite data.\n    - Replace the enter-longitude, enter-latitude, enter-your-api-key in http node URL.\n2. **Telegram Bot Credentials:**\n    - You need a Telegram bot. You can create one by talking to the **BotFather** on Telegram.\n    - **Bot Token:** BotFather will give you a unique authorization token. This is like a password for your bot.\n    - **Chat ID:** You need the ID of the chat where the bot will send messages. You can get this by sending a message to your bot and then visiting `https://api.telegram.org/bot&lt;YourBOTToken&gt;/getUpdates`. Look for the `chat` -&gt; `id` value in the response.\n3. **Your Location Coordinates:**\n    - Visit https://www.maps.ie/coordinates.html.\n    - Find your location on the map.\n    - Copy your **Latitude** and **Longitude** values.\n\n---\n\n### **Node-by-Node Explanation**\n\nThis workflow is composed of five nodes that execute in a sequence.\n\n---\n\n### **1. Schedule Trigger Node**\n\n- **Node Name:** `Schedule Trigger`\n- **Purpose:** This is the starting point of the workflow. It's designed to run automatically at a specific, recurring interval.\n- **Configuration:** The node is set to trigger **every 30 minutes**. This means the entire sequence of actions will be initiated twice every hour.\n\n---\n\n### **2. HTTP Request Node**\n\n- **Node Name:** `HTTP Request`\n- **Purpose:** This node is responsible for fetching data from an external source on the internet.\n- **Configuration:** It sends a request to the N2YO API URL: `https://api.n2yo.com/rest/v1/satellite/visualpasses/25544/...`\n    - The numbers `25544` represent the NORAD ID for the International Space Station (ISS).\n    - You must replace `enter-longitude`, `enter-latitude`, and `enter-your-api-key` with the actual **coordinates and API key** you gathered during the setup.\n    - The result of this request is a block of data (in JSON format) containing information about upcoming satellite passes.\n\n---\n\n### **3. Code Node**\n\n- **Node Name:** `Readable`\n- **Purpose:** This node uses JavaScript to process and reformat the raw data received from the `HTTP Request` node.\n- **Configuration:** The JavaScript code performs several actions:\n    - It extracts the details of the next upcoming satellite pass.\n    - It contains functions to convert timestamp numbers into human-readable dates and times (e.g., \"10th October 2025, 14:30 UTC\").\n    - It calculates the time remaining until the pass begins (e.g., \"in 2h 15m\").\n    - Finally, it constructs a formatted text message (`alert`) and calculates the number of minutes until the pass begins (`timeinminutes`), passing both pieces of information to the next node.\n\n---\n\n### **4. If Node**\n\n- **Node Name:** `If`\n- **Purpose:** This node acts as a gatekeeper. It checks if a specific condition is met before allowing the workflow to continue.\n- **Configuration:** It checks the `timeinminutes` value that was calculated in the previous `Code` node.\n    - The condition is: **Is `timeinminutes` less than or equal to `600`?**\n    - If the condition is **true** (the pass is 600 minutes or less away), the data is passed to the next node through the \"true\" output.\n    - If the condition is **false**, the workflow stops.\n\n---\n\n### **5. Telegram Node**\n\n- **Node Name:** `Send a text message`\n- **Purpose:** This node sends a message to your specified Telegram chat.\n- **Configuration:**\n    - It is configured with your Telegram bot's credentials.\n    - The `Chat ID` is set to the specific chat you want the message to appear in.\n    - The content of the text message is taken directly from the `alert` variable created by the `Code` node. This means it will send the fully formatted message about the upcoming ISS pass.",
+  "featuredImage": "/data/workflows/9320/9320.webp",
+  "author": {
+    "id": 101,
+    "slug": "iamvaar",
+    "name": "iamvaar",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 44,
+  "downloads": 4,
+  "createdAt": "2025-10-06T18:01:17.697Z",
+  "updatedAt": "2026-01-16T08:59:59.736Z",
+  "publishedAt": "2025-10-06T18:01:17.697Z",
+  "nodes": 6,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9320"
+}

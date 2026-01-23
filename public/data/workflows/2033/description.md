@@ -1,0 +1,8 @@
+This workflow will allow you to enrich in real-time a form submission from Webflow using Datagma. 
+
+Based on the result of this workflow, a specific Calendly link will be shown on the website.
+
+- If the process outcome is '1', a link for a one-on-one demo will be provided.
+- If the process outcome is '2', a link for a group demo will be shown.
+
+Full guide here: [Real-time Lead Routing](https://lempire.notion.site/Real-time-lead-routing-9fc55c9a5a17415ba736cbdbf5d43a30?pvs=4)

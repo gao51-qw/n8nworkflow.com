@@ -1,0 +1,176 @@
+{
+  "id": 9920,
+  "slug": "9920",
+  "title": "Auto-generate WordPress articles from news with Claude AI and LinkedIn sharing",
+  "description": "## **How it works**\n* This workflow sources news from news websites.\n* The information is then passed to an LLM, which processes the article's content.\n* An editor approves or rejects the article.\n* If accepted, the article is first published on the WordPress site and then on the LinkedIn page.\n\n## **Setup Instructions**\n\n**1. Credentials**\nYou'll need to add credentials for the following services in your n8n instance:\n* **News API**: A credential for your chosen news provider.\n* **LLM**: Your API key for the LLM you want to use.\n* **Google OAuth**: For both Gmail and Google Sheets.\n* **WordPress OAuth2**: To publish articles via the API. See the [WordPress Developer Docs](https://developer.wordpress.com/docs/api/).\n* **LinkedIn OAuth2**: To share the post on a company page.\n\n**2. Node Configuration**\nDon't forget to:\n* **Fetch News (HTTP Request)**: Set the query parameters (keywords, language, etc.) for your news source.\n* **Basic LLM Chain**: Review and **customize the prompt** to match your desired tone, language, and style.\n* **Approval request (Gmail)**: Set your email address in the `Send To` field.\n* **HTTP Request WP - Push article**: Replace `&lt;site_Id&gt;` in the URL with your WordPress Site ID.\n* **getImageId (Code Node)**: Update the array with your image IDs from the WordPress Media Library.\n* **Create a post (LinkedIn)**: Enter your LinkedIn `Organization ID`.\n* **Append row in sheet (Google Sheets)**: Select your Google Sheet file and the target sheet.\n* **All Email Nodes**: Make sure the `Send To` field is your email.",
+  "featuredImage": "/data/workflows/9920/9920.webp",
+  "author": {
+    "id": 101,
+    "slug": "mventuri",
+    "name": "Marco Venturi",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 704,
+  "downloads": 70,
+  "createdAt": "2025-10-19T22:48:28.700Z",
+  "updatedAt": "2026-01-16T09:02:37.510Z",
+  "publishedAt": "2025-10-19T22:48:28.700Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9920",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-generate WordPress articles from news with Claude AI and LinkedIn sharing",
+    "workflowName": "Auto-generate WordPress articles from news with Claude AI and LinkedIn sharing",
+    "description": "## **How it works**\n* This workflow sources news from news websites.\n* The information is then passed to an LLM, which processes the article's content.\n* An editor approves or rejects the article.\n* If accepted, the article is first published on the WordPress site and then on the LinkedIn page.\n\n## **Setup Instructions**\n\n**1. Credentials**\nYou'll need to add credentials for the following services in your n8n instance:\n* **News API**: A credential for your chosen news provider.\n* **LLM**: Your API key for the LLM you want to use.\n* **Google OAuth**: For both Gmail and Google Sheets.\n* **WordPress OAuth2**: To publish articles via the API. See the [WordPress Developer Docs](https://developer.wordpress.com/docs/api/).\n* **LinkedIn OAuth2**: To share the post on a company page.\n\n**2. Node Configuration**\nDon't forget to:\n* **Fetch News (HTTP Request)**: Set the query parameters (keywords, language, etc.) for your news source.\n* **Basic LLM Chain**: Review and **customize the prompt** to match your desired tone, language, and style.\n* **Approval request (Gmail)**: Set your email address in the `Send To` field.\n* **HTTP Request WP - Push article**: Replace `&lt;site_Id&gt;` in the URL with your WordPress Site ID.\n* **getImageId (Code Node)**: Update the array with your image IDs from the WordPress Media Library.\n* **Create a post (LinkedIn)**: Enter your LinkedIn `Organization ID`.\n* **Append row in sheet (Google Sheets)**: Select your Google Sheet file and the target sheet.\n* **All Email Nodes**: Make sure the `Send To` field is your email.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Approval request",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Success message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Failure message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetching news",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "JSON Parsing",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append log to sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Choose image from array",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Push article to WordPress",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "GET Image for Linkedin",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Push to Linkedin Page",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,272 @@
+{
+  "id": 3459,
+  "slug": "3459",
+  "title": "Adaptive RAG strategy with query classification & retrieval (Gemini & Qdrant)",
+  "description": "This n8n workflow implements a version of the Adaptive Retrieval-Augmented Generation (RAG) framework. It recognizes that the best way to retrieve information often depends on the type of question asked. Instead of a one-size-fits-all approach, this workflow adapts its strategy based on the user's query intent.\n\n## 🌟 How it Works\n\n1. **Receive Query:** Takes a user query as input (along with context like a chat session ID and Vector Store collection ID if used as sub-workflow).\n2. **Classify Query:** First, the workflow classifies the query into a predefined category. This template uses four examples:\n    * **Factual:** For specific facts.\n    * **Analytical:** For deeper explanations or comparisons.\n    * **Opinion:** For subjective viewpoints.\n    * **Contextual:** For questions relying on specific background.\n3. **Select & Adapt Strategy:** Based on the classification, it selects a corresponding strategy to prepare for information retrieval. The example strategies aim to:\n    * *Factual:* Refine the query for precision.\n    * *Analytical:* Break the query into sub-questions for broad coverage.\n    * *Opinion:* Identify different viewpoints to look for.\n    * *Contextual:* Incorporate implied or user-specific context.\n4. **Retrieve Info:** Uses the output of the selected strategy to search the specified knowledge base (Qdrant vector store - change as needed) for relevant documents.\n5. **Generate Response:** Constructs a response using the retrieved documents, guided by a prompt tailored to the original query type.\n\nBy adapting the retrieval strategy, this workflow aims to provide more relevant results tailored to the user's intent.\n\n## ⚙️ Usage & Flexibility\n\n* **Sub-Workflow:** Designed to be called from other n8n workflows, passing `user_query`, `chat_memory_key`, and `vector_store_id` as inputs.\n* **Chat Testing:** Can also be triggered directly via the n8n Chat interface for easy testing and interaction.\n* **Customizable Framework:** The query categories (Factual, Analytical, etc.) and the associated retrieval strategies are examples. You can modify or replace them entirely to fit your specific domain or requirements.\n\n## 🛠️ Requirements\n\n* **Credentials:** You will need API credentials configured in your n8n instance for:\n    * Google Gemini (AI Models)\n    * Qdrant (Vector Store)",
+  "featuredImage": "/data/workflows/3459/3459.webp",
+  "author": {
+    "id": 101,
+    "slug": "dmr",
+    "name": "dmr",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3162,
+  "downloads": 316,
+  "createdAt": "2025-04-07T15:43:47.541Z",
+  "updatedAt": "2026-01-16T08:29:53.050Z",
+  "publishedAt": "2025-04-07T15:43:47.541Z",
+  "nodes": 39,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3459",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Adaptive RAG strategy with query classification & retrieval (Gemini & Qdrant)",
+    "workflowName": "Adaptive RAG strategy with query classification & retrieval (Gemini & Qdrant)",
+    "description": "This n8n workflow implements a version of the Adaptive Retrieval-Augmented Generation (RAG) framework. It recognizes that the best way to retrieve information often depends on the type of question asked. Instead of a one-size-fits-all approach, this workflow adapts its strategy based on the user's query intent.\n\n## 🌟 How it Works\n\n1. **Receive Query:** Takes a user query as input (along with context like a chat session ID and Vector Store collection ID if used as sub-workflow).\n2. **Classify Query:** First, the workflow classifies the query into a predefined category. This template uses four examples:\n    * **Factual:** For specific facts.\n    * **Analytical:** For deeper explanations or comparisons.\n    * **Opinion:** For subjective viewpoints.\n    * **Contextual:** For questions relying on specific background.\n3. **Select & Adapt Strategy:** Based on the classification, it selects a corresponding strategy to prepare for information retrieval. The example strategies aim to:\n    * *Factual:* Refine the query for precision.\n    * *Analytical:* Break the query into sub-questions for broad coverage.\n    * *Opinion:* Identify different viewpoints to look for.\n    * *Contextual:* Incorporate implied or user-specific context.\n4. **Retrieve Info:** Uses the output of the selected strategy to search the specified knowledge base (Qdrant vector store - change as needed) for relevant documents.\n5. **Generate Response:** Constructs a response using the retrieved documents, guided by a prompt tailored to the original query type.\n\nBy adapting the retrieval strategy, this workflow aims to provide more relevant results tailored to the user's intent.\n\n## ⚙️ Usage & Flexibility\n\n* **Sub-Workflow:** Designed to be called from other n8n workflows, passing `user_query`, `chat_memory_key`, and `vector_store_id` as inputs.\n* **Chat Testing:** Can also be triggered directly via the n8n Chat interface for easy testing and interaction.\n* **Customizable Framework:** The query categories (Factual, Analytical, etc.) and the associated retrieval strategies are examples. You can modify or replace them entirely to fit your specific domain or requirements.\n\n## 🛠️ Requirements\n\n* **Credentials:** You will need API credentials configured in your n8n instance for:\n    * Google Gemini (AI Models)\n    * Qdrant (Vector Store)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Query Classification",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Factual Strategy - Focus on Precision",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Analytical Strategy - Comprehensive Coverage",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Opinion Strategy - Diverse Perspectives",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Contextual Strategy - User Context Integration",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Chat",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Factual Prompt and Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Contextual Prompt and Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Opinion Prompt and Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Analytical Prompt and Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Gemini Classification",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gemini Factual",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gemini Analytical",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Buffer Memory Analytical",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Chat Buffer Memory Factual",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Gemini Opinion",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Buffer Memory Opinion",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Gemini Contextual",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Buffer Memory Contextual",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Concatenate Context",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Retrieve Documents from Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set Prompt and Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Gemini Answer",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Answer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Chat Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Combined Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

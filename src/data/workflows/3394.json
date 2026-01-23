@@ -1,0 +1,247 @@
+{
+  "id": 3394,
+  "slug": "3394",
+  "title": "Airtable batch update / insert rows (send faster + save API call requests)",
+  "description": "This workflow allows you to batch update/insert Airtable rows in groups of 10, significantly reducing the number of API calls and increasing performance.\n\n## 🚀 How It Works\n\n1. **Copy the 3 Nodes**  \n   Copy the three nodes inside the red note box into your workflow.\n\n2. **Set Your Fields**  \n   In the `Set Fields` node, define the fields you want to update.  \n   ➤ Only include fields that match column names in your Airtable table.  \n   ➤ Make sure the field names are spelled **exactly** as they appear in Airtable.\n   ➤ Make sure the field type are correctly set. So numbers columns in Airtable need numbers type set as the field.\n\n3. **Configure the Airtable Batch Node**  \n   - Enter your **Airtable Base ID**\n     The part with `app...` in the URL:\nairtable\\.com / **app8pqOLeka1Cglwg** / tblnXZOdy8VtkAAJD/...\n   - Enter your **Airtable Table ID**\n     The part with `tbl...` in the URL:\nairtable\\.com / app8pqOLeka1Cglwg / **tblXXZOdy8VtkAAJD** /...\n   - **Set Matching Fields** (`fieldsToMergeOn`)  \n   Provide a string array that tells Airtable how to match existing rows. Examples:\n     - Match by one field (e.g. `TaskID`):  \n     `{{[\"TaskID\"]}}`\n     - Match by multiple fields (e.g. `firstname` and `lastname`):  \n     `{{[\"firstname\", \"lastname\"]}}`\n\n   - **Choose the Mode** (`mode` field)  \n   Available options:\n     - `upsert`: Update if a record exists, otherwise insert a new one\n     - `insert`: Always insert as new records\n     - `update`: Only update existing records (you **must** provide a field named `id`)\n",
+  "featuredImage": "/data/workflows/3394/3394.webp",
+  "author": {
+    "id": 101,
+    "slug": "s3n",
+    "name": "Simon Mayerhofer",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 469,
+  "downloads": 46,
+  "createdAt": "2025-04-01T08:53:00.311Z",
+  "updatedAt": "2026-01-16T08:29:33.381Z",
+  "publishedAt": "2025-04-01T08:53:00.311Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3394",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Airtable batch update / insert rows (send faster + save API call requests)",
+    "workflowName": "Airtable batch update / insert rows (send faster + save API call requests)",
+    "description": "This workflow allows you to batch update/insert Airtable rows in groups of 10, significantly reducing the number of API calls and increasing performance.\n\n## 🚀 How It Works\n\n1. **Copy the 3 Nodes**  \n   Copy the three nodes inside the red note box into your workflow.\n\n2. **Set Your Fields**  \n   In the `Set Fields` node, define the fields you want to update.  \n   ➤ Only include fields that match column names in your Airtable table.  \n   ➤ Make sure the field names are spelled **exactly** as they appear in Airtable.\n   ➤ Make sure the field type are correctly set. So numbers columns in Airtable need numbers type set as the field.\n\n3. **Configure the Airtable Batch Node**  \n   - Enter your **Airtable Base ID**\n     The part with `app...` in the URL:\nairtable\\.com / **app8pqOLeka1Cglwg** / tblnXZOdy8VtkAAJD/...\n   - Enter your **Airtable Table ID**\n     The part with `tbl...` in the URL:\nairtable\\.com / app8pqOLeka1Cglwg / **tblXXZOdy8VtkAAJD** /...\n   - **Set Matching Fields** (`fieldsToMergeOn`)  \n   Provide a string array that tells Airtable how to match existing rows. Examples:\n     - Match by one field (e.g. `TaskID`):  \n     `{{[\"TaskID\"]}}`\n     - Match by multiple fields (e.g. `firstname` and `lastname`):  \n     `{{[\"firstname\", \"lastname\"]}}`\n\n   - **Choose the Mode** (`mode` field)  \n   Available options:\n     - `upsert`: Update if a record exists, otherwise insert a new one\n     - `insert`: Always insert as new records\n     - `update`: Only update existing records (you **must** provide a field named `id`)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "upsert",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "random data",
+      "type": "n8n-nodes-base.debugHelper",
+      "role": "debugHelper",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "batch 10",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Airtable Subprocess",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "insert",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "rate limit?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait 0.2s to prevent rate limits",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "retry request",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "rate limit?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "retry request1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "rate limit?2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "retry request2",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate3",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate2",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "update",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Airtable Batch",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait 5s2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait 5s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait 5s1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "return merged output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+**How it works**
+- Runs at set times to fetch new Upwork job listings.
+- Checks each job’s total or hourly budget and keeps only higher-budget ones.
+- Extracts the job description for those selected jobs.
+- Uses AI to identify the core business idea from each description.
+- Records the idea and job details into a Google Sheet.
+- Can also be triggered manually to process a single job description.
+
+**Set up steps**
+
+- **Required:** Upwork API key, AI service key, and a Google Sheet.
+- **Import:** Bring the JSON into n8n.
+- **Configure:** Enter your API keys and connect to your Google Sheet.
+- **Time:** About 25–35 minutes to complete all steps.
+- **Notes:** Detailed setup instructions are added as sticky notes inside the workflow.

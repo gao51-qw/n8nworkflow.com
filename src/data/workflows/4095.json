@@ -1,0 +1,403 @@
+{
+  "id": 4095,
+  "slug": "4095",
+  "title": "Tesla quant technical indicators webhooks tool",
+  "description": "📡 This workflow serves as the **central Alpha Vantage API fetcher** for Tesla trading indicators, delivering **cleaned 20-point JSON outputs** for three timeframes: `15min`, `1hour`, and `1day`.\nIt is **required** by the following agents:\n\n* Tesla 15min, 1h, 1d Indicators Tools\n* Tesla Financial Market Data Analyst Tool\n\n ✅ **Requires an Alpha Vantage Premium API Key**\n 🚀 Used as a **sub-agent via webhook endpoints** triggered by other workflows\n\n---\n\n## 📈 What It Does\n\nFor each timeframe (`15min`, `1h`, `1d`), this tool:\n\n1. Triggers **6 technical indicators** via Alpha Vantage:\n\n   * RSI\n   * MACD\n   * BBANDS\n   * SMA\n   * EMA\n   * ADX\n2. **Trims the raw response** to the **latest 20 data points**\n3. Reformats into a **clean JSON structure**:\n\n   ```json\n   {\n     \"indicator\": \"MACD\",\n     \"timeframe\": \"1hour\",\n     \"data\": {\n       \"timestamp\": \"...\",\n       \"macd\": 0.32,\n       \"signal\": 0.29\n     }\n   }\n   ```\n4. Returns results via **Webhook Respond** for the calling agent\n\n---\n\n## 📂 Required Credentials\n\n* 🔑 **Alpha Vantage Premium API Key**\n  Set up under `Credentials &gt; HTTP Query Auth`\n\n  * Name: `Alpha Vantage Premium`\n  * Query Param: `apikey`\n\nGet yours here: [https://www.alphavantage.co/premium/](https://www.alphavantage.co/premium/)\n\n---\n\n## 🛠️ Setup Steps\n\n1. **Import Workflow** into n8n\n   Name it: `Tesla_Quant_Technical_Indicators_Webhooks_Tool`\n\n2. **Add HTTP Query Auth Credential**\n   Name: `Alpha Vantage Premium`\n   Param key: `apikey`\n   Value: your Alpha Vantage key\n\n3. **Publish and Use the Webhooks**\n   This workflow exposes 3 endpoints:\n\n   * `/15minData` → used by 15m Indicator Tool\n   * `/1hourData` → used by 1h Indicator Tool\n   * `/1dayData` → used by 1d Indicator Tool\n\n4. **Connect via Execute Workflow** or HTTP Request\n   Ensure caller sends webhook trigger correctly to the path\n\n---\n\n## 🧱 Architecture Summary\n\nEach timeframe section includes:\n\n| Component          | Details                                       |\n| ------------------ | --------------------------------------------- |\n| 📡 Webhook Trigger | Entry node (`/15minData`, `/1hourData`, etc.) |\n| 🔄 API Calls       | 6 nodes fetching indicators via Alpha Vantage |\n| 🧹 Formatters      | JS Code nodes to clean and trim responses     |\n| 🧩 Merge Node      | Consolidates cleaned JSONs                    |\n| 🚀 Webhook Respond | Returns structured data to calling workflow   |\n\n---\n\n## 🧾 Sticky Notes Overview\n\n✅ **Webhook Entry**: Instructions per timeframe\n✅ **API Call Summary**: Alpha Vantage endpoint for each indicator\n✅ **Format Nodes**: Explain JSON parsing and cleaning\n✅ **Merge Logic**: Final output format\n✅ **Webhook Response**: What gets returned to caller\n\nAll stickies follow n8n standard color-coding:\n\n* Blue = Webhook flow\n* Yellow = API request group\n* Purple = Formatters\n* Green = Merge step\n* Gray = Workflow overview and usage\n\n---\n\n## 🔐 Licensing & Support\n\n© 2025 **Treasurium Capital Limited Company**\nThis agent is part of the Tesla Quant AI Trading System and protected under U.S. copyright.\n\nFor support:\n🔗 [Don Jayamaha – LinkedIn](https://linkedin.com/in/donjayamahajr)\n🔗 [n8n Creator Profile](https://n8n.io/creators/don-the-gem-dealer/)\n\n---\n\n🚀 **Use this API tool to feed Tesla technical indicators into any AI or trading agent across 15m, 1h, and 1d timeframes.**\n**Required for all Tesla Quant Agent indicator tools.**\n",
+  "featuredImage": "/data/workflows/4095/4095.webp",
+  "author": {
+    "id": 101,
+    "slug": "don-the-gem-dealer",
+    "name": "Don Jayamaha Jr",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 921,
+  "downloads": 92,
+  "createdAt": "2025-05-16T08:58:13.199Z",
+  "updatedAt": "2026-01-16T08:33:03.672Z",
+  "publishedAt": "2025-05-16T08:58:13.199Z",
+  "nodes": 61,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4095",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Tesla quant technical indicators webhooks tool",
+    "workflowName": "Tesla quant technical indicators webhooks tool",
+    "description": "📡 This workflow serves as the **central Alpha Vantage API fetcher** for Tesla trading indicators, delivering **cleaned 20-point JSON outputs** for three timeframes: `15min`, `1hour`, and `1day`.\nIt is **required** by the following agents:\n\n* Tesla 15min, 1h, 1d Indicators Tools\n* Tesla Financial Market Data Analyst Tool\n\n ✅ **Requires an Alpha Vantage Premium API Key**\n 🚀 Used as a **sub-agent via webhook endpoints** triggered by other workflows\n\n---\n\n## 📈 What It Does\n\nFor each timeframe (`15min`, `1h`, `1d`), this tool:\n\n1. Triggers **6 technical indicators** via Alpha Vantage:\n\n   * RSI\n   * MACD\n   * BBANDS\n   * SMA\n   * EMA\n   * ADX\n2. **Trims the raw response** to the **latest 20 data points**\n3. Reformats into a **clean JSON structure**:\n\n   ```json\n   {\n     \"indicator\": \"MACD\",\n     \"timeframe\": \"1hour\",\n     \"data\": {\n       \"timestamp\": \"...\",\n       \"macd\": 0.32,\n       \"signal\": 0.29\n     }\n   }\n   ```\n4. Returns results via **Webhook Respond** for the calling agent\n\n---\n\n## 📂 Required Credentials\n\n* 🔑 **Alpha Vantage Premium API Key**\n  Set up under `Credentials &gt; HTTP Query Auth`\n\n  * Name: `Alpha Vantage Premium`\n  * Query Param: `apikey`\n\nGet yours here: [https://www.alphavantage.co/premium/](https://www.alphavantage.co/premium/)\n\n---\n\n## 🛠️ Setup Steps\n\n1. **Import Workflow** into n8n\n   Name it: `Tesla_Quant_Technical_Indicators_Webhooks_Tool`\n\n2. **Add HTTP Query Auth Credential**\n   Name: `Alpha Vantage Premium`\n   Param key: `apikey`\n   Value: your Alpha Vantage key\n\n3. **Publish and Use the Webhooks**\n   This workflow exposes 3 endpoints:\n\n   * `/15minData` → used by 15m Indicator Tool\n   * `/1hourData` → used by 1h Indicator Tool\n   * `/1dayData` → used by 1d Indicator Tool\n\n4. **Connect via Execute Workflow** or HTTP Request\n   Ensure caller sends webhook trigger correctly to the path\n\n---\n\n## 🧱 Architecture Summary\n\nEach timeframe section includes:\n\n| Component          | Details                                       |\n| ------------------ | --------------------------------------------- |\n| 📡 Webhook Trigger | Entry node (`/15minData`, `/1hourData`, etc.) |\n| 🔄 API Calls       | 6 nodes fetching indicators via Alpha Vantage |\n| 🧹 Formatters      | JS Code nodes to clean and trim responses     |\n| 🧩 Merge Node      | Consolidates cleaned JSONs                    |\n| 🚀 Webhook Respond | Returns structured data to calling workflow   |\n\n---\n\n## 🧾 Sticky Notes Overview\n\n✅ **Webhook Entry**: Instructions per timeframe\n✅ **API Call Summary**: Alpha Vantage endpoint for each indicator\n✅ **Format Nodes**: Explain JSON parsing and cleaning\n✅ **Merge Logic**: Final output format\n✅ **Webhook Response**: What gets returned to caller\n\nAll stickies follow n8n standard color-coding:\n\n* Blue = Webhook flow\n* Yellow = API request group\n* Purple = Formatters\n* Green = Merge step\n* Gray = Workflow overview and usage\n\n---\n\n## 🔐 Licensing & Support\n\n© 2025 **Treasurium Capital Limited Company**\nThis agent is part of the Tesla Quant AI Trading System and protected under U.S. copyright.\n\nFor support:\n🔗 [Don Jayamaha – LinkedIn](https://linkedin.com/in/donjayamahajr)\n🔗 [n8n Creator Profile](https://n8n.io/creators/don-the-gem-dealer/)\n\n---\n\n🚀 **Use this API tool to feed Tesla technical indicators into any AI or trading agent across 15m, 1h, and 1d timeframes.**\n**Required for all Tesla Quant Agent indicator tools.**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "MACD 15min",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "RSI 15min",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "BBands 15min",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "SMA 15min",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "EMA 15min",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "ADX 15min",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "15min Data Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "RSI 1hour",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "MACD 1hour",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "BBands 1hour",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "SMA 1hour",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "EMA 1hour",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "ADX 1hour",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "1hour Data Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "RSI 1day",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "MACD 1day",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "BBands 1day",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "SMA 1day",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "EMA 1day",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "ADX 1day",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "1day Data Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook 1day Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Respond to Webhook 15min Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Respond to Webhook 1hour Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Merge 1hour Indicators",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Merge 15 min Indicators",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Merge 1day Indicators",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Format Response - MACD 15min",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - RSI 15min",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - BBANDS 15min",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - SMA 15min",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - EMA 15min",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - ADX 15min",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - MACD 1hour",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - RSI 1hour",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - BBANDS 1hour",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - SMA 1hour",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - EMA 1hour",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - ADX 1hour",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - MACD 1day",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - RSI 1day",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - BBANDS 1day",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - SMA 1day",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - EMA 1day",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - ADX 1day",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

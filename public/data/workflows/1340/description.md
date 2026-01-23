@@ -1,0 +1,1 @@
+Gets Google Calendar events for the day (12 hours from execution time), and filters out in-person meetings, Signal meetings, and meetings canceled by Calendly ("transparent").

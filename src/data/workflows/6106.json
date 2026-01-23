@@ -1,0 +1,211 @@
+{
+  "id": 6106,
+  "slug": "6106",
+  "title": "Monitor file changes with Google Drive push notifications",
+  "description": "**Tired of being let down by the Google Drive Trigger? Rather not exhaust system resources by polling every minute? Then this workflow is for you!**\n\nGoogle drive is a great storage option for automation due to its relative simplicity, cheap costs and readily-available integrations. Using Google Drive as a trigger is the next logically step but many n8n users quickly realise the built-in Google Drive trigger just isn't that reliable. Disaster!\n\nTypically, the workaround is to poll the Google Drive search API in short intervals but the trade off is wasted server resources during inactivity. The ideal solution is of course, push notifications but they seem quite complicated to implement... or are they?\n\nThis template demonstrates that setting up **Google Push Notifications for Google Drive File Changes** actually isn't that hard! Using this approach, Google sends a POST request every time something in a drive changes which solves reliability of events and efficiency of resources.\n\n### How it works\n1. We begin with registering a **Notification channel (webhook)** with the Google Drive API. 2 key pieces of information is (a) the webhook URL which notifications will be pushed to and (b) because we want to scope to a single location, the driveId. Good to know that you can register as many as you like using http calls but you have to manage them yourself, there's no google dashboard for notification channels!\n2. The registration data along with the startPageToken are saved in `workflowStaticData` - This is a convenient persistence which we can use to hold small bits of data between executions.\n3. Now, whenever files or folders are created or updated in our target Google Drive, Google will send push notifications to our webhook trigger in this template.\n4. Once triggered, we need still need to call Google Drive's `Changes.list` to get the actual change events which were detected. we can do this with the HTTP request node.\n5. The Changes API will also return the `nextPageToken` - a marker to establish where next to get the new batch of changes. It's important that we use this token the next time we request from the changes API and so, we'll update the `workflowStaticData` with this updated value.\n6. Unfortunately, the `changes.list` API isn't able to filter change events by folder or action and so be sure to do your own set of filtering steps to get the files you want.\n7. Finally with the valid change events, optionally fetch the file metadata which gives you more attributes to play with. For example, you may want to know if the change event was triggered by n8n, in which case you'll want to check \"ModifiedByMe\" value.\n\n### How to use\n* Start with Step 1 and fill in the \"Set Variables\" node and Click on the Manual Execute Trigger. This will create a single Google Drive Notification Channel for a specific drive.\n* Activate the workflow to start recieving events from Google Drive.\n* To test, perform an action eg. create a file, on the target drive. Watch the webhook calls come pouring in!\n* Once you have the desired events, finish off this template to do something with the changed files.\n\n### Requirements\n* Google Drive Credentials. Note this workflow also works on Shared Drives.\n\n### Optimising This Workflow\n* With bulk actions, you'll notice that Google gradually starts to send increasingly large amounts of push notifications - sometimes numbering in the hundreds! For cloud plan users, this could easily exhaust execution limits if lots of changes are made in the same drive daily. One approach is to implement a throttling mechanism externally to batch events before sending them to n8n.\n* This throttling mechanism is outside the scope of this template but quite easy to achieve with something like Supabase Edge Functions.",
+  "featuredImage": "/data/workflows/6106/6106.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1110,
+  "downloads": 111,
+  "createdAt": "2025-07-17T22:50:03.915Z",
+  "updatedAt": "2026-01-16T08:43:12.428Z",
+  "publishedAt": "2025-07-17T22:50:03.915Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6106",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor file changes with Google Drive push notifications",
+    "workflowName": "Monitor file changes with Google Drive push notifications",
+    "description": "**Tired of being let down by the Google Drive Trigger? Rather not exhaust system resources by polling every minute? Then this workflow is for you!**\n\nGoogle drive is a great storage option for automation due to its relative simplicity, cheap costs and readily-available integrations. Using Google Drive as a trigger is the next logically step but many n8n users quickly realise the built-in Google Drive trigger just isn't that reliable. Disaster!\n\nTypically, the workaround is to poll the Google Drive search API in short intervals but the trade off is wasted server resources during inactivity. The ideal solution is of course, push notifications but they seem quite complicated to implement... or are they?\n\nThis template demonstrates that setting up **Google Push Notifications for Google Drive File Changes** actually isn't that hard! Using this approach, Google sends a POST request every time something in a drive changes which solves reliability of events and efficiency of resources.\n\n### How it works\n1. We begin with registering a **Notification channel (webhook)** with the Google Drive API. 2 key pieces of information is (a) the webhook URL which notifications will be pushed to and (b) because we want to scope to a single location, the driveId. Good to know that you can register as many as you like using http calls but you have to manage them yourself, there's no google dashboard for notification channels!\n2. The registration data along with the startPageToken are saved in `workflowStaticData` - This is a convenient persistence which we can use to hold small bits of data between executions.\n3. Now, whenever files or folders are created or updated in our target Google Drive, Google will send push notifications to our webhook trigger in this template.\n4. Once triggered, we need still need to call Google Drive's `Changes.list` to get the actual change events which were detected. we can do this with the HTTP request node.\n5. The Changes API will also return the `nextPageToken` - a marker to establish where next to get the new batch of changes. It's important that we use this token the next time we request from the changes API and so, we'll update the `workflowStaticData` with this updated value.\n6. Unfortunately, the `changes.list` API isn't able to filter change events by folder or action and so be sure to do your own set of filtering steps to get the files you want.\n7. Finally with the valid change events, optionally fetch the file metadata which gives you more attributes to play with. For example, you may want to know if the change event was triggered by n8n, in which case you'll want to check \"ModifiedByMe\" value.\n\n### How to use\n* Start with Step 1 and fill in the \"Set Variables\" node and Click on the Manual Execute Trigger. This will create a single Google Drive Notification Channel for a specific drive.\n* Activate the workflow to start recieving events from Google Drive.\n* To test, perform an action eg. create a file, on the target drive. Watch the webhook calls come pouring in!\n* Once you have the desired events, finish off this template to do something with the changed files.\n\n### Requirements\n* Google Drive Credentials. Note this workflow also works on Shared Drives.\n\n### Optimising This Workflow\n* With bulk actions, you'll notice that Google gradually starts to send increasingly large amounts of push notifications - sometimes numbering in the hundreds! For cloud plan users, this could easily exhaust execution limits if lots of changes are made in the same drive daily. One approach is to implement a throttling mechanism externally to batch events before sending them to n8n.\n* This throttling mechanism is outside the scope of this template but quite easy to achieve with something like Supabase Edge Functions.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get StartPageToken",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Register Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Save Registration to WorkflowStaticData",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Is Valid Request?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Invalid Request",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Changes List",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Change Events to Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Changed Events",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Registration From WorkflowStaticData",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Files Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Do Something With These Files!",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save NextPageToken to WorkflowStaticData",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Registration",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "First Run? Click Here!",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Subworkflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Stop Any Existing Notifications",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Register Notification Channel",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+This is the AI agent which will set the event in the Google Calendar and get the events from the calendar based on the prompt provided to AI agent based on Gemini.

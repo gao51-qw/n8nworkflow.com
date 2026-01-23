@@ -1,0 +1,176 @@
+{
+  "id": 5778,
+  "slug": "5778",
+  "title": "Automated RSS monitoring with Gemini AI summaries and deduplication to Google Sheets",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## Who's it for\n\nContent creators, marketers, and researchers who need to monitor multiple RSS feeds and get AI-generated summaries without manual work.\n\n## How it works\n\nThis workflow automatically monitors RSS feeds, filters new articles from the last X days, checks for duplicates, and generates structured AI summaries. It fetches full article content, converts HTML to markdown, and uses Gemini AI to create consistent summaries with quick takeaways, key points, and practical insights. All data is saved to Google Sheets for easy access and sharing.\n\nThe system processes RSS feeds in batches, ensuring no duplicate articles are processed twice by checking existing URLs in your Google Sheets. Each new article gets a comprehensive AI summary that includes the main message, key takeaways, important points, and practical applications.\n\n## Requirements\n\n- Google Sheets access\n- OpenRouter API key for Gemini AI model or other language model\n- RSS feed URLs to monitor\n\n## How to set up\n\nCopy the template Google Sheet, add your RSS feeds in the \"RSS FEEDS\" tab, configure Google Sheets and OpenRouter credentials in n8n, and adjust the time filter in the Settings node. The workflow can run manually or on schedule every hour.\n\n## How to customize\n\nModify AI prompts for different summary styles, change the time filter duration, add more data fields to Google Sheets, or switch to a different AI model in the LLM Chat Model node.\n",
+  "featuredImage": "/data/workflows/5778/5778.webp",
+  "author": {
+    "id": 101,
+    "slug": "romek",
+    "name": "Roman Rozenberger",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3395,
+  "downloads": 339,
+  "createdAt": "2025-07-08T12:49:42.101Z",
+  "updatedAt": "2026-01-16T08:41:22.260Z",
+  "publishedAt": "2025-07-08T12:49:42.101Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5778",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated RSS monitoring with Gemini AI summaries and deduplication to Google Sheets",
+    "workflowName": "Automated RSS monitoring with Gemini AI summaries and deduplication to Google Sheets",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## Who's it for\n\nContent creators, marketers, and researchers who need to monitor multiple RSS feeds and get AI-generated summaries without manual work.\n\n## How it works\n\nThis workflow automatically monitors RSS feeds, filters new articles from the last X days, checks for duplicates, and generates structured AI summaries. It fetches full article content, converts HTML to markdown, and uses Gemini AI to create consistent summaries with quick takeaways, key points, and practical insights. All data is saved to Google Sheets for easy access and sharing.\n\nThe system processes RSS feeds in batches, ensuring no duplicate articles are processed twice by checking existing URLs in your Google Sheets. Each new article gets a comprehensive AI summary that includes the main message, key takeaways, important points, and practical applications.\n\n## Requirements\n\n- Google Sheets access\n- OpenRouter API key for Gemini AI model or other language model\n- RSS feed URLs to monitor\n\n## How to set up\n\nCopy the template Google Sheet, add your RSS feeds in the \"RSS FEEDS\" tab, configure Google Sheets and OpenRouter credentials in n8n, and adjust the time filter in the Settings node. The workflow can run manually or on schedule every hour.\n\n## How to customize\n\nModify AI prompts for different summary styles, change the time filter duration, add more data fields to Google Sheets, or switch to a different AI model in the LLM Chat Model node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get RSS Feed List",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Read RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Rss Elements",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Row for URL is in Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Convert HTML to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Aummary to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Combine Rss with source name",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check If Article Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Summarize Content",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Format Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Filter Last X Days",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "LLM Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "End of worfklow",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Webpage HTML Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Body Content in HTML",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

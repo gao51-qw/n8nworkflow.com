@@ -1,0 +1,175 @@
+{
+  "id": 10104,
+  "slug": "10104",
+  "title": "Form to meeting: Google Calendar, Zoom, Gmail & Slack booking automation",
+  "description": "**Who’s it for**\n\nTeams that collect meeting requests via a form and want instant, error-free scheduling: customer success, sales, education, agencies, and community managers.\n\n**How it works / What it does**\n\nThis workflow ingests a form submission (name, email, preferred date/time), checks Google Calendar for conflicts, and branches automatically. If the slot is free, it creates a calendar event, spins up a Zoom meeting, emails the guest a confirmation, and posts a Slack summary to your team. If busy, it sends a polite “please pick another time” email. Time handling defaults to Asia/Tokyo and converts to ISO internally to keep downstream integrations consistent.\n\n**How to set up**\n\nImport the workflow and rename nodes for clarity if needed.\n\nOpen the Workflow Configuration (Set) node and adjust variables (calendar ID, meeting duration, Slack channel, sender info).\n\nMap your form fields in Extract Booking Details.\n\nConnect credentials in each service node (Google Calendar, Zoom, Gmail, Slack).\n\nTest once with a real submission.\n\n**Requirements**\n\nActive accounts and n8n credentials for Google Calendar, Zoom, Gmail, and Slack.\n\nA form or webhook source that sends name, email, and a valid datetime.\n\nHow to customize the workflow\n\nDuration & buffers: Change end time calculation in Extract Booking Details.\n\nTime zones: If you accept multiple time zones, normalize before building ISO strings.\n\nEmail copy: Personalize confirmation/alternative-time messages and add attachments if desired.\n\nSlack format: Enrich the post with fields (host, Zoom join URL, internal tags).\n\nRouting: Add CRM updates or reminders after the “slot free” branch.\n\nSecurity note: No hardcoded API keys in HTTP nodes. Configure all credentials via n8n’s credential manager.",
+  "featuredImage": "/data/workflows/10104/10104.webp",
+  "author": {
+    "id": 101,
+    "slug": "takuya",
+    "name": "Takuya Ojima",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1489,
+  "downloads": 148,
+  "createdAt": "2025-10-24T06:18:37.613Z",
+  "updatedAt": "2026-01-16T09:03:27.155Z",
+  "publishedAt": "2025-10-24T06:18:37.613Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10104",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Form to meeting: Google Calendar, Zoom, Gmail & Slack booking automation",
+    "workflowName": "Form to meeting: Google Calendar, Zoom, Gmail & Slack booking automation",
+    "description": "**Who’s it for**\n\nTeams that collect meeting requests via a form and want instant, error-free scheduling: customer success, sales, education, agencies, and community managers.\n\n**How it works / What it does**\n\nThis workflow ingests a form submission (name, email, preferred date/time), checks Google Calendar for conflicts, and branches automatically. If the slot is free, it creates a calendar event, spins up a Zoom meeting, emails the guest a confirmation, and posts a Slack summary to your team. If busy, it sends a polite “please pick another time” email. Time handling defaults to Asia/Tokyo and converts to ISO internally to keep downstream integrations consistent.\n\n**How to set up**\n\nImport the workflow and rename nodes for clarity if needed.\n\nOpen the Workflow Configuration (Set) node and adjust variables (calendar ID, meeting duration, Slack channel, sender info).\n\nMap your form fields in Extract Booking Details.\n\nConnect credentials in each service node (Google Calendar, Zoom, Gmail, Slack).\n\nTest once with a real submission.\n\n**Requirements**\n\nActive accounts and n8n credentials for Google Calendar, Zoom, Gmail, and Slack.\n\nA form or webhook source that sends name, email, and a valid datetime.\n\nHow to customize the workflow\n\nDuration & buffers: Change end time calculation in Extract Booking Details.\n\nTime zones: If you accept multiple time zones, normalize before building ISO strings.\n\nEmail copy: Personalize confirmation/alternative-time messages and add attachments if desired.\n\nSlack format: Enrich the post with fields (host, Zoom join URL, internal tags).\n\nRouting: Add CRM updates or reminders after the “slot free” branch.\n\nSecurity note: No hardcoded API keys in HTTP nodes. Configure all credentials via n8n’s credential manager.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Forms Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge Form Data1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Workflow Configuration1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Booking Details1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check Calendar Availability1",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Is Time Slot Available?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Calendar Event1",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create Zoom Meeting1",
+      "type": "n8n-nodes-base.zoom",
+      "role": "zoom",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Confirmation Email1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Notify Teammate on Slack1",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send Unavailable Email1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky: Google Forms Webhook1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Merge Form Data1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Workflow Configuration1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Extract Booking Details1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Check Calendar Availability1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Is Time Slot Available?1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Create Calendar Event1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Create Zoom Meeting1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Send Confirmation Email1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Notify Teammate on Slack1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Send Unavailable Email1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

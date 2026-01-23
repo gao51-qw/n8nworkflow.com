@@ -1,0 +1,266 @@
+{
+  "id": 2341,
+  "slug": "2341",
+  "title": "Build a tax code assistant with Qdrant, Mistral.ai and OpenAI",
+  "description": "This n8n workflows builds another example of creating a knowledgebase assistant but demonstrates how a more deliberate and targeted approach to ingesting the data can produce much better results for your chatbot.\n\nIn this example, a government tax code policy document is used. Whilst we could split the document into chunks by content length, we often lose the context of chapters and sections which may be required by the user.\n\nOur approach then is to first split the document into chapters and sections before importing into our vector store. Additionally, using metadata correctly is key to allow filtering and scoped queries.\n\n## Example\n\n**Human**: \"Tell me about what the tax code says about cargo for intentional commerce?\"\n\n**AI**: \"Section 11.25 of the Texas Property Tax Code pertains to \"MARINE CARGO CONTAINERS USED EXCLUSIVELY IN INTERNATIONAL COMMERCE.\" In this section, a person who is a citizen of a foreign country or an en...\"\n\n## How it works\n\n* The tax code policy document is downloaded as a zip file from the government website and its pages are extracted as separate chapters.\n* Each chapter is then parsed and split into its sections using data manipulation expressions.\n* Each section is then inserted into our Qdrant vector store tagged with its source, chapter and section numbers as metadata.\n* When our AI Agent needs to retrieve data from our vector store, we use a custom workflow tool to perform the query to Qdrant.\n* Because we're relying on Qdrant's advanced filtering capabilities, we perform the search using the Qdrant API rather than the Qdrant node.\n* When the AI Agent, needs to pull full wording or extracts, we can use Qdrant's scroll API and metadata filtering to do so. This makes Qdrant behave like a key-value store for our document.\n\n## Requirements\n* A Qdrant instance is required for the vector store and specifically for it's filtering functionality.\n* Mistral.ai account for Embeddings and AI models.\n\n## Customising this workflow\n\nDepending on your use-case, consider returning actual PDF pages (or links) to the user for the extra confirmation and to build trust.\n\nNot using Mistral? You are able to replace but note to match the distance and dimension size of Qdrant collection to your chosen embedding model.",
+  "featuredImage": "/data/workflows/2341/2341.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 10412,
+  "downloads": 1041,
+  "createdAt": "2024-07-11T10:41:27.677Z",
+  "updatedAt": "2026-01-16T08:24:07.896Z",
+  "publishedAt": "2024-07-11T10:41:27.677Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2341",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a tax code assistant with Qdrant, Mistral.ai and OpenAI",
+    "workflowName": "Build a tax code assistant with Qdrant, Mistral.ai and OpenAI",
+    "description": "This n8n workflows builds another example of creating a knowledgebase assistant but demonstrates how a more deliberate and targeted approach to ingesting the data can produce much better results for your chatbot.\n\nIn this example, a government tax code policy document is used. Whilst we could split the document into chunks by content length, we often lose the context of chapters and sections which may be required by the user.\n\nOur approach then is to first split the document into chapters and sections before importing into our vector store. Additionally, using metadata correctly is key to allow filtering and scoped queries.\n\n## Example\n\n**Human**: \"Tell me about what the tax code says about cargo for intentional commerce?\"\n\n**AI**: \"Section 11.25 of the Texas Property Tax Code pertains to \"MARINE CARGO CONTAINERS USED EXCLUSIVELY IN INTERNATIONAL COMMERCE.\" In this section, a person who is a citizen of a foreign country or an en...\"\n\n## How it works\n\n* The tax code policy document is downloaded as a zip file from the government website and its pages are extracted as separate chapters.\n* Each chapter is then parsed and split into its sections using data manipulation expressions.\n* Each section is then inserted into our Qdrant vector store tagged with its source, chapter and section numbers as metadata.\n* When our AI Agent needs to retrieve data from our vector store, we use a custom workflow tool to perform the query to Qdrant.\n* Because we're relying on Qdrant's advanced filtering capabilities, we perform the search using the Qdrant API rather than the Qdrant node.\n* When the AI Agent, needs to pull full wording or extracts, we can use Qdrant's scroll API and metadata filtering to do so. This makes Qdrant behave like a key-value store for our document.\n\n## Requirements\n* A Qdrant instance is required for the vector store and specifically for it's filtering functionality.\n* Mistral.ai account for Embeddings and AI models.\n\n## Customising this workflow\n\nDepending on your use-case, consider returning actual PDF pages (or links) to the user for the extra confirmation and to build trust.\n\nNot using Mistral? You are able to replace but note to match the distance and dimension size of Qdrant collection to your chosen embedding model.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Mistral Cloud",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Tax Code Zip File",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Zip Files",
+      "type": "n8n-nodes-base.compression",
+      "role": "compression",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Files as Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract PDF Contents",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract From Chapter",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Map To Sections",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Mistral Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Content Chunking @ 50k Chars",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Split Out Chunks",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "For Each Section...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sections To List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only Valid Sections",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Use Qdrant Search API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Use Qdrant Scroll API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Search Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "1sec",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Ask Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Search Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Ask Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

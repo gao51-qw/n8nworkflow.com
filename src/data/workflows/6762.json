@@ -1,0 +1,254 @@
+{
+  "id": 6762,
+  "slug": "6762",
+  "title": "Auto-like LinkedIn posts with GPT-4o, Phantombuster and SharePoint",
+  "description": "## Who’s it for  \nRecruiters, B2B marketers, and thought-leadership builders who want to boost their LinkedIn engagement by automatically liking fresh, relevant posts—while staying under LinkedIn’s daily limits.\n\n## How it works / What it does  \n1. **Schedule Trigger** runs hourly at a specified minute.  \n2. **Select Cookie** chooses a rotating LinkedIn session-cookie (time-slice logic).  \n3. **Generate Random Search Term** (GPT-4o) outputs a realistic AI/BPA keyword.  \n4. **Phantombuster LinkedIn Content Search Agent** scrapes recent posts → **Get Posts**.  \n5. **Get Random Post** selects one post, checks it isn’t already liked (SharePoint CSV) and appends the company-ID query param. If a personal LinkedIn Account is used, no company-ID is needed.\n6. Creates `linkedin_posts_to_like.csv`, uploads to SharePoint, and provides the URL to **Autolike Agent** which likes the post.  \n7. The post URL is added to `linkedin_posts_already_liked.csv` to avoid duplicates.  \n8. **Wait** nodes throttle launches to ≈400 likes/day.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `linkedin_session_cookies.txt` – one cookie per line.  \n   • `linkedin_posts_already_liked.csv` with header `postUrl`.  \n3. Update **Set ENV Variables** with your LinkedIn company ID (`ENV_COMPANY_ID_LINKEDIN`).  \n4. Adjust schedule or likes-per-launch as needed.  \n5. Activate the workflow; it will run hourly and like one new post per launch.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account (GPT-4o)  \n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Change niche: edit the prompt in **Generate Random Search Term**.  \n- Like more posts: raise `numberOfLinesPerLaunch` and schedule frequency.  \n- Swap SharePoint for Google Drive/Dropbox: replace the upload/download nodes.",
+  "featuredImage": "/data/workflows/6762/6762.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 103,
+  "downloads": 10,
+  "createdAt": "2025-08-01T08:04:57.687Z",
+  "updatedAt": "2026-01-16T08:46:59.249Z",
+  "publishedAt": "2025-08-01T08:04:57.687Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6762",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-like LinkedIn posts with GPT-4o, Phantombuster and SharePoint",
+    "workflowName": "Auto-like LinkedIn posts with GPT-4o, Phantombuster and SharePoint",
+    "description": "## Who’s it for  \nRecruiters, B2B marketers, and thought-leadership builders who want to boost their LinkedIn engagement by automatically liking fresh, relevant posts—while staying under LinkedIn’s daily limits.\n\n## How it works / What it does  \n1. **Schedule Trigger** runs hourly at a specified minute.  \n2. **Select Cookie** chooses a rotating LinkedIn session-cookie (time-slice logic).  \n3. **Generate Random Search Term** (GPT-4o) outputs a realistic AI/BPA keyword.  \n4. **Phantombuster LinkedIn Content Search Agent** scrapes recent posts → **Get Posts**.  \n5. **Get Random Post** selects one post, checks it isn’t already liked (SharePoint CSV) and appends the company-ID query param. If a personal LinkedIn Account is used, no company-ID is needed.\n6. Creates `linkedin_posts_to_like.csv`, uploads to SharePoint, and provides the URL to **Autolike Agent** which likes the post.  \n7. The post URL is added to `linkedin_posts_already_liked.csv` to avoid duplicates.  \n8. **Wait** nodes throttle launches to ≈400 likes/day.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `linkedin_session_cookies.txt` – one cookie per line.  \n   • `linkedin_posts_already_liked.csv` with header `postUrl`.  \n3. Update **Set ENV Variables** with your LinkedIn company ID (`ENV_COMPANY_ID_LINKEDIN`).  \n4. Adjust schedule or likes-per-launch as needed.  \n5. Activate the workflow; it will run hourly and like one new post per launch.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account (GPT-4o)  \n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Change niche: edit the prompt in **Generate Random Search Term**.  \n- Like more posts: raise `numberOfLinesPerLaunch` and schedule frequency.  \n- Swap SharePoint for Google Drive/Dropbox: replace the upload/download nodes.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Random Post",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create CSV Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload CSV",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Posts",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Response",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Autoliking Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Launch AL Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set ENV Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Launch Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Search Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate Random Search Term",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if in List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare Updated Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Available Session Cookies",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Cookies",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Cookie",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

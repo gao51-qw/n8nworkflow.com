@@ -1,0 +1,230 @@
+{
+  "id": 9970,
+  "slug": "9970",
+  "title": "Automated email responses with GPT-4O & Supabase conversation memory",
+  "description": "### This n8n workflow lets you delegate inbox management to an AI agent. It automatically replies to emails when a suitable response is found in your knowledge base. If no match is found, the message is forwarded to a human for review. This ensures all replies follow company guidelines and prevent misinformation or misrepresentation.\n\n## Use Case\nIdeal for businesses that receive frequent inquiries about products or services and want to automate responses, freeing up time to focus on core operations.\n\n## How It Works\n- Polls your inbox for new incoming emails  \n- Cleans HTML to reduce token usage and filters spam  \n- Categorizes emails for better organization  \n- Retrieves conversation history from Supabase (if available) to give the AI proper context  \n- Uses the AI agent to query your FAQ database for relevant answers  \n- Replies automatically if a suitable answer is found  \n- Sends a placeholder email and forwards to a human if no accurate answer exists  \n- Ingests all processed emails into Supabase to retain conversation history and improve future AI accuracy  \n\n## Customization\nYou can connect any email provider or LLM model. The workflow can also be expanded to let the AI schedule meetings, answer availability questions, or handle other inbox tasks.\n\nIf you'd like help tailoring this workflow to your business, feel free to reach out:  \n[Upwork Profile](https://www.upwork.com/freelancers/~01b9cfafda64624983)",
+  "featuredImage": "/data/workflows/9970/9970.webp",
+  "author": {
+    "id": 101,
+    "slug": "lukmanabdh",
+    "name": "Lukman",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 368,
+  "downloads": 36,
+  "createdAt": "2025-10-21T06:13:46.294Z",
+  "updatedAt": "2026-01-16T09:02:48.332Z",
+  "publishedAt": "2025-10-21T06:13:46.294Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9970",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated email responses with GPT-4O & Supabase conversation memory",
+    "workflowName": "Automated email responses with GPT-4O & Supabase conversation memory",
+    "description": "### This n8n workflow lets you delegate inbox management to an AI agent. It automatically replies to emails when a suitable response is found in your knowledge base. If no match is found, the message is forwarded to a human for review. This ensures all replies follow company guidelines and prevent misinformation or misrepresentation.\n\n## Use Case\nIdeal for businesses that receive frequent inquiries about products or services and want to automate responses, freeing up time to focus on core operations.\n\n## How It Works\n- Polls your inbox for new incoming emails  \n- Cleans HTML to reduce token usage and filters spam  \n- Categorizes emails for better organization  \n- Retrieves conversation history from Supabase (if available) to give the AI proper context  \n- Uses the AI agent to query your FAQ database for relevant answers  \n- Replies automatically if a suitable answer is found  \n- Sends a placeholder email and forwards to a human if no accurate answer exists  \n- Ingests all processed emails into Supabase to retain conversation history and improve future AI accuracy  \n\n## Customization\nYou can connect any email provider or LLM model. The workflow can also be expanded to let the AI schedule meetings, answer availability questions, or handle other inbox tasks.\n\nIf you'd like help tailoring this workflow to your business, feel free to reach out:  \n[Upwork Profile](https://www.upwork.com/freelancers/~01b9cfafda64624983)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Embeddings OpenAI2",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Microsoft Outlook Trigger",
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "role": "microsoftOutlookTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clean HTML",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Categorize",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "JSON",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "4o",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Conversation Retrieval",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Spam Filter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Email Manager",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Format",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email Template DB",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "FAQ DB",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Reply",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Reply1",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Forward?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Retrieve Categories",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Outlook Forward",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Supabase Vector Store4",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings OpenAI6",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader3",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Recursive Character Text Splitter3",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update a row2",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

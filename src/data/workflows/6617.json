@@ -1,0 +1,146 @@
+{
+  "id": 6617,
+  "slug": "6617",
+  "title": "Find engagement opportunities from Skool communities using Apify & GPT-4.1",
+  "description": "## Who's it for\n\nThis workflow is for **community builders, marketers, consultants, coaches, and thought leaders** who want to grow their presence in **Skool communities** through strategic, value-driven engagement. It's especially useful for professionals who want to:\n\n- Build authority in their niche by providing helpful insights\n- Scale their community engagement without spending hours manually browsing posts\n- Identify high-value conversation opportunities that align with their expertise\n- Maintain authentic, helpful presence across multiple Skool communities\n\n## What problem is this workflow solving\n\nMany professionals struggle to consistently engage meaningfully in online communities due to:\n- **Time constraints**: Manually browsing multiple communities daily is time-consuming\n- **Missed opportunities**: Important discussions happen when you're not online\n- **Inconsistent engagement**: Sporadic participation reduces visibility and relationship building\n- **Generic responses**: Quick replies often lack the depth needed to showcase expertise\n\nThis workflow solves these problems by automatically monitoring your target Skool communities, using AI to identify posts where your expertise could add genuine value, generating thoughtful contextual comment suggestions, and organizing opportunities for efficient manual review and engagement.\n\n## How it works\n\n### Scheduled Community Monitoring\nRuns daily at 7 PM to scan your configured Skool communities for new posts and discussions from the last 24 hours.\n\n### Intelligent Configuration Management\n- Pulls settings from Airtable including target communities, your domain expertise, and preferred tools\n- Possibility to add several configurations\n- Filters for active configurations only\n- Processes multiple community URLs efficiently\n\n### Comprehensive Data Extraction\nUses Apify Skool Scraper to collect:\n- Post content and metadata\n- Comments over 50 characters (quality filter)\n- Direct links for easy access\n\n### AI-Powered Opportunity Analysis\nLeverages OpenAI GPT-4.1 to:\n- Analyze each post for engagement opportunities based on your expertise\n- Identify specific trigger sentences that indicate a need you can address\n- Generate contextual, helpful comment suggestions\n- Maintain authentic tone without being promotional\n\n### Smart Filtering and Organization\n- Only surfaces genuine opportunities where you can add value\n- Stores results in Airtable with detailed reasoning\n- Provides suggested comments ready for review and posting\n- Tracks engagement history to avoid duplicate responses\n\n### Quality Control and Review\nAll opportunities are saved to Airtable where you can:\n- Review AI reasoning and suggested responses\n- Edit comments before posting\n- Track which opportunities you've acted on\n- Monitor success patterns over time\n\n## How to set up\n\n### Required credentials\n- **OpenAI API key** - For GPT-4.1 powered opportunity analysis\n- **Airtable Personal Access Token** - For configuration and results storage\n- **Apify API token** - For Skool community scraping\n\n### Airtable base setup\n\nCreate an Airtable base with two tables:\n\n**Config Table** (`config`):\n- `Name` (Single line text): Your configuration name\n- `Skool URLs` (Long text): Comma-separated list of Skool community URLs\n- `cookies` (Long text): Your Skool session cookies for authenticated access\n- `Domain of Activity` (Single line text): Your area of expertise (e.g., \"AI automation\", \"Digital marketing\")\n- `Tools Used` (Single line text): Your preferred tools to recommend (e.g., \"n8n\", \"Zapier\")\n- `active` (Checkbox): Whether this configuration is currently active\n\n**Results Table** (`Table 1`):\n- `title` (Single line text): Post title/author\n- `url` (URL): Direct link to the post\n- `reason` (Long text): AI's reasoning for the opportunity\n- `trigger` (Long text): Specific sentence that triggered the opportunity\n- `suggested answer` (Long text): AI-generated comment suggestion\n- `config` (Link to another record): Reference to the config used\n- `date` (Date): When the opportunity was found\n- `Select` (Single select): Status tracking (not commented/commented)\n\n### Skool cookies setup\nTo access private Skool communities, you'll need to:\n1. **Install Cookie Editor**: Go to Chrome Web Store and install the \"Cookie Editor\" extension\n2. **Login to Skool**: Navigate to any Skool community you want to monitor and log in\n3. **Open Cookie Editor**: Click the Cookie Editor extension icon in your browser toolbar\n4. **Export cookies**: \n   - Click \"Export\" button in the extension\n   - Copy the exported text\n5. **Add to Airtable**: Paste the cookie string into the `cookies` field in your Airtable config\n\n### Trigger configuration\n- Ensure the Schedule Trigger is set to your preferred monitoring time\n- Default is 7 PM daily, but adjust based on your target communities' peak activity\n\n## Requirements\n\n- **Self-hosted n8n or n8n Cloud account**\n- **Active Skool community memberships** - You must be a legitimate member of communities you want to monitor\n- **OpenAI API credits** \n- **Apify subscription** - For reliable Skool data scraping (free tier available)\n- **Airtable account** - Free tier sufficient for most use cases\n\n## How to customize the workflow\n\n### Modify AI analysis criteria\nEdit the `EvaluateOpportunities And Generate Comments` node to:\n- Adjust the opportunity detection sensitivity\n- Modify the comment tone and style\n- Add industry-specific keywords or phrases\n\n### Change monitoring frequency\nUpdate the Schedule Trigger to:\n- Multiple times per day for highly active communities\n- Weekly for slower-moving professional groups\n- Custom intervals based on community activity patterns\n\n### Customize data collection\nModify the Apify scraper settings to:\n- Adjust the time window (currently 24 hours)\n- Change comment length filters (currently &gt;50 characters)\n- Include/exclude media content\n- Modify the number of comments per post\n\n### Add additional filters\nInsert filter nodes to:\n- Skip posts from specific users\n- Focus on posts with minimum engagement levels\n- Exclude certain post types or keywords\n- Prioritize posts from influential community members\n\n### Enhance output options\nAdd nodes after `Record Results` to:\n- Send Slack/Discord notifications for high-priority opportunities\n- Create calendar events for engagement tasks\n- Export daily summaries to Google Sheets\n- Integrate with CRM systems for lead tracking\n\n## Example outputs\n\n### Opportunity analysis result\n```json\n{\n  \"opportunity\": true,\n  \"reason\": \"The user is struggling with manual social media management tasks that could be automated using n8n workflows.\",\n  \"trigger_sentence\": \"I'm spending 3+ hours daily just scheduling posts and responding to comments across all my social accounts.\",\n  \"suggested_comment\": \"That sounds exhausting! Have you considered setting up automation workflows? Tools like n8n can handle the scheduling and even help with response suggestions, potentially saving you 80% of that time. The initial setup takes a day but pays dividends long-term.\"\n}\nAirtable record example\n\nTitle: \"Sarah Johnson - Social Media Burnout\"\nURL: https://www.skool.com/community/post/123456\nReason: \"User expressing pain point with manual social media management - perfect fit for automation solutions\"\nTrigger: \"I'm spending 3+ hours daily just scheduling posts...\"\nSuggested Answer: \"That sounds exhausting! Have you considered setting up automation workflows?...\"\nConfig: [Your Config Name]\nDate: 2024-12-09 19:00:00\nStatus: \"not commented\"\n```\n\n## Best practices\n\n### Authentic engagement\n- Always review and personalize AI suggestions before posting\n- Focus on being genuinely helpful rather than promotional\n- Share experiences and ask follow-up questions\n- Engage in subsequent conversation when people respond\n\n### Community guidelines\n- Respect each community's rules and culture\n- Avoid over-promotion of your tools or services\n- Build relationships before introducing solutions\n- Contribute value consistently, not just when selling\n\n### Optimization tips\n- Monitor which types of opportunities convert best\n- A/B test different comment styles and approaches\n- Track engagement metrics on your actual comments\n- Adjust AI prompts based on community feedback\n\n\n",
+  "featuredImage": "/data/workflows/6617/6617.webp",
+  "author": {
+    "id": 101,
+    "slug": "alexaspalato",
+    "name": "Alexandra Spalato",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 726,
+  "downloads": 72,
+  "createdAt": "2025-07-29T08:59:57.953Z",
+  "updatedAt": "2026-01-16T08:45:59.245Z",
+  "publishedAt": "2025-07-29T08:59:57.953Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6617",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Find engagement opportunities from Skool communities using Apify & GPT-4.1",
+    "workflowName": "Find engagement opportunities from Skool communities using Apify & GPT-4.1",
+    "description": "## Who's it for\n\nThis workflow is for **community builders, marketers, consultants, coaches, and thought leaders** who want to grow their presence in **Skool communities** through strategic, value-driven engagement. It's especially useful for professionals who want to:\n\n- Build authority in their niche by providing helpful insights\n- Scale their community engagement without spending hours manually browsing posts\n- Identify high-value conversation opportunities that align with their expertise\n- Maintain authentic, helpful presence across multiple Skool communities\n\n## What problem is this workflow solving\n\nMany professionals struggle to consistently engage meaningfully in online communities due to:\n- **Time constraints**: Manually browsing multiple communities daily is time-consuming\n- **Missed opportunities**: Important discussions happen when you're not online\n- **Inconsistent engagement**: Sporadic participation reduces visibility and relationship building\n- **Generic responses**: Quick replies often lack the depth needed to showcase expertise\n\nThis workflow solves these problems by automatically monitoring your target Skool communities, using AI to identify posts where your expertise could add genuine value, generating thoughtful contextual comment suggestions, and organizing opportunities for efficient manual review and engagement.\n\n## How it works\n\n### Scheduled Community Monitoring\nRuns daily at 7 PM to scan your configured Skool communities for new posts and discussions from the last 24 hours.\n\n### Intelligent Configuration Management\n- Pulls settings from Airtable including target communities, your domain expertise, and preferred tools\n- Possibility to add several configurations\n- Filters for active configurations only\n- Processes multiple community URLs efficiently\n\n### Comprehensive Data Extraction\nUses Apify Skool Scraper to collect:\n- Post content and metadata\n- Comments over 50 characters (quality filter)\n- Direct links for easy access\n\n### AI-Powered Opportunity Analysis\nLeverages OpenAI GPT-4.1 to:\n- Analyze each post for engagement opportunities based on your expertise\n- Identify specific trigger sentences that indicate a need you can address\n- Generate contextual, helpful comment suggestions\n- Maintain authentic tone without being promotional\n\n### Smart Filtering and Organization\n- Only surfaces genuine opportunities where you can add value\n- Stores results in Airtable with detailed reasoning\n- Provides suggested comments ready for review and posting\n- Tracks engagement history to avoid duplicate responses\n\n### Quality Control and Review\nAll opportunities are saved to Airtable where you can:\n- Review AI reasoning and suggested responses\n- Edit comments before posting\n- Track which opportunities you've acted on\n- Monitor success patterns over time\n\n## How to set up\n\n### Required credentials\n- **OpenAI API key** - For GPT-4.1 powered opportunity analysis\n- **Airtable Personal Access Token** - For configuration and results storage\n- **Apify API token** - For Skool community scraping\n\n### Airtable base setup\n\nCreate an Airtable base with two tables:\n\n**Config Table** (`config`):\n- `Name` (Single line text): Your configuration name\n- `Skool URLs` (Long text): Comma-separated list of Skool community URLs\n- `cookies` (Long text): Your Skool session cookies for authenticated access\n- `Domain of Activity` (Single line text): Your area of expertise (e.g., \"AI automation\", \"Digital marketing\")\n- `Tools Used` (Single line text): Your preferred tools to recommend (e.g., \"n8n\", \"Zapier\")\n- `active` (Checkbox): Whether this configuration is currently active\n\n**Results Table** (`Table 1`):\n- `title` (Single line text): Post title/author\n- `url` (URL): Direct link to the post\n- `reason` (Long text): AI's reasoning for the opportunity\n- `trigger` (Long text): Specific sentence that triggered the opportunity\n- `suggested answer` (Long text): AI-generated comment suggestion\n- `config` (Link to another record): Reference to the config used\n- `date` (Date): When the opportunity was found\n- `Select` (Single select): Status tracking (not commented/commented)\n\n### Skool cookies setup\nTo access private Skool communities, you'll need to:\n1. **Install Cookie Editor**: Go to Chrome Web Store and install the \"Cookie Editor\" extension\n2. **Login to Skool**: Navigate to any Skool community you want to monitor and log in\n3. **Open Cookie Editor**: Click the Cookie Editor extension icon in your browser toolbar\n4. **Export cookies**: \n   - Click \"Export\" button in the extension\n   - Copy the exported text\n5. **Add to Airtable**: Paste the cookie string into the `cookies` field in your Airtable config\n\n### Trigger configuration\n- Ensure the Schedule Trigger is set to your preferred monitoring time\n- Default is 7 PM daily, but adjust based on your target communities' peak activity\n\n## Requirements\n\n- **Self-hosted n8n or n8n Cloud account**\n- **Active Skool community memberships** - You must be a legitimate member of communities you want to monitor\n- **OpenAI API credits** \n- **Apify subscription** - For reliable Skool data scraping (free tier available)\n- **Airtable account** - Free tier sufficient for most use cases\n\n## How to customize the workflow\n\n### Modify AI analysis criteria\nEdit the `EvaluateOpportunities And Generate Comments` node to:\n- Adjust the opportunity detection sensitivity\n- Modify the comment tone and style\n- Add industry-specific keywords or phrases\n\n### Change monitoring frequency\nUpdate the Schedule Trigger to:\n- Multiple times per day for highly active communities\n- Weekly for slower-moving professional groups\n- Custom intervals based on community activity patterns\n\n### Customize data collection\nModify the Apify scraper settings to:\n- Adjust the time window (currently 24 hours)\n- Change comment length filters (currently &gt;50 characters)\n- Include/exclude media content\n- Modify the number of comments per post\n\n### Add additional filters\nInsert filter nodes to:\n- Skip posts from specific users\n- Focus on posts with minimum engagement levels\n- Exclude certain post types or keywords\n- Prioritize posts from influential community members\n\n### Enhance output options\nAdd nodes after `Record Results` to:\n- Send Slack/Discord notifications for high-priority opportunities\n- Create calendar events for engagement tasks\n- Export daily summaries to Google Sheets\n- Integrate with CRM systems for lead tracking\n\n## Example outputs\n\n### Opportunity analysis result\n```json\n{\n  \"opportunity\": true,\n  \"reason\": \"The user is struggling with manual social media management tasks that could be automated using n8n workflows.\",\n  \"trigger_sentence\": \"I'm spending 3+ hours daily just scheduling posts and responding to comments across all my social accounts.\",\n  \"suggested_comment\": \"That sounds exhausting! Have you considered setting up automation workflows? Tools like n8n can handle the scheduling and even help with response suggestions, potentially saving you 80% of that time. The initial setup takes a day but pays dividends long-term.\"\n}\nAirtable record example\n\nTitle: \"Sarah Johnson - Social Media Burnout\"\nURL: https://www.skool.com/community/post/123456\nReason: \"User expressing pain point with manual social media management - perfect fit for automation solutions\"\nTrigger: \"I'm spending 3+ hours daily just scheduling posts...\"\nSuggested Answer: \"That sounds exhausting! Have you considered setting up automation workflows?...\"\nConfig: [Your Config Name]\nDate: 2024-12-09 19:00:00\nStatus: \"not commented\"\n```\n\n## Best practices\n\n### Authentic engagement\n- Always review and personalize AI suggestions before posting\n- Focus on being genuinely helpful rather than promotional\n- Share experiences and ask follow-up questions\n- Engage in subsequent conversation when people respond\n\n### Community guidelines\n- Respect each community's rules and culture\n- Avoid over-promotion of your tools or services\n- Build relationships before introducing solutions\n- Contribute value consistently, not just when selling\n\n### Optimization tips\n- Monitor which types of opportunities convert best\n- A/B test different comment styles and approaches\n- Track engagement metrics on your actual comments\n- Adjust AI prompts based on community feedback",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get Config",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Extract Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Skool Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Post Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "EvaluateOpportunities And Generate Comments",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Merge AI Answers With Extracted Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Opportunities To Comment",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Record Results",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is Active?",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

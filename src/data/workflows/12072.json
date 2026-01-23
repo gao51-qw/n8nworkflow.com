@@ -1,0 +1,134 @@
+{
+  "id": 12072,
+  "slug": "12072",
+  "title": "Monitor regulatory updates with ScrapeGraphAI and send alerts via Telegram",
+  "description": "# Breaking News Aggregator with Telegram and Redis\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow monitors selected government websites, regulatory bodies, and legal-news portals for new or amended regulations relevant to specific industries. It scrapes the latest headlines, compares them against previously recorded items in Redis, and pushes real-time compliance alerts to a Telegram channel or chat.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or cloud)\n- ScrapeGraphAI community node installed\n- Redis server accessible from n8n\n- Telegram Bot created via BotFather\n- (Optional) Cron node if you want fully automated scheduling instead of manual trigger\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables ScrapeGraphAI scraping functionality  \n- **Telegram Bot Token** – Allows n8n to send messages via your bot  \n- **Redis Credentials** – Host, port, and (if set) password for your Redis instance  \n\n### Redis Setup Requirements\n| Key Name | Description | Example |\n|----------|-------------|---------|\n| `latestRegIds` | Redis Set used to store hashes/IDs of the most recent regulatory articles processed | `latestRegIds` |\n\n&gt; Hint: Use a dedicated Redis DB (e.g., DB 1) to keep workflow data isolated from other applications.\n\n## How it works\n\nThis workflow monitors selected government websites, regulatory bodies, and legal-news portals for new or amended regulations relevant to specific industries. It scrapes the latest headlines, compares them against previously recorded items in Redis, and pushes real-time compliance alerts to a Telegram channel or chat.\n\n## Key Steps:\n- **Manual Trigger / Cron**: Starts the workflow manually or on a set schedule (e.g., daily at 06:00 UTC).  \n- **Code (Define Sources)**: Returns an array of URL objects pointing to regulatory pages to monitor.  \n- **SplitInBatches**: Iterates through each source URL in manageable chunks.  \n- **ScrapeGraphAI**: Extracts article titles, publication dates, and article URLs from each page.  \n- **Merge (Combine Results)**: Consolidates scraped items into a single stream.  \n- **If (Deduplication Check)**: Verifies whether each article ID already exists in Redis.  \n- **Set (Format Message)**: Creates a human-readable Telegram message string.  \n- **Telegram**: Sends the formatted compliance alert to your chosen chat/channel.  \n- **Redis (Add New IDs)**: Stores the article ID so it is not sent again in the future.  \n- **Sticky Note**: Provides inline documentation inside the workflow canvas.\n\n## Set up steps\n\n**Setup Time: 10-15 minutes**\n\n1. **Install community nodes**: In n8n, go to *Settings → Community Nodes* and install `n8n-nodes-scrapegraphai`.  \n2. **Create credentials**:  \n   a. Telegram → *Credentials → Telegram API* → paste your bot token.  \n   b. Redis → *Credentials → Redis* → fill host, port, password, DB.  \n   c. ScrapeGraphAI → *Credentials → ScrapeGraphAI API* → enter your key.  \n3. **Configure the “Define Sources” Code node**: Replace the placeholder URLs with the regulatory pages you need to monitor.  \n4. **Update Telegram chat ID**: Open any chat with your bot and use `https://api.telegram.org/bot&lt;token&gt;/getUpdates` to find the `chat.id`. Insert this value in the Telegram node.  \n5. **Adjust frequency**: Replace the Manual Trigger with a Cron node (e.g., daily 06:00 UTC).  \n6. **Test the workflow**: Execute once manually; confirm messages appear in Telegram and that Redis keys are created.  \n7. **Activate**: Enable the workflow so it runs automatically according to your schedule.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Manual Trigger** – Allows on-demand execution during development/testing.  \n- **Code (Define Sources)** – Returns an array of page URLs and meta info to the workflow.  \n- **SplitInBatches** – Prevents overloading websites by scraping in controlled groups.  \n- **ScrapeGraphAI** – Performs the actual web scraping using an AI-assisted parser.  \n- **Merge** – Merges data streams from multiple batches into one.  \n- **If (Check Redis)** – Filters out already-processed articles using Redis SET membership.  \n- **Set** – Shapes output into a user-friendly Telegram message.  \n- **Telegram** – Delivers compliance alerts to stakeholders in real time.  \n- **Redis** – Persists article IDs to avoid duplicate notifications.  \n- **Sticky Note** – Contains usage tips directly on the canvas.\n\n### Data Flow:\n1. **Manual Trigger** → **Code (Define Sources)** → **SplitInBatches** → **ScrapeGraphAI**  \n2. **ScrapeGraphAI** → **Merge** → **If (Check Redis)**  \n3. **If (true)** → **Set** → **Telegram** → **Redis**\n\n## Customization Examples\n\n### Change industries or keywords\n```javascript\n// Code node snippet\nreturn [\n  {\n    url: \"https://regulator.gov/energy-updates\",\n    industry: \"Energy\",\n    keywords: [\"renewable\", \"grid\", \"tariff\"]\n  },\n  {\n    url: \"https://financewatch.gov/financial-rules\",\n    industry: \"Finance\",\n    keywords: [\"AML\", \"KYC\", \"cryptocurrency\"]\n  }\n];\n```\n\n### Modify Telegram message formatting\n```javascript\n// Set node “Parameters → Value”\nitems[0].json.message = `🛡️ *${$json.industry} Regulation Update*\\n\\n*${$json.title}*\\n${$json.date}\\n${$json.url}`;\nreturn items;\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"title\": \"EU Proposes New ESG Disclosure Rules\",\n  \"date\": \"2024-04-18\",\n  \"url\": \"https://europa.eu/legal/eu-proposes-esg-disclosure\",\n  \"industry\": \"Finance\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **Empty scraped data** – Verify CSS selectors/XPath in the ScrapeGraphAI node; website structure may have changed.  \n2. **Duplicate alerts** – Ensure Redis credentials point to the same DB across nodes; otherwise IDs are not shared.  \n\n### Performance Tips\n- Limit `SplitInBatches` to 2-3 URLs at a time if sites implement rate limiting.  \n- Use environment variables for credentials to simplify migration between stages.\n\n**Pro Tips:**\n- Combine this workflow with n8n’s **Error Trigger** to log failures to Slack or email.  \n- Maintain a CSV of source URLs in Google Sheets and fetch it dynamically via the Google Sheets node.  \n- Pair with the **Webhook** node to let team members add new sources on the fly.",
+  "featuredImage": "/data/workflows/12072/12072.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 7,
+  "downloads": 0,
+  "createdAt": "2025-12-23T15:15:45.508Z",
+  "updatedAt": "2026-01-16T09:11:17.859Z",
+  "publishedAt": "2025-12-23T15:15:45.508Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12072",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor regulatory updates with ScrapeGraphAI and send alerts via Telegram",
+    "workflowName": "Monitor regulatory updates with ScrapeGraphAI and send alerts via Telegram",
+    "description": "# Breaking News Aggregator with Telegram and Redis\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow monitors selected government websites, regulatory bodies, and legal-news portals for new or amended regulations relevant to specific industries. It scrapes the latest headlines, compares them against previously recorded items in Redis, and pushes real-time compliance alerts to a Telegram channel or chat.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or cloud)\n- ScrapeGraphAI community node installed\n- Redis server accessible from n8n\n- Telegram Bot created via BotFather\n- (Optional) Cron node if you want fully automated scheduling instead of manual trigger\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables ScrapeGraphAI scraping functionality  \n- **Telegram Bot Token** – Allows n8n to send messages via your bot  \n- **Redis Credentials** – Host, port, and (if set) password for your Redis instance  \n\n### Redis Setup Requirements\n| Key Name | Description | Example |\n|----------|-------------|---------|\n| `latestRegIds` | Redis Set used to store hashes/IDs of the most recent regulatory articles processed | `latestRegIds` |\n\n&gt; Hint: Use a dedicated Redis DB (e.g., DB 1) to keep workflow data isolated from other applications.\n\n## How it works\n\nThis workflow monitors selected government websites, regulatory bodies, and legal-news portals for new or amended regulations relevant to specific industries. It scrapes the latest headlines, compares them against previously recorded items in Redis, and pushes real-time compliance alerts to a Telegram channel or chat.\n\n## Key Steps:\n- **Manual Trigger / Cron**: Starts the workflow manually or on a set schedule (e.g., daily at 06:00 UTC).  \n- **Code (Define Sources)**: Returns an array of URL objects pointing to regulatory pages to monitor.  \n- **SplitInBatches**: Iterates through each source URL in manageable chunks.  \n- **ScrapeGraphAI**: Extracts article titles, publication dates, and article URLs from each page.  \n- **Merge (Combine Results)**: Consolidates scraped items into a single stream.  \n- **If (Deduplication Check)**: Verifies whether each article ID already exists in Redis.  \n- **Set (Format Message)**: Creates a human-readable Telegram message string.  \n- **Telegram**: Sends the formatted compliance alert to your chosen chat/channel.  \n- **Redis (Add New IDs)**: Stores the article ID so it is not sent again in the future.  \n- **Sticky Note**: Provides inline documentation inside the workflow canvas.\n\n## Set up steps\n\n**Setup Time: 10-15 minutes**\n\n1. **Install community nodes**: In n8n, go to *Settings → Community Nodes* and install `n8n-nodes-scrapegraphai`.  \n2. **Create credentials**:  \n   a. Telegram → *Credentials → Telegram API* → paste your bot token.  \n   b. Redis → *Credentials → Redis* → fill host, port, password, DB.  \n   c. ScrapeGraphAI → *Credentials → ScrapeGraphAI API* → enter your key.  \n3. **Configure the “Define Sources” Code node**: Replace the placeholder URLs with the regulatory pages you need to monitor.  \n4. **Update Telegram chat ID**: Open any chat with your bot and use `https://api.telegram.org/bot&lt;token&gt;/getUpdates` to find the `chat.id`. Insert this value in the Telegram node.  \n5. **Adjust frequency**: Replace the Manual Trigger with a Cron node (e.g., daily 06:00 UTC).  \n6. **Test the workflow**: Execute once manually; confirm messages appear in Telegram and that Redis keys are created.  \n7. **Activate**: Enable the workflow so it runs automatically according to your schedule.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Manual Trigger** – Allows on-demand execution during development/testing.  \n- **Code (Define Sources)** – Returns an array of page URLs and meta info to the workflow.  \n- **SplitInBatches** – Prevents overloading websites by scraping in controlled groups.  \n- **ScrapeGraphAI** – Performs the actual web scraping using an AI-assisted parser.  \n- **Merge** – Merges data streams from multiple batches into one.  \n- **If (Check Redis)** – Filters out already-processed articles using Redis SET membership.  \n- **Set** – Shapes output into a user-friendly Telegram message.  \n- **Telegram** – Delivers compliance alerts to stakeholders in real time.  \n- **Redis** – Persists article IDs to avoid duplicate notifications.  \n- **Sticky Note** – Contains usage tips directly on the canvas.\n\n### Data Flow:\n1. **Manual Trigger** → **Code (Define Sources)** → **SplitInBatches** → **ScrapeGraphAI**  \n2. **ScrapeGraphAI** → **Merge** → **If (Check Redis)**  \n3. **If (true)** → **Set** → **Telegram** → **Redis**\n\n## Customization Examples\n\n### Change industries or keywords\n```javascript\n// Code node snippet\nreturn [\n  {\n    url: \"https://regulator.gov/energy-updates\",\n    industry: \"Energy\",\n    keywords: [\"renewable\", \"grid\", \"tariff\"]\n  },\n  {\n    url: \"https://financewatch.gov/financial-rules\",\n    industry: \"Finance\",\n    keywords: [\"AML\", \"KYC\", \"cryptocurrency\"]\n  }\n];\n```\n\n### Modify Telegram message formatting\n```javascript\n// Set node “Parameters → Value”\nitems[0].json.message = `🛡️ *${$json.industry} Regulation Update*\\n\\n*${$json.title}*\\n${$json.date}\\n${$json.url}`;\nreturn items;\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"title\": \"EU Proposes New ESG Disclosure Rules\",\n  \"date\": \"2024-04-18\",\n  \"url\": \"https://europa.eu/legal/eu-proposes-esg-disclosure\",\n  \"industry\": \"Finance\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **Empty scraped data** – Verify CSS selectors/XPath in the ScrapeGraphAI node; website structure may have changed.  \n2. **Duplicate alerts** – Ensure Redis credentials point to the same DB across nodes; otherwise IDs are not shared.  \n\n### Performance Tips\n- Limit `SplitInBatches` to 2-3 URLs at a time if sites implement rate limiting.  \n- Use environment variables for credentials to simplify migration between stages.\n\n**Pro Tips:**\n- Combine this workflow with n8n’s **Error Trigger** to log failures to Slack or email.  \n- Maintain a CSV of source URLs in Google Sheets and fetch it dynamically via the Google Sheets node.  \n- Pair with the **Webhook** node to let team members add new sources on the fly.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Start Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Define Sources",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split Sources",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Regulatory Data",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format & Deduplicate",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "New Important Update?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Telegram Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Send Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save to Redis",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Source & Split",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Scraping Layer",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Aggregation & Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Storage & Alerts",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

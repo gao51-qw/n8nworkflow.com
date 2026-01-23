@@ -1,0 +1,110 @@
+# AI-optimized content posting to X, Discord & LinkedIn with OpenRouter
+
+> Amplify your social media presence with **BuzzBlast**, an n8n workflow designed to make your content go viral across X, Discord, and LinkedIn. By sending a single chat message, BuzzBlast leverages OpenRouter's AI to optimize your input for each platform’s unique audience—crafting punchy tweets for X, engaging messages for Discord, and professional posts for LinkedIn. With smart language detection, it ensures the output matches your input’s language for authentic engagement.
+
+## Key Features
+
+- 🚀 **Multi-Platform Posting**: Shares optimized content to X, Discord, and LinkedIn simultaneously.
+- 🧠 **AI Optimization**: Uses OpenRouter’s AI to tailor content for virality on each platform.
+- 🌐 **Language Detection**: Matches output to your input language for seamless engagement.
+- 🔄 **Smart Routing**: Automatically directs content to the right platform using a switch node.
+- 📱 **Chat Trigger**: Initiates posts via a simple chat message.
+- ⚡ **Zero Hassle**: No manual reformatting—BuzzBlast handles it all.
+
+## Ideal For
+
+- Social media managers looking to streamline cross-platform posting.
+- Content creators aiming to boost engagement with minimal effort.
+- Businesses seeking to maximize reach across diverse audiences.
+
+## Pre-Requirements
+
+- **[n8n instance](https://n8n.partnerlinks.io/khaisastudio)**: A running n8n instance (cloud or self-hosted).
+- **Credentials**:
+  - X account with OAuth2 API access.
+  - Discord Webhook API setup for your server.
+  - LinkedIn account with OAuth2 API access.
+  - OpenRouter account for AI language model access.
+- **Chat Trigger Setup**: A configured chat platform (e.g., Slack, Telegram) to send input messages to the workflow.
+
+## Setup Instructions
+
+1. **Import the Workflow**:
+   - Copy the provided workflow JSON and import it into your n8n instance via the "Import Workflow" option in the n8n editor.
+2. **Configure Credentials**:
+   - In the `Post to X` node, set up OAuth2 credentials for your X account.
+   - In the `Post to Discord` node, configure a Discord Webhook for your server.
+   - In the `Post to LinkedIn` node, add OAuth2 credentials for your LinkedIn account.
+   - In the `OpenRouter AI Model` node, provide API credentials for your OpenRouter account.
+3. **Set Up Chat Trigger**:
+   - In the `Chat Input Trigger` node, configure your preferred chat platform (e.g., Slack, Telegram) to send trigger messages.
+   - Ensure the webhook is active and correctly linked to your chat platform.
+4. **Test the Workflow**:
+   - Send a test message via your chat platform (e.g., "Announcing our new product launch!").
+   - Verify that the AI optimizes the content and posts it to X, Discord, and LinkedIn as expected.
+5. **Activate the Workflow**:
+   - Once tested, toggle the workflow to "Active" in n8n to enable automatic execution when chat messages are received.
+
+## Customization Guidance
+- **Changes Chat Trigger**: Adjust the chat trigger using your preference platform like telegram, discord, etc.
+- **Modify AI Prompt**: Adjust the prompt in the `AI Content Optimizer` node to change the tone or style (e.g., more professional for LinkedIn or conversational for Discord).
+- **Add New Platforms**: Extend the `Route to Platforms` node by adding conditions for additional platforms (e.g., Instagram or Facebook) and corresponding posting nodes.
+- **Change AI Model**: In the `OpenRouter AI Model` node, select a different OpenRouter model to optimize content quality or manage costs.
+- **Enhance Output Format**: Update the JSON schema in the `Parse AI Output` node to include additional fields like hashtags, emojis, or links for specific platforms.
+- **Add Error Handling**: Include an error-handling node after the `Route to Platforms` node to log failed posts or retry them automatically.
+
+## Why Choose BuzzBlast?
+
+BuzzBlast saves time, maximizes reach, and lets AI craft platform-perfect posts that resonate with your audience. Whether you're an influencer, marketer, or business, this workflow makes cross-platform posting effortless. Ready to make waves online? Grab BuzzBlast and start buzzing!
+
+*made by: [khmuhtadin](khmuhtadin.com)*
+**Need a custom?** contact me on **[LinkedIn](https://www.linkedin.com/in/khmuhtadin/)** or **[Web](khmuhtadin.com)**
+
+## 📊 Basic Information
+
+- **Workflow ID:** 4022
+- **Complexity:** advanced
+- **Node Count:** 19
+- **Views:** 2396
+- **Downloads:** 239
+- **Created:** 2025/5/13
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/4022)
+
+## 👤 Author
+
+- **Name:** Khairul Muhtadin
+- **Username:** @khmuhtadin
+
+## 🏷️ Categories
+
+- Social Media
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×10)
+- **@n8n/n8n-nodes-langchain.lmChatOpenRouter** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **splitOut** 
+- **switch** 
+- **twitter** 
+- **linkedIn** 
+- **discord** 
+- **@n8n/n8n-nodes-langchain.chatTrigger** 
+- **@n8n/n8n-nodes-langchain.chainLlm** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 19 nodes with 6 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

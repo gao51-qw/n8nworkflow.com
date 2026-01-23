@@ -1,0 +1,218 @@
+{
+  "id": 8143,
+  "slug": "8143",
+  "title": "Morning briefing podcast: generate daily summaries with Gemini AI, weather, and calendar",
+  "description": "## What it does\n\nInstead of manually checking separate apps for your calendar, weather, and news each morning, this workflow consolidates the most important information into a single, convenient audio briefing. The \"Good Morning Podcast\" is designed to be a 3-minute summary of your day ahead, delivered directly to you. It's multi-lingual and customizable, allowing you to start your day informed and efficiently.\n\n## How it works\n\nThe workflow executes in three parallel branches before merging the data to generate the final audio file.\n\n1.  **Weather Summary:** It starts by taking a user-provided **city** and fetching the current 15-hour forecast from the **OpenWeatherMap**. It formats this information into a concise weather report.\n2.  **Calendar Summary:** It securely connects to your **Google Calendar** to retrieve all of today's scheduled meetings and events. It then formats the schedule into a clear, readable summary.\n3.  **News Summary:** It connects to the **NewsAPI** to perform two tasks: it fetches the top general headlines and also searches for articles based on user-defined **keywords** (e.g., \"AI\", \"automation\", \"space exploration\"). The collected headlines are then summarized using a **Google Gemini** node to create a brief news digest.\n4.  Audio Generation and Delivery: All three text summaries (weather, calendar, and news) are merged into a single script. The workflow uses **Google's Text-to-Speech (TTS)** to generate the raw multi-speaker audio. A dedicated **FFmpeg** node then processes and converts this audio into the final MP3 format. The completed podcast is then sent directly to you via a **Telegram Bot**.\n\n## Setup Instructions\n\nTo get this workflow running, you will need to configure credentials for each of the external services and set your initial parameters.\n\n⚠️ Important Prerequisite\n**Install FFmpeg**: The workflow requires the `FFmpeg` software package to be installed on the machine running your n8n instance (local or server). Please ensure it is installed and accessible in your system's PATH before running this workflow.\n\n### Required Credentials\n\n1.  **OpenWeatherMap:**\n    * Sign up for a free account at [OpenWeatherMap](https://openweathermap.org/) and get your API key.\n    * Add the API key to your n8n OpenWeatherMap credentials.\n2.  **Google Calendar & Google AI (Gemini/TTS):**\n    * You will need Google OAuth2 credentials for the Google Calendar node.\n    * You will also need credentials for the Google AI services (Gemini and Text-to-Speech). Follow the n8n documentation to create and add these credentials.\n3.  **NewsAPI:**\n    * Get a free API key from [NewsAPI.org](https://newsapi.org/).\n    * Add the API key to your n8n NewsAPI credentials.\n4.  **Telegram:**\n    * Create a new bot by talking to the `BotFather` in your Telegram app.\n    * Copy the **Bot Token** it provides and add it to your n8n Telegram credentials.\n    * Send a message to your new bot and get your **Chat ID** from the `Telegram Trigger` node or another method. You will need this for the `Telegram` send node.\n\n### Workflow Inputs\n\nIn the first node (or when you run the workflow manually), you must provide the following initial data:\n* `name`: Your first name for a personalized greeting.\n* `city`: The city for your local weather forecast (e.g., \"Amsterdam\").\n* `language`: The language for the entire podcast output (e.g., \"en-US\", \"nl-NL\", \"fa-IR\").\n* `news_keywords`: A comma-separated list of topics you are interested in for the news summary (e.g., \"n8n,AI,technology\").\n\n## How to Adapt the Template\n\nThis workflow is highly customizable. Here are several ways you can adapt it to fit your needs:\n\n### Triggers\n\n* **Automate It:** The default trigger is manual. Change it to a **Schedule Trigger** to have your podcast automatically generated and sent to you at the same time every morning (e.g., 7:00 AM).\n\n### Content Sources\n\n* **Weather:** In the \"User Weather Map\" node, you can change the forecast type or switch the units from metric to imperial.\n* **Calendar:** In the \"Get Today Meetings\" node, you can select a different calendar from your Google account (e.g., a shared work calendar instead of your personal one).\n* **News:**\n    * In the \"Get Headlines From News Sources\" node, change the country or category to get different top headlines.\n    * In the \"Get Links From Keywords\" node, update your keywords to track different topics.\n    * In the \"Aggregate Headlines\" (Gemini) node, you can modify the prompt to change the tone or length of the AI-generated news summary.\n\n### Audio Generation\n\n* **Voice & Language:** The `language` is a starting parameter, but you can go deeper into the Google TTS nodes (`Generate Virtual Parts`, etc.) to select specific voices, genders, and speaking rates to create a unique podcast host style.\n* **Scripting:** Modify the `Set` and `Merge` nodes that construct the final script. You can easily change the greeting, the transition phrases between sections, or the sign-off message.\n\n### Delivery\n\n* **Platform:** Don't use Telegram? Swap the `Telegram` node for a `Slack` node, `Discord` node, or even an `Email` node to send the MP3 file to your preferred platform.\n* **Message:** Customize the text message that is sent along with the audio file in the final node.",
+  "featuredImage": "/data/workflows/8143/8143.webp",
+  "author": {
+    "id": 101,
+    "slug": "attakhalighi",
+    "name": "Atta",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1042,
+  "downloads": 104,
+  "createdAt": "2025-09-02T05:23:44.516Z",
+  "updatedAt": "2026-01-16T08:54:21.766Z",
+  "publishedAt": "2025-09-02T05:23:44.516Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8143",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Morning briefing podcast: generate daily summaries with Gemini AI, weather, and calendar",
+    "workflowName": "Morning briefing podcast: generate daily summaries with Gemini AI, weather, and calendar",
+    "description": "## What it does\n\nInstead of manually checking separate apps for your calendar, weather, and news each morning, this workflow consolidates the most important information into a single, convenient audio briefing. The \"Good Morning Podcast\" is designed to be a 3-minute summary of your day ahead, delivered directly to you. It's multi-lingual and customizable, allowing you to start your day informed and efficiently.\n\n## How it works\n\nThe workflow executes in three parallel branches before merging the data to generate the final audio file.\n\n1.  **Weather Summary:** It starts by taking a user-provided **city** and fetching the current 15-hour forecast from the **OpenWeatherMap**. It formats this information into a concise weather report.\n2.  **Calendar Summary:** It securely connects to your **Google Calendar** to retrieve all of today's scheduled meetings and events. It then formats the schedule into a clear, readable summary.\n3.  **News Summary:** It connects to the **NewsAPI** to perform two tasks: it fetches the top general headlines and also searches for articles based on user-defined **keywords** (e.g., \"AI\", \"automation\", \"space exploration\"). The collected headlines are then summarized using a **Google Gemini** node to create a brief news digest.\n4.  Audio Generation and Delivery: All three text summaries (weather, calendar, and news) are merged into a single script. The workflow uses **Google's Text-to-Speech (TTS)** to generate the raw multi-speaker audio. A dedicated **FFmpeg** node then processes and converts this audio into the final MP3 format. The completed podcast is then sent directly to you via a **Telegram Bot**.\n\n## Setup Instructions\n\nTo get this workflow running, you will need to configure credentials for each of the external services and set your initial parameters.\n\n⚠️ Important Prerequisite\n**Install FFmpeg**: The workflow requires the `FFmpeg` software package to be installed on the machine running your n8n instance (local or server). Please ensure it is installed and accessible in your system's PATH before running this workflow.\n\n### Required Credentials\n\n1.  **OpenWeatherMap:**\n    * Sign up for a free account at [OpenWeatherMap](https://openweathermap.org/) and get your API key.\n    * Add the API key to your n8n OpenWeatherMap credentials.\n2.  **Google Calendar & Google AI (Gemini/TTS):**\n    * You will need Google OAuth2 credentials for the Google Calendar node.\n    * You will also need credentials for the Google AI services (Gemini and Text-to-Speech). Follow the n8n documentation to create and add these credentials.\n3.  **NewsAPI:**\n    * Get a free API key from [NewsAPI.org](https://newsapi.org/).\n    * Add the API key to your n8n NewsAPI credentials.\n4.  **Telegram:**\n    * Create a new bot by talking to the `BotFather` in your Telegram app.\n    * Copy the **Bot Token** it provides and add it to your n8n Telegram credentials.\n    * Send a message to your new bot and get your **Chat ID** from the `Telegram Trigger` node or another method. You will need this for the `Telegram` send node.\n\n### Workflow Inputs\n\nIn the first node (or when you run the workflow manually), you must provide the following initial data:\n* `name`: Your first name for a personalized greeting.\n* `city`: The city for your local weather forecast (e.g., \"Amsterdam\").\n* `language`: The language for the entire podcast output (e.g., \"en-US\", \"nl-NL\", \"fa-IR\").\n* `news_keywords`: A comma-separated list of topics you are interested in for the news summary (e.g., \"n8n,AI,technology\").\n\n## How to Adapt the Template\n\nThis workflow is highly customizable. Here are several ways you can adapt it to fit your needs:\n\n### Triggers\n\n* **Automate It:** The default trigger is manual. Change it to a **Schedule Trigger** to have your podcast automatically generated and sent to you at the same time every morning (e.g., 7:00 AM).\n\n### Content Sources\n\n* **Weather:** In the \"User Weather Map\" node, you can change the forecast type or switch the units from metric to imperial.\n* **Calendar:** In the \"Get Today Meetings\" node, you can select a different calendar from your Google account (e.g., a shared work calendar instead of your personal one).\n* **News:**\n    * In the \"Get Headlines From News Sources\" node, change the country or category to get different top headlines.\n    * In the \"Get Links From Keywords\" node, update your keywords to track different topics.\n    * In the \"Aggregate Headlines\" (Gemini) node, you can modify the prompt to change the tone or length of the AI-generated news summary.\n\n### Audio Generation\n\n* **Voice & Language:** The `language` is a starting parameter, but you can go deeper into the Google TTS nodes (`Generate Virtual Parts`, etc.) to select specific voices, genders, and speaking rates to create a unique podcast host style.\n* **Scripting:** Modify the `Set` and `Merge` nodes that construct the final script. You can easily change the greeting, the transition phrases between sections, or the sign-off message.\n\n### Delivery\n\n* **Platform:** Don't use Telegram? Swap the `Telegram` node for a `Slack` node, `Discord` node, or even an `Email` node to send the MP3 file to your preferred platform.\n* **Message:** Customize the text message that is sent along with the audio file in the final node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "News Sources",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split Out News Sources",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Headlines from NewsApi",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Today Meetings",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Calendar Summary",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Gemini_Calendar",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gemini_Weather",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Weather Summary",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Open Weather Map",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Useful Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate Headlines",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "News Summary",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Gemini_News",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate Podcast Parts",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Podcast Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Set Filename",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert Audio to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Write Audio File on Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert Audio to MP3",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Read Audio File from Disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Podcast to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Route",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate Events",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    }
+  ]
+}

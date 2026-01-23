@@ -1,0 +1,290 @@
+{
+  "id": 6537,
+  "slug": "6537",
+  "title": "Inbox manager (GPT, Google Calendar & Supabase)",
+  "description": "## Overview\nTurn your cluttered inbox into a smart, autonomous assistant that categorizes emails, replies to leads, checks your calendar, and notifies you on Telegram—all without lifting a finger.\n\nThis workflow is designed for a marketing agency, but can be adapted for any business. It classifies incoming emails into categories like Sales, Client Communication, Reports, Billing, and Other. If it detects a new lead or priority message, it routes the email to one of two agents:\n- The **Calendar Agent** checks your availability in Google Calendar and drafts a consultation reply  \n- The **Knowledge Agent** answers FAQs using your business knowledge base (with Supabase embeddings)  \n\nBoth agents create draft email responses and send a Telegram alert so you're always in the loop.\n\n### Who’s it for\n- Founders and agency owners buried in emails  \n- Marketing teams handling lots of inbound leads  \n- Customer support managers automating Tier 1 replies  \n- Anyone who wants a cleaner, smarter inbox without hiring a VA  \n\n### How it works\n- Gmail trigger watches for incoming emails  \n- Email content is passed to an AI classifier to apply a label (Sales, Client, Billing, etc.)  \n- If the message is a new inquiry or lead, it’s routed to:\n  - **Calendar Agent** → checks Google Calendar and drafts a reply with available slots  \n  - **Knowledge Agent** → searches vector DB and drafts a helpful reply from documentation  \n- Both agents create a Gmail draft response and send a Telegram notification with summary  \n\n### Example use case\n&gt; A lead emails you asking for a discovery call.  \n&gt;  \n&gt; ✅ Email is labeled \"Sales\"  \n&gt; ✅ AI Calendar Agent checks your Google Calendar  \n&gt; ✅ A reply is drafted offering free time slots  \n&gt; ✅ You get a Telegram ping:  \n&gt; _\"New lead: Abdul Mir. I checked your calendar and drafted a reply. Check your email!\"_  \n\n### How to set up\n1. Connect your Gmail and set up a trigger for new messages  \n2. Train the AI classifier with example categories and emails  \n3. Connect Google Calendar API for availability checks  \n4. Upload your internal docs and sync to Supabase vector store  \n5. Connect Telegram for alerts  \n6. Customize AI prompts and escalation logic as needed  \n\n### Requirements\n- Gmail integration  \n- OpenAI or Claude API (for classification + chat agents)  \n- Google Calendar API  \n- Supabase (or Pinecone, Weaviate) for RAG vector DB  \n- Telegram bot API key\n\n### How to customize\n- Add custom labels like “Recruiting,” “Investor,” or “Support”  \n- Replace Telegram with Slack or SMS alerts  \n- Add CRM sync to update lead status  \n- Escalate complicated replies to a human via task creation  \n- Add auto-send (instead of drafts) after review or based on confidence score\n",
+  "featuredImage": "/data/workflows/6537/6537.webp",
+  "author": {
+    "id": 101,
+    "slug": "abdulmir",
+    "name": "Abdul Mir",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2086,
+  "downloads": 208,
+  "createdAt": "2025-07-27T16:09:15.362Z",
+  "updatedAt": "2026-01-16T08:45:34.580Z",
+  "publishedAt": "2025-07-27T16:09:15.362Z",
+  "nodes": 42,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6537",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Inbox manager (GPT, Google Calendar & Supabase)",
+    "workflowName": "Inbox manager (GPT, Google Calendar & Supabase)",
+    "description": "Turn your cluttered inbox into a smart, autonomous assistant that categorizes emails, replies to leads, checks your calendar, and notifies you on Telegram—all without lifting a finger.\n\nThis workflow is designed for a marketing agency, but can be adapted for any business. It classifies incoming emails into categories like Sales, Client Communication, Reports, Billing, and Other. If it detects a new lead or priority message, it routes the email to one of two agents:\n- The **Calendar Agent** checks your availability in Google Calendar and drafts a consultation reply  \n- The **Knowledge Agent** answers FAQs using your business knowledge base (with Supabase embeddings)  \n\nBoth agents create draft email responses and send a Telegram alert so you're always in the loop.\n\n### Who’s it for\n- Founders and agency owners buried in emails  \n- Marketing teams handling lots of inbound leads  \n- Customer support managers automating Tier 1 replies  \n- Anyone who wants a cleaner, smarter inbox without hiring a VA  \n\n### How it works\n- Gmail trigger watches for incoming emails  \n- Email content is passed to an AI classifier to apply a label (Sales, Client, Billing, etc.)  \n- If the message is a new inquiry or lead, it’s routed to:\n  - **Calendar Agent** → checks Google Calendar and drafts a reply with available slots  \n  - **Knowledge Agent** → searches vector DB and drafts a helpful reply from documentation  \n- Both agents create a Gmail draft response and send a Telegram notification with summary  \n\n### Example use case\n&gt; A lead emails you asking for a discovery call.  \n&gt;  \n&gt; ✅ Email is labeled \"Sales\"  \n&gt; ✅ AI Calendar Agent checks your Google Calendar  \n&gt; ✅ A reply is drafted offering free time slots  \n&gt; ✅ You get a Telegram ping:  \n&gt; _\"New lead: Abdul Mir. I checked your calendar and drafted a reply. Check your email!\"_  \n\n### How to set up\n1. Connect your Gmail and set up a trigger for new messages  \n2. Train the AI classifier with example categories and emails  \n3. Connect Google Calendar API for availability checks  \n4. Upload your internal docs and sync to Supabase vector store  \n5. Connect Telegram for alerts  \n6. Customize AI prompts and escalation logic as needed  \n\n### Requirements\n- Gmail integration  \n- OpenAI or Claude API (for classification + chat agents)  \n- Google Calendar API  \n- Supabase (or Pinecone, Weaviate) for RAG vector DB  \n- Telegram bot API key\n\n### How to customize\n- Add custom labels like “Recruiting,” “Investor,” or “Support”  \n- Replace Telegram with Slack or SMS alerts  \n- Add CRM sync to update lead status  \n- Escalate complicated replies to a human via task creation  \n- Add auto-send (instead of drafts) after review or based on confidence score",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Text Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sales / Leads",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Client Comm",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Reports / Results",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Billing / Admin",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Other",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Mark as Read3",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_events",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Calendar Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "think_tool",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "role": "toolThink",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Calendar or Email",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Thread",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser6",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Gmail2",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Supabase Vector Store2",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI2",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Knowledge Database",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "role": "toolVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail3",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Inbox Bot",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Escalate?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Knowledge Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

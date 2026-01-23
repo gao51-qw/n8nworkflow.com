@@ -1,0 +1,1 @@
+Filters articles based on keywords, checks against MongoDB for unique links, then sends results to different webhooks

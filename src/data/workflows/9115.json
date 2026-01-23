@@ -1,0 +1,230 @@
+{
+  "id": 9115,
+  "slug": "9115",
+  "title": "Generate SEO/AEO-optimized Shopify blog articles with GPT-4 and Google Sheets",
+  "description": "**This n8n template demonstrates how to automatically generate and publish SEO/AEO-optimized Shopify blog articles from a list of keywords using AI for content creation, image generation, and metadata optimization.**\n\n## Who’s it for\nShopify marketers, content teams, and solo founders who want consistent, hands-off blog production with built-in SEO/AEO hygiene and internal linking.\n\n## What it does\nThe workflow picks a keyword from your Google Sheet based on priority, search volume, and difficulty. It then checks your Shopify blog for existing slugs to avoid duplicate, drafts a 900+ word article optimized for SEO/AEO, generates a hero image, creates the article in Shopify, sets SEO metafields (title/description), and logs the result to your Sheets for tracking and future internal links.\n\n## How it works\n- **Google Sheets → Candidate selection:** Reads **Keywords**, **Links**, and **Published** tabs: ranks by priority → volume → difficulty. (In the workflow it is explained how to exactly set up the Google Sheets)\n- **De-dupe slugs:** Paginates your blog via Shopify GraphQL to collect existing handles and make sure to use a different one.  \n- **OpenAI content + image:** Builds a structured prompt (SEO/AEO and internal linking), calls Chat Completions and Image Generation for a hero image.  \n- **Shopify publish:** Creates the article via REST and updates `title_tag` / `description_tag` metafields via GraphQL.  \n- **Log + link graph:** Appends to **Published** tab to keep track of articles posted and **Links** tab for ongoing internal-link suggestions.  \n\n## How to set up\n1. Open **Set – Config** and fill: `shopDomain`, `siteBaseUrl`, `blogId`, `blogHandle`, `sheetId`, `author`. Optional: `autoPublish`, `maxPerRun`, `tz`.  \n2. Create the Google Sheet with **Keywords**, **Links**, **Published** tabs using the provided column structure. I have personally used Semrush to generate that list of keywords. \n3. Add credentials: Shopify Admin token (Header/Bearer), OpenAI API key, and Google Service Account.\n\n## Requirements\n- Shopify store with Blog API access  \n- OpenAI API key  \n- Google Service Account with access to Google Sheets API (can be activated here [here](https://console.cloud.google.com/apis/api/sheets.googleapis.com)) \n\n## How to customize\n- Change the cron in **Schedule Trigger** for different days/times.  \n- Adjust `maxPerRun`, `autoPublish`, language or any other variables in the \"Set - Config\" node.\n- Adjust the prompt from the \"Code - Build Prompt\" node.  \n- Extend the Sheets schema with extra scoring signals if needed.  \n",
+  "featuredImage": "/data/workflows/9115/9115.webp",
+  "author": {
+    "id": 101,
+    "slug": "jojoq42",
+    "name": "Geoffroy",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 766,
+  "downloads": 76,
+  "createdAt": "2025-09-30T13:50:52.637Z",
+  "updatedAt": "2026-01-16T08:59:06.000Z",
+  "publishedAt": "2025-09-30T13:50:52.637Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9115",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate SEO/AEO-optimized Shopify blog articles with GPT-4 and Google Sheets",
+    "workflowName": "Generate SEO/AEO-optimized Shopify blog articles with GPT-4 and Google Sheets",
+    "description": "**This n8n template demonstrates how to automatically generate and publish SEO/AEO-optimized Shopify blog articles from a list of keywords using AI for content creation, image generation, and metadata optimization.**\n\n## Who’s it for\nShopify marketers, content teams, and solo founders who want consistent, hands-off blog production with built-in SEO/AEO hygiene and internal linking.\n\n## What it does\nThe workflow picks a keyword from your Google Sheet based on priority, search volume, and difficulty. It then checks your Shopify blog for existing slugs to avoid duplicate, drafts a 900+ word article optimized for SEO/AEO, generates a hero image, creates the article in Shopify, sets SEO metafields (title/description), and logs the result to your Sheets for tracking and future internal links.\n\n## How it works\n- **Google Sheets → Candidate selection:** Reads **Keywords**, **Links**, and **Published** tabs: ranks by priority → volume → difficulty. (In the workflow it is explained how to exactly set up the Google Sheets)\n- **De-dupe slugs:** Paginates your blog via Shopify GraphQL to collect existing handles and make sure to use a different one.  \n- **OpenAI content + image:** Builds a structured prompt (SEO/AEO and internal linking), calls Chat Completions and Image Generation for a hero image.  \n- **Shopify publish:** Creates the article via REST and updates `title_tag` / `description_tag` metafields via GraphQL.  \n- **Log + link graph:** Appends to **Published** tab to keep track of articles posted and **Links** tab for ongoing internal-link suggestions.  \n\n## How to set up\n1. Open **Set – Config** and fill: `shopDomain`, `siteBaseUrl`, `blogId`, `blogHandle`, `sheetId`, `author`. Optional: `autoPublish`, `maxPerRun`, `tz`.  \n2. Create the Google Sheet with **Keywords**, **Links**, **Published** tabs using the provided column structure. I have personally used Semrush to generate that list of keywords. \n3. Add credentials: Shopify Admin token (Header/Bearer), OpenAI API key, and Google Service Account.\n\n## Requirements\n- Shopify store with Blog API access  \n- OpenAI API key  \n- Google Service Account with access to Google Sheets API (can be activated here [here](https://console.cloud.google.com/apis/api/sheets.googleapis.com)) \n\n## How to customize\n- Change the cron in **Schedule Trigger** for different days/times.  \n- Adjust `maxPerRun`, `autoPublish`, language or any other variables in the \"Set - Config\" node.\n- Adjust the prompt from the \"Code - Build Prompt\" node.  \n- Extend the Sheets schema with extra scoring signals if needed.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Shopify: Create Article (REST)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Build Article GID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Shopify: metafieldsSet (GraphQL)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sheets - Read Keywords",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sheets - Read Links",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sheets - Read Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Code - Normalize Inputs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Code - Pick Candidate",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Shopify - List Article Slugs",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Set - Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If - More pages?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code - Init Slug Parser",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Accumulate Slugs + Cursor",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code - Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI - Chat Completions",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Code - Sanitize + pick non-conflicting slug",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "HTTP Request - OpenAI Images (Hero)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge - Wiring",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append row to \"Published\" tab",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Code - List of links for article",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append row to \"Links\" tab",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

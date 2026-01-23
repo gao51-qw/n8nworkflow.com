@@ -1,0 +1,140 @@
+{
+  "id": 11835,
+  "slug": "11835",
+  "title": "Track certification requirement changes with ScrapeGraphAI, GitHub and email",
+  "description": "# Job Posting Aggregator with Email and GitHub\n\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically aggregates certification-related job-posting requirements from multiple industry sources, compares them against last year’s data stored in GitHub, and emails a concise change log to subscribed professionals. It streamlines annual requirement checks and renewal reminders, ensuring users never miss an update.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n cloud)\n- ScrapeGraphAI community node installed\n- Git installed (for optional local testing of the repo)\n- Working SMTP server or other Email credential supported by n8n\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping of certification pages  \n- **GitHub Personal Access Token** – Allows the workflow to read/write files in the repo  \n- **Email / SMTP Credentials** – Sends the summary email to end-users  \n\n### Specific Setup Requirements\n| Resource | Purpose | Example |\n|----------|---------|---------|\n| GitHub Repository | Stores `certification_requirements.json` versioned annually | `https://github.com/&lt;you&gt;/cert-requirements.git` |\n| Watch List File  | List of page URLs & selectors to scrape | Saved in the repo under `/config/watchList.json` |\n| Email List       | Semicolon-separated list of recipients | `me@company.com;team@company.com` |\n\n## How it works\n\nThis workflow automatically aggregates certification-related job-posting requirements from multiple industry sources, compares them against last year’s data stored in GitHub, and emails a concise change log to subscribed professionals. It streamlines annual requirement checks and renewal reminders, ensuring users never miss an update.\n\n## Key Steps:\n- **Manual Trigger**: Starts the workflow on demand or via scheduled cron.\n- **Load Watch List (Code Node)**: Reads the list of certification URLs and CSS selectors.\n- **Split In Batches**: Iterates through each URL to avoid rate limits.\n- **ScrapeGraphAI**: Scrapes requirement details from each page.\n- **Merge (Wait)**: Reassembles individual scrape results into a single JSON array.\n- **GitHub (Read File)**: Retrieves last year’s `certification_requirements.json`.\n- **IF (Change Detector)**: Compares current vs. previous JSON and decides whether changes exist.\n- **Email Send**: Composes and sends a formatted summary of changes.\n- **GitHub (Upsert File)**: Commits the new JSON file back to the repo for future comparisons.\n\n## Set up steps\n\n**Setup Time: 15-25 minutes**\n\n1. **Install Community Node**: From n8n UI → Settings → Community Nodes → search and install “ScrapeGraphAI”.\n2. **Create/Clone GitHub Repo**: Add an empty `certification_requirements.json` ( `{}` ) and a `config/watchList.json` with an array of objects like:  \n   ```json\n   [\n     {\n       \"url\": \"https://cert-body.org/requirements\",\n       \"selector\": \"#requirements\"\n     }\n   ]\n   ```\n3. **Generate GitHub PAT**: Scope `repo`, store in n8n Credentials as “GitHub API”.\n4. **Add ScrapeGraphAI Credential**: Paste your API key into n8n Credentials.\n5. **Configure Email Credentials**: E.g., SMTP with username/password or OAuth2.\n6. **Open Workflow**: Import the template JSON into n8n.\n7. **Update Environment Variables** (in the Code node or via n8n variables):  \n   - `GITHUB_REPO` (e.g., `user/cert-requirements`)  \n   - `EMAIL_RECIPIENTS`  \n8. **Test Run**: Trigger manually. Verify email content and GitHub commit.\n9. **Schedule**: Add a Cron node (optional) for yearly or quarterly automatic runs.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Manual Trigger** – Initiates the workflow manually or via external schedule.\n- **Code (Load Watch List)** – Reads and parses `watchList.json` from GitHub or static input.\n- **SplitInBatches** – Controls request concurrency to avoid scraping bans.\n- **ScrapeGraphAI** – Extracts requirement text using provided CSS selectors or XPath.\n- **Merge (Combine)** – Waits for all batches and merges them into one dataset.\n- **GitHub (Read/Write File)** – Handles version-controlled storage of JSON data.\n- **IF (Change Detector)** – Compares hashes/JSON diff to detect updates.\n- **EmailSend** – Sends change log, including renewal reminders and diff summary.\n- **Sticky Note** – Provides in-workflow documentation for future editors.\n\n### Data Flow:\n1. **Manual Trigger** → **Code (Load Watch List)** → **SplitInBatches**  \n2. **SplitInBatches** → **ScrapeGraphAI** → **Merge**  \n3. **Merge** → **GitHub (Read File)** → **IF (Change Detector)**  \n4. **IF (True)** → **Email Send** → **GitHub (Upsert File)**\n\n## Customization Examples\n\n### Adjusting Scraper Configuration\n```javascript\n// Inside the Watch List JSON object\n{\n  \"url\": \"https://new-association.com/cert-update\",\n  \"selector\": \".content article:nth-of-type(1) ul\"\n}\n```\n\n### Custom Email Template\n```javascript\n// In Email Send node → HTML Content\n<div>\n  <h2>📋 Certification Updates – {{ $json.date }}</h2>\n  <p>The following certifications have new requirements:</p>\n  <ul>\n    {{ $json.diffHtml }}\n  </ul>\n  <p>For full details visit our GitHub repo.</p>\n</div>\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"timestamp\": \"2024-09-01T12:00:00Z\",\n  \"source\": \"watchList.json\",\n  \"current\": {\n    \"AWS-SAA\": \"Version 3.0, requires renewed proctored exam\",\n    \"PMP\": \"60 PDUs every 3 years\"\n  },\n  \"previous\": {\n    \"AWS-SAA\": \"Version 2.0\",\n    \"PMP\": \"60 PDUs every 3 years\"\n  },\n  \"changes\": {\n    \"AWS-SAA\": \"Updated to Version 3.0; exam format changed.\"\n  }\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty data** – Check CSS/XPath selectors and ensure page is publicly accessible.  \n2. **GitHub authentication fails** – Verify PAT scope includes `repo` and that the credential is linked in both GitHub nodes.  \n\n### Performance Tips\n- Limit `SplitInBatches` size to 3-5 URLs when sources are heavy to avoid timeouts.\n- Enable n8n execution mode “Queue” for long-running scrapes.\n\n**Pro Tips:**\n- Store selector samples in comments next to each watch list entry for future maintenance.  \n- Use a Cron node set to “0 0 1 1 *” for an annual run exactly on Jan 1st.  \n- Add a Telegram node after Email Send for instant mobile notifications.",
+  "featuredImage": "/data/workflows/11835/11835.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5,
+  "downloads": 0,
+  "createdAt": "2025-12-15T17:49:11.860Z",
+  "updatedAt": "2026-01-16T09:10:19.931Z",
+  "publishedAt": "2025-12-15T17:49:11.860Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11835",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Track certification requirement changes with ScrapeGraphAI, GitHub and email",
+    "workflowName": "Track certification requirement changes with ScrapeGraphAI, GitHub and email",
+    "description": "# Job Posting Aggregator with Email and GitHub\n\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically aggregates certification-related job-posting requirements from multiple industry sources, compares them against last year’s data stored in GitHub, and emails a concise change log to subscribed professionals. It streamlines annual requirement checks and renewal reminders, ensuring users never miss an update.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n cloud)\n- ScrapeGraphAI community node installed\n- Git installed (for optional local testing of the repo)\n- Working SMTP server or other Email credential supported by n8n\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping of certification pages  \n- **GitHub Personal Access Token** – Allows the workflow to read/write files in the repo  \n- **Email / SMTP Credentials** – Sends the summary email to end-users  \n\n### Specific Setup Requirements\n| Resource | Purpose | Example |\n|----------|---------|---------|\n| GitHub Repository | Stores `certification_requirements.json` versioned annually | `https://github.com/&lt;you&gt;/cert-requirements.git` |\n| Watch List File  | List of page URLs & selectors to scrape | Saved in the repo under `/config/watchList.json` |\n| Email List       | Semicolon-separated list of recipients | `me@company.com;team@company.com` |\n\n## How it works\n\nThis workflow automatically aggregates certification-related job-posting requirements from multiple industry sources, compares them against last year’s data stored in GitHub, and emails a concise change log to subscribed professionals. It streamlines annual requirement checks and renewal reminders, ensuring users never miss an update.\n\n## Key Steps:\n- **Manual Trigger**: Starts the workflow on demand or via scheduled cron.\n- **Load Watch List (Code Node)**: Reads the list of certification URLs and CSS selectors.\n- **Split In Batches**: Iterates through each URL to avoid rate limits.\n- **ScrapeGraphAI**: Scrapes requirement details from each page.\n- **Merge (Wait)**: Reassembles individual scrape results into a single JSON array.\n- **GitHub (Read File)**: Retrieves last year’s `certification_requirements.json`.\n- **IF (Change Detector)**: Compares current vs. previous JSON and decides whether changes exist.\n- **Email Send**: Composes and sends a formatted summary of changes.\n- **GitHub (Upsert File)**: Commits the new JSON file back to the repo for future comparisons.\n\n## Set up steps\n\n**Setup Time: 15-25 minutes**\n\n1. **Install Community Node**: From n8n UI → Settings → Community Nodes → search and install “ScrapeGraphAI”.\n2. **Create/Clone GitHub Repo**: Add an empty `certification_requirements.json` ( `{}` ) and a `config/watchList.json` with an array of objects like:  \n   ```json\n   [\n     {\n       \"url\": \"https://cert-body.org/requirements\",\n       \"selector\": \"#requirements\"\n     }\n   ]\n   ```\n3. **Generate GitHub PAT**: Scope `repo`, store in n8n Credentials as “GitHub API”.\n4. **Add ScrapeGraphAI Credential**: Paste your API key into n8n Credentials.\n5. **Configure Email Credentials**: E.g., SMTP with username/password or OAuth2.\n6. **Open Workflow**: Import the template JSON into n8n.\n7. **Update Environment Variables** (in the Code node or via n8n variables):  \n   - `GITHUB_REPO` (e.g., `user/cert-requirements`)  \n   - `EMAIL_RECIPIENTS`  \n8. **Test Run**: Trigger manually. Verify email content and GitHub commit.\n9. **Schedule**: Add a Cron node (optional) for yearly or quarterly automatic runs.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Manual Trigger** – Initiates the workflow manually or via external schedule.\n- **Code (Load Watch List)** – Reads and parses `watchList.json` from GitHub or static input.\n- **SplitInBatches** – Controls request concurrency to avoid scraping bans.\n- **ScrapeGraphAI** – Extracts requirement text using provided CSS selectors or XPath.\n- **Merge (Combine)** – Waits for all batches and merges them into one dataset.\n- **GitHub (Read/Write File)** – Handles version-controlled storage of JSON data.\n- **IF (Change Detector)** – Compares hashes/JSON diff to detect updates.\n- **EmailSend** – Sends change log, including renewal reminders and diff summary.\n- **Sticky Note** – Provides in-workflow documentation for future editors.\n\n### Data Flow:\n1. **Manual Trigger** → **Code (Load Watch List)** → **SplitInBatches**  \n2. **SplitInBatches** → **ScrapeGraphAI** → **Merge**  \n3. **Merge** → **GitHub (Read File)** → **IF (Change Detector)**  \n4. **IF (True)** → **Email Send** → **GitHub (Upsert File)**\n\n## Customization Examples\n\n### Adjusting Scraper Configuration\n```javascript\n// Inside the Watch List JSON object\n{\n  \"url\": \"https://new-association.com/cert-update\",\n  \"selector\": \".content article:nth-of-type(1) ul\"\n}\n```\n\n### Custom Email Template\n```javascript\n// In Email Send node → HTML Content\n<div>\n  <h2>📋 Certification Updates – {{ $json.date }}</h2>\n  <p>The following certifications have new requirements:</p>\n  <ul>\n    {{ $json.diffHtml }}\n  </ul>\n  <p>For full details visit our GitHub repo.</p>\n</div>\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"timestamp\": \"2024-09-01T12:00:00Z\",\n  \"source\": \"watchList.json\",\n  \"current\": {\n    \"AWS-SAA\": \"Version 3.0, requires renewed proctored exam\",\n    \"PMP\": \"60 PDUs every 3 years\"\n  },\n  \"previous\": {\n    \"AWS-SAA\": \"Version 2.0\",\n    \"PMP\": \"60 PDUs every 3 years\"\n  },\n  \"changes\": {\n    \"AWS-SAA\": \"Updated to Version 3.0; exam format changed.\"\n  }\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty data** – Check CSS/XPath selectors and ensure page is publicly accessible.  \n2. **GitHub authentication fails** – Verify PAT scope includes `repo` and that the credential is linked in both GitHub nodes.  \n\n### Performance Tips\n- Limit `SplitInBatches` size to 3-5 URLs when sources are heavy to avoid timeouts.\n- Enable n8n execution mode “Queue” for long-running scrapes.\n\n**Pro Tips:**\n- Store selector samples in comments next to each watch list entry for future maintenance.  \n- Use a Cron node set to “0 0 1 1 *” for an annual run exactly on Jan 1st.  \n- Add a Telegram node after Email Send for instant mobile notifications.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Input & Batching",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Scraping & Normalising",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Change Detection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Store & Notify",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Start Manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Define Certification URLs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Certification Page",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Scraped Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GitHub – Get Previous Snapshot",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Current & Previous",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Detect Changes",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Changes Detected?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GitHub – Upsert Snapshot",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Summary Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

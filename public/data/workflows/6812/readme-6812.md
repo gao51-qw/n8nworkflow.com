@@ -1,0 +1,81 @@
+# Generate YouTube SEO content & thumbnail from video scripts with GPT-4o & Runway
+
+> ## Who’s it for
+This template is ideal for YouTube video creators who spend a lot of time manually generating SEO assets like descriptions, tags, titles, keywords, and thumbnails. If you're looking to automate your YouTube SEO workflow, this is the perfect solution for you.
+
+## How it works / What it does
+Connect a Google Sheet to n8n and pull in the Hindi script (or any language).
+Use OpenAI to generate SEO content:
+- Video description
+- Tags
+- Keywords
+- Titles
+- Thumbnail titles etc.
+
+Use the generated description as input to create a thumbnail image using an image generation API.
+Store all outputs in the same Google Sheet in separate columns.
+Optionally, use tools like VidIQ or TubeBuddy to test the SEO strength of generated titles, tags, and keywords.
+```
+💡 Note: This example uses Runway’s image generation API, but you can plug in any other image-generation service of your choice.
+
+```
+## Requirements
+1. A Google Sheet with clearly named columns
+2. Hindi, English, or other language scripts in the sheet
+3. OpenAI API key
+4. Runway API key (or any other image generation API)
+
+## How to set up
+- You can set up this workflow in 15 minutes by following the pre-defined steps.
+- Replace the manual Google Sheet trigger with a scheduled trigger for daily or timed automation.
+- You may also swap Google Sheets with any database or data source of your choice.
+- No Google Sheets API required.
+- Requires minimal JavaScript or Python knowledge for advanced customizations.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6812
+- **Complexity:** advanced
+- **Node Count:** 19
+- **Views:** 1381
+- **Downloads:** 138
+- **Created:** 2025/8/1
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6812)
+
+## 👤 Author
+
+- **Name:** Janak Patel
+- **Username:** @dolphyai
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **googleSheetsTrigger** 
+- **noOp** 
+- **if** 
+- **@n8n/n8n-nodes-langchain.openAi** (×2)
+- **set** 
+- **googleSheets** (×3)
+- **code** (×2)
+- **httpRequest** 
+- **stickyNote** (×7)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 19 nodes with 10 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,121 @@
+{
+  "id": 9880,
+  "slug": "9880",
+  "title": "WooCommerce order updates to customers via WhatsApp with Rapiwa API",
+  "description": "## Who is this for?\nThis workflow is for online store owners, support teams, and marketing staff who want to automatically verify WhatsApp numbers and send order invoice links or personalized order updates to customers. It’s built against WooCommerce order webhooks but can be adapted to Shopify or other e-commerce platforms that provide `billing` and `line_items`.\n\n## What this Workflow Does\n- Receives order events (Webhook / WooCommerce `order.updated`).\n- Normalizes the payload into a compact object: `{ data: { customer, products, invoice_link } }` via a Code node.\n- Iterates items in batches (`SplitInBatches`) to control throughput.\n- Cleans phone numbers (removes non-digits) and verifies WhatsApp registration using Rapiwa (`/api/verify-whatsapp`).\n- Sends templated WhatsApp messages through Rapiwa (`/api/send-message`) for verified numbers.\n- Logs every attempt into Google Sheets: one sheet for verified & sent rows, another for unverified & not sent rows.\n- Uses a `Wait` node to throttle and loop back into the batch processor.\n\n## Key Features\n- Trigger-based automation (Webhook or WooCommerce trigger).\n- Payload normalization and mapping via JavaScript Code nodes.\n- Controlled batching (SplitInBatches) to avoid rate limits.\n- Pre-send verification of WhatsApp numbers using Rapiwa.\n- Conditional branching with the IF node to separate verified vs unverified flows.\n- Personalized message templates that pull customer and product fields from the mapped data.\n- Logging and audit trail stored in Google Sheets (two separate append flows).\n\n## How to Use — Step-by-step Setup\n1. Add credentials in n8n\n   - Rapiwa: Create an HTTP Bearer credential and paste your Bearer token (example name used in the flow: `Rapiwa Bearer Auth`).\n   - Google Sheets: Create an OAuth2 credential (example: `Google Sheets`).\n   - WooCommerce: Add WooCommerce API credentials for the trigger (or configure Shopify credentials if adapting).\n\n3. Import / configure nodes in n8n\n   - Webhook (or WooCommerce Trigger): receive order payloads. Example Webhook path is present in the exported flow.\n   - Code node `Format Webhook Response Data`: map `body.billing`, `body.line_items`, `body.payment_url` into `{ data: { customer, products, invoice_link } }`.\n   - Code node `Clean WhatsApp Number`: ensure the phone number is a string and strip non-digits: `String(rawNumber).replace(/\\D/g, \"\")`.\n   - HTTP Request `Check valid whatsapp number Using Rapiwa`: POST to `https://app.rapiwa.com/api/verify-whatsapp` with `{ number }`. Use the Rapiwa Bearer credential.\n   - IF `If`: check verification result. The flow compares `{{$json.data.exists}}` to `\"true\"` in the exported flow; normalize types if your API returns booleans.\n   - HTTP Request `Rapiwa Sender`: POST to `https://app.rapiwa.com/api/send-message` with `number`, `message_type: 'text'`, and a templated `message` (see message template in the flow).\n   - Google Sheets `Store State of Rows in Verified & Sent` and `Store State of Rows in Unverified & Not Sent`\n\n## Google Sheet Column Structure\nCreate these columns exactly (the Google Sheets nodes in the flow expect these names):\n**A Google Sheet formatted like this** ➤ [sample](https://docs.google.com/spreadsheets/d/1WKOFqFdF3tqfes5KKO1WGAp20SpO3jJl9GsE9CmtfLI/edit?usp=sharing)\n\n| Name            | Number        | Email             | Address      | Product Title                                  | Product ID | Size | Quantity | Total Price   | Product Image                                                                 | Invoice Link                                                                                             | Product Status | Validity   | Status   |\n|-----------------|---------------|-------------------|--------------|------------------------------------------------|------------|------|----------|----------------|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|----------------|------------|----------|\n| Abdul Mannan  | 8801322827799 | contact@spagreen.net   | mirpur dohs  | Air Force 1 Reigning Champ Dark Grey 1:1 - 40 | 251        | 40   | 1        | BDT 5800.00    | ![Product Image](https://rahxx23-WA0032.jpg)        | [Invoice](https://your_domainxxxr=truexxMqagSLWyft5t) | on-hold        | verified   | sent     |\n| Abdul Mannan  | 8801322827799 | contact@spagreen.net   | mirpur dohs  | Air Force 1 Reigning Champ Dark Grey 1:1 - 40 | 251        | 40   | 1        | BDT 5800.00    | ![Product Image](https://rahixxxx20250323-WA0032.jpg)        | [Invoice](https://your_domainxxxrxxxer_wMqagSLWyft5t) | on-hold        | unverified | not sent |\n\n\n## Customization Ideas\n- Adapt the Code mapping node for Shopify payloads or other marketplaces.\n- Iterate and include multiple products in the message instead of using `products[0]`.\n- Add filters in the Code node (e.g., only process orders with `total &gt; 5000`).\n- Add fallback channels (SMS or email) for unverified numbers.\n- Persist logs into a database for analytics and retention beyond Google Sheets.\n- Add admin notifications (Slack, email) at the end of each run.\n\n## Useful Links\n- **Dashboard:** [https://app.rapiwa.com](https://app.rapiwa.com/login)\n- **Official Website:** [https://rapiwa.com](https://rapiwa.com/)\n- **Documentation:** [https://docs.rapiwa.com](https://docs.rapiwa.com/)\n\n## Support & Help\n- **WhatsApp**: [Chat on WhatsApp](https://wa.me/8801322827799)\n- **Discord**: [SpaGreen Community](https://discord.gg/SsCChWEP)\n- **Facebook Group**: [SpaGreen Support](https://www.facebook.com/groups/spagreenbd)\n- **Website**: [https://spagreen.net](https://spagreen.net)\n- **Developer Portfolio**: [Codecanyon SpaGreen](https://codecanyon.net/user/spagreen/portfolio)\n",
+  "featuredImage": "/data/workflows/9880/9880.webp",
+  "author": {
+    "id": 101,
+    "slug": "rapiwa",
+    "name": "Rapiwa",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 138,
+  "downloads": 13,
+  "createdAt": "2025-10-19T05:34:31.088Z",
+  "updatedAt": "2026-01-16T09:02:26.588Z",
+  "publishedAt": "2025-10-19T05:34:31.088Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9880",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "WooCommerce order updates to customers via WhatsApp with Rapiwa API",
+    "workflowName": "WooCommerce order updates to customers via WhatsApp with Rapiwa API",
+    "description": "## Who is this for?\nThis workflow is for online store owners, support teams, and marketing staff who want to automatically verify WhatsApp numbers and send order invoice links or personalized order updates to customers. It’s built against WooCommerce order webhooks but can be adapted to Shopify or other e-commerce platforms that provide `billing` and `line_items`.\n\n## What this Workflow Does\n- Receives order events (Webhook / WooCommerce `order.updated`).\n- Normalizes the payload into a compact object: `{ data: { customer, products, invoice_link } }` via a Code node.\n- Iterates items in batches (`SplitInBatches`) to control throughput.\n- Cleans phone numbers (removes non-digits) and verifies WhatsApp registration using Rapiwa (`/api/verify-whatsapp`).\n- Sends templated WhatsApp messages through Rapiwa (`/api/send-message`) for verified numbers.\n- Logs every attempt into Google Sheets: one sheet for verified & sent rows, another for unverified & not sent rows.\n- Uses a `Wait` node to throttle and loop back into the batch processor.\n\n## Key Features\n- Trigger-based automation (Webhook or WooCommerce trigger).\n- Payload normalization and mapping via JavaScript Code nodes.\n- Controlled batching (SplitInBatches) to avoid rate limits.\n- Pre-send verification of WhatsApp numbers using Rapiwa.\n- Conditional branching with the IF node to separate verified vs unverified flows.\n- Personalized message templates that pull customer and product fields from the mapped data.\n- Logging and audit trail stored in Google Sheets (two separate append flows).\n\n## How to Use — Step-by-step Setup\n1. Add credentials in n8n\n   - Rapiwa: Create an HTTP Bearer credential and paste your Bearer token (example name used in the flow: `Rapiwa Bearer Auth`).\n   - Google Sheets: Create an OAuth2 credential (example: `Google Sheets`).\n   - WooCommerce: Add WooCommerce API credentials for the trigger (or configure Shopify credentials if adapting).\n\n3. Import / configure nodes in n8n\n   - Webhook (or WooCommerce Trigger): receive order payloads. Example Webhook path is present in the exported flow.\n   - Code node `Format Webhook Response Data`: map `body.billing`, `body.line_items`, `body.payment_url` into `{ data: { customer, products, invoice_link } }`.\n   - Code node `Clean WhatsApp Number`: ensure the phone number is a string and strip non-digits: `String(rawNumber).replace(/\\D/g, \"\")`.\n   - HTTP Request `Check valid whatsapp number Using Rapiwa`: POST to `https://app.rapiwa.com/api/verify-whatsapp` with `{ number }`. Use the Rapiwa Bearer credential.\n   - IF `If`: check verification result. The flow compares `{{$json.data.exists}}` to `\"true\"` in the exported flow; normalize types if your API returns booleans.\n   - HTTP Request `Rapiwa Sender`: POST to `https://app.rapiwa.com/api/send-message` with `number`, `message_type: 'text'`, and a templated `message` (see message template in the flow).\n   - Google Sheets `Store State of Rows in Verified & Sent` and `Store State of Rows in Unverified & Not Sent`\n\n## Google Sheet Column Structure\nCreate these columns exactly (the Google Sheets nodes in the flow expect these names):\n**A Google Sheet formatted like this** ➤ [sample](https://docs.google.com/spreadsheets/d/1WKOFqFdF3tqfes5KKO1WGAp20SpO3jJl9GsE9CmtfLI/edit?usp=sharing)\n\n| Name            | Number        | Email             | Address      | Product Title                                  | Product ID | Size | Quantity | Total Price   | Product Image                                                                 | Invoice Link                                                                                             | Product Status | Validity   | Status   |\n|-----------------|---------------|-------------------|--------------|------------------------------------------------|------------|------|----------|----------------|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|----------------|------------|----------|\n| Abdul Mannan  | 8801322827799 | contact@spagreen.net   | mirpur dohs  | Air Force 1 Reigning Champ Dark Grey 1:1 - 40 | 251        | 40   | 1        | BDT 5800.00    | ![Product Image](https://rahxx23-WA0032.jpg)        | [Invoice](https://your_domainxxxr=truexxMqagSLWyft5t) | on-hold        | verified   | sent     |\n| Abdul Mannan  | 8801322827799 | contact@spagreen.net   | mirpur dohs  | Air Force 1 Reigning Champ Dark Grey 1:1 - 40 | 251        | 40   | 1        | BDT 5800.00    | ![Product Image](https://rahixxxx20250323-WA0032.jpg)        | [Invoice](https://your_domainxxxrxxxer_wMqagSLWyft5t) | on-hold        | unverified | not sent |\n\n\n## Customization Ideas\n- Adapt the Code mapping node for Shopify payloads or other marketplaces.\n- Iterate and include multiple products in the message instead of using `products[0]`.\n- Add filters in the Code node (e.g., only process orders with `total &gt; 5000`).\n- Add fallback channels (SMS or email) for unverified numbers.\n- Persist logs into a database for analytics and retention beyond Google Sheets.\n- Add admin notifications (Slack, email) at the end of each run.\n\n## Useful Links\n- **Dashboard:** [https://app.rapiwa.com](https://app.rapiwa.com/login)\n- **Official Website:** [https://rapiwa.com](https://rapiwa.com/)\n- **Documentation:** [https://docs.rapiwa.com](https://docs.rapiwa.com/)\n\n## Support & Help\n- **WhatsApp**: [Chat on WhatsApp](https://wa.me/8801322827799)\n- **Discord**: [SpaGreen Community](https://discord.gg/SsCChWEP)\n- **Facebook Group**: [SpaGreen Support](https://www.facebook.com/groups/spagreenbd)\n- **Website**: [https://spagreen.net](https://spagreen.net)\n- **Developer Portfolio**: [Codecanyon SpaGreen](https://codecanyon.net/user/spagreen/portfolio)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Webhook Response Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean WhatsApp Number",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store State of Rows in Verified & Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Store State of Rows in Unverified & Not Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rapiwa",
+      "type": "n8n-nodes-rapiwa.rapiwa",
+      "role": "rapiwa",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rapiwa (send message)",
+      "type": "n8n-nodes-rapiwa.rapiwa",
+      "role": "rapiwa",
+      "configDescription": "Version 1"
+    }
+  ]
+}

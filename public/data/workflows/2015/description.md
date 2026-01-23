@@ -1,0 +1,15 @@
+This template can be used to verify email addresses with [Icypeas](https://www.icypeas.com/). Be sure to have an active account to use this template. 
+
+
+**How it works**
+This workflow can be divided into four steps :
+
+    1. The workflow initiates with a manual trigger (On clicking ‘execute’).
+    2. It reads your Google Sheet file.
+    3. It connects to your Icypeas account.
+    4. It performs an HTTP request to scan the domains/companies.
+
+**Set up steps**
+    1. You will need a formated Google sheet file with company/domain names. 
+    2. You will need a working icypeas account to run the workflow and get your API Key, API Secret and User ID.
+    3. You will need domain/companies names to scan them.

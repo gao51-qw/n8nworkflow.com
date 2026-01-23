@@ -1,0 +1,116 @@
+{
+  "id": 2463,
+  "slug": "2463",
+  "title": "Enrich company data from Google Sheet with OpenAI Agent and ScrapingBee",
+  "description": "\nThis workflow demonstrates how to enrich data from a list of companies in a spreadsheet. While this workflow is production-ready if all steps are followed, adding error handling would enhance its robustness.\n\n## Important notes\n\n- **Check legal regulations**: This workflow involves scraping, so make sure to check the legal regulations around scraping in your country before getting started. Better safe than sorry!\n- **Mind those tokens**: OpenAI tokens can add up fast, so keep an eye on usage unless you want a surprising bill that could knock your socks off! 💸\n\n## Main Workflow\n\n### Node 1 - `Webhook`\nThis node triggers the workflow via a webhook call. You can replace it with any other trigger of your choice, such as form submission, a new row added in Google Sheets, or a manual trigger.\n\n### Node 2 - `Get Rows from Google Sheet`\nThis node retrieves the list of companies from your spreadsheet. \nhere is the **[Google Sheet Template you can use](https://docs.google.com/spreadsheets/d/1AIzJGxdMmwMDuHyRqGyX-E0QYbyxWKlSMn-awlHH19s/)**.\nThe columns in this Google Sheet are:\n\n- **Company**: The name of the company\n- **Website**: The website URL of the company  \n  *These two fields are required at this step.*\n\n- **Business Area**: The business area deduced by OpenAI from the scraped data\n- **Offer**: The offer deduced by OpenAI from the scraped data\n- **Value Proposition**: The value proposition deduced by OpenAI from the scraped data\n- **Business Model**: The business model deduced by OpenAI from the scraped data\n- **ICP**: The Ideal Customer Profile deduced by OpenAI from the scraped data\n- **Additional Information**: Information related to the scraped data, including:\n  - **Information Sufficiency**:\n    - *Description*: Indicates if the information was sufficient to provide a full analysis.\n    - *Options*: \"Sufficient\" or \"Insufficient\"\n  - **Insufficient Details**:\n    - *Description*: If labeled \"Insufficient,\" specifies what information was missing or needed to complete the analysis.\n  - **Mismatched Content**:\n    - *Description*: Indicates whether the page content aligns with that of a typical company page.\n  - **Suggested Actions**:\n    - *Description*: Provides recommendations if the page content is insufficient or mismatched, such as verifying the URL or searching for alternative sources.\n\n### Node 3 - `Loop Over Items`\nThis node ensures that, in subsequent steps, the website in \"extra workflow input\" corresponds to the row being processed. You can delete this node, but you'll need to ensure that the \"query\" sent to the scraping workflow corresponds to the website of the specific company being scraped (rather than just the first row).\n\n### Node 4 - `AI Agent`\nThis AI agent is configured with a prompt to extract data from the content it receives. The node has three sub-nodes:\n  \n  - **OpenAI Chat Model**: The model used is currently `gpt4-o-mini`.\n  - **Call n8n Workflow**: This sub-node calls the workflow to use ScrapingBee and retrieves the scraped data.\n  - **Structured Output Parser**: This parser structures the output for clarity and ease of use, and then adds rows to the Google Sheet.\n\n### Node 5 - `Update Company Row in Google Sheet`\nThis node updates the specific company's row in Google Sheets with the enriched data.\n\n## Scraper Agent Workflow\n\n### Node 1 - `Tool Called from Agent`\nThis is the trigger for when the AI Agent calls the Scraper. A query is sent with:\n- Company name\n- Website (the URL of the website)\n\n### Node 2 - `Set Company URL`\nThis node renames a field, which may seem trivial but is useful for performing transformations on data received from the AI Agent.\n\n### Node 3 - `ScrapingBee: Scrape Company's Website`\nThis node scrapes data from the URL provided using ScrapingBee. You can use any scraper of your choice, but ScrapingBee is recommended, as it allows you to configure scraper behavior directly. Once configured, copy the provided \"curl\" command and import it into n8n.\n\n### Node 4 - `HTML to Markdown`\nThis node converts the scraped HTML data to Markdown, which is then sent to OpenAI. The Markdown format generally uses fewer tokens than HTML.\n\n## Improving the Workflow\nIt's always a pleasure to share workflows, but creators sometimes want to keep some magic to themselves ✨. Here are some ways you can enhance this workflow:\n\n- Handle potential errors\n- Configure the scraper tool to scrape other pages on the website. Although this will cost more tokens, it can be useful (e.g., scraping \"Pricing\" or \"About Us\" pages in addition to the homepage).\n- Instead of Google Sheets, connect directly to your CRM to enrich company data.\n- Trigger the workflow from form submissions on your website and send the scraped data about the lead to a Slack or Teams channel.\n",
+  "featuredImage": "/data/workflows/2463/2463.webp",
+  "author": {
+    "id": 101,
+    "slug": "dataki",
+    "name": "Dataki",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 9352,
+  "downloads": 935,
+  "createdAt": "2024-10-16T15:54:36.622Z",
+  "updatedAt": "2026-01-16T08:24:54.911Z",
+  "publishedAt": "2024-10-16T15:54:36.622Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2463",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Enrich company data from Google Sheet with OpenAI Agent and ScrapingBee",
+    "workflowName": "Enrich company data from Google Sheet with OpenAI Agent and ScrapingBee",
+    "description": "This workflow demonstrates how to enrich data from a list of companies in a spreadsheet. While this workflow is production-ready if all steps are followed, adding error handling would enhance its robustness.\n\n## Important notes\n\n- **Check legal regulations**: This workflow involves scraping, so make sure to check the legal regulations around scraping in your country before getting started. Better safe than sorry!\n- **Mind those tokens**: OpenAI tokens can add up fast, so keep an eye on usage unless you want a surprising bill that could knock your socks off! 💸\n\n## Main Workflow\n\n### Node 1 - `Webhook`\nThis node triggers the workflow via a webhook call. You can replace it with any other trigger of your choice, such as form submission, a new row added in Google Sheets, or a manual trigger.\n\n### Node 2 - `Get Rows from Google Sheet`\nThis node retrieves the list of companies from your spreadsheet. \nhere is the **[Google Sheet Template you can use](https://docs.google.com/spreadsheets/d/1AIzJGxdMmwMDuHyRqGyX-E0QYbyxWKlSMn-awlHH19s/)**.\nThe columns in this Google Sheet are:\n\n- **Company**: The name of the company\n- **Website**: The website URL of the company  \n  *These two fields are required at this step.*\n\n- **Business Area**: The business area deduced by OpenAI from the scraped data\n- **Offer**: The offer deduced by OpenAI from the scraped data\n- **Value Proposition**: The value proposition deduced by OpenAI from the scraped data\n- **Business Model**: The business model deduced by OpenAI from the scraped data\n- **ICP**: The Ideal Customer Profile deduced by OpenAI from the scraped data\n- **Additional Information**: Information related to the scraped data, including:\n  - **Information Sufficiency**:\n    - *Description*: Indicates if the information was sufficient to provide a full analysis.\n    - *Options*: \"Sufficient\" or \"Insufficient\"\n  - **Insufficient Details**:\n    - *Description*: If labeled \"Insufficient,\" specifies what information was missing or needed to complete the analysis.\n  - **Mismatched Content**:\n    - *Description*: Indicates whether the page content aligns with that of a typical company page.\n  - **Suggested Actions**:\n    - *Description*: Provides recommendations if the page content is insufficient or mismatched, such as verifying the URL or searching for alternative sources.\n\n### Node 3 - `Loop Over Items`\nThis node ensures that, in subsequent steps, the website in \"extra workflow input\" corresponds to the row being processed. You can delete this node, but you'll need to ensure that the \"query\" sent to the scraping workflow corresponds to the website of the specific company being scraped (rather than just the first row).\n\n### Node 4 - `AI Agent`\nThis AI agent is configured with a prompt to extract data from the content it receives. The node has three sub-nodes:\n  \n  - **OpenAI Chat Model**: The model used is currently `gpt4-o-mini`.\n  - **Call n8n Workflow**: This sub-node calls the workflow to use ScrapingBee and retrieves the scraped data.\n  - **Structured Output Parser**: This parser structures the output for clarity and ease of use, and then adds rows to the Google Sheet.\n\n### Node 5 - `Update Company Row in Google Sheet`\nThis node updates the specific company's row in Google Sheets with the enriched data.\n\n## Scraper Agent Workflow\n\n### Node 1 - `Tool Called from Agent`\nThis is the trigger for when the AI Agent calls the Scraper. A query is sent with:\n- Company name\n- Website (the URL of the website)\n\n### Node 2 - `Set Company URL`\nThis node renames a field, which may seem trivial but is useful for performing transformations on data received from the AI Agent.\n\n### Node 3 - `ScrapingBee: Scrape Company's Website`\nThis node scrapes data from the URL provided using ScrapingBee. You can use any scraper of your choice, but ScrapingBee is recommended, as it allows you to configure scraper behavior directly. Once configured, copy the provided \"curl\" command and import it into n8n.\n\n### Node 4 - `HTML to Markdown`\nThis node converts the scraped HTML data to Markdown, which is then sent to OpenAI. The Markdown format generally uses fewer tokens than HTML.\n\n## Improving the Workflow\nIt's always a pleasure to share workflows, but creators sometimes want to keep some magic to themselves ✨. Here are some ways you can enhance this workflow:\n\n- Handle potential errors\n- Configure the scraper tool to scrape other pages on the website. Although this will cost more tokens, it can be useful (e.g., scraping \"Pricing\" or \"About Us\" pages in addition to the homepage).\n- Instead of Google Sheets, connect directly to your CRM to enrich company data.\n- Trigger the workflow from form submissions on your website and send the scraped data about the lead to a Slack or Teams channel.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get rows from Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Call n8n workflow  : Scrape companies homepage content",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Company's Row on Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "ScrapingBee : Scrape company's homepage data ",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Tool called from Agent",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Set company url",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "HTML to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    }
+  ]
+}

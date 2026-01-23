@@ -1,0 +1,211 @@
+{
+  "id": 12081,
+  "slug": "12081",
+  "title": "Sync Google Calendar events to Google Sheets with Slack notifications",
+  "description": "Sync your Google Calendar events with Google Sheets and get daily Slack summaries with meeting statistics.\nFEATURES:\n\nReal-time sync of new and updated events\nAuto-categorization (Meeting, 1:1, Interview, Demo, Focus Time)\nPlatform detection (Google Meet, Zoom, Teams)\nDaily statistics dashboard\nCancellation tracking\nOptional email notifications to attendees\n\nFLOWS:\n\nNew Event: Log to Sheets + Slack notification + Optional email\nUpdated Event: Update Sheets + Slack notification\nCanceled Event: Log cancellation + Slack alert\nDaily Summary (8AM): Meeting time stats + Schedule to Slack\n\nSETUP:\n\nConnect Google account with Calendar access\nCreate Google Sheet with 3 tabs:\n\nEvents: ID, Synced At, Title, Category, Date, Day, Start Time, End Time, Duration, Platform, Attendees, Status, Meeting Link\nCancellations: ID, Canceled At, Title, Original Date, Original Time, Affected Attendees\nStatistics: Date, Total Events, Meeting Time, Minutes, Busy %, Status, Virtual, In-Person\n\n\nReplace YOUR_DOCUMENT_ID in all Sheets nodes\nConnect Slack (#calendar, #errors channels)\nOptional: Connect Gmail for attendee notifications\n\nDAILY STATISTICS:\n\nTotal events count\nTime spent in meetings\nBusy percentage of work day\nVirtual vs in-person breakdown\nFull day schedule\n\nIDEAL FOR:\nAnyone wanting to track their calendar, analyze meeting patterns, or get daily schedule summaries on Slack.",
+  "featuredImage": "/data/workflows/12081/12081.webp",
+  "author": {
+    "id": 101,
+    "slug": "manu",
+    "name": "Manu",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 17,
+  "downloads": 1,
+  "createdAt": "2025-12-23T21:40:01.618Z",
+  "updatedAt": "2026-01-16T09:11:20.429Z",
+  "publishedAt": "2025-12-23T21:40:01.618Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12081",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sync Google Calendar events to Google Sheets with Slack notifications",
+    "workflowName": "Sync Google Calendar events to Google Sheets with Slack notifications",
+    "description": "Sync your Google Calendar events with Google Sheets and get daily Slack summaries with meeting statistics.\nFEATURES:\n\nReal-time sync of new and updated events\nAuto-categorization (Meeting, 1:1, Interview, Demo, Focus Time)\nPlatform detection (Google Meet, Zoom, Teams)\nDaily statistics dashboard\nCancellation tracking\nOptional email notifications to attendees\n\nFLOWS:\n\nNew Event: Log to Sheets + Slack notification + Optional email\nUpdated Event: Update Sheets + Slack notification\nCanceled Event: Log cancellation + Slack alert\nDaily Summary (8AM): Meeting time stats + Schedule to Slack\n\nSETUP:\n\nConnect Google account with Calendar access\nCreate Google Sheet with 3 tabs:\n\nEvents: ID, Synced At, Title, Category, Date, Day, Start Time, End Time, Duration, Platform, Attendees, Status, Meeting Link\nCancellations: ID, Canceled At, Title, Original Date, Original Time, Affected Attendees\nStatistics: Date, Total Events, Meeting Time, Minutes, Busy %, Status, Virtual, In-Person\n\n\nReplace YOUR_DOCUMENT_ID in all Sheets nodes\nConnect Slack (#calendar, #errors channels)\nOptional: Connect Gmail for attendee notifications\n\nDAILY STATISTICS:\n\nTotal events count\nTime spent in meetings\nBusy percentage of work day\nVirtual vs in-person breakdown\nFull day schedule\n\nIDEAL FOR:\nAnyone wanting to track their calendar, analyze meeting patterns, or get daily schedule summaries on Slack.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "New Event Trigger",
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "role": "googleCalendarTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Updated Event Trigger",
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "role": "googleCalendarTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily Summary Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Process Event",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Is Canceled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Event",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Log Cancellation",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Slack - New Event",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Slack - Cancellation",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Has Attendees?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Confirmation Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Today Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Calculate Statistics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Slack - Daily Summary",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log Statistics",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Error",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Slack - Error Alert",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Done - Event",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Done - Cancellation",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Done - Summary",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 1 Calendar Triggers",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 2 Event Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 3 Logging",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 4 Email",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 5 Daily Summary",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 6 Error Handling",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

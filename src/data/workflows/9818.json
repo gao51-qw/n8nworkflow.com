@@ -1,0 +1,170 @@
+{
+  "id": 9818,
+  "slug": "9818",
+  "title": "Generate text & image responses in Telegram channels with GPT-4 and TGPT",
+  "description": "# Telegram AI Channel Bot - Text & Image Response Generator with TGPT\n\n## Overview\nThis n8n workflow creates an automated Telegram channel bot that responds to messages with AI-generated text or images using TGPT. The bot monitors a specific Telegram channel and generates responses based on message prefixes.\n\n## Features\n- Automated text response generation using TGPT\n- Image generation capabilities with customizable dimensions (1920x1080)\n- Duplicate message prevention\n- Time-window filtering (15 seconds) to process only recent messages\n- Continuous polling with 10-second intervals\n\n## Setup Instructions\n\n### Prerequisites\n1. **n8n Instance**: Ensure you have n8n installed and running\n2. **Telegram Bot**: Create a new bot via @BotFather on Telegram\n3. **Telegram Channel**: Create or have admin access to a Telegram channel\n4. **Linux Environment**: The workflow requires Linux for command execution\n\n### Configuration Steps\n\n#### 1. Obtain Telegram Bot Token\n- Open Telegram and search for @BotFather\n- Send `/newbot` and follow the prompts\n- Save the bot token provided (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)\n\n#### 2. Get Channel ID\n- Add your bot as an administrator to your Telegram channel\n- Send a test message to the channel\n- Visit: `https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates`\n- Look for `\"chat\":{\"id\":-100XXXXXXXXXX}` - this is your channel ID\n\n#### 3. Configure the Workflow\n- Import the workflow JSON into n8n\n- Open the **Config** node\n- Replace `your_telegram_token` with your actual bot token\n- Replace `your_telegram_channel_id` with your channel ID\n- Save the changes\n\n#### 4. Set Up Telegram Credentials in n8n\n- Navigate to the **Send Telegram Text Response** node\n- Click on the credentials field\n- Create new Telegram credentials using your bot token\n- Apply the same credentials to **Send Telegram Image Response** node\n\n#### 5. System Requirements\nThe workflow automatically installs required packages:\n- `util-linux-misc` (for script command)\n- `curl` (for downloading TGPT)\n- TGPT binary (downloaded automatically from GitHub)\n\n### Activation\n- Save all configuration changes\n- Toggle the workflow to **Active** status\n- The bot will start polling every 10 seconds\n\n## How to Use\n\n### Sending Commands to the Bot\n\n#### Text Generation\nTo generate a text response, send a message to your Telegram channel with the following format:\n```\nam# Your prompt here\n```\n\n**Example:**\n```\nam# Explain quantum computing in simple terms\n```\nThe bot will:\n1. Remove the `am#` prefix\n2. Send the prompt to TGPT with GPT-4 model\n3. Generate a response with temperature 0.3 (more focused/deterministic)\n4. Reply with the generated text in the channel\n\n#### Image Generation\nTo generate an image, send a message with this format:\n```\nami# Your image description here\n```\n\n**Example:**\n```\nami# A futuristic city with flying cars at sunset\n```\nThe bot will:\n1. Remove the `ami#` prefix\n2. Use TGPT to generate an image (1920x1080 resolution)\n3. Save the image temporarily\n4. Send the generated image to the channel\n\n### Important Usage Notes\n\n#### Response Time\n- The bot checks for new messages every 10 seconds\n- Messages older than 15 seconds are ignored\n- Expect a delay of 10-30 seconds for responses depending on generation time\n\n#### Message Processing\n- Only messages from the configured channel are processed\n- The bot maintains a list of processed message IDs to avoid duplicates\n- Maximum of 15 messages are retrieved per polling cycle\n\n#### Limitations\n- Text generation uses temperature 0.3 (less creative, more accurate)\n- Image generation uses temperature 0.7 (more creative)\n- Images are generated at 1920x1080 resolution\n- The bot requires continuous n8n execution\n\n### Troubleshooting\n\n#### Bot Not Responding\n1. Verify the workflow is active\n2. Check that the bot is an admin in the channel\n3. Confirm the channel ID is correct (negative number for channels)\n4. Ensure messages start with exact prefixes: `am# ` or `ami# `\n\n#### Duplicate Responses\n- The workflow includes duplicate prevention\n- If issues persist, restart the workflow to clear the processed IDs cache\n\n#### Missing Dependencies\n- The workflow automatically downloads TGPT on first run\n- If errors occur, check the Execute nodes' output for installation issues\n\n#### Performance Issues\n- Consider increasing the polling interval if server resources are limited\n- Monitor the n8n execution logs for timeout errors\n\n### Advanced Configuration\n\n#### Modify Polling Interval\nEdit the **Schedule** node to change the 10-second interval\n\n#### Adjust Time Window\nIn the **Process Offset** node, modify `timeWindowSeconds` variable (default: 15)\n\n#### Change AI Model Parameters\n- Text generation: Edit `--temperature \"0.3\"` in **Execute - Text** node\n- Image generation: Edit `--temperature \"0.7\"` in **Execute - Image** node\n- Both use `--model \"gtp-4\"` by default\n\n#### Customize Image Dimensions\nIn **Execute - Image** node, modify:\n- `--height=1080`\n- `--width=1920`\n\n## Security Considerations\n- Keep your bot token private\n- Use private channels to prevent unauthorized access\n- Regularly monitor bot activity through Telegram's BotFather\n- Consider implementing rate limiting for production use\n\n## Maintenance\n- Regularly check n8n logs for errors\n- Update TGPT version URL in Execute nodes when new versions are released\n- Clear `/tmp/` directory periodically to remove temporary files\n- Monitor disk space for image generation temporary files",
+  "featuredImage": "/data/workflows/9818/9818.webp",
+  "author": {
+    "id": 101,
+    "slug": "vighsandor",
+    "name": "Vigh Sandor",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 219,
+  "downloads": 21,
+  "createdAt": "2025-10-17T09:06:32.886Z",
+  "updatedAt": "2026-01-16T09:02:06.134Z",
+  "publishedAt": "2025-10-17T09:06:32.886Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9818",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate text & image responses in Telegram channels with GPT-4 and TGPT",
+    "workflowName": "Generate text & image responses in Telegram channels with GPT-4 and TGPT",
+    "description": "# Telegram AI Channel Bot - Text & Image Response Generator with TGPT\n\n## Overview\nThis n8n workflow creates an automated Telegram channel bot that responds to messages with AI-generated text or images using TGPT. The bot monitors a specific Telegram channel and generates responses based on message prefixes.\n\n## Features\n- Automated text response generation using TGPT\n- Image generation capabilities with customizable dimensions (1920x1080)\n- Duplicate message prevention\n- Time-window filtering (15 seconds) to process only recent messages\n- Continuous polling with 10-second intervals\n\n## Setup Instructions\n\n### Prerequisites\n1. **n8n Instance**: Ensure you have n8n installed and running\n2. **Telegram Bot**: Create a new bot via @BotFather on Telegram\n3. **Telegram Channel**: Create or have admin access to a Telegram channel\n4. **Linux Environment**: The workflow requires Linux for command execution\n\n### Configuration Steps\n\n#### 1. Obtain Telegram Bot Token\n- Open Telegram and search for @BotFather\n- Send `/newbot` and follow the prompts\n- Save the bot token provided (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)\n\n#### 2. Get Channel ID\n- Add your bot as an administrator to your Telegram channel\n- Send a test message to the channel\n- Visit: `https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates`\n- Look for `\"chat\":{\"id\":-100XXXXXXXXXX}` - this is your channel ID\n\n#### 3. Configure the Workflow\n- Import the workflow JSON into n8n\n- Open the **Config** node\n- Replace `your_telegram_token` with your actual bot token\n- Replace `your_telegram_channel_id` with your channel ID\n- Save the changes\n\n#### 4. Set Up Telegram Credentials in n8n\n- Navigate to the **Send Telegram Text Response** node\n- Click on the credentials field\n- Create new Telegram credentials using your bot token\n- Apply the same credentials to **Send Telegram Image Response** node\n\n#### 5. System Requirements\nThe workflow automatically installs required packages:\n- `util-linux-misc` (for script command)\n- `curl` (for downloading TGPT)\n- TGPT binary (downloaded automatically from GitHub)\n\n### Activation\n- Save all configuration changes\n- Toggle the workflow to **Active** status\n- The bot will start polling every 10 seconds\n\n## How to Use\n\n### Sending Commands to the Bot\n\n#### Text Generation\nTo generate a text response, send a message to your Telegram channel with the following format:\n```\nam# Your prompt here\n```\n\n**Example:**\n```\nam# Explain quantum computing in simple terms\n```\nThe bot will:\n1. Remove the `am#` prefix\n2. Send the prompt to TGPT with GPT-4 model\n3. Generate a response with temperature 0.3 (more focused/deterministic)\n4. Reply with the generated text in the channel\n\n#### Image Generation\nTo generate an image, send a message with this format:\n```\nami# Your image description here\n```\n\n**Example:**\n```\nami# A futuristic city with flying cars at sunset\n```\nThe bot will:\n1. Remove the `ami#` prefix\n2. Use TGPT to generate an image (1920x1080 resolution)\n3. Save the image temporarily\n4. Send the generated image to the channel\n\n### Important Usage Notes\n\n#### Response Time\n- The bot checks for new messages every 10 seconds\n- Messages older than 15 seconds are ignored\n- Expect a delay of 10-30 seconds for responses depending on generation time\n\n#### Message Processing\n- Only messages from the configured channel are processed\n- The bot maintains a list of processed message IDs to avoid duplicates\n- Maximum of 15 messages are retrieved per polling cycle\n\n#### Limitations\n- Text generation uses temperature 0.3 (less creative, more accurate)\n- Image generation uses temperature 0.7 (more creative)\n- Images are generated at 1920x1080 resolution\n- The bot requires continuous n8n execution\n\n### Troubleshooting\n\n#### Bot Not Responding\n1. Verify the workflow is active\n2. Check that the bot is an admin in the channel\n3. Confirm the channel ID is correct (negative number for channels)\n4. Ensure messages start with exact prefixes: `am# ` or `ami# `\n\n#### Duplicate Responses\n- The workflow includes duplicate prevention\n- If issues persist, restart the workflow to clear the processed IDs cache\n\n#### Missing Dependencies\n- The workflow automatically downloads TGPT on first run\n- If errors occur, check the Execute nodes' output for installation issues\n\n#### Performance Issues\n- Consider increasing the polling interval if server resources are limited\n- Monitor the n8n execution logs for timeout errors\n\n### Advanced Configuration\n\n#### Modify Polling Interval\nEdit the **Schedule** node to change the 10-second interval\n\n#### Adjust Time Window\nIn the **Process Offset** node, modify `timeWindowSeconds` variable (default: 15)\n\n#### Change AI Model Parameters\n- Text generation: Edit `--temperature \"0.3\"` in **Execute - Text** node\n- Image generation: Edit `--temperature \"0.7\"` in **Execute - Image** node\n- Both use `--model \"gtp-4\"` by default\n\n#### Customize Image Dimensions\nIn **Execute - Image** node, modify:\n- `--height=1080`\n- `--width=1920`\n\n## Security Considerations\n- Keep your bot token private\n- Use private channels to prevent unauthorized access\n- Regularly monitor bot activity through Telegram's BotFather\n- Consider implementing rate limiting for production use\n\n## Maintenance\n- Regularly check n8n logs for errors\n- Update TGPT version URL in Execute nodes when new versions are released\n- Clear `/tmp/` directory periodically to remove temporary files\n- Monitor disk space for image generation temporary files",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Updates",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Process Offset",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Execute - Text",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute - Image",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Telegram Text Response",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Telegram Image Response",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Read Generated Image",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clear Update List",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

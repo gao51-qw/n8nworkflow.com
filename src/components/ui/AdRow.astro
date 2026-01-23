@@ -1,0 +1,60 @@
+---
+/**
+ * 广告行组件
+ * 在首页和工作流详情页展示促销广告
+ */
+import ads from '../../data/ads.json';
+
+interface Props {
+  variant?: 'simple' | 'detailed';
+}
+
+const { variant = 'simple' } = Astro.props;
+---
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+  {ads.map((ad) => (
+    variant === 'simple' ? (
+      <a href={ad.url} target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class={`w-12 h-12 flex-shrink-0 bg-${ad.color}-50 rounded-lg flex items-center justify-center`}>
+          {ad.icon.startsWith('http') || ad.icon.startsWith('/') ? (
+            <img src={ad.icon} alt={ad.name} class="w-8 h-8" />
+          ) : (
+            <span class="text-xl">{ad.icon}</span>
+          )}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{ad.name}</p>
+          <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{ad.description}</p>
+        </div>
+        <span class="text-xs font-bold text-primary-700">{ad.cta}</span>
+      </a>
+    ) : (
+      <a href={ad.url} target="_blank" rel="noopener noreferrer" class="group block rounded-lg border border-primary-200 dark:border-primary-700 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 px-4 py-3 hover:shadow-md transition">
+        <div class="flex flex-col items-center justify-center text-center gap-[20px] h-full">
+          {ad.badge && (
+             <span class="text-[10px] font-bold px-2 py-1 rounded text-white" style={`background-color: var(--color-${ad.color}-600, #673DE6);`}>{ad.badge}</span>
+          )}
+          {ad.logo && (
+            <span class="inline-flex items-center justify-center bg-white dark:bg-white border border-gray-200 dark:border-gray-300 rounded px-2 py-1 shadow-sm">
+              <img src={ad.logo} alt={ad.name} class="h-5 w-auto object-contain align-middle" loading="lazy" decoding="async" />
+            </span>
+          )}
+          {ad.promo && (
+             <span class="text-[13px] font-bold px-4 py-2 rounded text-white text-center" style={`background-color: var(--color-${ad.color}-600, #673DE6);`} set:html={ad.promo.replace('\n', '<br>')}></span>
+          )}
+          <div>
+            <div class="font-bold text-[16px] text-gray-900 dark:text-white">{ad.description}</div>
+            <div class="text-[15px] text-gray-600 dark:text-gray-300">{ad.subDescription}</div>
+          </div>
+          <span class="inline-flex items-center gap-1 text-[13px] md:text-[13px] font-medium text-white bg-primary-500 group-hover:bg-primary-600 rounded-md px-2.5 py-1">
+            {ad.cta}
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M13 7l5 5-5 5M6 12h12"></path>
+            </svg>
+          </span>
+        </div>
+      </a>
+    )
+  ))}
+</div>

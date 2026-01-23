@@ -1,0 +1,242 @@
+{
+  "id": 9208,
+  "slug": "9208",
+  "title": "Automate RSS-to-social media with AI summaries and image generation",
+  "description": "## How it works\n\nThis workflow automates publishing content from any RSS feed directly to Facebook and Instagram.\nIt reads new RSS entries, extracts the article content, generates a short social-media-friendly summary using an AI model, and then creates an AI-generated image based on the topic.\nThe post is uploaded to Facebook and Instagram (via Graph API) and logged in Google Sheets for reference.\nFinally, a Telegram bot sends you a notification with links to the published posts.\n\n## Set up steps\n\t1.\tInsert your RSS feed URL in the RSS Feed Trigger node.\n\t2.\tConfigure Google Sheets credentials and replace the example sheet with your own.\n\t3.\tIn Supabase Config, insert your Supabase URL and bucket name.\n\t4.\tIn Facebook/Instagram nodes, replace [INSERT_YOUR_SITE_ID] with your own page or account ID.\n\t5.\tConnect your Facebook Graph API credentials (remove hardcoded tokens).\n\t6.\tConnect your OpenAI / Anthropic / Gemini credentials for text and image generation.\n\t7.\tSet up your Telegram Bot credentials if you want to receive notifications.\n\n## Notes\n\t•\tSticky notes inside the workflow explain each section (RSS trigger, filtering, content generation, posting, logging, notifications).\n\t•\tNo credentials are saved in the template – you must connect your own before running.\n\t•\tAll generated content (text + images) is fully automated but can be customized (e.g. change AI prompts for your preferred style).\n",
+  "featuredImage": "/data/workflows/9208/9208.webp",
+  "author": {
+    "id": 101,
+    "slug": "smart-camp-ai",
+    "name": "Karol Otręba",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 738,
+  "downloads": 73,
+  "createdAt": "2025-10-02T20:44:45.874Z",
+  "updatedAt": "2026-01-16T08:59:28.970Z",
+  "publishedAt": "2025-10-02T20:44:45.874Z",
+  "nodes": 34,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9208",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate RSS-to-social media with AI summaries and image generation",
+    "workflowName": "Automate RSS-to-social media with AI summaries and image generation",
+    "description": "## How it works\n\nThis workflow automates publishing content from any RSS feed directly to Facebook and Instagram.\nIt reads new RSS entries, extracts the article content, generates a short social-media-friendly summary using an AI model, and then creates an AI-generated image based on the topic.\nThe post is uploaded to Facebook and Instagram (via Graph API) and logged in Google Sheets for reference.\nFinally, a Telegram bot sends you a notification with links to the published posts.\n\n## Set up steps\n\t1.\tInsert your RSS feed URL in the RSS Feed Trigger node.\n\t2.\tConfigure Google Sheets credentials and replace the example sheet with your own.\n\t3.\tIn Supabase Config, insert your Supabase URL and bucket name.\n\t4.\tIn Facebook/Instagram nodes, replace [INSERT_YOUR_SITE_ID] with your own page or account ID.\n\t5.\tConnect your Facebook Graph API credentials (remove hardcoded tokens).\n\t6.\tConnect your OpenAI / Anthropic / Gemini credentials for text and image generation.\n\t7.\tSet up your Telegram Bot credentials if you want to receive notifications.\n\n## Notes\n\t•\tSticky notes inside the workflow explain each section (RSS trigger, filtering, content generation, posting, logging, notifications).\n\t•\tNo credentials are saved in the template – you must connect your own before running.\n\t•\tAll generated content (text + images) is fully automated but can be customized (e.g. change AI prompts for your preferred style).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "RSS Feed Trigger",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "role": "rssFeedReadTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTML",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post to Instagram1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Post URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Send a photo message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Basic LLM Chain1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate an image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload to Supabase (uses credentials)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Supabase Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Supabase Public URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Image pipeline",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Build Facebook URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Build Instagram URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Collect Important Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Image pipeline1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Image pipeline2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Image pipeline3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

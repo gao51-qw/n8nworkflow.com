@@ -1,0 +1,27 @@
+{
+  "id": 7577,
+  "slug": "7577",
+  "title": "Syncing iOS localization gaps with Google Sheets and GitHub PR placeholders",
+  "description": "# Fill iOS localization gaps from `.strings` → Google Sheets and PR with placeholders (GitHub)\n\nThis n8n workflow automatically identifies missing translations in `.strings` files across iOS localizations (e.g., `Base.lproj` vs `fr.lproj`) and generates a report in Google Sheets. Optionally, it creates a GitHub PR to insert placeholder strings (`\"__TODO_TRANSLATE__\"`) so builds don't fail. Supports DRY\\_RUN mode.\n\n## Who’s it for\n\n* iOS teams who want **fast feedback** on missing translations.\n* Localization managers who want a **shared sheet** to assign work to translators.\n\n## How it works\n\n1. A GitHub Webhook triggers on push or pull request.\n2. The iOS repo is scanned for `.strings` files under `Base.lproj` or `en.lproj` and their target-language counterparts.\n3. It compares keys and identifies what’s missing.\n4. A new or existing Google Sheet tab (e.g., `fr`) is updated with missing entries.\n5. If enabled, it creates a GitHub PR with placeholder keys (e.g., `\"__TODO_TRANSLATE__\"`).\n\n## How to set up\n1. **Import the Workflow JSON** into your n8n instance.\n2. **Set Config Node values** like:\n\n```json\n{\n\"GITHUB_OWNER\": \"your-github-user-name\",\n\"GITHUB_REPO\": \"your-iOS-repo-name\",\n\"BASE_BRANCH\": \"develop\",\n\"SHEET_ID\": \"&lt;YOUR_GOOGLE_SHEET_ID&gt;\",\n\"ENABLE_PR\": \"true\",\n\"IOS_SOURCE_GLOB\": \"**/Base.lproj/*.strings,**/en.lproj/*.strings\",\n\"IOS_TARGET_GLOB\": \"**/*.lproj/*.strings\",\n\"PLACEHOLDER_VALUE\": \"__TODO_TRANSLATE__\",\n\"BRANCH_TEMPLATE\": \"chore/l10n-gap-{{YYYYMMDD}}\",\n}\n```\n\n3. **Create GitHub Webhook**\n\t* URL: `https://your-n8n-instance/webhook/l10n-gap-ios`\n\t* Content-Type: `application/json`\n\t* Trigger on: `Push`, `Pull Request`\n\n4. **Connect credentials**\n\t* GitHub token with repo scope\n\t* Google Sheets API\n\t* (Optional) Slack OAuth + SMTP\n\n## Requirements\n\n| Tool | Needed For | Notes |\n| ---------------- | -------------------- | ---------------------------------------- |\n| GitHub Repo | Webhook, API for PRs | `repo` token or App |\n| Google Sheets | Sheet output | Needs valid `SHEET_ID` or create-per-run |\n| Slack (optional) | Notifications | `chat:write` scope |\n| SMTP (optional) | Email fallback | Standard SMTP creds |\n\n## How to customize\n\n* **Multiple Locales**: Add comma-separated values to `TARGET_LANGS_CSV` (e.g., `fr,de,es`).\n* **Globs**: Adjust `IOS_SOURCE_GLOB` and `IOS_TARGET_GLOB` to scan only certain modules or file patterns.\n* **Ignore Rules**: Add `IGNORE_KEY_PREFIXES_CSV` to skip certain internal/debug strings.\n* **Placeholder Value**: Change `PLACEHOLDER_VALUE` to something meaningful like `\"@@@\"`.\n* **Slack/Email**: Set `SLACK_CHANNEL` and `EMAIL_FALLBACK_TO_CSV` appropriately.\n* **DRY\\_RUN**: Set to true to skip GitHub PR creation but still update the sheet.\n\n## Add‑ons\n\n- **Android support:** Add a second path for `strings.xml` (`values` → `values-&lt;lang&gt;`), same diff → Sheets → placeholder PR.\n- **Multiple languages at once:** Expand `TARGET_LANGS_CSV` and loop tabs + placeholder commits per locale.\n- **`.stringsdict` handling:** Validate plural/format entries and open a precise PR.\n- **Translator DMs:** Provide a `LANG → Slack handle/email` map to DM translators with their specific file/key counts.\n- **GitLab/Bitbucket variants:** Replace GitHub API calls with GitLab/Bitbucket equivalents to open Merge Requests.\n\n## Use Case Examples\n\n- Before a test build, ensure `fr` has **all keys** present—placeholders keep the app compiling.\n- Weekly run creates a **single sheet** for translators and a PR with placeholders, avoiding last‑minute breakages.\n- A new screen adds 12 strings; the bot flags and pre‑fills them across locales.\n\n## Common troubleshooting\n\n| Issue | Possible Cause | Solution |\n| ------------------------ | --------------------------------------------- | ------------------------------------------------------ |\n| No source files found | Glob doesn't match `Base.lproj` or `en.lproj` | Adjust `IOS_SOURCE_GLOB` |\n| Target file missing | `fr.lproj` doesn’t exist yet | Will be created in placeholder PR |\n| Parsing skips entries | Non-standard string format in file | Ensure proper `.strings` format `\"key\" = \"value\";` |\n| Sheet not updating | `SHEET_ID` missing or insufficient permission | Add valid ID or allow write access |\n| PR not created | `ENABLE_PR=false` or no missing keys | Enable PR and ensure at least one key is missing |\n| Slack/Email not received | Missing credentials or config | Configure Slack/SMTP properly and set recipient fields |\n\n## Need Help?\n\nWant to expand this for Android? Loop through 5+ locales at once? Or replace GitHub with GitLab?\n**Contact our n8n Team at WeblineIndia with your repo & locale setup** and we’ll help tailor it to your translation workflow!",
+  "featuredImage": "/data/workflows/7577/7577.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 159,
+  "downloads": 15,
+  "createdAt": "2025-08-19T08:36:45.551Z",
+  "updatedAt": "2026-01-16T08:51:11.808Z",
+  "publishedAt": "2025-08-19T08:36:45.551Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7577"
+}

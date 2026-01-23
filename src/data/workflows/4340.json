@@ -1,0 +1,158 @@
+{
+  "id": 4340,
+  "slug": "4340",
+  "title": "Generate qualified leads from LinkedIn with Apify, GPT-4, and Airtable",
+  "description": "## Who is this for?\n\nThis workflow is perfect for **sales teams**, **business development professionals**, **recruitment agencies**, and **fractional CFO service providers** who need to identify and qualify companies actively hiring. Whether you're prospecting for new clients, building a database of potential customers, or researching market opportunities, this automated solution saves hours of manual research while delivering high-quality, AI-analyzed leads.\n\n## What problem is this workflow solving?\n\nFinding qualified prospects in the finance sector is time-consuming and often inefficient. Traditional methods involve:\n- Manually browsing LinkedIn job postings for hours\n- Difficulty distinguishing between genuine opportunities and recruitment spam\n- Inconsistent lead categorization and qualification\n- Risk of contacting the same companies multiple times\n- Lack of structured data for sales team follow-up\n\nThis workflow automates the entire lead generation process, from data collection to AI-powered qualification, ensuring you focus only on the most promising opportunities.\n\n## What this workflow does\n\nThis comprehensive lead generation system performs six key functions:\n\n1. **Automated LinkedIn Job Scraping**: Uses Apify's reliable LinkedIn Jobs Scraper to extract detailed job postings for finance positions, including company information, job descriptions, and contact details.\n\n2. **Smart Data Processing**: Removes duplicates, filters companies by size, and structures data for consistent analysis across all leads.\n\n3. **Intelligent Lead Categorization**: Compares new leads against your existing database to optimize processing and avoid duplicate work.\n\n4. **AI-Powered Qualification**: Leverages OpenAI's GPT-4 Mini to analyze each lead and determine:\n   - **Company Category**: Consumer companies, Fractional CFO services, Recruiting agencies, or Other\n   - **Finance Role Validation**: Confirms the position is genuinely finance-related\n   - **Seniority Level**: Entry, Mid, Senior, Director, or C-Level classification\n   - **Job Summary**: Concise description for quick sales team review\n\n5. **Automated Database Management**: Stores qualified leads in Airtable with comprehensive profiles, preventing duplicates while maintaining data integrity.\n\n6. **Lead Scoring & Routing**: Prioritizes leads based on processing status and qualification results for efficient sales team follow-up.\n\n## Setup\n\n### Prerequisites\n\nYou'll need accounts for three services:\n\n- **Airtable** (Free tier supported) - For lead storage and management\n- **Apify** (14-day free trial available) - For LinkedIn job scraping\n- **OpenAI** (Pay-per-use) - For AI-powered lead analysis\n\n### Step 1: Create Required Credentials\n\n#### Apify API Credential\n1. Sign up for an Apify account at [apify.com](https://apify.com)\n2. Navigate to Settings → Integrations → API tokens\n3. Create a new API token\n4. In n8n, create a new **Apify API** credential with your token\n\n#### OpenAI API Credential\n1. Create an account at [platform.openai.com](https://platform.openai.com)\n2. Generate an API key in the API section\n3. In n8n, create a new **OpenAI** credential with your key\n\n#### Airtable Personal Access Token\n1. Go to [airtable.com/create/tokens](https://airtable.com/create/tokens)\n2. Create a personal access token with the following scopes:\n   - `data.records:read`\n   - `data.records:write`\n   - `schema.bases:read`\n3. In n8n, create a new **Airtable Personal Access Token** credential\n\n### Step 2: Set Up Airtable Base\n\nCreate a new Airtable base with the following structure:\n\n**Table Name**: `Qualified Leads`\n\n**Required Fields**:\n```\n- Company Name (Single line text)\n- Job Title (Single line text) \n- Is Finance Job (Checkbox)\n- Seniority Level (Single select: Entry, Mid, Senior, Director, C-Level)\n- Company Category (Single select: Consumer, Recruiting, Fractional CFO, Other)\n- Job Summary (Long text)\n- Company LinkedIn (URL)\n- Job Link (URL)\n- Posted Date (Date)\n- Location (Single line text)\n- Industry (Single line text)\n- Company Employees (Number)\n```\n\n### Step 3: Configure the Workflow\n\n1. **Import the Workflow**: Copy the JSON and import it into your n8n instance\n2. **Update Credentials**: Replace placeholder credential IDs with your actual credential IDs in:\n   - \"Scrape LinkedIn Jobs\" node (Apify credential)\n   - \"OpenAI GPT-4 Mini\" node (OpenAI credential) \n   - \"Save to Airtable\" and \"Get Existing Leads\" nodes (Airtable credential)\n3. **Configure Airtable Connection**: Update the base ID and table ID in both Airtable nodes\n4. **Set Search Parameters**: In the \"Edit Variables\" node, configure:\n   - `linkedinUrls`: Your target LinkedIn job search URLs\n   - `maxEmployees`: Maximum company size filter (default: 200)\n   - `batchSize`: Processing batch size for API efficiency (default: 5)\n\n### Step 4: Test the Workflow\n\n1. Start with a small test by setting `count: 50` in the HTTP Request node\n2. Use a specific LinkedIn job search URL (e.g., \"CFO jobs in New York\")\n3. Execute the workflow manually and verify results in your Airtable base\n4. Review the AI categorization accuracy and adjust prompts if needed\n\n## How to customize this workflow to your needs\n\n### Targeting Different Roles\nModify the LinkedIn search URLs in the \"Edit Variables\" node to target different positions:\n```\n- \"https://www.linkedin.com/jobs/search/?keywords=Controller\"\n- \"https://www.linkedin.com/jobs/search/?keywords=Finance%20Director\"  \n- \"https://www.linkedin.com/jobs/search/?keywords=VP%20Finance\"\n```\n\n### Adjusting Company Size Filters\nChange the `maxEmployees` parameter to focus on different company segments:\n- Startups: 1-50 employees\n- SMBs: 51-500 employees  \n- Enterprise: 500+ employees\n\n### Customizing AI Analysis\nEnhance the GPT-4 prompt in the \"AI Lead Analyzer\" node to include:\n- Industry-specific criteria\n- Geographic preferences\n- Technology stack requirements\n- Company growth stage indicators\n\n### Integration Options\nExtend the workflow by adding:\n- **Slack notifications** for new qualified leads\n- **Email alerts** for high-priority prospects\n- **CRM integration** (Salesforce, HubSpot, Pipedrive)\n- **Lead enrichment** with additional data sources\n\n### Scheduling Automation\nSet up the workflow to run automatically:\n- **Daily**: For active prospecting campaigns\n- **Weekly**: For ongoing market research\n- **Monthly**: For periodic database updates\n\n## Performance & Cost Optimization\n\n- **API Efficiency**: The workflow processes leads in batches to optimize API usage\n- **Smart Deduplication**: Avoids re-processing existing leads to reduce costs\n- **Configurable Limits**: Adjust batch sizes and employee count filters based on your needs\n- **Expected Costs**: Approximately $0.05-$0.20 per 100 analysed leads (OpenAI costs)\n\n## Troubleshooting\n\n**Common Issues**:\n- **Rate Limiting**: Increase delays between API calls if you encounter rate limits\n- **Data Quality**: Review LinkedIn search URLs for relevance to your target market\n- **AI Accuracy**: Adjust prompts if categorisation doesn't match your criteria\n- **Airtable Errors**: Verify field names match exactly between workflow and base structure\n\n**Support Resources**:\n- [Apify LinkedIn Scraper Documentation](https://apify.com/curious_coder/linkedin-jobs-scraper)\n- [OpenAI API Documentation](https://platform.openai.com/docs)\n- [Airtable API Reference](https://airtable.com/developers/web/api/introduction)\n\nTransform your lead generation process with this powerful, AI-driven workflow that delivers qualified prospects ready for immediate outreach.",
+  "featuredImage": "/data/workflows/4340/4340.webp",
+  "author": {
+    "id": 101,
+    "slug": "javierhita",
+    "name": "Javier Hita",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2610,
+  "downloads": 261,
+  "createdAt": "2025-05-23T09:34:15.179Z",
+  "updatedAt": "2026-01-16T08:33:56.089Z",
+  "publishedAt": "2025-05-23T09:34:15.179Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4340",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate qualified leads from LinkedIn with Apify, GPT-4, and Airtable",
+    "workflowName": "Generate qualified leads from LinkedIn with Apify, GPT-4, and Airtable",
+    "description": "## Who is this for?\n\nThis workflow is perfect for **sales teams**, **business development professionals**, **recruitment agencies**, and **fractional CFO service providers** who need to identify and qualify companies actively hiring. Whether you're prospecting for new clients, building a database of potential customers, or researching market opportunities, this automated solution saves hours of manual research while delivering high-quality, AI-analyzed leads.\n\n## What problem is this workflow solving?\n\nFinding qualified prospects in the finance sector is time-consuming and often inefficient. Traditional methods involve:\n- Manually browsing LinkedIn job postings for hours\n- Difficulty distinguishing between genuine opportunities and recruitment spam\n- Inconsistent lead categorization and qualification\n- Risk of contacting the same companies multiple times\n- Lack of structured data for sales team follow-up\n\nThis workflow automates the entire lead generation process, from data collection to AI-powered qualification, ensuring you focus only on the most promising opportunities.\n\n## What this workflow does\n\nThis comprehensive lead generation system performs six key functions:\n\n1. **Automated LinkedIn Job Scraping**: Uses Apify's reliable LinkedIn Jobs Scraper to extract detailed job postings for finance positions, including company information, job descriptions, and contact details.\n\n2. **Smart Data Processing**: Removes duplicates, filters companies by size, and structures data for consistent analysis across all leads.\n\n3. **Intelligent Lead Categorization**: Compares new leads against your existing database to optimize processing and avoid duplicate work.\n\n4. **AI-Powered Qualification**: Leverages OpenAI's GPT-4 Mini to analyze each lead and determine:\n   - **Company Category**: Consumer companies, Fractional CFO services, Recruiting agencies, or Other\n   - **Finance Role Validation**: Confirms the position is genuinely finance-related\n   - **Seniority Level**: Entry, Mid, Senior, Director, or C-Level classification\n   - **Job Summary**: Concise description for quick sales team review\n\n5. **Automated Database Management**: Stores qualified leads in Airtable with comprehensive profiles, preventing duplicates while maintaining data integrity.\n\n6. **Lead Scoring & Routing**: Prioritizes leads based on processing status and qualification results for efficient sales team follow-up.\n\n## Setup\n\n### Prerequisites\n\nYou'll need accounts for three services:\n\n- **Airtable** (Free tier supported) - For lead storage and management\n- **Apify** (14-day free trial available) - For LinkedIn job scraping\n- **OpenAI** (Pay-per-use) - For AI-powered lead analysis\n\n### Step 1: Create Required Credentials\n\n#### Apify API Credential\n1. Sign up for an Apify account at [apify.com](https://apify.com)\n2. Navigate to Settings → Integrations → API tokens\n3. Create a new API token\n4. In n8n, create a new **Apify API** credential with your token\n\n#### OpenAI API Credential\n1. Create an account at [platform.openai.com](https://platform.openai.com)\n2. Generate an API key in the API section\n3. In n8n, create a new **OpenAI** credential with your key\n\n#### Airtable Personal Access Token\n1. Go to [airtable.com/create/tokens](https://airtable.com/create/tokens)\n2. Create a personal access token with the following scopes:\n   - `data.records:read`\n   - `data.records:write`\n   - `schema.bases:read`\n3. In n8n, create a new **Airtable Personal Access Token** credential\n\n### Step 2: Set Up Airtable Base\n\nCreate a new Airtable base with the following structure:\n\n**Table Name**: `Qualified Leads`\n\n**Required Fields**:\n```\n- Company Name (Single line text)\n- Job Title (Single line text) \n- Is Finance Job (Checkbox)\n- Seniority Level (Single select: Entry, Mid, Senior, Director, C-Level)\n- Company Category (Single select: Consumer, Recruiting, Fractional CFO, Other)\n- Job Summary (Long text)\n- Company LinkedIn (URL)\n- Job Link (URL)\n- Posted Date (Date)\n- Location (Single line text)\n- Industry (Single line text)\n- Company Employees (Number)\n```\n\n### Step 3: Configure the Workflow\n\n1. **Import the Workflow**: Copy the JSON and import it into your n8n instance\n2. **Update Credentials**: Replace placeholder credential IDs with your actual credential IDs in:\n   - \"Scrape LinkedIn Jobs\" node (Apify credential)\n   - \"OpenAI GPT-4 Mini\" node (OpenAI credential) \n   - \"Save to Airtable\" and \"Get Existing Leads\" nodes (Airtable credential)\n3. **Configure Airtable Connection**: Update the base ID and table ID in both Airtable nodes\n4. **Set Search Parameters**: In the \"Edit Variables\" node, configure:\n   - `linkedinUrls`: Your target LinkedIn job search URLs\n   - `maxEmployees`: Maximum company size filter (default: 200)\n   - `batchSize`: Processing batch size for API efficiency (default: 5)\n\n### Step 4: Test the Workflow\n\n1. Start with a small test by setting `count: 50` in the HTTP Request node\n2. Use a specific LinkedIn job search URL (e.g., \"CFO jobs in New York\")\n3. Execute the workflow manually and verify results in your Airtable base\n4. Review the AI categorization accuracy and adjust prompts if needed\n\n## How to customize this workflow to your needs\n\n### Targeting Different Roles\nModify the LinkedIn search URLs in the \"Edit Variables\" node to target different positions:\n```\n- \"https://www.linkedin.com/jobs/search/?keywords=Controller\"\n- \"https://www.linkedin.com/jobs/search/?keywords=Finance%20Director\"  \n- \"https://www.linkedin.com/jobs/search/?keywords=VP%20Finance\"\n```\n\n### Adjusting Company Size Filters\nChange the `maxEmployees` parameter to focus on different company segments:\n- Startups: 1-50 employees\n- SMBs: 51-500 employees  \n- Enterprise: 500+ employees\n\n### Customizing AI Analysis\nEnhance the GPT-4 prompt in the \"AI Lead Analyzer\" node to include:\n- Industry-specific criteria\n- Geographic preferences\n- Technology stack requirements\n- Company growth stage indicators\n\n### Integration Options\nExtend the workflow by adding:\n- **Slack notifications** for new qualified leads\n- **Email alerts** for high-priority prospects\n- **CRM integration** (Salesforce, HubSpot, Pipedrive)\n- **Lead enrichment** with additional data sources\n\n### Scheduling Automation\nSet up the workflow to run automatically:\n- **Daily**: For active prospecting campaigns\n- **Weekly**: For ongoing market research\n- **Monthly**: For periodic database updates\n\n## Performance & Cost Optimization\n\n- **API Efficiency**: The workflow processes leads in batches to optimize API usage\n- **Smart Deduplication**: Avoids re-processing existing leads to reduce costs\n- **Configurable Limits**: Adjust batch sizes and employee count filters based on your needs\n- **Expected Costs**: Approximately $0.05-$0.20 per 100 analysed leads (OpenAI costs)\n\n## Troubleshooting\n\n**Common Issues**:\n- **Rate Limiting**: Increase delays between API calls if you encounter rate limits\n- **Data Quality**: Review LinkedIn search URLs for relevance to your target market\n- **AI Accuracy**: Adjust prompts if categorisation doesn't match your criteria\n- **Airtable Errors**: Verify field names match exactly between workflow and base structure\n\n**Support Resources**:\n- [Apify LinkedIn Scraper Documentation](https://apify.com/curious_coder/linkedin-jobs-scraper)\n- [OpenAI API Documentation](https://platform.openai.com/docs)\n- [Airtable API Reference](https://airtable.com/developers/web/api/introduction)\n\nTransform your lead generation process with this powerful, AI-driven workflow that delivers qualified prospects ready for immediate outreach.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Scrape LinkedIn Jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Job Data",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean Data Format",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Existing Leads",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Categorize Leads",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Route Leads",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Filter by Company Size",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Process in Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "AI Lead Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "OpenAI GPT-4 Mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structure AI Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Save to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Workflow Complete",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Data Collection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Lead Intelligence",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Qualification",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

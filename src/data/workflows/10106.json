@@ -1,0 +1,127 @@
+{
+  "id": 10106,
+  "slug": "10106",
+  "title": "Track employee attendance with analytics, email reports & Slack alerts using Google Sheets",
+  "description": "Transform your attendance management with this enterprise-grade automated workflow featuring AI-powered analytics, multi-dimensional insights, and intelligent alerting. Running hourly, it integrates multiple data sources (attendance logs + employee master data), performs sophisticated statistical analysis, detects anomalies, generates department-specific insights, and delivers beautiful HTML reports via email and Slack. Get real-time visibility into attendance patterns, punctuality trends, and actionable alerts for HR, management, and department heads. 📊🎯✨\n\n## Good to Know\n* **Intelligent Scheduling**: Runs hourly but only sends management alerts when critical thresholds are breached\n* **Multi-Source Integration**: Combines attendance logs with employee master data for enriched context\n* **Smart Analytics**: Calculates attendance rate, punctuality rate, absenteeism rate, and department-wise metrics\n* **Conditional Routing**: Management emails are triggered only for high-priority alerts (no email fatigue!)\n* **Production-Ready**: Includes error handling, data validation, and comprehensive logging\n* **Scalable Design**: Handles multiple departments, shifts, and employee types efficiently\n\n### How It Works\n\n1. **Automated Trigger** – Runs hourly to monitor attendance with zero manual effort.\n2. **Dual Data Ingestion** – Fetches attendance and employee master data, then merges them for enriched analytics.\n3. **Advanced Analytics Engine** – Analyzes attendance, calculates key metrics, detects anomalies, and generates alerts.\n4. **Smart Conditional Routing** – Validates data, prioritizes alerts, and routes notifications via email, Slack, and database.\n5. **Rich Email Reports** – Sends visually formatted reports with metrics, alerts, and detailed employee breakdowns.\n6. **Slack Block Kit Integration** – Delivers structured, real-time attendance alerts with visual indicators to team channels.\n7. **Data Persistence & Logging** – Logs daily summaries, maintains audit trails, and prepares data for trend analysis dashboards.\n\n\n## How to Use\n\n### Basic Setup\n1. **Import the Workflow**: Copy JSON → n8n → Import from File\n2. **Configure Credentials**: Add Google Sheets, SMTP, and Slack credentials\n3. **Update Spreadsheet IDs**: Replace all placeholder sheet IDs with your actual Google Sheet IDs\n4. **Set Email Addresses**: Update sender and recipient email addresses\n5. **Configure Slack Channel**: Replace channel ID with your team's attendance channel\n6. **Test**: Execute workflow manually to verify connections\n7. **Activate**: Turn on the Schedule Trigger for hourly execution\n\n### Advanced Configuration\n* **Adjust Alert Thresholds**: Modify the 10% (late) and 15% (absent) thresholds in Analytics Engine\n* **Customize Email Design**: Edit HTML in Format Email node for brand alignment\n* **Add More Channels**: Extend with Microsoft Teams, Discord, or SMS notifications\n* **Enhance Analytics**: Add shift-specific analysis, contractor vs. full-time breakdowns\n* **Integrate BI Tools**: Enable Power BI push dataset for real-time dashboards\n\n## Requirements\n\n### Google Sheets Setup\n\n#### Sheet 1: AttendanceLogs\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| EmployeeID | Text | Unique employee identifier | EMP001 |\n| EmployeeName | Text | Full name | John Doe |\n| Date | Date | Attendance date (YYYY-MM-DD) | 2025-01-15 |\n| Status | Text | Present/Absent/Late/Leave/WFH/Half-Day | Present |\n| CheckInTime | Time | Arrival time (HH:MM) | 09:15 |\n| CheckOutTime | Time | Departure time (HH:MM) | 18:00 |\n| Notes | Text | Optional comments | Doctor appointment |\n\n#### Sheet 2: Employees (Master Data)\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| EmployeeID | Text | Unique identifier (matches AttendanceLogs) | EMP001 |\n| EmployeeName | Text | Full name | John Doe |\n| Department | Text | Department name | Engineering |\n| Manager | Text | Reporting manager name | Jane Smith |\n| Shift | Text | Day/Night/Evening | Day |\n| Email | Email | Work email address | john.doe@company.com |\n| ContractType | Text | Full-Time/Part-Time/Contract | Full-Time |\n\n#### Sheet 3: DailySummary (Auto-populated by workflow)\n| Column | Type | Description |\n|--------|------|-------------|\n| Date | Date | Report date |\n| Hour | Number | Hour of day (0-23) |\n| Present | Number | Present count |\n| Absent | Number | Absent count |\n| Late | Number | Late count |\n| AttendanceRate | Number | Attendance percentage |\n\n### Credentials Needed\n\n1. **Google Sheets OAuth2 API**\n   - Enable Google Sheets API in Google Cloud Console\n   - Create service account credentials\n   - Share all 3 sheets with service account email\n\n2. **SMTP Email Account**\n   - Gmail: Enable \"App Passwords\" in Google Account settings\n   - Or use company SMTP server details\n   - Requires: Host, Port (587), Username, Password\n\n3. **Slack Bot Token**\n   - Create Slack App at api.slack.com/apps\n   - Enable permissions: `chat:write`, `chat:write.public`\n   - Install app to workspace\n   - Copy Bot User OAuth Token (starts with `xoxb-`)\n   - Invite bot to target channel\n\n### Placeholder Values to Replace\n\n| Placeholder | Where to Find | Example |\n|-------------|---------------|---------|\n| `YOUR_ATTENDANCE_SPREADSHEET_ID` | Google Sheets URL | 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms |\n| `YOUR_EMPLOYEE_SPREADSHEET_ID` | Google Sheets URL | 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms |\n| `YOUR_SUMMARY_SPREADSHEET_ID` | Google Sheets URL | 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms |\n| `C12345678` | Slack → Right-click channel → Copy link → Extract ID | C05XXXXXXXX |\n| `hr@company.com` | Your HR email | hr@yourcompany.com |\n| `management@company.com` | Management distribution list | leadership@yourcompany.com |\n\n## Customizing This Workflow\n\n### Modify Alert Thresholds\nIn the **Analytics Engine** node, find these lines:\n```javascript\nconst lateThreshold = metrics.totalEmployees * 0.1; // Change 0.1 to 0.15 for 15%\nconst absentThreshold = metrics.totalEmployees * 0.15; // Change to 0.20 for 20%\n```\n\n### Add New Status Types\nIn the **Analytics Engine** node, add to the switch statement:\n```javascript\ncase 'Remote':\n  statusCount.remote++;\n  break;\n```\n\n### Customize Email Template\nIn the **Format Email** node, modify the `emailHtml` variable:\n- Change gradient colors in the header div\n- Add company logo: `<img src=\"https://yourcompany.com/logo.png\" />`\n- Adjust grid columns: `grid-template-columns: repeat(5, 1fr);`\n\n### Add SMS Notifications\n1. Add **Twilio** or **Vonage** node after \"Critical Alerts\"\n2. Send to on-call manager for high-severity alerts\n3. Use message: `🚨 ${data.absent} employees absent today. Review required.`\n\n### Multi-Location Support\nModify **Analytics Engine** to group by `Location` field:\n```javascript\nconst locationMetrics = {};\ntodayRecords.forEach(record =&gt; {\n  const location = employee.location;\n  if (!locationMetrics[location]) {\n    locationMetrics[location] = { present: 0, absent: 0, late: 0 };\n  }\n  // ... aggregate by location\n});\n```\n\n### Shift-Specific Analysis\nAdd logic to compare check-in times against shift schedules:\n```javascript\nconst shiftTimes = {\n  'Day': '09:00',\n  'Night': '21:00',\n  'Evening': '14:00'\n};\nconst expectedTime = shiftTimes[employee.shift];\n```\n\n### Integration with HR Systems\nAdd **HTTP Request** node to push data to:\n- **Workday**: POST attendance records via REST API\n- **BambooHR**: Update employee time-off balances\n- **ADP**: Sync payroll-related attendance data\n- **SAP SuccessFactors**: Update time management module\n\n### Advanced Analytics\nAdd **Python** or **R** nodes for:\n- **Predictive Analytics**: ML models to predict absence patterns\n- **Sentiment Analysis**: Correlate attendance with employee surveys\n- **Seasonality Detection**: Identify patterns (Monday blues, pre-holiday trends)\n- **Correlation Analysis**: Link attendance with project deadlines, weather, events\n\n### Dashboard Integration\nExport data to visualization platforms:\n- **Power BI**: Use HTTP Request node to push to streaming dataset\n- **Tableau**: Write to database (PostgreSQL, MySQL) via Execute Query node\n- **Grafana**: Store in InfluxDB time-series database\n- **Custom Dashboard**: Build React app that reads from DailySummary sheet\n\n## Troubleshooting\n\n### Common Issues\n\n**\"Could not find node\"**\n- Ensure all data sources are fetched before Analytics Engine runs\n- Check node names match exactly in `$('Node Name').all()` syntax\n\n**\"No records found\"**\n- Verify Date column format is `YYYY-MM-DD` in Google Sheets\n- Check timezone settings in Schedule Trigger vs. Sheet locale\n- Confirm EmployeeID values match between AttendanceLogs and Employees sheets\n\n**\"Email not sending\"**\n- Verify SMTP credentials are correct\n- Check if \"Critical Alerts?\" condition is being met\n- Test email node independently with static data\n\n**\"Slack message failed\"**\n- Ensure bot is invited to the target channel\n- Verify channel ID format (starts with C, not # symbol)\n- Check bot has `chat:write` permission scope\n\n## Performance Optimization\n\n- **Large Datasets (&gt;1000 employees)**: Add pagination in Google Sheets fetch\n- **Multiple Departments**: Run parallel branches for each department\n- **Historical Analysis**: Schedule separate weekly/monthly summary workflows\n- **Reduce API Calls**: Cache employee master data in workflow static data\n\n## Security Best Practices\n\n- ✅ Use service account credentials (not personal OAuth)\n- ✅ Restrict sheet access to service account only\n- ✅ Store credentials in n8n credential store (encrypted)\n- ✅ Enable 2FA on all integrated accounts\n- ✅ Audit logs regularly for unauthorized access\n- ✅ Use HTTPS for all external API calls\n\n**Discover more workflows – [Get in touch with us](https://www.oneclickitsolution.com/contact-us/)**",
+  "featuredImage": "/data/workflows/10106/10106.webp",
+  "author": {
+    "id": 101,
+    "slug": "oneclick-ai",
+    "name": "Oneclick AI Squad",
+    "avatar": ""
+  },
+  "categories": [
+    "HR"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 202,
+  "downloads": 20,
+  "createdAt": "2025-10-24T07:16:44.738Z",
+  "updatedAt": "2026-01-16T09:03:25.008Z",
+  "publishedAt": "2025-10-24T07:16:44.738Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10106",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Track employee attendance with analytics, email reports & Slack alerts using Google Sheets",
+    "workflowName": "Track employee attendance with analytics, email reports & Slack alerts using Google Sheets",
+    "description": "Transform your attendance management with this enterprise-grade automated workflow featuring AI-powered analytics, multi-dimensional insights, and intelligent alerting. Running hourly, it integrates multiple data sources (attendance logs + employee master data), performs sophisticated statistical analysis, detects anomalies, generates department-specific insights, and delivers beautiful HTML reports via email and Slack. Get real-time visibility into attendance patterns, punctuality trends, and actionable alerts for HR, management, and department heads. 📊🎯✨\n\n## Good to Know\n* **Intelligent Scheduling**: Runs hourly but only sends management alerts when critical thresholds are breached\n* **Multi-Source Integration**: Combines attendance logs with employee master data for enriched context\n* **Smart Analytics**: Calculates attendance rate, punctuality rate, absenteeism rate, and department-wise metrics\n* **Conditional Routing**: Management emails are triggered only for high-priority alerts (no email fatigue!)\n* **Production-Ready**: Includes error handling, data validation, and comprehensive logging\n* **Scalable Design**: Handles multiple departments, shifts, and employee types efficiently\n\n### How It Works\n\n1. **Automated Trigger** – Runs hourly to monitor attendance with zero manual effort.\n2. **Dual Data Ingestion** – Fetches attendance and employee master data, then merges them for enriched analytics.\n3. **Advanced Analytics Engine** – Analyzes attendance, calculates key metrics, detects anomalies, and generates alerts.\n4. **Smart Conditional Routing** – Validates data, prioritizes alerts, and routes notifications via email, Slack, and database.\n5. **Rich Email Reports** – Sends visually formatted reports with metrics, alerts, and detailed employee breakdowns.\n6. **Slack Block Kit Integration** – Delivers structured, real-time attendance alerts with visual indicators to team channels.\n7. **Data Persistence & Logging** – Logs daily summaries, maintains audit trails, and prepares data for trend analysis dashboards.\n\n\n## How to Use\n\n### Basic Setup\n1. **Import the Workflow**: Copy JSON → n8n → Import from File\n2. **Configure Credentials**: Add Google Sheets, SMTP, and Slack credentials\n3. **Update Spreadsheet IDs**: Replace all placeholder sheet IDs with your actual Google Sheet IDs\n4. **Set Email Addresses**: Update sender and recipient email addresses\n5. **Configure Slack Channel**: Replace channel ID with your team's attendance channel\n6. **Test**: Execute workflow manually to verify connections\n7. **Activate**: Turn on the Schedule Trigger for hourly execution\n\n### Advanced Configuration\n* **Adjust Alert Thresholds**: Modify the 10% (late) and 15% (absent) thresholds in Analytics Engine\n* **Customize Email Design**: Edit HTML in Format Email node for brand alignment\n* **Add More Channels**: Extend with Microsoft Teams, Discord, or SMS notifications\n* **Enhance Analytics**: Add shift-specific analysis, contractor vs. full-time breakdowns\n* **Integrate BI Tools**: Enable Power BI push dataset for real-time dashboards\n\n## Requirements\n\n### Google Sheets Setup\n\n#### Sheet 1: AttendanceLogs\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| EmployeeID | Text | Unique employee identifier | EMP001 |\n| EmployeeName | Text | Full name | John Doe |\n| Date | Date | Attendance date (YYYY-MM-DD) | 2025-01-15 |\n| Status | Text | Present/Absent/Late/Leave/WFH/Half-Day | Present |\n| CheckInTime | Time | Arrival time (HH:MM) | 09:15 |\n| CheckOutTime | Time | Departure time (HH:MM) | 18:00 |\n| Notes | Text | Optional comments | Doctor appointment |\n\n#### Sheet 2: Employees (Master Data)\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| EmployeeID | Text | Unique identifier (matches AttendanceLogs) | EMP001 |\n| EmployeeName | Text | Full name | John Doe |\n| Department | Text | Department name | Engineering |\n| Manager | Text | Reporting manager name | Jane Smith |\n| Shift | Text | Day/Night/Evening | Day |\n| Email | Email | Work email address | john.doe@company.com |\n| ContractType | Text | Full-Time/Part-Time/Contract | Full-Time |\n\n#### Sheet 3: DailySummary (Auto-populated by workflow)\n| Column | Type | Description |\n|--------|------|-------------|\n| Date | Date | Report date |\n| Hour | Number | Hour of day (0-23) |\n| Present | Number | Present count |\n| Absent | Number | Absent count |\n| Late | Number | Late count |\n| AttendanceRate | Number | Attendance percentage |\n\n### Credentials Needed\n\n1. **Google Sheets OAuth2 API**\n   - Enable Google Sheets API in Google Cloud Console\n   - Create service account credentials\n   - Share all 3 sheets with service account email\n\n2. **SMTP Email Account**\n   - Gmail: Enable \"App Passwords\" in Google Account settings\n   - Or use company SMTP server details\n   - Requires: Host, Port (587), Username, Password\n\n3. **Slack Bot Token**\n   - Create Slack App at api.slack.com/apps\n   - Enable permissions: `chat:write`, `chat:write.public`\n   - Install app to workspace\n   - Copy Bot User OAuth Token (starts with `xoxb-`)\n   - Invite bot to target channel\n\n### Placeholder Values to Replace\n\n| Placeholder | Where to Find | Example |\n|-------------|---------------|---------|\n| `YOUR_ATTENDANCE_SPREADSHEET_ID` | Google Sheets URL | 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms |\n| `YOUR_EMPLOYEE_SPREADSHEET_ID` | Google Sheets URL | 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms |\n| `YOUR_SUMMARY_SPREADSHEET_ID` | Google Sheets URL | 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms |\n| `C12345678` | Slack → Right-click channel → Copy link → Extract ID | C05XXXXXXXX |\n| `hr@company.com` | Your HR email | hr@yourcompany.com |\n| `management@company.com` | Management distribution list | leadership@yourcompany.com |\n\n## Customizing This Workflow\n\n### Modify Alert Thresholds\nIn the **Analytics Engine** node, find these lines:\n```javascript\nconst lateThreshold = metrics.totalEmployees * 0.1; // Change 0.1 to 0.15 for 15%\nconst absentThreshold = metrics.totalEmployees * 0.15; // Change to 0.20 for 20%\n```\n\n### Add New Status Types\nIn the **Analytics Engine** node, add to the switch statement:\n```javascript\ncase 'Remote':\n  statusCount.remote++;\n  break;\n```\n\n### Customize Email Template\nIn the **Format Email** node, modify the `emailHtml` variable:\n- Change gradient colors in the header div\n- Add company logo: `<img src=\"https://yourcompany.com/logo.png\" />`\n- Adjust grid columns: `grid-template-columns: repeat(5, 1fr);`\n\n### Add SMS Notifications\n1. Add **Twilio** or **Vonage** node after \"Critical Alerts\"\n2. Send to on-call manager for high-severity alerts\n3. Use message: `🚨 ${data.absent} employees absent today. Review required.`\n\n### Multi-Location Support\nModify **Analytics Engine** to group by `Location` field:\n```javascript\nconst locationMetrics = {};\ntodayRecords.forEach(record =&gt; {\n  const location = employee.location;\n  if (!locationMetrics[location]) {\n    locationMetrics[location] = { present: 0, absent: 0, late: 0 };\n  }\n  // ... aggregate by location\n});\n```\n\n### Shift-Specific Analysis\nAdd logic to compare check-in times against shift schedules:\n```javascript\nconst shiftTimes = {\n  'Day': '09:00',\n  'Night': '21:00',\n  'Evening': '14:00'\n};\nconst expectedTime = shiftTimes[employee.shift];\n```\n\n### Integration with HR Systems\nAdd **HTTP Request** node to push data to:\n- **Workday**: POST attendance records via REST API\n- **BambooHR**: Update employee time-off balances\n- **ADP**: Sync payroll-related attendance data\n- **SAP SuccessFactors**: Update time management module\n\n### Advanced Analytics\nAdd **Python** or **R** nodes for:\n- **Predictive Analytics**: ML models to predict absence patterns\n- **Sentiment Analysis**: Correlate attendance with employee surveys\n- **Seasonality Detection**: Identify patterns (Monday blues, pre-holiday trends)\n- **Correlation Analysis**: Link attendance with project deadlines, weather, events\n\n### Dashboard Integration\nExport data to visualization platforms:\n- **Power BI**: Use HTTP Request node to push to streaming dataset\n- **Tableau**: Write to database (PostgreSQL, MySQL) via Execute Query node\n- **Grafana**: Store in InfluxDB time-series database\n- **Custom Dashboard**: Build React app that reads from DailySummary sheet\n\n## Troubleshooting\n\n### Common Issues\n\n**\"Could not find node\"**\n- Ensure all data sources are fetched before Analytics Engine runs\n- Check node names match exactly in `$('Node Name').all()` syntax\n\n**\"No records found\"**\n- Verify Date column format is `YYYY-MM-DD` in Google Sheets\n- Check timezone settings in Schedule Trigger vs. Sheet locale\n- Confirm EmployeeID values match between AttendanceLogs and Employees sheets\n\n**\"Email not sending\"**\n- Verify SMTP credentials are correct\n- Check if \"Critical Alerts?\" condition is being met\n- Test email node independently with static data\n\n**\"Slack message failed\"**\n- Ensure bot is invited to the target channel\n- Verify channel ID format (starts with C, not # symbol)\n- Check bot has `chat:write` permission scope\n\n## Performance Optimization\n\n- **Large Datasets (&gt;1000 employees)**: Add pagination in Google Sheets fetch\n- **Multiple Departments**: Run parallel branches for each department\n- **Historical Analysis**: Schedule separate weekly/monthly summary workflows\n- **Reduce API Calls**: Cache employee master data in workflow static data\n\n## Security Best Practices\n\n- ✅ Use service account credentials (not personal OAuth)\n- ✅ Restrict sheet access to service account only\n- ✅ Store credentials in n8n credential store (encrypted)\n- ✅ Enable 2FA on all integrated accounts\n- ✅ Audit logs regularly for unauthorized access\n- ✅ Use HTTPS for all external API calls\n\n**Discover more workflows – [Get in touch with us](https://www.oneclickitsolution.com/contact-us/)**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Fetch Attendance Records",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fetch Employee Master Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Analytics Engine",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Records Available",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Critical Alerts",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Format Slack",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Log Summary",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

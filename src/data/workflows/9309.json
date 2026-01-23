@@ -1,0 +1,134 @@
+{
+  "id": 9309,
+  "slug": "9309",
+  "title": "Employee attrition risk detection & HR alerts using Azure OpenAI GPT-4o-mini & Gmail",
+  "description": "## Description \nAutomatically ingests new employee data, extracts relevant signals, scores attrition risk, and notifies HR/managers with structured insights and recommended actions. Built on Azure OpenAI Chat with Structured Output Parser and true/false routing for escalation.\n\n## What This Template Does \n- Trigger for new data: Starts when a new profile, survey, or report file is added.\n- Download & extract: Retrieves the file and converts PDFs/text into analyzable content.\n- Analyze signals: Uses Azure OpenAI Chat to interpret sentiment, workload, performance notes, feedback, and changes (role, compensation, manager, location).\n- Structured parsing: Maps to fields like risk_score, risk_level, key_drivers, recommended_interventions, escalation_required.\n- Logic routing: Applies thresholds (e.g., risk_score ≥ 0.7) and flags for urgent follow-up.\n- Email alerts: Drafts and sends tailored notifications to HR/manager with action steps.\n\n## Key Signals Considered \n- Sentiment & language: Negative tone, burnout cues, disengagement in feedback.\n- Activity trends: Drop in participation, delayed responses, meeting absenteeism.\n- Performance & goals: Recent rating changes, missed OKRs, quality issues.\n- Role & compensation: Lateral moves, pay gaps vs. market, stalled progression.\n- Managerial context: Team churn, conflict mentions, low recognition frequency.\n\n## Features \n- Azure OpenAI Chat: Interprets unstructured text into consistent risk fields.\n- Structured Output Parser: Guarantees schema for downstream decisions.\n- Conditional Logic (true/false): Threshold checks for escalation.\n- Memory: Maintains context across multiple files per employee for trend-aware scoring.\n- Calculate avg span: Computes tenure or recency metrics used in risk scoring.\n- Email Composer & Sender: Generates and dispatches HR-ready alerts.\n\n## Requirements \n- n8n instance with access to employee data sources (Drive, Inbox, HR folder).\n- Extract From PDF configured for clean text output.\n- Azure OpenAI credentials (e.g., GPT‑4o‑mini) connected to Chat Model.\n- Email service (Gmail/SMTP) set in n8n Credentials.\n- Parser schema aligned to your People Analytics fields (risk_score, drivers, actions).",
+  "featuredImage": "/data/workflows/9309/9309.webp",
+  "author": {
+    "id": 101,
+    "slug": "rahul08",
+    "name": "Rahul Joshi",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 146,
+  "downloads": 14,
+  "createdAt": "2025-10-06T13:20:25.086Z",
+  "updatedAt": "2026-01-16T08:59:56.798Z",
+  "publishedAt": "2025-10-06T13:20:25.086Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9309",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Employee attrition risk detection & HR alerts using Azure OpenAI GPT-4o-mini & Gmail",
+    "workflowName": "Employee attrition risk detection & HR alerts using Azure OpenAI GPT-4o-mini & Gmail",
+    "description": "## Description \nAutomatically ingests new employee data, extracts relevant signals, scores attrition risk, and notifies HR/managers with structured insights and recommended actions. Built on Azure OpenAI Chat with Structured Output Parser and true/false routing for escalation.\n\n## What This Template Does \n- Trigger for new data: Starts when a new profile, survey, or report file is added.\n- Download & extract: Retrieves the file and converts PDFs/text into analyzable content.\n- Analyze signals: Uses Azure OpenAI Chat to interpret sentiment, workload, performance notes, feedback, and changes (role, compensation, manager, location).\n- Structured parsing: Maps to fields like risk_score, risk_level, key_drivers, recommended_interventions, escalation_required.\n- Logic routing: Applies thresholds (e.g., risk_score ≥ 0.7) and flags for urgent follow-up.\n- Email alerts: Drafts and sends tailored notifications to HR/manager with action steps.\n\n## Key Signals Considered \n- Sentiment & language: Negative tone, burnout cues, disengagement in feedback.\n- Activity trends: Drop in participation, delayed responses, meeting absenteeism.\n- Performance & goals: Recent rating changes, missed OKRs, quality issues.\n- Role & compensation: Lateral moves, pay gaps vs. market, stalled progression.\n- Managerial context: Team churn, conflict mentions, low recognition frequency.\n\n## Features \n- Azure OpenAI Chat: Interprets unstructured text into consistent risk fields.\n- Structured Output Parser: Guarantees schema for downstream decisions.\n- Conditional Logic (true/false): Threshold checks for escalation.\n- Memory: Maintains context across multiple files per employee for trend-aware scoring.\n- Calculate avg span: Computes tenure or recency metrics used in risk scoring.\n- Email Composer & Sender: Generates and dispatches HR-ready alerts.\n\n## Requirements \n- n8n instance with access to employee data sources (Drive, Inbox, HR folder).\n- Extract From PDF configured for clean text output.\n- Azure OpenAI credentials (e.g., GPT‑4o‑mini) connected to Chat Model.\n- Email service (Gmail/SMTP) set in n8n Credentials.\n- Parser schema aligned to your People Analytics fields (risk_score, drivers, actions).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Azure OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "role": "lmChatAzureOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Trigger for new resume",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download resume",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculate avg span",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Logic",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send email to hr",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

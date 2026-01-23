@@ -1,0 +1,182 @@
+{
+  "id": 10737,
+  "slug": "10737",
+  "title": "Create LinkedIn content with GPT-4 via Telegram bot & approval loop",
+  "description": " AI LinkedIn Content Bot with Approval Loop\n\nThis n8n workflow transforms your Telegram messenger into a personal assistant for creating and publishing LinkedIn posts. You can simply send an idea as a text or voice message, collaboratively edit the AI's suggestion in a chat, and then publish the finished post directly to LinkedIn just by saying \"Okay.\"\n\n### What You'll Need to Get Started\n\nBefore you can use this workflow, you'll need a few prerequisites set up. This workflow connects three different services, so you will need API credentials for each:\n\n1.  **Telegram Bot API Key:** You can get this by talking to the **\"BotFather\"** on Telegram. It will guide you through creating your new bot and provide you with the API token.\n[New Chat with Telegram BotFather](https://telegram.me/BotFather)\n\n2.  **OpenAI API Key:** This is required for the \"Speech to Text\" and \"AI Agent\" nodes. You'll need an account with OpenAI to generate this key.\n[OpenAI API Platform](https://platform.openai.com\n)\n3.  **Blotato API Key:** This service is used to publish the final post to LinkedIn. You'll need a Blotato account and to connect your LinkedIn profile there to get the key.\n[Blotato platform for social media publishing]\n\nOnce you have these keys, you can add them to the corresponding credentials in your n8n instance.\n\n-----\n\n### How the Workflow Operates, Step-by-Step\n\nHere is a detailed breakdown of how the workflow processes your request and handles the publishing.\n\n### 1\\. Input & Initial Processing\n\nThis phase captures your idea and converts it into usable text.\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`Start: Telegram Message`** | This Telegram Trigger node initiates the entire process upon receiving any message from you in the bot. |\n| **`Prepare Input`** | Consolidates the message content, ensuring the AI receives only one clean text input. |\n| **`Check: ist it a Voice?`** | Checks the incoming message for text. If text is empty, it proceeds to voice handling. |\n| **`Get Voice File`** | If a voice note is detected, this node downloads the raw audio file from Telegram. |\n| **`Speech to Text`** | This node uses the OpenAI Whisper API to convert the downloaded audio file into a text string. |\n\n### 2\\. AI Core & Iteration Loop\n\nThis is the central dialogue system where the AI drafts the content and engages in the feedback loop.\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`AI: Draft & Revise Post`** | The main logic agent. It analyzes your request, applies the \"System Prompt\" rules, drafts the post, and handles revisions based on your feedback. |\n| **`OpenAI Chat Model`** | Defines the large language model (LLM) used for generating and revising the post. |\n| **`Window Buffer Memory`** | A memory buffer that stores the last turns of the conversation, allowing the AI to maintain context when you request changes (e.g., \"Make it shorter\"). |\n| **`Check if Approved`** | This crucial node detects the specific JSON structure the AI outputs only when you provide an approval keyword (like \"ok\" or \"approved\"). |\n| **`Post Suggestion Or Ask For Approval`** | Sends the AI's post draft back to your Telegram chat for review and feedback. |\n\n### AI Agent System Prompt (Internal Instructions - English)\n\nThe agent operates under a strict prompt that dictates its behavior and formatting (found within the **`AI: Draft & Revise Post`** node):\n\n&gt; **You are a LinkedIn Content Creator Agent for Telegram.**\n&gt; Keep the confirmation process, but change the output format as follows:\n&gt;\n&gt; **Your Task**\n&gt; Analyze the user's message:\n&gt;\n&gt;   * Topic\n&gt;   * Goal (e.g., reach, show expertise, recruiting, personal branding, leads)\n&gt;   * Target Audience\n&gt;   * Tonality (e.g., factual, personal, bold, inspiring)\n&gt;\n&gt; **Create a LinkedIn post as ONE continuous text:**\n&gt;\n&gt;   * Strong hook in the first 1–2 lines.\n&gt;   * Clear main part with added value, story, example, or insight.\n&gt;   * Optional Call-to-Action (e.g., question to the community, invitation to exchange).\n&gt;   * Integrate hashtags at the end of the post (5–12 suitable hashtags, mix of niche + somewhat broader).\n&gt;   * Readable on LinkedIn: short paragraphs, emojis only sparingly.\n&gt;\n&gt; **Present the suggestion to the user in the following format:**\n&gt;\n&gt; **Headline: Post Proposal:**\n&gt; Below that, the complete LinkedIn post (incl. hashtags at the end in the same text).\n&gt;\n&gt; **Ask for feedback:**\n&gt; For example:\n&gt; *\"Any changes? (Tone, length, formality, personal vs. professional, more technical content, different hashtags?)\"*\n&gt;\n&gt; **If the user requests changes:**\n&gt; Adjust the post specifically based on the feedback.\n&gt; Again, output only:\n&gt; **Post Proposal:**\n&gt; the revised complete post.\n&gt;\n&gt; **If the user says “approved”, “ok”, “sounds good”, or similar:**\n&gt; Return **exclusively** this JSON, without additional text, without Markdown:\n&gt;\n&gt; ```json\n&gt; {\n&gt;   \"Post\": \"The final LinkedIn post as one text, including hashtags at the end\"\n&gt; }\n&gt; ```\n&gt;\n&gt; **Important:**\n&gt;\n&gt;   * Never output JSON before approval, only normal suggestion text.\n&gt;   * The final output after approval consists of only one field: Post.\n\n### 3\\. Publishing & Status Check\n\nOnce approved, the workflow handles the publication and monitors the post's status in real-time.\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`Approval: Extract Final Post Text`** | Parses the incoming JSON, extracting only the clean text ready for publishing. |\n| **`Create post with Blotato`** | Uses the Blotato API to upload the finalized content to your connected LinkedIn account. |\n| **`Give Blotat 5s :)`** | A brief pause to allow the publishing service to start processing the request. |\n| **`Check post status`** | Checks back with Blotato to determine if the post is published, in progress, or failed. |\n| **`Published?`** | Checks if the status is \"published\" to send the success message. |\n| **`In Progress?`** | Checks if the post is still being processed. If so, it loops back to the next wait period. |\n| **`Give Blotat other 5s :)`** | Pauses the workflow before re-checking the post status, preventing unnecessary API calls. |\n\n### 4\\. Final Notification\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`Send a confirmation message`** | Sends a confirmation message and the direct link to the published LinkedIn post. |\n| **`Send an error message`** | Sends a notification if the post failed to upload or encountered an error during processing. |\n\n-----\n\n## 🛠️ Personalizing Your Content Bot\n\nThe true power of this n8n workflow lies in its flexibility. You can easily modify key components to match your unique brand voice and technical preferences.\n\n### 1\\. Tweak the Content Creator Prompt\n\nThe personality, tone, and formatting rules for your LinkedIn content are all defined in the System Prompt.\n\n  * **Where to find it:** Inside the **`AI: Draft & Revise Post`** node, under the `System Message` setting.\n  * **What to personalize:** Adjust the tone, change the formatting rules (e.g., number of hashtags, required emojis), or insert specific details about your industry or target audience.\n\n### 2\\. Switch the AI Model or Provider\n\nYou can easily swap the language model used for generation.\n\n  * **Where to find it:** The **`OpenAI Chat Model`** node.\n  * **What to personalize:**\n      * **Model:** Swap out the default model for a more powerful or faster alternative (e.g., `gpt-4` family, or models from other providers if you change the node).\n      * **Provider:** You can replace the entire Langchain block (including the `AI Model` and `Window Buffer Memory` nodes) with an equivalent block using a different provider's Chat/LLM node (e.g., Anthropic, Cohere, or Google Gemini), provided you set up the corresponding credentials and context flow.\n\n### 3\\. Modify Publishing Behavior (Schedule vs. Post)\n\nThe final step is currently set to publish immediately, but you might prefer to schedule posts.\n\n  * **Where to find it:** The **`Create post with Blotato`** node.\n  * **What to personalize:**\n      * Consult the Blotato documentation for alternative operations. Instead of choosing the \"Create Post\" operation (which often posts immediately), you can typically select a \"Schedule Post\" or \"Add to Queue\" operation within the Blotato node.\n      * If scheduling, you will need to add a step (e.g., a **Set** node or another agent prompt) before publishing to calculate and pass a `Scheduled Time` parameter to the Blotato node.",
+  "featuredImage": "/data/workflows/10737/10737.webp",
+  "author": {
+    "id": 101,
+    "slug": "ferasdabour",
+    "name": "Feras Dabour",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 153,
+  "downloads": 15,
+  "createdAt": "2025-11-11T19:49:32.252Z",
+  "updatedAt": "2026-01-16T09:06:06.270Z",
+  "publishedAt": "2025-11-11T19:49:32.252Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10737",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create LinkedIn content with GPT-4 via Telegram bot & approval loop",
+    "workflowName": "Create LinkedIn content with GPT-4 via Telegram bot & approval loop",
+    "description": "AI LinkedIn Content Bot with Approval Loop\n\nThis n8n workflow transforms your Telegram messenger into a personal assistant for creating and publishing LinkedIn posts. You can simply send an idea as a text or voice message, collaboratively edit the AI's suggestion in a chat, and then publish the finished post directly to LinkedIn just by saying \"Okay.\"\n\n### What You'll Need to Get Started\n\nBefore you can use this workflow, you'll need a few prerequisites set up. This workflow connects three different services, so you will need API credentials for each:\n\n1.  **Telegram Bot API Key:** You can get this by talking to the **\"BotFather\"** on Telegram. It will guide you through creating your new bot and provide you with the API token.\n[New Chat with Telegram BotFather](https://telegram.me/BotFather)\n\n2.  **OpenAI API Key:** This is required for the \"Speech to Text\" and \"AI Agent\" nodes. You'll need an account with OpenAI to generate this key.\n[OpenAI API Platform](https://platform.openai.com\n)\n3.  **Blotato API Key:** This service is used to publish the final post to LinkedIn. You'll need a Blotato account and to connect your LinkedIn profile there to get the key.\n[Blotato platform for social media publishing]\n\nOnce you have these keys, you can add them to the corresponding credentials in your n8n instance.\n\n-----\n\n### How the Workflow Operates, Step-by-Step\n\nHere is a detailed breakdown of how the workflow processes your request and handles the publishing.\n\n### 1\\. Input & Initial Processing\n\nThis phase captures your idea and converts it into usable text.\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`Start: Telegram Message`** | This Telegram Trigger node initiates the entire process upon receiving any message from you in the bot. |\n| **`Prepare Input`** | Consolidates the message content, ensuring the AI receives only one clean text input. |\n| **`Check: ist it a Voice?`** | Checks the incoming message for text. If text is empty, it proceeds to voice handling. |\n| **`Get Voice File`** | If a voice note is detected, this node downloads the raw audio file from Telegram. |\n| **`Speech to Text`** | This node uses the OpenAI Whisper API to convert the downloaded audio file into a text string. |\n\n### 2\\. AI Core & Iteration Loop\n\nThis is the central dialogue system where the AI drafts the content and engages in the feedback loop.\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`AI: Draft & Revise Post`** | The main logic agent. It analyzes your request, applies the \"System Prompt\" rules, drafts the post, and handles revisions based on your feedback. |\n| **`OpenAI Chat Model`** | Defines the large language model (LLM) used for generating and revising the post. |\n| **`Window Buffer Memory`** | A memory buffer that stores the last turns of the conversation, allowing the AI to maintain context when you request changes (e.g., \"Make it shorter\"). |\n| **`Check if Approved`** | This crucial node detects the specific JSON structure the AI outputs only when you provide an approval keyword (like \"ok\" or \"approved\"). |\n| **`Post Suggestion Or Ask For Approval`** | Sends the AI's post draft back to your Telegram chat for review and feedback. |\n\n### AI Agent System Prompt (Internal Instructions - English)\n\nThe agent operates under a strict prompt that dictates its behavior and formatting (found within the **`AI: Draft & Revise Post`** node):\n\n&gt; **You are a LinkedIn Content Creator Agent for Telegram.**\n&gt; Keep the confirmation process, but change the output format as follows:\n&gt;\n&gt; **Your Task**\n&gt; Analyze the user's message:\n&gt;\n&gt;   * Topic\n&gt;   * Goal (e.g., reach, show expertise, recruiting, personal branding, leads)\n&gt;   * Target Audience\n&gt;   * Tonality (e.g., factual, personal, bold, inspiring)\n&gt;\n&gt; **Create a LinkedIn post as ONE continuous text:**\n&gt;\n&gt;   * Strong hook in the first 1–2 lines.\n&gt;   * Clear main part with added value, story, example, or insight.\n&gt;   * Optional Call-to-Action (e.g., question to the community, invitation to exchange).\n&gt;   * Integrate hashtags at the end of the post (5–12 suitable hashtags, mix of niche + somewhat broader).\n&gt;   * Readable on LinkedIn: short paragraphs, emojis only sparingly.\n&gt;\n&gt; **Present the suggestion to the user in the following format:**\n&gt;\n&gt; **Headline: Post Proposal:**\n&gt; Below that, the complete LinkedIn post (incl. hashtags at the end in the same text).\n&gt;\n&gt; **Ask for feedback:**\n&gt; For example:\n&gt; *\"Any changes? (Tone, length, formality, personal vs. professional, more technical content, different hashtags?)\"*\n&gt;\n&gt; **If the user requests changes:**\n&gt; Adjust the post specifically based on the feedback.\n&gt; Again, output only:\n&gt; **Post Proposal:**\n&gt; the revised complete post.\n&gt;\n&gt; **If the user says “approved”, “ok”, “sounds good”, or similar:**\n&gt; Return **exclusively** this JSON, without additional text, without Markdown:\n&gt;\n&gt; ```json\n&gt; {\n&gt;   \"Post\": \"The final LinkedIn post as one text, including hashtags at the end\"\n&gt; }\n&gt; ```\n&gt;\n&gt; **Important:**\n&gt;\n&gt;   * Never output JSON before approval, only normal suggestion text.\n&gt;   * The final output after approval consists of only one field: Post.\n\n### 3\\. Publishing & Status Check\n\nOnce approved, the workflow handles the publication and monitors the post's status in real-time.\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`Approval: Extract Final Post Text`** | Parses the incoming JSON, extracting only the clean text ready for publishing. |\n| **`Create post with Blotato`** | Uses the Blotato API to upload the finalized content to your connected LinkedIn account. |\n| **`Give Blotat 5s :)`** | A brief pause to allow the publishing service to start processing the request. |\n| **`Check post status`** | Checks back with Blotato to determine if the post is published, in progress, or failed. |\n| **`Published?`** | Checks if the status is \"published\" to send the success message. |\n| **`In Progress?`** | Checks if the post is still being processed. If so, it loops back to the next wait period. |\n| **`Give Blotat other 5s :)`** | Pauses the workflow before re-checking the post status, preventing unnecessary API calls. |\n\n### 4\\. Final Notification\n\n| Node Name | Role in Workflow |\n| :--- | :--- |\n| **`Send a confirmation message`** | Sends a confirmation message and the direct link to the published LinkedIn post. |\n| **`Send an error message`** | Sends a notification if the post failed to upload or encountered an error during processing. |\n\n-----\n\n## 🛠️ Personalizing Your Content Bot\n\nThe true power of this n8n workflow lies in its flexibility. You can easily modify key components to match your unique brand voice and technical preferences.\n\n### 1\\. Tweak the Content Creator Prompt\n\nThe personality, tone, and formatting rules for your LinkedIn content are all defined in the System Prompt.\n\n  * **Where to find it:** Inside the **`AI: Draft & Revise Post`** node, under the `System Message` setting.\n  * **What to personalize:** Adjust the tone, change the formatting rules (e.g., number of hashtags, required emojis), or insert specific details about your industry or target audience.\n\n### 2\\. Switch the AI Model or Provider\n\nYou can easily swap the language model used for generation.\n\n  * **Where to find it:** The **`OpenAI Chat Model`** node.\n  * **What to personalize:**\n      * **Model:** Swap out the default model for a more powerful or faster alternative (e.g., `gpt-4` family, or models from other providers if you change the node).\n      * **Provider:** You can replace the entire Langchain block (including the `AI Model` and `Window Buffer Memory` nodes) with an equivalent block using a different provider's Chat/LLM node (e.g., Anthropic, Cohere, or Google Gemini), provided you set up the corresponding credentials and context flow.\n\n### 3\\. Modify Publishing Behavior (Schedule vs. Post)\n\nThe final step is currently set to publish immediately, but you might prefer to schedule posts.\n\n  * **Where to find it:** The **`Create post with Blotato`** node.\n  * **What to personalize:**\n      * Consult the Blotato documentation for alternative operations. Instead of choosing the \"Create Post\" operation (which often posts immediately), you can typically select a \"Schedule Post\" or \"Add to Queue\" operation within the Blotato node.\n      * If scheduling, you will need to add a step (e.g., a **Set** node or another agent prompt) before publishing to calculate and pass a `Scheduled Time` parameter to the Blotato node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Speech to Text",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get Voice File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check if Approved",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Start: Telegram Message",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Check: ist it a Voice?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI: Draft & Revise Post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Approval: Extract Final Post Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create post with Blotato",
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "role": "blotato",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Give Blotat 5s :)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check post status",
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "role": "blotato",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Published?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a confirmation message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "In Progress?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Give Blotat other 5s :)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send an error message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Post Suggestion Or Ask For Approval",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

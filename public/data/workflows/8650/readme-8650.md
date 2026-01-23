@@ -1,0 +1,92 @@
+# Server & network monitoring alerts via WhatsApp using HetrixTools
+
+> This workflow integrates [HetrixTools](https://hetrixtools.com/) with WhatsApp via the GOWA API to automate notifications about server monitoring events. It distinguishes between **Uptime Monitoring** and **Resource Usage Monitoring** events, formats the message accordingly, and sends it to a WhatsApp number using the GOWA WhatsApp REST API.
+
+It's especially useful for DevOps, sysadmins, or teams who need real-time server alerts delivered via WhatsApp.
+
+---
+
+## ⚙️ **Setup Instructions**
+
+1. **Set up HetrixTools:**
+
+   * Create a HetrixTools account at [https://hetrixtools.com/register](https://hetrixtools.com/register)
+   * Create your **Uptime Monitors** and/or enable **Resource Usage Monitoring** for your servers.
+   * Go to your HetrixTools contact settings and add the **n8n Webhook URL** provided by the workflow.
+   * Make sure to select this contact in your monitor’s alert settings.
+
+2. **Configure n8n Webhook:**
+
+   * Set the Webhook node to HTTP method: `POST`
+   * Ensure it is accessible via a public URL (you can use n8n Cloud, reverse proxy, or tunnel like `ngrok` for testing).
+
+3. **Customize WhatsApp Message:**
+
+   * The workflow includes a conditional branch to check whether the event is a Resource Usage alert or an Uptime alert.
+   * Each branch contains editable text nodes for customizing the WhatsApp message content.
+
+4. **Set up GOWA WhatsApp API:**
+
+   * Make sure your GOWA instance is running and accessible.
+   * Create necessary credentials (API key, base URL, etc.).
+   * In n8n, add the credentials and fill in the **sendChatPresence** and **sendText** nodes accordingly.
+
+5. **Deploy the Workflow:**
+
+   * Save and activate the workflow.
+   * Trigger a test alert from HetrixTools to verify if messages are received on WhatsApp.
+
+---
+
+## 🧱 **Prerequisites**
+
+* An active [HetrixTools](https://hetrixtools.com/) account with Uptime Monitors or Resource Usage Monitoring enabled.
+* A publicly accessible instance of **n8n** with Webhook node enabled.
+* Access to a running and configured **GOWA** (WhatsApp REST API) server.
+* Required credentials configured in n8n for GOWA (API key, URL, phone number, etc.).
+
+---
+
+## 📊 Basic Information
+
+- **Workflow ID:** 8650
+- **Complexity:** advanced
+- **Node Count:** 15
+- **Views:** 358
+- **Downloads:** 35
+- **Created:** 2025/9/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/8650)
+
+## 👤 Author
+
+- **Name:** Syamsul Bahri
+- **Username:** @syam785
+
+## 🏷️ Categories
+
+- DevOps
+
+## 🔗 Nodes Used
+
+- **webhook** 
+- **if** 
+- **set** (×3)
+- **@aldinokemal2104/n8n-nodes-gowa.gowa** (×3)
+- **wait** 
+- **stickyNote** (×6)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 15 nodes with 8 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

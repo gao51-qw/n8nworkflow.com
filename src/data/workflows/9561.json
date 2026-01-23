@@ -1,0 +1,248 @@
+{
+  "id": 9561,
+  "slug": "9561",
+  "title": "Automate product ad creation with Telegram, Fal.AI & Facebook posting",
+  "description": "This workflow automates the entire process of creating and publishing social media ads — directly from Telegram.  \nBy simply sending a product photo to your Telegram bot, the system analyzes the image, generates an AI-based advertising prompt, creates a marketing image via Fal.AI, writes an engaging Facebook/Instagram caption, and posts it automatically.  \n\nThis template saves hours of manual work for marketers and small business owners who constantly need to design, write, and publish product campaigns. It eliminates repetitive steps like prompt writing, AI model switching, and post scheduling — letting you focus on strategy, not execution.  \n\nThe workflow integrates seamlessly with **Fal.AI** for image generation, **OpenAI Vision** for image analysis, and the **Facebook Graph API** for automated publishing.  \nWhether you’re launching a 10.10 campaign or promoting a new product line, this template transforms your product photo into a ready-to-publish ad in just minutes.  \n\n---\n\n## Who’s it for\nThis workflow is designed for:\n- **Marketers and e-commerce owners** who need to create social content quickly.  \n- **Agencies** managing multiple clients’ campaigns.  \n- **Small business owners** who want to automate Facebook/Instagram posts.  \n- **n8n creators** who want to learn AI-assisted content automation.\n\n---\n\n## What problem does this solve\nManually creating ad images and captions is time-consuming and repetitive.  \nYou need to:\n1. Edit the product photo.  \n2. Write a creative brief or prompt.  \n3. Generate an image in Fal.AI or Midjourney.  \n4. Write a caption.  \n5. Log into Facebook and post.  \n\nThis workflow combines all five steps into one automation — triggered directly by sending a Telegram message.  \nIt handles **AI analysis, image creation, caption writing, and posting**, removing human friction while maintaining quality and creative control.\n\n---\n\n## What this workflow does\nThe workflow is divided into **four main zones**, color-coded inside the canvas:\n\n### 🟩 Zone 1 – Product Image Analysis\n- Trigger: User sends a product image to a Telegram bot.  \n- n8n retrieves the file path using Telegram API.  \n- OpenAI Vision analyzes the product photo and describes color, material, and shape.  \n- An AI agent converts this into structured data for generating ad prompts.\n\n### 🟥 Zone 2 – Generate Ad Image Prompt\n- The AI agent creates a professional advertising prompt based on the product description and campaign (e.g., “10.10 Sale”).  \n- The prompt is sent to the user for confirmation via Telegram before proceeding.\n\n### 🟨 Zone 3 – Create Ad Image via Fal.AI\n- The confirmed prompt and image are sent to **Fal.AI**’s image generation API.  \n- The system polls the generation status until completion.  \n- The generated image is sent back to Telegram for user review and approval.\n\n### 🟦 Zone 4 – Write Caption & Publish\n- The approved image is re-analyzed by AI to write a Facebook/Instagram caption.  \n- The user confirms the text on Telegram.  \n- Once approved, the workflow uploads the final post (image + caption) to Facebook automatically using the Graph API.\n\n---\n\n## Setup\n### Prerequisites\n- **n8n self-hosted or Cloud account**  \n- **Telegram Bot Token** (via @BotFather)  \n- **Fal.AI API key**  \n- **Facebook Page Access Token** with publishing permissions  \n- **OpenAI API Key** for image analysis and text generation  \n\n### Steps\n1. Create a **Telegram Bot** and paste its token into n8n Credentials.  \n2. Set up **Fal.AI Credentials** under HTTP Request → Authentication.  \n3. Connect your **Facebook Page** through Facebook Graph API credentials.  \n4. In the **HTTP Request node**, set:  \n   - URL: `https://fal.run/fal-ai/nano-banana`  \n   - Auth: Bearer {{ $credentials.FalAI.apiKey }}  \n5. Configure all LLM and Vision nodes using your **OpenAI credentials**.\n\n---\n\n## Node settings\n\n### 🟩 Analyze Image (OpenAI Vision)\n```json\n{\n  \"model\": \"gpt-4o-mini\",\n  \"input\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        { \"type\": \"image_url\", \"image_url\": \"{{$json.image_url}}\" },\n        { \"type\": \"text\", \"text\": \"Describe this product in detail for advertising context.\" }\n      ]\n    }\n  ]\n}\n```\n\n---\n\n### 🟥 Set Node – Prepare Fal.AI Body\n```json\n{\n  \"prompt\": {{ JSON.stringify(($json.ad_prompt || '').replace(/\\r?\\n/g, ' ')) }},\n  \"image_urls\": [{{ JSON.stringify($json.image_url || '') }}],\n  \"num_images\": 1,\n  \"output_format\": \"jpeg\"\n}\n```\n\n---\n\n### 🟦 HTTP Request (Facebook Graph API)\n```json\n{\n  \"method\": \"POST\",\n  \"url\": \"https://graph.facebook.com/v19.0/me/photos\",\n  \"body\": {\n    \"caption\": \"{{ $json.caption_text }}\",\n    \"url\": \"{{ $json.final_image_url }}\",\n    \"access_token\": \"{{ $credentials.facebook.accessToken }}\"\n  }\n}\n```\n\n---\n\n## How to customize the workflow\n- **Change AI Models:** Swap Fal.AI for Flux, Veo3, or SDXL by adjusting API endpoints.  \n- **Add Channels:** Extend the workflow to post on LINE OA or Instagram.  \n- **Add Approval Logic:** Keep Telegram confirmation steps before every publish.  \n- **Brand Rules:** Adjust AI prompt templates to enforce tone, logo, or color palette consistency.  \n- **Multi-language Posts:** Add translation nodes for global campaigns.\n\n---\n\n## Troubleshooting\n| Problem | Cause | Solution |\n|----------|--------|-----------|\n| Telegram message not triggering | Webhook misconfigured | Reconnect Telegram Trigger |\n| Fal.AI API error | Invalid JSON or token | Use `JSON.stringify()` in Set node and check credentials |\n| Facebook upload fails | Missing permissions | Ensure Page Access Token has `pages_manage_posts` |\n| LLM parser error | Output not valid JSON | Add `Structured Output Parser` and enforce schema |\n\n---\n\n## ⚠️ Security Notes\n- **Do NOT hardcode API keys** in Set or HTTP Request nodes.  \n- Always store credentials securely under **n8n Credentials Manager**.  \n- For self-hosted setups, use `.env` variables for sensitive keys (OpenAI, Fal.AI, Facebook).  \n\n---\n\n### 🏷️ Hashtags\n#n8n #Automation #AIworkflow #FalAI #FacebookAPI #TelegramBot #nanobanana #NoCode #MarketingAutomation #SocialMediaAI #JaruphatJ #WorkflowTemplate #OpenAI #LLM #ProductAds #CreativeAutomation\n\n## Product Image\n![Alt text](https://drive.google.com/thumbnail?id=1G0BrS1Zj1BMisa9VObeBQrR3s9ZPyMzS&sz=w300)\n\n## Process Step\n![Alt text](https://drive.google.com/thumbnail?id=1hEPQsXbhTIymeDKoav0u5nMEiTFTQzsX&sz=w300) ![Alt text](https://drive.google.com/thumbnail?id=1f_8h34SdhFGv6AxgWA7Ab5V6NdDwe4hK&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1I00j2SHiZ8mOQORTeVOjSNbXf0x_1dkh&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1YOwB-6z3kD2ITzK6ZPSyo_JtrrKTmlrB&sz=w300)",
+  "featuredImage": "/data/workflows/9561/9561.webp",
+  "author": {
+    "id": 101,
+    "slug": "jaruphatj",
+    "name": "Jaruphat J.",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 721,
+  "downloads": 72,
+  "createdAt": "2025-10-13T08:11:46.792Z",
+  "updatedAt": "2026-01-16T09:00:56.814Z",
+  "publishedAt": "2025-10-13T08:11:46.792Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9561",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate product ad creation with Telegram, Fal.AI & Facebook posting",
+    "workflowName": "Automate product ad creation with Telegram, Fal.AI & Facebook posting",
+    "description": "This workflow automates the entire process of creating and publishing social media ads — directly from Telegram.  \nBy simply sending a product photo to your Telegram bot, the system analyzes the image, generates an AI-based advertising prompt, creates a marketing image via Fal.AI, writes an engaging Facebook/Instagram caption, and posts it automatically.  \n\nThis template saves hours of manual work for marketers and small business owners who constantly need to design, write, and publish product campaigns. It eliminates repetitive steps like prompt writing, AI model switching, and post scheduling — letting you focus on strategy, not execution.  \n\nThe workflow integrates seamlessly with **Fal.AI** for image generation, **OpenAI Vision** for image analysis, and the **Facebook Graph API** for automated publishing.  \nWhether you’re launching a 10.10 campaign or promoting a new product line, this template transforms your product photo into a ready-to-publish ad in just minutes.  \n\n---\n\n## Who’s it for\nThis workflow is designed for:\n- **Marketers and e-commerce owners** who need to create social content quickly.  \n- **Agencies** managing multiple clients’ campaigns.  \n- **Small business owners** who want to automate Facebook/Instagram posts.  \n- **n8n creators** who want to learn AI-assisted content automation.\n\n---\n\n## What problem does this solve\nManually creating ad images and captions is time-consuming and repetitive.  \nYou need to:\n1. Edit the product photo.  \n2. Write a creative brief or prompt.  \n3. Generate an image in Fal.AI or Midjourney.  \n4. Write a caption.  \n5. Log into Facebook and post.  \n\nThis workflow combines all five steps into one automation — triggered directly by sending a Telegram message.  \nIt handles **AI analysis, image creation, caption writing, and posting**, removing human friction while maintaining quality and creative control.\n\n---\n\n## What this workflow does\nThe workflow is divided into **four main zones**, color-coded inside the canvas:\n\n### 🟩 Zone 1 – Product Image Analysis\n- Trigger: User sends a product image to a Telegram bot.  \n- n8n retrieves the file path using Telegram API.  \n- OpenAI Vision analyzes the product photo and describes color, material, and shape.  \n- An AI agent converts this into structured data for generating ad prompts.\n\n### 🟥 Zone 2 – Generate Ad Image Prompt\n- The AI agent creates a professional advertising prompt based on the product description and campaign (e.g., “10.10 Sale”).  \n- The prompt is sent to the user for confirmation via Telegram before proceeding.\n\n### 🟨 Zone 3 – Create Ad Image via Fal.AI\n- The confirmed prompt and image are sent to **Fal.AI**’s image generation API.  \n- The system polls the generation status until completion.  \n- The generated image is sent back to Telegram for user review and approval.\n\n### 🟦 Zone 4 – Write Caption & Publish\n- The approved image is re-analyzed by AI to write a Facebook/Instagram caption.  \n- The user confirms the text on Telegram.  \n- Once approved, the workflow uploads the final post (image + caption) to Facebook automatically using the Graph API.\n\n---\n\n## Setup\n### Prerequisites\n- **n8n self-hosted or Cloud account**  \n- **Telegram Bot Token** (via @BotFather)  \n- **Fal.AI API key**  \n- **Facebook Page Access Token** with publishing permissions  \n- **OpenAI API Key** for image analysis and text generation  \n\n### Steps\n1. Create a **Telegram Bot** and paste its token into n8n Credentials.  \n2. Set up **Fal.AI Credentials** under HTTP Request → Authentication.  \n3. Connect your **Facebook Page** through Facebook Graph API credentials.  \n4. In the **HTTP Request node**, set:  \n   - URL: `https://fal.run/fal-ai/nano-banana`  \n   - Auth: Bearer {{ $credentials.FalAI.apiKey }}  \n5. Configure all LLM and Vision nodes using your **OpenAI credentials**.\n\n---\n\n## Node settings\n\n### 🟩 Analyze Image (OpenAI Vision)\n```json\n{\n  \"model\": \"gpt-4o-mini\",\n  \"input\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        { \"type\": \"image_url\", \"image_url\": \"{{$json.image_url}}\" },\n        { \"type\": \"text\", \"text\": \"Describe this product in detail for advertising context.\" }\n      ]\n    }\n  ]\n}\n```\n\n---\n\n### 🟥 Set Node – Prepare Fal.AI Body\n```json\n{\n  \"prompt\": {{ JSON.stringify(($json.ad_prompt || '').replace(/\\r?\\n/g, ' ')) }},\n  \"image_urls\": [{{ JSON.stringify($json.image_url || '') }}],\n  \"num_images\": 1,\n  \"output_format\": \"jpeg\"\n}\n```\n\n---\n\n### 🟦 HTTP Request (Facebook Graph API)\n```json\n{\n  \"method\": \"POST\",\n  \"url\": \"https://graph.facebook.com/v19.0/me/photos\",\n  \"body\": {\n    \"caption\": \"{{ $json.caption_text }}\",\n    \"url\": \"{{ $json.final_image_url }}\",\n    \"access_token\": \"{{ $credentials.facebook.accessToken }}\"\n  }\n}\n```\n\n---\n\n## How to customize the workflow\n- **Change AI Models:** Swap Fal.AI for Flux, Veo3, or SDXL by adjusting API endpoints.  \n- **Add Channels:** Extend the workflow to post on LINE OA or Instagram.  \n- **Add Approval Logic:** Keep Telegram confirmation steps before every publish.  \n- **Brand Rules:** Adjust AI prompt templates to enforce tone, logo, or color palette consistency.  \n- **Multi-language Posts:** Add translation nodes for global campaigns.\n\n---\n\n## Troubleshooting\n| Problem | Cause | Solution |\n|----------|--------|-----------|\n| Telegram message not triggering | Webhook misconfigured | Reconnect Telegram Trigger |\n| Fal.AI API error | Invalid JSON or token | Use `JSON.stringify()` in Set node and check credentials |\n| Facebook upload fails | Missing permissions | Ensure Page Access Token has `pages_manage_posts` |\n| LLM parser error | Output not valid JSON | Add `Structured Output Parser` and enforce schema |\n\n---\n\n## ⚠️ Security Notes\n- **Do NOT hardcode API keys** in Set or HTTP Request nodes.  \n- Always store credentials securely under **n8n Credentials Manager**.  \n- For self-hosted setups, use `.env` variables for sensitive keys (OpenAI, Fal.AI, Facebook).  \n\n---\n\n### 🏷️ Hashtags\n#n8n #Automation #AIworkflow #FalAI #FacebookAPI #TelegramBot #nanobanana #NoCode #MarketingAutomation #SocialMediaAI #JaruphatJ #WorkflowTemplate #OpenAI #LLM #ProductAds #CreativeAutomation\n\n## Product Image\n![Alt text](https://drive.google.com/thumbnail?id=1G0BrS1Zj1BMisa9VObeBQrR3s9ZPyMzS&sz=w300)\n\n## Process Step\n![Alt text](https://drive.google.com/thumbnail?id=1hEPQsXbhTIymeDKoav0u5nMEiTFTQzsX&sz=w300) ![Alt text](https://drive.google.com/thumbnail?id=1f_8h34SdhFGv6AxgWA7Ab5V6NdDwe4hK&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1I00j2SHiZ8mOQORTeVOjSNbXf0x_1dkh&sz=w300)  ![Alt text](https://drive.google.com/thumbnail?id=1YOwB-6z3kD2ITzK6ZPSyo_JtrrKTmlrB&sz=w300)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Receive Product Image (Telegram Trigger)",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Telegram File Path",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Analyze Product Image (OpenAI Vision)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Generate Ad Prompt Draft (from Image Analysis)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Assemble Prompt Parameters",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "User Review: Approve/Reject Ad Prompt",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check Prompt Approval (Yes/No)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Revise Prompt Based on Feedback",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Prepare Fal.AI Input Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Call Fal.AI API (nano-banana model)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Check Fal.AI Image Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Verify Image Generation Completed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Retrieve Generated Image URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Send Generated Image to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "User Review: Approve/Reject Generated Image",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check Image Approval (Yes/No)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Analyze Final Ad Image (OpenAI Vision)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Generate Social Media Caption",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "User Review: Approve/Reject Caption",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check Caption Approval (Yes/No)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Preview Post Image (Telegram)",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Preview Post Caption (Telegram)",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Publish Post to Facebook Page",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

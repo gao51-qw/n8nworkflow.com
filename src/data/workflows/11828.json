@@ -1,0 +1,97 @@
+{
+  "id": 11828,
+  "slug": "11828",
+  "title": "CI artifact completeness gate (Git push, Sentry artifact verification, commit)",
+  "description": "# CI Artifact Completeness Gate (GitHub Push → Sentry Release Files → Artifact Validation → GitHub Commit Status Update)\n\nThis workflow acts as a CI/CD *quality gate* for mobile app crash-symbolication artifacts.\nWhenever a new commit is pushed to GitHub, the workflow automatically checks the corresponding Sentry release and confirms whether required build artifacts (dSYM or ProGuard + mapping.txt) exist. If artifacts are complete, it updates the GitHub commit status to **success**, allowing the PR to be merged. If incomplete, the workflow fails silently (no commit status update), effectively blocking merges.\n\n### ⚡ Quick Implementation Steps\n\n1.  Configure **GitHub Trigger** for your repo.\n2.  Add **Sentry API credentials**.\n3.  Add **GitHub API credentials**.\n4.  Update Sentry project URLs with your **org_slug** and **proj_slug**.\n5.  Ensure your build pipeline uploads artifacts to Sentry **before** the workflow runs.\n6.  Activate workflow.\n\n\n## What It Does\n\nThis workflow ensures your mobile crash-symbolication artifacts are fully present in Sentry for every release.\n\nWhen a new GitHub push occurs, the workflow:\n\n1.  Reads the commit SHA and repo info from the GitHub Push event.\n2.  Fetches the list of all releases from Sentry.\n3.  Locates the correct release and fetches its uploaded artifact files.\n4.  Runs custom validation logic:\n    -   **Success if:**\n        -   a `*.dSYM` file exists **OR**\\\n        -   both `proguard.txt` AND `mapping.txt` are present\\\n    -   **Failure if:**\n        -   neither dSYM nor both mapping artifacts exist.\n5.  If validated successfully, the commit receives a **success** status on GitHub → PR can be merged.\n\nThis provides a strong CI gate ensuring symbolication completeness and preventing un-debuggable releases.\n\n\n## Who's It For\n\n-   Mobile development teams using Sentry for crash reporting.\n-   Engineering teams enforcing strict release-quality gates.\n-   DevOps teams wanting automated artifact validation.\n-   CI/CD pipeline engineers integrating Sentry symbolication checks.\n-   Teams who frequently upload dSYM or ProGuard mapping files.\n\n\n## Requirements to Use This Workflow\n\n-   n8n instance (cloud or self-hosted)\n-   GitHub repository access (API credentials)\n-   Sentry project with:\n    -   org_slug\n    -   project_slug\n    -   Auth Token with release access\n-   Build process that uploads artifacts to Sentry releases\n-   The release version must match the format expected by the workflow\n\n\n## How It Works & How To Set Up\n\n### Step 1: GitHub Push Trigger\n\nThe **GithubPushTrigger** node listens for push events and extracts:\n\n-   Commit SHA\n-   Repository full name\n-   Branch\n-   Metadata\n\nNo configuration required except selecting your GitHub credentials.\n\n\n### Step 2: Configure Sentry Release Fetching\n\nOpen **Check Sentry Artifacts Releases** and update:\n    https://sentry.io/api/0/projects/&lt;org_slug&gt;/&lt;proj_slug&gt;/releases/\n\nMake sure the Sentry credential is correctly selected.\n\n\n### Step 3: Fetch Files for the Specific Release\n\nThe next HTTP Request (**Check Sentry Artifacts Files**) uses a dynamic\nURL:\n    https://sentry.io/api/0/projects/&lt;org_slug&gt;/&lt;proj_slug&gt;/releases/{{ $json.version }}/files/\n\nEnsure your build pipeline sets `version` consistently with what Sentry receives.\n\n\n### Step 4: Artifact Validation Logic\n\nThe **Verify Artifacts** node runs JS logic to check:\n\n#### ✔ Condition 1 --- Valid dSYM\nAny file ending with `.dSYM`\n\n#### ✔ Condition 2 --- Valid Android Mapping\n-   `proguard.txt`\\\n-   `mapping.txt`\n\n#### ✖ Failure --- If neither set exists\n\nThe Code node returns:\n\n``` json\n{ \"status\": \"failure\", \"description\": \"Missing artifacts...\" }\n```\n\nThis stops the workflow and prevents GitHub commit-status update.\n\n\n### Step 5: Extract Commit Info & Prepare Update\n\nThe **Artifacts Validation and Get Repository Data** node compiles:\n\n-   repo full name\n-   commit SHA\n-   validation status\n\nIf validation failed → workflow ends here.\n\n\n### Step 6: Update GitHub Commit Status\n\nThe **Update Status** node hits:\n\n    POST https://api.github.com/repos/&lt;repoFullName&gt;/statuses/&lt;commitSHA&gt;\n\nAnd sends:\n\n``` json\n{\n  \"state\": \"success\",\n  \"description\": \"Artifacts successfully verified.\"\n}\n```\n\nThis appears as a green check on your commit/PR.\n\n\n### Step 7: Activate the Workflow\n\nTurn on the workflow to start enforcing symbolication completeness for all releases.\n\n\n## How To Customize Nodes\n\n### Change Sentry Project\n\nEdit URLs in both Sentry HTTP Request nodes:\n\n-   `org_slug`\n-   `proj_slug`\n\n### Add Additional Artifact Rules\n\nModify JS inside **Verify Artifacts**, e.g., require:\n\n-   native symbols\n-   extra asset files\n-   other platform artifacts\n\n### Customize Commit Status Message\n\nEdit the request body in **Update Status**.\n\n### Support Multiple Platforms / Multiple Releases\n\nBranch logic in:\n\n-   Code nodes\n-   Conditional checks\n\n\n## Add-Ons (Optional Enhancements)\n\n-   Add Slack/Teams notifications when artifacts are missing.\n-   Auto-retry release checks after build completes.\n-   Merge-blocking PR checks for GitHub.\n-   Multi-platform artifact validation (iOS + Android + Unity).\n-   Upload artifacts directly from n8n.\n-   Store validation logs in Airtable or Google Sheets.\n-   Add GitHub Checks API rich reporting.\n\n\n## Use Case Examples\n\n1.  Block merges until symbolication artifacts are uploaded.\n2.  Enforce strict Sentry release completeness for every build.\n3.  Ensure Android mapping files always match the correct release version.\n4.  Automatically verify multiple release types (debug, staging, production).\n5.  Improve crash debugging by preventing un-symbolicated builds from shipping.\n\n\n## Troubleshooting Guide\n\n| Issue                       | Possible Cause                                 | Solution                                                                 |\n|----------------------------|-----------------------------------------------|--------------------------------------------------------------------------|\n| Commit status never updates| Validation failed silently                     | Check logs from **Verify Artifacts**                                      |\n| \"version undefined\" in URL | Sentry release list not matched                | Ensure your build uploads a valid `version`                               |\n| 401 from Sentry API        | Invalid/broken Sentry token                    | Regenerate token and update credentials                                   |\n| Always failing validation  | Artifact names differ (e.g., `.dsym.zip`)      | Update RegEx patterns in Code node                                         |\n| GitHub status API returns 404 | Missing repo permissions                   | Update GitHub credentials (repo status scope)                              |\n| Files array empty          | Build system not uploading artifacts           | Verify build → Sentry upload step                                          |\n\n## Need Help?\n\nIf you need help customizing the artifact rules, integrating multiple platforms or automating Sentry/GitHub workflows, reach out to our [n8n automation developers](https://www.weblineindia.com/hire-n8n-developers/) at WeblineIndia. We can assist with:\n\n-   Mobile CI/CD pipelines\n-   Sentry automation\n-   Multi-artifact validation\n-   GitHub PR quality-gates\n-   Advanced Code-node scripting\n-   And so much more.\n\nHappy automating! 🚀",
+  "featuredImage": "/data/workflows/11828/11828.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 22,
+  "downloads": 2,
+  "createdAt": "2025-12-15T09:49:14.741Z",
+  "updatedAt": "2026-01-16T09:10:15.643Z",
+  "publishedAt": "2025-12-15T09:49:14.741Z",
+  "nodes": 10,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11828",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "CI artifact completeness gate (Git push, Sentry artifact verification, commit)",
+    "workflowName": "CI artifact completeness gate (Git push, Sentry artifact verification, commit)",
+    "description": "# CI Artifact Completeness Gate (GitHub Push → Sentry Release Files → Artifact Validation → GitHub Commit Status Update)\n\nThis workflow acts as a CI/CD *quality gate* for mobile app crash-symbolication artifacts.\nWhenever a new commit is pushed to GitHub, the workflow automatically checks the corresponding Sentry release and confirms whether required build artifacts (dSYM or ProGuard + mapping.txt) exist. If artifacts are complete, it updates the GitHub commit status to **success**, allowing the PR to be merged. If incomplete, the workflow fails silently (no commit status update), effectively blocking merges.\n\n### ⚡ Quick Implementation Steps\n\n1.  Configure **GitHub Trigger** for your repo.\n2.  Add **Sentry API credentials**.\n3.  Add **GitHub API credentials**.\n4.  Update Sentry project URLs with your **org_slug** and **proj_slug**.\n5.  Ensure your build pipeline uploads artifacts to Sentry **before** the workflow runs.\n6.  Activate workflow.\n\n\n## What It Does\n\nThis workflow ensures your mobile crash-symbolication artifacts are fully present in Sentry for every release.\n\nWhen a new GitHub push occurs, the workflow:\n\n1.  Reads the commit SHA and repo info from the GitHub Push event.\n2.  Fetches the list of all releases from Sentry.\n3.  Locates the correct release and fetches its uploaded artifact files.\n4.  Runs custom validation logic:\n    -   **Success if:**\n        -   a `*.dSYM` file exists **OR**\\\n        -   both `proguard.txt` AND `mapping.txt` are present\\\n    -   **Failure if:**\n        -   neither dSYM nor both mapping artifacts exist.\n5.  If validated successfully, the commit receives a **success** status on GitHub → PR can be merged.\n\nThis provides a strong CI gate ensuring symbolication completeness and preventing un-debuggable releases.\n\n\n## Who's It For\n\n-   Mobile development teams using Sentry for crash reporting.\n-   Engineering teams enforcing strict release-quality gates.\n-   DevOps teams wanting automated artifact validation.\n-   CI/CD pipeline engineers integrating Sentry symbolication checks.\n-   Teams who frequently upload dSYM or ProGuard mapping files.\n\n\n## Requirements to Use This Workflow\n\n-   n8n instance (cloud or self-hosted)\n-   GitHub repository access (API credentials)\n-   Sentry project with:\n    -   org_slug\n    -   project_slug\n    -   Auth Token with release access\n-   Build process that uploads artifacts to Sentry releases\n-   The release version must match the format expected by the workflow\n\n\n## How It Works & How To Set Up\n\n### Step 1: GitHub Push Trigger\n\nThe **GithubPushTrigger** node listens for push events and extracts:\n\n-   Commit SHA\n-   Repository full name\n-   Branch\n-   Metadata\n\nNo configuration required except selecting your GitHub credentials.\n\n\n### Step 2: Configure Sentry Release Fetching\n\nOpen **Check Sentry Artifacts Releases** and update:\n    https://sentry.io/api/0/projects/&lt;org_slug&gt;/&lt;proj_slug&gt;/releases/\n\nMake sure the Sentry credential is correctly selected.\n\n\n### Step 3: Fetch Files for the Specific Release\n\nThe next HTTP Request (**Check Sentry Artifacts Files**) uses a dynamic\nURL:\n    https://sentry.io/api/0/projects/&lt;org_slug&gt;/&lt;proj_slug&gt;/releases/{{ $json.version }}/files/\n\nEnsure your build pipeline sets `version` consistently with what Sentry receives.\n\n\n### Step 4: Artifact Validation Logic\n\nThe **Verify Artifacts** node runs JS logic to check:\n\n#### ✔ Condition 1 --- Valid dSYM\nAny file ending with `.dSYM`\n\n#### ✔ Condition 2 --- Valid Android Mapping\n-   `proguard.txt`\\\n-   `mapping.txt`\n\n#### ✖ Failure --- If neither set exists\n\nThe Code node returns:\n\n``` json\n{ \"status\": \"failure\", \"description\": \"Missing artifacts...\" }\n```\n\nThis stops the workflow and prevents GitHub commit-status update.\n\n\n### Step 5: Extract Commit Info & Prepare Update\n\nThe **Artifacts Validation and Get Repository Data** node compiles:\n\n-   repo full name\n-   commit SHA\n-   validation status\n\nIf validation failed → workflow ends here.\n\n\n### Step 6: Update GitHub Commit Status\n\nThe **Update Status** node hits:\n\n    POST https://api.github.com/repos/&lt;repoFullName&gt;/statuses/&lt;commitSHA&gt;\n\nAnd sends:\n\n``` json\n{\n  \"state\": \"success\",\n  \"description\": \"Artifacts successfully verified.\"\n}\n```\n\nThis appears as a green check on your commit/PR.\n\n\n### Step 7: Activate the Workflow\n\nTurn on the workflow to start enforcing symbolication completeness for all releases.\n\n\n## How To Customize Nodes\n\n### Change Sentry Project\n\nEdit URLs in both Sentry HTTP Request nodes:\n\n-   `org_slug`\n-   `proj_slug`\n\n### Add Additional Artifact Rules\n\nModify JS inside **Verify Artifacts**, e.g., require:\n\n-   native symbols\n-   extra asset files\n-   other platform artifacts\n\n### Customize Commit Status Message\n\nEdit the request body in **Update Status**.\n\n### Support Multiple Platforms / Multiple Releases\n\nBranch logic in:\n\n-   Code nodes\n-   Conditional checks\n\n\n## Add-Ons (Optional Enhancements)\n\n-   Add Slack/Teams notifications when artifacts are missing.\n-   Auto-retry release checks after build completes.\n-   Merge-blocking PR checks for GitHub.\n-   Multi-platform artifact validation (iOS + Android + Unity).\n-   Upload artifacts directly from n8n.\n-   Store validation logs in Airtable or Google Sheets.\n-   Add GitHub Checks API rich reporting.\n\n\n## Use Case Examples\n\n1.  Block merges until symbolication artifacts are uploaded.\n2.  Enforce strict Sentry release completeness for every build.\n3.  Ensure Android mapping files always match the correct release version.\n4.  Automatically verify multiple release types (debug, staging, production).\n5.  Improve crash debugging by preventing un-symbolicated builds from shipping.\n\n\n## Troubleshooting Guide\n\n| Issue                       | Possible Cause                                 | Solution                                                                 |\n|----------------------------|-----------------------------------------------|--------------------------------------------------------------------------|\n| Commit status never updates| Validation failed silently                     | Check logs from **Verify Artifacts**                                      |\n| \"version undefined\" in URL | Sentry release list not matched                | Ensure your build uploads a valid `version`                               |\n| 401 from Sentry API        | Invalid/broken Sentry token                    | Regenerate token and update credentials                                   |\n| Always failing validation  | Artifact names differ (e.g., `.dsym.zip`)      | Update RegEx patterns in Code node                                         |\n| GitHub status API returns 404 | Missing repo permissions                   | Update GitHub credentials (repo status scope)                              |\n| Files array empty          | Build system not uploading artifacts           | Verify build → Sentry upload step                                          |\n\n## Need Help?\n\nIf you need help customizing the artifact rules, integrating multiple platforms or automating Sentry/GitHub workflows, reach out to our [n8n automation developers](https://www.weblineindia.com/hire-n8n-developers/) at WeblineIndia. We can assist with:\n\n-   Mobile CI/CD pipelines\n-   Sentry automation\n-   Multi-artifact validation\n-   GitHub PR quality-gates\n-   Advanced Code-node scripting\n-   And so much more.\n\nHappy automating! 🚀",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Verify Artifacts",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GithubPushTrigger",
+      "type": "n8n-nodes-base.githubTrigger",
+      "role": "githubTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Sentry Artifacts Releases",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Check Sentry Artifacts files",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Update Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Artifacts Validation and Get Repository Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

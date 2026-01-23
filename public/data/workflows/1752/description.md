@@ -1,0 +1,1 @@
+This workflow imports data from Google Sheets into a MySQL database.

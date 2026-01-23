@@ -1,0 +1,1 @@
+This workflow gets triggered every Friday at 6 PM with the help of a Cron node. It pulls in data about a random cocktail via the HTTP Request Node and sends the data to a Bannerbear node to create an image based on a template. The image is then finally shared on a specified Rocket.Chat channel.

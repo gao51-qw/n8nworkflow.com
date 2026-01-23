@@ -1,0 +1,122 @@
+# Meta ads to Google Sheets: daily & historical campaign performance report
+
+> ## Overview
+
+This template automatically exports **Meta (Facebook) Ads campaign performance** into **Google Sheets** — both **daily** and for **historical backfills**. It’s ideal for performance marketers, agencies, and analytics teams who want a reliable data pipeline from Meta Ads into their reporting stack.
+
+## What this workflow does
+
+- Runs a **daily cron job** to pull *yesterday’s* campaign-level performance from the Meta Ads Insights API.
+- Flattens the API response and calculates key KPIs like **CPL, CPA, ROAS, CTR, CPC, CPM, frequency** and more.
+- Appends one row per **campaign per day** to a Google Sheet (for dashboards and further analysis).
+- Provides a separate **Manual Backfill** section to import historical data using a `time_range` parameter (e.g. last 12–24 months).
+
+## Use cases
+
+- Build Looker Studio / Power BI dashboards on top of a clean, daily Meta Ads dataset.
+- Track ROAS, CPL, CPA, CTR, and frequency trends over time.
+- Combine campaign data with CRM or ecommerce data in the same spreadsheet.
+- Quickly backfill past performance when onboarding a new Meta Ads account.
+
+## How it works
+
+1. **Daily Incremental Flow**
+   - A `Schedule Trigger` runs every day at 05:00.
+   - The `Set config` node defines ad account, date preset (`yesterday`), and Google Sheet details.
+   - The `Meta Insights` node calls the Facebook Graph `insights` edge at `level=campaign`.
+   - The `Code` node flattens the data and derives CPL, CPA, ROAS, and other KPIs.
+   - The `Google Sheets` node appends the rows to your `Meta_Daily_Data` sheet.
+
+2. **Manual Backfill Flow**
+   - A `Manual Trigger` lets you run the flow on demand.
+   - The `Set backfill config` node defines `backfillSince` and `backfillUntil`.
+   - The `Meta Insights (time_range)` node fetches performance for that historical range.
+   - The same transform logic is applied, and rows are appended to the same sheet.
+
+## Prerequisites
+
+- A Meta Business account with:
+  - A **system user** and a **long-lived access token** with `ads_read` / `read_insights`.
+- A **Google Sheet** with a header row that matches the mapped column names.
+- n8n credentials for:
+  - **Facebook Graph API**
+  - **Google Sheets OAuth2**
+
+## Setup steps
+
+1. Import this template into your n8n instance.
+2. Open the `Set config` and `Set backfill config` nodes:
+   - Set your `adAccountId` (e.g. `act_123456789012345`).
+   - Set your `sheetId` (Google Sheet ID) and sheet name (e.g. `Meta_Daily_Data`).
+3. Configure your **Facebook Graph API** and **Google Sheets** credentials in n8n.
+4. (Optional) Run the **Manual Backfill** section for your desired historical ranges (e.g. per quarter).
+5. Enable the workflow so the **Daily Incremental** section runs automatically.
+
+## Customization
+
+- Change `level` from `campaign` to `adset` or `ad` if you need more granular reporting.
+- Add **breakdowns** (e.g. `publisher_platform`, `platform_position`) to split by platform and placement.
+- Extend the transform code with additional KPIs or dimensions that match your reporting needs.
+- Use a separate sheet for raw data and build dashboards on top of a cleaned or pivoted view.
+
+## Consulting & support
+
+If you need help with:
+
+- **E-Commerce Strategy & Development**
+(Shopify, Shopware 6, Magento 2, SAP Commerce Cloud, etc.)
+- **Growth & Performance Marketing**
+(Google / Meta / Microsoft Ads, etc.)
+- **Data & Analytics Setups**
+(tracking, dashboards, attribution, gdpr, etc.)
+
+please reach out to **Serendipity Technologies**:
+
+👉 [https://www.serendipity.at](https://www.serendipity.at)
+
+We can help you turn this workflow into a full analytics stack and reporting system tailored to your business.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 11499
+- **Complexity:** intermediate
+- **Node Count:** 14
+- **Views:** 328
+- **Downloads:** 32
+- **Created:** 2025/12/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/11499)
+
+## 👤 Author
+
+- **Name:** Reinhard Schmidbauer
+- **Username:** @rschmidbauer
+
+## 🏷️ Categories
+
+- Market Research
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×4)
+- **set** (×2)
+- **facebookGraphApi** (×2)
+- **code** (×2)
+- **googleSheets** (×2)
+- **manualTrigger** 
+- **scheduleTrigger** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 14 nodes with 8 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,96 @@
+# Predict next 5-day stock trends with Twelve Data API & Google Sheets
+
+> This automated n8n workflow fetches stock data from the Twelve Data API after market close, predicts 5-day trends using AI analysis, updates Google Sheets with the results, and sends an email summary report. This process helps users stay informed about stock movements and make data-driven decisions efficiently.
+
+## Good to Know
+- AI prediction accuracy improves with more historical stock data.
+- Market conditions and external factors can influence prediction outcomes.
+- Google Sheets access must be authorized to ensure smooth data updates.
+- Email notifications ensure timely delivery of summary reports.
+- The system relies on the Twelve Data API as the primary data source.
+
+## How It Works
+- **Daily Market Close Trigger** - Initiates the workflow daily at 9:00 PM (after market close), Monday to Friday.
+- **Read Stock Symbols** - Reads stock symbols from a Google Sheet to determine which stocks to analyze.
+- **Set Configuration Variables** - Configures API keys and other necessary variables manually.
+- **Fetch 5-Day Stock Data** - Retrieves 5-day stock data from the Twelve Data API.
+- **Analyze Stock Trends** - Uses AI to predict 5-day stock price movements based on the fetched data.
+- **Update Google Sheet** - Appends the analysis results to a Google Sheet for tracking.
+- **Format Email Report** - Creates a concise, human-friendly summary of the stock predictions.
+- **Send Email Report** - Delivers the summary report via email to designated recipients.
+
+## Data Sources
+The workflow utilizes one Google Sheet:
+
+- **Stock Data Sheet** - Contains stock analysis data with columns:
+  - Date (date)
+  - Stock Symbol (text)
+  - Current Price (number)
+  - Predicted 5-Day Trend (text)
+  - Confidence Level (number)
+  - Notes (text)
+
+## How to Use
+- Import the workflow into n8n.
+- Configure Google Sheets API access and authorize the application.
+- Set up email credentials for report delivery.
+- Create the required Google Sheet with the specified column structure.
+- Configure the Twelve Data API key.
+- Test with sample stock data to verify predictions and email delivery.
+- Adjust analysis parameters based on your specific stock monitoring needs.
+- Monitor and refine the system based on actual vs. predicted trends.
+
+## Requirements
+- Google Sheets API access.
+- Email service credentials (Gmail, SMTP, etc.).
+- Twelve Data API key.
+- Initial stock data for analysis.
+
+## Customizing This Workflow
+Modify the Stock Trend Predictor parameters to focus on specific stock sectors or adjust prediction horizons. Customize the email report format to match your preferences and integrate additional data sources like news feeds or financial indicators if needed.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9771
+- **Complexity:** intermediate
+- **Node Count:** 14
+- **Views:** 407
+- **Downloads:** 40
+- **Created:** 2025/10/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9771)
+
+## 👤 Author
+
+- **Name:** Oneclick AI Squad
+- **Username:** @oneclick-ai
+
+## 🏷️ Categories
+
+- Crypto Trading
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **cron** 
+- **googleSheets** (×2)
+- **set** 
+- **httpRequest** 
+- **code** (×2)
+- **emailSend** 
+- **stickyNote** (×6)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 14 nodes with 6 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

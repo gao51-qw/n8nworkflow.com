@@ -1,0 +1,92 @@
+{
+  "id": 6454,
+  "slug": "6454",
+  "title": "Automated inbox organization for Outlook using GPT-4.1 agent",
+  "description": "# Auto-Categorize Outlook Emails with AI in n8n\n\n## **How It Works**\n\n1. **Trigger:** The workflow starts with the **Microsoft Outlook Trigger** node, polling your inbox every minute for new emails.\n2. **Extract & Clean Email Content:** The email’s key fields (from, subject, isRead, body) are extracted. The body is converted from HTML to Markdown, then sanitized to plain text for reliable AI processing.\n\n   **Node Setup Details:**\n\n   - **Microsoft Outlook Trigger**\n     - **Resource:** Message\n     - **Operation:** Trigger on new email\n     - **Fields to Output:** from, subject, isRead(optional), body\n     - **Folders to Include:** (Set to your Inbox or specific folder IDs)\n   \n   - **Markdown Node**\n     - **Input:** `{{$json[\"body\"][\"content\"]}}` (HTML email body)\n     - **Output Key:** `Email Body Markdown`\n     - **Purpose:** Converts HTML to Markdown for easier downstream processing.\n   \n   - **Sanitize Node (Code Node)**\n     - **Input:** `Email Body Markdown` from previous node\n     - **Purpose:** Cleans up Markdown, strips images, links, HTML tags, table formatting, and truncates to 4000 characters.\n     - **Sample JS Code:**\n       ```javascript\n       // Get the markdown content from the previous node\n       const markdownContent = $input.item.json[\"Email Body Markdown\"];\n\n3. **Setup AI tools**\n   - Move message and Get Folders Outlook tools are required, get contacts is optional.\n   - Set each field in the tools to \"defined automatically by the model\" and describe each field so the model understands how to use it.\n   - OpenRouter or other LLM models tool: You can use any client for this, but make sure to use a model that does well with tool calls (Claude, GPT-4.1, Gemini 2.5 Pro, etc.).\n\n---\n\n## **Best Practices & Notes**\n\n- **AI Prompt Engineering:** The AI is instructed to be conservative—never move emails from real people or saved contacts, and always explain its reasoning if it doesn’t move a message.\n- This automation only works for **NEW** incoming messages.\n- **Inbox Zero:** This system is designed to help you achieve and maintain Inbox Zero by keeping only actionable items in your main inbox.\n- **Customization:** You can adjust the folder logic, add more categories, or tweak the AI prompt for your specific needs.\n- **Privacy:** All processing happens within your n8n instance; no email data is stored outside your environment except for the AI call (which only receives sanitized, minimal content).",
+  "featuredImage": "/data/workflows/6454/6454.webp",
+  "author": {
+    "id": 101,
+    "slug": "automatoralex",
+    "name": "AlexAutomates",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1347,
+  "downloads": 134,
+  "createdAt": "2025-07-25T19:11:39.840Z",
+  "updatedAt": "2026-01-16T08:45:03.378Z",
+  "publishedAt": "2025-07-25T19:11:39.840Z",
+  "nodes": 9,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6454",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated inbox organization for Outlook using GPT-4.1 agent",
+    "workflowName": "Automated inbox organization for Outlook using GPT-4.1 agent",
+    "description": "# Auto-Categorize Outlook Emails with AI in n8n\n\n## **How It Works**\n\n1. **Trigger:** The workflow starts with the **Microsoft Outlook Trigger** node, polling your inbox every minute for new emails.\n2. **Extract & Clean Email Content:** The email’s key fields (from, subject, isRead, body) are extracted. The body is converted from HTML to Markdown, then sanitized to plain text for reliable AI processing.\n\n   **Node Setup Details:**\n\n   - **Microsoft Outlook Trigger**\n     - **Resource:** Message\n     - **Operation:** Trigger on new email\n     - **Fields to Output:** from, subject, isRead(optional), body\n     - **Folders to Include:** (Set to your Inbox or specific folder IDs)\n   \n   - **Markdown Node**\n     - **Input:** `{{$json[\"body\"][\"content\"]}}` (HTML email body)\n     - **Output Key:** `Email Body Markdown`\n     - **Purpose:** Converts HTML to Markdown for easier downstream processing.\n   \n   - **Sanitize Node (Code Node)**\n     - **Input:** `Email Body Markdown` from previous node\n     - **Purpose:** Cleans up Markdown, strips images, links, HTML tags, table formatting, and truncates to 4000 characters.\n     - **Sample JS Code:**\n       ```javascript\n       // Get the markdown content from the previous node\n       const markdownContent = $input.item.json[\"Email Body Markdown\"];\n\n3. **Setup AI tools**\n   - Move message and Get Folders Outlook tools are required, get contacts is optional.\n   - Set each field in the tools to \"defined automatically by the model\" and describe each field so the model understands how to use it.\n   - OpenRouter or other LLM models tool: You can use any client for this, but make sure to use a model that does well with tool calls (Claude, GPT-4.1, Gemini 2.5 Pro, etc.).\n\n---\n\n## **Best Practices & Notes**\n\n- **AI Prompt Engineering:** The AI is instructed to be conservative—never move emails from real people or saved contacts, and always explain its reasoning if it doesn’t move a message.\n- This automation only works for **NEW** incoming messages.\n- **Inbox Zero:** This system is designed to help you achieve and maintain Inbox Zero by keeping only actionable items in your main inbox.\n- **Customization:** You can adjust the folder logic, add more categories, or tweak the AI prompt for your specific needs.\n- **Privacy:** All processing happens within your n8n instance; no email data is stored outside your environment except for the AI call (which only receives sanitized, minimal content).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Microsoft Outlook Trigger",
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "role": "microsoftOutlookTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent - Determine Category",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Move Message",
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "role": "microsoftOutlookTool",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Folders",
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "role": "microsoftOutlookTool",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Contacts",
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "role": "microsoftOutlookTool",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sanitize Email Body",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

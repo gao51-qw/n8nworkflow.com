@@ -1,0 +1,1 @@
+This workflow illustrates how to convert data from JSON to binary format and import JSON data or files into Google Sheets or local spreadsheets.

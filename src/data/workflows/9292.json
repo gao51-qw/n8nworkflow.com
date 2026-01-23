@@ -1,0 +1,140 @@
+{
+  "id": 9292,
+  "slug": "9292",
+  "title": "Auto send thank-you messages & loyalty coupons via WhatsApp from Shopify using Rapiwa",
+  "description": "# Shopify Auto Send WhatsApp Thank-You Messages & Loyalty Coupon Using Rapiwa API\n\n## Who is this for?\nThis workflow is for Shopify store owners, marketers, and support teams who want to automatically message their high-value customers on WhatsApp when new discount codes are created.\n\n## What this workflow does\n- Fetches customer data from Shopify\n- Filters customers where `total_spent &gt; 5000`\n- Cleans phone numbers (removes non-digit characters) and normalizes them to an international format\n- Verifies numbers via the Rapiwa API (`verify-whatsapp` endpoint)\n- Sends coupon or thank-you messages to verified numbers via the Rapiwa `send-message` endpoint\n- Logs each send attempt to Google Sheets with `status` and `validity`\n- Uses batching (SplitInBatches) and Wait nodes to avoid rate limits\n\n## Key features\n- Automated trigger: Shopify webhook (`discounts/create`) or manual trigger\n- Targeted sending to high-value customers\n- Pre-send verification to reduce failed sends\n- Google Sheets logging and status updates\n- Rate-limit protection using Wait node\n\n#How to use?\n## Step-by-step setup\n1) Prepare a Google Sheet\n   - Columns: `name`, `number`, `status`, `validity`, `check` (optional)\n   - Example row: `Abdul Mannan | 8801322827799 | not sent | unverified | check`\n\n2) Configure n8n credentials\n   - Shopify: store access token (X-Shopify-Access-Token)\n   - Rapiwa: Bearer token (HTTP Bearer credential)\n   - Google Sheets: OAuth2 credentials and sheet access\n\n3) Configure the nodes\n   - Webhook/Trigger: Shopify `discounts/create` or Manual Trigger\n   - HTTP Request (Shopify): `/admin/api/&lt;version&gt;/customers.json`\n   - Code node: filter customers `total_spent &gt; 5000` and map fields\n   - SplitInBatches: batching/looping\n   - Code (clean number): `waNoStr.replace(/\\D/g, \"\")`\n   - HTTP Request (Rapiwa verify): POST `https://app.rapiwa.com/api/verify-whatsapp` body `{ number }`\n   - IF node: check `data.exists` to decide branch\n   - HTTP Request (Rapiwa send-message): POST `https://app.rapiwa.com/api/send-message` body `{ number, message_type, message }`\n   - Google Sheets Append/Update: write `status` and `validity`\n   - Wait: add 2–5 seconds delay between sends\n\n4) Test with a small batch\n   - Run manually with 2–5 records first and verify results\n\n## Google Sheet column structure\n**A Google Sheet** formatted like this ➤ [Sample](https://docs.google.com/spreadsheets/d/1q5mO2pRCdO-v51OyUZt-56UprsGpmn0PMGhnglgg2ls/edit?usp=sharing)\n| Name  | Number  | Status   | Validity   |\n| -------------- | ------------- | -------- | ---------- |\n| Abdul Mannan | 8801322827798 | not sent | unverified |\n| Abdul Mannan | 8801322827799 | sent     | verified   |\n\n## Requirements\n- Shopify Admin API access (store access token)\n- Rapiwa account and Bearer token\n- Google account and Google Sheet (OAuth2 setup)\n- n8n instance (nodes used: HTTP Request, Code, SplitInBatches, IF, Google Sheets, Wait)\n\n## Customization ideas\n- Adjust the filter (e.g., order count, customer tags)\n- Use message templates to insert name and coupon code per customer\n- Add an SMS or email fallback for unverified numbers\n- Send a run summary to admin (Slack / email)\n- Store logs in a database for deeper analysis\n\n## Important notes\n- `data.exists` may be a boolean or a string — normalize it in a Code node before using in an IF node\n- Ensure Google Sheets column names match exactly\n- Store Rapiwa and Shopify tokens securely in n8n credentials\n- Start with small batches for testing and scale gradually\n\n## Useful Links\n- **Dashboard:** [https://app.rapiwa.com](https://app.rapiwa.com/login)\n- **Official Website:** [https://rapiwa.com](https://rapiwa.com/)\n- **Documentation:** [https://docs.rapiwa.com](https://docs.rapiwa.com/)\n\n\n## Support & Help\n- **WhatsApp**: [Chat on WhatsApp](https://wa.me/8801322827799)\n- **Discord**: [SpaGreen Community](https://discord.gg/SsCChWEP)\n- **Facebook Group**: [SpaGreen Support](https://www.facebook.com/groups/spagreenbd)\n- **Website**: [https://spagreen.net](https://spagreen.net)\n- **Developer Portfolio**: [Codecanyon SpaGreen](https://codecanyon.net/user/spagreen/portfolio)\n",
+  "featuredImage": "/data/workflows/9292/9292.webp",
+  "author": {
+    "id": 101,
+    "slug": "spagreen",
+    "name": "SpaGreen Creative",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 230,
+  "downloads": 23,
+  "createdAt": "2025-10-06T04:32:41.836Z",
+  "updatedAt": "2026-01-16T08:59:51.046Z",
+  "publishedAt": "2025-10-06T04:32:41.836Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9292",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto send thank-you messages & loyalty coupons via WhatsApp from Shopify using Rapiwa",
+    "workflowName": "Auto send thank-you messages & loyalty coupons via WhatsApp from Shopify using Rapiwa",
+    "description": "# Shopify Auto Send WhatsApp Thank-You Messages & Loyalty Coupon Using Rapiwa API\n\n## Who is this for?\nThis workflow is for Shopify store owners, marketers, and support teams who want to automatically message their high-value customers on WhatsApp when new discount codes are created.\n\n## What this workflow does\n- Fetches customer data from Shopify\n- Filters customers where `total_spent &gt; 5000`\n- Cleans phone numbers (removes non-digit characters) and normalizes them to an international format\n- Verifies numbers via the Rapiwa API (`verify-whatsapp` endpoint)\n- Sends coupon or thank-you messages to verified numbers via the Rapiwa `send-message` endpoint\n- Logs each send attempt to Google Sheets with `status` and `validity`\n- Uses batching (SplitInBatches) and Wait nodes to avoid rate limits\n\n## Key features\n- Automated trigger: Shopify webhook (`discounts/create`) or manual trigger\n- Targeted sending to high-value customers\n- Pre-send verification to reduce failed sends\n- Google Sheets logging and status updates\n- Rate-limit protection using Wait node\n\n#How to use?\n## Step-by-step setup\n1) Prepare a Google Sheet\n   - Columns: `name`, `number`, `status`, `validity`, `check` (optional)\n   - Example row: `Abdul Mannan | 8801322827799 | not sent | unverified | check`\n\n2) Configure n8n credentials\n   - Shopify: store access token (X-Shopify-Access-Token)\n   - Rapiwa: Bearer token (HTTP Bearer credential)\n   - Google Sheets: OAuth2 credentials and sheet access\n\n3) Configure the nodes\n   - Webhook/Trigger: Shopify `discounts/create` or Manual Trigger\n   - HTTP Request (Shopify): `/admin/api/&lt;version&gt;/customers.json`\n   - Code node: filter customers `total_spent &gt; 5000` and map fields\n   - SplitInBatches: batching/looping\n   - Code (clean number): `waNoStr.replace(/\\D/g, \"\")`\n   - HTTP Request (Rapiwa verify): POST `https://app.rapiwa.com/api/verify-whatsapp` body `{ number }`\n   - IF node: check `data.exists` to decide branch\n   - HTTP Request (Rapiwa send-message): POST `https://app.rapiwa.com/api/send-message` body `{ number, message_type, message }`\n   - Google Sheets Append/Update: write `status` and `validity`\n   - Wait: add 2–5 seconds delay between sends\n\n4) Test with a small batch\n   - Run manually with 2–5 records first and verify results\n\n## Google Sheet column structure\n**A Google Sheet** formatted like this ➤ [Sample](https://docs.google.com/spreadsheets/d/1q5mO2pRCdO-v51OyUZt-56UprsGpmn0PMGhnglgg2ls/edit?usp=sharing)\n| Name  | Number  | Status   | Validity   |\n| -------------- | ------------- | -------- | ---------- |\n| Abdul Mannan | 8801322827798 | not sent | unverified |\n| Abdul Mannan | 8801322827799 | sent     | verified   |\n\n## Requirements\n- Shopify Admin API access (store access token)\n- Rapiwa account and Bearer token\n- Google account and Google Sheet (OAuth2 setup)\n- n8n instance (nodes used: HTTP Request, Code, SplitInBatches, IF, Google Sheets, Wait)\n\n## Customization ideas\n- Adjust the filter (e.g., order count, customer tags)\n- Use message templates to insert name and coupon code per customer\n- Add an SMS or email fallback for unverified numbers\n- Send a run summary to admin (Slack / email)\n- Store logs in a database for deeper analysis\n\n## Important notes\n- `data.exists` may be a boolean or a string — normalize it in a Code node before using in an IF node\n- Ensure Google Sheets column names match exactly\n- Store Rapiwa and Shopify tokens securely in n8n credentials\n- Start with small batches for testing and scale gradually\n\n## Useful Links\n- **Dashboard:** [https://app.rapiwa.com](https://app.rapiwa.com/login)\n- **Official Website:** [https://rapiwa.com](https://rapiwa.com/)\n- **Documentation:** [https://docs.rapiwa.com](https://docs.rapiwa.com/)\n\n\n## Support & Help\n- **WhatsApp**: [Chat on WhatsApp](https://wa.me/8801322827799)\n- **Discord**: [SpaGreen Community](https://discord.gg/SsCChWEP)\n- **Facebook Group**: [SpaGreen Support](https://www.facebook.com/groups/spagreenbd)\n- **Website**: [https://spagreen.net](https://spagreen.net)\n- **Developer Portfolio**: [Codecanyon SpaGreen](https://codecanyon.net/user/spagreen/portfolio)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Clean WhatsApp Number",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check valid whatsapp number Using Rapiwa",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Append Rows in Sheet Verified & Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Append Rows in Sheet Unverified & Not sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send Message Using Rapiwa",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get All Customer Data In Store",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Clean HTTP Request Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clicki",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

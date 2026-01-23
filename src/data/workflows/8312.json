@@ -1,0 +1,205 @@
+{
+  "id": 8312,
+  "slug": "8312",
+  "title": "Automate document ingestion & RAG system with Google Drive, Sheets & OpenAI",
+  "description": "\n\n## 1. Overview\n\nThe **IngestionDocs** workflow is a fully automated **document\ningestion and knowledge management system** built with **n8n**. Its\npurpose is to continuously ingest organizational documents\nfrom **Google Drive**, transform them into vector embeddings using\n**OpenAI**, store them in **Pinecone**, and make them searchable and\nretrievable through an **AI-powered Q&A interface**.\n\nThis ensures that employees always have access to the most up-to-date\nknowledge base without requiring manual intervention.\n\n------------------------------------------------------------------------\n\n## 2. Key Objectives\n\n-   **Automated Ingestion** → Seamlessly process new and updated\n    documents from Google Drive.\\\n-   **Change Detection** → Track and differentiate between new, updated,\n    and previously processed documents.\\\n-   **Knowledge Base Construction** → Convert documents into embeddings\n    for semantic search.\\\n-   **AI-Powered Assistance** → Provide an intelligent Q&A system for\n    employees to query manuals.\\\n-   **Scalable & Maintainable** → Modular design using n8n, LangChain,\n    and Pinecone.\n\n------------------------------------------------------------------------\n\n## 3. Workflow Breakdown\n\n### **A. Document Monitoring and Retrieval**\n\n-   The workflow begins with two **Google Drive triggers**:\n    -   **File Created Trigger** → Fires when a new document is\n        uploaded.\\\n    -   **File Updated Trigger** → Fires when an existing document is\n        modified.\\\n-   A **search operation** lists the files in the designated Google\n    Drive folder.\\\n-   Non-downloadable items (e.g., subfolders) are filtered out.\\\n-   For valid files:\n    -   The file is downloaded.\\\n    -   A **SHA256 hash** is generated to uniquely identify the file's\n        content.\n\n------------------------------------------------------------------------\n\n### **B. Record Management (Google Sheets Integration)**\n\nTo keep track of ingestion states, the workflow uses a **Google\nSheets--based Record Manager**:\\\n- Each file entry contains:\\\n- **Id** (Google Drive file ID)\\\n- **Name** (file name)\\\n- **hashId** (SHA256 checksum)\\\n- The workflow compares the current file's hash with the stored one:\\\n- **New Document** → File not found in records → Inserted into the\nRecord Manager.\\\n- **Already Processed** → File exists and hash matches → Skipped.\\\n- **Updated Document** → File exists but hash differs → Record is\nupdated.\n\nThis guarantees that only new or modified content is processed, avoiding\nduplication.\n\n------------------------------------------------------------------------\n\n### **C. Document Processing and Vectorization**\n\nOnce a document is marked as new or updated:\\\n1. **Default Data Loader** extracts its content (binary files\nsupported).\\\n- Pages are split into individual chunks.\\\n- Metadata such as file ID and name are attached.\\\n2. **Recursive Character Text Splitter** divides the content into\nmanageable segments with overlap.\\\n3. **OpenAI Embeddings (`text-embedding-3-large`)** transform each text\nchunk into a semantic vector.\\\n4. **Pinecone Vector Store** stores these vectors in the configured\nindex:\\\n- For **new documents**, embeddings are inserted into a namespace based\non the file name.\\\n- For **updated documents**, the namespace is cleared first, then\nre-ingested with fresh embeddings.\n\nThis process builds a **scalable and queryable knowledge base**.\n\n------------------------------------------------------------------------\n\n### **D. Knowledge Base Q&A Interface**\n\nThe workflow also provides an **interactive form-based user\ninterface**:\\\n- **Form Trigger** → Collects employee questions.\\\n- **LangChain AI Agent**:\\\n- Receives the question.\\\n- Retrieves relevant context from **Pinecone** using vector similarity\nsearch.\\\n- Processes the response using **OpenAI Chat Model (`gpt-4.1-mini`)**.\\\n- **Answer Formatting**:\\\n- Responses are returned in **HTML** format for readability.\\\n- A **custom CSS theme** ensures a modern, user-friendly design.\\\n- Answers may include references to page numbers when available.\n\nThis creates a **self-service knowledge base assistant** that employees\ncan query in natural language.\n\n------------------------------------------------------------------------\n\n## 4. Technologies Used\n\n-   **n8n** → Orchestration of the entire workflow.\\\n-   **Google Drive API** → File monitoring, listing, and downloading.\\\n-   **Google Sheets API** → Record manager for tracking file states.\\\n-   **OpenAI API**:\n    -   **text-embedding-3-large** for semantic vector creation.\\\n    -   **gpt-4.1-mini** for conversational Q&A.\\\n-   **Pinecone** → Vector database for embedding storage and retrieval.\\\n-   **LangChain** → Document loaders, text splitters, vector store\n    connectors, and agent logic.\\\n-   **Crypto (SHA256)** → File hash generation for change detection.\\\n-   **Form Trigger + Form Node** → Employee-facing Q&A submission and\n    answer display.\\\n-   **Custom CSS** → Provides a modern, responsive, styled UI for the\n    knowledge base.\n\n------------------------------------------------------------------------\n\n## 5. End-to-End Data Flow\n\n1.  **Employee uploads or updates a document** → Google Drive detects\n    the change.\\\n2.  **Workflow downloads and hashes the file** → Ensures uniqueness and\n    detects modifications.\\\n3.  **Record Manager (Google Sheets)** → Decides whether to skip,\n    insert, or update the record.\\\n4.  **Document Processing** → Splitting + Embedding + Storing into\n    Pinecone.\\\n5.  **Knowledge Base Updated** → The latest version of documents is\n    indexed.\\\n6.  **Employee asks a question via the web form**.\\\n7.  **AI Agent retrieves embeddings from Pinecone + uses GPT-4.1-mini**\n    → Generates a contextual answer.\\\n8.  **Answer displayed in styled HTML** → Delivered back to the employee\n    through the form interface.\n\n------------------------------------------------------------------------\n\n## 6. Benefits\n\n-   **Always Up-to-Date** → Automatically syncs documents when uploaded\n    or changed.\\\n-   **No Duplicates** → Smart hashing ensures only relevant updates are\n    reprocessed.\\\n-   **Searchable Knowledge Base** → Employees can query documents\n    semantically, not just by keywords.\\\n-   **Enhanced Productivity** → Answers are immediate, reducing time\n    spent browsing manuals.\\\n-   **Scalable** → New documents and users can be added without workflow\n    redesign.\n\n------------------------------------------------------------------------\n\n✅ In summary, **IngestionDocs** is a **robust AI-driven\ndocument ingestion and retrieval system** that integrates **Google\nDrive, Google Sheets, OpenAI, and Pinecone** within **n8n**. It\ncontinuously builds and maintains a **knowledge base of manuals** while\noffering employees an intelligent, user-friendly **Q&A assistant** for\nfast and accurate knowledge retrieval.\n",
+  "featuredImage": "/data/workflows/8312/8312.webp",
+  "author": {
+    "id": 101,
+    "slug": "mohelwah",
+    "name": "Mohamed Abdelwahab",
+    "avatar": ""
+  },
+  "categories": [
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1307,
+  "downloads": 130,
+  "createdAt": "2025-09-05T21:55:37.070Z",
+  "updatedAt": "2026-01-16T08:55:13.529Z",
+  "publishedAt": "2025-09-05T21:55:37.070Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8312",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate document ingestion & RAG system with Google Drive, Sheets & OpenAI",
+    "workflowName": "Automate document ingestion & RAG system with Google Drive, Sheets & OpenAI",
+    "description": "## 1. Overview\n\nThe **IngestionDocs** workflow is a fully automated **document\ningestion and knowledge management system** built with **n8n**. Its\npurpose is to continuously ingest organizational documents\nfrom **Google Drive**, transform them into vector embeddings using\n**OpenAI**, store them in **Pinecone**, and make them searchable and\nretrievable through an **AI-powered Q&A interface**.\n\nThis ensures that employees always have access to the most up-to-date\nknowledge base without requiring manual intervention.\n\n------------------------------------------------------------------------\n\n## 2. Key Objectives\n\n-   **Automated Ingestion** → Seamlessly process new and updated\n    documents from Google Drive.\\\n-   **Change Detection** → Track and differentiate between new, updated,\n    and previously processed documents.\\\n-   **Knowledge Base Construction** → Convert documents into embeddings\n    for semantic search.\\\n-   **AI-Powered Assistance** → Provide an intelligent Q&A system for\n    employees to query manuals.\\\n-   **Scalable & Maintainable** → Modular design using n8n, LangChain,\n    and Pinecone.\n\n------------------------------------------------------------------------\n\n## 3. Workflow Breakdown\n\n### **A. Document Monitoring and Retrieval**\n\n-   The workflow begins with two **Google Drive triggers**:\n    -   **File Created Trigger** → Fires when a new document is\n        uploaded.\\\n    -   **File Updated Trigger** → Fires when an existing document is\n        modified.\\\n-   A **search operation** lists the files in the designated Google\n    Drive folder.\\\n-   Non-downloadable items (e.g., subfolders) are filtered out.\\\n-   For valid files:\n    -   The file is downloaded.\\\n    -   A **SHA256 hash** is generated to uniquely identify the file's\n        content.\n\n------------------------------------------------------------------------\n\n### **B. Record Management (Google Sheets Integration)**\n\nTo keep track of ingestion states, the workflow uses a **Google\nSheets--based Record Manager**:\\\n- Each file entry contains:\\\n- **Id** (Google Drive file ID)\\\n- **Name** (file name)\\\n- **hashId** (SHA256 checksum)\\\n- The workflow compares the current file's hash with the stored one:\\\n- **New Document** → File not found in records → Inserted into the\nRecord Manager.\\\n- **Already Processed** → File exists and hash matches → Skipped.\\\n- **Updated Document** → File exists but hash differs → Record is\nupdated.\n\nThis guarantees that only new or modified content is processed, avoiding\nduplication.\n\n------------------------------------------------------------------------\n\n### **C. Document Processing and Vectorization**\n\nOnce a document is marked as new or updated:\\\n1. **Default Data Loader** extracts its content (binary files\nsupported).\\\n- Pages are split into individual chunks.\\\n- Metadata such as file ID and name are attached.\\\n2. **Recursive Character Text Splitter** divides the content into\nmanageable segments with overlap.\\\n3. **OpenAI Embeddings (`text-embedding-3-large`)** transform each text\nchunk into a semantic vector.\\\n4. **Pinecone Vector Store** stores these vectors in the configured\nindex:\\\n- For **new documents**, embeddings are inserted into a namespace based\non the file name.\\\n- For **updated documents**, the namespace is cleared first, then\nre-ingested with fresh embeddings.\n\nThis process builds a **scalable and queryable knowledge base**.\n\n------------------------------------------------------------------------\n\n### **D. Knowledge Base Q&A Interface**\n\nThe workflow also provides an **interactive form-based user\ninterface**:\\\n- **Form Trigger** → Collects employee questions.\\\n- **LangChain AI Agent**:\\\n- Receives the question.\\\n- Retrieves relevant context from **Pinecone** using vector similarity\nsearch.\\\n- Processes the response using **OpenAI Chat Model (`gpt-4.1-mini`)**.\\\n- **Answer Formatting**:\\\n- Responses are returned in **HTML** format for readability.\\\n- A **custom CSS theme** ensures a modern, user-friendly design.\\\n- Answers may include references to page numbers when available.\n\nThis creates a **self-service knowledge base assistant** that employees\ncan query in natural language.\n\n------------------------------------------------------------------------\n\n## 4. Technologies Used\n\n-   **n8n** → Orchestration of the entire workflow.\\\n-   **Google Drive API** → File monitoring, listing, and downloading.\\\n-   **Google Sheets API** → Record manager for tracking file states.\\\n-   **OpenAI API**:\n    -   **text-embedding-3-large** for semantic vector creation.\\\n    -   **gpt-4.1-mini** for conversational Q&A.\\\n-   **Pinecone** → Vector database for embedding storage and retrieval.\\\n-   **LangChain** → Document loaders, text splitters, vector store\n    connectors, and agent logic.\\\n-   **Crypto (SHA256)** → File hash generation for change detection.\\\n-   **Form Trigger + Form Node** → Employee-facing Q&A submission and\n    answer display.\\\n-   **Custom CSS** → Provides a modern, responsive, styled UI for the\n    knowledge base.\n\n------------------------------------------------------------------------\n\n## 5. End-to-End Data Flow\n\n1.  **Employee uploads or updates a document** → Google Drive detects\n    the change.\\\n2.  **Workflow downloads and hashes the file** → Ensures uniqueness and\n    detects modifications.\\\n3.  **Record Manager (Google Sheets)** → Decides whether to skip,\n    insert, or update the record.\\\n4.  **Document Processing** → Splitting + Embedding + Storing into\n    Pinecone.\\\n5.  **Knowledge Base Updated** → The latest version of documents is\n    indexed.\\\n6.  **Employee asks a question via the web form**.\\\n7.  **AI Agent retrieves embeddings from Pinecone + uses GPT-4.1-mini**\n    → Generates a contextual answer.\\\n8.  **Answer displayed in styled HTML** → Delivered back to the employee\n    through the form interface.\n\n------------------------------------------------------------------------\n\n## 6. Benefits\n\n-   **Always Up-to-Date** → Automatically syncs documents when uploaded\n    or changed.\\\n-   **No Duplicates** → Smart hashing ensures only relevant updates are\n    reprocessed.\\\n-   **Searchable Knowledge Base** → Employees can query documents\n    semantically, not just by keywords.\\\n-   **Enhanced Productivity** → Answers are immediate, reducing time\n    spent browsing manuals.\\\n-   **Scalable** → New documents and users can be added without workflow\n    redesign.\n\n------------------------------------------------------------------------\n\n✅ In summary, **IngestionDocs** is a **robust AI-driven\ndocument ingestion and retrieval system** that integrates **Google\nDrive, Google Sheets, OpenAI, and Pinecone** within **n8n**. It\ncontinuously builds and maintains a **knowledge base of manuals** while\noffering employees an intelligent, user-friendly **Q&A assistant** for\nfast and accurate knowledge retrieval.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search files and folders",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "createHash",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "searchRecordManger",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add to Record Manger",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Pinecone Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update the RecordManger",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file1",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Download file2",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "create",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "update",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "nonDownloadableFile",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Form",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Pinecone Vector Store2",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

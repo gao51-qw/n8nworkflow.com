@@ -1,0 +1,230 @@
+{
+  "id": 11425,
+  "slug": "11425",
+  "title": "Create personalized news digests with GPT-5.1, SerpAPI, and Telegram delivery",
+  "description": "## Overview\n\nStaying up to date with fast-moving topics like AI, machine learning, or your specific industry can be overwhelming. You either drown in daily noise or miss important developments between weekly digests.\n\nThis **AI News Agent** workflow delivers a curated newsletter only when there's genuinely relevant news. I use it myself for AI and n8n topics.\n\n**Key features:**\n\n- **AI-driven send decision**: An AI agent evaluates whether today's news is worth sending.\n- **Deduplication**: Compares candidate articles against past newsletters to avoid repetition.\n- **Real-time news**: Uses [SerpAPI's DuckDuckGo News engine](https://serpapi.com/duckduckgo-news-api) for fresh results.\n- **Frequency guardrails**: Configure minimum and maximum days between newsletters.\n\nIn this post, I'll walk you through the complete workflow, explain each component, and show you how to set it up yourself.\n\n## What this workflow does\n\nAt a high level, the AI News Agent:\n\n1. **Fetches fresh news** twice daily via SerpAPI's DuckDuckGo News engine.\n2. **Stores articles** in a persistent data table with automatic deduplication.\n3. **Filters for freshness** - only considers articles newer than your last newsletter.\n4. **Applies frequency guardrails** - respects your min/max sending preferences.\n5. **Makes an editorial decision** - AI evaluates if the news is worth sending.\n6. **Enriches selected articles** - uses Tavily web search for fact-checking and depth.\n7. **Delivers via Telegram** - sends a clean, formatted newsletter.\n8. **Remembers what it sent** - stores each edition to prevent future repetition.\n\nThis allows you to get newsletters **only when there's genuinely relevant news** - in contrast to a fixed schedule.\n\n## Requirements\n\nTo run this workflow, you need:\n\n- **SerpAPI key**  \n  Create an account at [serpapi.com](https://serpapi.com) and generate an API key. They offer 250 free searches/month.\n\n- **Tavily API key**  \n  Sign up at [app.tavily.com](https://app.tavily.com) and create an API key. Generous free tier available.\n\n- **OpenAI API key**  \n  Get one from [OpenAI](https://platform.openai.com) - required for AI agent calls.\n\n- **Telegram bot + chat ID**  \n  A free Telegram bot (via BotFather) and the chat/channel ID where you want the newsletter. See [Telegram's bot tutorial](https://core.telegram.org/bots/tutorial) for setup.\n\n## How it works\n\nThe workflow is organized into five logical stages.\n\n### Stage 1: Schedule & Configuration\n\n- **Schedule Trigger**  \n  Runs the workflow on a cron schedule. Default: `0 0 9,17 * * *` (twice daily at 9:00 and 17:00). These frequent checks enable the AI to send newsletters at these times when it observes actually relevant news, not only once a week.\n_I picked 09:00 and 17:00 as natural check‑in points at the start and end of a typical workday, so you see updates when you’re most likely to read them without being interrupted in the middle of deep work. With SerpAPI’s 250 free searches/month, running twice per day with a small set of topics (e.g. 2–3) keeps you comfortably below the limit; if you add more topics or increase the schedule frequency, either tighten the cron window or move to a paid SerpAPI plan to avoid hitting the cap._\n\n- **Set topics and language**  \n  A `Set` node that defines your configuration:\n  - `topics`: comma-separated list (e.g., `AI, n8n`)\n  - `language`: output language (e.g., `English`)\n  - `minDaysBetween`: minimum days to wait (0 = no minimum)\n  - `maxDaysBetween`: maximum days without sending (triggers a \"must-send\" fallback)\n\n### Stage 2: Fetch & Store News\n\n- **Build topic queries**  \n  Splits your comma-separated topics into individual search queries:\n_In DuckDuckGo News via SerpAPI, a query like `AI,n8n` looks for news where both “AI” and “n8n” appear. For a niche tool like `n8n`, this is often almost identical to just searching for `n8n` ([docs](https://serpapi.com/duckduckgo-news-api)). It’s therefore better to split the topics, search for each of them separately, and let the AI later decide which news articles to select._\n\n```javascript\nreturn $input.first().json.topics.split(',').map(topic =&gt; ({\n  json: { topic: topic.trim() }\n}));\n```\n\n- **Fetch news from SerpAPI (DuckDuckGo News)**  \n  HTTP Request node calling SerpAPI with:\n  - `engine`: `duckduckgo_news`\n  - `q`: your topic\n  - `df`: `d` (last day)\n  \n  Auth is handled via `httpQueryAuth` credentials with your SerpAPI key.\n_SerpAPI also offers other news engines such as the Google News API ([see here](https://serpapi.com/google-news-api)). DuckDuckGo News is used here because, unlike Google News, it returns an excerpt/snippet in addition to the title, source, and URL ([see here](https://serpapi.com/duckduckgo-news-api))—giving the AI more context to work with._\n_Another option is NewsAPI, but its [free tier delays articles by 24 hours](https://newsapi.org/pricing), so you miss the freshness window that makes these twice-daily checks valuable. DuckDuckGo News through SerpAPI keeps the workflow real-time without that lag._\n_n8n has official SerpAPI nodes, but as of writing there is no dedicated node for the DuckDuckGo News API. That’s why this workflow uses a custom `HTTP Request` node instead, which works the same under the hood while giving you full control over the DuckDuckGo News parameters._\n\n- **Split SerpAPI results into articles**  \n  Expands the `results` array so each article becomes its own item.\n\n- **Upsert articles into News table**  \n  Stores each article in an n8n data table with fields: `title`, `source`, `url`, `excerpt`, `date`. Uses **upsert** on title + URL to avoid duplicates. Date is normalized to ISO UTC:\n\n```javascript\nDateTime.fromSeconds(Number($json.date), {zone: 'utc'}).toISO()\n```\n\n### Stage 3: Filtering & Frequency Guardrails\n\nThis is where the workflow gets smart about *what* to consider and *when* to send.\n\n- **Get previous newsletters → Sort → Get most recent**  \n  Pulls all editions from the `Newsletters` table and isolates the latest one with its `createdAt` timestamp.\n\n- **Combine articles with last newsletter metadata**  \n  Attaches the last newsletter timestamp to each candidate article.\n\n- **Filter articles newer than last newsletter**  \n  Keeps only articles published *after* the last edition. Uses a safe default date (`2024-01-01`) if no previous newsletter exists:\n\n```javascript\n$json.date_2 &gt; ($json.createdAt_1 || DateTime.fromISO('2024-01-01T00:00:00.000Z'))\n```\n\n- **Stop if last newsletter is too recent**  \n  Compares `createdAt` against your `minDaysBetween` setting. If you're still in the \"too soon to send\" window, the workflow short-circuits here.\n\n### Stage 4: AI Editorial Decision\n\nThis is the core intelligence of the workflow - an AI that decides *whether* to send and *what* to include. This stage is also the actual agentic part of the workflow, where the system makes its own decisions instead of just following a fixed schedule.\n\n- **Aggregate candidate articles for AI**  \n  Bundles today's filtered articles into a compact list with `title`, `excerpt`, `source`, and `url`.\n\n- **Limit previous newsletters to last 5 → Aggregate**  \n  Prepares the last 5 newsletter contents for the AI to check against for repetition.\n\n- **Combine candidate articles with past newsletters**  \n  Merges both lists so the AI sees \"today's candidates\" + \"recent history\" side by side.\n\n- **AI: decide send + select articles**  \n  The heart of the workflow. A GPT-5.1 call with a comprehensive editorial prompt:\n\n```text\nYou are an **AI Newsletter Editor**. Your job is to decide whether today’s newsletter edition should be sent, and to select the best articles.\n\nYou will receive a list of articles with:\n'title', 'excerpt', `source`, `url`.\n\nYou will also receive content of **previously sent newsletters** (markdown).\n\n# Your Tasks\n\n## 1. Decide whether to send the newsletter\n\nOutput \"YES\" only if all of the following are satisfied **OR** the fallback rule applies:\n\n### **Base Criteria**\n\n1. There are **at least 3 meaningful articles**.\n   *Meaningful = not trivial, not purely promotional, not clickbait, contains actual informational value.*\n\n2. Articles must be **non-duplicate and non-overlapping**:\n\n   * Not the same topic/headline rephrased\n   * Not reporting identical events with minor variations\n   * Not the same news covered by multiple sources without distinct insights\n\n3. Articles must be **relevant to the user's topics**:\n   **{{ $('Set topics and language').item.json.topics }}**\n\n4. Articles must be **novel** relative to the **topics in previous newsletters**:\n\n   * Compare against all previous newsletters below\n   * Exclude articles that discuss topics already substantially covered\n\n5. Articles must offer **clear value**:\n\n   * New information\n   * Impact that matters to the user\n   * Insight, analysis, or meaningful expansion\n\n### **Fallback rule: Newsletter frequency requirement**\n\nIf **at least 1 relevant article exists** *and*\nthe last newsletter was sent **more than {{ $('Set topics and language').item.json.maxDaysBetween }} days ago**, then you **MUST** return \"YES\" as a decision even if the other criteria are not completely met.\n\nLast newsletter was sent {{ $('Get most recent newsletter').item.json.createdAt ? Math.floor($now.diff(DateTime.fromISO($('Get most recent newsletter').item.json.createdAt), 'days').days) : 999 }} days ago.\n\n### Otherwise → \"NO\"\n\n## **2. If \"YES\": Select Articles**\n\nSelect the **top 3–5** articles that best fulfill the criteria above.\n\nFor each selected article, output:\n\n* **title** (rewrite for clarity, conciseness, and impact)\n* **summary** (1–2 sentences; written in the output language)\n* **source**\n* **url**\n\nAll summaries **must** be written in:\n**{{ $('Set topics and language').item.json.language }}**\n\n---\n\n# **Output Format (JSON)**\n\n{\n  \"decision\": \"YES or NO\",\n  \"articles\": [\n    {\n      \"title\": \"...\",\n      \"summary\": \"...\",\n      \"source\": \"...\",\n      \"url\": \"...\"\n    }\n  ]\n}\n\nWhen \"decision\": \"NO\", return an empty array for \"articles\".\n\n# **Article Input**\n\nUse these articles:\n\n{{\n  $json.results.map(\n   article =&gt;\n    `Title: ${article.title_2}\n     Excerpt: ${article.excerpt_2}\n     Source: ${article.source_2}\n     URL: ${article.url_2}`\n  ).join('\\n---\\n')\n}}\n\nYou must also consider the topics already covered in previous newsletters to avoid repetition:\n\n{{ $json.newsletters.map(x =&gt; `Newsletter: ${x.content}`).join('\\n---\\n') }}\n```\n\nThe AI outputs structured JSON:\n\n```json\n{\n  \"decision\": \"YES\",\n  \"articles\": [\n    {\n      \"title\": \"...\",\n      \"summary\": \"...\",\n      \"source\": \"...\",\n      \"url\": \"...\"\n    }\n  ]\n}\n```\n\n- **If AI decided to send newsletter**  \n  Routes based on `decision === \"YES\"`. If NO, the workflow ends gracefully.\n\n### Stage 5: Content Enrichment & Delivery\n\n- **Split selected articles for enrichment**  \n  Each selected article becomes its own item for individual processing.\n\n- **AI: enrich & write article**  \n  An AI Agent node with GPT-5.1 + Tavily web search tool. For each article:\n\n```text\nYou are a research writer that updates short news summaries into concise, factual articles.\n\n**Input:**\nTitle: {{ $json[\"title\"] }}\nSummary: {{ $json[\"summary\"] }}\nSource: {{ $json[\"source\"] }}\nOriginal URL: {{ $json[\"url\"] }}\nLanguage: {{ $('Set topics and language').item.json.language }}\n\n**Instructions:**\n\n1. Use **Tavily Search** to gather 2–3 reliable, recent, and relevant sources on this topic.\n2. Update the **title** if a more accurate or engaging one exists.\n3. Write **1–2 sentences** summarizing the topic, combining the original summary and information from the new sources.\n4. Return the original source name and url as well.\n\n**Output (JSON):**\n\n{\n  \"title\": \"final article title\",\n  \"content\": \"concise 1–2 sentence article content\",\n  \"source\": \"the name of the original source\",\n  \"url\": \"the url of the original source\"\n}\n\n**Rules:**\n\n* Ensure the topic is relevant, informative, and timely.\n* Translate the article if necessary to comply with the desired language {{ $('Set topics and language').item.json.language }}.\n```\n\nThe **Output Parser** enforces the JSON schema with `title`, `content`, `source`, and `url` fields.\n\n- **Aggregate enriched articles**  \n  Collects all enriched articles back into a single array.\n\n- **Insert newsletter content into Newsletters table**  \n  Stores the final markdown content for future deduplication:\n\n```javascript\n$json.output.map(article =&gt; {\n  const title = JSON.stringify(article.title).slice(1, -1);\n  const content = JSON.stringify(article.content).slice(1, -1);\n  const source = JSON.stringify(article.source).slice(1, -1);\n  const url = JSON.stringify(article.url).slice(1, -1);\n  return `*${title}*\\n${content}\\nSource: [${source}](${url})`;\n}).join('\\n\\n')\n```\n\n- **Send newsletter to Telegram**  \n  Sends the formatted newsletter to your Telegram chat/channel.\n\n## Why this workflow is powerful\n\n- **Intelligent send decisions**  \n  The AI evaluates news quality before sending, leading to a less noisy and more relevant news digest.\n\n- **Memory across editions**  \n  By persisting newsletters and comparing against history, the workflow avoids repetition.\n\n- **Frequency guardrails with flexibility**  \n  Set boundaries (e.g., \"at least 1 day between sends\" and \"must send within 5 days\"), but let the AI decide the optimal moment within those bounds.\n\n- **Source-level deduplication**  \n  The news table with upsert prevents the same article from being considered multiple times across runs.\n\n- **Grounded in facts**  \n  SerpAPI provides real news sources; Tavily enriches with additional verification. The newsletter stays factual.\n\n- **Configurable and extensible**  \n  Change topics, language, frequency - all in one `Set` node. In addition, the workflow is modular, allowing to add new news sources or new delivery channels without touching the core logic.\n\n## Configuration guide\n\nTo customize this workflow for your needs:\n\n1. **Topics and language**  \n   Open `Set topics and language` and modify:\n   - `topics`: your interests (e.g., `machine learning, startups, TypeScript`)\n   - `language`: your preferred output language\n\n2. **Frequency settings**  \n   - `minDaysBetween`: minimum days between newsletters (0 = no limit)\n   - `maxDaysBetween`: maximum gap before forcing a send\n   - For very high-volume topics (such as `\"AI\"`), expect the workflow to send almost every time once `minDaysBetween` has passed, because the content-quality criteria are usually met.\n\n3. **Schedule**  \n   Modify the `Schedule Trigger` cron expression. Default runs twice daily at 9:00 am and 5:00 pm; adjust to your preference.\n\n4. **Telegram**  \n   Update the `chatId` in the Telegram node to your chat/channel.\n\n5. **Credentials**  \n   Set up credentials for: SerpAPI (httpQueryAuth), Tavily, OpenAI, Telegram.\n\n## Next steps and improvements\n\nHere are concrete directions to take this workflow further:\n\n- **Multi-agent architecture**  \n  Split the current AI calls into specialized agents: signal detection, relevance scoring, editorial decision, content enhancement, and formatting - each with a single responsibility.\n\n- **1:1 personalization**  \n  Move from static topics to weighted preferences. Learn from click behavior and feedback.\n\n- **Telegram feedback buttons**  \n  Add inline buttons (👍 Useful / 👎 Not relevant / 🔎 More like this) and feed signals back into ranking.\n\n- **Email with HTML template**  \n  For more flexibility, send the newsletter via email.\n- **Incorporating other news APIs or RSS feeds**  \n  Add more sources such as other news APIs and RSS feeds from blogs, newsletters, or communities.\n- **Adjust for arxiv paper search and research news**  \n  Swap SerpAPI for arxiv search or other academic sources to obtain a personal research digest newsletter.\n- **Images and thumbnails**  \n  Fetch representative images for each article and include them in the newsletter.\n\n- **Web archive**  \n  Auto-publish each edition as a web page with permalinks.\n\n- **Retry logic and error handling**  \n  Add exponential backoff for external APIs and route failures to an error workflow.\n\n- **Prompt versioning**  \n  Move prompts to a data table with versioning for A/B testing and rollback.\n\n- **Audio and video news**  \n  Use audio or video models for better news communication.\n\n\n## Wrap-up\n\nThis AI News Agent workflow represents a significant evolution from simple scheduled newsletters. By adding **intelligent send decisions**, **historical deduplication**, and **frequency guardrails**, you get a newsletter that respects the quality of available news.\n\nI use this workflow myself to stay informed on AI and automation topics without the overload of daily news or the delayed delivery caused by a fixed newsletter schedule.\n\n\nNeed help with your automations? [Contact me here](https://akribic.com/contact).",
+  "featuredImage": "/data/workflows/11425/11425.webp",
+  "author": {
+    "id": 101,
+    "slug": "fkemeth",
+    "name": "Felix Kemeth",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 77,
+  "downloads": 7,
+  "createdAt": "2025-12-02T09:00:36.243Z",
+  "updatedAt": "2026-01-16T09:08:39.431Z",
+  "publishedAt": "2025-12-02T09:00:36.243Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11425",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create personalized news digests with GPT-5.1, SerpAPI, and Telegram delivery",
+    "workflowName": "Create personalized news digests with GPT-5.1, SerpAPI, and Telegram delivery",
+    "description": "Staying up to date with fast-moving topics like AI, machine learning, or your specific industry can be overwhelming. You either drown in daily noise or miss important developments between weekly digests.\n\nThis **AI News Agent** workflow delivers a curated newsletter only when there's genuinely relevant news. I use it myself for AI and n8n topics.\n\n**Key features:**\n\n- **AI-driven send decision**: An AI agent evaluates whether today's news is worth sending.\n- **Deduplication**: Compares candidate articles against past newsletters to avoid repetition.\n- **Real-time news**: Uses [SerpAPI's DuckDuckGo News engine](https://serpapi.com/duckduckgo-news-api) for fresh results.\n- **Frequency guardrails**: Configure minimum and maximum days between newsletters.\n\nIn this post, I'll walk you through the complete workflow, explain each component, and show you how to set it up yourself.\n\n## What this workflow does\n\nAt a high level, the AI News Agent:\n\n1. **Fetches fresh news** twice daily via SerpAPI's DuckDuckGo News engine.\n2. **Stores articles** in a persistent data table with automatic deduplication.\n3. **Filters for freshness** - only considers articles newer than your last newsletter.\n4. **Applies frequency guardrails** - respects your min/max sending preferences.\n5. **Makes an editorial decision** - AI evaluates if the news is worth sending.\n6. **Enriches selected articles** - uses Tavily web search for fact-checking and depth.\n7. **Delivers via Telegram** - sends a clean, formatted newsletter.\n8. **Remembers what it sent** - stores each edition to prevent future repetition.\n\nThis allows you to get newsletters **only when there's genuinely relevant news** - in contrast to a fixed schedule.\n\n## Requirements\n\nTo run this workflow, you need:\n\n- **SerpAPI key**  \n  Create an account at [serpapi.com](https://serpapi.com) and generate an API key. They offer 250 free searches/month.\n\n- **Tavily API key**  \n  Sign up at [app.tavily.com](https://app.tavily.com) and create an API key. Generous free tier available.\n\n- **OpenAI API key**  \n  Get one from [OpenAI](https://platform.openai.com) - required for AI agent calls.\n\n- **Telegram bot + chat ID**  \n  A free Telegram bot (via BotFather) and the chat/channel ID where you want the newsletter. See [Telegram's bot tutorial](https://core.telegram.org/bots/tutorial) for setup.\n\n## How it works\n\nThe workflow is organized into five logical stages.\n\n### Stage 1: Schedule & Configuration\n\n- **Schedule Trigger**  \n  Runs the workflow on a cron schedule. Default: `0 0 9,17 * * *` (twice daily at 9:00 and 17:00). These frequent checks enable the AI to send newsletters at these times when it observes actually relevant news, not only once a week.\n_I picked 09:00 and 17:00 as natural check‑in points at the start and end of a typical workday, so you see updates when you’re most likely to read them without being interrupted in the middle of deep work. With SerpAPI’s 250 free searches/month, running twice per day with a small set of topics (e.g. 2–3) keeps you comfortably below the limit; if you add more topics or increase the schedule frequency, either tighten the cron window or move to a paid SerpAPI plan to avoid hitting the cap._\n\n- **Set topics and language**  \n  A `Set` node that defines your configuration:\n  - `topics`: comma-separated list (e.g., `AI, n8n`)\n  - `language`: output language (e.g., `English`)\n  - `minDaysBetween`: minimum days to wait (0 = no minimum)\n  - `maxDaysBetween`: maximum days without sending (triggers a \"must-send\" fallback)\n\n### Stage 2: Fetch & Store News\n\n- **Build topic queries**  \n  Splits your comma-separated topics into individual search queries:\n_In DuckDuckGo News via SerpAPI, a query like `AI,n8n` looks for news where both “AI” and “n8n” appear. For a niche tool like `n8n`, this is often almost identical to just searching for `n8n` ([docs](https://serpapi.com/duckduckgo-news-api)). It’s therefore better to split the topics, search for each of them separately, and let the AI later decide which news articles to select._\n\n```javascript\nreturn $input.first().json.topics.split(',').map(topic =&gt; ({\n  json: { topic: topic.trim() }\n}));\n```\n\n- **Fetch news from SerpAPI (DuckDuckGo News)**  \n  HTTP Request node calling SerpAPI with:\n  - `engine`: `duckduckgo_news`\n  - `q`: your topic\n  - `df`: `d` (last day)\n  \n  Auth is handled via `httpQueryAuth` credentials with your SerpAPI key.\n_SerpAPI also offers other news engines such as the Google News API ([see here](https://serpapi.com/google-news-api)). DuckDuckGo News is used here because, unlike Google News, it returns an excerpt/snippet in addition to the title, source, and URL ([see here](https://serpapi.com/duckduckgo-news-api))—giving the AI more context to work with._\n_Another option is NewsAPI, but its [free tier delays articles by 24 hours](https://newsapi.org/pricing), so you miss the freshness window that makes these twice-daily checks valuable. DuckDuckGo News through SerpAPI keeps the workflow real-time without that lag._\n_n8n has official SerpAPI nodes, but as of writing there is no dedicated node for the DuckDuckGo News API. That’s why this workflow uses a custom `HTTP Request` node instead, which works the same under the hood while giving you full control over the DuckDuckGo News parameters._\n\n- **Split SerpAPI results into articles**  \n  Expands the `results` array so each article becomes its own item.\n\n- **Upsert articles into News table**  \n  Stores each article in an n8n data table with fields: `title`, `source`, `url`, `excerpt`, `date`. Uses **upsert** on title + URL to avoid duplicates. Date is normalized to ISO UTC:\n\n```javascript\nDateTime.fromSeconds(Number($json.date), {zone: 'utc'}).toISO()\n```\n\n### Stage 3: Filtering & Frequency Guardrails\n\nThis is where the workflow gets smart about *what* to consider and *when* to send.\n\n- **Get previous newsletters → Sort → Get most recent**  \n  Pulls all editions from the `Newsletters` table and isolates the latest one with its `createdAt` timestamp.\n\n- **Combine articles with last newsletter metadata**  \n  Attaches the last newsletter timestamp to each candidate article.\n\n- **Filter articles newer than last newsletter**  \n  Keeps only articles published *after* the last edition. Uses a safe default date (`2024-01-01`) if no previous newsletter exists:\n\n```javascript\n$json.date_2 &gt; ($json.createdAt_1 || DateTime.fromISO('2024-01-01T00:00:00.000Z'))\n```\n\n- **Stop if last newsletter is too recent**  \n  Compares `createdAt` against your `minDaysBetween` setting. If you're still in the \"too soon to send\" window, the workflow short-circuits here.\n\n### Stage 4: AI Editorial Decision\n\nThis is the core intelligence of the workflow - an AI that decides *whether* to send and *what* to include. This stage is also the actual agentic part of the workflow, where the system makes its own decisions instead of just following a fixed schedule.\n\n- **Aggregate candidate articles for AI**  \n  Bundles today's filtered articles into a compact list with `title`, `excerpt`, `source`, and `url`.\n\n- **Limit previous newsletters to last 5 → Aggregate**  \n  Prepares the last 5 newsletter contents for the AI to check against for repetition.\n\n- **Combine candidate articles with past newsletters**  \n  Merges both lists so the AI sees \"today's candidates\" + \"recent history\" side by side.\n\n- **AI: decide send + select articles**  \n  The heart of the workflow. A GPT-5.1 call with a comprehensive editorial prompt:\n\n```text\nYou are an **AI Newsletter Editor**. Your job is to decide whether today’s newsletter edition should be sent, and to select the best articles.\n\nYou will receive a list of articles with:\n'title', 'excerpt', `source`, `url`.\n\nYou will also receive content of **previously sent newsletters** (markdown).\n\n# Your Tasks\n\n## 1. Decide whether to send the newsletter\n\nOutput \"YES\" only if all of the following are satisfied **OR** the fallback rule applies:\n\n### **Base Criteria**\n\n1. There are **at least 3 meaningful articles**.\n   *Meaningful = not trivial, not purely promotional, not clickbait, contains actual informational value.*\n\n2. Articles must be **non-duplicate and non-overlapping**:\n\n   * Not the same topic/headline rephrased\n   * Not reporting identical events with minor variations\n   * Not the same news covered by multiple sources without distinct insights\n\n3. Articles must be **relevant to the user's topics**:\n   **{{ $('Set topics and language').item.json.topics }}**\n\n4. Articles must be **novel** relative to the **topics in previous newsletters**:\n\n   * Compare against all previous newsletters below\n   * Exclude articles that discuss topics already substantially covered\n\n5. Articles must offer **clear value**:\n\n   * New information\n   * Impact that matters to the user\n   * Insight, analysis, or meaningful expansion\n\n### **Fallback rule: Newsletter frequency requirement**\n\nIf **at least 1 relevant article exists** *and*\nthe last newsletter was sent **more than {{ $('Set topics and language').item.json.maxDaysBetween }} days ago**, then you **MUST** return \"YES\" as a decision even if the other criteria are not completely met.\n\nLast newsletter was sent {{ $('Get most recent newsletter').item.json.createdAt ? Math.floor($now.diff(DateTime.fromISO($('Get most recent newsletter').item.json.createdAt), 'days').days) : 999 }} days ago.\n\n### Otherwise → \"NO\"\n\n## **2. If \"YES\": Select Articles**\n\nSelect the **top 3–5** articles that best fulfill the criteria above.\n\nFor each selected article, output:\n\n* **title** (rewrite for clarity, conciseness, and impact)\n* **summary** (1–2 sentences; written in the output language)\n* **source**\n* **url**\n\nAll summaries **must** be written in:\n**{{ $('Set topics and language').item.json.language }}**\n\n---\n\n# **Output Format (JSON)**\n\n{\n  \"decision\": \"YES or NO\",\n  \"articles\": [\n    {\n      \"title\": \"...\",\n      \"summary\": \"...\",\n      \"source\": \"...\",\n      \"url\": \"...\"\n    }\n  ]\n}\n\nWhen \"decision\": \"NO\", return an empty array for \"articles\".\n\n# **Article Input**\n\nUse these articles:\n\n{{\n  $json.results.map(\n   article =&gt;\n    `Title: ${article.title_2}\n     Excerpt: ${article.excerpt_2}\n     Source: ${article.source_2}\n     URL: ${article.url_2}`\n  ).join('\\n---\\n')\n}}\n\nYou must also consider the topics already covered in previous newsletters to avoid repetition:\n\n{{ $json.newsletters.map(x =&gt; `Newsletter: ${x.content}`).join('\\n---\\n') }}\n```\n\nThe AI outputs structured JSON:\n\n```json\n{\n  \"decision\": \"YES\",\n  \"articles\": [\n    {\n      \"title\": \"...\",\n      \"summary\": \"...\",\n      \"source\": \"...\",\n      \"url\": \"...\"\n    }\n  ]\n}\n```\n\n- **If AI decided to send newsletter**  \n  Routes based on `decision === \"YES\"`. If NO, the workflow ends gracefully.\n\n### Stage 5: Content Enrichment & Delivery\n\n- **Split selected articles for enrichment**  \n  Each selected article becomes its own item for individual processing.\n\n- **AI: enrich & write article**  \n  An AI Agent node with GPT-5.1 + Tavily web search tool. For each article:\n\n```text\nYou are a research writer that updates short news summaries into concise, factual articles.\n\n**Input:**\nTitle: {{ $json[\"title\"] }}\nSummary: {{ $json[\"summary\"] }}\nSource: {{ $json[\"source\"] }}\nOriginal URL: {{ $json[\"url\"] }}\nLanguage: {{ $('Set topics and language').item.json.language }}\n\n**Instructions:**\n\n1. Use **Tavily Search** to gather 2–3 reliable, recent, and relevant sources on this topic.\n2. Update the **title** if a more accurate or engaging one exists.\n3. Write **1–2 sentences** summarizing the topic, combining the original summary and information from the new sources.\n4. Return the original source name and url as well.\n\n**Output (JSON):**\n\n{\n  \"title\": \"final article title\",\n  \"content\": \"concise 1–2 sentence article content\",\n  \"source\": \"the name of the original source\",\n  \"url\": \"the url of the original source\"\n}\n\n**Rules:**\n\n* Ensure the topic is relevant, informative, and timely.\n* Translate the article if necessary to comply with the desired language {{ $('Set topics and language').item.json.language }}.\n```\n\nThe **Output Parser** enforces the JSON schema with `title`, `content`, `source`, and `url` fields.\n\n- **Aggregate enriched articles**  \n  Collects all enriched articles back into a single array.\n\n- **Insert newsletter content into Newsletters table**  \n  Stores the final markdown content for future deduplication:\n\n```javascript\n$json.output.map(article =&gt; {\n  const title = JSON.stringify(article.title).slice(1, -1);\n  const content = JSON.stringify(article.content).slice(1, -1);\n  const source = JSON.stringify(article.source).slice(1, -1);\n  const url = JSON.stringify(article.url).slice(1, -1);\n  return `*${title}*\\n${content}\\nSource: [${source}](${url})`;\n}).join('\\n\\n')\n```\n\n- **Send newsletter to Telegram**  \n  Sends the formatted newsletter to your Telegram chat/channel.\n\n## Why this workflow is powerful\n\n- **Intelligent send decisions**  \n  The AI evaluates news quality before sending, leading to a less noisy and more relevant news digest.\n\n- **Memory across editions**  \n  By persisting newsletters and comparing against history, the workflow avoids repetition.\n\n- **Frequency guardrails with flexibility**  \n  Set boundaries (e.g., \"at least 1 day between sends\" and \"must send within 5 days\"), but let the AI decide the optimal moment within those bounds.\n\n- **Source-level deduplication**  \n  The news table with upsert prevents the same article from being considered multiple times across runs.\n\n- **Grounded in facts**  \n  SerpAPI provides real news sources; Tavily enriches with additional verification. The newsletter stays factual.\n\n- **Configurable and extensible**  \n  Change topics, language, frequency - all in one `Set` node. In addition, the workflow is modular, allowing to add new news sources or new delivery channels without touching the core logic.\n\n## Configuration guide\n\nTo customize this workflow for your needs:\n\n1. **Topics and language**  \n   Open `Set topics and language` and modify:\n   - `topics`: your interests (e.g., `machine learning, startups, TypeScript`)\n   - `language`: your preferred output language\n\n2. **Frequency settings**  \n   - `minDaysBetween`: minimum days between newsletters (0 = no limit)\n   - `maxDaysBetween`: maximum gap before forcing a send\n   - For very high-volume topics (such as `\"AI\"`), expect the workflow to send almost every time once `minDaysBetween` has passed, because the content-quality criteria are usually met.\n\n3. **Schedule**  \n   Modify the `Schedule Trigger` cron expression. Default runs twice daily at 9:00 am and 5:00 pm; adjust to your preference.\n\n4. **Telegram**  \n   Update the `chatId` in the Telegram node to your chat/channel.\n\n5. **Credentials**  \n   Set up credentials for: SerpAPI (httpQueryAuth), Tavily, OpenAI, Telegram.\n\n## Next steps and improvements\n\nHere are concrete directions to take this workflow further:\n\n- **Multi-agent architecture**  \n  Split the current AI calls into specialized agents: signal detection, relevance scoring, editorial decision, content enhancement, and formatting - each with a single responsibility.\n\n- **1:1 personalization**  \n  Move from static topics to weighted preferences. Learn from click behavior and feedback.\n\n- **Telegram feedback buttons**  \n  Add inline buttons (👍 Useful / 👎 Not relevant / 🔎 More like this) and feed signals back into ranking.\n\n- **Email with HTML template**  \n  For more flexibility, send the newsletter via email.\n- **Incorporating other news APIs or RSS feeds**  \n  Add more sources such as other news APIs and RSS feeds from blogs, newsletters, or communities.\n- **Adjust for arxiv paper search and research news**  \n  Swap SerpAPI for arxiv search or other academic sources to obtain a personal research digest newsletter.\n- **Images and thumbnails**  \n  Fetch representative images for each article and include them in the newsletter.\n\n- **Web archive**  \n  Auto-publish each edition as a web page with permalinks.\n\n- **Retry logic and error handling**  \n  Add exponential backoff for external APIs and route failures to an error workflow.\n\n- **Prompt versioning**  \n  Move prompts to a data table with versioning for A/B testing and rollback.\n\n- **Audio and video news**  \n  Use audio or video models for better news communication.\n\n\n## Wrap-up\n\nThis AI News Agent workflow represents a significant evolution from simple scheduled newsletters. By adding **intelligent send decisions**, **historical deduplication**, and **frequency guardrails**, you get a newsletter that respects the quality of available news.\n\nI use this workflow myself to stay informed on AI and automation topics without the overload of daily news or the delayed delivery caused by a fixed newsletter schedule.\n\n\nNeed help with your automations? [Contact me here](https://akribic.com/contact).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Set topics and language",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Build topic queries",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch news from SerpAPI (DuckDuckGo News)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split SerpAPI results into articles",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upsert articles into News table",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get previous newsletters",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sort newsletters by newest first",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get most recent newsletter",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit previous newsletters to last 5",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate previous newsletters into list",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine articles with last newsletter metadata",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Filter articles newer than last newsletter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Stop if last newsletter is too recent",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Aggregate candidate articles for AI",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine candidate articles with past newsletters",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If AI decided to send newsletter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Split selected articles for enrichment",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GPT-5.1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Tavily web search tool",
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "role": "tavilyTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse enriched article JSON",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI: enrich & write article",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI: decide send + select articles",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Aggregate enriched articles",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert newsletter content into Newsletters table",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send newsletter to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,272 @@
+{
+  "id": 6764,
+  "slug": "6764",
+  "title": "Automatic LinkedIn engagement with AI comments using GPT-4o and Phantombuster",
+  "description": "## Who’s it for  \nB2B marketers, recruiters, and personal-brand builders who want to spark\nconversations on LinkedIn by automatically posting short, relevant comments on\nfresh industry content—while staying under daily limits.\n\n## How it works / What it does  \n1. **Schedule Trigger** fires every hour.  \n2. **Select Cookie** picks a rotating LinkedIn session-cookie (time-slice logic).  \n3. **Generate Random Search Term** (GPT-4o) outputs a realistic AI/BPA keyword.  \n4. **LinkedIn Search Agent** (Phantombuster) scrapes recent posts.  \n5. **Get Random Post** chooses one post and passes its text to **Create Comment**\n   (GPT-4o) which returns a ≤150-character reply in the chosen language.  \n6. Builds `linkedin_posts_to_comment.csv`, uploads to SharePoint, and launches\n   the **Auto-comment Agent** to post the reply.  \n7. Post URL is logged to `linkedin_posts_already_commented.csv` to avoid\n   duplicates.  \n8. **Wait** nodes throttle launches to ~120 comments/day.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `linkedin_session_cookies.txt` – one cookie per line.  \n   • `linkedin_posts_already_commented.csv` with header `postUrl`.  \n3. Edit **Set ENV Variables** to set default language, comment prompt,\n   company ID, etc.  \n4. Adjust schedule or comments-per-launch as needed.  \n5. Activate the workflow; it will run hourly and comment on one new post each\n   launch.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account \n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Change tone/length: edit the prompt in **Create Comment**.  \n- Comment more often: raise `numberOfLinesPerLaunch` and schedule frequency.  \n- Use Google Drive/Dropbox instead of SharePoint by swapping storage nodes.",
+  "featuredImage": "/data/workflows/6764/6764.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 159,
+  "downloads": 15,
+  "createdAt": "2025-08-01T08:15:36.440Z",
+  "updatedAt": "2026-01-16T08:46:59.523Z",
+  "publishedAt": "2025-08-01T08:15:36.440Z",
+  "nodes": 39,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6764",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatic LinkedIn engagement with AI comments using GPT-4o and Phantombuster",
+    "workflowName": "Automatic LinkedIn engagement with AI comments using GPT-4o and Phantombuster",
+    "description": "## Who’s it for  \nB2B marketers, recruiters, and personal-brand builders who want to spark\nconversations on LinkedIn by automatically posting short, relevant comments on\nfresh industry content—while staying under daily limits.\n\n## How it works / What it does  \n1. **Schedule Trigger** fires every hour.  \n2. **Select Cookie** picks a rotating LinkedIn session-cookie (time-slice logic).  \n3. **Generate Random Search Term** (GPT-4o) outputs a realistic AI/BPA keyword.  \n4. **LinkedIn Search Agent** (Phantombuster) scrapes recent posts.  \n5. **Get Random Post** chooses one post and passes its text to **Create Comment**\n   (GPT-4o) which returns a ≤150-character reply in the chosen language.  \n6. Builds `linkedin_posts_to_comment.csv`, uploads to SharePoint, and launches\n   the **Auto-comment Agent** to post the reply.  \n7. Post URL is logged to `linkedin_posts_already_commented.csv` to avoid\n   duplicates.  \n8. **Wait** nodes throttle launches to ~120 comments/day.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `linkedin_session_cookies.txt` – one cookie per line.  \n   • `linkedin_posts_already_commented.csv` with header `postUrl`.  \n3. Edit **Set ENV Variables** to set default language, comment prompt,\n   company ID, etc.  \n4. Adjust schedule or comments-per-launch as needed.  \n5. Activate the workflow; it will run hourly and comment on one new post each\n   launch.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account \n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Change tone/length: edit the prompt in **Create Comment**.  \n- Comment more often: raise `numberOfLinesPerLaunch` and schedule frequency.  \n- Use Google Drive/Dropbox instead of SharePoint by swapping storage nodes.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Launch Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Random Post",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Comment",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create CSV Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload CSV",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Autocomment Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Posts",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Launch AC Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Response",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Search Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set ENV Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Random Search Term",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if in List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare Updated Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Available Session Cookies",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Cookies",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Cookie",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

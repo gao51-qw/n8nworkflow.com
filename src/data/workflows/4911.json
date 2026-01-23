@@ -1,0 +1,86 @@
+{
+  "id": 4911,
+  "slug": "4911",
+  "title": "Generate summaries from uploaded files using OpenAI Assistants API",
+  "description": "## Generate Summaries from Uploaded Files using OpenAI Assistants API\n\n### 📑 Overview  \nUpload a document (PDF, DOCX, PPTX, TXT, CSV, JSON, or Markdown) and receive an AI-generated summary containing:\n\n* **title** – 5-10 words  \n* **summary** – 1-2 sentences  \n* **bullets** – 3-5 key points  \n* **tags** – 3-6 short keywords  \n\nThe workflow:\n\n1. Stores the file in OpenAI.  \n2. Runs an Assistant with **File Search** **and Code Interpreter** enabled.  \n3. Polls until the run finishes.  \n4. Retrieves the summary JSON.\n\n---\n\n### ✅ Prerequisites  \n\n**OpenAI Assistant**\n- Create one at &lt;https://platform.openai.com/assistants&gt;\n- Enable **File Search** and **Code Interpreter**\n- Note: The assistant ID starts with `asst_`\n\n**OpenAI API credential setup in n8n**\n- Go to **Credentials → New → HTTP Header Auth**\n- Header name: `Authorization`\n- Value: `Bearer YOUR-OPENAI-API-KEY` (replace `YOUR-OPENAI-API-KEY` with your OpenAI API secret key for your assistant, starts with `sk-`)\n- Name it: `openAIApiHeader`\n\n---\n\n### 🔧 Setup  \n\n1. **Import the workflow JSON**.  \n2. When n8n prompts for a credential, choose **`openAIApiHeader`** for every HTTP Request node.  \n3. Open **Run Assistant** → Body and replace  \n\n   ```json\n   \"assistant_id\": \"REPLACE_WITH_YOUR_ASSISTANT_ID\"\n   ```  \n\n   with your real ID (starts with `asst_…`). Save.\n\n---\n\n### 🚀 How it works  \n\n| # | Node | Purpose |\n|---|------|---------|\n| 1 | **On form submission** | User uploads a file (`File`). |\n| 2 | **Upload File** | `POST /v1/files` (multipart) → returns `file_id`. |\n| 3 | **Create Thread** | Creates a thread and attaches the uploaded file. |\n| 4 | **Run Assistant** | Starts the run using your `assistant_id`. |\n| 5 | **Poll Run Status → Wait 2 s → IF** | Loops until `status = completed`. |\n| 6 | **Fetch Summary** | `GET /v1/threads/{thread_id}/messages` → summary JSON. |\n\n---\n\n### 🖌️ Customisation ideas  \n\n- Edit the user prompt in **Create Thread** to change summary length, tone, or language.  \n- Add an **HTTP Response** node after *Fetch Summary* to return plaintext to the uploader.  \n- Replace the polling loop with OpenAI’s forthcoming *wait-for-run* endpoint when available.\n\n---\n\n*No community nodes required. Works on any n8n Cloud plan (Starter, Pro, Enterprise) or self-hosted Community Edition.*\n",
+  "featuredImage": "/data/workflows/4911/4911.webp",
+  "author": {
+    "id": 101,
+    "slug": "samrobertson",
+    "name": "Sam Robertson ",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1104,
+  "downloads": 110,
+  "createdAt": "2025-06-13T03:33:27.446Z",
+  "updatedAt": "2026-01-16T08:36:52.445Z",
+  "publishedAt": "2025-06-13T03:33:27.446Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4911",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate summaries from uploaded files using OpenAI Assistants API",
+    "workflowName": "Generate summaries from uploaded files using OpenAI Assistants API",
+    "description": "## Generate Summaries from Uploaded Files using OpenAI Assistants API\n\n### 📑 Overview  \nUpload a document (PDF, DOCX, PPTX, TXT, CSV, JSON, or Markdown) and receive an AI-generated summary containing:\n\n* **title** – 5-10 words  \n* **summary** – 1-2 sentences  \n* **bullets** – 3-5 key points  \n* **tags** – 3-6 short keywords  \n\nThe workflow:\n\n1. Stores the file in OpenAI.  \n2. Runs an Assistant with **File Search** **and Code Interpreter** enabled.  \n3. Polls until the run finishes.  \n4. Retrieves the summary JSON.\n\n---\n\n### ✅ Prerequisites  \n\n**OpenAI Assistant**\n- Create one at &lt;https://platform.openai.com/assistants&gt;\n- Enable **File Search** and **Code Interpreter**\n- Note: The assistant ID starts with `asst_`\n\n**OpenAI API credential setup in n8n**\n- Go to **Credentials → New → HTTP Header Auth**\n- Header name: `Authorization`\n- Value: `Bearer YOUR-OPENAI-API-KEY` (replace `YOUR-OPENAI-API-KEY` with your OpenAI API secret key for your assistant, starts with `sk-`)\n- Name it: `openAIApiHeader`\n\n---\n\n### 🔧 Setup  \n\n1. **Import the workflow JSON**.  \n2. When n8n prompts for a credential, choose **`openAIApiHeader`** for every HTTP Request node.  \n3. Open **Run Assistant** → Body and replace  \n\n   ```json\n   \"assistant_id\": \"REPLACE_WITH_YOUR_ASSISTANT_ID\"\n   ```  \n\n   with your real ID (starts with `asst_…`). Save.\n\n---\n\n### 🚀 How it works  \n\n| # | Node | Purpose |\n|---|------|---------|\n| 1 | **On form submission** | User uploads a file (`File`). |\n| 2 | **Upload File** | `POST /v1/files` (multipart) → returns `file_id`. |\n| 3 | **Create Thread** | Creates a thread and attaches the uploaded file. |\n| 4 | **Run Assistant** | Starts the run using your `assistant_id`. |\n| 5 | **Poll Run Status → Wait 2 s → IF** | Loops until `status = completed`. |\n| 6 | **Fetch Summary** | `GET /v1/threads/{thread_id}/messages` → summary JSON. |\n\n---\n\n### 🖌️ Customisation ideas  \n\n- Edit the user prompt in **Create Thread** to change summary length, tone, or language.  \n- Add an **HTTP Response** node after *Fetch Summary* to return plaintext to the uploader.  \n- Replace the polling loop with OpenAI’s forthcoming *wait-for-run* endpoint when available.\n\n---\n\n*No community nodes required. Works on any n8n Cloud plan (Starter, Pro, Enterprise) or self-hosted Community Edition.*",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Thread",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Poll Run Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is Not Complete?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait 2s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Run Assistant",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Upload File",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

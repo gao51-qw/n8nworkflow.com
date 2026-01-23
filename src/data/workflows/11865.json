@@ -1,0 +1,356 @@
+{
+  "id": 11865,
+  "slug": "11865",
+  "title": "Automated marketing campaign email system with GPT-4 and HubSpot customer tracking",
+  "description": "## Overview\n\n* This workflow automates customer outreach for marketing campaigns, including customer prioritization, AI-generated emails, automated sending, reply tracking, and meeting scheduling.\n\n---\n\n## How It Works\n\n1. **Data Synchronization**\n\n   * Customer and campaign data are periodically synchronized from Google Sheets and internal data tables.\n   * New customers and campaigns are inserted into the system if they do not already exist.\n\n2. **Customer Evaluation and Prioritization**\n\n   * Customers are evaluated based on revenue, industry, capital, and location.\n   * Each customer is classified into High / Medium / Low priority using AI.\n   * Only high-priority customers are selected for campaign outreach.\n\n3. **Campaign Detection**\n\n   * The workflow checks for new, unsent marketing campaigns.\n   * Campaigns marked as already sent are excluded.\n\n4. **Personalized Email Generation**\n\n   * For each eligible customer, past email history is retrieved.\n   * An AI agent generates a personalized campaign email:\n\n     * Uses historical interaction data when available.\n     * Uses customer interests and keywords for new customers.\n     * Produces a professional, friendly email proposing a meeting.\n\n5. **Automated Email Sending**\n\n   * Emails are sent automatically via Gmail.\n   * Sent emails are logged into the message history database.\n   * Campaign status is updated to “sent” after completion.\n\n6. **Reply Handling**\n\n   * Incoming customer replies are detected via Gmail triggers.\n   * Replies are matched with previous messages and stored in the database.\n   * AI generates an appropriate follow-up reply when required.\n\n7. **Reply Classification and Scheduling**\n\n   * Customer replies are classified as Positive / Pending / Negative.\n   * If a reply includes scheduling information, meeting details are extracted.\n   * Calendar events are automatically created in Google Calendar.\n\n---\n\n## Setup Steps\n\n1. **Prepare Data Sources**\n\n   * Set up Google Sheets for:\n\n     * Customer master data\n       Format includes the following columns:\n       #/メール/ 氏名/ 会社名/ 所在地/ 売上(万円)/ 資本金(万円)/ 業界/関心/ Hubspot同期\n     * Campaign data\n       Format includes the following columns:\n       No / campaign_name / description / sent\n\n   * Prepare internal data tables for:\n\n     * Campaign records\n     * Email message histories\n\n\n2. **Create Data table**\n   * Campaign table:\n       * campaign_name: String\n       * description: String\n       * is_sent: boolean\n\n   * Mail Histories table:\n       * customer_email: String\n       * email_subject: String\n       * message: String\n       * reply: String\n       * reply_category: String\n\n3. **Configure Credentials**\n\n   * Google Sheets API\n   * Gmail OAuth\n   * Google Calendar API\n   * HubSpot App Token (for customer synchronization)\n   * OpenAI API (for AI agents)\n",
+  "featuredImage": "/data/workflows/11865/11865.webp",
+  "author": {
+    "id": 101,
+    "slug": "satoshi",
+    "name": "Satoshi",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 22,
+  "downloads": 2,
+  "createdAt": "2025-12-16T14:16:55.102Z",
+  "updatedAt": "2026-01-16T09:10:26.575Z",
+  "publishedAt": "2025-12-16T14:16:55.102Z",
+  "nodes": 53,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11865",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated marketing campaign email system with GPT-4 and HubSpot customer tracking",
+    "workflowName": "Automated marketing campaign email system with GPT-4 and HubSpot customer tracking",
+    "description": "* This workflow automates customer outreach for marketing campaigns, including customer prioritization, AI-generated emails, automated sending, reply tracking, and meeting scheduling.\n\n---\n\n## How It Works\n\n1. **Data Synchronization**\n\n   * Customer and campaign data are periodically synchronized from Google Sheets and internal data tables.\n   * New customers and campaigns are inserted into the system if they do not already exist.\n\n2. **Customer Evaluation and Prioritization**\n\n   * Customers are evaluated based on revenue, industry, capital, and location.\n   * Each customer is classified into High / Medium / Low priority using AI.\n   * Only high-priority customers are selected for campaign outreach.\n\n3. **Campaign Detection**\n\n   * The workflow checks for new, unsent marketing campaigns.\n   * Campaigns marked as already sent are excluded.\n\n4. **Personalized Email Generation**\n\n   * For each eligible customer, past email history is retrieved.\n   * An AI agent generates a personalized campaign email:\n\n     * Uses historical interaction data when available.\n     * Uses customer interests and keywords for new customers.\n     * Produces a professional, friendly email proposing a meeting.\n\n5. **Automated Email Sending**\n\n   * Emails are sent automatically via Gmail.\n   * Sent emails are logged into the message history database.\n   * Campaign status is updated to “sent” after completion.\n\n6. **Reply Handling**\n\n   * Incoming customer replies are detected via Gmail triggers.\n   * Replies are matched with previous messages and stored in the database.\n   * AI generates an appropriate follow-up reply when required.\n\n7. **Reply Classification and Scheduling**\n\n   * Customer replies are classified as Positive / Pending / Negative.\n   * If a reply includes scheduling information, meeting details are extracted.\n   * Calendar events are automatically created in Google Calendar.\n\n---\n\n## Setup Steps\n\n1. **Prepare Data Sources**\n\n   * Set up Google Sheets for:\n\n     * Customer master data\n       Format includes the following columns:\n       #/メール/ 氏名/ 会社名/ 所在地/ 売上(万円)/ 資本金(万円)/ 業界/関心/ Hubspot同期\n     * Campaign data\n       Format includes the following columns:\n       No / campaign_name / description / sent\n\n   * Prepare internal data tables for:\n\n     * Campaign records\n     * Email message histories\n\n\n2. **Create Data table**\n   * Campaign table:\n       * campaign_name: String\n       * description: String\n       * is_sent: boolean\n\n   * Mail Histories table:\n       * customer_email: String\n       * email_subject: String\n       * message: String\n       * reply: String\n       * reply_category: String\n\n3. **Configure Credentials**\n\n   * Google Sheets API\n   * Gmail OAuth\n   * Google Calendar API\n   * HubSpot App Token (for customer synchronization)\n   * OpenAI API (for AI agents)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Don't email on weekends",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get histories",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Customer information",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Convert to JSON object",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Campaign",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Convert to JSON object1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter customer",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get new campaign",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Convert to JSON object2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Reply to a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get message histories",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update customer's reply",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "reply to customer",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Insert new mesage",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get campaign",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Insert new campaign",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get customers",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "If campaign does not exist1",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert message history",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Update row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create an event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create calendar info",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Convert to JSON Object",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update reply's category",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Customer",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create new Customer",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get customer",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "ネガポジ判定",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

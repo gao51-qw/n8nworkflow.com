@@ -1,0 +1,200 @@
+{
+  "id": 4361,
+  "slug": "4361",
+  "title": " Extract Details from Receipts via Telegram with Tesseract and Llama",
+  "description": "# Tesseract - Money Mate Workflow Description\n![Screenshot 20250527 at 14.20.42.png](fileId:1383)\n**Disclaimer**: This template requires the `n8n-nodes-tesseractjs` community node, which is only available on self-hosted n8n instances. You’ll need a self-hosted n8n setup to use this workflow.\n\n## Who is this for?\nThis workflow is designed for individuals, freelancers, or small business owners who want an easy way to track expenses using Telegram. It’s ideal for anyone looking to digitize receipts—whether from photos or text messages—using free tools, without needing advanced technical skills.\n\n## What problem does this workflow solve?\nManually entering receipt details into a spreadsheet or app is time-consuming and prone to mistakes. This workflow automates the process by extracting information from receipt images or text messages sent via Telegram, categorizing expenses, and sending back a clear, formatted summary. It saves time, reduces errors, and makes expense tracking effortless.\n\n## What this workflow does\nThe workflow listens for messages sent to a Telegram bot, which can be either text descriptions of expenses or photos of receipts. If a photo is sent, Tesseract (an open-source text recognition tool) extracts the text. If text is sent, it’s processed directly. An AI model (LLaMA via OpenRouter) analyzes the input, categorizes it into expense types (e.g., Food & Beverages, Household, Transport), and creates a structured summary including store name, date, items, total, and category. The summary is then sent back to the user’s Telegram chat.\n\n## Setup Instructions\nFollow these step-by-step instructions to set up the workflow. No advanced technical knowledge is required, but you’ll need a self-hosted n8n instance.\n\n1. **Set Up a Self-Hosted [n8n Instance](https://n8n.partnerlinks.io/khaisastudio)**:\n   - If you don’t have n8n installed, follow the [n8n self-hosting guide](https://docs.n8n.io/hosting/installation/self-hosting/) to set it up. You can use platforms like Docker or a cloud provider (e.g., DigitalOcean, AWS).\n   - Ensure your n8n instance is running and accessible via a web browser.\n\n2. **Install the Tesseract Community Node**:\n   - In your n8n instance, go to **Settings &gt; Community Nodes** in the sidebar.\n   - Click **Install a Community Node**, then enter `n8n-nodes-tesseractjs` in the search bar.\n   - Click **Install** and wait for confirmation. This node enables receipt image processing.\n   - If you encounter issues, check the [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/) for troubleshooting.\n\n3. **Create a Telegram Bot**:\n   - Open Telegram and search for **@BotFather** to start a new bot.\n   - Send `/start` to BotFather, then `/newbot` to create your bot.\n   - Follow the prompts to name your bot (e.g., “MoneyMateBot”).\n   - BotFather will provide a **Bot Token** (e.g., `23872837287:ExampleExampleExample`). Copy this token.\n   - In n8n, go to **Credentials &gt; Add Credential**, select **Telegram API**, and paste the token. Name the credential (e.g., “MoneyMateBot”) and save.\n\n4. **Set Up OpenRouter for AI Processing**:\n   - Sign up for a free account at [OpenRouter](https://openrouter.ai/).\n   - In your OpenRouter dashboard, generate an **API Key** under the API section.\n   - In n8n, go to **Credentials &gt; Add Credential**, select **OpenRouter API**, and paste the API key. Name it (e.g., “OpenRouter Account”) and save.\n   - The free tier of OpenRouter’s LLaMA model is sufficient for this workflow.\n\n5. **Import and Configure the Workflow**:\n   - Download the workflow JSON file (provided separately or copy from the source).\n   - In n8n, go to **Workflows &gt; Import Workflow** and upload the JSON file.\n   - Open the imported workflow (“Tesseract - Money Mate”).\n   - Ensure the **Telegram Trigger** and **Send Expense Summary** nodes use the Telegram credential you created.\n   - Ensure the **AI Analyzer** node uses the OpenRouter credential.\n   - Save the workflow.\n\n6. **Test the Workflow**:\n   - Activate the workflow by toggling the **Active** switch in n8n.\n   - In Telegram, find your bot (e.g., @MoneyMateBot) and send `/start`.\n   - Test with a sample input (see “Example Inputs” below).\n   - Check the n8n workflow execution panel to ensure data flows correctly.\n   - If errors occur, double-check credentials and node connections.\n\n7. **Activate for Continuous Use**:\n   - Once tested, keep the workflow active in n8n.\n   - Your bot will now process any text or image sent to it via Telegram.\n\n## Example Inputs/Formats\nTo help the workflow process your data accurately, use clear and structured inputs. Below are examples of valid inputs:\n\n### Text Input Example:\nSend a message to your Telegram bot like this:\n```\nBought coffee at Starbucks, Jalan Sudirman, yesterday. Total Rp 50,000. 2 lattes, each Rp 25,000.\n```\n**Expected Output**:\n```\nhello [Your Name]\n\nIni Rekap Belanjamu\n📋 Store: Starbucks\n📍 Location: Jalan Sudirman\n📅 Date: 2025-05-26\n🛒 Items:\n- Latte: Rp 25,000\n- Latte: Rp 25,000\n💸 Total: Rp 50,000\n📌 Category: Food & Beverages\n```\n\n### Image Input Example:\nUpload a photo of a receipt to your Telegram bot. The receipt should contain:\n- Store name (e.g., “Alfamart”)\n- Address (e.g., “Jl. Gatot Subroto, Jakarta”)\n- Date and time (e.g., “27/05/2025 14:00”)\n- Items with prices (e.g., “Bread Rp 15,000”, “Milk Rp 20,000”)\n- Total amount (e.g., “Total: Rp 35,000”)\n\n**Expected Output**:\n```\nhello [Your Name]\n\nIni Rekap Belanjamu\n📋 Store: Alfamart\n📍 Location: Jl. Gatot Subroto, Jakarta\n📅 Date: 2025-05-27 14:00\n🛒 Items:\n- Bread: Rp 15,000\n- Milk: Rp 20,000\n💸 Total: Rp 35,000\n📌 Category: Household\n```\n\n**Tips for Images**:\n- Ensure the receipt is well-lit and text is readable.\n- Avoid blurry or angled photos for better Tesseract accuracy.\n\n## How to Customize This Workflow\n- **Change Expense Categories**: In the **AI Categorizer** node, edit the prompt to include custom categories (e.g., add “Entertainment” or “Utilities” to the list: Food & Beverages, Household, Transport).\n- **Modify Response Format**: In the **Format Summary Message** node, adjust the JavaScript code to change how the summary looks (e.g., add emojis, reorder fields).\n- **Save to a Database**: Add a node (e.g., Google Sheets or PostgreSQL) after the **Format Summary Message** node to store summaries.\n- **Support Other Languages**: In the **AI Categorizer** node, update the prompt to handle additional languages (e.g., Spanish, Mandarin) by specifying them in the instructions.\n- **Add Error Handling**: Enhance the **Check Invalid Input** node to catch more edge cases, like invalid dates.\n\n## All Free, End-to-End\nThis workflow is 100% free! It leverages:\n- **Telegram Bot API**: Free via BotFather.\n- **Tesseract**: Open-source text recognition.\n- **LLaMA via OpenRouter**: Free tier available for AI processing.\n\nEnjoy automating your expense tracking without any cost!\n\n*Made by: [khmuhtadin](khmuhtadin.com)*\n**Need a custom?** contact me on **[LinkedIn](https://www.linkedin.com/in/khmuhtadin/)** or **[Web](khmuhtadin.com)**",
+  "featuredImage": "/data/workflows/4361/4361.webp",
+  "author": {
+    "id": 101,
+    "slug": "khmuhtadin",
+    "name": "Khairul Muhtadin",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2145,
+  "downloads": 214,
+  "createdAt": "2025-05-24T14:19:39.715Z",
+  "updatedAt": "2026-01-16T08:33:59.162Z",
+  "publishedAt": "2025-05-24T14:19:39.715Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4361",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": " Extract Details from Receipts via Telegram with Tesseract and Llama",
+    "workflowName": " Extract Details from Receipts via Telegram with Tesseract and Llama",
+    "description": "# Tesseract - Money Mate Workflow Description\n![Screenshot 20250527 at 14.20.42.png](fileId:1383)\n**Disclaimer**: This template requires the `n8n-nodes-tesseractjs` community node, which is only available on self-hosted n8n instances. You’ll need a self-hosted n8n setup to use this workflow.\n\n## Who is this for?\nThis workflow is designed for individuals, freelancers, or small business owners who want an easy way to track expenses using Telegram. It’s ideal for anyone looking to digitize receipts—whether from photos or text messages—using free tools, without needing advanced technical skills.\n\n## What problem does this workflow solve?\nManually entering receipt details into a spreadsheet or app is time-consuming and prone to mistakes. This workflow automates the process by extracting information from receipt images or text messages sent via Telegram, categorizing expenses, and sending back a clear, formatted summary. It saves time, reduces errors, and makes expense tracking effortless.\n\n## What this workflow does\nThe workflow listens for messages sent to a Telegram bot, which can be either text descriptions of expenses or photos of receipts. If a photo is sent, Tesseract (an open-source text recognition tool) extracts the text. If text is sent, it’s processed directly. An AI model (LLaMA via OpenRouter) analyzes the input, categorizes it into expense types (e.g., Food & Beverages, Household, Transport), and creates a structured summary including store name, date, items, total, and category. The summary is then sent back to the user’s Telegram chat.\n\n## Setup Instructions\nFollow these step-by-step instructions to set up the workflow. No advanced technical knowledge is required, but you’ll need a self-hosted n8n instance.\n\n1. **Set Up a Self-Hosted [n8n Instance](https://n8n.partnerlinks.io/khaisastudio)**:\n   - If you don’t have n8n installed, follow the [n8n self-hosting guide](https://docs.n8n.io/hosting/installation/self-hosting/) to set it up. You can use platforms like Docker or a cloud provider (e.g., DigitalOcean, AWS).\n   - Ensure your n8n instance is running and accessible via a web browser.\n\n2. **Install the Tesseract Community Node**:\n   - In your n8n instance, go to **Settings &gt; Community Nodes** in the sidebar.\n   - Click **Install a Community Node**, then enter `n8n-nodes-tesseractjs` in the search bar.\n   - Click **Install** and wait for confirmation. This node enables receipt image processing.\n   - If you encounter issues, check the [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/) for troubleshooting.\n\n3. **Create a Telegram Bot**:\n   - Open Telegram and search for **@BotFather** to start a new bot.\n   - Send `/start` to BotFather, then `/newbot` to create your bot.\n   - Follow the prompts to name your bot (e.g., “MoneyMateBot”).\n   - BotFather will provide a **Bot Token** (e.g., `23872837287:ExampleExampleExample`). Copy this token.\n   - In n8n, go to **Credentials &gt; Add Credential**, select **Telegram API**, and paste the token. Name the credential (e.g., “MoneyMateBot”) and save.\n\n4. **Set Up OpenRouter for AI Processing**:\n   - Sign up for a free account at [OpenRouter](https://openrouter.ai/).\n   - In your OpenRouter dashboard, generate an **API Key** under the API section.\n   - In n8n, go to **Credentials &gt; Add Credential**, select **OpenRouter API**, and paste the API key. Name it (e.g., “OpenRouter Account”) and save.\n   - The free tier of OpenRouter’s LLaMA model is sufficient for this workflow.\n\n5. **Import and Configure the Workflow**:\n   - Download the workflow JSON file (provided separately or copy from the source).\n   - In n8n, go to **Workflows &gt; Import Workflow** and upload the JSON file.\n   - Open the imported workflow (“Tesseract - Money Mate”).\n   - Ensure the **Telegram Trigger** and **Send Expense Summary** nodes use the Telegram credential you created.\n   - Ensure the **AI Analyzer** node uses the OpenRouter credential.\n   - Save the workflow.\n\n6. **Test the Workflow**:\n   - Activate the workflow by toggling the **Active** switch in n8n.\n   - In Telegram, find your bot (e.g., @MoneyMateBot) and send `/start`.\n   - Test with a sample input (see “Example Inputs” below).\n   - Check the n8n workflow execution panel to ensure data flows correctly.\n   - If errors occur, double-check credentials and node connections.\n\n7. **Activate for Continuous Use**:\n   - Once tested, keep the workflow active in n8n.\n   - Your bot will now process any text or image sent to it via Telegram.\n\n## Example Inputs/Formats\nTo help the workflow process your data accurately, use clear and structured inputs. Below are examples of valid inputs:\n\n### Text Input Example:\nSend a message to your Telegram bot like this:\n```\nBought coffee at Starbucks, Jalan Sudirman, yesterday. Total Rp 50,000. 2 lattes, each Rp 25,000.\n```\n**Expected Output**:\n```\nhello [Your Name]\n\nIni Rekap Belanjamu\n📋 Store: Starbucks\n📍 Location: Jalan Sudirman\n📅 Date: 2025-05-26\n🛒 Items:\n- Latte: Rp 25,000\n- Latte: Rp 25,000\n💸 Total: Rp 50,000\n📌 Category: Food & Beverages\n```\n\n### Image Input Example:\nUpload a photo of a receipt to your Telegram bot. The receipt should contain:\n- Store name (e.g., “Alfamart”)\n- Address (e.g., “Jl. Gatot Subroto, Jakarta”)\n- Date and time (e.g., “27/05/2025 14:00”)\n- Items with prices (e.g., “Bread Rp 15,000”, “Milk Rp 20,000”)\n- Total amount (e.g., “Total: Rp 35,000”)\n\n**Expected Output**:\n```\nhello [Your Name]\n\nIni Rekap Belanjamu\n📋 Store: Alfamart\n📍 Location: Jl. Gatot Subroto, Jakarta\n📅 Date: 2025-05-27 14:00\n🛒 Items:\n- Bread: Rp 15,000\n- Milk: Rp 20,000\n💸 Total: Rp 35,000\n📌 Category: Household\n```\n\n**Tips for Images**:\n- Ensure the receipt is well-lit and text is readable.\n- Avoid blurry or angled photos for better Tesseract accuracy.\n\n## How to Customize This Workflow\n- **Change Expense Categories**: In the **AI Categorizer** node, edit the prompt to include custom categories (e.g., add “Entertainment” or “Utilities” to the list: Food & Beverages, Household, Transport).\n- **Modify Response Format**: In the **Format Summary Message** node, adjust the JavaScript code to change how the summary looks (e.g., add emojis, reorder fields).\n- **Save to a Database**: Add a node (e.g., Google Sheets or PostgreSQL) after the **Format Summary Message** node to store summaries.\n- **Support Other Languages**: In the **AI Categorizer** node, update the prompt to handle additional languages (e.g., Spanish, Mandarin) by specifying them in the instructions.\n- **Add Error Handling**: Enhance the **Check Invalid Input** node to catch more edge cases, like invalid dates.\n\n## All Free, End-to-End\nThis workflow is 100% free! It leverages:\n- **Telegram Bot API**: Free via BotFather.\n- **Tesseract**: Open-source text recognition.\n- **LLaMA via OpenRouter**: Free tier available for AI processing.\n\nEnjoy automating your expense tracking without any cost!\n\n*Made by: [khmuhtadin](khmuhtadin.com)*\n**Need a custom?** contact me on **[LinkedIn](https://www.linkedin.com/in/khmuhtadin/)** or **[Web](khmuhtadin.com)**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Format Summary Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Telegram File",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky - Telegram Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Categorizer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Check Invalid Input",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract Text Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check for Image",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky - Check for Image",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Receipt Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Error Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Expense Summary",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky - Parse Receipt Data1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Value From Image",
+      "type": "n8n-nodes-tesseractjs.tesseractNode",
+      "role": "tesseractNode",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Send Expense Summary1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Extract Text Input1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Parse Receipt Data2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Get Telegram File1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Download Image2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Download Image3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Format Summary Message1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - AI Categorizer1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Send Error Message1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - Check Invalid Input1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky - OpenRouter AI Model1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

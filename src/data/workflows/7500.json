@@ -1,0 +1,134 @@
+{
+  "id": 7500,
+  "slug": "7500",
+  "title": "Monitor & alert on inactive AWS IAM users with Slack notifications",
+  "description": "# AWS IAM Inactive User Automation Alert Workflow\n\n&gt; Weekly job that finds IAM users with **no activity for &gt; 90 days** and notifies a Slack channel.  \n&gt; ⚠️ **Important:** AWS SigV4 for IAM must be scoped to **`us-east-1`**. Create the AWS credential in n8n with region **us-east-1** (even if your other services run elsewhere).\n\n## **Who’s it for**\n- SRE/DevOps teams that want automated IAM hygiene checks.\n- Security/compliance owners who need regular inactivity reports.\n- MSPs managing multiple AWS accounts who need lightweight alerting.\n\n## **How it works / What it does**\n1. **Weekly scheduler** – kicks off the workflow (e.g., every Monday 09:00).\n2. **Get many users** – lists IAM users.\n3. **Get user** – enriches each user with details (password status, MFA, etc.).\n4. **Filter bad data** – drops service-linked users or items without usable dates.\n5. **IAM user inactive for more than 90 days?** – keeps users whose **last activity** is older than 90 days.\n   - Last activity is derived from any of:\n     - `PasswordLastUsed` (console sign-in)\n     - `AccessKeyLastUsed.LastUsedDate` (from `GetAccessKeyLastUsed` if you add it)\n     - Fallback to `CreateDate` if no usage data exists (optional)\n6. **Send a message (Slack)** – posts an alert for each inactive user.\n7. **No operation** – path for users that don’t match (do nothing).\n\n## **How to set up**\n1. **Credentials**\n   - **AWS (Predefined → AWS)**  \n     - Service: `iam`  \n     - Region: `us-east-1`  ← **required for IAM**  \n     - Access/Secret (or Assume Role) with read-only IAM perms (see below).\n   - **Slack** OAuth (bot in your target channel).\n\n## **Requirements**\n- n8n (current version).\n- **AWS IAM permissions** (minimum):\n  - `iam:ListUsers`, `iam:GetUser`\n  - *(Optional for higher fidelity)* `iam:ListAccessKeys`, `iam:GetAccessKeyLastUsed`\n- Slack bot with permission to post in the target channel.\n- Network egress to `iam.amazonaws.com`.\n\n## **How to customize the workflow**\n- **Change window:** set 60/120/180 days by adjusting `minus(N, 'days')`.\n- **Audit log:** append results to Google Sheets/DB with `UserName`, `Arn`, `LastActivity`, `CheckedAt`.\n- **Escalation:** if a user remains inactive for another cycle, mention `@security` or open a ticket.\n- **Auto-remediation (advanced):** on a separate approval path, disable access keys or detach policies.\n- **Multi-account / multi-region:** iterate a list of AWS credentials (one per account; IAM stays `us-east-1`).\n- **Exclude list:** add a static list or tag-based filter to skip known service users.\n\n## **Notes & gotchas**\n- Many users never sign in; if you don’t pull `GetAccessKeyLastUsed`, they may look “inactive”. Add that call for accuracy.\n- `PasswordLastUsed` is null if console login never happened.\n- IAM returns timestamps in ISO or epoch—use `toDate`/`toDateTime` before comparisons.",
+  "featuredImage": "/data/workflows/7500/7500.webp",
+  "author": {
+    "id": 101,
+    "slug": "trungtran",
+    "name": "Trung Tran",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 185,
+  "downloads": 18,
+  "createdAt": "2025-08-17T06:47:55.627Z",
+  "updatedAt": "2026-01-16T08:50:37.194Z",
+  "publishedAt": "2025-08-17T06:47:55.627Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7500",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor & alert on inactive AWS IAM users with Slack notifications",
+    "workflowName": "Monitor & alert on inactive AWS IAM users with Slack notifications",
+    "description": "# AWS IAM Inactive User Automation Alert Workflow\n\n&gt; Weekly job that finds IAM users with **no activity for &gt; 90 days** and notifies a Slack channel.  \n&gt; ⚠️ **Important:** AWS SigV4 for IAM must be scoped to **`us-east-1`**. Create the AWS credential in n8n with region **us-east-1** (even if your other services run elsewhere).\n\n## **Who’s it for**\n- SRE/DevOps teams that want automated IAM hygiene checks.\n- Security/compliance owners who need regular inactivity reports.\n- MSPs managing multiple AWS accounts who need lightweight alerting.\n\n## **How it works / What it does**\n1. **Weekly scheduler** – kicks off the workflow (e.g., every Monday 09:00).\n2. **Get many users** – lists IAM users.\n3. **Get user** – enriches each user with details (password status, MFA, etc.).\n4. **Filter bad data** – drops service-linked users or items without usable dates.\n5. **IAM user inactive for more than 90 days?** – keeps users whose **last activity** is older than 90 days.\n   - Last activity is derived from any of:\n     - `PasswordLastUsed` (console sign-in)\n     - `AccessKeyLastUsed.LastUsedDate` (from `GetAccessKeyLastUsed` if you add it)\n     - Fallback to `CreateDate` if no usage data exists (optional)\n6. **Send a message (Slack)** – posts an alert for each inactive user.\n7. **No operation** – path for users that don’t match (do nothing).\n\n## **How to set up**\n1. **Credentials**\n   - **AWS (Predefined → AWS)**  \n     - Service: `iam`  \n     - Region: `us-east-1`  ← **required for IAM**  \n     - Access/Secret (or Assume Role) with read-only IAM perms (see below).\n   - **Slack** OAuth (bot in your target channel).\n\n## **Requirements**\n- n8n (current version).\n- **AWS IAM permissions** (minimum):\n  - `iam:ListUsers`, `iam:GetUser`\n  - *(Optional for higher fidelity)* `iam:ListAccessKeys`, `iam:GetAccessKeyLastUsed`\n- Slack bot with permission to post in the target channel.\n- Network egress to `iam.amazonaws.com`.\n\n## **How to customize the workflow**\n- **Change window:** set 60/120/180 days by adjusting `minus(N, 'days')`.\n- **Audit log:** append results to Google Sheets/DB with `UserName`, `Arn`, `LastActivity`, `CheckedAt`.\n- **Escalation:** if a user remains inactive for another cycle, mention `@security` or open a ticket.\n- **Auto-remediation (advanced):** on a separate approval path, disable access keys or detach policies.\n- **Multi-account / multi-region:** iterate a list of AWS credentials (one per account; IAM stays `us-east-1`).\n- **Exclude list:** add a static list or tag-based filter to skip known service users.\n\n## **Notes & gotchas**\n- Many users never sign in; if you don’t pull `GetAccessKeyLastUsed`, they may look “inactive”. Add that call for accuracy.\n- `PasswordLastUsed` is null if console login never happened.\n- IAM returns timestamps in ISO or epoch—use `toDate`/`toDateTime` before comparisons.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Weekly scheduler",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get many users",
+      "type": "n8n-nodes-base.awsIam",
+      "role": "awsIam",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get user",
+      "type": "n8n-nodes-base.awsIam",
+      "role": "awsIam",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "IAM user inactive for more than 90 days?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Filter bad data",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Custom HTTP Request (enable to try)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "id": 10600,
+  "slug": "10600",
+  "title": "Interactive CV chatbot with GPT-4 and Telegram follow-up system",
+  "description": "## This template demonstrates how to provide an interactive chatbot for your work history based off your CV. Unanswered questions and follow-up email contacts are sent to you via Telegram.\n\nUse case: link on your profile to not only show off you AI workflow skills but also to provide an interactive chatbot about your work history for prospective employers. \n\n#### Good to Know\n\nIt will require access to an OpenAI API Key (free for low usage) and setting up a bot in Telegram (free). \n\n## How it Works\n\n* The n8n inbuilt chat node will be hosted on n8n services to provide the chat interface.\n* You will upload your CV either exported from LinkedIn or exported yourself to Microsoft OneDrive along with a simple text file explaining some other information about you.\n* On each chat interaction the PDF and text file are used as tools to get context information for the chatbot to respond.\n* If a question cannot be answered reliably, a subworkflow will be called to capture that question and send it to you as a telegram message.\n* If the person chatting supplies their email address, this will be sent to you via a Telegram message along with other information the user provides. \n\n## How to use\n\n1. After importing the template, create the subworkflows so that they can be used a Tools by the AI Node. Don't forget to add the Execute sub-workflow trigger.\n2. Setup credentials for Open AI, OneDrive and telegram.\n3. Upload your CV & text file summary to OneDrive and replace the document IDs in the `get_documents` sub-workflow.\n4. Activate the workflow so that publicly available chat will get generated on n8n.",
+  "featuredImage": "/data/workflows/10600/10600.webp",
+  "author": {
+    "id": 101,
+    "slug": "gede",
+    "name": "Gede Suparsa",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 73,
+  "downloads": 7,
+  "createdAt": "2025-11-07T15:13:43.696Z",
+  "updatedAt": "2026-01-16T09:05:39.373Z",
+  "publishedAt": "2025-11-07T15:13:43.696Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10600",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Interactive CV chatbot with GPT-4 and Telegram follow-up system",
+    "workflowName": "Interactive CV chatbot with GPT-4 and Telegram follow-up system",
+    "description": "## This template demonstrates how to provide an interactive chatbot for your work history based off your CV. Unanswered questions and follow-up email contacts are sent to you via Telegram.\n\nUse case: link on your profile to not only show off you AI workflow skills but also to provide an interactive chatbot about your work history for prospective employers. \n\n#### Good to Know\n\nIt will require access to an OpenAI API Key (free for low usage) and setting up a bot in Telegram (free). \n\n## How it Works\n\n* The n8n inbuilt chat node will be hosted on n8n services to provide the chat interface.\n* You will upload your CV either exported from LinkedIn or exported yourself to Microsoft OneDrive along with a simple text file explaining some other information about you.\n* On each chat interaction the PDF and text file are used as tools to get context information for the chatbot to respond.\n* If a question cannot be answered reliably, a subworkflow will be called to capture that question and send it to you as a telegram message.\n* If the person chatting supplies their email address, this will be sent to you via a Telegram message along with other information the user provides. \n\n## How to use\n\n1. After importing the template, create the subworkflows so that they can be used a Tools by the AI Node. Don't forget to add the Execute sub-workflow trigger.\n2. Setup credentials for Open AI, OneDrive and telegram.\n3. Upload your CV & text file summary to OneDrive and replace the document IDs in the `get_documents` sub-workflow.\n4. Activate the workflow so that publicly available chat will get generated on n8n.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Call 'get_documents'",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Call 'record_unknown_question'",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Call 'record_user_details'",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ExtractFromPDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ExtractFromTXT",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Download PDF CV",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download Summary text file",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a text message1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

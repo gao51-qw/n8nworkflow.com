@@ -1,0 +1,1 @@
+This workflow automates a two way sync of customer data between Pipedrive and MySQL. It will create new records in one source if it only exists in the other. Where matching records have different data for name, phone number or email address, it will sync the most recently updated version.

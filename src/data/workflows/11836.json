@@ -1,0 +1,200 @@
+{
+  "id": 11836,
+  "slug": "11836",
+  "title": "Automated Gmail classification and labeling with GPT-4, Sheets and Slack alerts",
+  "description": "## This n8n template automates email labeling using AI-enhanced classification and intelligent routing\n\nGmail users report spending significant time manually sorting email, so this tool helps alleviate that burden.\n\n## How it works\n- Gmail Trigger monitors unread emails every 2 minutes\n- Once an email arrives, the content is extracted with HTML cleaning\n- AI Agent (the node is set for Chat GPT-4) is used for classification & entity extraction\n- A Structured Output Parser parses the email to JSON\n- A 9-way category routing system categorizes the email (Inquiry, Support, Newsletter, Marketing, Personal, Urgent, Spam, Invoice, Meeting)\n- Gmail auto-labeling is used for each category\n- Google Sheets is used for logging (the main log that includes all emails and  an error log which are emails that cannot be classified)\n- Slack alerts are generated for high-priority/urgent emails\n- Error handling is done with separate error logging in Google Sheets\n\n## How to use\n- Set up credentials for Google Gmail, LLM (ChatGPT, Gemini, etc.), Google Sheets, and Slack\n- Modify the categories as needed per user preference\n\n## Requirements\n- Gmail \n- Any LLM like ChatGPT or Google Gemini\n- Google Drive with Google Sheets is optional for logging and error handling\n- Slack is optional for high-priority messages",
+  "featuredImage": "/data/workflows/11836/11836.webp",
+  "author": {
+    "id": 101,
+    "slug": "chrismielke",
+    "name": "Chris Mielke",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 71,
+  "downloads": 7,
+  "createdAt": "2025-12-15T18:15:25.267Z",
+  "updatedAt": "2026-01-16T09:10:18.463Z",
+  "publishedAt": "2025-12-15T18:15:25.267Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11836",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated Gmail classification and labeling with GPT-4, Sheets and Slack alerts",
+    "workflowName": "Automated Gmail classification and labeling with GPT-4, Sheets and Slack alerts",
+    "description": "## This n8n template automates email labeling using AI-enhanced classification and intelligent routing\n\nGmail users report spending significant time manually sorting email, so this tool helps alleviate that burden.\n\n## How it works\n- Gmail Trigger monitors unread emails every 2 minutes\n- Once an email arrives, the content is extracted with HTML cleaning\n- AI Agent (the node is set for Chat GPT-4) is used for classification & entity extraction\n- A Structured Output Parser parses the email to JSON\n- A 9-way category routing system categorizes the email (Inquiry, Support, Newsletter, Marketing, Personal, Urgent, Spam, Invoice, Meeting)\n- Gmail auto-labeling is used for each category\n- Google Sheets is used for logging (the main log that includes all emails and  an error log which are emails that cannot be classified)\n- Slack alerts are generated for high-priority/urgent emails\n- Error handling is done with separate error logging in Google Sheets\n\n## How to use\n- Set up credentials for Google Gmail, LLM (ChatGPT, Gemini, etc.), Google Sheets, and Slack\n- Modify the categories as needed per user preference\n\n## Requirements\n- Gmail \n- Any LLM like ChatGPT or Google Gemini\n- Google Drive with Google Sheets is optional for logging and error handling\n- Slack is optional for high-priority messages",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Extract and Clean Email Content",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Classify and Extract Entities",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Parse and Validate AI Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Classification Success",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Route by Category",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Label: Inquiry",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Support Request",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Newsletter",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Marketing",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Personal",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Urgent",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Spam",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Invoice/Receipt",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label: Meeting Request",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Log All Emails",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Check if High Priority or Urgent",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Urgent Email Alert",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log Classification Errors",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Email Ingestion",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Classification",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Routing Logic",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Integrations",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Handling",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email Ingestion1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail Check Every 2 Min",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    }
+  ]
+}

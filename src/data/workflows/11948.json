@@ -1,0 +1,295 @@
+{
+  "id": 11948,
+  "slug": "11948",
+  "title": "Submit sitemap URLs from Oncrawl to Google Indexing API and IndexNow",
+  "description": "# Summary\n\nThis workflow enables the submission of business-critical URLs via the Google Indexing API and IndexNow.\n\nWhy is this important for SEO?\n\n- If your objective is visibility within AI-powered search and answer engines (such as Copilot, Perplexity, or OpenAI tools), the IndexNow integration is particularly relevant. IndexNow accelerates URL discovery for Bing and Yandex, which are key retrieval sources for several LLM-based platforms.\n- In parallel, Google remains the dominant search engine, representing ~80% of global search traffic. Gemini is deeply integrated into Google’s ecosystem and, when grounding is enabled, can leverage Google Search as an external retrieval source. Ensuring fast and reliable indexation of critical URLs therefore remains a strategic foundation for both traditional SEO and AI-assisted search experiences.\n\n# Description\n\nThis workflow uses OnCrawl API endpoint to automatically discover your `sitemaps.xml` and submit their latest updates to both Google Indexing API and IndexNOW.\n\nIt includes two variations:\n\n- Index orphan pages detected in `sitemap.xml` and submit them to Google and IndexNow.\n- Index newly released pages by identifying indexable canonical URLs added between a pre-release crawl and a post-release crawl.\n\n# How it works\n\nThis workflow works for Oncrawl users with API access enabled in their plan.\n\nif you are not an Oncrawl users, please refer to: [https://n8n.io/workflows/8778-workflow-for-submitting-changed-sitemap-urls-using-google-indexing-api-and-bing-indexnow/](https://n8n.io/workflows/8778-workflow-for-submitting-changed-sitemap-urls-using-google-indexing-api-and-bing-indexnow/)\n\nTo get an API Key, just go in your User Account profile &gt; tokens &gt; + Add API access token:\n\n- Description: any name\n- Scope: select all checkboxes\n- Click in Create token. Keep your API secret safe\n\n## Discover & parse Sitemaps\n\n- Create your first crawl by: Clicking in Create configuration &gt; choose a template &gt; Automate &gt; Webhook.\n- Webhook Node: In n8n, copy paste the Webhook callback URL into the Oncrawl Webhook section. At the end, Oncrawl sends a POST HTTP request to n8n containing: `Workspace_ID`, `Project_ID`, `Crawl_ID`. More details in Webhook Documentation: [https://developer.oncrawl.com/#notification](https://developer.oncrawl.com/#notification)\n- `Discover_sitemaps` endpoint:  documentation: [https://developer.oncrawl.com/](https://developer.oncrawl.com/). This endpoint checks the Sitemaps declared in your robots.txt file. You can filter the output to avoid duplicate sitemaps\n- Config: It’s an initiation node that populate variables such as:\n    - `Crawl_ID`: Fetch from Webhook Node\n    - `SITE_URL`: Your site with the following format: https://your-site.com\n    - `SITEMAP_URL`: For subdomain sitemaps, you can duplicate this field.\n    - `INDEXNOW_KEY`: You can create it in the Bing Webmaster tools here [https://www.bing.com/indexnow/getstarted](https://www.bing.com/indexnow/getstarted)\n    - `INDEXNOW_KEY_UR`L: it's usually your domain and the INDEXNOW_KEY: [wwww.example.com/](http://wwww.example.com/) &lt;INDEXNOW_KEY&gt;\n    \n    Variables you can update depending on your specs:\n    \n    - `DAYS_BACK`: 7 by default.\n    - `BATCH_SIZE`: 500 it's the default recommended by IndexNow\n    - `USE_GOOGLE`, `USE_INDEXNOW`: by default it's true which means the process will run for both Google and IndexNow\n\n\n## Google Node\n\n### Check Status Node (**OAuth Setup**):\n   - documentation: [https://developers.google.com/webmaster-tools/v1/urlInspection.index/inspect](https://developers.google.com/webmaster-tools/v1/urlInspection.index/inspect)\n    Create credentials: [https://console.cloud.google.com/apis/credentials]([https://console.cloud.google.com/apis/credentials)\n- Enable Google Search Console API\n- Download the Client ID / Client Secret JSON\n\t- Connect n8n using:\n        - Client ID\n        - Client Secret\n        - Scopes\n        - Google Search Console account\n    - All explanations are contained in these tutorials: [https://www.youtube.com/watch?v=HT56wExnN5k](https://www.youtube.com/watch?v=HT56wExnN5k) | [https://www.youtube.com/watch?v=FBGtpWMTppw](https://www.youtube.com/watch?v=FBGtpWMTppw)\n    Scopes reference: [https://developers.google.com/identity/protocols/oauth2/scopes](https://developers.google.com/identity/protocols/oauth2/scopes)\n\n### Google Index API:\n\n- Create a service account here [https://console.cloud.google.com/iam-admin/serviceaccounts](https://console.cloud.google.com/iam-admin/serviceaccounts)\n    - Assign role: Owner\n- Generate a **JSON key** (contains email + private key)\n- For the two Google API nodes:\n    - Authentication: **Predefined credential type**\n    - Credential Type: **Google Service Account API**\n- Credential configuration:\n    - Region: Your project region\n    - Service Account Email / Private Key: From the JSON key\n    - Enable “Set up for use in HTTP Request node”\n    - Scope: [https://www.googleapis.com/auth/indexing](https://www.googleapis.com/auth/indexing)\n    - ⚠️ **Important:** once you have created a \"Service account email\" you need to add a user with this email and permission \"Owner\" in your Google Search Console: \n[https://search.google.com/search-console/users](https://search.google.com/search-console/users)\n- Others Nodes\n    - Gate: Google Is `USE_GOOGLE = true` from Cofig?\n    - Check status: Useful to get the `coverageState` and `lastCrawlTime` of a given URL given by Google Search Console\n    - Loop Over Items: Prevents rate-limiting\n    - Switch:\n        - Case: coverageState= “`Submitted and indexed`” -&gt; Push to \"isNew\" node\n        - Case: coverageState= “`Crawled - currently not indexed`” -&gt; Push to \"URL Updated\" node\n    - Is New: URLs from Sitemap with Last modification date AFTER the GoogleLast Crawl date\n        - If true, we submit URLs to Index API\n        - If false, no need to push that URL for indexation\n    - URL Updates\n        - doc: [https://developers.google.com/search/apis/indexing-api/v3/using-api#gettinginfo](https://developers.google.com/search/apis/indexing-api/v3/using-api#gettinginfo)\n        - Endpoint: [https://indexing.googleapis.com/v3/urlNotifications:publish](https://indexing.googleapis.com/v3/urlNotifications:publish)\n        - We call the Update URL request\n    - Wait: Generates a random delay between 0.30 and 1.50 seconds, rounded to 2 decimals\n\n**⚠️ Google alternative to batch index URLs consists in using Premium Service to by pass the URL inspection tool: [https://fr.speedyindex.com/](https://fr.speedyindex.com/)**\n\n\n## IndexNow auto-submitting\n\n- documentation: [https://www.bing.com/indexnow/getstarted](https://www.bing.com/indexnow/getstarted)\n- Gate: IndexNow: Is USE_INDEXNOW is true from Config?\n- Split in Batches: split in batch of 500 URLs max to avoid rate Limiting issues\n- Build IndexNow payload: description in the node name\n- IndexNow Submit: Submit the URLs to indexNow\n\n## VariationA:  Index orphan pages\n\n- API documentation: [https://developer.oncrawl.com/#Data-API](https://developer.oncrawl.com/#Data-API)\n- OQL definition: Get orphan pages for both sitemaps & logs\n- Merge node: Merge Items that InnerJoin `loc`, `url` fields. This is useful to recover the `lastmod` from Orphan pages referenced into Sitemaps.\nThis data can be shared into Google Node afterward.\nInput1 should be: \"`Assign mandatory sitemap fields`\" Node\n\nNext nodes\n\n- change \"Set Node\" name in the script variables\n\n## VariationB: Index newly added pages between a Crawl 1 & a Crawl2\n\n- API documentation: [https://developer.oncrawl.com/#Data-API](https://developer.oncrawl.com/#Data-API)\n- OQL definition: Returns indexable canonical pages added in Crawl 2\n- Merge node: Merge Items that match between `loc`, `url` fields. This is useful to recover the `lastmod` data for Google Node\nInput1 should be: \"`Assign mandatory sitemap fields\"` Node\n\nNext nodes\n\n- change \"Set Node\" name in the script variables\n",
+  "featuredImage": "/data/workflows/11948/11948.webp",
+  "author": {
+    "id": 101,
+    "slug": "traversac",
+    "name": "Philippe",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8,
+  "downloads": 0,
+  "createdAt": "2025-12-19T10:31:38.687Z",
+  "updatedAt": "2026-01-16T09:10:47.839Z",
+  "publishedAt": "2025-12-19T10:31:38.687Z",
+  "nodes": 43,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11948",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Submit sitemap URLs from Oncrawl to Google Indexing API and IndexNow",
+    "workflowName": "Submit sitemap URLs from Oncrawl to Google Indexing API and IndexNow",
+    "description": "# Summary\n\nThis workflow enables the submission of business-critical URLs via the Google Indexing API and IndexNow.\n\nWhy is this important for SEO?\n\n- If your objective is visibility within AI-powered search and answer engines (such as Copilot, Perplexity, or OpenAI tools), the IndexNow integration is particularly relevant. IndexNow accelerates URL discovery for Bing and Yandex, which are key retrieval sources for several LLM-based platforms.\n- In parallel, Google remains the dominant search engine, representing ~80% of global search traffic. Gemini is deeply integrated into Google’s ecosystem and, when grounding is enabled, can leverage Google Search as an external retrieval source. Ensuring fast and reliable indexation of critical URLs therefore remains a strategic foundation for both traditional SEO and AI-assisted search experiences.\n\n# Description\n\nThis workflow uses OnCrawl API endpoint to automatically discover your `sitemaps.xml` and submit their latest updates to both Google Indexing API and IndexNOW.\n\nIt includes two variations:\n\n- Index orphan pages detected in `sitemap.xml` and submit them to Google and IndexNow.\n- Index newly released pages by identifying indexable canonical URLs added between a pre-release crawl and a post-release crawl.\n\n# How it works\n\nThis workflow works for Oncrawl users with API access enabled in their plan.\n\nif you are not an Oncrawl users, please refer to: [https://n8n.io/workflows/8778-workflow-for-submitting-changed-sitemap-urls-using-google-indexing-api-and-bing-indexnow/](https://n8n.io/workflows/8778-workflow-for-submitting-changed-sitemap-urls-using-google-indexing-api-and-bing-indexnow/)\n\nTo get an API Key, just go in your User Account profile &gt; tokens &gt; + Add API access token:\n\n- Description: any name\n- Scope: select all checkboxes\n- Click in Create token. Keep your API secret safe\n\n## Discover & parse Sitemaps\n\n- Create your first crawl by: Clicking in Create configuration &gt; choose a template &gt; Automate &gt; Webhook.\n- Webhook Node: In n8n, copy paste the Webhook callback URL into the Oncrawl Webhook section. At the end, Oncrawl sends a POST HTTP request to n8n containing: `Workspace_ID`, `Project_ID`, `Crawl_ID`. More details in Webhook Documentation: [https://developer.oncrawl.com/#notification](https://developer.oncrawl.com/#notification)\n- `Discover_sitemaps` endpoint:  documentation: [https://developer.oncrawl.com/](https://developer.oncrawl.com/). This endpoint checks the Sitemaps declared in your robots.txt file. You can filter the output to avoid duplicate sitemaps\n- Config: It’s an initiation node that populate variables such as:\n    - `Crawl_ID`: Fetch from Webhook Node\n    - `SITE_URL`: Your site with the following format: https://your-site.com\n    - `SITEMAP_URL`: For subdomain sitemaps, you can duplicate this field.\n    - `INDEXNOW_KEY`: You can create it in the Bing Webmaster tools here [https://www.bing.com/indexnow/getstarted](https://www.bing.com/indexnow/getstarted)\n    - `INDEXNOW_KEY_UR`L: it's usually your domain and the INDEXNOW_KEY: [wwww.example.com/](http://wwww.example.com/) &lt;INDEXNOW_KEY&gt;\n    \n    Variables you can update depending on your specs:\n    \n    - `DAYS_BACK`: 7 by default.\n    - `BATCH_SIZE`: 500 it's the default recommended by IndexNow\n    - `USE_GOOGLE`, `USE_INDEXNOW`: by default it's true which means the process will run for both Google and IndexNow\n\n\n## Google Node\n\n### Check Status Node (**OAuth Setup**):\n   - documentation: [https://developers.google.com/webmaster-tools/v1/urlInspection.index/inspect](https://developers.google.com/webmaster-tools/v1/urlInspection.index/inspect)\n    Create credentials: [https://console.cloud.google.com/apis/credentials]([https://console.cloud.google.com/apis/credentials)\n- Enable Google Search Console API\n- Download the Client ID / Client Secret JSON\n\t- Connect n8n using:\n        - Client ID\n        - Client Secret\n        - Scopes\n        - Google Search Console account\n    - All explanations are contained in these tutorials: [https://www.youtube.com/watch?v=HT56wExnN5k](https://www.youtube.com/watch?v=HT56wExnN5k) | [https://www.youtube.com/watch?v=FBGtpWMTppw](https://www.youtube.com/watch?v=FBGtpWMTppw)\n    Scopes reference: [https://developers.google.com/identity/protocols/oauth2/scopes](https://developers.google.com/identity/protocols/oauth2/scopes)\n\n### Google Index API:\n\n- Create a service account here [https://console.cloud.google.com/iam-admin/serviceaccounts](https://console.cloud.google.com/iam-admin/serviceaccounts)\n    - Assign role: Owner\n- Generate a **JSON key** (contains email + private key)\n- For the two Google API nodes:\n    - Authentication: **Predefined credential type**\n    - Credential Type: **Google Service Account API**\n- Credential configuration:\n    - Region: Your project region\n    - Service Account Email / Private Key: From the JSON key\n    - Enable “Set up for use in HTTP Request node”\n    - Scope: [https://www.googleapis.com/auth/indexing](https://www.googleapis.com/auth/indexing)\n    - ⚠️ **Important:** once you have created a \"Service account email\" you need to add a user with this email and permission \"Owner\" in your Google Search Console: \n[https://search.google.com/search-console/users](https://search.google.com/search-console/users)\n- Others Nodes\n    - Gate: Google Is `USE_GOOGLE = true` from Cofig?\n    - Check status: Useful to get the `coverageState` and `lastCrawlTime` of a given URL given by Google Search Console\n    - Loop Over Items: Prevents rate-limiting\n    - Switch:\n        - Case: coverageState= “`Submitted and indexed`” -&gt; Push to \"isNew\" node\n        - Case: coverageState= “`Crawled - currently not indexed`” -&gt; Push to \"URL Updated\" node\n    - Is New: URLs from Sitemap with Last modification date AFTER the GoogleLast Crawl date\n        - If true, we submit URLs to Index API\n        - If false, no need to push that URL for indexation\n    - URL Updates\n        - doc: [https://developers.google.com/search/apis/indexing-api/v3/using-api#gettinginfo](https://developers.google.com/search/apis/indexing-api/v3/using-api#gettinginfo)\n        - Endpoint: [https://indexing.googleapis.com/v3/urlNotifications:publish](https://indexing.googleapis.com/v3/urlNotifications:publish)\n        - We call the Update URL request\n    - Wait: Generates a random delay between 0.30 and 1.50 seconds, rounded to 2 decimals\n\n**⚠️ Google alternative to batch index URLs consists in using Premium Service to by pass the URL inspection tool: [https://fr.speedyindex.com/](https://fr.speedyindex.com/)**\n\n\n## IndexNow auto-submitting\n\n- documentation: [https://www.bing.com/indexnow/getstarted](https://www.bing.com/indexnow/getstarted)\n- Gate: IndexNow: Is USE_INDEXNOW is true from Config?\n- Split in Batches: split in batch of 500 URLs max to avoid rate Limiting issues\n- Build IndexNow payload: description in the node name\n- IndexNow Submit: Submit the URLs to indexNow\n\n## VariationA:  Index orphan pages\n\n- API documentation: [https://developer.oncrawl.com/#Data-API](https://developer.oncrawl.com/#Data-API)\n- OQL definition: Get orphan pages for both sitemaps & logs\n- Merge node: Merge Items that InnerJoin `loc`, `url` fields. This is useful to recover the `lastmod` from Orphan pages referenced into Sitemaps.\nThis data can be shared into Google Node afterward.\nInput1 should be: \"`Assign mandatory sitemap fields`\" Node\n\nNext nodes\n\n- change \"Set Node\" name in the script variables\n\n## VariationB: Index newly added pages between a Crawl 1 & a Crawl2\n\n- API documentation: [https://developer.oncrawl.com/#Data-API](https://developer.oncrawl.com/#Data-API)\n- OQL definition: Returns indexable canonical pages added in Crawl 2\n- Merge node: Merge Items that match between `loc`, `url` fields. This is useful to recover the `lastmod` data for Google Node\nInput1 should be: \"`Assign mandatory sitemap fields\"` Node\n\nNext nodes\n\n- change \"Set Node\" name in the script variables",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Split In Batches (IndexNow ≤500)1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait (IndexNow jitter)1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Orphan Pages",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Post - Get Sitemaps",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Assign mandatory sitemap fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Filter: lastmod within DAYS_BACK",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get sitemap.xml",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Convert sitemap to JSON",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get content-specific sitemaps",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get content of each sitemap",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "convert page data to JSON",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Force urlset.url to array",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sort",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Build IndexNow payload",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IndexNow Submit",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Gate: IndexNow",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Gate: Google",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "is new?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "URL Updated",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Config - Orphan",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Crawl over crawl",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Split Out - Orphan1",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out - Orphan2",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out - Coc1",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

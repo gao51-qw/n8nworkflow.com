@@ -1,0 +1,229 @@
+{
+  "id": 9351,
+  "slug": "9351",
+  "title": "Random Process Scheduler",
+  "description": "# Random Process Scheduler\n\n### Turn predictable automations into human-like activity with random scheduling across easily customisable time slots.\n\nPerfect for content publishing with organic scheduling patterns, social media automation, API systems that need to avoid rate limiting, or any automation requiring randomised timing control across multiple periods.\n\nAll times are configured in local timezone with automatic UTC conversion for technical operations.\n\nFeatures easy slot management with chronological ordering, gap support, and 24-hour window scheduling.\n\n### How to use\n\n- Set `schedulerExecutionTime` in **Init** node (match it to **Schedule Trigger** cron)\n- Define **time slots** with start/end hours and probability values (see below)\n- Configure **Execute sub-process** with your own workflow ID\n- Configure SMTP credentials, local time zone and optionally project paths\n\n### Step by Step Configuration\n\nTwo variables to set in the **Init** node's **\"Custom Configuration\"** section:\n\n**1. When the scheduler runs daily:**\n```javascript\nconst schedulerExecutionTime = 1; // 1am (24h clock; must match Schedule Trigger node)\n```\n\n**2. Your execution slots:**\n```javascript\nconst subprocessTimeSlots = {\n  morning: { start: 6, end: 12, probability: 0.85 },\n  afternoon: { start: 12, end: 18, probability: 0.85 },\n  evening: { start: 18, end: 24, probability: 0.5 }\n};\n```\n\nThat's it. Three slots, three probabilities.\n\nAdd or remove slots, adjust times - it just works.\n\n**Real-world example with gaps:**\n```javascript\nconst subprocessTimeSlots = {\n  night: { start: 0, end: 2, probability: 0.1 },      // Optional late activity\n  morning: { start: 6, end: 10, probability: 0.85 },  // Gap from 2-6am (no execution)\n  noon: { start: 12, end: 14, probability: 0.85 },    // Gap from 10am-12pm\n  afternoon: { start: 16, end: 18, probability: 0.85 }, // Gap from 2-4pm\n  evening: { start: 20, end: 24, probability: 0.5 }   // Gap from 6-8pm\n};\n```\n**3. Configure Execute sub-process with your workflow ID**\n\nYour sub-workflow **MUST** start with a **Wait** node and be configured with `{{ $json.executions.relativeDelaySeconds }}` as “Wait Amount”.\n\n![RPS  Community Description20251005164526603.png](fileId:2782)\n\n**4. Additional Configuration**\n* SMTP credential\n* Time zone (**Init** node): `const LOCAL_TIMEZONE = $env.GENERIC_TIMEZONE || 'Europe/Paris';` by default\n* Project paths (**Init** node):\n```\n// ⚠️ Your email here\n• const N8N_ADMIN_EMAIL = $env.N8N_ADMIN_EMAIL || 'yourmail@world.com';\n\n// ⚠️ Your projects’ ROOT folder on your mapped server here\n• const N8N_PROJECTS_DIR = $env.N8N_PROJECTS_DIR || '/files/n8n-projects-data';\n\n// ⚠️ Your project’s folder name here for logging\n• const PROJECT_FOLDER_NAME = \"RPS\";\n```\n\n### Requirements\n\n- n8n instance running in Docker with file system access\n- Volume mapping for persistent storage (e.g., `/local-files:/files`)\n- **De-activate** Read/Write nodes & Email sends if you do not want to use logging features (file system access optional)\n- SMTP server for notifications\n- n8n API credentials for error handling\n- **Target sub-workflow** with **Wait** node to handle relativeDelaySeconds\n\n**IMPORTANT:** Your sub-workflow **MUST** start with a **Wait** node and be configured with `{{ $json.executions.relativeDelaySeconds }}` as “Wait Amount”.\n\n### How it works\n\n- **24-Hour Window Algorithm**: Schedules executions from current time until next scheduler run, handling timezone conversions and cross-midnight scenarios\n- **Automatic Validation**: Checks for overlaps, invalid time ranges, and probability values on every run\n- **Chronological Processing**: Processes slots in order regardless of how you define them\n- **Inclusive/Exclusive Boundaries**: 6-12 slot runs from 6:00:00 to 11:59:59 (start inclusive, end exclusive)\n- **Chained Execution**: Each subprocess receives a relativeDelaySeconds value for sequential execution with calculated intervals\n- **Comprehensive Monitoring**: Tracks planned vs actual execution times with delay calculations and detailed logging\n\n### Configuration Rules\n\n- **No Overlap**: Slots cannot overlap (6-10 and 9-12 is invalid)\n- **Valid Ranges**: Start 0-23, end 0-24, start &lt; end\n- **Valid Probability**: 0 to 1 (0.85 = 85% chance)\n- **Gaps Allowed**: Skip hours completely (e.g., no execution 2-6am)\n- **Emoji Support**: Use \"night\", \"morning\", \"noon\", \"evening\" keywords in slot names for visual logs\n\n**Use Cases:**\n- Content publishing with organic scheduling patterns\n- Social media automation with human-like posting intervals\n- API systems avoiding rate limits through unpredictable timing\n- Business hours automation with precise timing control",
+  "featuredImage": "/data/workflows/9351/9351.webp",
+  "author": {
+    "id": 101,
+    "slug": "florent",
+    "name": "Florent",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 28,
+  "downloads": 2,
+  "createdAt": "2025-10-07T13:57:18.903Z",
+  "updatedAt": "2026-01-16T09:00:05.910Z",
+  "publishedAt": "2025-10-07T13:57:18.903Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9351",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Random Process Scheduler",
+    "workflowName": "Random Process Scheduler",
+    "description": "# Random Process Scheduler\n\n### Turn predictable automations into human-like activity with random scheduling across easily customisable time slots.\n\nPerfect for content publishing with organic scheduling patterns, social media automation, API systems that need to avoid rate limiting, or any automation requiring randomised timing control across multiple periods.\n\nAll times are configured in local timezone with automatic UTC conversion for technical operations.\n\nFeatures easy slot management with chronological ordering, gap support, and 24-hour window scheduling.\n\n### How to use\n\n- Set `schedulerExecutionTime` in **Init** node (match it to **Schedule Trigger** cron)\n- Define **time slots** with start/end hours and probability values (see below)\n- Configure **Execute sub-process** with your own workflow ID\n- Configure SMTP credentials, local time zone and optionally project paths\n\n### Step by Step Configuration\n\nTwo variables to set in the **Init** node's **\"Custom Configuration\"** section:\n\n**1. When the scheduler runs daily:**\n```javascript\nconst schedulerExecutionTime = 1; // 1am (24h clock; must match Schedule Trigger node)\n```\n\n**2. Your execution slots:**\n```javascript\nconst subprocessTimeSlots = {\n  morning: { start: 6, end: 12, probability: 0.85 },\n  afternoon: { start: 12, end: 18, probability: 0.85 },\n  evening: { start: 18, end: 24, probability: 0.5 }\n};\n```\n\nThat's it. Three slots, three probabilities.\n\nAdd or remove slots, adjust times - it just works.\n\n**Real-world example with gaps:**\n```javascript\nconst subprocessTimeSlots = {\n  night: { start: 0, end: 2, probability: 0.1 },      // Optional late activity\n  morning: { start: 6, end: 10, probability: 0.85 },  // Gap from 2-6am (no execution)\n  noon: { start: 12, end: 14, probability: 0.85 },    // Gap from 10am-12pm\n  afternoon: { start: 16, end: 18, probability: 0.85 }, // Gap from 2-4pm\n  evening: { start: 20, end: 24, probability: 0.5 }   // Gap from 6-8pm\n};\n```\n**3. Configure Execute sub-process with your workflow ID**\n\nYour sub-workflow **MUST** start with a **Wait** node and be configured with `{{ $json.executions.relativeDelaySeconds }}` as “Wait Amount”.\n\n![RPS  Community Description20251005164526603.png](fileId:2782)\n\n**4. Additional Configuration**\n* SMTP credential\n* Time zone (**Init** node): `const LOCAL_TIMEZONE = $env.GENERIC_TIMEZONE || 'Europe/Paris';` by default\n* Project paths (**Init** node):\n```\n// ⚠️ Your email here\n• const N8N_ADMIN_EMAIL = $env.N8N_ADMIN_EMAIL || 'yourmail@world.com';\n\n// ⚠️ Your projects’ ROOT folder on your mapped server here\n• const N8N_PROJECTS_DIR = $env.N8N_PROJECTS_DIR || '/files/n8n-projects-data';\n\n// ⚠️ Your project’s folder name here for logging\n• const PROJECT_FOLDER_NAME = \"RPS\";\n```\n\n### Requirements\n\n- n8n instance running in Docker with file system access\n- Volume mapping for persistent storage (e.g., `/local-files:/files`)\n- **De-activate** Read/Write nodes & Email sends if you do not want to use logging features (file system access optional)\n- SMTP server for notifications\n- n8n API credentials for error handling\n- **Target sub-workflow** with **Wait** node to handle relativeDelaySeconds\n\n**IMPORTANT:** Your sub-workflow **MUST** start with a **Wait** node and be configured with `{{ $json.executions.relativeDelaySeconds }}` as “Wait Amount”.\n\n### How it works\n\n- **24-Hour Window Algorithm**: Schedules executions from current time until next scheduler run, handling timezone conversions and cross-midnight scenarios\n- **Automatic Validation**: Checks for overlaps, invalid time ranges, and probability values on every run\n- **Chronological Processing**: Processes slots in order regardless of how you define them\n- **Inclusive/Exclusive Boundaries**: 6-12 slot runs from 6:00:00 to 11:59:59 (start inclusive, end exclusive)\n- **Chained Execution**: Each subprocess receives a relativeDelaySeconds value for sequential execution with calculated intervals\n- **Comprehensive Monitoring**: Tracks planned vs actual execution times with delay calculations and detailed logging\n\n### Configuration Rules\n\n- **No Overlap**: Slots cannot overlap (6-10 and 9-12 is invalid)\n- **Valid Ranges**: Start 0-23, end 0-24, start &lt; end\n- **Valid Probability**: 0 to 1 (0.85 = 85% chance)\n- **Gaps Allowed**: Skip hours completely (e.g., no execution 2-6am)\n- **Emoji Support**: Use \"night\", \"morning\", \"noon\", \"evening\" keywords in slot names for visual logs\n\n**Use Cases:**\n- Content publishing with organic scheduling patterns\n- Social media automation with human-like posting intervals\n- API systems avoiding rate limits through unpredictable timing\n- Business hours automation with precise timing control",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Execute sub-process",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Sub-workflow Name",
+      "type": "n8n-nodes-base.n8n",
+      "role": "n8n",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Planning File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Read Planning File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ERROR: Execute Sub-worflow",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Monitoring",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "ERROR: Monitoring",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Go/no go",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Daily Scheduler",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Init",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "NOTHING Planned Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Write Planning File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send planning",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Write Log File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ERROR: Daily Scheduler",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "FINAL SUCCESS Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Read Final Planning File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "LOOP SUCCESS email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Return Monitoring Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Read Log File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    }
+  ]
+}

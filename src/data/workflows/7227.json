@@ -1,0 +1,122 @@
+{
+  "id": 7227,
+  "slug": "7227",
+  "title": "AI website chatbot with CRM lead collection using GPT and Google Sheets",
+  "description": "This n8n training workflow demonstrates how to connect a **sub-workflow** as a **tool** to an AI Agent.  \nIn this example, the main workflow is a **Website Chatbot** that engages visitors, collects contact information, and sends that data to a CRM process.  \nThe CRM process itself is a separate sub-workflow, connected to the agent as a tool via the **Tool Workflow** node.\n\n---\n\n## Step-by-Step Setup Instructions\n\n### 1. Create the Sub-Workflow (CRM Tool)\nThis sub-workflow will be triggered by the AI agent to process collected information.  \nIt will:\n1. Receive inputs (email, description) from the main chatbot workflow.\n2. Format the data into a structured JSON format.\n3. Append the data to a Google Sheet (acting as the CRM database).\n4. Send a confirmation message back to the main workflow.\n\n**Steps inside the sub-workflow:**\n- **When Executed by Another Workflow** – Triggered by the main workflow’s tool node.\n- **Convert Conversation (Agent)** – Uses OpenAI to extract and format the input into a JSON structure:\n  ```json\n  {\n    \"email\": \"jane.doe@example.com\",\n    \"description\": \"Wants help automating lead intake and sending Slack notifications.\"\n  }\n\n**Structured Output Parser** – Ensures the extracted data matches the expected JSON schema.\n\n**Append row in sheet (Google Sheets)** – Adds the new lead data to your CRM sheet.\n\n**Code Node** – Returns a simple text confirmation like `\"Thanks for the info, we will be in touch soon\"`.\n\n### Required setup for Google Sheets:\n- Enable the Google Sheets API and connect your Google account in n8n.\n- Create a sheet with at least the columns `email` and `description`.\n- Use the sheet's Document ID and tab name in the Google Sheets node.\n\n---\n\n## 2. Create the Main Workflow (Website Chatbot)\nThis workflow acts as the main AI Agent handling incoming chat messages.\n\n### Steps in the main workflow:\n1. **When chat message received** – Starts the workflow whenever a visitor sends a message via your chatbot integration.\n2. **Website Chatbot (Agent Node)** – Configured with a **System Message** that:\n   - Briefly explains your services.\n   - Asks the visitor what processes they want to automate.\n   - Requests their name and email.\n   - Sends collected data to the CRM tool once email and description are available.\n3. **OpenAI Chat Model** – Connects to the AI agent as its language model.\n4. **Simple Memory** – Stores short-term context for the ongoing chat.\n5. **CRM Tool (Tool Workflow Node)** – Points to the sub-workflow created in Step 1, allowing the chatbot to trigger it directly.\n\n---\n\n## 3. Connecting the Sub-Workflow to the AI Agent\n1. Add a **Tool Workflow** node to the main workflow.\n2. Select `\"Parameter\"` as the source.\n3. Paste in your sub-workflow JSON or select it from your n8n workflows.\n4. Connect the **Tool Workflow** node to your AI Agent using the `ai_tool` connection.\n5. Give the tool a clear description (e.g., `crm tool to store lead information`) so the agent knows when to use it.\n\n---\n\n## 4. How It Works in Action\n1. A visitor sends a message through the chatbot.\n2. The AI Agent engages, asks questions, and collects their name, email, and request.\n3. Once collected, the agent triggers the **CRM Tool**.\n4. The sub-workflow formats the data, stores it in Google Sheets, and sends a confirmation.\n5. The chatbot confirms with the visitor that their request was received.\n\n---\n\n## 5. Customization Ideas\n- Replace Google Sheets with your actual CRM API.\n- Add validation to ensure the email format is correct before saving.\n- Expand the CRM tool to send a Slack or email notification after storing the lead.\n\n---\n\n**Created by Robert A. – Ynteractive**  \nWebsite: https://ynteractive.com  \nEmail: robert@ynteractive.com\n",
+  "featuredImage": "/data/workflows/7227/7227.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1777,
+  "downloads": 177,
+  "createdAt": "2025-08-10T21:30:15.418Z",
+  "updatedAt": "2026-01-16T08:49:07.895Z",
+  "publishedAt": "2025-08-10T21:30:15.418Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7227",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI website chatbot with CRM lead collection using GPT and Google Sheets",
+    "workflowName": "AI website chatbot with CRM lead collection using GPT and Google Sheets",
+    "description": "This n8n training workflow demonstrates how to connect a **sub-workflow** as a **tool** to an AI Agent.  \nIn this example, the main workflow is a **Website Chatbot** that engages visitors, collects contact information, and sends that data to a CRM process.  \nThe CRM process itself is a separate sub-workflow, connected to the agent as a tool via the **Tool Workflow** node.\n\n---\n\n## Step-by-Step Setup Instructions\n\n### 1. Create the Sub-Workflow (CRM Tool)\nThis sub-workflow will be triggered by the AI agent to process collected information.  \nIt will:\n1. Receive inputs (email, description) from the main chatbot workflow.\n2. Format the data into a structured JSON format.\n3. Append the data to a Google Sheet (acting as the CRM database).\n4. Send a confirmation message back to the main workflow.\n\n**Steps inside the sub-workflow:**\n- **When Executed by Another Workflow** – Triggered by the main workflow’s tool node.\n- **Convert Conversation (Agent)** – Uses OpenAI to extract and format the input into a JSON structure:\n  ```json\n  {\n    \"email\": \"jane.doe@example.com\",\n    \"description\": \"Wants help automating lead intake and sending Slack notifications.\"\n  }\n\n**Structured Output Parser** – Ensures the extracted data matches the expected JSON schema.\n\n**Append row in sheet (Google Sheets)** – Adds the new lead data to your CRM sheet.\n\n**Code Node** – Returns a simple text confirmation like `\"Thanks for the info, we will be in touch soon\"`.\n\n### Required setup for Google Sheets:\n- Enable the Google Sheets API and connect your Google account in n8n.\n- Create a sheet with at least the columns `email` and `description`.\n- Use the sheet's Document ID and tab name in the Google Sheets node.\n\n---\n\n## 2. Create the Main Workflow (Website Chatbot)\nThis workflow acts as the main AI Agent handling incoming chat messages.\n\n### Steps in the main workflow:\n1. **When chat message received** – Starts the workflow whenever a visitor sends a message via your chatbot integration.\n2. **Website Chatbot (Agent Node)** – Configured with a **System Message** that:\n   - Briefly explains your services.\n   - Asks the visitor what processes they want to automate.\n   - Requests their name and email.\n   - Sends collected data to the CRM tool once email and description are available.\n3. **OpenAI Chat Model** – Connects to the AI agent as its language model.\n4. **Simple Memory** – Stores short-term context for the ongoing chat.\n5. **CRM Tool (Tool Workflow Node)** – Points to the sub-workflow created in Step 1, allowing the chatbot to trigger it directly.\n\n---\n\n## 3. Connecting the Sub-Workflow to the AI Agent\n1. Add a **Tool Workflow** node to the main workflow.\n2. Select `\"Parameter\"` as the source.\n3. Paste in your sub-workflow JSON or select it from your n8n workflows.\n4. Connect the **Tool Workflow** node to your AI Agent using the `ai_tool` connection.\n5. Give the tool a clear description (e.g., `crm tool to store lead information`) so the agent knows when to use it.\n\n---\n\n## 4. How It Works in Action\n1. A visitor sends a message through the chatbot.\n2. The AI Agent engages, asks questions, and collects their name, email, and request.\n3. Once collected, the agent triggers the **CRM Tool**.\n4. The sub-workflow formats the data, stores it in Google Sheets, and sends a confirmation.\n5. The chatbot confirms with the visitor that their request was received.\n\n---\n\n## 5. Customization Ideas\n- Replace Google Sheets with your actual CRM API.\n- Add validation to ensure the email format is correct before saving.\n- Expand the CRM tool to send a Slack or email notification after storing the lead.\n\n---\n\n**Created by Robert A. – Ynteractive**  \nWebsite: https://ynteractive.com  \nEmail: robert@ynteractive.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory3",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Website Chatbot",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Convert Conversation",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "crm tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "id": 3191,
+  "slug": "3191",
+  "title": "Automatically save & organize LINE message files in Google Drive with Sheets logging",
+  "description": "\n## Overview\nThis workflow automatically saves files received via LINE Messaging API into Google Drive and logs the file details into a Google Sheet. It checks the file type against allowed types, organizes files into date-based folders and (optionally) file type–specific subfolders, and sends a reply message back to the LINE user with the file URL or an error message if the file type is not permitted.\n\n## Who is this for?\n**Developers & IT Administrators:** Looking to integrate LINE with Google Drive and Sheets for automated file management.\n**Businesses & Marketing Teams:** That want to automatically archive media files and documents received from users via LINE.\n**Anyone Interested in No-Code Automation:** Users who want to leverage n8n’s capabilities without heavy coding.\n\n## What Problem Does This Workflow Solve?\n**Automated File Organization:** Files received from LINE are automatically checked for allowed file types, then stored in a structured folder hierarchy in Google Drive (by date and/or file type).\n**Data Logging:** Each file upload is recorded in a Google Sheet, providing an audit trail with file names, upload dates, URLs, and types.\n**Instant Feedback:** Users receive an immediate reply via LINE confirming the file upload, or an error message if the file type is not allowed.\n## What This Workflow Does\n**1. Receives Incoming Requests:**\n* A webhook node (*\"LINE Webhook Listener\"*) listens for POST requests from LINE, capturing file upload events and associated metadata.\n\n**2. Configuration Loading:**\n* A Google Sheets node (*\"Get Config\"*) reads configuration data (e.g., parent folder ID, allowed file types, folder organization settings, and credentials) from a pre-defined sheet.\n\n**Data Merging & Processing:**\n* The *\"Merge Event and Config Data\"* and *\"Process Event and Config Data\"* nodes merge and structure the event data with configuration settings.\n* A *\"Determine Folder Info\"* node calculates folder names based on the configuration. If Store by Date is enabled, it uses the current date (or a specified date) as the folder name. If Store by File Type is also enabled, it uses the file’s type (e.g., image) for a subfolder.\n\n**4. Folder Search & Creation:**\n* The workflow searches for an existing date folder (*\"Search Date Folder\"*).\n* If the date folder is not found, an IF node (*\"Check Existing Date Folder\"*) routes to a *\"Create Date Folder\"* node.\n* Similarly, for file type organization, the workflow uses a *\"Search FileType Folder\"* node (with appropriate conditions) to look for a subfolder, or creates it if not found.\n* The *\"Set Date Folder ID\"* and *\"Set Image Folder ID\"* nodes capture and merge the resulting folder IDs.\n* Finally, the *\"Config final ParentId\"* node sets the final target folder ID based on the configuration conditions:\n  - **Store by Date: TRUE, Store by File Type: TRUE:** Use the file type folder (inside the date folder).\n  - **Store by Date: TRUE, Store by File Type: FALSE:** Use the date folder.\n  - **Store by Date: FALSE, Store by File Type: TRUE:** Use the file type folder.\n  - **Store by Date: FALSE, Store by File Type: FALSE:** Use the Parent Folder ID from the configuration.\n\n**5. File Retrieval and Validation:**\n- A HTTP Request node (*\"Get File Binary Content\"*) fetches the file’s binary data from the LINE API.\n- A Function node (*\"Validate File Type\"*) checks if the file’s MIME type is included in the allowed list (e.g., \"audio|image|video\"). If not, it throws an error that is captured for the reply.\n\n**6. File Upload and Logging:**\n- The *\"Upload File to Google Drive\"* node uploads the validated binary file to the final target folder.\n- After a successful upload, the *\"Log File Details to Google Sheet\"* node logs details such as file name, upload date, Google Drive URL, and file type into a designated Google Sheet.\n\n**7. User Feedback:**\n- The *\"Check Reply Enabled Flag\"* node checks if the reply feature is enabled.\n- Finally, the *\"Send LINE Reply Message\"* node sends a reply message back to the LINE user with either the file URL (if the upload was successful) or an error message (if the file type was not allowed).\n\n## Setup Instructions\n**1. Google Sheets Setup:**\n* **Create a Google Sheet with two sheets:**\n  - **config:** Include columns for Parent Folder Path, Parent Folder ID, Store by Date (boolean), Store by File Type (boolean), Allow File Types (e.g., “audio|image|video”), CurrentDate, Reply Enabled, and CHANNEL ACCESS TOKEN.\n  - **fileList:** Create headers for File Name, Date Uploaded, Google Drive URL, and File Type.\n\nFor an example of the required format, check this Google Sheets template: [Google Sheet Template](https://docs.google.com/spreadsheets/d/1iO4ZHU7s0fe1Jn8jcScNDce7rFXQlkRBqsO8IFHbcSc/edit?usp=sharing)\n\n\n**2. Google Drive Credentials:**\n- Set up and authorize your Google Drive credentials in n8n.\n\n**3. LINE Messaging API:**\n* Configure your LINE Developer Console webhook to point to the n8n Webhook URL (\"Line Chat Bot\" node).\n* Ensure you have the proper Channel Access Token stored in your Google Sheet.\n\n**4. n8n Workflow Import:**\n* Import the provided JSON file into your n8n instance.\n* Verify node connections and update any credential references as needed.\n\n**5. Test the Workflow:**\n* Send a test message via LINE to confirm that files are properly validated, uploaded, logged, and that reply messages are sent.\n\n## How to Customize This Workflow\n* Allowed File Types: Adjust the *\"Validate File Type\"* field in your config sheet to control which file types are accepted.\n* Folder Structure: Modify the logic in the \"Determine Folder Info\" and subsequent folder nodes to change how folders are structured (e.g., use different date formats or add additional categorization).\n* Logging: Update the *\"Log File Details to Google Sheet\"* node if you wish to log additional file metadata.\n* Reply Messages: Customize the reply text in the *\"Send LINE Reply Message\"* node to include more detailed information or instructions.",
+  "featuredImage": "/data/workflows/3191/3191.webp",
+  "author": {
+    "id": 101,
+    "slug": "jaruphatj",
+    "name": "Jaruphat J.",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 4403,
+  "downloads": 440,
+  "createdAt": "2025-03-17T05:31:22.025Z",
+  "updatedAt": "2026-01-16T08:28:36.015Z",
+  "publishedAt": "2025-03-17T05:31:22.025Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3191",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatically save & organize LINE message files in Google Drive with Sheets logging",
+    "workflowName": "Automatically save & organize LINE message files in Google Drive with Sheets logging",
+    "description": "## Overview\nThis workflow automatically saves files received via LINE Messaging API into Google Drive and logs the file details into a Google Sheet. It checks the file type against allowed types, organizes files into date-based folders and (optionally) file type–specific subfolders, and sends a reply message back to the LINE user with the file URL or an error message if the file type is not permitted.\n\n## Who is this for?\n**Developers & IT Administrators:** Looking to integrate LINE with Google Drive and Sheets for automated file management.\n**Businesses & Marketing Teams:** That want to automatically archive media files and documents received from users via LINE.\n**Anyone Interested in No-Code Automation:** Users who want to leverage n8n’s capabilities without heavy coding.\n\n## What Problem Does This Workflow Solve?\n**Automated File Organization:** Files received from LINE are automatically checked for allowed file types, then stored in a structured folder hierarchy in Google Drive (by date and/or file type).\n**Data Logging:** Each file upload is recorded in a Google Sheet, providing an audit trail with file names, upload dates, URLs, and types.\n**Instant Feedback:** Users receive an immediate reply via LINE confirming the file upload, or an error message if the file type is not allowed.\n## What This Workflow Does\n**1. Receives Incoming Requests:**\n* A webhook node (*\"LINE Webhook Listener\"*) listens for POST requests from LINE, capturing file upload events and associated metadata.\n\n**2. Configuration Loading:**\n* A Google Sheets node (*\"Get Config\"*) reads configuration data (e.g., parent folder ID, allowed file types, folder organization settings, and credentials) from a pre-defined sheet.\n\n**Data Merging & Processing:**\n* The *\"Merge Event and Config Data\"* and *\"Process Event and Config Data\"* nodes merge and structure the event data with configuration settings.\n* A *\"Determine Folder Info\"* node calculates folder names based on the configuration. If Store by Date is enabled, it uses the current date (or a specified date) as the folder name. If Store by File Type is also enabled, it uses the file’s type (e.g., image) for a subfolder.\n\n**4. Folder Search & Creation:**\n* The workflow searches for an existing date folder (*\"Search Date Folder\"*).\n* If the date folder is not found, an IF node (*\"Check Existing Date Folder\"*) routes to a *\"Create Date Folder\"* node.\n* Similarly, for file type organization, the workflow uses a *\"Search FileType Folder\"* node (with appropriate conditions) to look for a subfolder, or creates it if not found.\n* The *\"Set Date Folder ID\"* and *\"Set Image Folder ID\"* nodes capture and merge the resulting folder IDs.\n* Finally, the *\"Config final ParentId\"* node sets the final target folder ID based on the configuration conditions:\n  - **Store by Date: TRUE, Store by File Type: TRUE:** Use the file type folder (inside the date folder).\n  - **Store by Date: TRUE, Store by File Type: FALSE:** Use the date folder.\n  - **Store by Date: FALSE, Store by File Type: TRUE:** Use the file type folder.\n  - **Store by Date: FALSE, Store by File Type: FALSE:** Use the Parent Folder ID from the configuration.\n\n**5. File Retrieval and Validation:**\n- A HTTP Request node (*\"Get File Binary Content\"*) fetches the file’s binary data from the LINE API.\n- A Function node (*\"Validate File Type\"*) checks if the file’s MIME type is included in the allowed list (e.g., \"audio|image|video\"). If not, it throws an error that is captured for the reply.\n\n**6. File Upload and Logging:**\n- The *\"Upload File to Google Drive\"* node uploads the validated binary file to the final target folder.\n- After a successful upload, the *\"Log File Details to Google Sheet\"* node logs details such as file name, upload date, Google Drive URL, and file type into a designated Google Sheet.\n\n**7. User Feedback:**\n- The *\"Check Reply Enabled Flag\"* node checks if the reply feature is enabled.\n- Finally, the *\"Send LINE Reply Message\"* node sends a reply message back to the LINE user with either the file URL (if the upload was successful) or an error message (if the file type was not allowed).\n\n## Setup Instructions\n**1. Google Sheets Setup:**\n* **Create a Google Sheet with two sheets:**\n  - **config:** Include columns for Parent Folder Path, Parent Folder ID, Store by Date (boolean), Store by File Type (boolean), Allow File Types (e.g., “audio|image|video”), CurrentDate, Reply Enabled, and CHANNEL ACCESS TOKEN.\n  - **fileList:** Create headers for File Name, Date Uploaded, Google Drive URL, and File Type.\n\nFor an example of the required format, check this Google Sheets template: [Google Sheet Template](https://docs.google.com/spreadsheets/d/1iO4ZHU7s0fe1Jn8jcScNDce7rFXQlkRBqsO8IFHbcSc/edit?usp=sharing)\n\n\n**2. Google Drive Credentials:**\n- Set up and authorize your Google Drive credentials in n8n.\n\n**3. LINE Messaging API:**\n* Configure your LINE Developer Console webhook to point to the n8n Webhook URL (\"Line Chat Bot\" node).\n* Ensure you have the proper Channel Access Token stored in your Google Sheet.\n\n**4. n8n Workflow Import:**\n* Import the provided JSON file into your n8n instance.\n* Verify node connections and update any credential references as needed.\n\n**5. Test the Workflow:**\n* Send a test message via LINE to confirm that files are properly validated, uploaded, logged, and that reply messages are sent.\n\n## How to Customize This Workflow\n* Allowed File Types: Adjust the *\"Validate File Type\"* field in your config sheet to control which file types are accepted.\n* Folder Structure: Modify the logic in the \"Determine Folder Info\" and subsequent folder nodes to change how folders are structured (e.g., use different date formats or add additional categorization).\n* Logging: Update the *\"Log File Details to Google Sheet\"* node if you wish to log additional file metadata.\n* Reply Messages: Customize the reply text in the *\"Send LINE Reply Message\"* node to include more detailed information or instructions.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Config",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Date Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Date Folder ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create File Type Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Upload File to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Determine Folder Info",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Search Date Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge Event and Config Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Existing Date Folder",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Existing File Type Folder",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Final Parent Folder Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search File Type Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set File Type Folder ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Configure Final Parent Folder ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process Event and Config Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get File Binary Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Log File Details to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Check Reply Enabled Flag",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if Store by Date is Enabled",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if Store by File Type is Enabled",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "LINE Webhook Listener",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send LINE Reply Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Validate File Type",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

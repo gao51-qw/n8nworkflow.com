@@ -1,0 +1,176 @@
+{
+  "id": 5691,
+  "slug": "5691",
+  "title": "Generate personalized sales emails with LinkedIn data & Claude 3.7 via OpenRouter",
+  "description": "## How it works\n- The automation loads rows from a Google Sheet of leads that you want to contact.\n- It makes a Google search via Apify for LinkedIn links based on the First name / Last name / Company.\n- Another Apify actor fetches the right LinkedIn profile based on the first profile which is retuned\n- The same process is done for the company that the lead works for, giving extra context. If the lead has a current company listed on their LinkedIn, we use that URL to do the lookup, rather than doing a separate Google search.\n- A call is made to OpenRouter to get an LLM to generate an email based on a prompt designed to do personalized outreach.\n- An email is sent via a Gmail node.\n\n\n## Set up steps\n- Connect your Google Sheets + Gmail accounts to use these APIs.\n- Make an account with Apify and enter your credentials.\n- Set your details in the \"Set My Data\" node to customize the workflow to revolve around your company + value proposition. \n\nI would recommend changing the prompt in the \"Generate Personalized Email\" node to match the tone of voice that you want your agent to have. \n\nYou can change the guidelines to e.g. change whether the agent introduces itself, and give more examples in the style you want to make the output better.",
+  "featuredImage": "/data/workflows/5691/5691.webp",
+  "author": {
+    "id": 101,
+    "slug": "adamjanes",
+    "name": "Adam Janes",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 14765,
+  "downloads": 1476,
+  "createdAt": "2025-07-05T06:27:01.963Z",
+  "updatedAt": "2026-01-16T08:40:56.378Z",
+  "publishedAt": "2025-07-05T06:27:01.963Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5691",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate personalized sales emails with LinkedIn data & Claude 3.7 via OpenRouter",
+    "workflowName": "Generate personalized sales emails with LinkedIn data & Claude 3.7 via OpenRouter",
+    "description": "## How it works\n- The automation loads rows from a Google Sheet of leads that you want to contact.\n- It makes a Google search via Apify for LinkedIn links based on the First name / Last name / Company.\n- Another Apify actor fetches the right LinkedIn profile based on the first profile which is retuned\n- The same process is done for the company that the lead works for, giving extra context. If the lead has a current company listed on their LinkedIn, we use that URL to do the lookup, rather than doing a separate Google search.\n- A call is made to OpenRouter to get an LLM to generate an email based on a prompt designed to do personalized outreach.\n- An email is sent via a Gmail node.\n\n\n## Set up steps\n- Connect your Google Sheets + Gmail accounts to use these APIs.\n- Make an account with Apify and enter your credentials.\n- Set your details in the \"Set My Data\" node to customize the workflow to revolve around your company + value proposition. \n\nI would recommend changing the prompt in the \"Generate Personalized Email\" node to match the tone of voice that you want your agent to have. \n\nYou can change the guidelines to e.g. change whether the agent introduces itself, and give more examples in the style you want to make the output better.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only People Links",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get LinkedIn Person",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Only Company Links",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Current Company Exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Search for Company LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Search for Person LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get LinkedIn Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Set Company URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Company URL1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Personalized Email",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

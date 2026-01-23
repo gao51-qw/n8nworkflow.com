@@ -1,0 +1,157 @@
+{
+  "id": 3297,
+  "slug": "3297",
+  "title": "Monitor Dropbox folders for new files with DB comparison",
+  "description": "Here's the corrected English text:\n\n# Dropbox Folder Monitoring Workflow\n\nAs we don't have (yet?) a Dropbox node \"Watching new files\" or \"Watching folder\", I created this central workflow to do it.\n\n## How it works\n- Triggered by Dropbox webhook\n- I respond immediately to Dropbox to avoid webhook disabling\n- Then I add/duplicate one branch per monitored folder, according to my needs\n\nIn my case, I need to monitor several folders, like \"vocal notes to process\", \"transcriptions to LinkedIn posts\" or \"quotes to add\".\n\n### This workflow shows 2 types of folder monitoring:\n1. **Way #1:** Each file in the monitored folder calls a sub-workflow\n2. **Way #2:** We get all files from the monitored folder and compare them to a database. If the file is not listed in DB, i supposed it's new one.\n\n### Way #1 - We get all files from the monitored folder\n1. I set a variable `folder_to_watch` to indicate which folder to monitor. This step is here just to be homogeneous and allow setting the folder path only once in this branch.\n2. I list the folder files\n3. We keep only files (exclude folders)\n4. Then I call the specialized sub-workflow\n\n### Way #2 - We want only new files from the monitored folder\n1. I set a variable `folder_to_watch` to indicate which folder to monitor \n2. I list the folder files and keep only files\n3. Meanwhile, I query my DB to get known files about this folder (I send the query to NocoDB `(folder_to_watch,eq,{{ $json.folder_to_watch }})`)\n4. Now I can exclude old files and keep only new ones by merging (I compare from Dropbox file `id` - as the file could be renamed by the user)\n5. I add the new file in DB to be sure to recognize it next time - I save the JSON Dropbox data:\n```\n{\n\"id\":\"{{ $json.id }}\",\n\"name\":\"{{ $json.name }}\",\n\"lastModifiedClient\": \"{{ $json.lastModifiedClient }}\",\n\"lastModifiedServer\": \"{{ $json.lastModifiedServer }}\",\n\"rev\": \"{{ $json.rev }}\",\n\"contentSize\": {{ $json.contentSize }},\n\"type\": \"{{ $json.type }}\",\n\"contentHash\": \"{{ $json.contentHash }}\",\n\"pathLower\": \"{{ $json.pathLower }}\",\n\"pathDisplay\": \"{{ $json.pathDisplay }}\",\n\"isDownloadable\": {{ $json.isDownloadable }}\n}\n```\n6. And now I can call my sub-workflow :)\n\n### My DB\nColumns details:\n- `folder_to_watch`\n- `data` (json/text)\n- `timestamp`\n- `file_id` (Dropbox file ID, to ease future searches)\n\n## My vision:\n- I have only one workflow in my n8n that monitors Dropbox folders/files\n- This workflow calls the required sub-workflow specialized for the tasks required\n- I will have as many branches as I have folders to monitor (if I have 5 different folders to watch, I will get 5 branches and 5 sub-workflows)",
+  "featuredImage": "/data/workflows/3297/3297.webp",
+  "author": {
+    "id": 101,
+    "slug": "davidlevesque",
+    "name": "David Levesque",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1490,
+  "downloads": 149,
+  "createdAt": "2025-03-23T17:50:18.345Z",
+  "updatedAt": "2026-01-16T08:29:04.203Z",
+  "publishedAt": "2025-03-23T17:50:18.345Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3297",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor Dropbox folders for new files with DB comparison",
+    "workflowName": "Monitor Dropbox folders for new files with DB comparison",
+    "description": "Here's the corrected English text:\n\n# Dropbox Folder Monitoring Workflow\n\nAs we don't have (yet?) a Dropbox node \"Watching new files\" or \"Watching folder\", I created this central workflow to do it.\n\n## How it works\n- Triggered by Dropbox webhook\n- I respond immediately to Dropbox to avoid webhook disabling\n- Then I add/duplicate one branch per monitored folder, according to my needs\n\nIn my case, I need to monitor several folders, like \"vocal notes to process\", \"transcriptions to LinkedIn posts\" or \"quotes to add\".\n\n### This workflow shows 2 types of folder monitoring:\n1. **Way #1:** Each file in the monitored folder calls a sub-workflow\n2. **Way #2:** We get all files from the monitored folder and compare them to a database. If the file is not listed in DB, i supposed it's new one.\n\n### Way #1 - We get all files from the monitored folder\n1. I set a variable `folder_to_watch` to indicate which folder to monitor. This step is here just to be homogeneous and allow setting the folder path only once in this branch.\n2. I list the folder files\n3. We keep only files (exclude folders)\n4. Then I call the specialized sub-workflow\n\n### Way #2 - We want only new files from the monitored folder\n1. I set a variable `folder_to_watch` to indicate which folder to monitor \n2. I list the folder files and keep only files\n3. Meanwhile, I query my DB to get known files about this folder (I send the query to NocoDB `(folder_to_watch,eq,{{ $json.folder_to_watch }})`)\n4. Now I can exclude old files and keep only new ones by merging (I compare from Dropbox file `id` - as the file could be renamed by the user)\n5. I add the new file in DB to be sure to recognize it next time - I save the JSON Dropbox data:\n```\n{\n\"id\":\"{{ $json.id }}\",\n\"name\":\"{{ $json.name }}\",\n\"lastModifiedClient\": \"{{ $json.lastModifiedClient }}\",\n\"lastModifiedServer\": \"{{ $json.lastModifiedServer }}\",\n\"rev\": \"{{ $json.rev }}\",\n\"contentSize\": {{ $json.contentSize }},\n\"type\": \"{{ $json.type }}\",\n\"contentHash\": \"{{ $json.contentHash }}\",\n\"pathLower\": \"{{ $json.pathLower }}\",\n\"pathDisplay\": \"{{ $json.pathDisplay }}\",\n\"isDownloadable\": {{ $json.isDownloadable }}\n}\n```\n6. And now I can call my sub-workflow :)\n\n### My DB\nColumns details:\n- `folder_to_watch`\n- `data` (json/text)\n- `timestamp`\n- `file_id` (Dropbox file ID, to ease future searches)\n\n## My vision:\n- I have only one workflow in my n8n that monitors Dropbox folders/files\n- This workflow calls the required sub-workflow specialized for the tasks required\n- I will have as many branches as I have folders to monitor (if I have 5 different folders to watch, I will get 5 branches and 5 sub-workflows)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Dropbox - List watched folder",
+      "type": "n8n-nodes-base.dropbox",
+      "role": "dropbox",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch File vs Folder",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Switch File vs Folder1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "NocoDB - Get know files to exclude",
+      "type": "n8n-nodes-base.nocoDb",
+      "role": "nocoDb",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge - Keep only new items",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Just a quick answer to Dropbox - webhook validation",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Respond to Dropbox in less than 10sec",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Dropbox get files",
+      "type": "n8n-nodes-base.dropbox",
+      "role": "dropbox",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "NocoDB - Add this file in the table",
+      "type": "n8n-nodes-base.nocoDb",
+      "role": "nocoDb",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "set_folder A",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "set_folder to watch B",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Execute Workflow - what i want to do for this folder/file A",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Execute Workflow - Something to do for new files",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

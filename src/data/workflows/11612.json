@@ -1,0 +1,211 @@
+{
+  "id": 11612,
+  "slug": "11612",
+  "title": "Detect AWS Orphaned Resources & Send Cost Reports to Slack, Email, and Sheets",
+  "description": "## How it works\n\nThis workflow automatically scans AWS accounts for orphaned resources (unattached EBS volumes, old snapshots &gt;90 days, unassociated Elastic IPs) that waste money. It calculates cost impact, validates compliance tags, and sends multi-channel alerts via Slack, Email, and Google Sheets audit logs.\n\n**Key Features:**\n- 🔍 Multi-region scanning with parallel execution\n- 💰 Monthly/annual cost calculation with risk scoring\n- 📊 Professional HTML reports with charts and tables\n- 🏷️ Tag compliance validation (SOC2/ISO27001/HIPAA)\n- ✅ Conditional alerting (only alerts when resources found)\n- 📈 Google Sheets audit trail for trend analysis\n\n**What gets detected:**\n- Unattached EBS volumes ($0.10/GB/month waste)\n- Snapshots older than 90 days ($0.05/GB/month)\n- Unassociated Elastic IPs ($3.60/month each)\n\n**Typical savings:** $50-10K/month depending on account size\n\n## Set up steps\n\n### Prerequisites\n\n**AWS Configuration:**\n1. Create IAM user `n8n-resource-scanner` with these permissions:\n   - `ec2:DescribeVolumes`\n   - `ec2:DescribeSnapshots`\n   - `ec2:DescribeAddresses`\n   - `ec2:DescribeInstances`\n   - `lambda:InvokeFunction`\n2. Deploy Lambda function `aws-orphaned-resource-scanner` (Node.js 18+)\n3. Add EC2 read-only permissions to Lambda execution role\n4. Generate AWS Access Key + Secret Key\n\n**Lambda Function Code:** See sticky notes in workflow for complete implementation using `@aws-sdk/client-ec2`\n\n**Credentials Required:**\n- AWS IAM (Access Key + Secret)\n- Slack (OAuth2 or Webhook)\n- Gmail (OAuth2)\n- Google Sheets (OAuth2)\n\n### Configuration\n\n1. **Initialize Config Node:** Update these settings:\n   - `awsRegions`: Your AWS regions (default: us-east-1)\n   - `emailRecipients`: FinOps team emails\n   - `slackChannel`: Alert channel (e.g., #cloud-ops)\n   - `requiredTags`: Compliance tags to validate\n   - `snapshotAgeDays`: Age threshold (default: 90)\n\n2. **Set Region Variables:** Choose regions to scan\n\n3. **Lambda Function:** Deploy function with provided code (see workflow sticky notes)\n\n4. **Google Sheet:** Create spreadsheet with headers:\n   - Scan Date | Region | Resource Type | Resource ID | Monthly Cost | Compliance | etc.\n\n5. **Credentials:** Connect all four credential types in n8n\n\n6. **Schedule:** Enable \"Weekly Scan Trigger\" (default: Mondays 8 AM UTC)\n\n### Testing\n\n1. Click \"Execute Workflow\" to run manual test\n2. Verify Lambda invokes successfully\n3. Check Slack alert appears\n4. Confirm email with HTML report received\n5. Validate Google Sheets logging works\n\n### Customization Options\n\n- **Multi-region:** Add regions in \"Initialize Config\"\n- **Alert thresholds:** Modify cost/age thresholds\n- **Additional resource types:** Extend Lambda function\n- **Custom tags:** Update required tags list\n- **Schedule frequency:** Adjust cron trigger\n\n## Use Cases\n\n- **FinOps Teams:** Automated cloud waste detection and cost reporting\n- **Cloud Operations:** Weekly compliance and governance audits\n- **DevOps:** Resource cleanup automation and alerting\n- **Security/Compliance:** Tag validation for SOC2/ISO27001/HIPAA\n- **Executive Reporting:** Monthly cost optimization metrics\n\n## Resources\n\n- [AWS IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)\n- [Lambda Function Code](https://github.com/chadmcrowell/lambda-function-for-aws-orphaned-resource-scanner)",
+  "featuredImage": "/data/workflows/11612/11612.webp",
+  "author": {
+    "id": 101,
+    "slug": "chadmcrowell",
+    "name": "Chad M. Crowell",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 69,
+  "downloads": 6,
+  "createdAt": "2025-12-08T19:13:17.889Z",
+  "updatedAt": "2026-01-16T09:09:20.694Z",
+  "publishedAt": "2025-12-08T19:13:17.889Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11612",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Detect AWS Orphaned Resources & Send Cost Reports to Slack, Email, and Sheets",
+    "workflowName": "Detect AWS Orphaned Resources & Send Cost Reports to Slack, Email, and Sheets",
+    "description": "## How it works\n\nThis workflow automatically scans AWS accounts for orphaned resources (unattached EBS volumes, old snapshots &gt;90 days, unassociated Elastic IPs) that waste money. It calculates cost impact, validates compliance tags, and sends multi-channel alerts via Slack, Email, and Google Sheets audit logs.\n\n**Key Features:**\n- 🔍 Multi-region scanning with parallel execution\n- 💰 Monthly/annual cost calculation with risk scoring\n- 📊 Professional HTML reports with charts and tables\n- 🏷️ Tag compliance validation (SOC2/ISO27001/HIPAA)\n- ✅ Conditional alerting (only alerts when resources found)\n- 📈 Google Sheets audit trail for trend analysis\n\n**What gets detected:**\n- Unattached EBS volumes ($0.10/GB/month waste)\n- Snapshots older than 90 days ($0.05/GB/month)\n- Unassociated Elastic IPs ($3.60/month each)\n\n**Typical savings:** $50-10K/month depending on account size\n\n## Set up steps\n\n### Prerequisites\n\n**AWS Configuration:**\n1. Create IAM user `n8n-resource-scanner` with these permissions:\n   - `ec2:DescribeVolumes`\n   - `ec2:DescribeSnapshots`\n   - `ec2:DescribeAddresses`\n   - `ec2:DescribeInstances`\n   - `lambda:InvokeFunction`\n2. Deploy Lambda function `aws-orphaned-resource-scanner` (Node.js 18+)\n3. Add EC2 read-only permissions to Lambda execution role\n4. Generate AWS Access Key + Secret Key\n\n**Lambda Function Code:** See sticky notes in workflow for complete implementation using `@aws-sdk/client-ec2`\n\n**Credentials Required:**\n- AWS IAM (Access Key + Secret)\n- Slack (OAuth2 or Webhook)\n- Gmail (OAuth2)\n- Google Sheets (OAuth2)\n\n### Configuration\n\n1. **Initialize Config Node:** Update these settings:\n   - `awsRegions`: Your AWS regions (default: us-east-1)\n   - `emailRecipients`: FinOps team emails\n   - `slackChannel`: Alert channel (e.g., #cloud-ops)\n   - `requiredTags`: Compliance tags to validate\n   - `snapshotAgeDays`: Age threshold (default: 90)\n\n2. **Set Region Variables:** Choose regions to scan\n\n3. **Lambda Function:** Deploy function with provided code (see workflow sticky notes)\n\n4. **Google Sheet:** Create spreadsheet with headers:\n   - Scan Date | Region | Resource Type | Resource ID | Monthly Cost | Compliance | etc.\n\n5. **Credentials:** Connect all four credential types in n8n\n\n6. **Schedule:** Enable \"Weekly Scan Trigger\" (default: Mondays 8 AM UTC)\n\n### Testing\n\n1. Click \"Execute Workflow\" to run manual test\n2. Verify Lambda invokes successfully\n3. Check Slack alert appears\n4. Confirm email with HTML report received\n5. Validate Google Sheets logging works\n\n### Customization Options\n\n- **Multi-region:** Add regions in \"Initialize Config\"\n- **Alert thresholds:** Modify cost/age thresholds\n- **Additional resource types:** Extend Lambda function\n- **Custom tags:** Update required tags list\n- **Schedule frequency:** Adjust cron trigger\n\n## Use Cases\n\n- **FinOps Teams:** Automated cloud waste detection and cost reporting\n- **Cloud Operations:** Weekly compliance and governance audits\n- **DevOps:** Resource cleanup automation and alerting\n- **Security/Compliance:** Tag validation for SOC2/ISO27001/HIPAA\n- **Executive Reporting:** Monthly cost optimization metrics\n\n## Resources\n\n- [AWS IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)\n- [Lambda Function Code](https://github.com/chadmcrowell/lambda-function-for-aws-orphaned-resource-scanner)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Weekly Scan Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Initialize Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate All Resources",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculate Summary Stats",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate HTML Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate CSV Export",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Set Region Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Scan Elastic IPs",
+      "type": "n8n-nodes-base.awsLambda",
+      "role": "awsLambda",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scan EBS Snapshots",
+      "type": "n8n-nodes-base.awsLambda",
+      "role": "awsLambda",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scan unattached EBS Volumes",
+      "type": "n8n-nodes-base.awsLambda",
+      "role": "awsLambda",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Snapshots",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process EBS Volumes",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process Elastic IPs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "None Found Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Clean Scan CSV Export",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Resources Found",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log to Google Sheets (Found)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    }
+  ]
+}

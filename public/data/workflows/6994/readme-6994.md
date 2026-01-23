@@ -1,0 +1,133 @@
+# Build a retrieval-based chatbot with Telegram, OpenAI and Google Drive PDF backup
+
+> # 📚 Telegram RAG Chatbot with PDF Document & Google Drive Backup
+- An upgraded Retrieval-Augmented Generation (RAG) chatbot built in **n8n** that lets users ask questions via Telegram and receive accurate answers from uploaded PDFs. It embeds documents using OpenAI and backs them up to Google Drive.
+
+## 👤 Who’s it for
+
+Perfect for:
+- Knowledge workers who want instant access to private documents
+- Support teams needing searchable SOPs and guides
+- Educators enabling course material Q&A for students
+- Individuals automating personal document search + cloud backup
+
+## ⚙️ How it works / What it does
+
+### 💬 Telegram Chat Handling
+1. **User sends a message**  
+   Triggered by the Telegram bot, the workflow checks if the message is text.
+
+2. **Text message → OpenAI RAG Agent**  
+   If the message is text, it's passed to a GPT-powered document agent.  
+   This agent:
+   - Retrieves relevant info from embedded documents using semantic search
+   - Returns a context-aware answer to the user
+
+3. **Send answer back**  
+   The bot sends the generated response back to the Telegram user.
+
+4. **Non-text input fallback**  
+   If the message is not text, the bot replies with a polite unsupported message.
+
+### 📄 PDF Upload and Embedding
+1. **User uploads PDFs manually**  
+   A manual trigger starts the embedding flow.
+
+2. **Default Data Loader**  
+   Reads and chunks the PDF(s) into text segments.
+
+3. **Insert to Vector Store (Embedding)**  
+   Text chunks are embedded using OpenAI and saved for retrieval.
+
+4. **Backup to Google Drive**  
+   The original PDF is uploaded to Google Drive for safekeeping.
+
+## 🛠️ How to set up
+
+1. **Telegram Bot**
+   - Create via [BotFather](https://t.me/botfather)
+   - Connect it to the Telegram Trigger node
+
+2. **OpenAI**
+   - Use your OpenAI API key
+   - Connect the Embeddings and Chat Model nodes (GPT-3.5/4)
+   - Ensure both embedding and querying use the same Embedding node
+
+3. **Google Drive**
+   - Set up credentials in n8n for your Google account
+   - Connect the “Backup to Google Drive” node
+
+4. **PDF Ingestion**
+   - Use the “Upload your PDF here” trigger
+   - Connect it to the loader, embedder, and backup flow
+
+## ✅ Requirements
+
+- Telegram bot token
+- OpenAI API key (GPT + Embeddings)
+- n8n instance (self-hosted or cloud)
+- Google Drive integration
+- PDF files to upload
+
+## 🧩 How to customize the workflow
+
+| Feature                        | How to Customize                                                  |
+|-------------------------------|-------------------------------------------------------------------|
+| Auto-ingest from folders       | Add Google Drive/Dropbox watchers for new PDFs                   |
+| Add file upload via Telegram   | Extend Telegram bot to receive PDFs and run the embedding flow   |
+| Track user questions           | Log Telegram usernames and questions to a database               |
+| Summarize documents            | Add summarization step on upload                                 |
+| Add Markdown or HTML support   | Format replies for better Telegram rendering                     |
+
+Built with 💬 Telegram + 📄 PDF + 🧠 OpenAI Embeddings + ☁️ Google Drive + ⚡ n8n
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6994
+- **Complexity:** advanced
+- **Node Count:** 24
+- **Views:** 1138
+- **Downloads:** 113
+- **Created:** 2025/8/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6994)
+
+## 👤 Author
+
+- **Name:** Trung Tran
+- **Username:** @trungtran
+
+## 🏷️ Categories
+
+- Internal Wiki
+- AI RAG
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.embeddingsOpenAi** 
+- **@n8n/n8n-nodes-langchain.documentDefaultDataLoader** 
+- **@n8n/n8n-nodes-langchain.vectorStoreInMemory** (×2)
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** 
+- **stickyNote** (×11)
+- **telegramTrigger** 
+- **if** 
+- **telegram** (×2)
+- **@n8n/n8n-nodes-langchain.agent** 
+- **code** 
+- **formTrigger** 
+- **googleDrive** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 24 nodes with 11 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,20 @@
+
+## How it works
+
+This workflow automatically scrapes real estate listings from Zillow and sends them to a Telegram channel.
+
+## Key Steps
+
+1. **Scheduled Trigger** - Runs the workflow at specified intervals to find new listings.
+2. **AI-Powered Scraping** - Uses ScrapeGraphAI to extract property information from Zillow.
+3. **Data Formatting** - Processes and structures the scraped data for Telegram messages.
+4. **Telegram Integration** - Sends formatted listing details to your specified Telegram channel.
+
+## Set up steps
+
+**Setup time: 5-10 minutes**
+
+1. **Configure ScrapeGraphAI credentials** - Add your ScrapeGraphAI API key.
+2. **Set up Telegram connection** - Connect your Telegram account and specify the target channel.
+3. **Customize the Zillow URL** - Update the URL to target specific locations or search criteria.
+4. **Adjust schedule** - Modify the trigger timing based on how frequently you want to check for new listings.

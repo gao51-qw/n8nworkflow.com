@@ -1,0 +1,194 @@
+{
+  "id": 4663,
+  "slug": "4663",
+  "title": "Enrich Company Data from LinkedIn via Bright Data & Google Sheets",
+  "description": "This n8n workflow automates the enrichment of a company list by discovering and extracting each company’s official LinkedIn URL using Bright Data’s search capabilities and Google Gemini AI for HTML parsing and result interpretation.\n\n![image.png](fileId:1451)\n\n## Who is this template for?\nThis workflow is ideal for sales, business development, and data research professionals who need to collect official LinkedIn company profiles for multiple organizations, starting from a list of company names in Google Sheets. It’s especially useful for teams who want to automate sourcing LinkedIn URLs, enrich their prospect database, or validate company data at scale.\n\n## How it works\n**Manual Trigger:**\nThe workflow is started manually (useful for controlled batch runs and testing).\n**Read Company Names:**\nCompany names are loaded from a specified Google Sheets table.\n**Loop Over Each Company:**\nEach company is processed one-by-one:\n- A custom Google Search URL is generated for each name.\n- A Bright Data Web Unlocker request is sent to fetch Google search results for “site:linkedin.com [company name]”.\n- Parse LinkedIn Profile URL Using AI:\nGoogle Gemini (or your specified LLM) analyzes the fetched search page and extracts the most likely official LinkedIn company profile.\n\n**Result Handling:**\n- If a profile is found, it’s stored in the results.\n- If not, an empty result is created, but you can add custom logic (notifications, retries, etc.).\n\n**Batch Data Enrichment:**\nAll found company URLs are bundled into a single request for further enrichment from a Bright Data dataset.\n**Export:**\nThe workflow appends the final, structured data for each company to another sheet in your Google Sheets file.\n## Setup instructions\n**1. Replace API Keys:**\nInsert your Bright Data API key in these nodes:\n- Bright Data Web Request - Google Search for Company LinkedIn URL\n- HTTP Request - Post API call to Bright Data\n- Snapshot Progress\n- HTTP Request - Getting data from Bright Data\n\n**2. Connect Google Sheets:**\nSet up your Google Sheets credentials and specify the sheet for reading input and writing output.\n\n**3. Customize Output Structure:**\nAdjust the Python code node (see sticky note in the template) if you want to include additional or fewer fields in your output.\n\n**4. Adjust for Scale or Error Handling:**\n- You can modify the logic for “not found” results (e.g., to notify a Slack channel or retry failed companies).\n\n**5. Run the Workflow:**\nStart manually, monitor the run, and check your Google Sheet for results.\n\n## Customization guidance\n**Change Input/Output Sheets:**\nUpdate the sheet names or columns if your source/target spreadsheet has a different structure.\n\n**Use Another AI Model:**\nReplace the Google Gemini node with another LLM node if preferred.\n\n**Integrate Alerts:**\nAdd Slack or email nodes to notify your team when a LinkedIn profile is not found or when the process is complete.",
+  "featuredImage": "/data/workflows/4663/4663.webp",
+  "author": {
+    "id": 101,
+    "slug": "glebd",
+    "name": "Gleb D",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 729,
+  "downloads": 72,
+  "createdAt": "2025-06-04T19:50:41.467Z",
+  "updatedAt": "2026-01-16T08:35:34.879Z",
+  "publishedAt": "2025-06-04T19:50:41.467Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4663",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Enrich Company Data from LinkedIn via Bright Data & Google Sheets",
+    "workflowName": "Enrich Company Data from LinkedIn via Bright Data & Google Sheets",
+    "description": "This n8n workflow automates the enrichment of a company list by discovering and extracting each company’s official LinkedIn URL using Bright Data’s search capabilities and Google Gemini AI for HTML parsing and result interpretation.\n\n![image.png](fileId:1451)\n\n## Who is this template for?\nThis workflow is ideal for sales, business development, and data research professionals who need to collect official LinkedIn company profiles for multiple organizations, starting from a list of company names in Google Sheets. It’s especially useful for teams who want to automate sourcing LinkedIn URLs, enrich their prospect database, or validate company data at scale.\n\n## How it works\n**Manual Trigger:**\nThe workflow is started manually (useful for controlled batch runs and testing).\n**Read Company Names:**\nCompany names are loaded from a specified Google Sheets table.\n**Loop Over Each Company:**\nEach company is processed one-by-one:\n- A custom Google Search URL is generated for each name.\n- A Bright Data Web Unlocker request is sent to fetch Google search results for “site:linkedin.com [company name]”.\n- Parse LinkedIn Profile URL Using AI:\nGoogle Gemini (or your specified LLM) analyzes the fetched search page and extracts the most likely official LinkedIn company profile.\n\n**Result Handling:**\n- If a profile is found, it’s stored in the results.\n- If not, an empty result is created, but you can add custom logic (notifications, retries, etc.).\n\n**Batch Data Enrichment:**\nAll found company URLs are bundled into a single request for further enrichment from a Bright Data dataset.\n**Export:**\nThe workflow appends the final, structured data for each company to another sheet in your Google Sheets file.\n## Setup instructions\n**1. Replace API Keys:**\nInsert your Bright Data API key in these nodes:\n- Bright Data Web Request - Google Search for Company LinkedIn URL\n- HTTP Request - Post API call to Bright Data\n- Snapshot Progress\n- HTTP Request - Getting data from Bright Data\n\n**2. Connect Google Sheets:**\nSet up your Google Sheets credentials and specify the sheet for reading input and writing output.\n\n**3. Customize Output Structure:**\nAdjust the Python code node (see sticky note in the template) if you want to include additional or fewer fields in your output.\n\n**4. Adjust for Scale or Error Handling:**\n- You can modify the logic for “not found” results (e.g., to notify a Slack channel or retry failed companies).\n\n**5. Run the Workflow:**\nStart manually, monitor the run, and check your Google Sheet for results.\n\n## Customization guidance\n**Change Input/Output Sheets:**\nUpdate the sheet names or columns if your source/target spreadsheet has a different structure.\n\n**Use Another AI Model:**\nReplace the Google Gemini node with another LLM node if preferred.\n\n**Integrate Alerts:**\nAdd Slack or email nodes to notify your team when a LinkedIn profile is not found or when the process is complete.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "LinkedIn Profile is Found?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Add Unique Result",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Snapshot Progress",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTTP Request- Post API call to Bright Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait - Polling Bright Data",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "HTTP Request - Getting data from Bright Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Checking status of Snapshot - if data is ready or not",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Code - Parse and Organize JSON Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Prepare Request Body for Bright Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add Empty result",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Body from Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Results to Google Sheets table",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Read Company Names from Google Sheets table",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract LinkedIn Url",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Bright Data Web Request - Google Search for Company LinkedIn URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Edit Company Search URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

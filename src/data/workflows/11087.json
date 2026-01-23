@@ -1,0 +1,128 @@
+{
+  "id": 11087,
+  "slug": "11087",
+  "title": "Create film location database with Google Maps, AI analysis & Google Sheets",
+  "description": "## Who is this for?\nThis workflow is ideal for **filmmakers, video producers, content creators, and location managers** who need to quickly build a database of potential shooting locations without manual research and data entry.\n\n## How it works\n1. **Chat Input**: Start the workflow via the n8n chat interface and enter a search query (e.g., \"Quiet cafes in Kyoto\" or \"Cyberpunk streets\").\n2. **Search**: The workflow queries the **Google Maps Places API** to find matching real-world locations.\n3. **AI Analysis**: An AI agent (via OpenRouter) reviews the location details and writes a short, creative \"Director's Commentary\" highlighting its cinematic appeal.\n4. **Data Entry**: The location name, address, rating, Google Maps link, and the AI's commentary are automatically saved to a **Google Sheet**.\n5. **Notification**: Once all locations are processed, a summary link is sent to your **Slack** channel.\n\n## Prerequisites\n*   **n8n Version**: 1.0 or later\n*   **Google Cloud Platform**: API Key with \"Places API (New)\" enabled.\n*   **Google Sheets**: A formatted sheet (see setup below).\n*   **Slack**: An App/Bot token with chat writing permissions.\n*   **OpenRouter** (or OpenAI/Anthropic): API Key for the LLM.\n\n## How to set up\n1. **Google Sheet**: Create a new sheet with the following headers in the first row:\n    *   `場所名` (Name)\n    *   `住所` (Address)\n    *   `評価(星)` (Rating)\n    *   `AI監督のコメント` (AI Comment)\n    *   `GoogleMapリンク` (Link)\n2. **Credentials**: Configure your credentials for Google Maps, Google Sheets, Slack, and OpenRouter within n8n.\n3. **Configuration Node**: Open the node named **\"Workflow Configuration\"** and input your specific details:\n    *   `googleMapsApiKey`: Your Google Cloud API key.\n    *   `slackChannelId`: The Channel ID where you want notifications (e.g., C0123456).\n    *   `googleSheetId`: The string of characters found in your Google Sheet URL.\n\n## Customization\n*   **Adjust Results**: Change the **Limit** node settings to process more locations per run (default is set to 2 to save API credits during testing).\n*   **Change Persona**: Edit the \"System Prompt\" in the **AI Location Analyzer** node to change the AI's tone (e.g., from \"Film Director\" to \"Real Estate Agent\" or \"Travel Blogger\").\n*   **Swap LLM**: You can easily replace the OpenRouter node with an OpenAI or Anthropic node if you prefer a different model.",
+  "featuredImage": "/data/workflows/11087/11087.webp",
+  "author": {
+    "id": 101,
+    "slug": "yoshinoharuki",
+    "name": "Yoshino Haruki",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 84,
+  "downloads": 8,
+  "createdAt": "2025-11-21T07:01:17.361Z",
+  "updatedAt": "2026-01-16T09:07:28.596Z",
+  "publishedAt": "2025-11-21T07:01:17.361Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11087",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create film location database with Google Maps, AI analysis & Google Sheets",
+    "workflowName": "Create film location database with Google Maps, AI analysis & Google Sheets",
+    "description": "## Who is this for?\nThis workflow is ideal for **filmmakers, video producers, content creators, and location managers** who need to quickly build a database of potential shooting locations without manual research and data entry.\n\n## How it works\n1. **Chat Input**: Start the workflow via the n8n chat interface and enter a search query (e.g., \"Quiet cafes in Kyoto\" or \"Cyberpunk streets\").\n2. **Search**: The workflow queries the **Google Maps Places API** to find matching real-world locations.\n3. **AI Analysis**: An AI agent (via OpenRouter) reviews the location details and writes a short, creative \"Director's Commentary\" highlighting its cinematic appeal.\n4. **Data Entry**: The location name, address, rating, Google Maps link, and the AI's commentary are automatically saved to a **Google Sheet**.\n5. **Notification**: Once all locations are processed, a summary link is sent to your **Slack** channel.\n\n## Prerequisites\n*   **n8n Version**: 1.0 or later\n*   **Google Cloud Platform**: API Key with \"Places API (New)\" enabled.\n*   **Google Sheets**: A formatted sheet (see setup below).\n*   **Slack**: An App/Bot token with chat writing permissions.\n*   **OpenRouter** (or OpenAI/Anthropic): API Key for the LLM.\n\n## How to set up\n1. **Google Sheet**: Create a new sheet with the following headers in the first row:\n    *   `場所名` (Name)\n    *   `住所` (Address)\n    *   `評価(星)` (Rating)\n    *   `AI監督のコメント` (AI Comment)\n    *   `GoogleMapリンク` (Link)\n2. **Credentials**: Configure your credentials for Google Maps, Google Sheets, Slack, and OpenRouter within n8n.\n3. **Configuration Node**: Open the node named **\"Workflow Configuration\"** and input your specific details:\n    *   `googleMapsApiKey`: Your Google Cloud API key.\n    *   `slackChannelId`: The Channel ID where you want notifications (e.g., C0123456).\n    *   `googleSheetId`: The string of characters found in your Google Sheet URL.\n\n## Customization\n*   **Adjust Results**: Change the **Limit** node settings to process more locations per run (default is set to 2 to save API credits during testing).\n*   **Change Persona**: Edit the \"System Prompt\" in the **AI Location Analyzer** node to change the AI's tone (e.g., from \"Film Director\" to \"Real Estate Agent\" or \"Travel Blogger\").\n*   **Swap LLM**: You can easily replace the OpenRouter node with an OpenAI or Anthropic node if you prefer a different model.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Google Maps Places Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "AI Location Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Main Sticky",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Config Group",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search Group",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Group",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

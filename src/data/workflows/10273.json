@@ -1,0 +1,170 @@
+{
+  "id": 10273,
+  "slug": "10273",
+  "title": "AI-powered document search with Oracle and ONNX embeddings for recruiting",
+  "description": "# How it works\n\n1. Create a user for doing Hybrid Search.\n2. Clear Existing Data, if present.\n3. Add Documents into the table.\n4. Create a hybrid index.\n5. Run ***Semantic*** search on Documents table for ***\"prioritize teamwork and leadership experience\"***.\n6. Run ***Hybrid*** search for the text inputted in Chat interface.\n\n\n# Setup Steps\n\n**Download the ONNX model**\n\n[all_MiniLM_L12_v2_augmented.zip](https://adwc4pm.objectstorage.us-ashburn-1.oci.customer-oci.com/p/VBRD9P8ZFWkKvnfhrWxkpPe8K03-JIoM5h_8EJyJcpE80c108fuUjg7R5L5O7mMZ/n/adwc4pm/b/OML-Resources/o/all_MiniLM_L12_v2_augmented.zip)\n\nExtract the ZIP file on the database server into a directory, for example `/opt/oracle/onnx`.\nAfter extraction, the folder contents should look like:\n\n```bash\nbash-4.4$ pwd\n/opt/oracle/onnx\nbash-4.4$ ls\nall_MiniLM_L12_v2.onnx\n```\n\n**Connect as SYSDBA and create the DBA user**\n\n\n```sql\n-- Create DBA user\nCREATE USER app_admin IDENTIFIED BY \"StrongPassword123\"\n  DEFAULT TABLESPACE users \n  TEMPORARY TABLESPACE temp \n  QUOTA UNLIMITED ON users;\n\n\n-- Grant privileges\nGRANT DBA TO app_admin;\nGRANT CREATE TABLESPACE, ALTER TABLESPACE, DROP TABLESPACE TO app_admin;\n```\n\n**Create n8n Oracle DB credentials**\n- hybridsearchuser → for hybrid search operations\n- dbadocuser → for DBA setup (user and tablespace creation)\n\n\n# Run the workflow\n\n**Click the manual Trigger**\n- It displays Pure semantic search results\n\n\n**Enter search text in Chat interface**\n- It displays results for vector and keyword search. \n\n\n\n## Note\n- The workflow currently creates the hybrid search user, **docuser** with the password visible in plain text inside the n8n Execute SQL node.\n- For better security, consider performing the user creation manually outside n8n.\n- Oracle **23ai or 26ai** Database has to be used`\n\n# Reference\n[Hybrid Search End-End Example](https://docs.oracle.com/en/database/oracle/oracle-database/26/vecse/query-hybrid-vector-indexes-end-end-example.html)",
+  "featuredImage": "/data/workflows/10273/10273.webp",
+  "author": {
+    "id": 101,
+    "slug": "sudarshansoma",
+    "name": "sudarshan",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 141,
+  "downloads": 14,
+  "createdAt": "2025-10-29T12:54:17.886Z",
+  "updatedAt": "2026-01-16T09:04:13.856Z",
+  "publishedAt": "2025-10-29T12:54:17.886Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10273",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered document search with Oracle and ONNX embeddings for recruiting",
+    "workflowName": "AI-powered document search with Oracle and ONNX embeddings for recruiting",
+    "description": "# How it works\n\n1. Create a user for doing Hybrid Search.\n2. Clear Existing Data, if present.\n3. Add Documents into the table.\n4. Create a hybrid index.\n5. Run ***Semantic*** search on Documents table for ***\"prioritize teamwork and leadership experience\"***.\n6. Run ***Hybrid*** search for the text inputted in Chat interface.\n\n\n# Setup Steps\n\n**Download the ONNX model**\n\n[all_MiniLM_L12_v2_augmented.zip](https://adwc4pm.objectstorage.us-ashburn-1.oci.customer-oci.com/p/VBRD9P8ZFWkKvnfhrWxkpPe8K03-JIoM5h_8EJyJcpE80c108fuUjg7R5L5O7mMZ/n/adwc4pm/b/OML-Resources/o/all_MiniLM_L12_v2_augmented.zip)\n\nExtract the ZIP file on the database server into a directory, for example `/opt/oracle/onnx`.\nAfter extraction, the folder contents should look like:\n\n```bash\nbash-4.4$ pwd\n/opt/oracle/onnx\nbash-4.4$ ls\nall_MiniLM_L12_v2.onnx\n```\n\n**Connect as SYSDBA and create the DBA user**\n\n\n```sql\n-- Create DBA user\nCREATE USER app_admin IDENTIFIED BY \"StrongPassword123\"\n  DEFAULT TABLESPACE users \n  TEMPORARY TABLESPACE temp \n  QUOTA UNLIMITED ON users;\n\n\n-- Grant privileges\nGRANT DBA TO app_admin;\nGRANT CREATE TABLESPACE, ALTER TABLESPACE, DROP TABLESPACE TO app_admin;\n```\n\n**Create n8n Oracle DB credentials**\n- hybridsearchuser → for hybrid search operations\n- dbadocuser → for DBA setup (user and tablespace creation)\n\n\n# Run the workflow\n\n**Click the manual Trigger**\n- It displays Pure semantic search results\n\n\n**Enter search text in Chat interface**\n- It displays results for vector and keyword search. \n\n\n\n## Note\n- The workflow currently creates the hybrid search user, **docuser** with the password visible in plain text inside the n8n Execute SQL node.\n- For better security, consider performing the user creation manually outside n8n.\n- Oracle **23ai or 26ai** Database has to be used`\n\n# Reference\n[Hybrid Search End-End Example](https://docs.oracle.com/en/database/oracle/oracle-database/26/vecse/query-hybrid-vector-indexes-end-end-example.html)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a user",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ONNX Model Directory path",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Grant Privileges to user",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clear Existing Data",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Documents data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add Documents in to table",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Hybrid Index",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Text Input",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Perform Semantic Search",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Perform Hybrid Search",
+      "type": "n8n-nodes-base.oracleDatabase",
+      "role": "oracleDatabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format the result",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

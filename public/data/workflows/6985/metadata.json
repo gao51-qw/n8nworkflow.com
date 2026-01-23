@@ -1,0 +1,27 @@
+{
+  "id": 6985,
+  "slug": "6985",
+  "title": "YouTube thumbnail generator with OpenAI & Apify",
+  "description": "\nThis n8n workflow automatically generates a custom YouTube thumbnail using OpenAI’s DALL·E based on a YouTube video’s transcript and title. It uses [Apify](https://apify.com) actors to extract video metadata and transcript, then processes the data into a prompt for DALL·E and creates a high-resolution image for use as a thumbnail.\n\n---\n\n### ✅ Key Features\n\n- **📥 Form Trigger**: Accepts a YouTube URL from the user.\n- **🧠 GPT-4o Prompt Creation**: Summarizes transcript and title into a descriptive DALL·E prompt.\n- **🎨 DALL·E Image Generation**: Produces a clean, minimalist YouTube thumbnail with OpenAI’s image model.\n- **🪄 Automatic Image Resizing**: Resizes final image to YouTube specs (1280x720).\n- **🔍 Apify Integration**: Uses two Apify actors:\n  - `Youtube-Transcript-Scraper` to extract transcript\n  - `youtube-scraper` to get video metadata like title, channel, etc.\n\n---\n\n### 🧰 What You'll Need\n\n- **OpenAI API Key**\n- **Apify Account & API Token**\n- **YouTube video URL**\n- **n8n instance (cloud or self-hosted)**\n\n---\n\n### 🔧 Step-by-Step Setup\n\n#### 1️⃣ Form & Parameter Assignment\n- **Node**: `Form Trigger`\n- **How it works**: Collects the YouTube URL via a form embedded in your n8n instance.\n- **API Required**: None\n- **Additional Node**: `Set`\n  - Converts the single input URL into the format Apify expects: an array of `{ url }` objects.\n\n#### 2️⃣ Apify Actors for Data Extraction\n- **Node**: `HTTP Request (Query Metadata)`\n  - **URL**: `https://api.apify.com/v2/acts/streamers~youtube-scraper/run-sync-get-dataset-items`\n  - **Payload**: JSON with `startUrls` array and filtering options like `maxResults`, `isHD`, etc.\n- **Node**: `HTTP Request (Query Transcript)`\n  - **URL**: `https://api.apify.com/v2/acts/topaz_sharingan~Youtube-Transcript-Scraper/run-sync-get-dataset-items`\n  - **Payload**: `startUrls` array\n- **API Required**: Apify API Token (via HTTP Query Auth)\n- **Notes**: You must have an Apify account and actor credits to use these actors.\n\n#### 3️⃣ OpenAI GPT-4o & DALL·E Generation\n- **Node**: `OpenAI (Prompt Creator)`\n  - Uses the transcript and title to generate a DALL·E-compatible visual prompt.\n- **Node**: `OpenAI (Image Generator)`\n  - Resource: `image`\n  - Model: DALL·E (default with GPT-4o key)\n- **API Required**: OpenAI API Key\n- **Prompt Strategy**:\n```markdown\nCreate a minimalist YouTube thumbnail in an illustration style. The background should be a very simple, uncluttered setting with soft, ambient lighting that subtly reflects the essence of the transcript. The overall mood should be professional and non-cluttered, ensuring that the text overlay stands out without distraction. Do not include any text.\n```\n\n#### 4️⃣ Resize for YouTube Format\n- **Node**: `Edit Image`\n- **Purpose**: Resize final image to 1280x720 with `ignoreAspectRatio` set to true.\n- **No API required** — this runs entirely in n8n.\n\n---\n\n### 👤 Created By\n**Robert Breen**  \nAutomation Consultant | AI Workflow Designer | n8n Expert  \n📧 [robert@ynteractive.com](mailto:robert@ynteractive.com)  \n🌐 [ynteractive.com](https://ynteractive.com)  \n🔗 [LinkedIn](https://www.linkedin.com/in/robert-breen-29429625/)\n\n---\n\n### 🏷️ Tags\n`openai` `dalle` `youtube` `thumbnail generator` `apify` `ai automation` `image generation` `illustration` `prompt engineering` `gpt-4o`\n",
+  "featuredImage": "/data/workflows/6985/6985.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1438,
+  "downloads": 143,
+  "createdAt": "2025-08-04T22:52:45.587Z",
+  "updatedAt": "2026-01-16T08:47:59.222Z",
+  "publishedAt": "2025-08-04T22:52:45.587Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6985"
+}

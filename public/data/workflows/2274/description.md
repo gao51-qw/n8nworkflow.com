@@ -1,0 +1,7 @@
+- Flow Start: The flow starts upon receiving an HTTP GET call.
+- Webhook: Receives the HTTP GET call and triggers the flow.
+- Database: Connects to the database (Customer Datastore) to retrieve all necessary information (getAllPeople).
+- Data Processing:
+- Variable Insertion: The retrieved data is inserted into a variable.
+- Variable Aggregation: The variables are aggregated and prepared for use in FlutterFlow.
+- Webhook Response: Sends the response back through the Webhook with the processed data ready for use in FlutterFlow.

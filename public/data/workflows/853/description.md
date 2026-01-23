@@ -1,0 +1,1 @@
+A workflow to automatically create groups of three based on a Mattermost channel and send out invitations to each group member.

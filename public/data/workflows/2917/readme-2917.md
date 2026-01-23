@@ -1,0 +1,73 @@
+# Allow users to send a sequence of messages to an AI agent in Telegram
+
+> ### Use Case
+When creating chatbots that interface through applications such as **Telegram** and **WhatsApp**, users can often sends multiple shorter messages in quick succession, in place of a single, longer message. This workflow accounts for this behaviour.
+### What it Does
+This workflow allows users to send several messages in quick succession, treating them as one coherent conversation instead of separate messages requiring individual responses. 
+### How it Works
+1. When messages arrive, they are stored in a **Supabase PostgreSQL** table
+2. The system waits briefly to see if additional messages arrive
+3. If no new messages arrive within the waiting period, all queued messages are:
+   - Combined and processed as a single conversation
+   - Responded to with one unified reply
+   - Deleted from the queue
+### Setup
+1. Create a table in Supabase called **message_queue**. It needs to have the following columns: **user_id** (`uint8`), **message** (`text`), and **message_id** (`uint8`)
+2. Add your **Telegram**, **Supabase**, **OpenAI**, and **PostgreSQL** credentials
+3. Activate the workflow and test by sending multiple messages the Telegram bot in one go
+4. Wait ten seconds after which you will receive a single reply to all of your messages
+### How to Modify it to Your Needs
+- Change the value of **Wait Amount** in the **Wait 10 Seconds** node in order to to modify the buffering window 
+- Add a **System Message** to the **AI Agent** to tailor it to your specific use case
+- Replace the **OpenAI** sub-node to use a different language model
+
+## 📊 Basic Information
+
+- **Workflow ID:** 2917
+- **Complexity:** advanced
+- **Node Count:** 22
+- **Views:** 13907
+- **Downloads:** 1390
+- **Created:** 2025/2/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/2917)
+
+## 👤 Author
+
+- **Name:** Chris Carr
+- **Username:** @chriscarr
+
+## 🏷️ Categories
+
+- Support Chatbot
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×9)
+- **telegram** 
+- **telegramTrigger** 
+- **wait** 
+- **supabase** (×3)
+- **noOp** 
+- **aggregate** 
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** 
+- **sort** 
+- **if** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.memoryPostgresChat** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 22 nodes with 11 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

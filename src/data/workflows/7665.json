@@ -1,0 +1,230 @@
+{
+  "id": 7665,
+  "slug": "7665",
+  "title": "Monitor Kubernetes services & pods with Prometheus and send alerts to Slack",
+  "description": "#### 🧩 Short Summary\n\nProactively alert to service endpoint changes and pod/container issues (Pending, Not Ready, Restart spikes) using Prometheus metrics, formatted and sent to Slack.\n\n#### 🗂️ Category\n\nDevOps / Monitoring & Observability\n\n#### 🏷️ Tags\n\nkubernetes, prometheus, slack, alerting, sre, ops, kube-state-metrics\n\n#### ✅ Prerequisites\n\n- Prometheus scraping kube-state-metrics v2.x.\n- Slack App or Incoming Webhook (channel access).\n- n8n instance with outbound access to Prometheus & Slack.\n\n\n#### 🔑 Required Credentials in n8n\n\nSlack: Bot OAuth (chat:write) or Incoming Webhook URL.\n\n(Optional) Prometheus Basic Auth (if your Prometheus needs it).\n\n#### 🧠 What This Template Does\n\n- Detects pods stuck in Pending (scheduling problems like taints/affinity/capacity).\n- Detects containers Not Ready (readiness probe failures).\n- Detects container restart spikes over a sliding window (default 5 minutes).\n- Detects service discovery changes (endpoint count diffs current vs previous snapshot).\n- Sends clean, emoji-enhanced Slack alerts with pod/namespace/service context.\n- Outputs a 5-minute summary block to reduce noise.\n\n#### 📣 Slack Message Style (examples)\n\n![image.png](fileId:2165)\n\n![image.png](fileId:2164)",
+  "featuredImage": "/data/workflows/7665/7665.webp",
+  "author": {
+    "id": 101,
+    "slug": "johnpranay",
+    "name": "John Pranay Kumar Reddy",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 737,
+  "downloads": 73,
+  "createdAt": "2025-08-20T19:07:35.628Z",
+  "updatedAt": "2026-01-16T08:51:41.152Z",
+  "publishedAt": "2025-08-20T19:07:35.628Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7665",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor Kubernetes services & pods with Prometheus and send alerts to Slack",
+    "workflowName": "Monitor Kubernetes services & pods with Prometheus and send alerts to Slack",
+    "description": "#### 🧩 Short Summary\n\nProactively alert to service endpoint changes and pod/container issues (Pending, Not Ready, Restart spikes) using Prometheus metrics, formatted and sent to Slack.\n\n#### 🗂️ Category\n\nDevOps / Monitoring & Observability\n\n#### 🏷️ Tags\n\nkubernetes, prometheus, slack, alerting, sre, ops, kube-state-metrics\n\n#### ✅ Prerequisites\n\n- Prometheus scraping kube-state-metrics v2.x.\n- Slack App or Incoming Webhook (channel access).\n- n8n instance with outbound access to Prometheus & Slack.\n\n\n#### 🔑 Required Credentials in n8n\n\nSlack: Bot OAuth (chat:write) or Incoming Webhook URL.\n\n(Optional) Prometheus Basic Auth (if your Prometheus needs it).\n\n#### 🧠 What This Template Does\n\n- Detects pods stuck in Pending (scheduling problems like taints/affinity/capacity).\n- Detects containers Not Ready (readiness probe failures).\n- Detects container restart spikes over a sliding window (default 5 minutes).\n- Detects service discovery changes (endpoint count diffs current vs previous snapshot).\n- Sends clean, emoji-enhanced Slack alerts with pod/namespace/service context.\n- Outputs a 5-minute summary block to reduce noise.\n\n#### 📣 Slack Message Style (examples)\n\n![image.png](fileId:2165)\n\n![image.png](fileId:2164)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "🕒 Every 5 Min Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "📤 Send Alerts to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "CrashLoopBackOff / Termination Reason",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Pod Restart Spike (last 5m)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Normalization",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Slack formatter with summary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Pods Running State",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Map Prometheus results into namespace/service",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map Prometheus results into namespace/service1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Normalization Node",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge (endpoints)",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Current endpoints",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Endpoints 5m ago",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge All data collected",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Containers Not Ready",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Pod Pending State",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

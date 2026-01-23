@@ -1,0 +1,188 @@
+{
+  "id": 8488,
+  "slug": "8488",
+  "title": "Voice AI customer support for WooCommerce using VAPI, GPT-4o & Gemini with RAG",
+  "description": "This workflow integrates a **Retrieval-Augmented Generation (RAG) system** with a **post-sales AI agent for WooCommerce**. It combines vector-based search (Qdrant + OpenAI embeddings) with LLMs (Google Gemini and GPT-4o-mini) to provide accurate and contextual responses.\n\nBoth systems are connected to **VAPI webhooks**, making the workflow usable in a **voice AI assistant** via **Twilio** phone numbers.\n\nThe workflow receives JSON payloads from VAPI via webhooks, processes the request through the appropriate chain (Agent or RAG), and sends a structured response back to VAPI to be read out to the user.\n\n---\n\n### Advantages\n\n* ✅ **Unified AI Support System**: Combines knowledge retrieval (RAG) with transactional support (WooCommerce).\n* ✅ **Data Privacy & Security**: Enforces strict email/order verification before sharing information.\n* ✅ **Multi-Model Power**: Leverages both **Google Gemini** and **OpenAI GPT-4o-mini** for optimal responses.\n* ✅ **Scalable Knowledge Base**: Qdrant vector database ensures fast and accurate context retrieval.\n* ✅ **Customer Satisfaction**: Provides real-time answers about orders, tracking, and store policies.\n* ✅ **Flexible Integration**: Easily connects with VAPI for **voice assistants** and **phone-based customer support**.\n* ✅ **Reusable Components**: The RAG part can be extended for FAQs, while the post-sales agent can scale with more WooCommerce tools.\n\n---\n\n### How it Works\n\nIt has two main components:\n\n1. **RAG System (Knowledge Retrieval & Q\\&A)**\n\n   * Uses **OpenAI embeddings** to store documents in **Qdrant**.\n   * Retrieves relevant context with a **Vector Store Retriever**.\n   * Sends the information to a **Question & Answer Chain** powered by **Google Gemini**.\n   * Returns precise, context-based answers to user queries via webhook.\n\n2. **Post-Sales Customer Support Agent**\n\n   * Acts as a **WooCommerce virtual assistant** to:\n\n     * Retrieve customer orders (`get_order`, `get_orders`).\n     * Get user profiles (`get_user`).\n     * Provide **shipment tracking** (`get_tracking`) using YITH WooCommerce Order Tracking plugin.\n   * Enforces **strict verification rules**: customer email must match the order before disclosing details.\n   * Communicates professionally, providing clear and secure customer support.\n   * Integrates with **GPT-4o-mini** for natural conversation flow.\n\n---\n\n### **Set Up Steps**\n\nTo implement this workflow, follow these three main steps:\n\n**1. Infrastructure & Credentials Setup in n8n:**\n*   Ensure all required nodes have their credentials configured:\n    *   **OpenAI API Key:** For the `GPT 4o-mini` and `Embeddings OpenAI` nodes.\n    *   **Google Gemini API Key:** For the `Google Gemini Chat Model` node.\n    *   **Qdrant Connection Details:** For the `Qdrant Vector Store1` node (points to a Hetzner server).\n    *   **WooCommerce API Keys:** For the `get_order`, `get_orders`, and `get_user` nodes (for `magnanigioielli.com`).\n    *   **WordPress HTTP Auth Credentials:** For the `Get tracking` node in the sub-workflow.\n*   **Pre-populate the Vector Database:** The RAG system requires a pre-filled Qdrant collection with your store's knowledge base (e.g., policy documents, product info). The \"Sticky Note2\" provides a link to a guide on building this RAG system.\n\n**2. Workflow Activation in n8n:**\n*   Save this JSON workflow in your n8n instance.\n*   **Activate the workflow.** This is crucial, as n8n only listens for webhook triggers when the workflow is active.\n*   Note the unique public webhook URLs generated for the `Webhook` (post-sales agent) and `rag` (RAG system) nodes. You will need these URLs for the next step.\n\n**3. VAPI Configuration:**\n*   **Create Two API Tools in VAPI:**\n    *   **Tool 1 (Post-Sales):** Create an \"API Request\" tool. Connect it to the n8n `Webhook` URL. Configure the request body to send parameters `email` and `n_order` based on the conversation with the user.\n    *   **Tool 2 (RAG):** Create another \"API Request\" tool. Connect it to the n8n `rag` webhook URL. Configure the request body to send a `search` parameter containing the user's query.\n*   **Build the Assistant:** Create a new assistant in VAPI. Write a system prompt that instructs the AI on when to use each of the two tools you created. In the \"Tools\" tab, add both tools.\n*   **Go Live:** Add a phone number (e.g., from Twilio) to your VAPI assistant and set it to \"Inbound\" to receive customer calls.\n\n---\n\n\n\n### **Need help customizing?**  \n[Contact me](mailto:info@n3w.it) for consulting and support or add me on [Linkedin](https://www.linkedin.com/in/davideboizza/). ",
+  "featuredImage": "/data/workflows/8488/8488.webp",
+  "author": {
+    "id": 101,
+    "slug": "n3witalia",
+    "name": "Davide",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 874,
+  "downloads": 87,
+  "createdAt": "2025-09-11T22:05:08.215Z",
+  "updatedAt": "2026-01-16T08:56:06.903Z",
+  "publishedAt": "2025-09-11T22:05:08.215Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8488",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Voice AI customer support for WooCommerce using VAPI, GPT-4o & Gemini with RAG",
+    "workflowName": "Voice AI customer support for WooCommerce using VAPI, GPT-4o & Gemini with RAG",
+    "description": "This workflow integrates a **Retrieval-Augmented Generation (RAG) system** with a **post-sales AI agent for WooCommerce**. It combines vector-based search (Qdrant + OpenAI embeddings) with LLMs (Google Gemini and GPT-4o-mini) to provide accurate and contextual responses.\n\nBoth systems are connected to **VAPI webhooks**, making the workflow usable in a **voice AI assistant** via **Twilio** phone numbers.\n\nThe workflow receives JSON payloads from VAPI via webhooks, processes the request through the appropriate chain (Agent or RAG), and sends a structured response back to VAPI to be read out to the user.\n\n---\n\n### Advantages\n\n* ✅ **Unified AI Support System**: Combines knowledge retrieval (RAG) with transactional support (WooCommerce).\n* ✅ **Data Privacy & Security**: Enforces strict email/order verification before sharing information.\n* ✅ **Multi-Model Power**: Leverages both **Google Gemini** and **OpenAI GPT-4o-mini** for optimal responses.\n* ✅ **Scalable Knowledge Base**: Qdrant vector database ensures fast and accurate context retrieval.\n* ✅ **Customer Satisfaction**: Provides real-time answers about orders, tracking, and store policies.\n* ✅ **Flexible Integration**: Easily connects with VAPI for **voice assistants** and **phone-based customer support**.\n* ✅ **Reusable Components**: The RAG part can be extended for FAQs, while the post-sales agent can scale with more WooCommerce tools.\n\n---\n\n### How it Works\n\nIt has two main components:\n\n1. **RAG System (Knowledge Retrieval & Q\\&A)**\n\n   * Uses **OpenAI embeddings** to store documents in **Qdrant**.\n   * Retrieves relevant context with a **Vector Store Retriever**.\n   * Sends the information to a **Question & Answer Chain** powered by **Google Gemini**.\n   * Returns precise, context-based answers to user queries via webhook.\n\n2. **Post-Sales Customer Support Agent**\n\n   * Acts as a **WooCommerce virtual assistant** to:\n\n     * Retrieve customer orders (`get_order`, `get_orders`).\n     * Get user profiles (`get_user`).\n     * Provide **shipment tracking** (`get_tracking`) using YITH WooCommerce Order Tracking plugin.\n   * Enforces **strict verification rules**: customer email must match the order before disclosing details.\n   * Communicates professionally, providing clear and secure customer support.\n   * Integrates with **GPT-4o-mini** for natural conversation flow.\n\n---\n\n### **Set Up Steps**\n\nTo implement this workflow, follow these three main steps:\n\n**1. Infrastructure & Credentials Setup in n8n:**\n*   Ensure all required nodes have their credentials configured:\n    *   **OpenAI API Key:** For the `GPT 4o-mini` and `Embeddings OpenAI` nodes.\n    *   **Google Gemini API Key:** For the `Google Gemini Chat Model` node.\n    *   **Qdrant Connection Details:** For the `Qdrant Vector Store1` node (points to a Hetzner server).\n    *   **WooCommerce API Keys:** For the `get_order`, `get_orders`, and `get_user` nodes (for `magnanigioielli.com`).\n    *   **WordPress HTTP Auth Credentials:** For the `Get tracking` node in the sub-workflow.\n*   **Pre-populate the Vector Database:** The RAG system requires a pre-filled Qdrant collection with your store's knowledge base (e.g., policy documents, product info). The \"Sticky Note2\" provides a link to a guide on building this RAG system.\n\n**2. Workflow Activation in n8n:**\n*   Save this JSON workflow in your n8n instance.\n*   **Activate the workflow.** This is crucial, as n8n only listens for webhook triggers when the workflow is active.\n*   Note the unique public webhook URLs generated for the `Webhook` (post-sales agent) and `rag` (RAG system) nodes. You will need these URLs for the next step.\n\n**3. VAPI Configuration:**\n*   **Create Two API Tools in VAPI:**\n    *   **Tool 1 (Post-Sales):** Create an \"API Request\" tool. Connect it to the n8n `Webhook` URL. Configure the request body to send parameters `email` and `n_order` based on the conversation with the user.\n    *   **Tool 2 (RAG):** Create another \"API Request\" tool. Connect it to the n8n `rag` webhook URL. Configure the request body to send a `search` parameter containing the user's query.\n*   **Build the Assistant:** Create a new assistant in VAPI. Write a system prompt that instructs the AI on when to use each of the two tools you created. In the \"Tools\" tab, add both tools.\n*   **Go Live:** Add a phone number (e.g., from Twilio) to your VAPI assistant and set it to \"Inbound\" to receive customer calls.\n\n---\n\n\n\n### **Need help customizing?**  \n[Contact me](mailto:info@n3w.it) for consulting and support or add me on [Linkedin](https://www.linkedin.com/in/davideboizza/).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Question and Answer Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "role": "chainRetrievalQa",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "role": "retrieverVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "rag",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "get_order",
+      "type": "n8n-nodes-base.wooCommerceTool",
+      "role": "wooCommerceTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_orders",
+      "type": "n8n-nodes-base.wooCommerceTool",
+      "role": "wooCommerceTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_user",
+      "type": "n8n-nodes-base.wooCommerceTool",
+      "role": "wooCommerceTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_tracking",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Post-Sales Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get tracking",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Set tracking code",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "GPT 4o-mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send response to VAPI",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Send RAG response to VAPI",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

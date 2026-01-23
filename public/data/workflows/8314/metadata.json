@@ -1,0 +1,27 @@
+{
+  "id": 8314,
+  "slug": "8314",
+  "title": "Telegram chatbot with voice recognition and message batching using OpenAI",
+  "description": "This Telegram workflow batches rapid-fire messages from the same user into one prompt (20–30s debounce), then sends a single AI reply.\n\nIt uses **two Google Sheets**:\n- **Message Retention** (`date | user_id | message`) — queues incoming messages.\n- **Message  Checkup** (`user_id | is_waiting | last_updated`) — debounces per user.\n\nFlow per message:\n1. Log to **Message Retention**.\n2. Read **Message  Checkup** for that `user_id`. If empty, synthesize `{ is_waiting:false }`.\n3. IF (**OR**):\n   - `last_updated` is **older than 30s**, **or**\n   - `is_waiting` is **false**  \n   → Start wait window: set `is_waiting=true`, update `last_updated`, **Wait** (e.g., 30s).\n4. After Wait: fetch all queued messages for the user, merge them, delete those rows, send one AI answer to Telegram, then clear the Waiting row.\n5. If a new message arrives while waiting, we only refresh `last_updated` (extend the window) — we do **not** start another wait.\n\nCopy/paste:\n- Older-than-30s: `{{ new Date(Date.now() - 30000).toISOString() }}`\n- “No Rows” normalizer (Code node) ensures the IF always has data to check.\n\nSupports text and voice (voice via Whisper). Works reliably on Telegram once the webhook is registered and Sheets are shared with the service account.",
+  "featuredImage": "/data/workflows/8314/8314.webp",
+  "author": {
+    "id": 101,
+    "slug": "rushtechhub",
+    "name": "Kirill Zolygin",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 707,
+  "downloads": 70,
+  "createdAt": "2025-09-05T22:27:56.621Z",
+  "updatedAt": "2026-01-16T08:55:14.430Z",
+  "publishedAt": "2025-09-05T22:27:56.621Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8314"
+}

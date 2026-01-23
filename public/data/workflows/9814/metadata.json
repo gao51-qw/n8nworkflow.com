@@ -1,0 +1,27 @@
+{
+  "id": 9814,
+  "slug": "9814",
+  "title": "Personalized email outreach with LinkedIn & Crunchbase data and Gemini AI review",
+  "description": "AI-Enriched Cold Outreach: Research → Draft → QA → Write-back\n============================================================\n\nWhat this template does\n-----------------------\nAutomates cold email drafting from a lead list by:\n1. Enriching each lead with LinkedIn profile, LinkedIn company, and Crunchbase data  \n2. Generating a personalized subject + body with Gemini  \n3. Auto-reviewing with a Judge agent and writing back only APPROVED drafts to your Data Table  \n\nHighlights\n-----------\n- Hands-off enrichment via RapidAPI; raw JSON stored back on each row  \n- Two-agent pattern: **Creative Outreach Agent (draft)** + **Outreach Email Judge (QA)**  \n- Structured outputs guaranteed by LangChain Structured Output Parsers  \n- Data Table–native: reads “unprocessed” rows, writes results to the same row  \n- Async polling with Wait nodes for scraper task results  \n\nHow it works (flow)\n-------------------\n1. **Trigger:** Manual (replace with Cron if needed)  \n2. **Fetch leads:** Data Table “Get row(s)” filters rows where `email_subject` is empty (pending)  \n3. **Loop:** Split in Batches iterates rows  \n4. **Enrichment (runs in parallel):**\n   - **LinkedIn profile:** HTTP (`company_url`) → Wait → Results → Data Table update → `linkedin_profile_scrape`  \n   - **LinkedIn company:** HTTP (`company_url`) → Wait → Results → Data Table update → `linkedin_company_scrape`  \n   - **Crunchbase company:** HTTP (`url_search`) → Wait → Results → Data Table update → `crunchbase_company_scrape`  \n   *(All calls use host `cold-outreach-enrichment-scraper` with a RapidAPI key.)*  \n5. **Draft (Gemini):** “Agent One” composes a concise, personalized email using row fields + enrichment + ABOUT ME block.  \n   - Structured Output Parser enforces:  \n     ```json\n     {\n       \"email_subject\": \"text\",\n       \"email_content\": \"text\"\n     }\n     ```  \n6. **Prep for QA:** “Email Context” maps `email_subject`, `email_content`, and `email` for the judge.  \n7. **QA (Judge):** “Judge Agent” returns `APPROVED` or `REVISE` (brief feedback allowed).  \n8. **Route:**\n   - If `APPROVED` → Data Table “Update row(s)” writes `email_subject` + `email_body` (a.k.a. `email_content`) back to the row.  \n   - If `REVISE` → Skipped; loop continues.  \n\nRequired setup\n---------------\n**Data Table:** “email_linkedin_list” (or your own) with at least:  \n- `email`, `First_name`, `Last_name`, `Title`, `Location`, `Company_Name`, `Company_site`,  \n  `Linkedin_URL`, `company_linkedin` (if used), `Crunchbase_URL`,  \n  `email_subject`, `email_body`,  \n  `linkedin_profile_scrape`, `linkedin_company_scrape`, `crunchbase_company_scrape` (string fields for JSON).  \n\n**Credentials:**  \n- RapidAPI key for `cold-outreach-enrichment-scraper` *(store securely as credential, not hardcoded)*  \n- Google Gemini (PaLM) API configured in the Google Gemini Chat Model node  \n\n**ABOUT ME block:**  \nReplace the sample persona (James / CEO / Company Sample / AI Automations) with your own.\n\nNodes used\n-----------\n- **Data Table**\n- **HTTP Request:**  \n- **AI Agent:**\n- **Google Gemini Chat Model**  \n- **Split in Batches:** Main Loop  \n- **Set:** RapidAPI-Key\n\nCustomization ideas\n------------------- \n- **Process flags:** Add `email_generated_at` or `processed` boolean to prevent reprocessing.  \n- **Human-in-the-loop:** Send drafts to Slack/Email for spot check before write-back.  \n- **Delivery:** After approval, optionally email the draft to the sender for review.  \n\nQuotas & costs\n---------------\n- RapidAPI: Multiple calls per row (three tasks + result polls).  \n- Gemini: Token usage for generator + judge per row.  \nTune batch size and schedule accordingly.  \n\nPrivacy & compliance\n--------------------\nYou are scraping and storing person/company data.  \nEnsure lawful basis, respect ToS, and minimize stored data.  ",
+  "featuredImage": "/data/workflows/9814/9814.webp",
+  "author": {
+    "id": 101,
+    "slug": "johnnyrafael",
+    "name": "Johnny Rafael",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2460,
+  "downloads": 246,
+  "createdAt": "2025-10-17T07:22:21.599Z",
+  "updatedAt": "2026-01-16T09:02:04.408Z",
+  "publishedAt": "2025-10-17T07:22:21.599Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9814"
+}

@@ -1,0 +1,181 @@
+{
+  "id": 4444,
+  "slug": "4444",
+  "title": "Build production-ready user authentication with Airtable and JWT",
+  "description": "This n8n workflow provides a comprehensive solution for user authentication and management, leveraging Airtable as the backend database. It includes flows for user sign-up and login, aswell as the sample crud operations retrieving user details, and updating user information.\n\n**Youtube Video of me explaining the flow:** https://www.youtube.com/watch?v=gKcGfyq3dPM\n\n### How it Works\n\n**User Sign-Up Flow**\n1.  **Receives POST request**: A webhook listens for POST requests containing new user details (email, first name, last name, password).\n2.  **Checks for existing email**: The workflow queries Airtable to see if the submitted email already exists.\n3.  **Handles email in use**: If the email is found, it responds with `{\"response\": \"email in use\"}`.\n4.  **Creates new user**: If the email is unique, the password is **SHA256 hashed (Base64 encoded)**, and the user's information (including the hashed password) is stored in Airtable. A successful response of `{\"response\": \"success\"}` is then sent.\n\n**User Login Flow**\n1.  **Receives POST request**: A webhook listens for POST requests with user email and password for login.\n2.  **Verifies user existence**: It checks Airtable for a user with the provided email. If no user is found, it responds with a failure message (`\"wrong email\"`).\n3.  **Compares passwords**: If a user is found, the submitted password is **hashed (SHA256, Base64 encoded)** and compared with the stored hashed password in Airtable.\n4.  **Responds with JWT or error**: If passwords match, a **JWT token** containing the user's ID and email is issued. If they don't match, a `\"wrong password\"` response is sent.\n\n**Flows for a Logged-In User**\n\nThese flows require a **JWT-authenticated request**.\n\n* **Get User Details:**\n    1.  **Webhook (GET)**: Receives a JWT-authenticated request.\n    2.  **Airtable (Read)**: Fetches the current user’s record using the `jwtPayload.id`.\n    3.  **Set Node (\"Specify Current Details\")**: Maps fields like \"First Name,\" \"Last Name,\" \"Email,\" and \"Date\" from Airtable to a standard output format.\n\n* **Update User Details:**\n    1.  **Webhook (POST)**: Receives updated user data (email, name, password).\n    2.  **Airtable (Upsert)**: Updates the record matching `jwtPayload.id` using the submitted fields.\n    3.  **Set Node (\"Specify New Details\")**: Outputs the updated data in a standard format.\n\n### Set Up Steps (Approx. 5 Minutes)\n\n**Step 1: Set up your Airtable Base and Table**\n\nYou'll need an Airtable Base and a table to store your user data. Ensure your table has at least the following columns:\n\n* **Email** (Single Line Text)\n* **First Name** (Single Line Text)\n* **Last Name** (Single Line Text)\n* **Password** (Single Line Text - this will store the hashed password)\n* **Date** (Date - optional, for user sign-up date)\n\n**Step 2: Obtain an Airtable Personal Access Token**\n\n1.  Go to the Airtable website and log in to your account.\n2.  Navigate to your personal access token page (usually found under your developer settings or by searching for \"personal access tokens\").\n3.  Click \"Create new token.\"\n4.  Give your token a name (e.g., \"n8n User Management\").\n5.  **Grant necessary permissions**:\n    * **Scope**: `data.records:read`, `data.records:write` for the specific base you will be using.\n    * **Base**: Select the Airtable base where your user management table resides.\n6.  Generate the token and **copy it immediately**. You won't be able to see it again. Store it securely.\n\n**Step 3: Create a JWT Auth Credential in n8n**\n\n1.  In your n8n instance, go to \"Credentials\" (usually found in the left-hand sidebar).\n2.  Click \"New Credential\" and search for \"JWT Auth\".\n3.  Give the credential a name (e.g., \"UserAuthJWT\").\n4.  For the \"Signing Secret,\" enter a strong, random string of characters. This secret will be used to sign and verify your JWT tokens. **Keep this secret highly confidential.**\n5.  Save the credential.\n\n### Customization Options\n\nThis workflow is designed to be highly adaptable:\n\n* **Database Integration**: Easily switch from Airtable to other databases like PostgreSQL, MySQL, MongoDB, or even Google Sheets by replacing the Airtable nodes with the appropriate database nodes in n8n.\n* **Authentication Methods**: Extend the authentication to include multi-factor authentication (MFA), social logins (Google, Facebook), or integrate with existing identity providers (IdP) by adding additional nodes.\n* **User Profile Fields**: Add or remove user profile fields (e.g., phone number, address, user roles) by adjusting the Airtable table columns and the Set nodes in the workflow.\n* **Notification System**: Integrate notification systems (e.g., email, SMS) for events like new user sign-ups, password resets, or account changes.\n* **Admin Panel**: Build an admin panel using n8n to manage users directly, including functionalities for adding, deleting, or updating user records, and resetting passwords.\n\nThis workflow provides a solid foundation for building robust user management systems, adaptable to a wide range of applications and security requirements.\n\n---\n\n### Need Assistance or Customization?\n\nDo you have specific integrations in mind, or are you looking to add more user management features to this workflow?\n\nIf you need help setting this up, or want to adapt it for a unique use case, don't hesitate to reach out! You can contact me directly at **nanabrownsnr@gmail.com**. I'd be glad to assist you.",
+  "featuredImage": "/data/workflows/4444/4444.webp",
+  "author": {
+    "id": 101,
+    "slug": "nanabrown",
+    "name": "NanaB",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 855,
+  "downloads": 85,
+  "createdAt": "2025-05-28T03:58:04.708Z",
+  "updatedAt": "2026-01-16T08:34:22.510Z",
+  "publishedAt": "2025-05-28T03:58:04.708Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4444",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build production-ready user authentication with Airtable and JWT",
+    "workflowName": "Build production-ready user authentication with Airtable and JWT",
+    "description": "This n8n workflow provides a comprehensive solution for user authentication and management, leveraging Airtable as the backend database. It includes flows for user sign-up and login, aswell as the sample crud operations retrieving user details, and updating user information.\n\n**Youtube Video of me explaining the flow:** https://www.youtube.com/watch?v=gKcGfyq3dPM\n\n### How it Works\n\n**User Sign-Up Flow**\n1.  **Receives POST request**: A webhook listens for POST requests containing new user details (email, first name, last name, password).\n2.  **Checks for existing email**: The workflow queries Airtable to see if the submitted email already exists.\n3.  **Handles email in use**: If the email is found, it responds with `{\"response\": \"email in use\"}`.\n4.  **Creates new user**: If the email is unique, the password is **SHA256 hashed (Base64 encoded)**, and the user's information (including the hashed password) is stored in Airtable. A successful response of `{\"response\": \"success\"}` is then sent.\n\n**User Login Flow**\n1.  **Receives POST request**: A webhook listens for POST requests with user email and password for login.\n2.  **Verifies user existence**: It checks Airtable for a user with the provided email. If no user is found, it responds with a failure message (`\"wrong email\"`).\n3.  **Compares passwords**: If a user is found, the submitted password is **hashed (SHA256, Base64 encoded)** and compared with the stored hashed password in Airtable.\n4.  **Responds with JWT or error**: If passwords match, a **JWT token** containing the user's ID and email is issued. If they don't match, a `\"wrong password\"` response is sent.\n\n**Flows for a Logged-In User**\n\nThese flows require a **JWT-authenticated request**.\n\n* **Get User Details:**\n    1.  **Webhook (GET)**: Receives a JWT-authenticated request.\n    2.  **Airtable (Read)**: Fetches the current user’s record using the `jwtPayload.id`.\n    3.  **Set Node (\"Specify Current Details\")**: Maps fields like \"First Name,\" \"Last Name,\" \"Email,\" and \"Date\" from Airtable to a standard output format.\n\n* **Update User Details:**\n    1.  **Webhook (POST)**: Receives updated user data (email, name, password).\n    2.  **Airtable (Upsert)**: Updates the record matching `jwtPayload.id` using the submitted fields.\n    3.  **Set Node (\"Specify New Details\")**: Outputs the updated data in a standard format.\n\n### Set Up Steps (Approx. 5 Minutes)\n\n**Step 1: Set up your Airtable Base and Table**\n\nYou'll need an Airtable Base and a table to store your user data. Ensure your table has at least the following columns:\n\n* **Email** (Single Line Text)\n* **First Name** (Single Line Text)\n* **Last Name** (Single Line Text)\n* **Password** (Single Line Text - this will store the hashed password)\n* **Date** (Date - optional, for user sign-up date)\n\n**Step 2: Obtain an Airtable Personal Access Token**\n\n1.  Go to the Airtable website and log in to your account.\n2.  Navigate to your personal access token page (usually found under your developer settings or by searching for \"personal access tokens\").\n3.  Click \"Create new token.\"\n4.  Give your token a name (e.g., \"n8n User Management\").\n5.  **Grant necessary permissions**:\n    * **Scope**: `data.records:read`, `data.records:write` for the specific base you will be using.\n    * **Base**: Select the Airtable base where your user management table resides.\n6.  Generate the token and **copy it immediately**. You won't be able to see it again. Store it securely.\n\n**Step 3: Create a JWT Auth Credential in n8n**\n\n1.  In your n8n instance, go to \"Credentials\" (usually found in the left-hand sidebar).\n2.  Click \"New Credential\" and search for \"JWT Auth\".\n3.  Give the credential a name (e.g., \"UserAuthJWT\").\n4.  For the \"Signing Secret,\" enter a strong, random string of characters. This secret will be used to sign and verify your JWT tokens. **Keep this secret highly confidential.**\n5.  Save the credential.\n\n### Customization Options\n\nThis workflow is designed to be highly adaptable:\n\n* **Database Integration**: Easily switch from Airtable to other databases like PostgreSQL, MySQL, MongoDB, or even Google Sheets by replacing the Airtable nodes with the appropriate database nodes in n8n.\n* **Authentication Methods**: Extend the authentication to include multi-factor authentication (MFA), social logins (Google, Facebook), or integrate with existing identity providers (IdP) by adding additional nodes.\n* **User Profile Fields**: Add or remove user profile fields (e.g., phone number, address, user roles) by adjusting the Airtable table columns and the Set nodes in the workflow.\n* **Notification System**: Integrate notification systems (e.g., email, SMS) for events like new user sign-ups, password resets, or account changes.\n* **Admin Panel**: Build an admin panel using n8n to manage users directly, including functionalities for adding, deleting, or updating user records, and resetting passwords.\n\nThis workflow provides a solid foundation for building robust user management systems, adaptable to a wide range of applications and security requirements.\n\n---\n\n### Need Assistance or Customization?\n\nDo you have specific integrations in mind, or are you looking to add more user management features to this workflow?\n\nIf you need help setting this up, or want to adapt it for a unique use case, don't hesitate to reach out! You can contact me directly at **nanabrownsnr@gmail.com**. I'd be glad to assist you.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "hash password",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "add record to database",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "respond with sign up successful",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "request to sign up",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "request to sign in",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check if email in database",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "If email in database",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "respond with email already in use",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "check if user exists",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "If user exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "hash submitted password",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If passwords match",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "respond with wrong email submitted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "respond with successful login",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "respond with wrong password submitted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Specify Current Details",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Specify New Details",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "request to get user details",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "request to update user details",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "get current details",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "update with new details",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

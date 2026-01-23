@@ -1,0 +1,1 @@
+This workflow queries a table in MySQL and inserts the data into Google Sheets.

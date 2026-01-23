@@ -1,0 +1,9 @@
+This n8n workflow automatically monitors RSS feeds for the latest AI vulnerability news, extracts key threat details, and creates a corresponding Security Incident in ServiceNow for each item.
+
+Schedule Trigger – Runs at scheduled intervals to check for updates.
+RSS Read – Fetches the latest AI vulnerability entries from the RSS feed.
+Read URL Content – Retrieves the full article for detailed analysis.
+Information Extractor (OpenAI Chat Model) – Parses and summarizes critical security information.
+Split Out – Processes each vulnerability alert separately.
+Create Incident – Generates a ServiceNow Security Incident with the extracted details.
+Ideal for security teams to track and respond quickly to emerging AI-related threats without manual feed monitoring.

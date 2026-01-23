@@ -1,0 +1,110 @@
+{
+  "id": 11404,
+  "slug": "11404",
+  "title": "Track software vulnerability patents with ScrapeGraphAI, Matrix, and Intercom",
+  "description": "# Software Vulnerability Patent Tracker\n\n![Workflow Preview Image](https://via.placeholder.com/800x400/004AAD/FFFFFF?text=Software+Vulnerability+Patent+Tracker+Workflow+Preview)\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically tracks newly-published patent filings that mention software-security vulnerabilities, buffer-overflow mitigation techniques, and related technology keywords. Every week it aggregates fresh patent data from USPTO and international patent databases, filters it by relevance, and delivers a concise JSON digest (and optional Intercom notification) to R&D teams and patent attorneys.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n cloud, v1.7.0+)\n- ScrapeGraphAI community node installed\n- Basic understanding of patent search syntax (for customizing keyword sets)\n- Optional: Intercom account for in-app alerts\n\n### Required Credentials\n| Credential | Purpose |\n|------------|---------|\n| **ScrapeGraphAI API Key** | Enables ScrapeGraphAI nodes to fetch and parse patent-office webpages |\n| **Intercom Access Token** (optional) | Sends weekly digests directly to an Intercom workspace |\n\n### Additional Setup Requirements\n| Setting | Recommended Value | Notes |\n|---------|-------------------|-------|\n| Cron schedule | `0 9 * * 1` | Triggers every Monday at 09:00 server time |\n| Patent keyword matrix | See example CSV below | List of comma-separated keywords per tech focus |\n\nExample keyword matrix (upload as `keywords.csv` or paste into the “Matrix” node):\n\n```\ntopic,keywords\nBuffer Overflow,\"buffer overflow, stack smashing, stack buffer\"\nMemory Safety,\"memory safety, safe memory allocation, pointer sanitization\"\nCode Injection,\"SQL injection, command injection, injection prevention\"\n```\n\n## How it works\n\nThis workflow automatically tracks newly-published patent filings that mention software-security vulnerabilities, buffer-overflow mitigation techniques, and related technology keywords. Every week it aggregates fresh patent data from USPTO and international patent databases, filters it by relevance, and delivers a concise JSON digest (and optional Intercom notification) to R&D teams and patent attorneys.\n\n## Key Steps:\n- **Schedule Trigger**: Fires weekly based on the configured cron expression.\n- **Matrix (Keyword Loader)**: Loads the CSV-based technology keyword matrix into memory.\n- **Code (Build Search Queries)**: Dynamically assembles patent-search URLs for each keyword group.\n- **ScrapeGraphAI (Fetch Results)**: Scrapes USPTO, EPO, and WIPO result pages and parses titles, abstracts, publication numbers, and dates.\n- **If (Relevance Filter)**: Removes patents older than 1 year or without vulnerability-related terms in the abstract.\n- **Set (Normalize JSON)**: Formats the remaining records into a uniform JSON schema.\n- **Intercom (Notify Team)**: Sends a summarized digest to your chosen Intercom workspace.  \n  _(Skip or disable this node if you prefer to consume the raw JSON output instead.)_\n- **Sticky Notes**: Contain inline documentation and customization tips for future editors.\n\n## Set up steps\n\n**Setup Time: 10-15 minutes**\n\n1. **Install Community Node**  \n   Navigate to “Settings → Community Nodes”, search for **ScrapeGraphAI**, and click “Install”.\n2. **Create Credentials**  \n   - Go to “Credentials” → “New Credential” → select **ScrapeGraphAI API** → paste your API key.  \n   - (Optional) Add an **Intercom** credential with a valid access token.\n3. **Import the Workflow**  \n   - Click “Import” → “Workflow JSON” and paste the template JSON, or drag-and-drop the `.json` file.\n4. **Configure Schedule**  \n   Open the **Schedule Trigger** node and adjust the cron expression if a different frequency is required.\n5. **Upload / Edit Keyword Matrix**  \n   Open the **Matrix** node, paste your custom CSV, or modify existing topics & keywords.\n6. **Review Search Logic**  \n   In the **Code (Build Search Queries)** node, review the base URLs and adjust patent databases as needed.\n7. **Define Notification Channel**  \n   If using Intercom, select your Intercom credential in the **Intercom** node and choose the target channel.\n8. **Execute & Activate**  \n   Click “Execute Workflow” for a trial run. Verify the output. If satisfied, switch the workflow to “Active”.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Schedule Trigger** – Initiates the workflow on a weekly cron schedule.\n- **Matrix** – Holds the CSV keyword table and makes each row available as an item.\n- **Code (Build Search Queries)** – Generates search URLs and attaches meta-data for later nodes.\n- **ScrapeGraphAI** – Scrapes patent listings and extracts structured fields (title, abstract, pub. date, link).\n- **If (Relevance Filter)** – Applies date and keyword relevance filters.\n- **Set (Normalize JSON)** – Maps scraped fields into a clean JSON schema for downstream use.\n- **Intercom** – Sends formatted patent summaries to an Intercom inbox or channel.\n- **Sticky Notes** – Provide inline documentation and edit history markers.\n\n### Data Flow:\n1. **Schedule Trigger** → **Matrix** → **Code** → **ScrapeGraphAI** → **If** → **Set** → **Intercom**\n\n## Customization Examples\n\n### Change Data Source to Google Patents\n```javascript\n// In the Code node\nconst base = 'https://patents.google.com/?q=';\nitems.forEach(item =&gt; {\n  item.json.searchUrl = `${base}${encodeURIComponent(item.json.keywords)}&oq=${encodeURIComponent(item.json.keywords)}`;\n});\nreturn items;\n```\n\n### Send Digest via Slack Instead of Intercom\n```javascript\n// Replace Intercom node with Slack node\n{\n  \"text\": `🚀 New Vulnerability-related Patents (${items.length})\\n` +\n          items.map(i =&gt; `• &lt;${i.json.link}|${i.json.title}&gt;`).join('\\n')\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"topic\": \"Memory Safety\",\n  \"keywords\": \"memory safety, safe memory allocation, pointer sanitization\",\n  \"title\": \"Memory protection for compiled binary code\",\n  \"publicationNumber\": \"US20240123456A1\",\n  \"publicationDate\": \"2024-03-21\",\n  \"abstract\": \"Techniques for enforcing memory safety in compiled software...\",\n  \"link\": \"https://patents.google.com/patent/US20240123456A1/en\",\n  \"source\": \"USPTO\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **Empty Result Set** – Ensure that the keywords are specific but not overly narrow; test queries manually on USPTO.\n2. **ScrapeGraphAI Timeouts** – Increase the `timeout` parameter in the ScrapeGraphAI node or reduce concurrent requests.\n\n### Performance Tips\n- Limit the keyword matrix to &lt;50 rows to keep weekly runs under 2 minutes.\n- Schedule the workflow during off-peak hours to reduce load on patent-office servers.\n\n**Pro Tips:**\n- Combine this workflow with a vector database (e.g., Pinecone) to create a semantic patent knowledge base.\n- Add a “Merge” node to correlate new patents with existing vulnerability CVE entries.\n- Use a second ScrapeGraphAI node to crawl citation trees and identify emerging technology clusters.",
+  "featuredImage": "/data/workflows/11404/11404.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 40,
+  "downloads": 4,
+  "createdAt": "2025-12-01T16:31:36.130Z",
+  "updatedAt": "2026-01-16T09:08:35.040Z",
+  "publishedAt": "2025-12-01T16:31:36.130Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11404",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Track software vulnerability patents with ScrapeGraphAI, Matrix, and Intercom",
+    "workflowName": "Track software vulnerability patents with ScrapeGraphAI, Matrix, and Intercom",
+    "description": "# Software Vulnerability Patent Tracker\n\n![Workflow Preview Image](https://via.placeholder.com/800x400/004AAD/FFFFFF?text=Software+Vulnerability+Patent+Tracker+Workflow+Preview)\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically tracks newly-published patent filings that mention software-security vulnerabilities, buffer-overflow mitigation techniques, and related technology keywords. Every week it aggregates fresh patent data from USPTO and international patent databases, filters it by relevance, and delivers a concise JSON digest (and optional Intercom notification) to R&D teams and patent attorneys.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n cloud, v1.7.0+)\n- ScrapeGraphAI community node installed\n- Basic understanding of patent search syntax (for customizing keyword sets)\n- Optional: Intercom account for in-app alerts\n\n### Required Credentials\n| Credential | Purpose |\n|------------|---------|\n| **ScrapeGraphAI API Key** | Enables ScrapeGraphAI nodes to fetch and parse patent-office webpages |\n| **Intercom Access Token** (optional) | Sends weekly digests directly to an Intercom workspace |\n\n### Additional Setup Requirements\n| Setting | Recommended Value | Notes |\n|---------|-------------------|-------|\n| Cron schedule | `0 9 * * 1` | Triggers every Monday at 09:00 server time |\n| Patent keyword matrix | See example CSV below | List of comma-separated keywords per tech focus |\n\nExample keyword matrix (upload as `keywords.csv` or paste into the “Matrix” node):\n\n```\ntopic,keywords\nBuffer Overflow,\"buffer overflow, stack smashing, stack buffer\"\nMemory Safety,\"memory safety, safe memory allocation, pointer sanitization\"\nCode Injection,\"SQL injection, command injection, injection prevention\"\n```\n\n## How it works\n\nThis workflow automatically tracks newly-published patent filings that mention software-security vulnerabilities, buffer-overflow mitigation techniques, and related technology keywords. Every week it aggregates fresh patent data from USPTO and international patent databases, filters it by relevance, and delivers a concise JSON digest (and optional Intercom notification) to R&D teams and patent attorneys.\n\n## Key Steps:\n- **Schedule Trigger**: Fires weekly based on the configured cron expression.\n- **Matrix (Keyword Loader)**: Loads the CSV-based technology keyword matrix into memory.\n- **Code (Build Search Queries)**: Dynamically assembles patent-search URLs for each keyword group.\n- **ScrapeGraphAI (Fetch Results)**: Scrapes USPTO, EPO, and WIPO result pages and parses titles, abstracts, publication numbers, and dates.\n- **If (Relevance Filter)**: Removes patents older than 1 year or without vulnerability-related terms in the abstract.\n- **Set (Normalize JSON)**: Formats the remaining records into a uniform JSON schema.\n- **Intercom (Notify Team)**: Sends a summarized digest to your chosen Intercom workspace.  \n  _(Skip or disable this node if you prefer to consume the raw JSON output instead.)_\n- **Sticky Notes**: Contain inline documentation and customization tips for future editors.\n\n## Set up steps\n\n**Setup Time: 10-15 minutes**\n\n1. **Install Community Node**  \n   Navigate to “Settings → Community Nodes”, search for **ScrapeGraphAI**, and click “Install”.\n2. **Create Credentials**  \n   - Go to “Credentials” → “New Credential” → select **ScrapeGraphAI API** → paste your API key.  \n   - (Optional) Add an **Intercom** credential with a valid access token.\n3. **Import the Workflow**  \n   - Click “Import” → “Workflow JSON” and paste the template JSON, or drag-and-drop the `.json` file.\n4. **Configure Schedule**  \n   Open the **Schedule Trigger** node and adjust the cron expression if a different frequency is required.\n5. **Upload / Edit Keyword Matrix**  \n   Open the **Matrix** node, paste your custom CSV, or modify existing topics & keywords.\n6. **Review Search Logic**  \n   In the **Code (Build Search Queries)** node, review the base URLs and adjust patent databases as needed.\n7. **Define Notification Channel**  \n   If using Intercom, select your Intercom credential in the **Intercom** node and choose the target channel.\n8. **Execute & Activate**  \n   Click “Execute Workflow” for a trial run. Verify the output. If satisfied, switch the workflow to “Active”.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Schedule Trigger** – Initiates the workflow on a weekly cron schedule.\n- **Matrix** – Holds the CSV keyword table and makes each row available as an item.\n- **Code (Build Search Queries)** – Generates search URLs and attaches meta-data for later nodes.\n- **ScrapeGraphAI** – Scrapes patent listings and extracts structured fields (title, abstract, pub. date, link).\n- **If (Relevance Filter)** – Applies date and keyword relevance filters.\n- **Set (Normalize JSON)** – Maps scraped fields into a clean JSON schema for downstream use.\n- **Intercom** – Sends formatted patent summaries to an Intercom inbox or channel.\n- **Sticky Notes** – Provide inline documentation and edit history markers.\n\n### Data Flow:\n1. **Schedule Trigger** → **Matrix** → **Code** → **ScrapeGraphAI** → **If** → **Set** → **Intercom**\n\n## Customization Examples\n\n### Change Data Source to Google Patents\n```javascript\n// In the Code node\nconst base = 'https://patents.google.com/?q=';\nitems.forEach(item =&gt; {\n  item.json.searchUrl = `${base}${encodeURIComponent(item.json.keywords)}&oq=${encodeURIComponent(item.json.keywords)}`;\n});\nreturn items;\n```\n\n### Send Digest via Slack Instead of Intercom\n```javascript\n// Replace Intercom node with Slack node\n{\n  \"text\": `🚀 New Vulnerability-related Patents (${items.length})\\n` +\n          items.map(i =&gt; `• &lt;${i.json.link}|${i.json.title}&gt;`).join('\\n')\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"topic\": \"Memory Safety\",\n  \"keywords\": \"memory safety, safe memory allocation, pointer sanitization\",\n  \"title\": \"Memory protection for compiled binary code\",\n  \"publicationNumber\": \"US20240123456A1\",\n  \"publicationDate\": \"2024-03-21\",\n  \"abstract\": \"Techniques for enforcing memory safety in compiled software...\",\n  \"link\": \"https://patents.google.com/patent/US20240123456A1/en\",\n  \"source\": \"USPTO\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **Empty Result Set** – Ensure that the keywords are specific but not overly narrow; test queries manually on USPTO.\n2. **ScrapeGraphAI Timeouts** – Increase the `timeout` parameter in the ScrapeGraphAI node or reduce concurrent requests.\n\n### Performance Tips\n- Limit the keyword matrix to &lt;50 rows to keep weekly runs under 2 minutes.\n- Schedule the workflow during off-peak hours to reduce load on patent-office servers.\n\n**Pro Tips:**\n- Combine this workflow with a vector database (e.g., Pinecone) to create a semantic patent knowledge base.\n- Add a “Merge” node to correlate new patents with existing vulnerability CVE entries.\n- Use a second ScrapeGraphAI node to crawl citation trees and identify emerging technology clusters.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Collection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Filter",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Output",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Weekly Patent Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Construct Patent Query",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scrape Patent Data",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze Relevance",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Relevant?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Matrix Alert",
+      "type": "n8n-nodes-base.matrix",
+      "role": "matrix",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Map Fields for Storage",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Save to Intercom",
+      "type": "n8n-nodes-base.intercom",
+      "role": "intercom",
+      "configDescription": "Version 1"
+    }
+  ]
+}

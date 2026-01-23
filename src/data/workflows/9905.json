@@ -1,0 +1,182 @@
+{
+  "id": 9905,
+  "slug": "9905",
+  "title": "Automate invoice processing with Gmail, OCR.space, Slack & Xero",
+  "description": " **How It Works**\n\n1. **Trigger**: Watches for new emails in Gmail with PDF/image attachments.  \n2. **OCR**: Sends the attachment to OCR.space API (https://ocr.space/OCRAPI) to extract invoice text.  \n3. **Parsing**: Extracts key fields:  \n   - Vendor  \n   - Invoice number  \n   - Amount  \n   - Currency  \n   - Invoice date  \n   - Due date  \n   - Description  \n4. **Validation Logic**:  \n   - Checks if amount is valid  \n   - Ensures vendor and invoice number are present  \n   - Flags high-value invoices (e.g., over $10,000)  \n5. **Routing**:  \n   - If invalid: \n   - Sends a Slack message highlighting issues\n   - Labels email as **Rejected**  \n   - If valid:  \n     - Logs the invoice into Google Sheets  \n     - Sends a Slack message to the finance team for approval  \n     - After approval, creates a draft invoice in Xero  \n     - Labels the email as **Processed** in Gmail  \n________________________________________\n**Set up steps**\n\n•\tEstimated setup time: 45-60 mins\n•\tYou’ll need connected credentials for Gmail, Slack, Google Sheets, and Xero\n•\tReplace the default API key for OCR.space with your own (in the HTTP Request node)\n•\tUpdate Slack channel IDs and label IDs to match your workspace\n•\tAdjust invoice validation rules as needed (e.g. currency, red flag conditions)\n\nAll detailed explanations and field mappings are provided in sticky notes within the workflow.\n\n",
+  "featuredImage": "/data/workflows/9905/9905.webp",
+  "author": {
+    "id": 101,
+    "slug": "abiodedeyi",
+    "name": "Abi Odedeyi",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 291,
+  "downloads": 29,
+  "createdAt": "2025-10-19T17:03:01.846Z",
+  "updatedAt": "2026-01-16T09:02:34.761Z",
+  "publishedAt": "2025-10-19T17:03:01.846Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9905",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate invoice processing with Gmail, OCR.space, Slack & Xero",
+    "workflowName": "Automate invoice processing with Gmail, OCR.space, Slack & Xero",
+    "description": "**How It Works**\n\n1. **Trigger**: Watches for new emails in Gmail with PDF/image attachments.  \n2. **OCR**: Sends the attachment to OCR.space API (https://ocr.space/OCRAPI) to extract invoice text.  \n3. **Parsing**: Extracts key fields:  \n   - Vendor  \n   - Invoice number  \n   - Amount  \n   - Currency  \n   - Invoice date  \n   - Due date  \n   - Description  \n4. **Validation Logic**:  \n   - Checks if amount is valid  \n   - Ensures vendor and invoice number are present  \n   - Flags high-value invoices (e.g., over $10,000)  \n5. **Routing**:  \n   - If invalid: \n   - Sends a Slack message highlighting issues\n   - Labels email as **Rejected**  \n   - If valid:  \n     - Logs the invoice into Google Sheets  \n     - Sends a Slack message to the finance team for approval  \n     - After approval, creates a draft invoice in Xero  \n     - Labels the email as **Processed** in Gmail  \n________________________________________\n**Set up steps**\n\n•\tEstimated setup time: 45-60 mins\n•\tYou’ll need connected credentials for Gmail, Slack, Google Sheets, and Xero\n•\tReplace the default API key for OCR.space with your own (in the HTTP Request node)\n•\tUpdate Slack channel IDs and label IDs to match your workspace\n•\tAdjust invoice validation rules as needed (e.g. currency, red flag conditions)\n\nAll detailed explanations and field mappings are provided in sticky notes within the workflow.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Slack Approval Request",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Slack Rejection message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Check Qualification",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Parse Invoice Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format for Slack",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Rejection message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Success message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Update Rejected Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Update Approved Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Add Processed label",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Add Rejected label",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get many contacts",
+      "type": "n8n-nodes-base.xero",
+      "role": "xero",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clean Invoice Payload",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Has Valid Attachment?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Was Approved?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract Text",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,374 @@
+{
+  "id": 5201,
+  "slug": "5201",
+  "title": "WhatsApp expense tracker with multi-input (text, image & audio)",
+  "description": "# Description\n**CashMate – Your AI-Powered WhatsApp Finance Agent**  \nTurn WhatsApp into a smart finance assistant that auto-registers you, logs transactions in natural language, extracts data from receipts and voice notes, and delivers instant report summaries—no apps, no charts, just lightning-fast insights in chat.\n\n# Who is this for?\n- Personal finance enthusiasts wanting effortless expense tracking  \n- Freelancers & solopreneurs juggling multiple incomes and expenses  \n- Small business owners needing quick bookkeeping on the go  \n- Busy professionals who prefer messaging over apps  \n- Privacy-minded users who host data on their own PostgreSQL  \n\n# What problem does this solve?\n- Zero onboarding friction: Just send \"Hi\"—no forms, no sign-ups  \n- No app switching: Track everything right inside WhatsApp  \n- Manual entry eliminated: Natural-language, image, and voice input all auto-parsed  \n- Instant summaries: On-demand report requests—no dashboards to navigate  \n\n# How it works\n## Auto-Registration\n- New users: \"Hi\" → Creates your profile in PostgreSQL  \n- Returning users: Bypasses creation if your number already exists  \n\n## Intent Classification routes every message into one of five branches:\n### Reports & Summaries\n- Triggers on keywords like \"today's report,\" \"show May vs June,\" or \"summary.\"  \n- Returns concise text summary of income, expenses, and net balance.  \n\n### Natural-Language Transactions\n- Messages like \"Give 200 to Mukesh for car repair\" → AI extracts date, category, amount, payee → logs it.  \n\n### Receipt OCR\n- Attach a receipt image → Gemini OCR node reads line-items → AI categorizes and logs.  \n\n### Voice-Driven Logging\n- Send a voice note → Deepgram node transcribes → AI logs transaction.  \n\n### General Chat & Greetings\n- \"Hi,\" \"Hello,\" or casual finance questions → Routed to chat branch for greetings or tips.  \n\n# Setup\n## Prerequisites\n- n8n instance (self-hosted or n8n.cloud, v1.0+)  \n- WhatsApp Business Cloud API credentials  \n- PostgreSQL database (host, port, user, password)  \n- OpenRouter/OpenAI API key for NLP  \n- Gemini API key for OCR  \n- Deepgram API key for voice transcription  \n\n## Quick Start\n1. Import CashMate.n8n.json into n8n.  \n2. Rename nodes to suit your environment.  \n3. Configure Credentials in n8n's Credentials section—avoid hard-coding keys.  \n4. Activate workflow and message \"Hi\" from WhatsApp.  \n5. Test by sending a sample expense text, image receipt, or voice note.  \n\n&gt; **Note:** All detailed setup instructions and deep configuration steps are provided in the sticky notes within the template.  \n\n# How to Customize\n- **Categories & Currencies:** Edit parsing logic in the Function nodes.  \n- **AI Models:** Swap OpenAI/OpenRouter for GPT-4, Claude, or self-hosted alternatives.  \n- **Multi-User Support:** Extend registration logic to tag team or family accounts.  \n- **Additional Features:** Add budget alerts, multi-currency support, or bank integrations via Plaid.  \n\n# Example Interactions\n## 1. Text Transaction\n```yaml\nUser: 300 given to James for the coffee  \nCashMate: ✅ Transaction Added:\n   • Date:          2025-06-24  \n   • Category:      Coffee & Beverages  \n   • Type:          Expense  \n   • Amount:        ₹300.00  \n   • Counterparty:  James\n```\n\n## 2. Receipt Image (OCR)\n\n```yaml\nUser: [sends image of café bill totaling ₹450]  \nCashMate: ✅ Transaction Added:\n   • Date:          2025-06-24  \n   • Category:      Coffee & Beverages  \n   • Type:          Expense  \n   • Amount:        ₹450.00  \n   • Counterparty:  Café Aroma\n\n```\n\n\n## 3. Voice Transaction\n```yaml\nUser: [voice note: \"Paid 650 rupees for office stationery\"]  \nCashMate: ✅ Transaction Added:\n   • Date:          2025-06-24  \n   • Category:      Office Supplies  \n   • Type:          Expense  \n   • Amount:        ₹650.00  \n   • Counterparty:  (none)\n\n```",
+  "featuredImage": "/data/workflows/5201/5201.webp",
+  "author": {
+    "id": 101,
+    "slug": "rawsun007",
+    "name": "Roshan Ramani",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1130,
+  "downloads": 113,
+  "createdAt": "2025-06-24T13:22:01.168Z",
+  "updatedAt": "2026-01-16T08:38:18.149Z",
+  "publishedAt": "2025-06-24T13:22:01.168Z",
+  "nodes": 56,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5201",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "WhatsApp expense tracker with multi-input (text, image & audio)",
+    "workflowName": "WhatsApp expense tracker with multi-input (text, image & audio)",
+    "description": "# Description\n**CashMate – Your AI-Powered WhatsApp Finance Agent**  \nTurn WhatsApp into a smart finance assistant that auto-registers you, logs transactions in natural language, extracts data from receipts and voice notes, and delivers instant report summaries—no apps, no charts, just lightning-fast insights in chat.\n\n# Who is this for?\n- Personal finance enthusiasts wanting effortless expense tracking  \n- Freelancers & solopreneurs juggling multiple incomes and expenses  \n- Small business owners needing quick bookkeeping on the go  \n- Busy professionals who prefer messaging over apps  \n- Privacy-minded users who host data on their own PostgreSQL  \n\n# What problem does this solve?\n- Zero onboarding friction: Just send \"Hi\"—no forms, no sign-ups  \n- No app switching: Track everything right inside WhatsApp  \n- Manual entry eliminated: Natural-language, image, and voice input all auto-parsed  \n- Instant summaries: On-demand report requests—no dashboards to navigate  \n\n# How it works\n## Auto-Registration\n- New users: \"Hi\" → Creates your profile in PostgreSQL  \n- Returning users: Bypasses creation if your number already exists  \n\n## Intent Classification routes every message into one of five branches:\n### Reports & Summaries\n- Triggers on keywords like \"today's report,\" \"show May vs June,\" or \"summary.\"  \n- Returns concise text summary of income, expenses, and net balance.  \n\n### Natural-Language Transactions\n- Messages like \"Give 200 to Mukesh for car repair\" → AI extracts date, category, amount, payee → logs it.  \n\n### Receipt OCR\n- Attach a receipt image → Gemini OCR node reads line-items → AI categorizes and logs.  \n\n### Voice-Driven Logging\n- Send a voice note → Deepgram node transcribes → AI logs transaction.  \n\n### General Chat & Greetings\n- \"Hi,\" \"Hello,\" or casual finance questions → Routed to chat branch for greetings or tips.  \n\n# Setup\n## Prerequisites\n- n8n instance (self-hosted or n8n.cloud, v1.0+)  \n- WhatsApp Business Cloud API credentials  \n- PostgreSQL database (host, port, user, password)  \n- OpenRouter/OpenAI API key for NLP  \n- Gemini API key for OCR  \n- Deepgram API key for voice transcription  \n\n## Quick Start\n1. Import CashMate.n8n.json into n8n.  \n2. Rename nodes to suit your environment.  \n3. Configure Credentials in n8n's Credentials section—avoid hard-coding keys.  \n4. Activate workflow and message \"Hi\" from WhatsApp.  \n5. Test by sending a sample expense text, image receipt, or voice note.  \n\n&gt; **Note:** All detailed setup instructions and deep configuration steps are provided in the sticky notes within the template.  \n\n# How to Customize\n- **Categories & Currencies:** Edit parsing logic in the Function nodes.  \n- **AI Models:** Swap OpenAI/OpenRouter for GPT-4, Claude, or self-hosted alternatives.  \n- **Multi-User Support:** Extend registration logic to tag team or family accounts.  \n- **Additional Features:** Add budget alerts, multi-currency support, or bank integrations via Plaid.  \n\n# Example Interactions\n## 1. Text Transaction\n```yaml\nUser: 300 given to James for the coffee  \nCashMate: ✅ Transaction Added:\n   • Date:          2025-06-24  \n   • Category:      Coffee & Beverages  \n   • Type:          Expense  \n   • Amount:        ₹300.00  \n   • Counterparty:  James\n```\n\n## 2. Receipt Image (OCR)\n\n```yaml\nUser: [sends image of café bill totaling ₹450]  \nCashMate: ✅ Transaction Added:\n   • Date:          2025-06-24  \n   • Category:      Coffee & Beverages  \n   • Type:          Expense  \n   • Amount:        ₹450.00  \n   • Counterparty:  Café Aroma\n\n```\n\n\n## 3. Voice Transaction\n```yaml\nUser: [voice note: \"Paid 650 rupees for office stationery\"]  \nCashMate: ✅ Transaction Added:\n   • Date:          2025-06-24  \n   • Category:      Office Supplies  \n   • Type:          Expense  \n   • Amount:        ₹650.00  \n   • Counterparty:  (none)\n\n```",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Date and time",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Normal Conversation ",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message Intent Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Route by Intent",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Parse & Validate Transaction",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Build Custom Report Query",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Transform Custom Query for Postgres",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Custom Query Results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Execute Custom Report Query",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Build Custom Financial Summary",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Send Custom Report",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "simple conversation ",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Date and time1",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Date and time2",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Date and time4",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Date and time5",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Transform image to base64",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Date and time6",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Financial Response1",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Transaction JSON1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Validate Transaction Fields1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Transaction into DB1",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Build Confirmation Message1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Date and time7",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Date and time8",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "role": "toolCode",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Incoming WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "role": "whatsAppTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check Message Type",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Fetch User Profile from Postgres",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Create New User",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Check user Exists or not",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Image Download link ",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Run OCR on Image (Gemini API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse & Validate Transaction (Receipts & Bills)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Create Audio Download link ",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Transaction Lines",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse & Validate Transaction(Audio Transcribe)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Transcribe Audio by deepgram ",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

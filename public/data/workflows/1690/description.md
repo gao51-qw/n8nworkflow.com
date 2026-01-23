@@ -1,0 +1,3 @@
+This workflow illustrates how HTML reports can be created using *Markdown* Node. An example data consists of a Time Sheet table for 2 persons. Based on this table a markdown document is generated using *Function* Node. After that a final HTML report is created and is saved as binary file. This file can be either downloaded directly from the workflow canvas or sent as an email attachement.
+
+![markdownworkflow.png](1)

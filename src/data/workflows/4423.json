@@ -1,0 +1,164 @@
+{
+  "id": 4423,
+  "slug": "4423",
+  "title": "Evaluations metric: answer similarity",
+  "description": "### This n8n template demonstrates how to calculate the evaluation metric \"Similarity\" which in this scenario, measures the consistency of the agent.\n\nThe scoring approach is adapted from the open-source evaluations project [RAGAS](https://docs.ragas.io/) and you can see the source here [https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_similarity.py](https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_similarity.py)\n\n### How it works\n* This evaluation works best where questions are close-ended or about facts where the answer can have little to no deviation.\n* For our scoring, we generate embeddings for both the AI's response and ground truth and calculate the cosine similarity between them.\n* A high score indicates LLM consistency with expected results whereas a low score could signal model hallucination.\n\n### Requirements\n* n8n version 1.94+\n* Check out this Google Sheet for a sample data [https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing)\n",
+  "featuredImage": "/data/workflows/4423/4423.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1011,
+  "downloads": 101,
+  "createdAt": "2025-05-27T07:15:17.213Z",
+  "updatedAt": "2026-01-16T08:34:18.534Z",
+  "publishedAt": "2025-05-27T07:15:17.213Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4423",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Evaluations metric: answer similarity",
+    "workflowName": "Evaluations metric: answer similarity",
+    "description": "### This n8n template demonstrates how to calculate the evaluation metric \"Similarity\" which in this scenario, measures the consistency of the agent.\n\nThe scoring approach is adapted from the open-source evaluations project [RAGAS](https://docs.ragas.io/) and you can see the source here [https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_similarity.py](https://github.com/explodinggradients/ragas/blob/main/ragas/src/ragas/metrics/_answer_similarity.py)\n\n### How it works\n* This evaluation works best where questions are close-ended or about facts where the answer can have little to no deviation.\n* For our scoring, we generate embeddings for both the AI's response and ground truth and calculate the cosine similarity between them.\n* A high score indicates LLM consistency with expected results whereas a low score could signal model hallucination.\n\n### Requirements\n* n8n version 1.94+\n* Check out this Google Sheet for a sample data [https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When fetching a dataset row",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "role": "evaluationTrigger",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Remap Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Evaluation",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Set Input Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Update Output",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Update Metrics",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "GroundTruth to Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Embeddings1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remap Embeddings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Remap Embeddings1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create Embeddings Result",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Calculate Similarity Score",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

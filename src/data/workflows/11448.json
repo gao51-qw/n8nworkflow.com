@@ -1,0 +1,716 @@
+{
+  "id": 11448,
+  "slug": "11448",
+  "title": "Automated B2B lead management and AI outreach",
+  "description": "This workflow is a comprehensive, production-grade automation for B2B lead management and multichannel outreach, designed for Sales Development Representatives (SDRs), growth teams, and sales operations. It covers the entire SDR pipeline: from lead ingestion and validation, through enrichment, scoring, AI-powered outreach, reply handling, analytics, and reporting.\n\n**Key Features:**\n- Lead validation (email, suppression, geo/GDPR)\n- Multi-source data enrichment\n- Lead scoring and tiering (HIGH/MEDIUM/LOW)\n- AI-generated personalized cold emails (with A/B subject testing)\n- Multichannel outreach (Email, LinkedIn, WhatsApp) with rate limiting and compliance\n- AI-based reply simulation and intent classification\n- Automated routing (qualification, follow-up, manual review)\n- Full event logging to database\n- Aggregated analytics and daily reporting\n- Human-readable AI summary and Slack notifications\n\n---\n\n## What This Workflow Does\n\n### 1. Lead Ingestion & Validation\n- Loads leads from a source (test data, CRM, webhook, etc.)\n- Validates email format and checks against suppression lists (blocked domains/emails)\n- Applies geo and GDPR compliance logic (blocks/flags leads from restricted countries)\n\n### 2. Data Enrichment\n- Enriches each lead via one or more external APIs (company info, tech stack, revenue, etc.)\n- Handles enrichment failures gracefully and logs them for analytics\n\n### 3. Lead Scoring & Segmentation\n- Scores leads based on industry, country, company size, revenue, and pain points\n- Segments leads into HIGH, MEDIUM, or LOW tiers for tailored outreach\n\n### 4. AI-Powered Outreach Generation\n- Uses OpenAI (or compatible LLM) to generate personalized cold email content\n- Creates A/B tested subject lines for each email\n- Generates LinkedIn and WhatsApp message variants for multichannel outreach\n\n### 5. Multichannel Outreach Execution\n- Sends emails via SMTP (with rate limiting and quiet hours)\n- Simulates LinkedIn and WhatsApp sends (can be replaced with real integrations)\n- Logs all outreach events to a Postgres database\n\n### 6. Reply Simulation & AI Classification\n- Simulates a variety of lead replies (interested, not interested, follow-up, unclear)\n- Uses AI to classify reply intent and suggest next actions\n\n### 7. Automated Routing & Follow-up\n- Routes leads based on AI classification:\n  - **Interested:** Schedules meeting, logs qualification, proposes follow-up\n  - **Follow-up Later:** Schedules future follow-up\n  - **Not Interested:** Marks as closed/lost\n  - **Unclear:** Flags for manual review and notifies team via Slack\n\n### 8. Event Logging & Analytics\n- Logs every significant event (enrichment, outreach, reply, status change) to a database\n- Aggregates results by lead score, channel, and status\n- Calculates key metrics (qualification rate, enrichment success, multichannel rate, etc.)\n\n### 9. Reporting & Team Notification\n- Generates a daily analytics row and stores it in the database\n- Uses AI to create a human-readable summary of the run\n- Posts a detailed summary to a Slack channel\n\n---\n\n## Use Cases\n\n- **Automated SDR Workflows:** Replace manual lead research, outreach, and follow-up with a fully automated, auditable process.\n- **Growth Experiments:** Run A/B tests on messaging, subject lines, and channels at scale.\n- **Sales Analytics:** Get transparent, granular reporting on every step of the SDR funnel.\n- **Compliance-First Outreach:** Ensure all outreach respects geo, GDPR, and suppression rules.\n- **AI-Driven Personalization:** Use LLMs to generate highly relevant, non-generic outreach at scale.\n\n---\n\n## Installation & Setup\n\n### 1. Import the Workflow\n- Download or copy the workflow from the n8n Template Store.\n- In your n8n editor, click **Import** and paste the workflow JSON, or use the \"Use Template\" button.\n\n### 2. Configure Required Credentials\n- **Postgres:** Set up a Postgres credential for event and analytics logging.\n- **SMTP:** Add your email provider's SMTP credentials for sending emails.\n- **OpenAI:** Add your OpenAI API key for AI-powered nodes.\n- **Slack:** Add your Slack API credential for notifications.\n- **Enrichment APIs:** Add credentials for any external enrichment APIs you use.\n\n### 3. Customize Lead Source\n- Replace the test data in the `Load Test Leads` node with your real lead source (e.g., webhook, CRM, Google Sheets, etc.).\n\n### 4. Adjust Compliance & Suppression Logic\n- Update the suppression lists and geo/GDPR logic in the relevant nodes to match your organization's requirements.\n\n### 5. Review Multichannel Logic\n- The workflow simulates LinkedIn and WhatsApp sends. Replace these with real integrations if needed.\n\n### 6. Database Preparation\n- Ensure your Postgres database has the following tables (or adjust node configs):\n  - `lead_events` (for all event logs)\n  - `analytics_daily` (for daily summary rows)\n  - `meetings` (for scheduled meetings)\n  - `execution_runs` (for workflow run metadata)\n\n### 7. Test the Workflow\n- Run the workflow manually with sample data.\n- Check the database and Slack for logs and notifications.\n- Review AI-generated content for tone and compliance.\n\n---\n\n## Configuration Details\n\n- **Rate Limiting:** Email, LinkedIn, and WhatsApp sends are rate-limited and respect quiet hours.\n- **A/B Testing:** Each email uses a randomly selected subject variant for ongoing optimization.\n- **AI Models:** Uses OpenAI GPT-4o-mini by default; can be swapped for other models.\n- **Event Logging:** Every action (enrichment, outreach, reply, status change) is logged with timestamp and payload for full traceability.\n- **Analytics:** Aggregates by lead score, channel, and status; calculates rates and averages.\n- **Slack Notifications:** Posts a summary of each run, including key metrics and AI-generated insights.\n\n---\n\n## Advanced Customization\n\n- **Add/Replace Enrichment APIs:** Plug in any HTTP-based enrichment service.\n- **Custom Lead Scoring:** Adjust the scoring logic in the `Compute Lead Score` node to fit your ICP.\n- **Custom AI Prompts:** Edit the system messages in AI nodes for your brand voice.\n- **Additional Channels:** Integrate SMS, phone, or other channels as needed.\n- **Webhook Triggers:** Replace manual trigger with webhook for real-time automation.\n\n---\n\n## Requirements\n\n- n8n version **1.123.0** or later\n- Postgres database (or adapt for your DB)\n- SMTP email provider\n- OpenAI API key (or compatible LLM)\n- Slack workspace (for notifications)\n- (Optional) Enrichment API keys\n\n---\n\n## Template Store Submission Notes\n\n- All credentials are handled via n8n's credential system (no hardcoded secrets).\n- The workflow is modular, well-commented, and ready for production use.\n- All event and analytics logging is auditable and GDPR-compliant.\n- Please review and test all integrations in your environment before using in production.\n\n---\n\n## Example Analytics Output\n\n| Metric                | Value   |\n|-----------------------|---------|\n| Total Leads           | 100     |\n| Qualified             | 22      |\n| Follow-up Scheduled   | 15      |\n| Closed Lost           | 40      |\n| Manual Review         | 3       |\n| Qualification Rate    | 22%     |\n| Enrichment Success    | 90%     |\n| Multichannel Rate     | 60%     |\n\n---\nReady to automate your SDR pipeline? Import this workflow and start scaling your B2B outreach today!",
+  "featuredImage": "/data/workflows/11448/11448.webp",
+  "author": {
+    "id": 101,
+    "slug": "tuguidragos",
+    "name": "Țugui Dragoș",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 205,
+  "downloads": 20,
+  "createdAt": "2025-12-03T04:49:17.528Z",
+  "updatedAt": "2026-01-16T09:08:45.144Z",
+  "publishedAt": "2025-12-03T04:49:17.528Z",
+  "nodes": 113,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11448",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated B2B lead management and AI outreach",
+    "workflowName": "Automated B2B lead management and AI outreach",
+    "description": "This workflow is a comprehensive, production-grade automation for B2B lead management and multichannel outreach, designed for Sales Development Representatives (SDRs), growth teams, and sales operations. It covers the entire SDR pipeline: from lead ingestion and validation, through enrichment, scoring, AI-powered outreach, reply handling, analytics, and reporting.\n\n**Key Features:**\n- Lead validation (email, suppression, geo/GDPR)\n- Multi-source data enrichment\n- Lead scoring and tiering (HIGH/MEDIUM/LOW)\n- AI-generated personalized cold emails (with A/B subject testing)\n- Multichannel outreach (Email, LinkedIn, WhatsApp) with rate limiting and compliance\n- AI-based reply simulation and intent classification\n- Automated routing (qualification, follow-up, manual review)\n- Full event logging to database\n- Aggregated analytics and daily reporting\n- Human-readable AI summary and Slack notifications\n\n---\n\n## What This Workflow Does\n\n### 1. Lead Ingestion & Validation\n- Loads leads from a source (test data, CRM, webhook, etc.)\n- Validates email format and checks against suppression lists (blocked domains/emails)\n- Applies geo and GDPR compliance logic (blocks/flags leads from restricted countries)\n\n### 2. Data Enrichment\n- Enriches each lead via one or more external APIs (company info, tech stack, revenue, etc.)\n- Handles enrichment failures gracefully and logs them for analytics\n\n### 3. Lead Scoring & Segmentation\n- Scores leads based on industry, country, company size, revenue, and pain points\n- Segments leads into HIGH, MEDIUM, or LOW tiers for tailored outreach\n\n### 4. AI-Powered Outreach Generation\n- Uses OpenAI (or compatible LLM) to generate personalized cold email content\n- Creates A/B tested subject lines for each email\n- Generates LinkedIn and WhatsApp message variants for multichannel outreach\n\n### 5. Multichannel Outreach Execution\n- Sends emails via SMTP (with rate limiting and quiet hours)\n- Simulates LinkedIn and WhatsApp sends (can be replaced with real integrations)\n- Logs all outreach events to a Postgres database\n\n### 6. Reply Simulation & AI Classification\n- Simulates a variety of lead replies (interested, not interested, follow-up, unclear)\n- Uses AI to classify reply intent and suggest next actions\n\n### 7. Automated Routing & Follow-up\n- Routes leads based on AI classification:\n  - **Interested:** Schedules meeting, logs qualification, proposes follow-up\n  - **Follow-up Later:** Schedules future follow-up\n  - **Not Interested:** Marks as closed/lost\n  - **Unclear:** Flags for manual review and notifies team via Slack\n\n### 8. Event Logging & Analytics\n- Logs every significant event (enrichment, outreach, reply, status change) to a database\n- Aggregates results by lead score, channel, and status\n- Calculates key metrics (qualification rate, enrichment success, multichannel rate, etc.)\n\n### 9. Reporting & Team Notification\n- Generates a daily analytics row and stores it in the database\n- Uses AI to create a human-readable summary of the run\n- Posts a detailed summary to a Slack channel\n\n---\n\n## Use Cases\n\n- **Automated SDR Workflows:** Replace manual lead research, outreach, and follow-up with a fully automated, auditable process.\n- **Growth Experiments:** Run A/B tests on messaging, subject lines, and channels at scale.\n- **Sales Analytics:** Get transparent, granular reporting on every step of the SDR funnel.\n- **Compliance-First Outreach:** Ensure all outreach respects geo, GDPR, and suppression rules.\n- **AI-Driven Personalization:** Use LLMs to generate highly relevant, non-generic outreach at scale.\n\n---\n\n## Installation & Setup\n\n### 1. Import the Workflow\n- Download or copy the workflow from the n8n Template Store.\n- In your n8n editor, click **Import** and paste the workflow JSON, or use the \"Use Template\" button.\n\n### 2. Configure Required Credentials\n- **Postgres:** Set up a Postgres credential for event and analytics logging.\n- **SMTP:** Add your email provider's SMTP credentials for sending emails.\n- **OpenAI:** Add your OpenAI API key for AI-powered nodes.\n- **Slack:** Add your Slack API credential for notifications.\n- **Enrichment APIs:** Add credentials for any external enrichment APIs you use.\n\n### 3. Customize Lead Source\n- Replace the test data in the `Load Test Leads` node with your real lead source (e.g., webhook, CRM, Google Sheets, etc.).\n\n### 4. Adjust Compliance & Suppression Logic\n- Update the suppression lists and geo/GDPR logic in the relevant nodes to match your organization's requirements.\n\n### 5. Review Multichannel Logic\n- The workflow simulates LinkedIn and WhatsApp sends. Replace these with real integrations if needed.\n\n### 6. Database Preparation\n- Ensure your Postgres database has the following tables (or adjust node configs):\n  - `lead_events` (for all event logs)\n  - `analytics_daily` (for daily summary rows)\n  - `meetings` (for scheduled meetings)\n  - `execution_runs` (for workflow run metadata)\n\n### 7. Test the Workflow\n- Run the workflow manually with sample data.\n- Check the database and Slack for logs and notifications.\n- Review AI-generated content for tone and compliance.\n\n---\n\n## Configuration Details\n\n- **Rate Limiting:** Email, LinkedIn, and WhatsApp sends are rate-limited and respect quiet hours.\n- **A/B Testing:** Each email uses a randomly selected subject variant for ongoing optimization.\n- **AI Models:** Uses OpenAI GPT-4o-mini by default; can be swapped for other models.\n- **Event Logging:** Every action (enrichment, outreach, reply, status change) is logged with timestamp and payload for full traceability.\n- **Analytics:** Aggregates by lead score, channel, and status; calculates rates and averages.\n- **Slack Notifications:** Posts a summary of each run, including key metrics and AI-generated insights.\n\n---\n\n## Advanced Customization\n\n- **Add/Replace Enrichment APIs:** Plug in any HTTP-based enrichment service.\n- **Custom Lead Scoring:** Adjust the scoring logic in the `Compute Lead Score` node to fit your ICP.\n- **Custom AI Prompts:** Edit the system messages in AI nodes for your brand voice.\n- **Additional Channels:** Integrate SMS, phone, or other channels as needed.\n- **Webhook Triggers:** Replace manual trigger with webhook for real-time automation.\n\n---\n\n## Requirements\n\n- n8n version **1.123.0** or later\n- Postgres database (or adapt for your DB)\n- SMTP email provider\n- OpenAI API key (or compatible LLM)\n- Slack workspace (for notifications)\n- (Optional) Enrichment API keys\n\n---\n\n## Template Store Submission Notes\n\n- All credentials are handled via n8n's credential system (no hardcoded secrets).\n- The workflow is modular, well-commented, and ready for production use.\n- All event and analytics logging is auditable and GDPR-compliant.\n- Please review and test all integrations in your environment before using in production.\n\n---\n\n## Example Analytics Output\n\n| Metric                | Value   |\n|-----------------------|---------|\n| Total Leads           | 100     |\n| Qualified             | 22      |\n| Follow-up Scheduled   | 15      |\n| Closed Lost           | 40      |\n| Manual Review         | 3       |\n| Qualification Rate    | 22%     |\n| Enrichment Success    | 90%     |\n| Multichannel Rate     | 60%     |\n\n---\nReady to automate your SDR pipeline? Import this workflow and start scaling your B2B outreach today!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Load Test Leads",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Enrich Lead via HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Check Enrichment Success",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Merge Enrichment Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Enrichment Failed Flag",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Parse Enrichment Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI - Generate Outreach Email",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model - Email Gen",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output - Email",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Extract Email Fields",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Prepare Email Event Log",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log Email Sent to DB",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Simulate Reply Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI - Classify Reply Intent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model - Reply Classifier",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output - Classification",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Route by Intent",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Mark as Qualified",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log Qualified Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Calculate Follow-up Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Follow-up Event",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log Follow-up Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Mark as Not Interested",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log Closed Lost Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Mark as Needs Review",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log Manual Review Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Aggregate All Results",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculate Final Stats",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extra Enrichment API 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Normalize Enrichment Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Extra Enrichment Success",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log Enrichment Success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Insert Enrichment Success Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Log Enrichment Failure",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Insert Enrichment Failed Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Compute Lead Score",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Branch by Lead Score",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set HIGH Score Attributes",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log HIGH Score Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Set MEDIUM Score Attributes",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log MEDIUM Score Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Set LOW Score Attributes",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log LOW Score Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Generate LinkedIn Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate WhatsApp Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check if Multichannel Eligible",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Simulate LinkedIn Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Check LinkedIn Send Success",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log LinkedIn Success",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Log LinkedIn Failure",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Simulate WhatsApp Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Check WhatsApp Send Success",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log WhatsApp Success",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Log WhatsApp Failure",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Create Subject Variants A/B",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log Subject Variant",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "AI - Draft Meeting Follow-up",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model - Meeting",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output - Meeting",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create Meeting Object",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Meeting Record",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Calculate Extended Follow-up Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Extended Follow-up Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Log Manual Review Notification",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Aggregate by Lead Score",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Aggregate by Channel",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Analytics Daily Row",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Analytics Daily Row",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Enrich Final Stats",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Validate Email Format",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Suppression List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check if Invalid or Suppressed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log Invalid Lead Event",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Load Config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Email Rate Limit",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email Rate OK?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log Email Rate Limited",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Check LinkedIn Rate Limit",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "LinkedIn Rate OK?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log LinkedIn Rate Limited",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Check WhatsApp Rate Limit",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "WhatsApp Rate OK?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log WhatsApp Rate Limited",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Set Geo Compliance Flags",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Do Not Contact",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log Geo Blocked",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Check GDPR Sensitive",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log GDPR Sensitive",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Check if Needs Human Review",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send Human Review Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Log Escalated to Human",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Calculate Best Send Time",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log Send Time Planned",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Estimate Lead Cost",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Build Execution Metadata",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Execution Run Record",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "AI - Generate Human Summary",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model - Summary",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output - Summary",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Merge Summary with Stats",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Final Output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notify Team – Run Summary",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

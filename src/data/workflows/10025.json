@@ -1,0 +1,206 @@
+{
+  "id": 10025,
+  "slug": "10025",
+  "title": "Automate interior design lead qualification with AI & human approval to Notion",
+  "description": "\n\n## Overview\nThis automated workflow intelligently qualifies interior design leads, generates personalized client emails, and manages follow-up through a human-approval process. Built with n8n, Claude AI, Telegram approval, and Notion database integration.\n\n![image.png](fileId:3035)\n\n## ⚠️ Hosting Options\nThis template works with both **n8n Cloud** and **self-hosted** instances. Most nodes are native to n8n, making it cloud-compatible out of the box.\n\n## What This Template Does\n\n**Automated Lead Management Pipeline:**\n- Captures client intake form submissions from website or n8n forms\n- AI-powered classification into HOT/WARM/COLD categories based on budget, project scope, and commitment indicators\n- Generates personalized outreach emails tailored to each lead type\n- Human approval workflow via Telegram for quality control\n- Email revision capability for rejected drafts\n- Automated client email delivery via Gmail\n- Centralized lead tracking in Notion database\n\n## Key Features\n\n✅ **Intelligent Lead Scoring**: Analyzes 12+ data points including budget (AED), space count, project type, timeline, and style preferences\n\n✅ **Personalized Communication**: AI-generated emails reference specific client details, demonstrating genuine understanding\n\n✅ **Quality Control**: Human-in-the-loop approval via Telegram prevents errors before client contact\n\n✅ **Smart Routing**: Different workflows for qualified leads (meeting invitations) vs. unqualified leads (respectful alternatives)\n\n✅ **Revision Loop**: Rejected emails automatically route to revision agent for improvements\n\n✅ **Database Integration**: All leads stored in Notion for pipeline tracking and analytics\n\n## Use Cases\n\n- Interior design firms managing high-volume lead intake\n- Architecture practices with complex qualification criteria\n- Home renovation companies prioritizing project value\n- Any service business requiring budget-based lead scoring\n- Sales teams needing approval workflows before client contact\n\n## Prerequisites\n\n### Required Accounts & API Keys:\n1. **Anthropic Claude API** - For AI classification and email generation\n2. **Telegram Bot Token** - For approval notifications\n3. **Gmail Account** - For sending client emails (or any SMTP provider)\n4. **Notion Account** - For lead database storage\n5. **n8n Account** - Cloud or self-hosted instance\n\n### Technical Requirements:\n- Basic understanding of n8n workflows\n- Ability to create Telegram bots via BotFather\n- Gmail app password or OAuth setup\n- Notion database with appropriate properties\n\n## Setup Instructions\n\n### Step 1: Clone and Import Template\n1. Copy this template to your n8n instance (cloud or self-hosted)\n2. All nodes will appear as inactive - this is normal\n\n### Step 2: Configure Form Trigger\n1. Open the **Client Intake Form Trigger** node\n2. Choose your trigger type:\n   - For n8n forms: Configure form fields matching the template structure\n   - For webhook: Copy webhook URL and integrate with your website form\n3. Required form fields:\n   - First Name, Second Name, Email, Contact Number\n   - Project Address, Project Type, Spaces Included\n   - Budget Range, Completion Date, Style Preferences\n   - Involvement Level, Previous Experience, Inspiration Links\n\n### Step 3: Set Up Claude AI Credentials\n1. Obtain API key from https://console.anthropic.com\n2. In n8n: Create new credential → Anthropic → Paste API key\n3. Apply credential to these nodes:\n   - **AI Lead Scoring Engine**\n   - **Personalized Client Outreach Email Generator**\n   - **Email Revision Agent**\n\n### Step 4: Configure Telegram Approval Bot\n1. Create bot via Telegram's @BotFather\n2. Copy bot token\n3. Get your Telegram Chat ID (use @userinfobot)\n4. In n8n: Create Telegram credential with bot token\n5. Configure **Human-in-the-Loop Email Approval** node:\n   - Add your Chat ID\n   - Customize approval message format if desired\n\n### Step 5: Set Up Gmail Sending\n1. Enable 2-factor authentication on Gmail account\n2. Generate app password: Google Account → Security → App Passwords\n3. In n8n: Create Gmail credential using app password\n4. Configure **Client Email Delivery** node with sender details\n\n### Step 6: Connect Notion Database\n1. Create Notion integration at https://www.notion.so/my-integrations\n2. Copy integration token\n3. Create database with these properties:\n   - Client Name (Title), Email (Email), Contact Number (Phone)\n   - Project Address (Text), Project Type (Multi-select)\n   - Spaces Included (Text), Budget (Select), Timeline (Date)\n   - Classification (Select: HOT/WARM/COLD), Confidence (Select)\n   - Estimated Value (Number), Status (Select)\n4. Share database with your integration\n5. In n8n: Add Notion credential → Paste token\n6. Configure **Notion Lead Database Manager** with database ID\n\n### Step 7: Customize Classification Rules (Optional)\n1. Open **AI Lead Scoring Engine** node\n2. Review classification criteria in the prompt:\n   - HOT: 500k+ AED, full renovations, 2+ spaces\n   - WARM: 100k+ AED, 2+ spaces\n   - COLD: &lt;100k AED OR single space\n3. Adjust thresholds to match your business requirements\n4. Modify currency if not using AED\n\n### Step 8: Personalize Email Templates\n1. Open **Personalized Client Outreach Email Generator** node\n2. Customize:\n   - Company name and branding\n   - Signature placeholders ([Your Name], [Title], etc.)\n   - Tone and style preferences\n   - Alternative designer recommendations for COLD leads\n\n### Step 9: Test the Workflow\n1. Activate the workflow\n2. Submit a test form with sample data\n3. Monitor each node execution in n8n\n4. Check Telegram for approval message\n5. Verify email delivery and Notion database entry\n\n### Step 10: Set Up Error Handling (Recommended)\n1. Add error workflow trigger\n2. Configure notifications for failed executions\n3. Set up retry logic for API failures\n\n## Workflow Node Breakdown\n\n### 1. Client Intake Form Trigger\nCaptures lead data from website forms or n8n native forms with all project details.\n\n### 2. AI Lead Scoring Engine\nAnalyzes intake data using structured logic: budget validation, space counting, and multi-factor evaluation. Returns HOT/WARM/COLD classification with confidence scores.\n\n### 3. Lead Classification Router\nRoutes leads into three priority workflows based on AI classification, optimizing resource allocation.\n\n### 4. Sales Team Email Notifier\nSends instant alerts to sales representatives with complete lead details and AI reasoning for internal tracking.\n\n### 5. Personalized Client Outreach Email Generator\nAI-powered composer creating tailored responses demonstrating genuine understanding of client vision, adapted by lead type.\n\n### 6. Latest Email Version Controller\nCaptures most recent email output ensuring only final approved version proceeds to delivery.\n\n### 7. Human-in-the-Loop Email Approval\nTelegram-based review checkpoint sending generated emails to team member for quality control before client delivery.\n\n### 8. Approval Decision Router\nEvaluates reviewer's response, routing approved emails to client delivery or rejected emails to revision agent.\n\n### 9. Email Revision Agent\nAI-powered editor refining rejected emails based on feedback while maintaining personalization and brand voice.\n\n### 10. Client Email Delivery\nSends final approved personalized emails demonstrating understanding of project vision with clear next steps.\n\n### 11. Notion Lead Database Manager\nRecords all potential clients with complete intake data, classification results, and tracking information for pipeline management.\n\n## Customization Tips\n\n**Adjust Classification Thresholds:**\nModify budget ranges and space requirements in the AI Lead Scoring Engine prompt to match your market and service level.\n\n**Multi-Language Support:**\nUpdate all AI agent prompts with instructions for your target language. Claude supports 100+ languages.\n\n**Additional Routing:**\nAdd branches for special cases like urgent projects, VIP clients, or specific geographic regions.\n\n**CRM Integration:**\nReplace Notion with HubSpot, Salesforce, or Airtable using respective n8n nodes.\n\n**SMS Notifications:**\nAdd Twilio node for immediate HOT lead alerts to mobile devices.\n\n## Troubleshooting\n\n**Issue: Telegram approval not received**\n- Verify bot token is correct\n- Confirm chat ID matches your Telegram account\n- Check bot is not blocked\n\n**Issue: Claude API errors**\n- Verify API key validity and credits\n- Check prompt length isn't exceeding token limits\n- Review rate limits on your Anthropic plan\n\n**Issue: Gmail not sending**\n- Confirm app password (not regular password) is used\n- Check \"Less secure app access\" if using older method\n- Verify daily sending limits not exceeded\n\n**Issue: Notion database not updating**\n- Confirm integration has access to database\n- Verify property names match exactly (case-sensitive)\n- Check property types align with data being sent\n\n## Template Metrics\n\n- **Execution Time**: ~30-45 seconds per lead (including AI processing)\n- **API Calls**: 2-3 Claude requests per lead (classification + email generation, +1 if revision)\n- **Cost Estimate**: ~$0.05-0.15 per lead processed (based on Claude API pricing)\n\n## Support & Community\n\n- **n8n Community Forum**: https://community.n8n.io\n- **Template Issues**: Report bugs or suggest improvements via n8n template feedback\n- **Claude Documentation**: https://docs.anthropic.com\n- **Notion API Docs**: https://developers.notion.com\n\n## License\n\nThis template is provided as-is under MIT license. Modify and adapt freely for your business needs.\n\n---\n\n**Version**: 1.0\n**Last Updated**: October 2025\n**Compatibility**: n8n v1.0+ (Cloud & Self-Hosted), Claude API v2024-10+",
+  "featuredImage": "/data/workflows/10025/10025.webp",
+  "author": {
+    "id": 101,
+    "slug": "jamesonk",
+    "name": "Jameson Kanakulya",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 195,
+  "downloads": 19,
+  "createdAt": "2025-10-22T07:11:28.022Z",
+  "updatedAt": "2026-01-16T09:03:02.470Z",
+  "publishedAt": "2025-10-22T07:11:28.022Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10025",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate interior design lead qualification with AI & human approval to Notion",
+    "workflowName": "Automate interior design lead qualification with AI & human approval to Notion",
+    "description": "## Overview\nThis automated workflow intelligently qualifies interior design leads, generates personalized client emails, and manages follow-up through a human-approval process. Built with n8n, Claude AI, Telegram approval, and Notion database integration.\n\n![image.png](fileId:3035)\n\n## ⚠️ Hosting Options\nThis template works with both **n8n Cloud** and **self-hosted** instances. Most nodes are native to n8n, making it cloud-compatible out of the box.\n\n## What This Template Does\n\n**Automated Lead Management Pipeline:**\n- Captures client intake form submissions from website or n8n forms\n- AI-powered classification into HOT/WARM/COLD categories based on budget, project scope, and commitment indicators\n- Generates personalized outreach emails tailored to each lead type\n- Human approval workflow via Telegram for quality control\n- Email revision capability for rejected drafts\n- Automated client email delivery via Gmail\n- Centralized lead tracking in Notion database\n\n## Key Features\n\n✅ **Intelligent Lead Scoring**: Analyzes 12+ data points including budget (AED), space count, project type, timeline, and style preferences\n\n✅ **Personalized Communication**: AI-generated emails reference specific client details, demonstrating genuine understanding\n\n✅ **Quality Control**: Human-in-the-loop approval via Telegram prevents errors before client contact\n\n✅ **Smart Routing**: Different workflows for qualified leads (meeting invitations) vs. unqualified leads (respectful alternatives)\n\n✅ **Revision Loop**: Rejected emails automatically route to revision agent for improvements\n\n✅ **Database Integration**: All leads stored in Notion for pipeline tracking and analytics\n\n## Use Cases\n\n- Interior design firms managing high-volume lead intake\n- Architecture practices with complex qualification criteria\n- Home renovation companies prioritizing project value\n- Any service business requiring budget-based lead scoring\n- Sales teams needing approval workflows before client contact\n\n## Prerequisites\n\n### Required Accounts & API Keys:\n1. **Anthropic Claude API** - For AI classification and email generation\n2. **Telegram Bot Token** - For approval notifications\n3. **Gmail Account** - For sending client emails (or any SMTP provider)\n4. **Notion Account** - For lead database storage\n5. **n8n Account** - Cloud or self-hosted instance\n\n### Technical Requirements:\n- Basic understanding of n8n workflows\n- Ability to create Telegram bots via BotFather\n- Gmail app password or OAuth setup\n- Notion database with appropriate properties\n\n## Setup Instructions\n\n### Step 1: Clone and Import Template\n1. Copy this template to your n8n instance (cloud or self-hosted)\n2. All nodes will appear as inactive - this is normal\n\n### Step 2: Configure Form Trigger\n1. Open the **Client Intake Form Trigger** node\n2. Choose your trigger type:\n   - For n8n forms: Configure form fields matching the template structure\n   - For webhook: Copy webhook URL and integrate with your website form\n3. Required form fields:\n   - First Name, Second Name, Email, Contact Number\n   - Project Address, Project Type, Spaces Included\n   - Budget Range, Completion Date, Style Preferences\n   - Involvement Level, Previous Experience, Inspiration Links\n\n### Step 3: Set Up Claude AI Credentials\n1. Obtain API key from https://console.anthropic.com\n2. In n8n: Create new credential → Anthropic → Paste API key\n3. Apply credential to these nodes:\n   - **AI Lead Scoring Engine**\n   - **Personalized Client Outreach Email Generator**\n   - **Email Revision Agent**\n\n### Step 4: Configure Telegram Approval Bot\n1. Create bot via Telegram's @BotFather\n2. Copy bot token\n3. Get your Telegram Chat ID (use @userinfobot)\n4. In n8n: Create Telegram credential with bot token\n5. Configure **Human-in-the-Loop Email Approval** node:\n   - Add your Chat ID\n   - Customize approval message format if desired\n\n### Step 5: Set Up Gmail Sending\n1. Enable 2-factor authentication on Gmail account\n2. Generate app password: Google Account → Security → App Passwords\n3. In n8n: Create Gmail credential using app password\n4. Configure **Client Email Delivery** node with sender details\n\n### Step 6: Connect Notion Database\n1. Create Notion integration at https://www.notion.so/my-integrations\n2. Copy integration token\n3. Create database with these properties:\n   - Client Name (Title), Email (Email), Contact Number (Phone)\n   - Project Address (Text), Project Type (Multi-select)\n   - Spaces Included (Text), Budget (Select), Timeline (Date)\n   - Classification (Select: HOT/WARM/COLD), Confidence (Select)\n   - Estimated Value (Number), Status (Select)\n4. Share database with your integration\n5. In n8n: Add Notion credential → Paste token\n6. Configure **Notion Lead Database Manager** with database ID\n\n### Step 7: Customize Classification Rules (Optional)\n1. Open **AI Lead Scoring Engine** node\n2. Review classification criteria in the prompt:\n   - HOT: 500k+ AED, full renovations, 2+ spaces\n   - WARM: 100k+ AED, 2+ spaces\n   - COLD: &lt;100k AED OR single space\n3. Adjust thresholds to match your business requirements\n4. Modify currency if not using AED\n\n### Step 8: Personalize Email Templates\n1. Open **Personalized Client Outreach Email Generator** node\n2. Customize:\n   - Company name and branding\n   - Signature placeholders ([Your Name], [Title], etc.)\n   - Tone and style preferences\n   - Alternative designer recommendations for COLD leads\n\n### Step 9: Test the Workflow\n1. Activate the workflow\n2. Submit a test form with sample data\n3. Monitor each node execution in n8n\n4. Check Telegram for approval message\n5. Verify email delivery and Notion database entry\n\n### Step 10: Set Up Error Handling (Recommended)\n1. Add error workflow trigger\n2. Configure notifications for failed executions\n3. Set up retry logic for API failures\n\n## Workflow Node Breakdown\n\n### 1. Client Intake Form Trigger\nCaptures lead data from website forms or n8n native forms with all project details.\n\n### 2. AI Lead Scoring Engine\nAnalyzes intake data using structured logic: budget validation, space counting, and multi-factor evaluation. Returns HOT/WARM/COLD classification with confidence scores.\n\n### 3. Lead Classification Router\nRoutes leads into three priority workflows based on AI classification, optimizing resource allocation.\n\n### 4. Sales Team Email Notifier\nSends instant alerts to sales representatives with complete lead details and AI reasoning for internal tracking.\n\n### 5. Personalized Client Outreach Email Generator\nAI-powered composer creating tailored responses demonstrating genuine understanding of client vision, adapted by lead type.\n\n### 6. Latest Email Version Controller\nCaptures most recent email output ensuring only final approved version proceeds to delivery.\n\n### 7. Human-in-the-Loop Email Approval\nTelegram-based review checkpoint sending generated emails to team member for quality control before client delivery.\n\n### 8. Approval Decision Router\nEvaluates reviewer's response, routing approved emails to client delivery or rejected emails to revision agent.\n\n### 9. Email Revision Agent\nAI-powered editor refining rejected emails based on feedback while maintaining personalization and brand voice.\n\n### 10. Client Email Delivery\nSends final approved personalized emails demonstrating understanding of project vision with clear next steps.\n\n### 11. Notion Lead Database Manager\nRecords all potential clients with complete intake data, classification results, and tracking information for pipeline management.\n\n## Customization Tips\n\n**Adjust Classification Thresholds:**\nModify budget ranges and space requirements in the AI Lead Scoring Engine prompt to match your market and service level.\n\n**Multi-Language Support:**\nUpdate all AI agent prompts with instructions for your target language. Claude supports 100+ languages.\n\n**Additional Routing:**\nAdd branches for special cases like urgent projects, VIP clients, or specific geographic regions.\n\n**CRM Integration:**\nReplace Notion with HubSpot, Salesforce, or Airtable using respective n8n nodes.\n\n**SMS Notifications:**\nAdd Twilio node for immediate HOT lead alerts to mobile devices.\n\n## Troubleshooting\n\n**Issue: Telegram approval not received**\n- Verify bot token is correct\n- Confirm chat ID matches your Telegram account\n- Check bot is not blocked\n\n**Issue: Claude API errors**\n- Verify API key validity and credits\n- Check prompt length isn't exceeding token limits\n- Review rate limits on your Anthropic plan\n\n**Issue: Gmail not sending**\n- Confirm app password (not regular password) is used\n- Check \"Less secure app access\" if using older method\n- Verify daily sending limits not exceeded\n\n**Issue: Notion database not updating**\n- Confirm integration has access to database\n- Verify property names match exactly (case-sensitive)\n- Check property types align with data being sent\n\n## Template Metrics\n\n- **Execution Time**: ~30-45 seconds per lead (including AI processing)\n- **API Calls**: 2-3 Claude requests per lead (classification + email generation, +1 if revision)\n- **Cost Estimate**: ~$0.05-0.15 per lead processed (based on Claude API pricing)\n\n## Support & Community\n\n- **n8n Community Forum**: https://community.n8n.io\n- **Template Issues**: Report bugs or suggest improvements via n8n template feedback\n- **Claude Documentation**: https://docs.anthropic.com\n- **Notion API Docs**: https://developers.notion.com\n\n## License\n\nThis template is provided as-is under MIT license. Modify and adapt freely for your business needs.\n\n---\n\n**Version**: 1.0\n**Last Updated**: October 2025\n**Compatibility**: n8n v1.0+ (Cloud & Self-Hosted), Claude API v2024-10+",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "set email",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Classification Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Email Revision Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Classification Router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Email Notifier",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Outreach Email Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Human approval",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Decision Router",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store in notion database",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send to Client",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

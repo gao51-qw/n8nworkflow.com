@@ -1,0 +1,96 @@
+# Track weekly keyword rankings with Google SERP, Serper API, and Google Sheets
+
+> This template is designed for SEO specialists, content marketers, and digital growth teams who want to automate the process of tracking keyword rankings.
+
+Manually checking SERPs every week is time-consuming and prone to error. This workflow solves that by automatically querying Google search results with the Serper API, updating rankings in Google Sheets, and keeping historical data for up to 12 weeks.
+
+Prerequisites
+
+Before you begin, make sure you have:
+
+A Google Sheet with columns:
+
+Sr.no (unique row identifier)
+
+Keyword
+
+Target Page (the URL you want to track)
+
+A Google Service Account credential set up in n8n
+
+A Serper API key (added to n8n credentials as serperApiKey)
+
+Detailed Setup
+
+Import the workflow into n8n.
+
+Update the Google Sheets nodes:
+
+Replace your-google-sheet-id with your actual Google Sheet ID
+
+Replace your-sheet-name with the correct tab name
+
+Add your Google Service Account credentials to the Google Sheets nodes.
+
+Add your Serper API key to the HTTP Request node (serperApiKey).
+
+(Optional) Update the HARDCODED_DOMAIN variable in the Code node if you want to lock rankings to a specific domain.
+
+Run the workflow once manually to confirm everything is working.
+
+Usage & Customization
+
+By default, the workflow runs every Monday at 00:00 (midnight). You can adjust this by editing the Cron node.
+
+The workflow stores ranking history for 12 weeks. If you want more, simply extend the columns in your Google Sheet and update the Code node logic.
+
+The workflow checks for both exact URLs and domains. You can customize this in the Code node depending on whether you want to track page-level or domain-level rankings.
+
+Data is updated only for the current week unless you allow overwriting, ensuring historical accuracy.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 8225
+- **Complexity:** advanced
+- **Node Count:** 18
+- **Views:** 198
+- **Downloads:** 19
+- **Created:** 2025/9/3
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/8225)
+
+## 👤 Author
+
+- **Name:** Amuratech
+- **Username:** @amuratech
+
+## 🏷️ Categories
+
+- Market Research
+
+## 🔗 Nodes Used
+
+- **splitInBatches** 
+- **googleSheets** (×2)
+- **httpRequest** 
+- **code** (×2)
+- **merge** 
+- **stickyNote** (×8)
+- **scheduleTrigger** 
+- **manualTrigger** 
+- **wait** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 18 nodes with 9 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

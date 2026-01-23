@@ -1,0 +1,1 @@
+A sample error workflow which when triggered sends a notification to the specified Mattermost channel as well as an SMS to the specified mobile number.

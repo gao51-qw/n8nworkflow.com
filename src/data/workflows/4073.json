@@ -1,0 +1,158 @@
+{
+  "id": 4073,
+  "slug": "4073",
+  "title": "Automate GitHub PR linting with Google Gemini AI and auto-fix PRs",
+  "description": "# LintGuardian: Automated PR Linting with n8n & AI\n\n## What It Does\n\nLintGuardian is an n8n workflow template that automates code quality enforcement for GitHub repositories. When a pull request is created, the workflow automatically analyzes the changed files, identifies linting issues, fixes them, and submits a new PR with corrections. This eliminates manual code style reviews, reduces back-and-forth comments, and lets your team focus on functionality rather than formatting.\n\n## How It Works\n\nThe workflow is triggered by a GitHub webhook when a PR is created. It fetches all changed files from the PR using the GitHub API, processes them through an AI-powered linting service (Google Gemini), and automatically generates fixes. The AI agent then creates a new branch with the corrected files and submits a \"linting fixes\" PR against the original branch. Developers can review and merge these fixes with a single click, keeping code consistently formatted with minimal effort.\n\n## Prerequisites\n\nTo use this template, you'll need:\n\n1. **n8n instance**: Either self-hosted or using n8n.cloud\n2. **GitHub repository**: Where you want to enforce linting standards\n3. **GitHub Personal Access Token**: With permissions for repo access (repo, workflow, admin:repo_hook)\n4. **Google AI API Key**: For the Gemini language model that powers the linting analysis\n5. **GitHub webhook**: Configured to send PR creation events to your n8n instance\n\n## Setup Instructions\n\n1. **Import the template** into your n8n instance\n2. **Configure credentials**:\n   - Add your [GitHub Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) under Credentials → GitHub API\n   - Add your [Google AI API key](https://ai.google.dev/tutorials/setup) under Credentials → Google Gemini API\n3. **Update repository information**:\n   - Locate the \"Set Common Fields\" code node at the beginning of the workflow\n   - Change the `gitHubRepoName` and `gitHubOrgName` values to match your repository\n   ```javascript\n   const commonFields = {\n     'gitHubRepoName': 'your-repo-name',\n     'gitHubOrgName': 'your-org-name'\n   }\n   ```\n4. **Configure the webhook**:\n Create a file named `.github/workflows/lint-guardian.yml` in your repository replacing the `Trigger n8n Workflow` step with your webhook:\n     ```yaml\n     name: Lint Guardian\n     \n     on:\n       pull_request:\n         types: [opened, synchronize]\n     \n     jobs:\n       trigger-linting:\n         runs-on: ubuntu-latest\n         steps:\n           - name: Trigger n8n Workflow\n             uses: fjogeleit/http-request-action@v1\n             with:\n               url: 'https://your-n8n-instance.com/webhook/1da5a6e1-9453-4a65-bbac-a1fed633f6ad'\n               method: 'POST'\n               contentType: 'application/json'\n               data: |\n                 {\n                   \"pull_request_number\": ${{ github.event.pull_request.number }},\n                   \"repository\": \"${{ github.repository }}\",\n                   \"branch\": \"${{ github.event.pull_request.head.ref }}\",\n                   \"base_branch\": \"${{ github.event.pull_request.base.ref }}\"\n                 }\n               preventFailureOnNoResponse: true\n     ```\n5. **Customize linting rules** (optional):\n   - Modify the AI Agent's system message to specify your team's linting preferences\n   - Adjust file handling if you have specific file types to focus on or ignore\n\n## Security Considerations\n\nWhen creating your GitHub Personal Access Token, remember to:\n- Choose the minimal permissions needed (repo, workflow, admin:repo_hook)\n- Set an appropriate expiration date\n- Treat your token like a password and store it securely\n- Consider using GitHub's fine-grained personal access tokens for more limited scope\n\nAs GitHub [documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#keeping-your-personal-access-tokens-secure) notes: \"Personal access tokens are like passwords, and they share the same inherent security risks.\"\n\n## Extending the Template\n\nYou can enhance this workflow by:\n- Adding Slack notifications when linting fixes are submitted\n- Creating custom linting rules specific to your team's needs\n- Expanding it to handle different types of code quality checks\n- Adding approval steps for more controlled environments\n\nThis template provides an excellent starting point that you can customize to fit your team's exact workflow and code style requirements.\n",
+  "featuredImage": "/data/workflows/4073/4073.webp",
+  "author": {
+    "id": 101,
+    "slug": "adbertram",
+    "name": "Adam Bertram",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 371,
+  "downloads": 37,
+  "createdAt": "2025-05-15T15:00:58.877Z",
+  "updatedAt": "2026-01-16T08:32:55.169Z",
+  "publishedAt": "2025-05-15T15:00:58.877Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4073",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate GitHub PR linting with Google Gemini AI and auto-fix PRs",
+    "workflowName": "Automate GitHub PR linting with Google Gemini AI and auto-fix PRs",
+    "description": "# LintGuardian: Automated PR Linting with n8n & AI\n\n## What It Does\n\nLintGuardian is an n8n workflow template that automates code quality enforcement for GitHub repositories. When a pull request is created, the workflow automatically analyzes the changed files, identifies linting issues, fixes them, and submits a new PR with corrections. This eliminates manual code style reviews, reduces back-and-forth comments, and lets your team focus on functionality rather than formatting.\n\n## How It Works\n\nThe workflow is triggered by a GitHub webhook when a PR is created. It fetches all changed files from the PR using the GitHub API, processes them through an AI-powered linting service (Google Gemini), and automatically generates fixes. The AI agent then creates a new branch with the corrected files and submits a \"linting fixes\" PR against the original branch. Developers can review and merge these fixes with a single click, keeping code consistently formatted with minimal effort.\n\n## Prerequisites\n\nTo use this template, you'll need:\n\n1. **n8n instance**: Either self-hosted or using n8n.cloud\n2. **GitHub repository**: Where you want to enforce linting standards\n3. **GitHub Personal Access Token**: With permissions for repo access (repo, workflow, admin:repo_hook)\n4. **Google AI API Key**: For the Gemini language model that powers the linting analysis\n5. **GitHub webhook**: Configured to send PR creation events to your n8n instance\n\n## Setup Instructions\n\n1. **Import the template** into your n8n instance\n2. **Configure credentials**:\n   - Add your [GitHub Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) under Credentials → GitHub API\n   - Add your [Google AI API key](https://ai.google.dev/tutorials/setup) under Credentials → Google Gemini API\n3. **Update repository information**:\n   - Locate the \"Set Common Fields\" code node at the beginning of the workflow\n   - Change the `gitHubRepoName` and `gitHubOrgName` values to match your repository\n   ```javascript\n   const commonFields = {\n     'gitHubRepoName': 'your-repo-name',\n     'gitHubOrgName': 'your-org-name'\n   }\n   ```\n4. **Configure the webhook**:\n Create a file named `.github/workflows/lint-guardian.yml` in your repository replacing the `Trigger n8n Workflow` step with your webhook:\n     ```yaml\n     name: Lint Guardian\n     \n     on:\n       pull_request:\n         types: [opened, synchronize]\n     \n     jobs:\n       trigger-linting:\n         runs-on: ubuntu-latest\n         steps:\n           - name: Trigger n8n Workflow\n             uses: fjogeleit/http-request-action@v1\n             with:\n               url: 'https://your-n8n-instance.com/webhook/1da5a6e1-9453-4a65-bbac-a1fed633f6ad'\n               method: 'POST'\n               contentType: 'application/json'\n               data: |\n                 {\n                   \"pull_request_number\": ${{ github.event.pull_request.number }},\n                   \"repository\": \"${{ github.repository }}\",\n                   \"branch\": \"${{ github.event.pull_request.head.ref }}\",\n                   \"base_branch\": \"${{ github.event.pull_request.base.ref }}\"\n                 }\n               preventFailureOnNoResponse: true\n     ```\n5. **Customize linting rules** (optional):\n   - Modify the AI Agent's system message to specify your team's linting preferences\n   - Adjust file handling if you have specific file types to focus on or ignore\n\n## Security Considerations\n\nWhen creating your GitHub Personal Access Token, remember to:\n- Choose the minimal permissions needed (repo, workflow, admin:repo_hook)\n- Set an appropriate expiration date\n- Treat your token like a password and store it securely\n- Consider using GitHub's fine-grained personal access tokens for more limited scope\n\nAs GitHub [documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#keeping-your-personal-access-tokens-secure) notes: \"Personal access tokens are like passwords, and they share the same inherent security risks.\"\n\n## Extending the Template\n\nYou can enhance this workflow by:\n- Adding Slack notifications when linting fixes are submitted\n- Creating custom linting rules specific to your team's needs\n- Expanding it to handle different types of code quality checks\n- Adding approval steps for more controlled environments\n\nThis template provides an excellent starting point that you can customize to fit your team's exact workflow and code style requirements.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Listen for Trigger from Github Workflow",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get PR Files",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get File Contents",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Convert Base64 to Text File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Code/FilePath Object",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Collect All Files Changed",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get PR GitHub Branch",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create GitHub Blob",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create GitHub Tree",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create GitHub Commit",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create Pull Request",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create Branch",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Latest Main Branch Commit SHA",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Latest Main Branch Tree Hash",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Branch",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Common Fields",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

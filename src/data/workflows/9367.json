@@ -1,0 +1,110 @@
+{
+  "id": 9367,
+  "slug": "9367",
+  "title": "Generate comprehensive & abstract summaries from Jotform data with Gemini AI",
+  "description": "## Who this is for\n\nThis workflow is designed for researchers, marketing teams, customer success managers, and survey analysts who want to automatically generate AI-powered summaries of form responses collected via Jotform  — turning raw feedback into actionable insights.\n\nIt is ideal for:\n\n* Teams conducting market research or post-event surveys.\n* Customer experience teams that collect feedback via forms and need instant, digestible summaries.\n* Product managers seeking concise overviews of user comments and suggestions.\n* Analysts who want to compare comprehensive vs. abstract summaries for richer intelligence.\n\n\n## What problem this workflow solves\n\nAnalyzing open-ended Jotform responses manually can be slow, repetitive, and error-prone.\nThis workflow automates the process by generating two AI summaries for every response:\n\n* Comprehensive Summary — captures all factual details from the response.\n* Abstract Summary — rephrases and synthesizes insights at a higher, conceptual level.\n\n### With this workflow:\n\n* Each response is summarized instantly using Google Gemini AI.\n* Both comprehensive and abstract summaries are automatically generated and stored.\n* Data is persisted in Google Sheets, DataTable, and Google Docs for further use.\n\n## What this workflow does\n\nThis n8n workflow transforms Jotform submissions into structured summaries using Google Gemini.\n\n### Step-by-Step Breakdown\n\n1. **Webhook Trigger (Jotform Integration)**\n\n   * Listens for new Jotform submissions using the Webhook node.\n   * Receives full form data via the Webhook response.\n  \n2. **Set the Input Fields**\n\n   * Extracts and assigns key fields like:\n\n     * `FormTitle`\n     * `SubmissionID`\n     * `Body` (the formatted form data)\n   * Prepares structured JSON to feed into the AI summarization stage.\n\n3. **Comprehensive & Abstract Summarizer**\n\n   * Powered by Google Gemini Chat Model (models/gemini-2.0-flash-exp).\n   * Custom prompt:\n\n     ```\n     You are an expert comprehensive summarizer. Build a detailed and abstract summary of the following {{ $json.body.pretty }}.\n     ```\n   * Produces two distinct summaries:\n\n     * `comprehensive_summary`\n     * `abstract_summary`\n\n4. **Structured Output Parser**\n\n   * Ensures Gemini output matches a defined JSON schema:\n\n     ```json\n     {\n       \"comprehensive_summary\": \"\",\n       \"abstract_summary\": \"\"\n     }\n     ```\n   * Guarantees reliable downstream integration with Sheets and Docs.\n\n5. **Persist on DataTable**\n\n   * Saves both summaries into an n8n DataTable for historical tracking or visualization.\n   * Useful for teams running internal analytics within n8n Cloud or self-hosted environments.\n\n6. **Append or Update Row in Google Sheets**\n\n   * Writes both summaries into a connected **Google Sheet**.\n   * Columns:\n\n     * `comprehensive_summary`\n     * `abstract_summary`\n\n7. **Create Google Document**\n\n   * Automatically generates a Google Docs file titled:\n\n     ```\n     {FormTitle}-{SubmissionID}\n     ```\n   * Acts as a per-submission record with a placeholder ready for AI summary insertion.\n\n8. **Update Google Document**\n\n   * Inserts both summaries directly into the newly created Google Doc:\n\n     ```\n     Comprehensive Summary:\n     [Full detailed summary]\n\n     Abstract Summary:\n     [Conceptual summary]\n     ```\n   * Each doc becomes a polished, shareable insight artifact.\n\n\n## Concepts Used in the Workflow\n\n### Comprehensive Summarization\n\nComprehensive summarization captures every important detail in a factual, exhaustive way — ideal when accuracy and completeness matter.\n\n**Goal:**\n\nProvide a detailed understanding of user responses without losing nuance.\n\n**Best For:**\n\n* Research surveys\n* Customer service logs\n* Support ticket summaries\n* Feedback traceability\n\n### Abstract Summarization\n\nAbstract summarization rephrases and synthesizes ideas, offering high-level insights rather than copying text.\n\n**Goal:**\n\nCapture the *essence* and *implications* of feedback — ideal for storytelling and executive reviews.\n\n**Best For:**\n\n* Executive summaries\n* Marketing insights\n* Customer trend analysis\n* Blog-style recaps\n\n## Setup Instructions\n\n### Pre-requisite \n\nIf you are new to Jotform, Please do signup using [Jotform Signup](https://www.jotform.com/?partner=ranjandailata)\n\nFor the purpose of demonstation, we are considering the Jotforms Prebuilt Form as a example.\n\nFollow these steps to deploy and customize the workflow:\n\n### Step 0: Local n8n\nThis step is required for the locally hosted n8n only. Please make sure to setup and install [ngrok](ngrok) and follow the steps to configure and run ngrok on your local with the n8n port. This is how you can run.\n```\nngrok http 5678\n```\nCopy the base URL ex: https://2c6ab9f2c746.ngrok-free.app/ as it will be utilized as part of the webhook configuration for the Jotform.\n\n\n### Step 1: Configure Jotform Webhook\n\n- Copy the webhook URL generated by n8n’s Jotform Trigger node.\n- In your Jotform dashboard, go to:  \n  Settings → Integrations → Webhooks → Add Webhook \n- If you are executing this workflow on a self hosted n8n instance, please follow the steps for setting up ngrok and format the Webhook URL so that the Jotform can make a Webhook POST over the public URL.\n\n- Copy the Webhook URL generated by n8n. \nYou can copy the URL by double clicking on the Jotform Trigger node. Make sure to replace the base url with the above Step 0, if you are running the workflow from your local machine.\n\n![n8n Workflow Jotform Trigger](fileId:2786)\n\n\n### Step 2: Connect Google Gemini\n\n* Navigate to n8n → Credentials → Google Gemini (PaLM API).\n* Add API credentials and select the model:\n  `models/gemini-2.0-flash-exp`\n* Test the connection before proceeding.\n\n\n### Step 3: Configure the Structured Output Parser\n\n* Open the Structured Output Parser node.\n* Ensure the schema includes:\n\n  ```json\n  {\n    \"comprehensive_summary\": \"\",\n    \"abstract_summary\": \"\"\n  }\n  ```\n* Modify or expand schema fields if additional summaries (e.g., “sentiment_summary”) are needed.\n\n\n### Step 4: Connect Google Sheets\n\n* Link your Google Sheets OAuth2 credentials.\n* Specify:\n\n  * **Document ID** (Google Sheet URL)\n  * **Sheet Name** (e.g., “Sheet1”)\n* Map columns to:\n\n  * `comprehensive_summary`\n  * `abstract_summary`\n\n### Step 5: Enable DataTable Storage (Optional)\n\n* Use the DataTable node to maintain a permanent database within n8n Cloud.\n* Configure the schema fields for:\n\n  * `comprehensive_summary`\n  * `abstract_summary`\n\n\n### Step 6: Generate and Update Google Docs\n\n* Link your Google Docs account under n8n credentials.\n* The workflow auto-creates and updates a doc per submission, embedding both summaries for easy sharing.\n\n\n## How to Customize\n\n- **Add Sentiment Analysis**\n\nAfter generating the summary, insert another Google Gemini node to classify the tone of each response — for example, Positive, Neutral, or Negative.\n\nThis helps you track user sentiment trends over time.\n\n- **Send Alerts for Urgent Feedback**\n\nUse an IF node to check if the abstract summary contains words such as “urgent,” “issue,” or “negative.”\n\nIf triggered, automatically send an alert through Slack, Gmail, or Discord, so the team can respond immediately.\n\n- **Enable Multi-Language Support**\n\nInsert a Language Detection node before the Gemini summarizer.\n\nOnce the language is detected, modify the summarizer prompt dynamically to summarize in that same language — ensuring localized insights.\n\n- **Add Topic Extraction**\n\nInclude an additional Gemini text extraction node that identifies major topics or recurring themes from each response before summarization.\n\nThis creates structured insights ready for analytics or tagging.\n\n- **Integrate with CRM or Ticketing Systems**\n\nConnect your workflow to HubSpot, Salesforce, or Zendesk to automatically create new records or tickets based on the feedback type or sentiment.\nThis closes the loop between survey collection and actionable response.\n\n## Summary\n\nThis workflow automates survey intelligence generation from Jotform submissions — powered by Google Gemini AI — delivering dual-layer summarization outputs directly into Google Sheets, DataTables, and Google Docs.\n\n**Benefits:**\n\n* Instant comprehensive and abstract summaries per submission.\n* Ready-to-use outputs for reports, dashboards, and client deliverables.\n\n",
+  "featuredImage": "/data/workflows/9367/9367.webp",
+  "author": {
+    "id": 101,
+    "slug": "ranjancse",
+    "name": "Ranjan Dailata",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 40,
+  "downloads": 4,
+  "createdAt": "2025-10-08T02:17:35.293Z",
+  "updatedAt": "2026-01-16T09:00:10.423Z",
+  "publishedAt": "2025-10-08T02:17:35.293Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9367",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate comprehensive & abstract summaries from Jotform data with Gemini AI",
+    "workflowName": "Generate comprehensive & abstract summaries from Jotform data with Gemini AI",
+    "description": "## Who this is for\n\nThis workflow is designed for researchers, marketing teams, customer success managers, and survey analysts who want to automatically generate AI-powered summaries of form responses collected via Jotform  — turning raw feedback into actionable insights.\n\nIt is ideal for:\n\n* Teams conducting market research or post-event surveys.\n* Customer experience teams that collect feedback via forms and need instant, digestible summaries.\n* Product managers seeking concise overviews of user comments and suggestions.\n* Analysts who want to compare comprehensive vs. abstract summaries for richer intelligence.\n\n\n## What problem this workflow solves\n\nAnalyzing open-ended Jotform responses manually can be slow, repetitive, and error-prone.\nThis workflow automates the process by generating two AI summaries for every response:\n\n* Comprehensive Summary — captures all factual details from the response.\n* Abstract Summary — rephrases and synthesizes insights at a higher, conceptual level.\n\n### With this workflow:\n\n* Each response is summarized instantly using Google Gemini AI.\n* Both comprehensive and abstract summaries are automatically generated and stored.\n* Data is persisted in Google Sheets, DataTable, and Google Docs for further use.\n\n## What this workflow does\n\nThis n8n workflow transforms Jotform submissions into structured summaries using Google Gemini.\n\n### Step-by-Step Breakdown\n\n1. **Webhook Trigger (Jotform Integration)**\n\n   * Listens for new Jotform submissions using the Webhook node.\n   * Receives full form data via the Webhook response.\n  \n2. **Set the Input Fields**\n\n   * Extracts and assigns key fields like:\n\n     * `FormTitle`\n     * `SubmissionID`\n     * `Body` (the formatted form data)\n   * Prepares structured JSON to feed into the AI summarization stage.\n\n3. **Comprehensive & Abstract Summarizer**\n\n   * Powered by Google Gemini Chat Model (models/gemini-2.0-flash-exp).\n   * Custom prompt:\n\n     ```\n     You are an expert comprehensive summarizer. Build a detailed and abstract summary of the following {{ $json.body.pretty }}.\n     ```\n   * Produces two distinct summaries:\n\n     * `comprehensive_summary`\n     * `abstract_summary`\n\n4. **Structured Output Parser**\n\n   * Ensures Gemini output matches a defined JSON schema:\n\n     ```json\n     {\n       \"comprehensive_summary\": \"\",\n       \"abstract_summary\": \"\"\n     }\n     ```\n   * Guarantees reliable downstream integration with Sheets and Docs.\n\n5. **Persist on DataTable**\n\n   * Saves both summaries into an n8n DataTable for historical tracking or visualization.\n   * Useful for teams running internal analytics within n8n Cloud or self-hosted environments.\n\n6. **Append or Update Row in Google Sheets**\n\n   * Writes both summaries into a connected **Google Sheet**.\n   * Columns:\n\n     * `comprehensive_summary`\n     * `abstract_summary`\n\n7. **Create Google Document**\n\n   * Automatically generates a Google Docs file titled:\n\n     ```\n     {FormTitle}-{SubmissionID}\n     ```\n   * Acts as a per-submission record with a placeholder ready for AI summary insertion.\n\n8. **Update Google Document**\n\n   * Inserts both summaries directly into the newly created Google Doc:\n\n     ```\n     Comprehensive Summary:\n     [Full detailed summary]\n\n     Abstract Summary:\n     [Conceptual summary]\n     ```\n   * Each doc becomes a polished, shareable insight artifact.\n\n\n## Concepts Used in the Workflow\n\n### Comprehensive Summarization\n\nComprehensive summarization captures every important detail in a factual, exhaustive way — ideal when accuracy and completeness matter.\n\n**Goal:**\n\nProvide a detailed understanding of user responses without losing nuance.\n\n**Best For:**\n\n* Research surveys\n* Customer service logs\n* Support ticket summaries\n* Feedback traceability\n\n### Abstract Summarization\n\nAbstract summarization rephrases and synthesizes ideas, offering high-level insights rather than copying text.\n\n**Goal:**\n\nCapture the *essence* and *implications* of feedback — ideal for storytelling and executive reviews.\n\n**Best For:**\n\n* Executive summaries\n* Marketing insights\n* Customer trend analysis\n* Blog-style recaps\n\n## Setup Instructions\n\n### Pre-requisite \n\nIf you are new to Jotform, Please do signup using [Jotform Signup](https://www.jotform.com/?partner=ranjandailata)\n\nFor the purpose of demonstation, we are considering the Jotforms Prebuilt Form as a example.\n\nFollow these steps to deploy and customize the workflow:\n\n### Step 0: Local n8n\nThis step is required for the locally hosted n8n only. Please make sure to setup and install [ngrok](ngrok) and follow the steps to configure and run ngrok on your local with the n8n port. This is how you can run.\n```\nngrok http 5678\n```\nCopy the base URL ex: https://2c6ab9f2c746.ngrok-free.app/ as it will be utilized as part of the webhook configuration for the Jotform.\n\n\n### Step 1: Configure Jotform Webhook\n\n- Copy the webhook URL generated by n8n’s Jotform Trigger node.\n- In your Jotform dashboard, go to:  \n  Settings → Integrations → Webhooks → Add Webhook \n- If you are executing this workflow on a self hosted n8n instance, please follow the steps for setting up ngrok and format the Webhook URL so that the Jotform can make a Webhook POST over the public URL.\n\n- Copy the Webhook URL generated by n8n. \nYou can copy the URL by double clicking on the Jotform Trigger node. Make sure to replace the base url with the above Step 0, if you are running the workflow from your local machine.\n\n![n8n Workflow Jotform Trigger](fileId:2786)\n\n\n### Step 2: Connect Google Gemini\n\n* Navigate to n8n → Credentials → Google Gemini (PaLM API).\n* Add API credentials and select the model:\n  `models/gemini-2.0-flash-exp`\n* Test the connection before proceeding.\n\n\n### Step 3: Configure the Structured Output Parser\n\n* Open the Structured Output Parser node.\n* Ensure the schema includes:\n\n  ```json\n  {\n    \"comprehensive_summary\": \"\",\n    \"abstract_summary\": \"\"\n  }\n  ```\n* Modify or expand schema fields if additional summaries (e.g., “sentiment_summary”) are needed.\n\n\n### Step 4: Connect Google Sheets\n\n* Link your Google Sheets OAuth2 credentials.\n* Specify:\n\n  * **Document ID** (Google Sheet URL)\n  * **Sheet Name** (e.g., “Sheet1”)\n* Map columns to:\n\n  * `comprehensive_summary`\n  * `abstract_summary`\n\n### Step 5: Enable DataTable Storage (Optional)\n\n* Use the DataTable node to maintain a permanent database within n8n Cloud.\n* Configure the schema fields for:\n\n  * `comprehensive_summary`\n  * `abstract_summary`\n\n\n### Step 6: Generate and Update Google Docs\n\n* Link your Google Docs account under n8n credentials.\n* The workflow auto-creates and updates a doc per submission, embedding both summaries for easy sharing.\n\n\n## How to Customize\n\n- **Add Sentiment Analysis**\n\nAfter generating the summary, insert another Google Gemini node to classify the tone of each response — for example, Positive, Neutral, or Negative.\n\nThis helps you track user sentiment trends over time.\n\n- **Send Alerts for Urgent Feedback**\n\nUse an IF node to check if the abstract summary contains words such as “urgent,” “issue,” or “negative.”\n\nIf triggered, automatically send an alert through Slack, Gmail, or Discord, so the team can respond immediately.\n\n- **Enable Multi-Language Support**\n\nInsert a Language Detection node before the Gemini summarizer.\n\nOnce the language is detected, modify the summarizer prompt dynamically to summarize in that same language — ensuring localized insights.\n\n- **Add Topic Extraction**\n\nInclude an additional Gemini text extraction node that identifies major topics or recurring themes from each response before summarization.\n\nThis creates structured insights ready for analytics or tagging.\n\n- **Integrate with CRM or Ticketing Systems**\n\nConnect your workflow to HubSpot, Salesforce, or Zendesk to automatically create new records or tickets based on the feedback type or sentiment.\nThis closes the loop between survey collection and actionable response.\n\n## Summary\n\nThis workflow automates survey intelligence generation from Jotform submissions — powered by Google Gemini AI — delivering dual-layer summarization outputs directly into Google Sheets, DataTables, and Google Docs.\n\n**Benefits:**\n\n* Instant comprehensive and abstract summaries per submission.\n* Ready-to-use outputs for reports, dashboards, and client deliverables.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Persist On DataTable",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Comprehensive & Abstract Summarizer",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a document",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set the Input Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Update a document",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    }
+  ]
+}

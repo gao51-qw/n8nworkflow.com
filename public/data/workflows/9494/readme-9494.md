@@ -1,0 +1,79 @@
+# Automate real estate lead matching with Jotform, & Gemini AI to Zoho CRM
+
+> ## 🧩 What Problem Does It Solve?
+In real estate, inquiries come from many sources and often require immediate, personalized attention. Brokers waste significant time manually:
+
+* **Qualifying leads:** Determining if a prospect's budget, neighborhood, and needs match available inventory.
+
+* **Searching listings:** Cross-referencing customer criteria against a large, static database.
+
+* **Data entry:** Moving contact details and search summaries into a CRM like Zoho.
+
+* **Initial follow-up:** Sending an email to confirm the submission and schedule the next step.
+## 🛠️ How to Configure It
+### Jotform & CRM Setup
+* **Jotform Trigger:** Replace the placeholder with your specific Jotform ID.
+* **Zoho CRM:** Replace the placeholder TEMPLATED_COMPANY_NAME with your actual company name.
+
+* **Gmail:** Replace the placeholder Calendly link YOUR_CALENDLY_LINK in the Send a message node with your real estate consultant's booking link.
+### Database & AI Setup
+* **Google Sheets:** Replace YOUR_GOOGLE_SHEET_DOCUMENT_ID and YOUR_SHEET_GID_OR_NAME in both Google Sheets nodes. Your listings must be structured with columns matching the AI prompt (e.g., bedrooms, rent, neighborhoods).
+
+* **AI Models:** Ensure your Google Gemini API key is linked to the Google Gemini Chat Model node.
+
+* **AI Agent Prompt:** The included prompt contains the exact matching and scoring rules for the AI. You can edit this prompt to refine how the AI prioritizes factors like supplier_rating or neighborhood proximity.
+## 🧠 Use Case Examples
+* **Small Startups:** Collect High-Quality Leads: New inquiries must be quickly logged for sales follow-up, but manual entry is slow.
+* **B2B Sales:** High-Value Lead Enrichment: Need to prioritize leads that match specific product requirements and budget tiers.
+* **Travel/Hospitality:** Personalized Itinerary Matching: Quickly match customer preferences (e.g., dates, group size, activity level) to available packages.
+* **E-commerce:** Manual Product Recommendation: Sales teams manually recommend expensive, configurable items (e.g., furniture, specialized equipment).
+
+If you need any help [Get in Touch](https://www.linkedin.com/in/abdallaelshikh0/)
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9494
+- **Complexity:** advanced
+- **Node Count:** 15
+- **Views:** 685
+- **Downloads:** 68
+- **Created:** 2025/10/11
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9494)
+
+## 👤 Author
+
+- **Name:** Abdullah Alshiekh
+- **Username:** @abdullah01
+
+## 🏷️ Categories
+
+- Lead Generation
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **set** 
+- **jotFormTrigger** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **googleSheetsTool** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **gmail** 
+- **zohoCrm** 
+- **stickyNote** (×7)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 15 nodes with 7 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

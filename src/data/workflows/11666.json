@@ -1,0 +1,115 @@
+{
+  "id": 11666,
+  "slug": "11666",
+  "title": "Complete client onboarding: Form to Monday.com, Google Drive & Email",
+  "description": "\n## Overview\nStreamline your entire client onboarding process with a single workflow. When a new client submits the intake form, this automation creates a Monday.com item, generates a complete Google Drive folder structure from your template, updates the Monday item with the folder link, and sends a personalized welcome email—all automatically.\n\n## What This Workflow Does\n1. Displays a professional intake form (client name, email, project type)\n2. Creates a new item in your Monday.com board with all details\n3. Generates a Google Drive folder for the client\n4. Duplicates your template folder structure using Apps Script\n5. Updates the Monday.com item with the Google Drive folder link\n6. Sends a welcome email to the client with folder access\n\n## Key Features\n- **End-to-end automation** — From form submission to welcome email\n- **CRM integration** — All client data captured in Monday.com\n- **Organized file storage** — Consistent folder structure for every client\n- **Professional onboarding** — Clients receive immediate welcome email with resources\n- **Fully customizable** — Add more form fields, notifications, or integrations\n\n## Prerequisites\n- Monday.com account with API credentials\n- Google Drive account with OAuth2 credentials\n- Gmail account with OAuth2 credentials\n- Google Apps Script deployment (code below)\n- Template folder in Google Drive with `{{NAME}}` placeholders\n\n## Setup\n\n### Step 1: Get your Monday.com IDs\n1. Open your Monday.com board\n2. Board ID: Check the URL → `monday.com/boards/BOARD_ID`\n3. Group ID: Use Monday API Explorer or browser dev tools\n4. Column IDs: Found in column settings or via API\n\n### Step 2: Create your Drive template folder\n```\n📁 {{NAME}} - Client Files\n├── 📁 01. Contracts & Agreements\n├── 📁 02. {{NAME}} - Assets\n├── 📁 03. Deliverables\n├── 📁 04. Communications\n└── 📄 {{NAME}} - Project Brief.gdoc\n```\n\n### Step 3: Deploy Apps Script\n1. Go to [script.google.com](https://script.google.com)\n2. Create new project → Paste code below\n3. Deploy → New deployment → Web app\n4. Execute as: `Me` | Access: `Anyone`\n5. Copy the deployment URL\n\n### Step 4: Configure the workflow\nReplace these placeholders:\n- `YOUR_BOARD_ID` — Monday.com board ID\n- `YOUR_GROUP_ID` — Monday.com group ID\n- `DESTINATION_PARENT_FOLDER_ID` — Drive folder for new client folders\n- `YOUR_APPS_SCRIPT_URL` — Apps Script deployment URL\n- `YOUR_TEMPLATE_FOLDER_ID` — Template folder to duplicate\n\n### Step 5: Connect credentials\n- Monday.com API credentials\n- Google Drive OAuth2\n- Gmail OAuth2\n\n---\n\n## Apps Script Code\n\n```javascript\nfunction doPost(e) {\n  try {\n    var params = e.parameter;\n    var templateFolderId = params.templateFolderId;\n    var name = params.name;\n    var destinationFolderId = params.destinationFolderId;\n    \n    if (!templateFolderId || !name) {\n      return jsonResponse({\n        success: false,\n        error: 'Missing required parameters: templateFolderId and name are required'\n      });\n    }\n    \n    var templateFolder = DriveApp.getFolderById(templateFolderId);\n    \n    if (destinationFolderId) {\n      var destinationFolder = DriveApp.getFolderById(destinationFolderId);\n      copyContentsRecursively(templateFolder, destinationFolder, name);\n      \n      return jsonResponse({\n        success: true,\n        id: destinationFolder.getId(),\n        url: destinationFolder.getUrl(),\n        name: destinationFolder.getName(),\n        mode: 'copied_to_existing',\n        timestamp: new Date().toISOString()\n      });\n    } else {\n      var parentFolder = templateFolder.getParents().next();\n      var newFolderName = replacePlaceholders(templateFolder.getName(), name);\n      var newFolder = parentFolder.createFolder(newFolderName);\n      copyContentsRecursively(templateFolder, newFolder, name);\n      \n      return jsonResponse({\n        success: true,\n        id: newFolder.getId(),\n        url: newFolder.getUrl(),\n        name: newFolder.getName(),\n        mode: 'created_new',\n        timestamp: new Date().toISOString()\n      });\n    }\n  } catch (error) {\n    return jsonResponse({\n      success: false,\n      error: error.toString()\n    });\n  }\n}\n\nfunction replacePlaceholders(text, name) {\n  var result = text;\n  result = result.replace(/\\{\\{NAME\\}\\}/g, name);\n  result = result.replace(/\\{\\{name\\}\\}/g, name.toLowerCase());\n  result = result.replace(/\\{\\{Name\\}\\}/g, name);\n  return result;\n}\n\nfunction copyContentsRecursively(sourceFolder, destinationFolder, name) {\n  var files = sourceFolder.getFiles();\n  while (files.hasNext()) {\n    try {\n      var file = files.next();\n      var newFileName = replacePlaceholders(file.getName(), name);\n      file.makeCopy(newFileName, destinationFolder);\n      Utilities.sleep(150);\n    } catch (error) {\n      Logger.log('Error copying file: ' + error.toString());\n    }\n  }\n  \n  var subfolders = sourceFolder.getFolders();\n  while (subfolders.hasNext()) {\n    try {\n      var subfolder = subfolders.next();\n      var newSubfolderName = replacePlaceholders(subfolder.getName(), name);\n      var newSubfolder = destinationFolder.createFolder(newSubfolderName);\n      Utilities.sleep(200);\n      copyContentsRecursively(subfolder, newSubfolder, name);\n    } catch (error) {\n      Logger.log('Error copying subfolder: ' + error.toString());\n    }\n  }\n}\n\nfunction jsonResponse(data) {\n  return ContentService\n    .createTextOutput(JSON.stringify(data))\n    .setMimeType(ContentService.MimeType.JSON);\n}\n```\n\n---\n\n## Use Cases\n- **Agencies** — Automate client onboarding with CRM tracking\n- **Freelancers** — Professional intake process for new projects\n- **Consulting firms** — Standardized client setup workflow\n- **Creative studios** — Organize assets and deliverables from day one\n- **Service businesses** — Streamline customer setup and communication\n\n## Customization Ideas\n- Add more form fields: phone, company size, budget, deadline\n- Add Slack notification to alert your team\n- Create tasks in Monday.com sub-items\n- Add to Google Calendar for kickoff meeting\n- Integrate with invoicing (Stripe, QuickBooks)\n\n## Notes\n- Apps Script may take 30-60 seconds for large folder structures\n- Monday.com column IDs must match your board's actual columns\n- The welcome email can be customized with your branding\n- Test with a single client before full deployment",
+  "featuredImage": "/data/workflows/11666/11666.webp",
+  "author": {
+    "id": 101,
+    "slug": "akav",
+    "name": "Antonio Gasso",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 169,
+  "downloads": 16,
+  "createdAt": "2025-12-10T18:27:52.393Z",
+  "updatedAt": "2026-01-16T09:09:36.221Z",
+  "publishedAt": "2025-12-10T18:27:52.393Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11666",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Complete client onboarding: Form to Monday.com, Google Drive & Email",
+    "workflowName": "Complete client onboarding: Form to Monday.com, Google Drive & Email",
+    "description": "## Overview\nStreamline your entire client onboarding process with a single workflow. When a new client submits the intake form, this automation creates a Monday.com item, generates a complete Google Drive folder structure from your template, updates the Monday item with the folder link, and sends a personalized welcome email—all automatically.\n\n## What This Workflow Does\n1. Displays a professional intake form (client name, email, project type)\n2. Creates a new item in your Monday.com board with all details\n3. Generates a Google Drive folder for the client\n4. Duplicates your template folder structure using Apps Script\n5. Updates the Monday.com item with the Google Drive folder link\n6. Sends a welcome email to the client with folder access\n\n## Key Features\n- **End-to-end automation** — From form submission to welcome email\n- **CRM integration** — All client data captured in Monday.com\n- **Organized file storage** — Consistent folder structure for every client\n- **Professional onboarding** — Clients receive immediate welcome email with resources\n- **Fully customizable** — Add more form fields, notifications, or integrations\n\n## Prerequisites\n- Monday.com account with API credentials\n- Google Drive account with OAuth2 credentials\n- Gmail account with OAuth2 credentials\n- Google Apps Script deployment (code below)\n- Template folder in Google Drive with `{{NAME}}` placeholders\n\n## Setup\n\n### Step 1: Get your Monday.com IDs\n1. Open your Monday.com board\n2. Board ID: Check the URL → `monday.com/boards/BOARD_ID`\n3. Group ID: Use Monday API Explorer or browser dev tools\n4. Column IDs: Found in column settings or via API\n\n### Step 2: Create your Drive template folder\n```\n📁 {{NAME}} - Client Files\n├── 📁 01. Contracts & Agreements\n├── 📁 02. {{NAME}} - Assets\n├── 📁 03. Deliverables\n├── 📁 04. Communications\n└── 📄 {{NAME}} - Project Brief.gdoc\n```\n\n### Step 3: Deploy Apps Script\n1. Go to [script.google.com](https://script.google.com)\n2. Create new project → Paste code below\n3. Deploy → New deployment → Web app\n4. Execute as: `Me` | Access: `Anyone`\n5. Copy the deployment URL\n\n### Step 4: Configure the workflow\nReplace these placeholders:\n- `YOUR_BOARD_ID` — Monday.com board ID\n- `YOUR_GROUP_ID` — Monday.com group ID\n- `DESTINATION_PARENT_FOLDER_ID` — Drive folder for new client folders\n- `YOUR_APPS_SCRIPT_URL` — Apps Script deployment URL\n- `YOUR_TEMPLATE_FOLDER_ID` — Template folder to duplicate\n\n### Step 5: Connect credentials\n- Monday.com API credentials\n- Google Drive OAuth2\n- Gmail OAuth2\n\n---\n\n## Apps Script Code\n\n```javascript\nfunction doPost(e) {\n  try {\n    var params = e.parameter;\n    var templateFolderId = params.templateFolderId;\n    var name = params.name;\n    var destinationFolderId = params.destinationFolderId;\n    \n    if (!templateFolderId || !name) {\n      return jsonResponse({\n        success: false,\n        error: 'Missing required parameters: templateFolderId and name are required'\n      });\n    }\n    \n    var templateFolder = DriveApp.getFolderById(templateFolderId);\n    \n    if (destinationFolderId) {\n      var destinationFolder = DriveApp.getFolderById(destinationFolderId);\n      copyContentsRecursively(templateFolder, destinationFolder, name);\n      \n      return jsonResponse({\n        success: true,\n        id: destinationFolder.getId(),\n        url: destinationFolder.getUrl(),\n        name: destinationFolder.getName(),\n        mode: 'copied_to_existing',\n        timestamp: new Date().toISOString()\n      });\n    } else {\n      var parentFolder = templateFolder.getParents().next();\n      var newFolderName = replacePlaceholders(templateFolder.getName(), name);\n      var newFolder = parentFolder.createFolder(newFolderName);\n      copyContentsRecursively(templateFolder, newFolder, name);\n      \n      return jsonResponse({\n        success: true,\n        id: newFolder.getId(),\n        url: newFolder.getUrl(),\n        name: newFolder.getName(),\n        mode: 'created_new',\n        timestamp: new Date().toISOString()\n      });\n    }\n  } catch (error) {\n    return jsonResponse({\n      success: false,\n      error: error.toString()\n    });\n  }\n}\n\nfunction replacePlaceholders(text, name) {\n  var result = text;\n  result = result.replace(/\\{\\{NAME\\}\\}/g, name);\n  result = result.replace(/\\{\\{name\\}\\}/g, name.toLowerCase());\n  result = result.replace(/\\{\\{Name\\}\\}/g, name);\n  return result;\n}\n\nfunction copyContentsRecursively(sourceFolder, destinationFolder, name) {\n  var files = sourceFolder.getFiles();\n  while (files.hasNext()) {\n    try {\n      var file = files.next();\n      var newFileName = replacePlaceholders(file.getName(), name);\n      file.makeCopy(newFileName, destinationFolder);\n      Utilities.sleep(150);\n    } catch (error) {\n      Logger.log('Error copying file: ' + error.toString());\n    }\n  }\n  \n  var subfolders = sourceFolder.getFolders();\n  while (subfolders.hasNext()) {\n    try {\n      var subfolder = subfolders.next();\n      var newSubfolderName = replacePlaceholders(subfolder.getName(), name);\n      var newSubfolder = destinationFolder.createFolder(newSubfolderName);\n      Utilities.sleep(200);\n      copyContentsRecursively(subfolder, newSubfolder, name);\n    } catch (error) {\n      Logger.log('Error copying subfolder: ' + error.toString());\n    }\n  }\n}\n\nfunction jsonResponse(data) {\n  return ContentService\n    .createTextOutput(JSON.stringify(data))\n    .setMimeType(ContentService.MimeType.JSON);\n}\n```\n\n---\n\n## Use Cases\n- **Agencies** — Automate client onboarding with CRM tracking\n- **Freelancers** — Professional intake process for new projects\n- **Consulting firms** — Standardized client setup workflow\n- **Creative studios** — Organize assets and deliverables from day one\n- **Service businesses** — Streamline customer setup and communication\n\n## Customization Ideas\n- Add more form fields: phone, company size, budget, deadline\n- Add Slack notification to alert your team\n- Create tasks in Monday.com sub-items\n- Add to Google Calendar for kickoff meeting\n- Integrate with invoicing (Stripe, QuickBooks)\n\n## Notes\n- Apps Script may take 30-60 seconds for large folder structures\n- Monday.com column IDs must match your board's actual columns\n- The welcome email can be customized with your branding\n- Test with a single client before full deployment",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Main Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configuration Warning",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Client Intake Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Client in Monday",
+      "type": "n8n-nodes-base.mondayCom",
+      "role": "mondayCom",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Client Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait for Drive Sync",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Duplicate Template Structure",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Add Folder Link to Monday",
+      "type": "n8n-nodes-base.mondayCom",
+      "role": "mondayCom",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

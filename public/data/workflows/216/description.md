@@ -1,0 +1,12 @@
+![workflow-screenshot](fileId:26)
+
+Simpe API which queries the received country code via GraphQL and returns it.
+
+Example URL: [https://n8n.exampl.ecom/webhook/1/webhook/webhook?code=DE](https://n8n.exampl.ecom/webhook/1/webhook/webhook?code=DE)
+
+1. Receives country code from an incoming HTTP Request
+1. Reads data via GraphQL
+1. Converts the data to JSON
+1. Constructs return string
+
+

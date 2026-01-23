@@ -1,0 +1,176 @@
+{
+  "id": 3951,
+  "slug": "3951",
+  "title": "Extract and organize Colombian invoices with Gmail, GPT-4o & Google Workspace",
+  "description": "# 🧾 Personal Invoice Processor\n\nThis N8N workflow automates the extraction and organization of **personal invoices in Colombia** received via **Gmail**. It includes the following key steps:\n\n## 🔁 Flow Summary\n\n1. **Email Trigger**\n   - Polls Gmail every **30 minutes** for emails with `.zip` attachments (assumed to contain invoices).\n   - Expects ZIP file following DIAN standards.\n\n2. **ZIP File Handling**\n   - Extracts all files.\n   - Filters only **PDF** and **XML** files for processing.\n\n3. **Data Extraction & Processing**\n   - Uses **LangChain Agent + OpenAI (GPT-4o-mini)** to extract:\n     - Tipo de documento (Factura / Nota Crédito)\n     - Número de factura\n     - Fecha de emisión (YYYY-MM-DD)\n     - NIT emisor y receptor (sin dígito de verificación)\n     - Razón social del emisor\n     - Subtotal, IVA, Total\n     - CUFE\n     - Resumen de compra (max 20 words, formatted sentence)\n\n4. **Validation**\n   - Ensures **Total = Subtotal + IVA** using a calculator node.\n\n5. **Storage**\n   - Uploads the original PDF to **Google Drive**.\n   - Renames the file to: `YYYY-MM-DD-NUMERO_FACTURA.pdf`.\n   - Inserts or updates invoice details in **Google Sheets** using a unique `Key` (`NIT_Emisor + Numero_Factura`) to prevent duplication.\n\n---\n\n&gt; ⚙️ Designed for personal use with minimal latency tolerance and high automation reliability.",
+  "featuredImage": "/data/workflows/3951/3951.webp",
+  "author": {
+    "id": 101,
+    "slug": "juansave",
+    "name": "Juan Sanchez",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3106,
+  "downloads": 310,
+  "createdAt": "2025-05-09T00:09:17.630Z",
+  "updatedAt": "2026-01-16T08:32:20.604Z",
+  "publishedAt": "2025-05-09T00:09:17.630Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3951",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract and organize Colombian invoices with Gmail, GPT-4o & Google Workspace",
+    "workflowName": "Extract and organize Colombian invoices with Gmail, GPT-4o & Google Workspace",
+    "description": "# 🧾 Personal Invoice Processor\n\nThis N8N workflow automates the extraction and organization of **personal invoices in Colombia** received via **Gmail**. It includes the following key steps:\n\n## 🔁 Flow Summary\n\n1. **Email Trigger**\n   - Polls Gmail every **30 minutes** for emails with `.zip` attachments (assumed to contain invoices).\n   - Expects ZIP file following DIAN standards.\n\n2. **ZIP File Handling**\n   - Extracts all files.\n   - Filters only **PDF** and **XML** files for processing.\n\n3. **Data Extraction & Processing**\n   - Uses **LangChain Agent + OpenAI (GPT-4o-mini)** to extract:\n     - Tipo de documento (Factura / Nota Crédito)\n     - Número de factura\n     - Fecha de emisión (YYYY-MM-DD)\n     - NIT emisor y receptor (sin dígito de verificación)\n     - Razón social del emisor\n     - Subtotal, IVA, Total\n     - CUFE\n     - Resumen de compra (max 20 words, formatted sentence)\n\n4. **Validation**\n   - Ensures **Total = Subtotal + IVA** using a calculator node.\n\n5. **Storage**\n   - Uploads the original PDF to **Google Drive**.\n   - Renames the file to: `YYYY-MM-DD-NUMERO_FACTURA.pdf`.\n   - Inserts or updates invoice details in **Google Sheets** using a unique `Key` (`NIT_Emisor + Numero_Factura`) to prevent duplication.\n\n---\n\n&gt; ⚙️ Designed for personal use with minimal latency tolerance and high automation reliability.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "On Email receipt",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Filename and mimeType",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter ZIP files only",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Unzip Invoice",
+      "type": "n8n-nodes-base.compression",
+      "role": "compression",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Just for style",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get filename and mimeType on extracted docs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split XML and PDF",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Extract PDF Data",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract XML Data",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to JSON",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append both Docs",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Aggregate all Data into 1 list",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Data from PDF and XML",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Create initial PDF",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge both flows",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Update PDF with actual name",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Current Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create or update row",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "id": 3184,
+  "slug": "3184",
+  "title": "🚀 Process YouTube transcripts with Apify, OpenAI & Pinecone database",
+  "description": "# 🚀 YouTube Transcript Indexing Backend for Pinecone 🎥💾\n\nThis tutorial explains how to build the **backend** workflow in n8n that indexes YouTube video transcripts into a Pinecone vector database. **Note:** This workflow handles the processing and indexing of transcripts only—the retrieval agent (which searches these embeddings) is implemented separately.\n\n---\n\n## 📋 Workflow Overview\n\nThis backend workflow performs the following tasks:\n\n1. **Fetch Video Records from Airtable** 📥  \n   Retrieves video URLs and related metadata.\n\n2. **Scrape YouTube Transcripts Using Apify** 🎬  \n   Triggers an Apify actor to scrape transcripts with timestamps from each video.\n\n3. **Update Airtable with Transcript Data** 🔄  \n   Stores the fetched transcript JSON back in Airtable linked via video ID.\n\n4. **Process & Chunk Transcripts** ✂️  \n   Parses the transcript JSON, converts \"mm:ss\" timestamps to seconds, and groups entries into meaningful chunks. Each chunk is enriched with metadata—such as video title, description, start/end timestamps, and a direct URL linking to that video moment.\n\n5. **Generate Embeddings & Index in Pinecone** 💾  \n   Uses OpenAI to create vector embeddings for each transcript chunk and indexes them in Pinecone. This enables efficient semantic searches later by a separate retrieval agent.\n\n---\n\n## 🔧 Step-by-Step Guide\n\n### Step 1: Retrieve Video Records from Airtable 📥\n\n- **Airtable Search Node:**  \n  - **Setup:** Configure the node to fetch video records (with essential fields like `url` and metadata) from your Airtable base.\n  \n- **Loop Over Items:**  \n  - Use a **SplitInBatches** node to process each video record individually.\n\n---\n\n### Step 2: Scrape YouTube Transcripts Using Apify 🎬\n\n- **Trigger Apify Actor:**  \n  - **HTTP Request Node (\"Apify NinjaPost\"):**  \n    - **Method:** POST  \n    - **Endpoint:** `https://api.apify.com/v2/acts/topaz_sharingan~youtube-transcript-scraper-1/runs?token=&lt;YOUR_TOKEN&gt;`  \n    - **Payload Example:**\n      ```json\n      {\n        \"includeTimestamps\": \"Yes\",\n        \"startUrls\": [\"{{ $json.url }}\"]\n      }\n      ```\n  - **Purpose:** Initiates transcript scraping for each video URL.\n\n- **Wait for Processing:**  \n  - **Wait Node:**  \n    - **Duration:** Approximately 1 minute to allow Apify to generate the transcript.\n\n- **Retrieve Transcript Data:**  \n  - **HTTP Request Node (\"Get JSON TS\"):**  \n    - **Method:** GET  \n    - **Endpoint:** `https://api.apify.com/v2/acts/topaz_sharingan~youtube-transcript-scraper-1/runs/last/dataset/items?token=&lt;YOUR_TOKEN&gt;`\n\n---\n\n### Step 3: Update Airtable with Transcript Data 🔄\n\n- **Format Transcript Data:**  \n  - **Code Node (\"Code\"):**  \n    - **Task:** Convert the fetched transcript JSON into a formatted string.\n      ```javascript\n      const jsonObject = items[0].json;\n      const jsonString = JSON.stringify(jsonObject, null, 2);\n      return { json: { stringifiedJson: jsonString } };\n      ```\n      \n- **Extract the Video ID:**  \n  - **Set Node (\"Edit Fields\"):**  \n    - **Expression:**  \n      ```javascript\n      {{$json.url.split('v=')[1].split('&')[0]}}\n      ```\n      \n- **Update Airtable Record:**  \n  - **Airtable Update Node (\"Airtable1\"):**  \n    - **Updates:**  \n      - **ts:** Stores the transcript string.  \n      - **videoid:** Uses the extracted video ID to match the record.\n\n---\n\n### Step 4: Process Transcripts into Semantic Chunks ✂️\n\n- **Retrieve Updated Records:**  \n  - **Airtable Search Node (\"Airtable2\"):**  \n    - **Purpose:** Fetch records that now contain transcript data.\n\n- **Parse and Chunk Transcripts:**  \n  - **Code Node (\"Code4\"):**  \n    - **Functionality:**  \n      - Parses transcript JSON.\n      - Converts \"mm:ss\" timestamps to seconds.\n      - Groups transcript entries into chunks based on a 3-second gap.\n      - Creates an object for each chunk that includes:\n        - **Text:** The transcript segment.\n        - **Video Metadata:** Video ID, title, description, published date, thumbnail.\n        - **Chunk Details:** Start and end timestamps.\n        - **Direct URL:** A link to the exact moment in the video (e.g., `https://youtube.com/watch?v=VIDEOID&t=XXs`).\n\n- **Enrich & Split Text:**  \n  - **Default Data Loader Node:**  \n    - Attaches additional metadata (e.g., video title, description) to each chunk.\n  - **Recursive Character Text Splitter Node:**  \n    - **Settings:** Typically set to 500-character chunks with a 50-character overlap.\n    - **Purpose:** Ensures long transcript texts are broken into manageable segments for embedding.\n\n---\n\n### Step 5: Generate Embeddings & Index in Pinecone 💾\n\n- **Generate Embeddings:**  \n  - **Embeddings OpenAI Node:**  \n    - **Task:** Convert each transcript chunk into a vector embedding.\n    - **Tip:** Adjust the batch size (e.g., 512) based on your data volume.\n\n- **Index in Pinecone:**  \n  - **Pinecone Vector Store Node:**  \n    - **Configuration:**  \n      - **Index:** Specify your Pinecone index (e.g., `\"videos\"`).  \n      - **Namespace:** Use a dedicated namespace (e.g., `\"transcripts\"`).\n    - **Outcome:** Each enriched transcript chunk is stored in Pinecone, ready for semantic retrieval by a separate retrieval agent.\n\n---\n\n## 🎉 Final Thoughts\n\nThis backend workflow is dedicated to processing and indexing YouTube video transcripts so that a separate retrieval agent can perform efficient semantic searches. With this setup:\n\n- **Transcripts Are Indexed:**  \n  Chunks of transcripts are enriched with metadata and stored as vector embeddings.\n\n- **Instant Topic Retrieval:**  \n  A retrieval agent (implemented separately) can later query Pinecone to find the exact moment in a video where a topic is discussed, thanks to the direct URL and metadata stored with each chunk.\n\n- **Scalable & Modular:**  \n  The separation between indexing and retrieval allows for easy updates and scalability.\n\nHappy automating and enjoy building powerful search capabilities with your YouTube content! 🎉",
+  "featuredImage": "/data/workflows/3184/3184.webp",
+  "author": {
+    "id": 101,
+    "slug": "adyl",
+    "name": "Adyl Itto",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1053,
+  "downloads": 105,
+  "createdAt": "2025-03-16T18:15:06.954Z",
+  "updatedAt": "2026-01-16T08:28:32.692Z",
+  "publishedAt": "2025-03-16T18:15:06.954Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3184",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "🚀 Process YouTube transcripts with Apify, OpenAI & Pinecone database",
+    "workflowName": "🚀 Process YouTube transcripts with Apify, OpenAI & Pinecone database",
+    "description": "# 🚀 YouTube Transcript Indexing Backend for Pinecone 🎥💾\n\nThis tutorial explains how to build the **backend** workflow in n8n that indexes YouTube video transcripts into a Pinecone vector database. **Note:** This workflow handles the processing and indexing of transcripts only—the retrieval agent (which searches these embeddings) is implemented separately.\n\n---\n\n## 📋 Workflow Overview\n\nThis backend workflow performs the following tasks:\n\n1. **Fetch Video Records from Airtable** 📥  \n   Retrieves video URLs and related metadata.\n\n2. **Scrape YouTube Transcripts Using Apify** 🎬  \n   Triggers an Apify actor to scrape transcripts with timestamps from each video.\n\n3. **Update Airtable with Transcript Data** 🔄  \n   Stores the fetched transcript JSON back in Airtable linked via video ID.\n\n4. **Process & Chunk Transcripts** ✂️  \n   Parses the transcript JSON, converts \"mm:ss\" timestamps to seconds, and groups entries into meaningful chunks. Each chunk is enriched with metadata—such as video title, description, start/end timestamps, and a direct URL linking to that video moment.\n\n5. **Generate Embeddings & Index in Pinecone** 💾  \n   Uses OpenAI to create vector embeddings for each transcript chunk and indexes them in Pinecone. This enables efficient semantic searches later by a separate retrieval agent.\n\n---\n\n## 🔧 Step-by-Step Guide\n\n### Step 1: Retrieve Video Records from Airtable 📥\n\n- **Airtable Search Node:**  \n  - **Setup:** Configure the node to fetch video records (with essential fields like `url` and metadata) from your Airtable base.\n  \n- **Loop Over Items:**  \n  - Use a **SplitInBatches** node to process each video record individually.\n\n---\n\n### Step 2: Scrape YouTube Transcripts Using Apify 🎬\n\n- **Trigger Apify Actor:**  \n  - **HTTP Request Node (\"Apify NinjaPost\"):**  \n    - **Method:** POST  \n    - **Endpoint:** `https://api.apify.com/v2/acts/topaz_sharingan~youtube-transcript-scraper-1/runs?token=&lt;YOUR_TOKEN&gt;`  \n    - **Payload Example:**\n      ```json\n      {\n        \"includeTimestamps\": \"Yes\",\n        \"startUrls\": [\"{{ $json.url }}\"]\n      }\n      ```\n  - **Purpose:** Initiates transcript scraping for each video URL.\n\n- **Wait for Processing:**  \n  - **Wait Node:**  \n    - **Duration:** Approximately 1 minute to allow Apify to generate the transcript.\n\n- **Retrieve Transcript Data:**  \n  - **HTTP Request Node (\"Get JSON TS\"):**  \n    - **Method:** GET  \n    - **Endpoint:** `https://api.apify.com/v2/acts/topaz_sharingan~youtube-transcript-scraper-1/runs/last/dataset/items?token=&lt;YOUR_TOKEN&gt;`\n\n---\n\n### Step 3: Update Airtable with Transcript Data 🔄\n\n- **Format Transcript Data:**  \n  - **Code Node (\"Code\"):**  \n    - **Task:** Convert the fetched transcript JSON into a formatted string.\n      ```javascript\n      const jsonObject = items[0].json;\n      const jsonString = JSON.stringify(jsonObject, null, 2);\n      return { json: { stringifiedJson: jsonString } };\n      ```\n      \n- **Extract the Video ID:**  \n  - **Set Node (\"Edit Fields\"):**  \n    - **Expression:**  \n      ```javascript\n      {{$json.url.split('v=')[1].split('&')[0]}}\n      ```\n      \n- **Update Airtable Record:**  \n  - **Airtable Update Node (\"Airtable1\"):**  \n    - **Updates:**  \n      - **ts:** Stores the transcript string.  \n      - **videoid:** Uses the extracted video ID to match the record.\n\n---\n\n### Step 4: Process Transcripts into Semantic Chunks ✂️\n\n- **Retrieve Updated Records:**  \n  - **Airtable Search Node (\"Airtable2\"):**  \n    - **Purpose:** Fetch records that now contain transcript data.\n\n- **Parse and Chunk Transcripts:**  \n  - **Code Node (\"Code4\"):**  \n    - **Functionality:**  \n      - Parses transcript JSON.\n      - Converts \"mm:ss\" timestamps to seconds.\n      - Groups transcript entries into chunks based on a 3-second gap.\n      - Creates an object for each chunk that includes:\n        - **Text:** The transcript segment.\n        - **Video Metadata:** Video ID, title, description, published date, thumbnail.\n        - **Chunk Details:** Start and end timestamps.\n        - **Direct URL:** A link to the exact moment in the video (e.g., `https://youtube.com/watch?v=VIDEOID&t=XXs`).\n\n- **Enrich & Split Text:**  \n  - **Default Data Loader Node:**  \n    - Attaches additional metadata (e.g., video title, description) to each chunk.\n  - **Recursive Character Text Splitter Node:**  \n    - **Settings:** Typically set to 500-character chunks with a 50-character overlap.\n    - **Purpose:** Ensures long transcript texts are broken into manageable segments for embedding.\n\n---\n\n### Step 5: Generate Embeddings & Index in Pinecone 💾\n\n- **Generate Embeddings:**  \n  - **Embeddings OpenAI Node:**  \n    - **Task:** Convert each transcript chunk into a vector embedding.\n    - **Tip:** Adjust the batch size (e.g., 512) based on your data volume.\n\n- **Index in Pinecone:**  \n  - **Pinecone Vector Store Node:**  \n    - **Configuration:**  \n      - **Index:** Specify your Pinecone index (e.g., `\"videos\"`).  \n      - **Namespace:** Use a dedicated namespace (e.g., `\"transcripts\"`).\n    - **Outcome:** Each enriched transcript chunk is stored in Pinecone, ready for semantic retrieval by a separate retrieval agent.\n\n---\n\n## 🎉 Final Thoughts\n\nThis backend workflow is dedicated to processing and indexing YouTube video transcripts so that a separate retrieval agent can perform efficient semantic searches. With this setup:\n\n- **Transcripts Are Indexed:**  \n  Chunks of transcripts are enriched with metadata and stored as vector embeddings.\n\n- **Instant Topic Retrieval:**  \n  A retrieval agent (implemented separately) can later query Pinecone to find the exact moment in a video where a topic is discussed, thanks to the direct URL and metadata stored with each chunk.\n\n- **Scalable & Modular:**  \n  The separation between indexing and retrieval allows for easy updates and scalability.\n\nHappy automating and enjoy building powerful search capabilities with your YouTube content! 🎉",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Airtable1",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Apify NinjaPost",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get JSON TS",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "JSON Stringifier",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Airtable2",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transcript Processor",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter1",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Installation Tutorial",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

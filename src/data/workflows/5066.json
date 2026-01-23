@@ -1,0 +1,176 @@
+{
+  "id": 5066,
+  "slug": "5066",
+  "title": "Benchmark LLM performance on legal documents with Google Sheets and OpenRouter",
+  "description": "This workflow demonstrates a simple way to run evals on a set of test cases stored in a Google Sheet.\n\nThe example we are using comes from an info extraction task dataset, where we tested 6 different LLMs on 18 different test cases.\n\nThis workflow extends the functionality of my simple eval for benchmarking legal tasks [here](https://n8n.io/workflows/4712-simple-eval-for-legal-benchmarking/).\n\nRather than running executions sequentially (waiting for each one to respond before making another request), we use parallel processing to fire 2 requests every second.\n\nYou can see our sample data in this spreadsheet [here](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) to get started.\n\nOnce you have this working for our dataset, you can plug in your own test cases matching different LLMs to see how it works with your own data.\n\n## How it works\n- Pull our test cases from Google Sheets.\n- For each case, fire off an HTTP request to a webhook.\n- That webhook grabs the relevant source file from Google Drive and converts it to text.\n- The text gets sent to an LLM via Open Router (so we can easily swap out models).\n- Results come back and are logged in Google Sheets.\n\n\n## Set up steps:\n- Add your credentials for Google Sheets, Google Drive, and [OpenRouter](https://openrouter.ai/).\n- Make a copy of the [original data spreadsheet](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) so that you can edit it yourself. You will need to plug your version in the Update Results node to see the spreadsheet update on each run of the loop.",
+  "featuredImage": "/data/workflows/5066/5066.webp",
+  "author": {
+    "id": 101,
+    "slug": "adamjanes",
+    "name": "Adam Janes",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 661,
+  "downloads": 66,
+  "createdAt": "2025-06-20T01:24:04.318Z",
+  "updatedAt": "2026-01-16T08:37:27.843Z",
+  "publishedAt": "2025-06-20T01:24:04.318Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5066",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Benchmark LLM performance on legal documents with Google Sheets and OpenRouter",
+    "workflowName": "Benchmark LLM performance on legal documents with Google Sheets and OpenRouter",
+    "description": "This workflow demonstrates a simple way to run evals on a set of test cases stored in a Google Sheet.\n\nThe example we are using comes from an info extraction task dataset, where we tested 6 different LLMs on 18 different test cases.\n\nThis workflow extends the functionality of my simple eval for benchmarking legal tasks [here](https://n8n.io/workflows/4712-simple-eval-for-legal-benchmarking/).\n\nRather than running executions sequentially (waiting for each one to respond before making another request), we use parallel processing to fire 2 requests every second.\n\nYou can see our sample data in this spreadsheet [here](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) to get started.\n\nOnce you have this working for our dataset, you can plug in your own test cases matching different LLMs to see how it works with your own data.\n\n## How it works\n- Pull our test cases from Google Sheets.\n- For each case, fire off an HTTP request to a webhook.\n- That webhook grabs the relevant source file from Google Drive and converts it to text.\n- The text gets sent to an LLM via Open Router (so we can easily swap out models).\n- Results come back and are logged in Google Sheets.\n\n\n## Set up steps:\n- Add your credentials for Google Sheets, Google Drive, and [OpenRouter](https://openrouter.ai/).\n- Make a copy of the [original data spreadsheet](https://docs.google.com/spreadsheets/d/10l_gMtPsge00eTTltGrgvAo54qhh3_twEDsETrQLAGU/edit?usp=sharing) so that you can edit it yourself. You will need to plug your version in the Update Results node to see the spreadsheet update on each run of the loop.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Get Tests",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Is PDF?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Basic LLM Chain1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save Input/Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Execute Subworkflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Keep Original Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit (for testing)",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Results",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    }
+  ]
+}

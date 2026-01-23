@@ -1,0 +1,530 @@
+{
+  "id": 8697,
+  "slug": "8697",
+  "title": "Transform spreadsheet data into smart charts with OpenAI, QuickChart & Google Drive",
+  "description": "## Overview of the n8n Workflow\n\nThis n8n workflow automates the transformation of spreadsheet data into professional charts and graphs using AI-driven analysis. Triggered via Slack, it processes uploaded files (Excel, CSV, Google Sheets, or Drive links), interprets the data with an AI agent to determine the best visualization type (e.g., bar, line, pie, doughnut, or bubble charts), generates images via QuickChart, uploads them to Google Drive, and delivers the results back to the user in Slack with titles and shareable links. It maintains conversation context in Postgres for seamless multi-turn interactions and handles audio or text inputs for chart requests.\n\n![image.png](fileId:2652)\n\n## What this workflow does:\n- Hooks up to Slack for seamless spreadsheet uploads\n- Automatically extracts your data and generates bar charts, line graphs, bubble charts, and more\n- Delivers stunning visualizations straight back to you in Slack\n- Makes it easy to spot trends, patterns, and insights—on demand\n\n\n---\n\n## How it Works\n\n• Users upload spreadsheets or share links via Slack, along with a natural language request (e.g., \"Create a bar chart of sales by month\").\n• The workflow detects file types, extracts and aggregates data, then uses an AI agent to parse the request and select an appropriate chart type.\n\n![Screenshot 20250916 214838.png](fileId:2653)\n• Data is formatted and sent to QuickChart's API to generate the visualization image.\n\n![Screenshot 20250916 214822.png](fileId:2654)\n• Images are uploaded to Google Drive, and a confirmation message with titles and links is sent back to Slack.\n\n---\n\n## Set Up Steps\n\nSetup takes about 15-30 minutes, mainly for credential configuration. Detailed node instructions are in the workflow's sticky notes—focus on pasting API keys and testing triggers. Once cloned, the workflow runs plug-and-play; only tweak credentials and optional prompts as needed.\n\n---\n\n### ⚙️ Turn Spreadsheets Into Charts & Graphics\n\nAutomate turning uploaded spreadsheets into AI-generated charts (bar, line, pie, etc.) via Slack, with results shared as Google Drive links.\n\n### 🧑‍💻 Author: LeeWei\n\n---\n\n### 🚀 Steps to Connect:\n\n1.  **Slack Bot Setup**\n    - Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps) and add scopes for `chat:write`, `files:read`, `channels:read`.\n    - Generate a Bot User OAuth Token and paste it into the **`Slack Trigger`** node's credentials in n8n.\n    - Invite the bot to your desired channel for file uploads and messages.\n\n2.  **OpenAI API Key**\n    - Sign up at [platform.openai.com](https://platform.openai.com) and generate an API key.\n    - Paste this key into the **`OpenAI`** (gpt-4o-mini) node's credentials.\n    - 💡 For cost efficiency, monitor usage—basic charts use minimal tokens.\n\n3.  **Postgres Database Connection**\n    - Set up a Postgres instance (e.g., via Supabase or your host) with a table named `n8n_rodger_chat` for chat history.\n    - Add connection details (host, database, user, password) to the **`Postgres`** nodes' credentials.\n    - This enables thread memory; skip if not using multi-turn chats (but recommended for context).\n\n4.  **Google Sheets & Drive Setup**\n    - Create OAuth2 credentials at [console.cloud.google.com](https://console.cloud.google.com) with scopes for Sheets (read) and Drive (upload, share).\n    - Paste the credentials into the **`Google Sheets`** and implied Drive upload nodes.\n    - Test by sharing a sample sheet—ensures data extraction and image storage work.\n\n5.  **QuickChart Integration**\n    - No API key needed for free tier (up to 500 charts/month); visit [quickchart.io](https://quickchart.io) to confirm.\n    - For production (100k+ charts/month), upgrade to corporate plan ($40/month) and add any auth if required in the **`HTTP Request`** node.\n    - The node is pre-configured for chart generation—edit URL params only for custom styling.\n\n---\n\n## Plug and Play Instructions\n\nClone the workflow JSON directly into n8n—all nodes (triggers, AI agents, extractors, switches) are pre-wired and ready. No re-setup needed beyond the steps above. Key editable fields (found in sticky notes):\n\n- **AI Agent Node: System Prompt**  \n  Customize the chart interpretation (default: auto-selects bar/line/pie/etc. based on data). Example: Change to prioritize \"scatter plots for correlations\" if needed.\n\n- **Switch Nodes (File Detection)**  \n  Add rules for new formats (e.g., `.ods` for OpenDocument) in the conditions for XLS/XLSX/CSV/Sheets/Drive.\n\n- **HTTP Request Node (QuickChart)**  \n  Tweak chart params like `width=800&height=600` for size, or colors via `?chart=...` for branding.\n\n- **Let User Know Upload Complete: Text**  \n  Adjust the confirmation message template for tone (e.g., add emojis or custom phrasing).\n\nTest with a sample Slack message: \"Make a line graph from this sales CSV over months.\" Results appear instantly with links.\n\n---\n\n## Potential Customizations\n\n- **Add Chart Types**: Duplicate a chart branch (e.g., Line Graph) and integrate new QuickChart endpoints for scatter or funnel charts.\n- **Switch AI Provider**: Replace OpenAI with OpenRouter in the Chat Model node for alternative LLMs.\n- **Batch Size**: Edit the Loop Over Items node's batch for larger datasets (default handles small files efficiently).\n- **Error Handling**: Add IF nodes post-extraction to notify on invalid data.\n\n---\n\n## Considerations and Improvements\n\n- **Rate Limits**: QuickChart free tier suits testing; scale to paid for heavy use. OpenAI tokens add up for complex data.\n- **File Limits**: Supports up to ~10MB uploads; for larger, preprocess externally.\n- **Privacy**: Data passes through OpenAI—review for sensitive info.\n- **Enhancements**: Integrate image OCR for scanned tables, or export to PDF for reports.\n\nThis workflow streamlines data viz without coding, perfect for teams analyzing trends on the fly. Questions? Drop a Slack message in your bot channel!",
+  "featuredImage": "/data/workflows/8697/8697.webp",
+  "author": {
+    "id": 101,
+    "slug": "leeweihernandez07",
+    "name": "LeeWei",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 94,
+  "downloads": 9,
+  "createdAt": "2025-09-18T02:00:36.829Z",
+  "updatedAt": "2026-01-16T08:57:17.260Z",
+  "publishedAt": "2025-09-18T02:00:36.829Z",
+  "nodes": 82,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8697",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Transform spreadsheet data into smart charts with OpenAI, QuickChart & Google Drive",
+    "workflowName": "Transform spreadsheet data into smart charts with OpenAI, QuickChart & Google Drive",
+    "description": "of the n8n Workflow\n\nThis n8n workflow automates the transformation of spreadsheet data into professional charts and graphs using AI-driven analysis. Triggered via Slack, it processes uploaded files (Excel, CSV, Google Sheets, or Drive links), interprets the data with an AI agent to determine the best visualization type (e.g., bar, line, pie, doughnut, or bubble charts), generates images via QuickChart, uploads them to Google Drive, and delivers the results back to the user in Slack with titles and shareable links. It maintains conversation context in Postgres for seamless multi-turn interactions and handles audio or text inputs for chart requests.\n\n![image.png](fileId:2652)\n\n## What this workflow does:\n- Hooks up to Slack for seamless spreadsheet uploads\n- Automatically extracts your data and generates bar charts, line graphs, bubble charts, and more\n- Delivers stunning visualizations straight back to you in Slack\n- Makes it easy to spot trends, patterns, and insights—on demand\n\n\n---\n\n## How it Works\n\n• Users upload spreadsheets or share links via Slack, along with a natural language request (e.g., \"Create a bar chart of sales by month\").\n• The workflow detects file types, extracts and aggregates data, then uses an AI agent to parse the request and select an appropriate chart type.\n\n![Screenshot 20250916 214838.png](fileId:2653)\n• Data is formatted and sent to QuickChart's API to generate the visualization image.\n\n![Screenshot 20250916 214822.png](fileId:2654)\n• Images are uploaded to Google Drive, and a confirmation message with titles and links is sent back to Slack.\n\n---\n\n## Set Up Steps\n\nSetup takes about 15-30 minutes, mainly for credential configuration. Detailed node instructions are in the workflow's sticky notes—focus on pasting API keys and testing triggers. Once cloned, the workflow runs plug-and-play; only tweak credentials and optional prompts as needed.\n\n---\n\n### ⚙️ Turn Spreadsheets Into Charts & Graphics\n\nAutomate turning uploaded spreadsheets into AI-generated charts (bar, line, pie, etc.) via Slack, with results shared as Google Drive links.\n\n### 🧑‍💻 Author: LeeWei\n\n---\n\n### 🚀 Steps to Connect:\n\n1.  **Slack Bot Setup**\n    - Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps) and add scopes for `chat:write`, `files:read`, `channels:read`.\n    - Generate a Bot User OAuth Token and paste it into the **`Slack Trigger`** node's credentials in n8n.\n    - Invite the bot to your desired channel for file uploads and messages.\n\n2.  **OpenAI API Key**\n    - Sign up at [platform.openai.com](https://platform.openai.com) and generate an API key.\n    - Paste this key into the **`OpenAI`** (gpt-4o-mini) node's credentials.\n    - 💡 For cost efficiency, monitor usage—basic charts use minimal tokens.\n\n3.  **Postgres Database Connection**\n    - Set up a Postgres instance (e.g., via Supabase or your host) with a table named `n8n_rodger_chat` for chat history.\n    - Add connection details (host, database, user, password) to the **`Postgres`** nodes' credentials.\n    - This enables thread memory; skip if not using multi-turn chats (but recommended for context).\n\n4.  **Google Sheets & Drive Setup**\n    - Create OAuth2 credentials at [console.cloud.google.com](https://console.cloud.google.com) with scopes for Sheets (read) and Drive (upload, share).\n    - Paste the credentials into the **`Google Sheets`** and implied Drive upload nodes.\n    - Test by sharing a sample sheet—ensures data extraction and image storage work.\n\n5.  **QuickChart Integration**\n    - No API key needed for free tier (up to 500 charts/month); visit [quickchart.io](https://quickchart.io) to confirm.\n    - For production (100k+ charts/month), upgrade to corporate plan ($40/month) and add any auth if required in the **`HTTP Request`** node.\n    - The node is pre-configured for chart generation—edit URL params only for custom styling.\n\n---\n\n## Plug and Play Instructions\n\nClone the workflow JSON directly into n8n—all nodes (triggers, AI agents, extractors, switches) are pre-wired and ready. No re-setup needed beyond the steps above. Key editable fields (found in sticky notes):\n\n- **AI Agent Node: System Prompt**  \n  Customize the chart interpretation (default: auto-selects bar/line/pie/etc. based on data). Example: Change to prioritize \"scatter plots for correlations\" if needed.\n\n- **Switch Nodes (File Detection)**  \n  Add rules for new formats (e.g., `.ods` for OpenDocument) in the conditions for XLS/XLSX/CSV/Sheets/Drive.\n\n- **HTTP Request Node (QuickChart)**  \n  Tweak chart params like `width=800&height=600` for size, or colors via `?chart=...` for branding.\n\n- **Let User Know Upload Complete: Text**  \n  Adjust the confirmation message template for tone (e.g., add emojis or custom phrasing).\n\nTest with a sample Slack message: \"Make a line graph from this sales CSV over months.\" Results appear instantly with links.\n\n---\n\n## Potential Customizations\n\n- **Add Chart Types**: Duplicate a chart branch (e.g., Line Graph) and integrate new QuickChart endpoints for scatter or funnel charts.\n- **Switch AI Provider**: Replace OpenAI with OpenRouter in the Chat Model node for alternative LLMs.\n- **Batch Size**: Edit the Loop Over Items node's batch for larger datasets (default handles small files efficiently).\n- **Error Handling**: Add IF nodes post-extraction to notify on invalid data.\n\n---\n\n## Considerations and Improvements\n\n- **Rate Limits**: QuickChart free tier suits testing; scale to paid for heavy use. OpenAI tokens add up for complex data.\n- **File Limits**: Supports up to ~10MB uploads; for larger, preprocess externally.\n- **Privacy**: Data passes through OpenAI—review for sensitive info.\n- **Enhancements**: Integrate image OCR for scanned tables, or export to PDF for reports.\n\nThis workflow streamlines data viz without coding, perfect for teams analyzing trends on the fly. Questions? Drop a Slack message in your bot channel!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize1",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from Excel",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch2",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from File1",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate2",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize2",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Let User Know Upload Complete",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Update Thread Memory Session",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Update Thread Memory Session14",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Download File2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download File3",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download File4",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download File5",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Download File7",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Message: User",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note31",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "4.1-mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Message: User 1",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Update Thread Memory Session6",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Landmark",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Review and approval",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Update Thread Memory Session1",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If audio",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Process Other Files",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Process Drive Links",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Text",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Process Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Log Files",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Log Drive Links",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Initial Processing",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Links 1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Links 2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Text Input",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Combine Text Input",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Text & Files",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Combine Text & Files",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Switch3",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Pull Thread Context",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Mini-Landmark",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If session_id Has top",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Combine All Context",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Context",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate3",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Spreadsheet Links",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields7",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields8",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "text_landmark",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Upload file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Titles & Links",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "role": "slackTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Bar Chart",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser4",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Pie Chart",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Doughnut Chart",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Structured Output Parser6",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Bubble Chart",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Structured Output Parser9",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Line Graph",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Switch4",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note32",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note34",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

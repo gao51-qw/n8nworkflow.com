@@ -1,0 +1,194 @@
+{
+  "id": 11834,
+  "slug": "11834",
+  "title": "Daily news curation with Gemini AI: auto-filter & publish to Notion & Telegram",
+  "description": "## What this template does\nThis workflow creates a daily “n8n News Radar” briefing:\n- Pulls the latest n8n ecosystem updates from Blog, Community, GitHub Releases, and Reddit.\n- Filters to the last 24 hours + keyword relevance.\n- Uses a Gemini “Editor-in-Chief” agent to semantically deduplicate topics and score them (only Score 3+ pass).\n- Saves curated topics to a Notion database.\n- Sends urgent alerts (Score 4+) to Telegram.\n\n## How it works (high level)\n1) Scheduled trigger (daily) or Manual trigger (testing)\n2) Data ingestion from 4 sources (RSS + GitHub API)\n3) Normalize + filter (24h)\n4) Keyword pre-filter (reduce noise + LLM cost)\n5) Batch items → Gemini agent (dedupe + scoring + Spanish strategic summary)\n6) Parse JSON output + Notion-safe chunking\n7) Save to Notion\n8) If Score &gt;= 4 → send Telegram alert\n\n## Setup steps (after import)\n1) Connect these credentials in n8n:\n- Google Gemini (AI Agent)\n- Notion (Content DB)\n- Telegram (alerts)\n\n2) Replace placeholders inside nodes:\n- **Add to Notion (Content DB)** → `databaseId.value` = `YOUR_NOTION_DATABASE_ID`\n- **Telegram Notification** → `chatId` = `YOUR_TELEGRAM_CHAT_ID_OR_@channelusername`\n\n## Requirements\n- An n8n instance (Cloud or self-hosted)\n- Google Gemini API access\n- A Notion database with the properties used by the Notion node\n- A Telegram bot + target chat/channel",
+  "featuredImage": "/data/workflows/11834/11834.webp",
+  "author": {
+    "id": 101,
+    "slug": "vasylpavlyuchok",
+    "name": "Vasyl Pavlyuchok",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 22,
+  "downloads": 2,
+  "createdAt": "2025-12-15T16:44:12.675Z",
+  "updatedAt": "2026-01-16T09:10:18.568Z",
+  "publishedAt": "2025-12-15T16:44:12.675Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11834",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Daily news curation with Gemini AI: auto-filter & publish to Notion & Telegram",
+    "workflowName": "Daily news curation with Gemini AI: auto-filter & publish to Notion & Telegram",
+    "description": "## What this template does\nThis workflow creates a daily “n8n News Radar” briefing:\n- Pulls the latest n8n ecosystem updates from Blog, Community, GitHub Releases, and Reddit.\n- Filters to the last 24 hours + keyword relevance.\n- Uses a Gemini “Editor-in-Chief” agent to semantically deduplicate topics and score them (only Score 3+ pass).\n- Saves curated topics to a Notion database.\n- Sends urgent alerts (Score 4+) to Telegram.\n\n## How it works (high level)\n1) Scheduled trigger (daily) or Manual trigger (testing)\n2) Data ingestion from 4 sources (RSS + GitHub API)\n3) Normalize + filter (24h)\n4) Keyword pre-filter (reduce noise + LLM cost)\n5) Batch items → Gemini agent (dedupe + scoring + Spanish strategic summary)\n6) Parse JSON output + Notion-safe chunking\n7) Save to Notion\n8) If Score &gt;= 4 → send Telegram alert\n\n## Setup steps (after import)\n1) Connect these credentials in n8n:\n- Google Gemini (AI Agent)\n- Notion (Content DB)\n- Telegram (alerts)\n\n2) Replace placeholders inside nodes:\n- **Add to Notion (Content DB)** → `databaseId.value` = `YOUR_NOTION_DATABASE_ID`\n- **Telegram Notification** → `chatId` = `YOUR_TELEGRAM_CHAT_ID_OR_@channelusername`\n\n## Requirements\n- An n8n instance (Cloud or self-hosted)\n- Google Gemini API access\n- A Notion database with the properties used by the Notion node\n- A Telegram bot + target chat/channel",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge All Sources",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Normalize & Filter (24h)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note AI1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Time1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Time2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Add to Notion (Content DB)",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Editor-in-Chief (AI Agent)",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "n8n Blog RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "n8n Community Announcements",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GitHub n8n Releases",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Reddit n8n News",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Keyword Pre-filter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Batch Items",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Classification Gate",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Parse & Chunk Output (Notion Guardrail)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Random Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Stop Process",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    }
+  ]
+}

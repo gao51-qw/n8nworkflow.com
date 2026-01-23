@@ -1,0 +1,164 @@
+{
+  "id": 9689,
+  "slug": "9689",
+  "title": "Parse & track orders from email with Gemini/GPT & Notion database sync",
+  "description": "# **Automated Email Order Tracking System with AI Classification and Notion Sync**\n\n## Overview\n\n**⚠️ Self-Hosted Solution Required**  \nThis workflow requires a self-hosted n8n instance with active integrations for Gmail, Google Gemini AI, OpenAI, and Notion. API credentials and database IDs must be configured before use.\n\n---\n\n## Template Image\n\n![image.png](fileId:3011)\n---\n\n## Description\n\nThis intelligent automation system monitors your Gmail inbox for order-related emails, extracts key order information using AI, and automatically syncs the data to a Notion database for centralized order tracking. Perfect for individuals managing multiple e-commerce accounts or small businesses tracking customer orders across various platforms (Amazon, Noon, Namshi, etc.).\n\n### **What This Workflow Does**\n\n1. **Email Monitoring**: Continuously monitors Gmail inbox for new incoming emails\n2. **Smart Classification**: Uses AI to identify order-related emails (confirmations, shipping notifications, delivery updates)\n3. **Intelligent Extraction**: Parses email content to extract order details (order number, items, prices, status, delivery info)\n4. **Database Synchronization**: Automatically creates or updates Notion database records with order information\n5. **Status Tracking**: Monitors order progression through stages (Ordered → Shipped → Out for Delivery → Delivered)\n\n### **Key Features**\n\n- **Multi-vendor support**: Works with any e-commerce platform (Amazon, Noon, Carrefour, Namshi, etc.)\n- **Duplicate prevention**: Searches existing records before creating new entries\n- **Smart updates**: Only modifies records when order status actually changes\n- **Status validation**: Detects backward status changes (potential returns/reshipments)\n- **Graceful error handling**: Handles missing data and optional fields intelligently\n- **Timestamped history**: Maintains audit trail of all status changes\n\n### **Technologies Used**\n\n- **Gmail Trigger**: Email monitoring\n- **JavaScript Code**: Email content classification with pattern matching\n- **Google Gemini AI / OpenAI**: Natural language processing for order extraction\n- **Structured Output Parser**: JSON formatting and validation\n- **Notion API**: Database search, create, and update operations\n\n---\n\n## Prerequisites\n\nBefore setting up this workflow, ensure you have:\n\n1. **Self-hosted n8n instance** (version 1.0.0 or higher)\n2. **Gmail account** with IMAP access enabled\n3. **Google Gemini API key** OR **OpenAI API key**\n4. **Notion workspace** with:\n   - Integration access configured\n   - Database created with the required schema (see below)\n   - Integration token/API key\n\n---\n\n## Notion Database Schema\n\nCreate a Notion database with the following properties:\n\n### **Required Properties**\n| Property Name | Type | Description |\n|--------------|------|-------------|\n| Name of the Item | Title | Product/item name |\n| Order Number | Text | Unique order identifier |\n| Quantity | Number | Number of items |\n| Expected Date | Date or Text | Expected delivery date |\n| Order Status | Select | Options: `Ordered`, `Shipped`, `Out for Delivery`, `Delivered` |\n\n### **Optional Properties** (Recommended)\n| Property Name | Type | Description |\n|--------------|------|-------------|\n| Vendor | Select | E-commerce platform (Amazon, Noon, etc.) |\n| Customer Name | Rich Text | Order recipient name |\n| Price | Number or Rich Text | Item price |\n| Order Total | Number | Total order amount |\n| Currency | Select | Currency code (AED, USD, SAR, etc.) |\n| Delivery Location | Rich Text | Delivery city/address |\n| Notes | Rich Text | Status change history |\n| Created Date | Created Time | Auto-populated by Notion |\n| Last Updated | Last Edited Time | Auto-populated by Notion |\n\n---\n\n## Setup Instructions\n\n### **Step 1: Import the Workflow**\n\n1. Copy the workflow JSON from this template\n2. In your n8n instance, go to **Workflows** → **Add Workflow** → **Import from File/URL**\n3. Paste the JSON and click **Import**\n\n---\n\n### **Step 2: Configure Gmail Trigger**\n\n1. Click on the **Gmail Trigger** node\n2. Click **Create New Credential**\n3. Follow the OAuth authentication flow to connect your Gmail account\n4. Configure trigger settings:\n   - **Trigger On**: `Message Received`\n   - **Filters**: (Optional) Add label filters to monitor specific folders\n\n---\n\n### **Step 3: Configure AI Model (Choose One)**\n\n#### **Option A: Google Gemini AI**\n\n1. Click on the **Google Gemini AI Model** node\n2. Click **Create New Credential**\n3. Enter your Gemini API key (obtain from [Google AI Studio](https://makersuite.google.com/app/apikey))\n4. Select model: `gemini-1.5-pro` or `gemini-1.5-flash`\n\n#### **Option B: OpenAI**\n\n1. Click on the **OpenAI Chat Model** node\n2. Click **Create New Credential**\n3. Enter your OpenAI API key (obtain from [OpenAI Platform](https://platform.openai.com/api-keys))\n4. Select model: `gpt-4o` or `gpt-4-turbo`\n\n---\n\n### **Step 4: Update Email Classification Node**\n\n1. Click on the **Check Email Type** node (JavaScript code)\n2. Review the classification patterns (pre-configured for common e-commerce emails)\n3. (Optional) Add custom keywords specific to your vendors\n\n---\n\n### **Step 5: Configure Notion Integration**\n\n#### **5.1: Create Notion Integration**\n\n1. Go to [Notion Integrations](https://www.notion.so/my-integrations)\n2. Click **New Integration**\n3. Name it (e.g., \"n8n Order Tracker\")\n4. Select your workspace\n5. Copy the **Internal Integration Token**\n\n#### **5.2: Share Database with Integration**\n\n1. Open your Notion order database\n2. Click **Share** → **Invite**\n3. Search for your integration name and select it\n4. Grant **Edit** permissions\n\n#### **5.3: Get Database ID**\n\n1. Open your Notion database in browser\n2. Copy the database ID from the URL:\n   ```\n   https://notion.so/workspace/DATABASE_ID?v=...\n                              ^^^^^^^^^^^^\n   ```\n\n#### **5.4: Configure Notion Nodes**\n\n1. Click on **Search a database in Notion** node\n2. Click **Create New Credential**\n3. Paste your Integration Token\n4. In the node parameters:\n   - **Database ID**: Paste your database ID\n   - **Filter**: Set to search by `Order Number` property\n\n5. Repeat credential setup for **Create a database page in Notion** and **Update a database page in Notion** nodes\n\n---\n\n### **Step 6: Update Agent Prompts**\n\n1. Click on the **Email Classification and Extraction Agent** node\n2. Review the system prompt (pre-configured for common order emails)\n3. Update the `{{$now}}` variable if using a different timezone\n4. (Optional) Customize extraction rules for specific vendors\n\n5. Click on the **Order Database Sync Agent** node\n6. Replace `{{notion_database_id}}` with your actual database ID in the prompt\n7. Review status handling logic\n\n---\n\n### **Step 7: Test the Workflow**\n\n1. Click **Execute Workflow** to activate it\n2. Send yourself a test order confirmation email\n3. Monitor the execution:\n   - Check if email was classified correctly\n   - Verify extraction output in the AI agent node\n   - Confirm Notion database was updated\n4. Review your Notion database for the new/updated record\n\n---\n\n### **Step 8: Activate for Production**\n\n1. Click **Active** toggle in the top-right corner\n2. The workflow will now run automatically for new emails\n3. Monitor executions in the **Executions** tab\n\n---\n\n## Workflow Node Descriptions\n\n### **Email Trigger**\nMonitors Gmail inbox for new incoming emails and triggers the workflow when a message is received.\n\n### **Check Email Type**\nJavaScript code node that analyzes email content using pattern matching to identify order-related emails based on keywords, order numbers, and shipping terminology.\n\n### **Email Router (IF Node)**\nRoutes emails based on classification results:\n- **TRUE branch**: Order-related emails proceed to extraction\n- **FALSE branch**: Non-order emails are filtered out (no action)\n\n### **Email Classification and Extraction Agent**\nAI-powered parser using Google Gemini or OpenAI to extract structured order information:\n- Order number, items, prices, quantities\n- Order status (Ordered/Shipped/Out for Delivery/Delivered)\n- Customer name, delivery location, expected dates\n- Vendor identification\n\n### **Structured Output Parser**\nValidates and formats AI extraction output into clean JSON for downstream processing.\n\n### **Search a database in Notion**\nQueries the Notion database by order number to check if a record already exists, preventing duplicates.\n\n### **Order Database Sync Agent**\nIntelligent database manager that decides whether to create new records or update existing ones based on search results and status comparison.\n\n### **Create a database page in Notion**\nAdds new order records to Notion when no existing record is found.\n\n### **Update a database page in Notion**\nModifies existing records when order status changes, appending timestamped notes for audit history.\n\n### **No Action Taken**\nTerminates workflow branch for non-order emails with no further processing.\n\n---\n\n## Customization Options\n\n### **Add More Vendors**\nEdit the **Check Email Type** node to add vendor-specific keywords:\n```javascript\nconst customVendors = [\n  'your-vendor-name',\n  'vendor-domain.com'\n];\n```\n\n### **Modify Status Values**\nUpdate the **Email Classification and Extraction Agent** prompt to add custom status values or change status progression logic.\n\n### **Add Email Notifications**\nInsert a **Send Email** node after database sync to receive notifications for status changes.\n\n### **Filter by Labels**\nConfigure Gmail Trigger to monitor only specific labels (e.g., \"Orders\", \"Shopping\").\n\n### **Multi-Database Support**\nDuplicate the Notion sync section to route different vendors to separate databases.\n\n---\n\n## Troubleshooting\n\n### **Email not being classified as order**\n- Check the **Check Email Type** node output\n- Add vendor-specific keywords to the classification patterns\n- Review email content for order indicators\n\n### **AI extraction returning empty data**\n- Verify AI model credentials are valid\n- Check if email content is being passed correctly\n- Review the extraction prompt for compatibility with email format\n\n### **Notion database not updating**\n- Confirm integration has edit permissions on the database\n- Verify database ID is correct in all Notion nodes\n- Check that property names in the workflow match your Notion schema exactly\n\n### **Duplicate records being created**\n- Ensure **Search a database in Notion** node is filtering by `Order Number`\n- Verify the search results are being evaluated correctly in the sync agent\n\n### **Status not updating**\n- Check if the **Order Database Sync Agent** is comparing current vs new status\n- Review the status comparison logic in the agent prompt\n\n---\n\n## Performance Considerations\n\n- **Email Volume**: This workflow processes each email individually. For high-volume inboxes, consider adding filters or label-based routing.\n- **AI Costs**: Each email classification uses AI tokens. Monitor your API usage and costs.\n- **Rate Limits**: Notion API has rate limits (3 requests/second). The workflow handles this gracefully with built-in error handling.\n\n---\n\n## Privacy & Security\n\n- All email content is processed through AI APIs (Google/OpenAI) - review their privacy policies\n- Notion data is stored in your workspace with your configured permissions\n- No data is stored or logged outside your n8n instance, AI provider, and Notion workspace\n- Consider using self-hosted AI models for sensitive order information\n\n---\n\n## Support & Contributions\n\nFound a bug or have a suggestion? Please open an issue or contribute improvements to this template!\n\n---\n\n## License\n\nThis template is provided as-is under the MIT License. Feel free to modify and distribute as needed.\n\n---\n\n## Credits\n\nCreated for the n8n community to streamline e-commerce order tracking across multiple platforms.",
+  "featuredImage": "/data/workflows/9689/9689.webp",
+  "author": {
+    "id": 101,
+    "slug": "jamesonk",
+    "name": "Jameson Kanakulya",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 86,
+  "downloads": 8,
+  "createdAt": "2025-10-15T08:37:51.200Z",
+  "updatedAt": "2026-01-16T09:01:32.071Z",
+  "publishedAt": "2025-10-15T08:37:51.200Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9689",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Parse & track orders from email with Gemini/GPT & Notion database sync",
+    "workflowName": "Parse & track orders from email with Gemini/GPT & Notion database sync",
+    "description": "# **Automated Email Order Tracking System with AI Classification and Notion Sync**\n\n## Overview\n\n**⚠️ Self-Hosted Solution Required**  \nThis workflow requires a self-hosted n8n instance with active integrations for Gmail, Google Gemini AI, OpenAI, and Notion. API credentials and database IDs must be configured before use.\n\n---\n\n## Template Image\n\n![image.png](fileId:3011)\n---\n\n## Description\n\nThis intelligent automation system monitors your Gmail inbox for order-related emails, extracts key order information using AI, and automatically syncs the data to a Notion database for centralized order tracking. Perfect for individuals managing multiple e-commerce accounts or small businesses tracking customer orders across various platforms (Amazon, Noon, Namshi, etc.).\n\n### **What This Workflow Does**\n\n1. **Email Monitoring**: Continuously monitors Gmail inbox for new incoming emails\n2. **Smart Classification**: Uses AI to identify order-related emails (confirmations, shipping notifications, delivery updates)\n3. **Intelligent Extraction**: Parses email content to extract order details (order number, items, prices, status, delivery info)\n4. **Database Synchronization**: Automatically creates or updates Notion database records with order information\n5. **Status Tracking**: Monitors order progression through stages (Ordered → Shipped → Out for Delivery → Delivered)\n\n### **Key Features**\n\n- **Multi-vendor support**: Works with any e-commerce platform (Amazon, Noon, Carrefour, Namshi, etc.)\n- **Duplicate prevention**: Searches existing records before creating new entries\n- **Smart updates**: Only modifies records when order status actually changes\n- **Status validation**: Detects backward status changes (potential returns/reshipments)\n- **Graceful error handling**: Handles missing data and optional fields intelligently\n- **Timestamped history**: Maintains audit trail of all status changes\n\n### **Technologies Used**\n\n- **Gmail Trigger**: Email monitoring\n- **JavaScript Code**: Email content classification with pattern matching\n- **Google Gemini AI / OpenAI**: Natural language processing for order extraction\n- **Structured Output Parser**: JSON formatting and validation\n- **Notion API**: Database search, create, and update operations\n\n---\n\n## Prerequisites\n\nBefore setting up this workflow, ensure you have:\n\n1. **Self-hosted n8n instance** (version 1.0.0 or higher)\n2. **Gmail account** with IMAP access enabled\n3. **Google Gemini API key** OR **OpenAI API key**\n4. **Notion workspace** with:\n   - Integration access configured\n   - Database created with the required schema (see below)\n   - Integration token/API key\n\n---\n\n## Notion Database Schema\n\nCreate a Notion database with the following properties:\n\n### **Required Properties**\n| Property Name | Type | Description |\n|--------------|------|-------------|\n| Name of the Item | Title | Product/item name |\n| Order Number | Text | Unique order identifier |\n| Quantity | Number | Number of items |\n| Expected Date | Date or Text | Expected delivery date |\n| Order Status | Select | Options: `Ordered`, `Shipped`, `Out for Delivery`, `Delivered` |\n\n### **Optional Properties** (Recommended)\n| Property Name | Type | Description |\n|--------------|------|-------------|\n| Vendor | Select | E-commerce platform (Amazon, Noon, etc.) |\n| Customer Name | Rich Text | Order recipient name |\n| Price | Number or Rich Text | Item price |\n| Order Total | Number | Total order amount |\n| Currency | Select | Currency code (AED, USD, SAR, etc.) |\n| Delivery Location | Rich Text | Delivery city/address |\n| Notes | Rich Text | Status change history |\n| Created Date | Created Time | Auto-populated by Notion |\n| Last Updated | Last Edited Time | Auto-populated by Notion |\n\n---\n\n## Setup Instructions\n\n### **Step 1: Import the Workflow**\n\n1. Copy the workflow JSON from this template\n2. In your n8n instance, go to **Workflows** → **Add Workflow** → **Import from File/URL**\n3. Paste the JSON and click **Import**\n\n---\n\n### **Step 2: Configure Gmail Trigger**\n\n1. Click on the **Gmail Trigger** node\n2. Click **Create New Credential**\n3. Follow the OAuth authentication flow to connect your Gmail account\n4. Configure trigger settings:\n   - **Trigger On**: `Message Received`\n   - **Filters**: (Optional) Add label filters to monitor specific folders\n\n---\n\n### **Step 3: Configure AI Model (Choose One)**\n\n#### **Option A: Google Gemini AI**\n\n1. Click on the **Google Gemini AI Model** node\n2. Click **Create New Credential**\n3. Enter your Gemini API key (obtain from [Google AI Studio](https://makersuite.google.com/app/apikey))\n4. Select model: `gemini-1.5-pro` or `gemini-1.5-flash`\n\n#### **Option B: OpenAI**\n\n1. Click on the **OpenAI Chat Model** node\n2. Click **Create New Credential**\n3. Enter your OpenAI API key (obtain from [OpenAI Platform](https://platform.openai.com/api-keys))\n4. Select model: `gpt-4o` or `gpt-4-turbo`\n\n---\n\n### **Step 4: Update Email Classification Node**\n\n1. Click on the **Check Email Type** node (JavaScript code)\n2. Review the classification patterns (pre-configured for common e-commerce emails)\n3. (Optional) Add custom keywords specific to your vendors\n\n---\n\n### **Step 5: Configure Notion Integration**\n\n#### **5.1: Create Notion Integration**\n\n1. Go to [Notion Integrations](https://www.notion.so/my-integrations)\n2. Click **New Integration**\n3. Name it (e.g., \"n8n Order Tracker\")\n4. Select your workspace\n5. Copy the **Internal Integration Token**\n\n#### **5.2: Share Database with Integration**\n\n1. Open your Notion order database\n2. Click **Share** → **Invite**\n3. Search for your integration name and select it\n4. Grant **Edit** permissions\n\n#### **5.3: Get Database ID**\n\n1. Open your Notion database in browser\n2. Copy the database ID from the URL:\n   ```\n   https://notion.so/workspace/DATABASE_ID?v=...\n                              ^^^^^^^^^^^^\n   ```\n\n#### **5.4: Configure Notion Nodes**\n\n1. Click on **Search a database in Notion** node\n2. Click **Create New Credential**\n3. Paste your Integration Token\n4. In the node parameters:\n   - **Database ID**: Paste your database ID\n   - **Filter**: Set to search by `Order Number` property\n\n5. Repeat credential setup for **Create a database page in Notion** and **Update a database page in Notion** nodes\n\n---\n\n### **Step 6: Update Agent Prompts**\n\n1. Click on the **Email Classification and Extraction Agent** node\n2. Review the system prompt (pre-configured for common order emails)\n3. Update the `{{$now}}` variable if using a different timezone\n4. (Optional) Customize extraction rules for specific vendors\n\n5. Click on the **Order Database Sync Agent** node\n6. Replace `{{notion_database_id}}` with your actual database ID in the prompt\n7. Review status handling logic\n\n---\n\n### **Step 7: Test the Workflow**\n\n1. Click **Execute Workflow** to activate it\n2. Send yourself a test order confirmation email\n3. Monitor the execution:\n   - Check if email was classified correctly\n   - Verify extraction output in the AI agent node\n   - Confirm Notion database was updated\n4. Review your Notion database for the new/updated record\n\n---\n\n### **Step 8: Activate for Production**\n\n1. Click **Active** toggle in the top-right corner\n2. The workflow will now run automatically for new emails\n3. Monitor executions in the **Executions** tab\n\n---\n\n## Workflow Node Descriptions\n\n### **Email Trigger**\nMonitors Gmail inbox for new incoming emails and triggers the workflow when a message is received.\n\n### **Check Email Type**\nJavaScript code node that analyzes email content using pattern matching to identify order-related emails based on keywords, order numbers, and shipping terminology.\n\n### **Email Router (IF Node)**\nRoutes emails based on classification results:\n- **TRUE branch**: Order-related emails proceed to extraction\n- **FALSE branch**: Non-order emails are filtered out (no action)\n\n### **Email Classification and Extraction Agent**\nAI-powered parser using Google Gemini or OpenAI to extract structured order information:\n- Order number, items, prices, quantities\n- Order status (Ordered/Shipped/Out for Delivery/Delivered)\n- Customer name, delivery location, expected dates\n- Vendor identification\n\n### **Structured Output Parser**\nValidates and formats AI extraction output into clean JSON for downstream processing.\n\n### **Search a database in Notion**\nQueries the Notion database by order number to check if a record already exists, preventing duplicates.\n\n### **Order Database Sync Agent**\nIntelligent database manager that decides whether to create new records or update existing ones based on search results and status comparison.\n\n### **Create a database page in Notion**\nAdds new order records to Notion when no existing record is found.\n\n### **Update a database page in Notion**\nModifies existing records when order status changes, appending timestamped notes for audit history.\n\n### **No Action Taken**\nTerminates workflow branch for non-order emails with no further processing.\n\n---\n\n## Customization Options\n\n### **Add More Vendors**\nEdit the **Check Email Type** node to add vendor-specific keywords:\n```javascript\nconst customVendors = [\n  'your-vendor-name',\n  'vendor-domain.com'\n];\n```\n\n### **Modify Status Values**\nUpdate the **Email Classification and Extraction Agent** prompt to add custom status values or change status progression logic.\n\n### **Add Email Notifications**\nInsert a **Send Email** node after database sync to receive notifications for status changes.\n\n### **Filter by Labels**\nConfigure Gmail Trigger to monitor only specific labels (e.g., \"Orders\", \"Shopping\").\n\n### **Multi-Database Support**\nDuplicate the Notion sync section to route different vendors to separate databases.\n\n---\n\n## Troubleshooting\n\n### **Email not being classified as order**\n- Check the **Check Email Type** node output\n- Add vendor-specific keywords to the classification patterns\n- Review email content for order indicators\n\n### **AI extraction returning empty data**\n- Verify AI model credentials are valid\n- Check if email content is being passed correctly\n- Review the extraction prompt for compatibility with email format\n\n### **Notion database not updating**\n- Confirm integration has edit permissions on the database\n- Verify database ID is correct in all Notion nodes\n- Check that property names in the workflow match your Notion schema exactly\n\n### **Duplicate records being created**\n- Ensure **Search a database in Notion** node is filtering by `Order Number`\n- Verify the search results are being evaluated correctly in the sync agent\n\n### **Status not updating**\n- Check if the **Order Database Sync Agent** is comparing current vs new status\n- Review the status comparison logic in the agent prompt\n\n---\n\n## Performance Considerations\n\n- **Email Volume**: This workflow processes each email individually. For high-volume inboxes, consider adding filters or label-based routing.\n- **AI Costs**: Each email classification uses AI tokens. Monitor your API usage and costs.\n- **Rate Limits**: Notion API has rate limits (3 requests/second). The workflow handles this gracefully with built-in error handling.\n\n---\n\n## Privacy & Security\n\n- All email content is processed through AI APIs (Google/OpenAI) - review their privacy policies\n- Notion data is stored in your workspace with your configured permissions\n- No data is stored or logged outside your n8n instance, AI provider, and Notion workspace\n- Consider using self-hosted AI models for sensitive order information\n\n---\n\n## Support & Contributions\n\nFound a bug or have a suggestion? Please open an issue or contribute improvements to this template!\n\n---\n\n## License\n\nThis template is provided as-is under the MIT License. Feel free to modify and distribute as needed.\n\n---\n\n## Credits\n\nCreated for the n8n community to streamline e-commerce order tracking across multiple platforms.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create a database page in Notion",
+      "type": "n8n-nodes-base.notionTool",
+      "role": "notionTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update a database page in Notion",
+      "type": "n8n-nodes-base.notionTool",
+      "role": "notionTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Email Classification and Extraction Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Order Database Sync Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check Email Type",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No action taken",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email Router",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Search a page in Notion",
+      "type": "n8n-nodes-base.notionTool",
+      "role": "notionTool",
+      "configDescription": "Version 2.2"
+    }
+  ]
+}

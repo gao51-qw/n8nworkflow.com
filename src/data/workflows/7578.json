@@ -1,0 +1,182 @@
+{
+  "id": 7578,
+  "slug": "7578",
+  "title": "Create photorealistic social media images with Flux Realism, LoRa models & Airtable",
+  "description": "# AI Image Generation Workflow for Social Media Content\n\n## Overview\nThis n8n workflow automates the creation of photorealistic AI-generated images for social media content. The workflow uses RunComfy (ComfyUI cloud service) combined with Airtable for data management to create high-quality images based on custom prompts and LoRa models.\n\n## Key Features\n\n**Automated Image Generation**: Creates photorealistic images using Flux Realism model and custom LoRa models\n\n**Airtable Integration**: Centrally manages content requests, model information, and image status\n\n**Cloud-based Processing**: Utilizes RunComfy servers for powerful GPU processing without local hardware requirements\n\n**Status Tracking**: Monitors generation process and automatically updates database entries\n\n**Telegram Notifications**: Sends success notifications after image completion\n\n## Technical Workflow\n\n1. **Server Initialization**: Starts RunComfy server with configured specifications\n2. **Data Retrieval**: Fetches content requests from Airtable database\n3. **Image Generation**: Sends prompts to ComfyUI with Flux Realism + LoRa models\n4. **Status Monitoring**: Checks generation progress in 30-second intervals\n5. **Download**: Downloads completed images\n6. **Database Update**: Updates Airtable with image links and status\n7. **Server Cleanup**: Deletes RunComfy server for cost optimization\n\n## Prerequisites\n\n- **RunComfy Membership** with API access\n- **Airtable Account** with configured database\n- **Telegram Bot** for notifications\n- **Flux Realism Workflow** in RunComfy library\n- **Uploaded LoRa Models** in RunComfy\n\n## Airtable Schema\n\nThe database must contain these fields:\n- `topic`: Content description\n- `pose_1`: Detailed image prompt  \n- `LoRa Name Flux`: LoRa model name\n- `Model`: Character name\n- `pose_1_drive_fotolink`: Link to generated image\n- `Bilder erstellt`: Generation status\n\n## Configuration Options\n\n**Image Resolution**: Default 832x1216px (adjustable in ComfyUI parameters)\n\n**Generation Parameters**: 35 steps, Euler sampler, Guidance 2.0\n\n**Server Size**: \"Large\" for optimal performance (adjustable based on requirements)\n\n**Time Intervals**: 30s status checks, 50s server initialization\n\nThis workflow is ideal for content creators who need regular, high-quality, character-consistent images for social media campaigns.",
+  "featuredImage": "/data/workflows/7578/7578.webp",
+  "author": {
+    "id": 101,
+    "slug": "saits",
+    "name": "Robert Schröder",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 627,
+  "downloads": 62,
+  "createdAt": "2025-08-19T09:06:43.943Z",
+  "updatedAt": "2026-01-16T08:51:12.287Z",
+  "publishedAt": "2025-08-19T09:06:43.943Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7578",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create photorealistic social media images with Flux Realism, LoRa models & Airtable",
+    "workflowName": "Create photorealistic social media images with Flux Realism, LoRa models & Airtable",
+    "description": "# AI Image Generation Workflow for Social Media Content\n\n## Overview\nThis n8n workflow automates the creation of photorealistic AI-generated images for social media content. The workflow uses RunComfy (ComfyUI cloud service) combined with Airtable for data management to create high-quality images based on custom prompts and LoRa models.\n\n## Key Features\n\n**Automated Image Generation**: Creates photorealistic images using Flux Realism model and custom LoRa models\n\n**Airtable Integration**: Centrally manages content requests, model information, and image status\n\n**Cloud-based Processing**: Utilizes RunComfy servers for powerful GPU processing without local hardware requirements\n\n**Status Tracking**: Monitors generation process and automatically updates database entries\n\n**Telegram Notifications**: Sends success notifications after image completion\n\n## Technical Workflow\n\n1. **Server Initialization**: Starts RunComfy server with configured specifications\n2. **Data Retrieval**: Fetches content requests from Airtable database\n3. **Image Generation**: Sends prompts to ComfyUI with Flux Realism + LoRa models\n4. **Status Monitoring**: Checks generation progress in 30-second intervals\n5. **Download**: Downloads completed images\n6. **Database Update**: Updates Airtable with image links and status\n7. **Server Cleanup**: Deletes RunComfy server for cost optimization\n\n## Prerequisites\n\n- **RunComfy Membership** with API access\n- **Airtable Account** with configured database\n- **Telegram Bot** for notifications\n- **Flux Realism Workflow** in RunComfy library\n- **Uploaded LoRa Models** in RunComfy\n\n## Airtable Schema\n\nThe database must contain these fields:\n- `topic`: Content description\n- `pose_1`: Detailed image prompt  \n- `LoRa Name Flux`: LoRa model name\n- `Model`: Character name\n- `pose_1_drive_fotolink`: Link to generated image\n- `Bilder erstellt`: Generation status\n\n## Configuration Options\n\n**Image Resolution**: Default 832x1216px (adjustable in ComfyUI parameters)\n\n**Generation Parameters**: 35 steps, Euler sampler, Guidance 2.0\n\n**Server Size**: \"Large\" for optimal performance (adjustable based on requirements)\n\n**Time Intervals**: 30s status checks, 50s server initialization\n\nThis workflow is ideal for content creators who need regular, high-quality, character-consistent images for social media campaigns.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Status Check2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "ComfyUI Actual Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "RunComfyFluxRealism",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get RunComfy Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "RunComfy Start Server",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Server Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Search All Records from Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Server Ready Check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait for Server",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete RunComfy Server",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Airtable Record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Download Generated Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait for Prompt",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set RunComfy Parameter",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Final message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "User ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "User and Workflow Version ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

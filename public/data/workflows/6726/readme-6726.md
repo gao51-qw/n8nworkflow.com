@@ -1,0 +1,167 @@
+# Track stock prices with ScrapeGraphAI, Yahoo Finance & Google Sheets
+
+> # AI-Powered Stock Tracker with Yahoo Finance & Google Sheets
+
+![Stock Tracker Workflow](https://via.placeholder.com/800x400/4A90E2/FFFFFF?text=AI-Powered+Stock+Tracker+Workflow+Preview)
+
+**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**
+
+This automated workflow monitors stock prices by scraping real-time data from Yahoo Finance. It uses a scheduled trigger to run at specified intervals, extracts key stock metrics using AI-powered extraction, formats the data through a custom code node, and automatically saves the structured information to Google Sheets for tracking and analysis.
+
+## Pre-conditions/Requirements
+
+### Prerequisites
+- n8n instance (self-hosted or cloud)
+- ScrapeGraphAI community node installed
+- Google Sheets API access
+- Yahoo Finance access (no API key required)
+
+### Required Credentials
+- **ScrapeGraphAI API Key** - For web scraping capabilities
+- **Google Sheets OAuth2** - For spreadsheet integration
+
+### Google Sheets Setup
+Create a Google Sheets document with the following column structure:
+
+| Column A | Column B | Column C | Column D | Column E | Column F | Column G |
+|----------|----------|----------|----------|----------|----------|----------|
+| **symbol** | **current_price** | **change** | **change_percent** | **volume** | **market_cap** | **timestamp** |
+| AAPL | 225.50 | +2.15 | +0.96% | 45,234,567 | 3.45T | 2024-01-15 14:30:00 |
+
+## How it works
+
+This automated workflow monitors stock prices by scraping real-time data from Yahoo Finance. It uses a scheduled trigger to run at specified intervals, extracts key stock metrics using AI-powered extraction, formats the data through a custom code node, and automatically saves the structured information to Google Sheets for tracking and analysis.
+
+## Key Steps:
+- **Scheduled Trigger**: Runs automatically at specified intervals to collect fresh stock data
+- **AI-Powered Scraping**: Uses ScrapeGraphAI to intelligently extract stock information (symbol, current price, price change, change percentage, volume, and market cap) from Yahoo Finance
+- **Data Processing**: Formats extracted data through a custom Code node for optimal spreadsheet compatibility and handles both single and multiple stock formats
+- **Automated Storage**: Saves all stock data to Google Sheets with proper column mapping for easy filtering, analysis, and historical tracking
+
+## Set up steps
+
+**Setup Time: 5-10 minutes**
+
+1. **Configure Credentials**: Set up your ScrapeGraphAI API key and Google Sheets OAuth2 credentials
+2. **Customize Target**: Update the website URL in the ScrapeGraphAI node to your desired stock symbol (currently set to AAPL)
+3. **Configure Schedule**: Set your preferred trigger frequency (daily, hourly, etc.) for stock price monitoring
+4. **Map Spreadsheet**: Connect to your Google Sheets document and configure column mapping for the stock data fields
+
+## Node Descriptions
+
+### Core Workflow Nodes:
+- **Schedule Trigger** - Initiates the workflow at specified intervals
+- **Yahoo Finance Stock Scraper** - Extracts real-time stock data using ScrapeGraphAI
+- **Stock Data Formatter** - Processes and formats extracted data for spreadsheet compatibility
+- **Google Sheets Stock Logger** - Saves formatted stock data to your spreadsheet
+
+### Data Flow:
+1. **Trigger** → **Scraper** → **Formatter** → **Logger**
+
+## Customization Examples
+
+### Track Multiple Stocks
+```javascript
+// In the ScrapeGraphAI node, modify the URL to track different stocks:
+const stockSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA'];
+const baseUrl = 'https://finance.yahoo.com/quote/';
+```
+
+### Add Additional Data Fields
+```javascript
+// In the Code node, extend the data structure:
+const extendedData = {
+  ...stockData,
+  pe_ratio: extractedData.pe_ratio,
+  dividend_yield: extractedData.dividend_yield,
+  day_range: extractedData.day_range
+};
+```
+
+### Custom Scheduling
+```javascript
+// Modify the Schedule Trigger for different frequencies:
+// Daily at 9:30 AM (market open): "0 30 9 * * *"
+// Every 15 minutes during market hours: "0 */15 9-16 * * 1-5"
+// Weekly on Monday: "0 0 9 * * 1"
+```
+
+## Data Output Format
+
+The workflow outputs structured JSON data with the following fields:
+
+```json
+{
+  "symbol": "AAPL",
+  "current_price": "225.50",
+  "change": "+2.15",
+  "change_percent": "+0.96%",
+  "volume": "45,234,567",
+  "market_cap": "3.45T",
+  "timestamp": "2024-01-15T14:30:00Z"
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+1. **ScrapeGraphAI Rate Limits** - Implement delays between requests
+2. **Yahoo Finance Structure Changes** - Update scraping prompts
+3. **Google Sheets Permission Errors** - Verify OAuth2 credentials and document permissions
+
+### Performance Tips
+- Use appropriate trigger intervals (avoid excessive scraping)
+- Implement error handling for network issues
+- Consider data validation before saving to sheets
+
+**Pro Tips:**
+- Keep detailed configuration notes in the sticky notes within the workflow
+- Test with a single stock first before scaling to multiple stocks
+- Consider modifying the Code node to handle different stock symbols or add additional data fields
+- Perfect for building a historical database of stock performance over time
+- Can be extended to track multiple stocks by modifying the ScrapeGraphAI prompt
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6726
+- **Complexity:** intermediate
+- **Node Count:** 8
+- **Views:** 1373
+- **Downloads:** 137
+- **Created:** 2025/7/31
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6726)
+
+## 👤 Author
+
+- **Name:** vinci-king-01
+- **Username:** @vinci-king-01
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **scheduleTrigger** 
+- **n8n-nodes-scrapegraphai.scrapegraphAi** 
+- **googleSheets** 
+- **code** 
+- **stickyNote** (×4)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 8 nodes with 3 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

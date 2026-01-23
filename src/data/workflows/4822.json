@@ -1,0 +1,164 @@
+{
+  "id": 4822,
+  "slug": "4822",
+  "title": "Extract and analyze Google AI overviews with LLM for SEO recommendations",
+  "description": "# How it works\n\n• **Extract AI Overviews from Google Search** - Receives data from browser extension via webhook\n• **Convert HTML to Markdown** - Automatically processes and cleans AI Overview content  \n• **Store in Google Sheets** - Archives all extracted AI Overviews with metadata and sources\n• **Generate SEO Guidelines** - AI analyzes page content vs AI Overview to suggest improvements\n• **Automate Analysis** - Batch process multiple URLs and schedule regular checks\n\n# Set up steps\n\n• **Import workflow** - Load the JSON template into your n8n instance (2 minutes)\n• **Configure Google Sheets** - Set up OAuth connection and create spreadsheet with required columns (5 minutes)  \n• **Set up AI provider** - Add OpenRouter API credentials for Gemini 2.5 Pro (3 minutes)\n• **Install browser extension** - Deploy the companion Chrome/Firefox extension for data extraction (5 minutes)\n• **Test webhook endpoint** - Verify the connection between extension and n8n workflow (2 minutes)\n\n**Total setup time: ~15 minutes**\n\n## What you'll need:\n- Google account for Sheets integration\n- [Google Sheet template](https://docs.google.com/spreadsheets/d/15xqZ2dTiLMoyICYnnnRV-HPvXfdgVeXowr8a7kU4uHk/edit?gid=0#gid=0) with required columns\n- OpenRouter API key for Gemini 2.5 Pro model access\n- Browser extension: [Chrome Extension](https://chromewebstore.google.com/detail/ai-overview-extractor/cbkdfibgmhicgnmmdanlhnebbgonhjje) or [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/ai-overview-extractor/)\n- n8n instance (local or cloud)\n\n## Use cases:\n- **SEO agencies** - Monitor AI Overview presence for client keywords\n- **Content marketers** - Analyze what content gets featured in AI Overviews\n- **E-commerce** - Track AI Overview coverage for product-related searches\n- **Research** - Build datasets of AI Overview content across different topics\n\nThe workflow comes with a free browser extension ([Chrome](https://chromewebstore.google.com/detail/ai-overview-extractor/cbkdfibgmhicgnmmdanlhnebbgonhjje) | [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ai-overview-extractor/)) that automatically extracts AI Overview content from Google Search and sends it via webhook to your n8n workflow for processing and analysis.\n\n**GitHub Repository:** https://github.com/romek-rozen/ai-overview-extractor/\n\n# Detailed Setup Instructions - AI Overview Extractor\n\n## Prerequisites\n\n- **n8n instance** (local or cloud) - version 1.95.3+\n- **Google account** for Sheets integration\n- **OpenRouter API account** for Gemini 2.5 Pro access\n- **Browser** (Chrome/Firefox) for the extension\n\n## Step 1: Import the Workflow\n\n1. **Open n8n** and navigate to `Workflows`\n2. **Click** \"Add workflow\" → \"Import from JSON\"\n3. **Upload** the `AI_OVERVIES_EXTRACTOR_TEMPLATE.json` file\n4. **Save** the workflow\n\n## Step 2: Configure Google Sheets\n\n### Create Google Sheets Document\n\n1. **Create new Google Sheet** with these columns:\n   ```\n   extractedAt | searchQuery | sources | markdown | myURL | task | guidelines | key \n   ```\n\nHere is public google sheet template: https://docs.google.com/spreadsheets/d/15xqZ2dTiLMoyICYnnnRV-HPvXfdgVeXowr8a7kU4uHk/edit?gid=0#gid=0 \n\n\n2. **Copy the Google Sheets URL** (you'll need it for the workflow)\n\n### Set up Google Sheets Credentials\n\n1. **In n8n**, go to `Settings` → `Credentials`\n2. **Click** \"Add credential\" → \"Google Sheets OAuth2 API\"\n3. **Follow the OAuth setup** to authorize n8n access to Google Sheets\n4. **Name the credential** (e.g., \"Google Sheets AI Overview\")\n\n### Configure Google Sheets Nodes\n\n**Update these nodes with your Google Sheets URL:**\n- `Get URLs to Analyze`\n- `Save AI Overview to Sheets` \n- `Save SEO Guidelines to Sheets`\n\n**In each node:**\n1. Set `documentId` to your Google Sheets URL\n2. Set `sheetName` to your Google Sheets URL\n3. Select your Google Sheets credential\n\n## Step 3: Configure AI Provider (OpenRouter)\n\n### Get OpenRouter API Key\n\n1. **Sign up** at https://openrouter.ai/\n2. **Generate API key** in your account settings\n3. **Add credits** to your account\n\n### Set up OpenRouter Credentials\n\n1. **In n8n**, go to `Settings` → `Credentials`\n2. **Click** \"Add credential\" → \"OpenRouter API\"\n3. **Enter your API key**\n4. **Name the credential** (e.g., \"OpenRouter AI Overview\")\n\n### Configure OpenRouter Node\n\n1. **Select the Gemini 2.5 Pro Model node**\n2. **Choose your credential** from the dropdown\n3. **Verify the model** (default: `google/gemini-2.5-pro-preview`)\n\n## Step 4: Install Browser Extension\n\n### Install in Chrome\n\n**Official Extension (Recommended)**\n1. **Visit**: https://chromewebstore.google.com/detail/ai-overview-extractor/cbkdfibgmhicgnmmdanlhnebbgonhjje\n2. **Click \"Add to Chrome\"**\n\n### Install in Firefox\n\n**Official Add-on**\n1. **Visit**: https://addons.mozilla.org/en-US/firefox/addon/ai-overview-extractor/\n2. **Click \"Add to Firefox\"**\n\n## Step 5: Configure Webhook Connection\n\n### Get Webhook URL\n\n1. **In n8n workflow**, click on the `Webhook` node\n2. **Copy the webhook URL** (should be like: `http://localhost:5678/webhook/ai-overview-extractor-template-123456789`)\n\n### Configure Extension\n\n1. **Go to Google Search** and perform any search with AI Overview\n2. **Click the browser extension button** (AI Overview Extractor)\n3. **In webhook configuration section**, paste your webhook URL\n4. **Click \"Test\"** - should show ✅ Test successful\n5. **Click \"Save\"** to store the configuration\n\n## Step 6: Activate and Test\n\n### Activate Workflow\n\n1. **In n8n**, toggle the workflow to \"Active\" (top right switch)\n2. **Verify** all nodes are properly configured\n\n### Test End-to-End\n\n1. **Go to Google Search**\n2. **Search for something** that shows AI Overview\n3. **Use the extension** to extract AI Overview\n4. **Send via webhook** - check your Google Sheets for the data\n5. **Verify** the markdown conversion worked correctly\n\n## Optional: Batch Analysis Setup\n\n### For SEO Analysis Features\n\n1. **In your Google Sheets**, add URLs in the `myURL` column\n2. **Set `task` column** to \"create guidelines\"\n3. **Run the workflow manually** or wait for the 15-minute scheduler\n4. **Check `guidelines` column** for AI-generated SEO recommendations\n\n## Troubleshooting\n\n### Webhook Issues\n- Ensure n8n is running on port 5678\n- Check if workflow is activated\n- Verify webhook URL format\n\n### Google Sheets Errors\n- Confirm OAuth credentials are working\n- Check sheet URL format\n- Verify column names match exactly\n- Ensure nodes `Get URLs to Analyze`, `Save AI Overview to Sheets`, and `Save SEO Guidelines to Sheets` are properly configured\n\n### OpenRouter Issues\n- Check API key validity\n- Ensure sufficient account credits\n- Try different models if Gemini 2.5 Pro fails\n- Verify the `Gemini 2.5 Pro Model` node is properly connected\n\n### Extension Problems\n- Check browser console for errors\n- Verify extension is properly installed\n- Ensure you're on google.com/search pages\n- Confirm webhook URL is correctly configured in extension\n\n## Next Steps\n\n- **Customize AI prompts** in the `Generate SEO Recommendations` node for your specific needs\n- **Adjust scheduler frequency** (default: 15 minutes)\n- **Add more URL analysis** by populating Google Sheets\n- **Monitor usage** and API costs\n\n## Support\n\n- **GitHub Issues**: https://github.com/romek-rozen/ai-overview-extractor/issues\n- **n8n Community**: https://community.n8n.io/\n- **Template Documentation**: Check the included README files\n",
+  "featuredImage": "/data/workflows/4822/4822.webp",
+  "author": {
+    "id": 101,
+    "slug": "romek",
+    "name": "Roman Rozenberger",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2360,
+  "downloads": 236,
+  "createdAt": "2025-06-09T15:25:17.211Z",
+  "updatedAt": "2026-01-16T08:36:22.708Z",
+  "publishedAt": "2025-06-09T15:25:17.211Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4822",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract and analyze Google AI overviews with LLM for SEO recommendations",
+    "workflowName": "Extract and analyze Google AI overviews with LLM for SEO recommendations",
+    "description": "# How it works\n\n• **Extract AI Overviews from Google Search** - Receives data from browser extension via webhook\n• **Convert HTML to Markdown** - Automatically processes and cleans AI Overview content  \n• **Store in Google Sheets** - Archives all extracted AI Overviews with metadata and sources\n• **Generate SEO Guidelines** - AI analyzes page content vs AI Overview to suggest improvements\n• **Automate Analysis** - Batch process multiple URLs and schedule regular checks\n\n# Set up steps\n\n• **Import workflow** - Load the JSON template into your n8n instance (2 minutes)\n• **Configure Google Sheets** - Set up OAuth connection and create spreadsheet with required columns (5 minutes)  \n• **Set up AI provider** - Add OpenRouter API credentials for Gemini 2.5 Pro (3 minutes)\n• **Install browser extension** - Deploy the companion Chrome/Firefox extension for data extraction (5 minutes)\n• **Test webhook endpoint** - Verify the connection between extension and n8n workflow (2 minutes)\n\n**Total setup time: ~15 minutes**\n\n## What you'll need:\n- Google account for Sheets integration\n- [Google Sheet template](https://docs.google.com/spreadsheets/d/15xqZ2dTiLMoyICYnnnRV-HPvXfdgVeXowr8a7kU4uHk/edit?gid=0#gid=0) with required columns\n- OpenRouter API key for Gemini 2.5 Pro model access\n- Browser extension: [Chrome Extension](https://chromewebstore.google.com/detail/ai-overview-extractor/cbkdfibgmhicgnmmdanlhnebbgonhjje) or [Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/ai-overview-extractor/)\n- n8n instance (local or cloud)\n\n## Use cases:\n- **SEO agencies** - Monitor AI Overview presence for client keywords\n- **Content marketers** - Analyze what content gets featured in AI Overviews\n- **E-commerce** - Track AI Overview coverage for product-related searches\n- **Research** - Build datasets of AI Overview content across different topics\n\nThe workflow comes with a free browser extension ([Chrome](https://chromewebstore.google.com/detail/ai-overview-extractor/cbkdfibgmhicgnmmdanlhnebbgonhjje) | [Firefox](https://addons.mozilla.org/en-US/firefox/addon/ai-overview-extractor/)) that automatically extracts AI Overview content from Google Search and sends it via webhook to your n8n workflow for processing and analysis.\n\n**GitHub Repository:** https://github.com/romek-rozen/ai-overview-extractor/\n\n# Detailed Setup Instructions - AI Overview Extractor\n\n## Prerequisites\n\n- **n8n instance** (local or cloud) - version 1.95.3+\n- **Google account** for Sheets integration\n- **OpenRouter API account** for Gemini 2.5 Pro access\n- **Browser** (Chrome/Firefox) for the extension\n\n## Step 1: Import the Workflow\n\n1. **Open n8n** and navigate to `Workflows`\n2. **Click** \"Add workflow\" → \"Import from JSON\"\n3. **Upload** the `AI_OVERVIES_EXTRACTOR_TEMPLATE.json` file\n4. **Save** the workflow\n\n## Step 2: Configure Google Sheets\n\n### Create Google Sheets Document\n\n1. **Create new Google Sheet** with these columns:\n   ```\n   extractedAt | searchQuery | sources | markdown | myURL | task | guidelines | key \n   ```\n\nHere is public google sheet template: https://docs.google.com/spreadsheets/d/15xqZ2dTiLMoyICYnnnRV-HPvXfdgVeXowr8a7kU4uHk/edit?gid=0#gid=0 \n\n\n2. **Copy the Google Sheets URL** (you'll need it for the workflow)\n\n### Set up Google Sheets Credentials\n\n1. **In n8n**, go to `Settings` → `Credentials`\n2. **Click** \"Add credential\" → \"Google Sheets OAuth2 API\"\n3. **Follow the OAuth setup** to authorize n8n access to Google Sheets\n4. **Name the credential** (e.g., \"Google Sheets AI Overview\")\n\n### Configure Google Sheets Nodes\n\n**Update these nodes with your Google Sheets URL:**\n- `Get URLs to Analyze`\n- `Save AI Overview to Sheets` \n- `Save SEO Guidelines to Sheets`\n\n**In each node:**\n1. Set `documentId` to your Google Sheets URL\n2. Set `sheetName` to your Google Sheets URL\n3. Select your Google Sheets credential\n\n## Step 3: Configure AI Provider (OpenRouter)\n\n### Get OpenRouter API Key\n\n1. **Sign up** at https://openrouter.ai/\n2. **Generate API key** in your account settings\n3. **Add credits** to your account\n\n### Set up OpenRouter Credentials\n\n1. **In n8n**, go to `Settings` → `Credentials`\n2. **Click** \"Add credential\" → \"OpenRouter API\"\n3. **Enter your API key**\n4. **Name the credential** (e.g., \"OpenRouter AI Overview\")\n\n### Configure OpenRouter Node\n\n1. **Select the Gemini 2.5 Pro Model node**\n2. **Choose your credential** from the dropdown\n3. **Verify the model** (default: `google/gemini-2.5-pro-preview`)\n\n## Step 4: Install Browser Extension\n\n### Install in Chrome\n\n**Official Extension (Recommended)**\n1. **Visit**: https://chromewebstore.google.com/detail/ai-overview-extractor/cbkdfibgmhicgnmmdanlhnebbgonhjje\n2. **Click \"Add to Chrome\"**\n\n### Install in Firefox\n\n**Official Add-on**\n1. **Visit**: https://addons.mozilla.org/en-US/firefox/addon/ai-overview-extractor/\n2. **Click \"Add to Firefox\"**\n\n## Step 5: Configure Webhook Connection\n\n### Get Webhook URL\n\n1. **In n8n workflow**, click on the `Webhook` node\n2. **Copy the webhook URL** (should be like: `http://localhost:5678/webhook/ai-overview-extractor-template-123456789`)\n\n### Configure Extension\n\n1. **Go to Google Search** and perform any search with AI Overview\n2. **Click the browser extension button** (AI Overview Extractor)\n3. **In webhook configuration section**, paste your webhook URL\n4. **Click \"Test\"** - should show ✅ Test successful\n5. **Click \"Save\"** to store the configuration\n\n## Step 6: Activate and Test\n\n### Activate Workflow\n\n1. **In n8n**, toggle the workflow to \"Active\" (top right switch)\n2. **Verify** all nodes are properly configured\n\n### Test End-to-End\n\n1. **Go to Google Search**\n2. **Search for something** that shows AI Overview\n3. **Use the extension** to extract AI Overview\n4. **Send via webhook** - check your Google Sheets for the data\n5. **Verify** the markdown conversion worked correctly\n\n## Optional: Batch Analysis Setup\n\n### For SEO Analysis Features\n\n1. **In your Google Sheets**, add URLs in the `myURL` column\n2. **Set `task` column** to \"create guidelines\"\n3. **Run the workflow manually** or wait for the 15-minute scheduler\n4. **Check `guidelines` column** for AI-generated SEO recommendations\n\n## Troubleshooting\n\n### Webhook Issues\n- Ensure n8n is running on port 5678\n- Check if workflow is activated\n- Verify webhook URL format\n\n### Google Sheets Errors\n- Confirm OAuth credentials are working\n- Check sheet URL format\n- Verify column names match exactly\n- Ensure nodes `Get URLs to Analyze`, `Save AI Overview to Sheets`, and `Save SEO Guidelines to Sheets` are properly configured\n\n### OpenRouter Issues\n- Check API key validity\n- Ensure sufficient account credits\n- Try different models if Gemini 2.5 Pro fails\n- Verify the `Gemini 2.5 Pro Model` node is properly connected\n\n### Extension Problems\n- Check browser console for errors\n- Verify extension is properly installed\n- Ensure you're on google.com/search pages\n- Confirm webhook URL is correctly configured in extension\n\n## Next Steps\n\n- **Customize AI prompts** in the `Generate SEO Recommendations` node for your specific needs\n- **Adjust scheduler frequency** (default: 15 minutes)\n- **Add more URL analysis** by populating Google Sheets\n- **Monitor usage** and API costs\n\n## Support\n\n- **GitHub Issues**: https://github.com/romek-rozen/ai-overview-extractor/issues\n- **n8n Community**: https://community.n8n.io/\n- **Template Documentation**: Check the included README files",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save AI Overview to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "myURL Exists",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract Page Title and H1",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Fetch Page Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Process URLs in Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Current URL Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Save SEO Guidelines to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get URLs to Analyze",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Gemini 2.5 Pro Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert AI Overview to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate SEO Recommendations",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Webhook Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert Page Content to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    }
+  ]
+}

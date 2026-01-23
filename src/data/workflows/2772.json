@@ -1,0 +1,1513 @@
+{
+  "id": 2772,
+  "slug": "2772",
+  "title": "Realtime Notion Todoist 2-way sync with Redis",
+  "description": "## Purpose\n\nThis solution enables you to manage all your Notion and Todoist tasks from different workspaces as well as your calendar events in a single place.\n\nAll tasks can be managed in Todoist and additionally Fantastical can be used to manage scheduled tasks & events all together.\n\n## Demo & Explanation\n\n[![demo video](https://img.youtube.com/vi/k66j6ZspjCg/0.jpg)](https://youtu.be/k66j6ZspjCg)\n\n## How it works\n\n- The realtime sync consists of two workflows, both triggered by a registered webhook from either Notion or Todoist\n- To avoid overwrites by lately arriving webhook calls, every time the current task is retrieved from both sides.\n- Redis is used to prevent from endless loops, since an update in one system triggers another webhook call again. Using the ID of the task, the trigger is being locked down for 15 seconds.\n- Depending on the detected changes, the other side is updated accordingly.\nGenerally Notion is treaded as the main source. Using an \"Obsolete\" Status, it is guaranteed, that tasks never get deleted entirely by accident.\n- The Todoist ID is stored in the Notion task, so they stay linked together\n- An additional full sync workflow daily fixes inconsistencies, if any of them occurred, since webhooks cannot be trusted entirely.\n- Since Todoist requires a more complex setup, a tiny workflow helps with activating the webhook.\n- Another tiny workflow helps generating a global config, which is used by all workflows for mapping purposes.\n\n## Mapping (Notion &gt;&gt; Todoist)\n\n- Name: Task Name\n- Priority: Priority (1: do first, 2: urgent, 3: important, 4: unset)\n- Due: Date\n- Status: Section (Done: completed, Obsolete: deleted)\n- &lt;page_link&gt;: Description (read-only)\n- Todoist ID: &lt;task_id&gt;\n\n## Current limitations\n\n- Changes on the same task cannot be made simultaneously in both systems within a 15-20 second time frame\n- Subtasks are not linked automatically to their parent yet\n- Recurring tasks are not supported yet\n- Tasks names do not support URL’s yet\n\n## Prerequisites\n\n### Notion\n- A database must already exist (get a basic template [here](https://steadfast-banjo-d1f.notion.site/17682b476c848086b002de766879aa71)) with the following properties (case matters!):\n  - Text: \"Name\"\n  - Status: \"Status\", containing at least the options \"Backlog\", \"In progress\", \"Done\", \"Obsolete\"\n  - Select: \"Priority\", containing the options \"do first\", \"urgent\", \"important\"\n  - Date: \"Due\"\n  - Checkbox: \"Focus\"\n  - Text: \"Todoist ID\"\n### Todoist\n- A project must already exist with the same sections like defined as Status in Notion (except Done and Obsolete)\n### Redis\n- Create a [Free Redis Cloud](https://redis.io/try-free/) instance or self-host\n\n\n## Setup\n\n[![setup video](https://img.youtube.com/vi/73jhyU0t4c4/0.jpg)](https://youtu.be/73jhyU0t4c4)\n\n*The setup involves quite a lot of steps, yet many of them can be automated for business internal purposes.*\n\nJust follow the video or do the following steps:\n- Setup credentials for Notion (access token), Todoist (access token) and Redis - you can also create empty credentials and populate these later during further setup\n- Clone this workflow by clicking the \"Use workflow\" button and then choosing your n8n instance - otherwise you need to map the credentials of many nodes.\n- Follow the instructions described within the bundle of sticky notes on the top left of the workflow\n\n\n## How to use\n\n- You can apply changes (create, update, delete) to tasks both in Notion and Todoist which then get synced over within a couple of seconds (this is handled by the differential realtime sync)\n- The daily running full sync, resolves possible discrepancies in Todoist and sends a summary via email, if anything needed to be updated. In case that contains an unintended change, you can jump to the Task from the email directly to fix it manually.",
+  "featuredImage": "/data/workflows/2772/2772.webp",
+  "author": {
+    "id": 101,
+    "slug": "octionic",
+    "name": "Mario",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8193,
+  "downloads": 819,
+  "createdAt": "2025-01-21T22:51:02.952Z",
+  "updatedAt": "2026-01-16T08:26:23.861Z",
+  "publishedAt": "2025-01-21T22:51:02.952Z",
+  "nodes": 246,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2772",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Realtime Notion Todoist 2-way sync with Redis",
+    "workflowName": "Realtime Notion Todoist 2-way sync with Redis",
+    "description": "## Purpose\n\nThis solution enables you to manage all your Notion and Todoist tasks from different workspaces as well as your calendar events in a single place.\n\nAll tasks can be managed in Todoist and additionally Fantastical can be used to manage scheduled tasks & events all together.\n\n## Demo & Explanation\n\n[![demo video](https://img.youtube.com/vi/k66j6ZspjCg/0.jpg)](https://youtu.be/k66j6ZspjCg)\n\n## How it works\n\n- The realtime sync consists of two workflows, both triggered by a registered webhook from either Notion or Todoist\n- To avoid overwrites by lately arriving webhook calls, every time the current task is retrieved from both sides.\n- Redis is used to prevent from endless loops, since an update in one system triggers another webhook call again. Using the ID of the task, the trigger is being locked down for 15 seconds.\n- Depending on the detected changes, the other side is updated accordingly.\nGenerally Notion is treaded as the main source. Using an \"Obsolete\" Status, it is guaranteed, that tasks never get deleted entirely by accident.\n- The Todoist ID is stored in the Notion task, so they stay linked together\n- An additional full sync workflow daily fixes inconsistencies, if any of them occurred, since webhooks cannot be trusted entirely.\n- Since Todoist requires a more complex setup, a tiny workflow helps with activating the webhook.\n- Another tiny workflow helps generating a global config, which is used by all workflows for mapping purposes.\n\n## Mapping (Notion &gt;&gt; Todoist)\n\n- Name: Task Name\n- Priority: Priority (1: do first, 2: urgent, 3: important, 4: unset)\n- Due: Date\n- Status: Section (Done: completed, Obsolete: deleted)\n- &lt;page_link&gt;: Description (read-only)\n- Todoist ID: &lt;task_id&gt;\n\n## Current limitations\n\n- Changes on the same task cannot be made simultaneously in both systems within a 15-20 second time frame\n- Subtasks are not linked automatically to their parent yet\n- Recurring tasks are not supported yet\n- Tasks names do not support URL’s yet\n\n## Prerequisites\n\n### Notion\n- A database must already exist (get a basic template [here](https://steadfast-banjo-d1f.notion.site/17682b476c848086b002de766879aa71)) with the following properties (case matters!):\n  - Text: \"Name\"\n  - Status: \"Status\", containing at least the options \"Backlog\", \"In progress\", \"Done\", \"Obsolete\"\n  - Select: \"Priority\", containing the options \"do first\", \"urgent\", \"important\"\n  - Date: \"Due\"\n  - Checkbox: \"Focus\"\n  - Text: \"Todoist ID\"\n### Todoist\n- A project must already exist with the same sections like defined as Status in Notion (except Done and Obsolete)\n### Redis\n- Create a [Free Redis Cloud](https://redis.io/try-free/) instance or self-host\n\n\n## Setup\n\n[![setup video](https://img.youtube.com/vi/73jhyU0t4c4/0.jpg)](https://youtu.be/73jhyU0t4c4)\n\n*The setup involves quite a lot of steps, yet many of them can be automated for business internal purposes.*\n\nJust follow the video or do the following steps:\n- Setup credentials for Notion (access token), Todoist (access token) and Redis - you can also create empty credentials and populate these later during further setup\n- Clone this workflow by clicking the \"Use workflow\" button and then choosing your n8n instance - otherwise you need to map the credentials of many nodes.\n- Follow the instructions described within the bundle of sticky notes on the top left of the workflow\n\n\n## How to use\n\n- You can apply changes (create, update, delete) to tasks both in Notion and Todoist which then get synced over within a couple of seconds (this is handled by the differential realtime sync)\n- The daily running full sync, resolves possible discrepancies in Todoist and sends a summary via email, if anything needed to be updated. In case that contains an unintended change, you can jump to the Task from the email directly to fix it manually.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get projects",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get sections",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Notion Databases",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Prep Dropdown",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prep Dropdown1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Choose Notion Database",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Choose Todoist Project",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Verify security token",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Generate security token",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store variables",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get variables",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Redirect to Auth Page",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OAuth redirect",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Exchange Tokens",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Respond with success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Respond with error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Notion Database ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Todoist Project ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notion-Todoist Sync Setup Helper",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Todoist Webhook Setup Helper",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Return config JSON",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Todoist",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Compare Datasets",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Exists/Completed in Notion",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Todoist Task",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "If Todoist ID exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Store Todoist ID",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mark as Incomplete in Todoist",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Mark as Completed in Todoist",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Delete Task in Todoist",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Notion Task",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update Task in Todoist",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Pick Todoist Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map Notion to Todoist",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update task in Todoist before closing",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Map Notion to Todoist1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Handle empty dates",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Handle empty dates1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Handle empty dates2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create task in Todoist",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Add project ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Lock Todoist ID",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate UUID",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update section (Sync API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Status changed",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Batching Items",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Status is Done",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Lock Todoist ID1",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Lock Todoist ID2",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update task in Todoist",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get mapped item",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get mapped item1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Prepare summary data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare summary data1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Prepare summary data2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter out status changes",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Map Todoist to Notion",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map summary fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert to HTML Table",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate email body",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get mapped item2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge summary",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Globals",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Differences exist1",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Requires completion change1",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create task in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update task in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mark as Done in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mark as Obsolete in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mark as In Progress in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Only continue if not locked",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Lock Notion ID",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if Todoist ID is locked",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Description in Todoist",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Description has changed in Todoist",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update Description in Todoist1",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Generate UUID1",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update section (Sync API)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Backlog Section ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notion Task not found",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if creating flag exists1",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only continue if flag does not exist1",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set creating flag1",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Neither focussed nor planned1",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mark as Focussed in Notion",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Todoist trigger reference",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Notion Task2",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Notion Task found1",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Switch by Event",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If event is not :deleted",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Execution Data",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execution Data1",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execution Data2",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execution Data3",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execution Data4",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Globals1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Map Todoist to Notion1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Todoist Task1",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Notion Task1",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note26",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note27",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note29",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note31",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note32",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note35",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note36",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note37",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Requires completion change",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Has been completed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Differences exist",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Only continue if not locked1",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if Notion ID is locked",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Notion task",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if creating flag exists",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only continue if flag does not exist",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set creating flag",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Todoist ID exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get todoist ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Todoist ID exists",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get todoist ID1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Status changed but not empty",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Status is Obsolete?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Status is not Done",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Neither focussed nor planned",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Notion trigger reference",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Notion Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store Todoist ID1",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mark as Completed in Todoist1",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update task in Todoist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Globals2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Mark as Incomplete in Todoist1",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Generate UUID2",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update section (Sync API)2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Lock Todoist ID4",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete Task in Todoist2",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Map Notion to Todoist2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Todoist Task2",
+      "type": "n8n-nodes-base.todoist",
+      "role": "todoist",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create task in Todoist1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Execution Data5",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execution Data6",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note38",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note39",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note41",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note42",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note43",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note44",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note45",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note46",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note47",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note48",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note49",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note51",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note52",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note53",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note54",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note55",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note56",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note57",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note58",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note59",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Todoist Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note60",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note61",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note62",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note63",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note64",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note65",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract IDs",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split out Notion changes",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Body is array?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note66",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch by project",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note67",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Execute Workflow1",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note50",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note68",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note69",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note70",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note72",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Due date empty",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Has not been completed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "End here",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Retry limit reached",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set tries",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Update tries",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Catch known error",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If tries left",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Retry limit reached1",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set tries1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Update tries1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Catch known error1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If tries left1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set tries2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Update tries2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Catch known error2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If tries left2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Retry limit reached2",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note30",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Turn Markdown into Notion Blocks",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Handle each block separately",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Notion Block",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note34",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note40",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

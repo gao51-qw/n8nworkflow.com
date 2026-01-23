@@ -1,0 +1,98 @@
+{
+  "id": 8675,
+  "slug": "8675",
+  "title": "Automated Zalo OA token management with OAuth and webhook integration",
+  "description": "# Description (How it works)\nThis workflow keeps your Zalo Official Account access token valid and easy to reuse across other flows—no external server required.\n\n**High-level steps**\n1. **Scheduled refresh** runs on an interval to renew the access token before it expires.  \n2. **Static Data cache** (global) stores access/refresh tokens + expiries for reuse by any downstream node.  \n3. **OAuth exchange** calls Zalo OAuth v4 with your `app_id` and `secret_key` to get a fresh access token.  \n4. **Immediate output** returns the current access token to the next nodes after each refresh.  \n5. **Operational webhooks** include:\n   - A **reset** webhook to clear the cache when rotating credentials or testing.\n   - A **token peek** webhook to read the currently cached token for other services.\n\n# Setup steps (estimated time ~8–15 minutes)\n1. **Collect Zalo credentials (2–3 min):** Obtain `app_id`, `secret_key`, and a valid `refresh_token`.  \n2. **Import & activate workflow (1–2 min):** Import the JSON into n8n and activate it.  \n3. **Wire inputs (2–3 min):** Point the “Set Refresh Token and App ID” node to your env vars (or paste values for a quick test).  \n4. **Adjust schedule & secure webhooks (2–3 min):** Tune the run interval to your token TTL; protect the reset/peek endpoints (e.g., secret param or IP allowlist).  \n5. **Test (1–2 min):** Execute once to populate Static Data; optionally try the token peek and reset webhooks to confirm behavior.\n",
+  "featuredImage": "/data/workflows/8675/8675.webp",
+  "author": {
+    "id": 101,
+    "slug": "leeseifer",
+    "name": "Le Nguyen",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "DevOps"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 515,
+  "downloads": 51,
+  "createdAt": "2025-09-17T11:55:18.168Z",
+  "updatedAt": "2026-01-16T08:57:10.273Z",
+  "publishedAt": "2025-09-17T11:55:18.168Z",
+  "nodes": 10,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8675",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated Zalo OA token management with OAuth and webhook integration",
+    "workflowName": "Automated Zalo OA token management with OAuth and webhook integration",
+    "description": "# Description (How it works)\nThis workflow keeps your Zalo Official Account access token valid and easy to reuse across other flows—no external server required.\n\n**High-level steps**\n1. **Scheduled refresh** runs on an interval to renew the access token before it expires.  \n2. **Static Data cache** (global) stores access/refresh tokens + expiries for reuse by any downstream node.  \n3. **OAuth exchange** calls Zalo OAuth v4 with your `app_id` and `secret_key` to get a fresh access token.  \n4. **Immediate output** returns the current access token to the next nodes after each refresh.  \n5. **Operational webhooks** include:\n   - A **reset** webhook to clear the cache when rotating credentials or testing.\n   - A **token peek** webhook to read the currently cached token for other services.\n\n# Setup steps (estimated time ~8–15 minutes)\n1. **Collect Zalo credentials (2–3 min):** Obtain `app_id`, `secret_key`, and a valid `refresh_token`.  \n2. **Import & activate workflow (1–2 min):** Import the JSON into n8n and activate it.  \n3. **Wire inputs (2–3 min):** Point the “Set Refresh Token and App ID” node to your env vars (or paste values for a quick test).  \n4. **Adjust schedule & secure webhooks (2–3 min):** Tune the run interval to your token TTL; protect the reset/peek endpoints (e.g., secret param or IP allowlist).  \n5. **Test (1–2 min):** Execute once to populate Static Data; optionally try the token peek and reset webhooks to confirm behavior.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Store to SD & Pass token",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Refresh Token (Zalo v4)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Execute_Node",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Clean Zalo Static Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Refresh Token and App ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Load to Static Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Load Access Token",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "id": 4840,
+  "slug": "4840",
+  "title": "Search business prospects with natural language using Claude AI and Explorium MCP",
+  "description": "Explorium Prospects Search Chatbot\n\n# Template\n\nDownload the following json file and import it to a new n8n workflow:\n\n[mcp\\_to\\_prospects\\_to\\_csv.json](https://drive.usercontent.google.com/u/0/uc?id=1_TO79jMUJxaDt5s2PAI2RYHOpB-7xPwD\\&export=download)\n\n![](https://files.readme.io/7d8d1a8a648e41b07f704212ebbbd392c38082aeffb70c23a4981c8ec0e03e0d-image.png)\n\n<br />\n\n# Overview\n\nThis n8n workflow creates a chatbot that understands natural language requests for finding business prospects and automatically:\n\n* Interprets your query using AI (Claude Sonnet 3.7)\n* Converts it to proper Explorium API filters\n* Validates the API request structure\n* Fetches prospect data from Explorium\n* Exports results as a downloadable CSV file\n\nPerfect for sales teams, recruiters, and business development professionals who need to quickly find and export targeted prospect lists without learning complex API syntax.\n\n# Key Features\n\n* **Natural Language Interface**: Simply describe who you're looking for in plain English\n* **Smart Query Translation**: AI converts your request to valid API parameters\n* **Built-in Validation**: Ensures API calls meet Explorium's requirements\n* **Error Recovery**: Automatically retries with corrections if validation fails\n* **Pagination Support**: Handles large result sets automatically\n* **CSV Export**: Clean, formatted output ready for CRM import\n* **Conversation Memory**: Maintains context for follow-up queries\n\n# Example Queries\n\nThe chatbot understands queries like:\n\n* \"Find marketing directors at SaaS companies in New York with 50-200 employees\"\n* \"Get me CTOs from fintech startups in California\"\n* \"Show me sales managers at healthcare companies with revenue over $10M\"\n* \"Find engineers at Microsoft with 3-5 years experience\"\n* \"Get customer service leads from e-commerce companies in Europe\"\n\n# Prerequisites\n\nBefore setting up this workflow, ensure you have:\n\n1. **n8n instance** with chat interface enabled\n2. **Anthropic API key** for Claude\n3. **Explorium API credentials** (Bearer token) - [Get explorium api key](https://developers.explorium.ai/reference/getting_your_api_key)\n4. Basic understanding of n8n chat workflows\n\n# Supported Filters\n\nThe chatbot can search using these criteria:\n\n## Company Filters\n\n* **Size**: 1-10, 11-50, 51-200, 201-500, 501-1000, 1001-5000, 5001-10000, 10001+ employees\n* **Revenue**: Ranges from $0-500K up to $10T+\n* **Age**: 0-3, 3-6, 6-10, 10-20, 20+ years\n* **Location**: Countries, regions, cities\n* **Industry**: Google categories, NAICS codes, LinkedIn categories\n* **Name**: Specific company names\n\n## Prospect Filters\n\n* **Job Level**: CXO, VP, Director, Manager, Senior, Entry, etc.\n* **Department**: Sales, Marketing, Engineering, Finance, HR, etc.\n* **Experience**: Total months and current role duration\n* **Location**: Country and region codes\n* **Contact Info**: Filter by email/phone availability\n\n# Installation & Setup\n\n## Step 1: Import the Workflow\n\n1. Copy the workflow JSON from the template\n2. In n8n: **Workflows** → **Add Workflow** → **Import from File**\n3. Paste the JSON and click **Import**\n\n## Step 2: Configure Anthropic Credentials\n\n1. Click on the **Anthropic Chat Model1** node\n2. Under Credentials, click **Create New**\n3. Add your Anthropic API key\n4. Name: \"Anthropic API\"\n5. Save credentials\n\n## Step 3: Configure Explorium Credentials\n\nYou'll need to set up Explorium credentials in two places:\n\n#### For MCP Client:\n\n1. Click on the **MCP Client** node\n2. Under Credentials, create new **Header Auth**\n3. Add your authentication header (usually `Authorization: Bearer YOUR_TOKEN`)\n4. Save credentials\n\n#### For API Calls:\n\n1. Click on the **Prospects API Call** node\n2. Use the same Header Auth credentials created above\n3. Verify the API endpoint is correct\n\n## Step 4: Activate the Workflow\n\n1. Save the workflow\n2. Click the **Active** toggle to enable it\n3. The chat interface will now be available\n\n## Step 5: Access the Chat Interface\n\n1. Click on the **When chat message received** node\n2. Copy the webhook URL\n3. Access this URL in your browser to start chatting\n\n# How It Works\n\n## Workflow Architecture\n\n1. **Chat Trigger**: Receives natural language queries from users\n2. **Memory Buffer**: Maintains conversation context\n3. **AI Agent**: Interprets queries and generates API parameters\n4. **Validation**: Checks API structure against Explorium requirements\n5. **API Call**: Fetches prospect data with pagination\n6. **Data Processing**: Formats results for CSV export\n7. **File Conversion**: Creates downloadable CSV file\n\n## Processing Flow\n\n```\nUser Query → AI Interpretation → Validation → API Call → CSV Export\n     ↑                                  ↓\n     └──── Error Correction Loop ←──────┘\n```\n\n## Validation Rules\n\nThe workflow validates:\n\n* Filter keys are allowed by Explorium API\n* Values match expected formats (e.g., valid country codes)\n* Range filters have proper gte/lte values\n* No duplicate values in arrays\n* Required structure is maintained\n\n# Usage Guide\n\n## Basic Conversation Flow\n\n1. **Start with your query**:\n   ```\n   \"Find me VPs of Sales at software companies in the US\"\n   ```\n\n2. **Bot processes and responds**:\n   * Generates API filters\n   * Validates the structure\n   * Fetches data\n   * Returns CSV download link\n\n3. **Refine if needed**:\n   ```\n   \"Can you also include directors and filter for companies with 100+ employees?\"\n   ```\n\n## Query Tips\n\n* **Be specific**: Include job titles, departments, company details\n* **Use standard terms**: \"CTO\" instead of \"Chief Technology Officer\"\n* **Specify locations**: Use country names or standard codes\n* **Include size/revenue**: Helps narrow results effectively\n\n## Advanced Queries\n\nCombine multiple criteria:\n\n```\n\"Find engineering managers and senior engineers at B2B SaaS companies \nin New York and California with 50-500 employees and revenue over $5M \nwho have been in their role for at least 1 year\"\n```\n\n# Output Format\n\nThe CSV file includes:\n\n* Prospect ID\n* Name (first, last, full)\n* Location (country, region, city)\n* LinkedIn profile\n* Experience summary\n* Skills and interests\n* Company details\n* Job information\n* Business ID\n\n# Troubleshooting\n\n## Common Issues\n\n**\"Validation failed\" errors**\n\n* Check that your query uses supported filter values\n* Ensure location names are spelled correctly\n* Verify company sizes/revenues match allowed ranges\n\n**No results returned**\n\n* Broaden your search criteria\n* Check if the company exists in Explorium's database\n* Verify filter combinations aren't too restrictive\n\n**Chat not responding**\n\n* Ensure workflow is activated\n* Check all credentials are properly configured\n* Verify webhook URL is accessible\n\n**Large result sets timing out**\n\n* Try adding more specific filters\n* Limit results by location or company size\n* Use the size parameter (max 10,000)\n\n## Error Messages\n\nThe bot provides clear feedback:\n\n* **Invalid filters**: Shows which filters aren't supported\n* **Value errors**: Lists correct options for each field\n* **API failures**: Explains connection or authentication issues\n\n# Performance Optimization\n\n## Best Practices\n\n1. **Start broad, then narrow**: Begin with basic criteria and add filters\n2. **Use business IDs**: When targeting specific companies\n3. **Limit by contact info**: Add `has_email: true` for actionable leads\n4. **Batch by location**: Process regions separately for large searches\n\n## API Limits\n\n* Maximum 10,000 results per search\n* Pagination handles up to 100 records per page\n* Rate limits apply based on your Explorium subscription\n\n# Customization Options\n\n## Modify AI Behavior\n\nEdit the **AI Agent** system message to:\n\n* Change response format\n* Add custom filters\n* Adjust interpretation logic\n* Include additional instructions\n\n## Extend Functionality\n\nAdd nodes to:\n\n* Send results via email\n* Import directly to CRM\n* Schedule recurring searches\n* Create custom reports\n\n## Integration Ideas\n\n* Connect to Slack for team queries\n* Add to CRM workflows\n* Create lead scoring systems\n* Build automated outreach campaigns\n\n# Security Considerations\n\n* API credentials are stored securely in n8n\n* Chat sessions are isolated\n* No prospect data is stored permanently\n* CSV files are generated on-demand\n\n# Support Resources\n\nFor issues with:\n\n* **n8n platform**: Check n8n documentation\n* **Explorium API**: Contact Explorium support\n* **Anthropic/Claude**: Refer to Anthropic docs\n* **Workflow logic**: Review node configurations",
+  "featuredImage": "/data/workflows/4840/4840.webp",
+  "author": {
+    "id": 101,
+    "slug": "explorium",
+    "name": "explorium",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1152,
+  "downloads": 115,
+  "createdAt": "2025-06-10T06:55:38.377Z",
+  "updatedAt": "2026-01-16T08:36:29.368Z",
+  "publishedAt": "2025-06-10T06:55:38.377Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4840",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Search business prospects with natural language using Claude AI and Explorium MCP",
+    "workflowName": "Search business prospects with natural language using Claude AI and Explorium MCP",
+    "description": "Explorium Prospects Search Chatbot\n\n# Template\n\nDownload the following json file and import it to a new n8n workflow:\n\n[mcp\\_to\\_prospects\\_to\\_csv.json](https://drive.usercontent.google.com/u/0/uc?id=1_TO79jMUJxaDt5s2PAI2RYHOpB-7xPwD\\&export=download)\n\n![](https://files.readme.io/7d8d1a8a648e41b07f704212ebbbd392c38082aeffb70c23a4981c8ec0e03e0d-image.png)\n\n<br />\n\n# Overview\n\nThis n8n workflow creates a chatbot that understands natural language requests for finding business prospects and automatically:\n\n* Interprets your query using AI (Claude Sonnet 3.7)\n* Converts it to proper Explorium API filters\n* Validates the API request structure\n* Fetches prospect data from Explorium\n* Exports results as a downloadable CSV file\n\nPerfect for sales teams, recruiters, and business development professionals who need to quickly find and export targeted prospect lists without learning complex API syntax.\n\n# Key Features\n\n* **Natural Language Interface**: Simply describe who you're looking for in plain English\n* **Smart Query Translation**: AI converts your request to valid API parameters\n* **Built-in Validation**: Ensures API calls meet Explorium's requirements\n* **Error Recovery**: Automatically retries with corrections if validation fails\n* **Pagination Support**: Handles large result sets automatically\n* **CSV Export**: Clean, formatted output ready for CRM import\n* **Conversation Memory**: Maintains context for follow-up queries\n\n# Example Queries\n\nThe chatbot understands queries like:\n\n* \"Find marketing directors at SaaS companies in New York with 50-200 employees\"\n* \"Get me CTOs from fintech startups in California\"\n* \"Show me sales managers at healthcare companies with revenue over $10M\"\n* \"Find engineers at Microsoft with 3-5 years experience\"\n* \"Get customer service leads from e-commerce companies in Europe\"\n\n# Prerequisites\n\nBefore setting up this workflow, ensure you have:\n\n1. **n8n instance** with chat interface enabled\n2. **Anthropic API key** for Claude\n3. **Explorium API credentials** (Bearer token) - [Get explorium api key](https://developers.explorium.ai/reference/getting_your_api_key)\n4. Basic understanding of n8n chat workflows\n\n# Supported Filters\n\nThe chatbot can search using these criteria:\n\n## Company Filters\n\n* **Size**: 1-10, 11-50, 51-200, 201-500, 501-1000, 1001-5000, 5001-10000, 10001+ employees\n* **Revenue**: Ranges from $0-500K up to $10T+\n* **Age**: 0-3, 3-6, 6-10, 10-20, 20+ years\n* **Location**: Countries, regions, cities\n* **Industry**: Google categories, NAICS codes, LinkedIn categories\n* **Name**: Specific company names\n\n## Prospect Filters\n\n* **Job Level**: CXO, VP, Director, Manager, Senior, Entry, etc.\n* **Department**: Sales, Marketing, Engineering, Finance, HR, etc.\n* **Experience**: Total months and current role duration\n* **Location**: Country and region codes\n* **Contact Info**: Filter by email/phone availability\n\n# Installation & Setup\n\n## Step 1: Import the Workflow\n\n1. Copy the workflow JSON from the template\n2. In n8n: **Workflows** → **Add Workflow** → **Import from File**\n3. Paste the JSON and click **Import**\n\n## Step 2: Configure Anthropic Credentials\n\n1. Click on the **Anthropic Chat Model1** node\n2. Under Credentials, click **Create New**\n3. Add your Anthropic API key\n4. Name: \"Anthropic API\"\n5. Save credentials\n\n## Step 3: Configure Explorium Credentials\n\nYou'll need to set up Explorium credentials in two places:\n\n#### For MCP Client:\n\n1. Click on the **MCP Client** node\n2. Under Credentials, create new **Header Auth**\n3. Add your authentication header (usually `Authorization: Bearer YOUR_TOKEN`)\n4. Save credentials\n\n#### For API Calls:\n\n1. Click on the **Prospects API Call** node\n2. Use the same Header Auth credentials created above\n3. Verify the API endpoint is correct\n\n## Step 4: Activate the Workflow\n\n1. Save the workflow\n2. Click the **Active** toggle to enable it\n3. The chat interface will now be available\n\n## Step 5: Access the Chat Interface\n\n1. Click on the **When chat message received** node\n2. Copy the webhook URL\n3. Access this URL in your browser to start chatting\n\n# How It Works\n\n## Workflow Architecture\n\n1. **Chat Trigger**: Receives natural language queries from users\n2. **Memory Buffer**: Maintains conversation context\n3. **AI Agent**: Interprets queries and generates API parameters\n4. **Validation**: Checks API structure against Explorium requirements\n5. **API Call**: Fetches prospect data with pagination\n6. **Data Processing**: Formats results for CSV export\n7. **File Conversion**: Creates downloadable CSV file\n\n## Processing Flow\n\n```\nUser Query → AI Interpretation → Validation → API Call → CSV Export\n     ↑                                  ↓\n     └──── Error Correction Loop ←──────┘\n```\n\n## Validation Rules\n\nThe workflow validates:\n\n* Filter keys are allowed by Explorium API\n* Values match expected formats (e.g., valid country codes)\n* Range filters have proper gte/lte values\n* No duplicate values in arrays\n* Required structure is maintained\n\n# Usage Guide\n\n## Basic Conversation Flow\n\n1. **Start with your query**:\n   ```\n   \"Find me VPs of Sales at software companies in the US\"\n   ```\n\n2. **Bot processes and responds**:\n   * Generates API filters\n   * Validates the structure\n   * Fetches data\n   * Returns CSV download link\n\n3. **Refine if needed**:\n   ```\n   \"Can you also include directors and filter for companies with 100+ employees?\"\n   ```\n\n## Query Tips\n\n* **Be specific**: Include job titles, departments, company details\n* **Use standard terms**: \"CTO\" instead of \"Chief Technology Officer\"\n* **Specify locations**: Use country names or standard codes\n* **Include size/revenue**: Helps narrow results effectively\n\n## Advanced Queries\n\nCombine multiple criteria:\n\n```\n\"Find engineering managers and senior engineers at B2B SaaS companies \nin New York and California with 50-500 employees and revenue over $5M \nwho have been in their role for at least 1 year\"\n```\n\n# Output Format\n\nThe CSV file includes:\n\n* Prospect ID\n* Name (first, last, full)\n* Location (country, region, city)\n* LinkedIn profile\n* Experience summary\n* Skills and interests\n* Company details\n* Job information\n* Business ID\n\n# Troubleshooting\n\n## Common Issues\n\n**\"Validation failed\" errors**\n\n* Check that your query uses supported filter values\n* Ensure location names are spelled correctly\n* Verify company sizes/revenues match allowed ranges\n\n**No results returned**\n\n* Broaden your search criteria\n* Check if the company exists in Explorium's database\n* Verify filter combinations aren't too restrictive\n\n**Chat not responding**\n\n* Ensure workflow is activated\n* Check all credentials are properly configured\n* Verify webhook URL is accessible\n\n**Large result sets timing out**\n\n* Try adding more specific filters\n* Limit results by location or company size\n* Use the size parameter (max 10,000)\n\n## Error Messages\n\nThe bot provides clear feedback:\n\n* **Invalid filters**: Shows which filters aren't supported\n* **Value errors**: Lists correct options for each field\n* **API failures**: Explains connection or authentication issues\n\n# Performance Optimization\n\n## Best Practices\n\n1. **Start broad, then narrow**: Begin with basic criteria and add filters\n2. **Use business IDs**: When targeting specific companies\n3. **Limit by contact info**: Add `has_email: true` for actionable leads\n4. **Batch by location**: Process regions separately for large searches\n\n## API Limits\n\n* Maximum 10,000 results per search\n* Pagination handles up to 100 records per page\n* Rate limits apply based on your Explorium subscription\n\n# Customization Options\n\n## Modify AI Behavior\n\nEdit the **AI Agent** system message to:\n\n* Change response format\n* Add custom filters\n* Adjust interpretation logic\n* Include additional instructions\n\n## Extend Functionality\n\nAdd nodes to:\n\n* Send results via email\n* Import directly to CRM\n* Schedule recurring searches\n* Create custom reports\n\n## Integration Ideas\n\n* Connect to Slack for team queries\n* Add to CRM workflows\n* Create lead scoring systems\n* Build automated outreach campaigns\n\n# Security Considerations\n\n* API credentials are stored securely in n8n\n* Chat sessions are isolated\n* No prospect data is stored permanently\n* CSV files are generated on-demand\n\n# Support Resources\n\nFor issues with:\n\n* **n8n platform**: Check n8n documentation\n* **Explorium API**: Contact Explorium support\n* **Anthropic/Claude**: Refer to Anthropic docs\n* **Workflow logic**: Review node configurations",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Extract \"data\"",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge All Pages",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare for CSV",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "API Call Validation",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Validation Prompter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Is API Call Valid?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Chat or Refinement",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Explorium MCP",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Explorium Prospects API Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

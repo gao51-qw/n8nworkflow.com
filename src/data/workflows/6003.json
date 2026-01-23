@@ -1,0 +1,608 @@
+{
+  "id": 6003,
+  "slug": "6003",
+  "title": "Build a multi-modal Telegram AI assistant with Gemini, voice & image generation",
+  "description": "## How it works\n\nThis workflow creates a multi-talented AI assistant named Simran that interacts with users via Telegram. It can handle text and voice messages, understand the user's intent, and perform various tasks.\nStep 1: Receive & Transcribe Input\nThe workflow triggers on any new Telegram message. If it's a voice message, it uses AssemblyAI to transcribe it into text; otherwise, it processes the incoming text directly.\nStep 2: Understand User Intent\nUsing a Large Language Model (LLM), the workflow analyzes the user's message to determine their goal, categorizing it as a general chat, a request to generate an image, a command to set a reminder, or a request to remember a specific piece of information.\nStep 3: Fetch Context & Route\nThe assistant retrieves past conversation summaries from a MongoDB database to maintain context. Based on the user's intent, the workflow routes the task to the appropriate path.\nStep 4: Execute the Task\nChat: Generates a response using an AI agent whose personality can be toggled between a standard assistant and a \"Girlfriend Mode.\" It also analyzes the user's mood to tailor the response.\nGenerate Image: Creates a detailed prompt and uses an image generation API to create and send a picture.\nSet Reminder: Parses the natural language request, creates an event in Google Calendar and a task in Google Tasks, and sends a confirmation.\nRemember Info: Saves specific user-provided information to a dedicated memory collection in MongoDB.\nStep 5: Respond and Save Memory\nThe final output (text, voice message, or image) is sent back to the user on Telegram. The workflow then summarizes the interaction and saves it to the database to ensure continuity in future conversations.\n## Set up steps\nEstimated Set up time: 20 - 30 minutes.\n1. Configure Credentials: You will need to add credentials for several services in your n8n instance:\nTelegram (Bot API Token)\nAssemblyAI (API Key)\nMongoDB\nGoogle (for Calendar, Tasks, Sheets, and Natural Language API)\nA Large Language Model (the workflow uses Google Gemini but can be adapted)\nAn image generation service (the workflow uses the Together.xyz API)\n2. Set up External Services:\nEnsure your MongoDB instance has two collections: user_memory and memory_auto.\nCreate a Google Sheet to manage the \"Girlfriend Mode\" status for different users.\nEnsure edge-tts is installed on the machine running your n8n instance for the text-to-speech functionality.\n3. Customize Nodes:\nReview the nodes with hardcoded IDs, such as Google Tasks and Google Sheets, and update them with your specific Task List ID and Sheet ID.\nThe sticky notes inside the workflow provide more detailed instructions for specific nodes and segments.",
+  "featuredImage": "/data/workflows/6003/6003.webp",
+  "author": {
+    "id": 101,
+    "slug": "netwithjc",
+    "name": "Iniyavan JC",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2537,
+  "downloads": 253,
+  "createdAt": "2025-07-14T16:38:50.640Z",
+  "updatedAt": "2026-01-16T08:42:38.407Z",
+  "publishedAt": "2025-07-14T16:38:50.640Z",
+  "nodes": 95,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6003",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a multi-modal Telegram AI assistant with Gemini, voice & image generation",
+    "workflowName": "Build a multi-modal Telegram AI assistant with Gemini, voice & image generation",
+    "description": "## How it works\n\nThis workflow creates a multi-talented AI assistant named Simran that interacts with users via Telegram. It can handle text and voice messages, understand the user's intent, and perform various tasks.\nStep 1: Receive & Transcribe Input\nThe workflow triggers on any new Telegram message. If it's a voice message, it uses AssemblyAI to transcribe it into text; otherwise, it processes the incoming text directly.\nStep 2: Understand User Intent\nUsing a Large Language Model (LLM), the workflow analyzes the user's message to determine their goal, categorizing it as a general chat, a request to generate an image, a command to set a reminder, or a request to remember a specific piece of information.\nStep 3: Fetch Context & Route\nThe assistant retrieves past conversation summaries from a MongoDB database to maintain context. Based on the user's intent, the workflow routes the task to the appropriate path.\nStep 4: Execute the Task\nChat: Generates a response using an AI agent whose personality can be toggled between a standard assistant and a \"Girlfriend Mode.\" It also analyzes the user's mood to tailor the response.\nGenerate Image: Creates a detailed prompt and uses an image generation API to create and send a picture.\nSet Reminder: Parses the natural language request, creates an event in Google Calendar and a task in Google Tasks, and sends a confirmation.\nRemember Info: Saves specific user-provided information to a dedicated memory collection in MongoDB.\nStep 5: Respond and Save Memory\nThe final output (text, voice message, or image) is sent back to the user on Telegram. The workflow then summarizes the interaction and saves it to the database to ensure continuity in future conversations.\n## Set up steps\nEstimated Set up time: 20 - 30 minutes.\n1. Configure Credentials: You will need to add credentials for several services in your n8n instance:\nTelegram (Bot API Token)\nAssemblyAI (API Key)\nMongoDB\nGoogle (for Calendar, Tasks, Sheets, and Natural Language API)\nA Large Language Model (the workflow uses Google Gemini but can be adapted)\nAn image generation service (the workflow uses the Together.xyz API)\n2. Set up External Services:\nEnsure your MongoDB instance has two collections: user_memory and memory_auto.\nCreate a Google Sheet to manage the \"Girlfriend Mode\" status for different users.\nEnsure edge-tts is installed on the machine running your n8n instance for the text-to-speech functionality.\n3. Customize Nodes:\nReview the nodes with hardcoded IDs, such as Google Tasks and Google Sheets, and update them with your specific Task List ID and Sheet ID.\nThe sticky notes inside the workflow provide more detailed instructions for specific nodes and segments.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Fetch User Memory2",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Intent Analysis2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Parse Intent2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract Memory Info1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Check If Worth Remembering1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Route Intent2",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Gemini Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Chat Agent2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "MongoDB Chat Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "role": "memoryMongoDbChat",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "intent string2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Edit Fields5",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Telegram Trigger1",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "reminder status confirmation1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Tasks",
+      "type": "n8n-nodes-base.googleTasks",
+      "role": "googleTasks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Edit Fields6",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Build Context2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Voice Message1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store Transcript ID1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Wait 5 Seconds1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check Transcription Status1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Is Completed?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Results1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Is Error?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch User Memory3",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Build Context3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Chat Agent3",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Natural Language Reminders to JSON1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Clean & Parse1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Chat Agent Output Cleaner1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean Prompt Text1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Detect Mood1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract & Validate Data1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge3",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Set GF Mode TRUE1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set GF Mode FALSE1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Toggle GF Mode1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Cloud Natural Language1",
+      "type": "n8n-nodes-base.googleCloudNaturalLanguage",
+      "role": "googleCloudNaturalLanguage",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize Chat2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Edit Fields7",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Save Conversation Memory on user_memory1",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Save Conversation Memory on memory_auto3",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Build Auto Memory Context1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch Auto Memory1",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "intent from route intent1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "intent from string1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "intent match checker1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Google Gemini Chat Model8",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model9",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model10",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Run Edge-TTS1",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Read MP3 File1",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "role": "readBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize Chat3",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Save Conversation Memory on memory_auto4",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Google Gemini Chat Model11",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Save Conversation Memory on memory_auto5",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Google Gemini Chat Model12",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Intent Analysis3",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Parse Intent3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Route Intent3",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "intent string3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Gemini Chat Model13",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request for image generation on voice input1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTTP Request Fetch Voice Message Audio1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Submit Audio Transcription Job1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Reply: Sorry, Didn’t Hear You1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Summarize Voice Message1",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Prepare Voice Summary Document1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send reply1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check GF Mode Status1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Google Sheets:Set GF Mode FALSE1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Google Sheets: Set GF Mode TRUE1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Send Mode Confirmation : /gf_off1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Mode Confirmation : /gf_on1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Image for Voice msg1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Image for Text1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Edit Fields for \"Build Memory_auto1 Document1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "AI Agent FOR Generate Image Prompt1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

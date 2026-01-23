@@ -1,0 +1,102 @@
+# Build a website customer support chatbot with Groq AI and Google Sheets knowledge base
+
+> Build a Website Customer Support Chatbot with Groq AI and Google Sheets as its Knowledge Base.
+
+## Setup Instructions
+
+### Prerequisites
+1. **API Credentials Required:**
+   - Groq API credentials - You'll need a valid API key from Groq
+   - Google Sheets credentials - OAuth authentication required to access your knowledge base sheets
+
+### Step-by-Step Setup
+1. **Add Required Credentials:**
+   - Click on the Credentials menu and add your Groq API credentials
+   - Set up Google OAuth credentials for Google Sheets access
+   
+2. **Configure the Groq Chat Model:**
+   - Click on the "Groq Chat Model" node
+   - Select your preferred Groq model (e.g., Llama-3-70b or Mixtral-8x7b)
+   - Set token limits and other parameters as needed
+   
+3. **Set Up Your Knowledge Base:**
+   - Create a Google Sheet with your support information (example structure below)
+   - Note the Google Sheet ID from the URL
+   
+4. **Configure the Google Sheets Node:**
+   - Click on the "Google Sheets" node
+   - Select your document ID from the dropdown
+   - Select the specific sheet name containing your knowledge base
+   
+5. **Customize the AI Agent:**
+   - Modify the system message to match your brand's tone and support style
+   - Adjust the context window length in the "Chat History" node based on your needs
+   
+6. **Test the Chatbot:**
+   - Click the "Chat" button to test with sample customer questions
+   - Verify the AI retrieves correct information from your knowledge base
+   
+7. **Deploy to Your Website:**
+   - Click "Make Public" to generate an embed code
+   - Add the embed code to your website HTML
+
+### Knowledge Base Structure Example
+Your Google Sheet should be structured with clear headers and organized data. Example format:
+
+| Question | Answer | Category | Keywords |
+|----------|--------|----------|----------|
+| How do I reset my password? | To reset your password, click the "Forgot Password" link on the login page and follow the instructions sent to your email. | Account | password, reset, forgot, login |
+| What are your shipping rates? | Standard shipping is $5.99. Express shipping is $12.99. Orders over $50 qualify for free standard shipping. | Shipping | rates, costs, delivery, free shipping |
+| How do I return an item? | Returns can be initiated within 30 days of purchase by logging into your account and selecting "Start a Return" in your order history. | Returns | return policy, exchange, refund |
+
+Each row should contain a complete customer query and response pair, with optional categorization and keywords to help the AI find relevant information quickly.
+
+## Website Embedding 
+You can use and replace the placeholders in the following code: [View on Codepen (external link)](https://codepen.io/olemai/pen/RNwPdVp)
+
+Put the customized Code inside your website's head element (before the `&lt;/head&gt;` tag).
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3364
+- **Complexity:** intermediate
+- **Node Count:** 9
+- **Views:** 214
+- **Downloads:** 21
+- **Created:** 2025/3/30
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3364)
+
+## 👤 Author
+
+- **Name:** Gegenfeld
+- **Username:** @gegenfeld
+
+## 🏷️ Categories
+
+- Support Chatbot
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.chatTrigger** 
+- **@n8n/n8n-nodes-langchain.memoryBufferWindow** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **stickyNote** (×4)
+- **@n8n/n8n-nodes-langchain.lmChatGroq** 
+- **googleSheetsTool** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 9 nodes with 4 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

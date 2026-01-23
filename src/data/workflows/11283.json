@@ -1,0 +1,146 @@
+{
+  "id": 11283,
+  "slug": "11283",
+  "title": "B2B lead follow-up automation with Gemini AI, Gmail and Google Sheets",
+  "description": "## Overview\nThis n8n workflow template automates your B2B marketing follow-up process. It tracks which introductory emails have received a reply, identifies leads who haven't responded within a set time, uses Gemini AI to draft a personalized, casual reminder, sends the follow-up as a reply on the original thread, and updates your lead tracker in Google Sheets.\n\nBest if used with preivously created workflow that sends an automated introductory email with templatized subject.\n\n## Requirements\nTo use this workflow, you need the following accounts and credentials:\n\nGmail Account: To check for replies and send the reminder emails.\n\nGoogle Sheets Account: To manage your lead tracking spreadsheet (the workflow uses a sheet with ID).\nBelow are the Sheet columns\n*First Name\t\nLast Name\t\nEmail ID\t\nCompany Name\t\nCompany Information (optional)\t\nDesignation (optional)\t\nMessage\t- the main form enquiry\nLocation (optional)\t\nStatus\t(auto)\nIntro email Date (auto)\t\nReminder 1 needed? (auto)\t\nReminder 1 Email Date (auto)*\n\nGoogle Gemini (PaLM) API Key: For the AI Agent node to generate the personalized email content.\n\n## How It Works\nThis automation is broken down into three main stages:\n\n#### Stage 1: Check for Replies and Update Tracker\nThis stage excludes leads who have already replied to your introductory email and updates the status in your tracker.\n\nWhen clicking ‘Execute workflow’ (Manual Trigger): The workflow starts manually or can be scheduled.\n\nGet many messages (Gmail): The node searches your inbox (CATEGORY_PERSONAL) for replies to your introductory email (using the search query subject: &lt;template of your introductory email&gt;).\n\nUpdate row in sheet (Google Sheets): For every incoming reply found, the workflow matches the lead by Email ID and updates the column Reminder 1 needed? to No.\n\n#### Stage 2: Identify Who Needs a Reminder\nThis stage finds leads who have not yet received a reminder and checks if the introductory email was sent over 5 days ago.\n\nGet row(s) in sheet (Google Sheets): The workflow retrieves all leads from the tracker where the column Reminder 1 needed? is not set to No (i.e., they haven't replied and a reminder status hasn't been logged).\n\nIf: A condition checks if the Intro email Date is older than 5 days (DateTime.now().minus({ days: 5 })). Only leads that meet this age criteria are passed forward.\n\n#### Stage 3: Send Personalized Reminder and Final Update\nFor eligible leads, the AI generates a follow-up, finds the original email thread, sends the reply, and logs the action.\n\nAI Agent: The AI Agent acts as a B2B marketing assistant to write a short, friendly first reminder email. It uses lead data (First Name, Company Name, Message) to personalize the content, referencing the original introductory email and the client's pain point.\n\nNote: The AI is instructed to format its output into ClientEmail and ClientEmailBody using the Structured Output Parser.\n\nEdit Fields (Set): The structured output from the AI is mapped to workflow fields.\n\nGet many messages1 (Gmail): The workflow searches the SENT label for the original email using the client's email and the introductory subject line to find the correct threadId and messageId.\n\nReply to a message (Gmail): The personalized body is sent as a reply on the original thread to maintain context.\n\nUpdate row in sheet1 (Google Sheets): The final step updates the lead's row in the tracker, setting Status to Reminder 1 Drafted, Reminder 1 needed? to Yes, and recording the current date in the Reminder 1 Email Date column.\n\n\nCustomization\nCurrently it has option to send first reminder. This can be extended to add another reminder.\n\nWrite to priyanka@buildmyaiflow.agency for more customizations.",
+  "featuredImage": "/data/workflows/11283/11283.webp",
+  "author": {
+    "id": 101,
+    "slug": "aiagentpriyanka",
+    "name": "Priyanka Rana",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 172,
+  "downloads": 17,
+  "createdAt": "2025-11-27T09:49:43.681Z",
+  "updatedAt": "2026-01-16T09:08:14.519Z",
+  "publishedAt": "2025-11-27T09:49:43.681Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11283",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "B2B lead follow-up automation with Gemini AI, Gmail and Google Sheets",
+    "workflowName": "B2B lead follow-up automation with Gemini AI, Gmail and Google Sheets",
+    "description": "This n8n workflow template automates your B2B marketing follow-up process. It tracks which introductory emails have received a reply, identifies leads who haven't responded within a set time, uses Gemini AI to draft a personalized, casual reminder, sends the follow-up as a reply on the original thread, and updates your lead tracker in Google Sheets.\n\nBest if used with preivously created workflow that sends an automated introductory email with templatized subject.\n\n## Requirements\nTo use this workflow, you need the following accounts and credentials:\n\nGmail Account: To check for replies and send the reminder emails.\n\nGoogle Sheets Account: To manage your lead tracking spreadsheet (the workflow uses a sheet with ID).\nBelow are the Sheet columns\n*First Name\t\nLast Name\t\nEmail ID\t\nCompany Name\t\nCompany Information (optional)\t\nDesignation (optional)\t\nMessage\t- the main form enquiry\nLocation (optional)\t\nStatus\t(auto)\nIntro email Date (auto)\t\nReminder 1 needed? (auto)\t\nReminder 1 Email Date (auto)*\n\nGoogle Gemini (PaLM) API Key: For the AI Agent node to generate the personalized email content.\n\n## How It Works\nThis automation is broken down into three main stages:\n\n#### Stage 1: Check for Replies and Update Tracker\nThis stage excludes leads who have already replied to your introductory email and updates the status in your tracker.\n\nWhen clicking ‘Execute workflow’ (Manual Trigger): The workflow starts manually or can be scheduled.\n\nGet many messages (Gmail): The node searches your inbox (CATEGORY_PERSONAL) for replies to your introductory email (using the search query subject: &lt;template of your introductory email&gt;).\n\nUpdate row in sheet (Google Sheets): For every incoming reply found, the workflow matches the lead by Email ID and updates the column Reminder 1 needed? to No.\n\n#### Stage 2: Identify Who Needs a Reminder\nThis stage finds leads who have not yet received a reminder and checks if the introductory email was sent over 5 days ago.\n\nGet row(s) in sheet (Google Sheets): The workflow retrieves all leads from the tracker where the column Reminder 1 needed? is not set to No (i.e., they haven't replied and a reminder status hasn't been logged).\n\nIf: A condition checks if the Intro email Date is older than 5 days (DateTime.now().minus({ days: 5 })). Only leads that meet this age criteria are passed forward.\n\n#### Stage 3: Send Personalized Reminder and Final Update\nFor eligible leads, the AI generates a follow-up, finds the original email thread, sends the reply, and logs the action.\n\nAI Agent: The AI Agent acts as a B2B marketing assistant to write a short, friendly first reminder email. It uses lead data (First Name, Company Name, Message) to personalize the content, referencing the original introductory email and the client's pain point.\n\nNote: The AI is instructed to format its output into ClientEmail and ClientEmailBody using the Structured Output Parser.\n\nEdit Fields (Set): The structured output from the AI is mapped to workflow fields.\n\nGet many messages1 (Gmail): The workflow searches the SENT label for the original email using the client's email and the introductory subject line to find the correct threadId and messageId.\n\nReply to a message (Gmail): The personalized body is sent as a reply on the original thread to maintain context.\n\nUpdate row in sheet1 (Google Sheets): The final step updates the lead's row in the tracker, setting Status to Reminder 1 Drafted, Reminder 1 needed? to Yes, and recording the current date in the Reminder 1 Email Date column.\n\n\nCustomization\nCurrently it has option to send first reminder. This can be extended to add another reminder.\n\nWrite to priyanka@buildmyaiflow.agency for more customizations.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get many messages",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get many messages1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Reply to a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

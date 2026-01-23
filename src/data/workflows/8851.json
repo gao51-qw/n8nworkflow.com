@@ -1,0 +1,242 @@
+{
+  "id": 8851,
+  "slug": "8851",
+  "title": "Agentic B2B lead enrichment from Google Search to Google Sheets",
+  "description": "## How it works\n\nThis is an advanced \"Agentic\" workflow that acts as an autonomous lead generation specialist. It goes beyond simple scraping by \"thinking\" about where to look for contact info.\n\n1. **Search & Filter:** It performs a Google Search for your niche (e.g., \"Marketing Agencies in Toronto\"), normalizing results to remove directories (Clutch, Yelp) and junk links.\n2. **Homepage Analysis:** It visits every lead's website and uses an AI Agent to identify key pages (Contact, About, Careers) and social profiles.\n3. **Deep Scan (Branch A):** If a \"Contact Us\" page is found, a second AI Agent visits that specific page to extract hidden emails and phone numbers.\n4. **LinkedIn Enrichment (Branch B):** Simultaneously, if a LinkedIn profile is found, it scrapes the profile to extract Company Size, Industry, and Headquarters location.\n5. **Aggregation:** Finally, it merges data from all sources, formats the arrays into readable text, and saves the complete profile to Google Sheets.\n\n## Set up steps\n\n1. **Configure APIs:**\n   * **Serper.dev:** Required for the initial Google Search results.\n   * **ScraperAPI:** Required to bypass bot detection when visiting company websites and LinkedIn.\n   * **Google Gemini (or OpenAI):** Required for the AI Agents to analyze HTML.\n\n2. **Setup Google Sheet:**\n   * Create a new Sheet with these exact headers in Row 1: `Company Name`, `Linked Summary`, `employee count`, `industry`, `Emails`, `Phone`, `Website`.\n   * Connect the **Google Sheets** node to this file.\n\n3. **Configure Variables:**\n   * In the **Edit Fields** node (Start), enter your `search_query` (e.g., \"Plumbers in Chicago\").\n\n4. **Important Note:**\n   * This workflow uses a **Loop** with a 1.5s wait time to be polite to servers. A batch of 50 leads will take approximately 10-15 minutes to complete.",
+  "featuredImage": "/data/workflows/8851/8851.webp",
+  "author": {
+    "id": 101,
+    "slug": "dhruvmali",
+    "name": "Dhruv Mali",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 156,
+  "downloads": 15,
+  "createdAt": "2025-09-23T06:35:18.609Z",
+  "updatedAt": "2026-01-16T08:57:56.535Z",
+  "publishedAt": "2025-09-23T06:35:18.609Z",
+  "nodes": 34,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8851",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Agentic B2B lead enrichment from Google Search to Google Sheets",
+    "workflowName": "Agentic B2B lead enrichment from Google Search to Google Sheets",
+    "description": "## How it works\n\nThis is an advanced \"Agentic\" workflow that acts as an autonomous lead generation specialist. It goes beyond simple scraping by \"thinking\" about where to look for contact info.\n\n1. **Search & Filter:** It performs a Google Search for your niche (e.g., \"Marketing Agencies in Toronto\"), normalizing results to remove directories (Clutch, Yelp) and junk links.\n2. **Homepage Analysis:** It visits every lead's website and uses an AI Agent to identify key pages (Contact, About, Careers) and social profiles.\n3. **Deep Scan (Branch A):** If a \"Contact Us\" page is found, a second AI Agent visits that specific page to extract hidden emails and phone numbers.\n4. **LinkedIn Enrichment (Branch B):** Simultaneously, if a LinkedIn profile is found, it scrapes the profile to extract Company Size, Industry, and Headquarters location.\n5. **Aggregation:** Finally, it merges data from all sources, formats the arrays into readable text, and saves the complete profile to Google Sheets.\n\n## Set up steps\n\n1. **Configure APIs:**\n   * **Serper.dev:** Required for the initial Google Search results.\n   * **ScraperAPI:** Required to bypass bot detection when visiting company websites and LinkedIn.\n   * **Google Gemini (or OpenAI):** Required for the AI Agents to analyze HTML.\n\n2. **Setup Google Sheet:**\n   * Create a new Sheet with these exact headers in Row 1: `Company Name`, `Linked Summary`, `employee count`, `industry`, `Emails`, `Phone`, `Website`.\n   * Connect the **Google Sheets** node to this file.\n\n3. **Configure Variables:**\n   * In the **Edit Fields** node (Start), enter your `search_query` (e.g., \"Plumbers in Chicago\").\n\n4. **Important Note:**\n   * This workflow uses a **Loop** with a 1.5s wait time to be polite to servers. A batch of 50 leads will take approximately 10-15 minutes to complete.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Serper Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "parse search results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Normalize leads",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Fetch Homepage",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "output combiner",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Linked in Details",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "LinkedIN scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "convert scrapable link",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "filter redirecting links",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Filter Linked In specific link",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Linked In Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Contact Page Scan Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Home Page Analyst",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Format for Sheets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

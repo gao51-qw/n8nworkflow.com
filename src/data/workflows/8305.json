@@ -1,0 +1,175 @@
+{
+  "id": 8305,
+  "slug": "8305",
+  "title": "Automate Everhour time-off sync to Google Calendar with all-day events",
+  "description": "## Who’s it for\nTeams that track absences in **Everhour** and want a shared **Google Calendar** view for quick planning. Ideal for managers, HR/OPS, and teammates who need instant visibility into approved time off.\n\n## What it does\n- Pulls **approved time-off** from Everhour on a schedule  \n- Creates/updates **all-day events** per day of absence in Google Calendar  \n- Removes **stale events** if a request changes or is canceled  \n- Uses a stable external key (`everhour:ASSIGNMENT_ID:YYYY-MM-DD`) to avoid duplicates\n\n## How it works\nA **Schedule Trigger** runs periodically → the workflow fetches Everhour assignments, filters **approved** time-off, expands multi-day requests into single-day items, then **searches by external key** to either create or update events. Separate cleanup steps **list** calendar events and **delete** any that are no longer present in Everhour.\n\n## How to set up\n1. In n8n, create an **HTTP Header Auth** credential for Everhour with header `X-Api-Key: {YOUR_EVERHOUR_API_KEY}\n`.  \n2. Add a **Google Calendar OAuth** credential.  \n3. Open the **Config** node and set your `calendarId` (e.g., `team@group.calendar.google.com`).  \n4. Enable the workflow and choose your schedule.\n\n## Requirements\n- Everhour account with API access  \n- Google Calendar (workspace or personal)  \n- n8n Cloud or self-hosted\n\n## How to customize the workflow\n- Adjust the **schedule** (hourly/daily).  \n- Filter by **user** or **time-off type**.  \n- Tweak the **event title/description** templates.  \n- Point to multiple calendars (duplicate the create/update branch per calendar).\n",
+  "featuredImage": "/data/workflows/8305/8305.webp",
+  "author": {
+    "id": 101,
+    "slug": "hosseinkarami",
+    "name": "Hossein Karami",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 112,
+  "downloads": 11,
+  "createdAt": "2025-09-05T17:45:10.113Z",
+  "updatedAt": "2026-01-16T08:55:13.220Z",
+  "publishedAt": "2025-09-05T17:45:10.113Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8305",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate Everhour time-off sync to Google Calendar with all-day events",
+    "workflowName": "Automate Everhour time-off sync to Google Calendar with all-day events",
+    "description": "## Who’s it for\nTeams that track absences in **Everhour** and want a shared **Google Calendar** view for quick planning. Ideal for managers, HR/OPS, and teammates who need instant visibility into approved time off.\n\n## What it does\n- Pulls **approved time-off** from Everhour on a schedule  \n- Creates/updates **all-day events** per day of absence in Google Calendar  \n- Removes **stale events** if a request changes or is canceled  \n- Uses a stable external key (`everhour:ASSIGNMENT_ID:YYYY-MM-DD`) to avoid duplicates\n\n## How it works\nA **Schedule Trigger** runs periodically → the workflow fetches Everhour assignments, filters **approved** time-off, expands multi-day requests into single-day items, then **searches by external key** to either create or update events. Separate cleanup steps **list** calendar events and **delete** any that are no longer present in Everhour.\n\n## How to set up\n1. In n8n, create an **HTTP Header Auth** credential for Everhour with header `X-Api-Key: {YOUR_EVERHOUR_API_KEY}\n`.  \n2. Add a **Google Calendar OAuth** credential.  \n3. Open the **Config** node and set your `calendarId` (e.g., `team@group.calendar.google.com`).  \n4. Enable the workflow and choose your schedule.\n\n## Requirements\n- Everhour account with API access  \n- Google Calendar (workspace or personal)  \n- n8n Cloud or self-hosted\n\n## How to customize the workflow\n- Adjust the **schedule** (hourly/daily).  \n- Filter by **user** or **time-off type**.  \n- Tweak the **event title/description** templates.  \n- Point to multiple calendars (duplicate the create/update branch per calendar).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Build Assignment Groups",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Build Global Key Set",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Everhour - Fetch Time Off",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter Approved Time-Off",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Build Calendar Payload",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare Time-Off Items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Find Existing Event by External Key",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Attach Found Event ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check if Event Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update All-Day Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create All-Day Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "List Assignment Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Find Obsolete Events (per assignment)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete Calendar Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "List All Everhour Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Find Obsolete Events (global)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "🗒️ Template Description (Read Me)",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Fetch Everhour",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Build Keys",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Upsert Events",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Cleanup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

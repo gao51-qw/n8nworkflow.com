@@ -1,0 +1,109 @@
+{
+  "id": 10378,
+  "slug": "10378",
+  "title": "Domain availability monitor with Porkbun, Google Sheets & multi-channel alerts",
+  "description": "This workflow automatically checks a list of desired domain names for availability every 30 minutes. Using the Porkbun API and Google Sheets, it instantly sends detailed notifications via Gmail and Discord the moment a domain becomes available, so you can secure it before anyone else.\n\n## Why Use This Workflow?\n\n**Time Savings:** Eliminates hours of manual domain checking each week. Set your list once and let the automation monitor your targets 24/7.\n\n**Competitive Edge:** Gain a critical speed advantage in acquiring high-value or expiring domains the second they become available.\n\n**Scalability:** Effortlessly monitor hundreds of domains simultaneously without any extra effort or performance degradation.\n\n## Ideal For\n\n- **Domain Investors:** Automatically track and snipe valuable expiring domains for their portfolio without constant manual checks.\n- **Marketing Agencies & SEO Specialists:** Secure brandable domains for new clients or build out private blog networks by catching domains as soon as they drop.\n- **Startups & Entrepreneurs:** Monitor desired brand names without the daily hassle, ensuring they get the perfect domain the moment it's available.\n\n## How It Works\n\n1. **Trigger:** A schedule trigger initiates the workflow every 30 minutes.\n2. **Data Collection:** It retrieves a list of domains to monitor from a designated Google Sheet, specifically targeting rows marked as \"no\" for availability.\n3. **Processing:** The workflow iterates through each domain one by one.\n4. **Intelligence Layer:** It makes an API call to Porkbun to check the current availability of the domain. An IF node then determines if the domain is available (`avail` == `yes`).\n5. **Output & Delivery:** If a domain is available, the workflow sends a rich HTML email via Gmail and a formatted message to a Discord channel, complete with pricing details and a direct registration link.\n6. **Storage & Logging:** The Google Sheet is automatically updated to mark the domain as \"available,\" preventing redundant notifications on future runs.\n\n## Setup Guide\n\n### Prerequisites\n\n| Requirement | Type | Purpose |\n|-------------|------|---------|\n| [n8n instance](https://n8n.partnerlinks.io/khmuhtadin) | Essential | Workflow execution platform |\n| [Porkbun Account](https://porkbun.com/) | Essential | API Access for domain checks |\n| Google Cloud Platform | Essential | Storing domain list (Sheets) & sending alerts (Gmail) |\n| Discord Server | Optional | Real-time channel notifications |\n\n### Installation Steps\n\n1. Import the JSON file to your [n8n instance](https://n8n.partnerlinks.io/khmuhtadin).\n2. **Create a Google Sheet** with two columns: `Domain` (e.g., example.com) and `isAvailable` (e.g., no).\n3. **Configure credentials:**\n   - **Porkbun**: Log in to Porkbun, go to API Access, create a new key, and copy the API Key and Secret Key into the HTTP Request nodes. A \"Validate API KEY\" node is included for testing your credentials.\n   - **Google Sheets/Gmail**: Authenticate your Google account for the Google Sheets and Gmail nodes.\n   - **Discord**: Create a Discord Bot and add the credentials to the Discord node.\n4. **Update environment-specific values:**\n   - **Get Domains from Sheet**: Enter your Google Sheet ID and select the correct sheet name.\n   - **Send Email Alert**: Set your recipient's email address in the \"To\" field.\n   - **Send Discord Notification**: Select your desired Server and Channel ID.\n5. **Test execution:**\n   - Add a domain you know is available to your Google Sheet (with `isAvailable` set to \"no\"). Run the workflow manually to verify that all connections work and you receive notifications.\n\n## Technical Details\n\n### Core Nodes\n\n| Node | Purpose | Key Configuration |\n|------|---------|-------------------|\n| Schedule Trigger | Initiates the workflow on a recurring basis. | Set the desired interval (default: 30 minutes). |\n| Google Sheets | Reads the domain list and updates its status. | Sheet ID, Sheet Name, and column mapping. |\n| SplitInBatches | Processes each domain from the list individually. | Batch size is set to 1 to check domains sequentially. |\n| HTTP Request | Queries the Porkbun API for domain availability. | Porkbun API endpoint and credentials. |\n| IF | Routes the workflow based on the API response. | Checks if `response.avail` equals \"yes\". |\n| Gmail | Sends a detailed email alert for available domains. | Recipient email, subject, and HTML body. |\n| Discord | Sends a concise notification to a Discord channel. | Server ID, Channel ID, and message content. |\n| Wait | Prevents API rate-limiting. | Pauses for 10 seconds between checking domains. |\n\n### Workflow Logic\n\nThe workflow is triggered by a schedule, fetching a list of domains from a Google Sheet. \n\nIt uses the `SplitInBatches` node to loop through each domain sequentially. \n\nFor every domain, it calls the Porkbun API. An `IF` node checks the response; if available, it triggers notifications and updates the Google Sheet. \n\nA `Wait` node is crucial for respecting API rate limits, ensuring the workflow runs smoothly even with large domain lists.\n\n## Customization Options\n\n**Basic Adjustments:**\n- **Check Frequency**: Modify the \"Schedule Trigger\" node to run more or less frequently.\n- **Notification Channels**: Remove the Gmail or Discord nodes, or add new ones like Slack or Telegram.\n- **Email Content**: Customize the HTML in the Gmail node to match your branding.\n\n**Advanced Enhancements:**\n- **Auto-Registration**: Extend the workflow to use Porkbun's domain registration API endpoint to automatically purchase the domain when it becomes available (use with caution).\n- **Advanced Filtering**: Add logic to only send notifications for domains with specific TLDs (.com, .io, etc.) or that are not marked as \"premium.\"\n- **Tiered Notifications**: Set up different notification channels based on the perceived value of the domain, sending high-priority alerts via SMS for critical domains.\n\n## Troubleshooting\n\n**Common Issues:**\n\n| Problem | Cause | Solution |\n|---------|-------|----------|\n| Workflow fails at HTTP Request node | Invalid Porkbun API credentials. | Use the separate \"Validate API KEY\" node to test your keys directly. Regenerate them if needed. |\n| No domains are processed | Google Sheets node configuration error or the sheet is empty. | Verify the Sheet ID is correct and that the `isAvailable` column contains \"no\" for the domains you want to check. |\n| Authentication errors | Google or Discord credentials have expired or lack permissions. | Re-authenticate the respective nodes in the n8n credentials panel. |\n\n\n---\n\n**Created by:** [Khaisa Studio](https://khaisa.studio)\n\n**Category:** Monitoring\n**Tags:** Porkbun, Domain, Automation, Google Sheets, Notifications\n\n**Need custom workflows?** [Contact us](https://khaisa.studio/pages/contact)\n\n**Connect with the creator:**\n\n[Portfolio](https://khmuhtadin.com) • [Workflows](https://khaisa.studio/products/) • [LinkedIn](https://www.linkedin.com/in/khmuhtadin/) • [Medium](https://medium.com/@khaisastudio) • [Threads](https://www.threads.com/@khmuhtadin)",
+  "featuredImage": "/data/workflows/10378/10378.webp",
+  "author": {
+    "id": 101,
+    "slug": "khmuhtadin",
+    "name": "Khairul Muhtadin",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 42,
+  "downloads": 4,
+  "createdAt": "2025-10-31T09:30:02.247Z",
+  "updatedAt": "2026-01-16T09:04:48.428Z",
+  "publishedAt": "2025-10-31T09:30:02.247Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10378",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Domain availability monitor with Porkbun, Google Sheets & multi-channel alerts",
+    "workflowName": "Domain availability monitor with Porkbun, Google Sheets & multi-channel alerts",
+    "description": "This workflow automatically checks a list of desired domain names for availability every 30 minutes. Using the Porkbun API and Google Sheets, it instantly sends detailed notifications via Gmail and Discord the moment a domain becomes available, so you can secure it before anyone else.\n\n## Why Use This Workflow?\n\n**Time Savings:** Eliminates hours of manual domain checking each week. Set your list once and let the automation monitor your targets 24/7.\n\n**Competitive Edge:** Gain a critical speed advantage in acquiring high-value or expiring domains the second they become available.\n\n**Scalability:** Effortlessly monitor hundreds of domains simultaneously without any extra effort or performance degradation.\n\n## Ideal For\n\n- **Domain Investors:** Automatically track and snipe valuable expiring domains for their portfolio without constant manual checks.\n- **Marketing Agencies & SEO Specialists:** Secure brandable domains for new clients or build out private blog networks by catching domains as soon as they drop.\n- **Startups & Entrepreneurs:** Monitor desired brand names without the daily hassle, ensuring they get the perfect domain the moment it's available.\n\n## How It Works\n\n1. **Trigger:** A schedule trigger initiates the workflow every 30 minutes.\n2. **Data Collection:** It retrieves a list of domains to monitor from a designated Google Sheet, specifically targeting rows marked as \"no\" for availability.\n3. **Processing:** The workflow iterates through each domain one by one.\n4. **Intelligence Layer:** It makes an API call to Porkbun to check the current availability of the domain. An IF node then determines if the domain is available (`avail` == `yes`).\n5. **Output & Delivery:** If a domain is available, the workflow sends a rich HTML email via Gmail and a formatted message to a Discord channel, complete with pricing details and a direct registration link.\n6. **Storage & Logging:** The Google Sheet is automatically updated to mark the domain as \"available,\" preventing redundant notifications on future runs.\n\n## Setup Guide\n\n### Prerequisites\n\n| Requirement | Type | Purpose |\n|-------------|------|---------|\n| [n8n instance](https://n8n.partnerlinks.io/khmuhtadin) | Essential | Workflow execution platform |\n| [Porkbun Account](https://porkbun.com/) | Essential | API Access for domain checks |\n| Google Cloud Platform | Essential | Storing domain list (Sheets) & sending alerts (Gmail) |\n| Discord Server | Optional | Real-time channel notifications |\n\n### Installation Steps\n\n1. Import the JSON file to your [n8n instance](https://n8n.partnerlinks.io/khmuhtadin).\n2. **Create a Google Sheet** with two columns: `Domain` (e.g., example.com) and `isAvailable` (e.g., no).\n3. **Configure credentials:**\n   - **Porkbun**: Log in to Porkbun, go to API Access, create a new key, and copy the API Key and Secret Key into the HTTP Request nodes. A \"Validate API KEY\" node is included for testing your credentials.\n   - **Google Sheets/Gmail**: Authenticate your Google account for the Google Sheets and Gmail nodes.\n   - **Discord**: Create a Discord Bot and add the credentials to the Discord node.\n4. **Update environment-specific values:**\n   - **Get Domains from Sheet**: Enter your Google Sheet ID and select the correct sheet name.\n   - **Send Email Alert**: Set your recipient's email address in the \"To\" field.\n   - **Send Discord Notification**: Select your desired Server and Channel ID.\n5. **Test execution:**\n   - Add a domain you know is available to your Google Sheet (with `isAvailable` set to \"no\"). Run the workflow manually to verify that all connections work and you receive notifications.\n\n## Technical Details\n\n### Core Nodes\n\n| Node | Purpose | Key Configuration |\n|------|---------|-------------------|\n| Schedule Trigger | Initiates the workflow on a recurring basis. | Set the desired interval (default: 30 minutes). |\n| Google Sheets | Reads the domain list and updates its status. | Sheet ID, Sheet Name, and column mapping. |\n| SplitInBatches | Processes each domain from the list individually. | Batch size is set to 1 to check domains sequentially. |\n| HTTP Request | Queries the Porkbun API for domain availability. | Porkbun API endpoint and credentials. |\n| IF | Routes the workflow based on the API response. | Checks if `response.avail` equals \"yes\". |\n| Gmail | Sends a detailed email alert for available domains. | Recipient email, subject, and HTML body. |\n| Discord | Sends a concise notification to a Discord channel. | Server ID, Channel ID, and message content. |\n| Wait | Prevents API rate-limiting. | Pauses for 10 seconds between checking domains. |\n\n### Workflow Logic\n\nThe workflow is triggered by a schedule, fetching a list of domains from a Google Sheet. \n\nIt uses the `SplitInBatches` node to loop through each domain sequentially. \n\nFor every domain, it calls the Porkbun API. An `IF` node checks the response; if available, it triggers notifications and updates the Google Sheet. \n\nA `Wait` node is crucial for respecting API rate limits, ensuring the workflow runs smoothly even with large domain lists.\n\n## Customization Options\n\n**Basic Adjustments:**\n- **Check Frequency**: Modify the \"Schedule Trigger\" node to run more or less frequently.\n- **Notification Channels**: Remove the Gmail or Discord nodes, or add new ones like Slack or Telegram.\n- **Email Content**: Customize the HTML in the Gmail node to match your branding.\n\n**Advanced Enhancements:**\n- **Auto-Registration**: Extend the workflow to use Porkbun's domain registration API endpoint to automatically purchase the domain when it becomes available (use with caution).\n- **Advanced Filtering**: Add logic to only send notifications for domains with specific TLDs (.com, .io, etc.) or that are not marked as \"premium.\"\n- **Tiered Notifications**: Set up different notification channels based on the perceived value of the domain, sending high-priority alerts via SMS for critical domains.\n\n## Troubleshooting\n\n**Common Issues:**\n\n| Problem | Cause | Solution |\n|---------|-------|----------|\n| Workflow fails at HTTP Request node | Invalid Porkbun API credentials. | Use the separate \"Validate API KEY\" node to test your keys directly. Regenerate them if needed. |\n| No domains are processed | Google Sheets node configuration error or the sheet is empty. | Verify the Sheet ID is correct and that the `isAvailable` column contains \"no\" for the domains you want to check. |\n| Authentication errors | Google or Discord credentials have expired or lack permissions. | Re-authenticate the respective nodes in the n8n credentials panel. |\n\n\n---\n\n**Created by:** [Khaisa Studio](https://khaisa.studio)\n\n**Category:** Monitoring\n**Tags:** Porkbun, Domain, Automation, Google Sheets, Notifications\n\n**Need custom workflows?** [Contact us](https://khaisa.studio/pages/contact)\n\n**Connect with the creator:**\n\n[Portfolio](https://khmuhtadin.com) • [Workflows](https://khaisa.studio/products/) • [LinkedIn](https://www.linkedin.com/in/khmuhtadin/) • [Medium](https://medium.com/@khaisastudio) • [Threads](https://www.threads.com/@khmuhtadin)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Validate API KEY",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Each Domain",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check Domain Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Domain Available?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Discord Notification",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Sheet: Mark Available",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Wait 10 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check every 30 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Domains from Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    }
+  ]
+}

@@ -1,0 +1,260 @@
+{
+  "id": 9267,
+  "slug": "9267",
+  "title": "Personalized cold email system with Google Gemini, Telegram approval & Google Sheets",
+  "description": "## Personalized Cold Email System with Google Gemini AI and Telegram Approval\n\nAn AI-powered cold email automation that uses Google Gemini to generate personalized outreach and a Telegram workflow for manual approval, ensuring high-quality, human-in-the-loop campaigns.\n\n### Features\n\n-   **Smart Lead Selection**: Fetches leads with an \"Available\" status from a designated Google Sheet.\n-   **AI Email Generation**: Google Gemini creates a personalized subject line and email body based on lead data.\n-   **Telegram Approval**: Sends each generated email to a Telegram chat for a one-click \"Approve\" or \"Reject\" decision.\n-   **Edit & Regenerate**: Allows users to provide feedback on rejected emails, which the AI uses to regenerate a new version for re-approval.\n-   **Auto-Send**: Approved emails are automatically dispatched via a configured SMTP server, including a professional signature.\n-   **Complete Tracking**: Updates three separate Google Sheets (Filtered Leads, Sent Leads, Emails Sent) to maintain a clear audit trail.\n-   **Rate Limiting**: A one-second delay between email sends helps avoid spam filters and protects sender reputation.\n-   **Batch Processing**: Handles three leads per execution by default, which is configurable to scale up or down.\n\n### How It Works\n\n1.  A manual trigger initiates the workflow and captures the current date and time for logging.\n2.  The system fetches a set number of leads (default is three) from the `Filtered Leads` sheet where the status is \"Available\".\n3.  It loops through each lead individually to generate and send a unique email.\n4.  The AI generates a personalized email (Subject + Body) using the lead's data.\n5.  A preview of the email is sent to a specified Telegram chat with \"Approve\" and \"Reject\" buttons.\n6.  **If approved**: The email is sent via SMTP. The lead's status is updated, and logs are written to the `Sent Leads` and `Emails Sent` sheets. The system waits one second before processing the next lead.\n7.  **If rejected**: The system prompts the user for feedback in Telegram. The feedback is combined with the original prompt to generate a new email draft, which is sent for re-approval.\n8.  A final notification is sent to Telegram when the batch is complete.\n\n### Requirements\n\n-   Google Sheets with three tabs (see structure below).\n-   Telegram Bot Token and user/group Chat ID.\n-   Google Gemini API Key.\n-   SMTP Email Account credentials (server, port, username, password).\n\n---\n\n## Setup Instructions\n\n1.  **Google Sheets Setup**: Create a new Google Sheet. Rename three tabs to exactly `Filtered Leads`, `Sent Leads`, and `Emails Sent`. Populate the `Filtered Leads` sheet with your lead data according to the structure specified below.\n2.  **API Credentials**:\n    * **Google Gemini**: Generate an API key from your Google AI Studio account.\n    * **Telegram Bot**: Create a new bot by messaging `@BotFather` on Telegram and follow the prompts to get your API token. Get your Chat ID by messaging `@userinfobot`.\n3.  **SMTP Configuration**: Obtain the SMTP server address, port, username, and password from your email provider (e.g., Google Workspace, Outlook).\n4.  **Automation Platform**: In your automation platform (e.g., n8n, Make), create a new workflow.\n    * Connect your Google Sheets account using OAuth2.\n    * Add the Gemini API Key, Telegram Bot Token, Chat ID, and SMTP credentials into the respective modules or credential stores.\n    * Map the sheet columns to the variables in the workflow modules.\n\n## Google Sheets Structure\n\nThe automation requires the following column headers in each sheet. The names must be exact.\n\n* **1. Filtered Leads (Input Sheet)**\n    * `FirstName`: Lead's first name.\n    * `LastName`: Lead's last name.\n    * `Email`: Lead's email address.\n    * `CompanyName`: Name of the lead's company.\n    * `JobTitle`: Lead's current job title.\n    * `Website`: Company website (for AI context).\n    * `LinkedIn`: URL of the lead's LinkedIn profile.\n    * `Notes`: Any specific details or pain points for personalization.\n    * `Status`: Workflow status. Set to `Available` for leads ready to be processed.\n\n* **2. Sent Leads (Tracking Sheet)**\n    * `Email`: Email address of the contacted lead.\n    * `CompanyName`: Name of the company.\n    * `TimestampSent`: Date and time the email was sent.\n\n* **3. Emails Sent (Archive Sheet)**\n    * `RecipientEmail`: The lead's email address.\n    * `Subject`: The exact subject line that was sent.\n    * `Body`: The full email body that was sent.\n    * `TimestampSent`: Date and time the email was sent.\n\n## Customization Guide\n\nThis template can be adapted to fit specific campaign needs.\n\n* **Batch Size**: The number of leads processed per execution is controlled by the initial \"Get Leads\" module. Change the `Limit` parameter from 3 to your desired number.\n* **AI Prompt**: The core of the personalization is the prompt sent to the Gemini API. Modify this prompt to change the email's tone, structure, or call-to-action. You can instruct the AI to focus on specific data from the `Notes` column or reference a different value proposition.\n* **Lead Filtering**: The trigger condition is set to pull leads where `Status = \"Available\"`. This can be changed to any other logic, such as `Priority = \"High\"` or `Campaign = \"Q4-Push\"`, by adjusting the filter in the Google Sheets module.\n* **Email Signature**: The signature is typically configured within the SMTP \"Send Email\" module. Update the HTML or plain text here to change the signature across all sends.\n* **Telegram Notifications**: The text and buttons sent to Telegram for approval can be modified. You can add more lead data to the approval message (e.g., Job Title, Company Name) to give the approver more context.",
+  "featuredImage": "/data/workflows/9267/9267.webp",
+  "author": {
+    "id": 101,
+    "slug": "asherif08",
+    "name": "Ahmed Sherif",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 487,
+  "downloads": 48,
+  "createdAt": "2025-10-04T20:03:11.372Z",
+  "updatedAt": "2026-01-16T08:59:45.547Z",
+  "publishedAt": "2025-10-04T20:03:11.372Z",
+  "nodes": 37,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9267",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Personalized cold email system with Google Gemini, Telegram approval & Google Sheets",
+    "workflowName": "Personalized cold email system with Google Gemini, Telegram approval & Google Sheets",
+    "description": "## Personalized Cold Email System with Google Gemini AI and Telegram Approval\n\nAn AI-powered cold email automation that uses Google Gemini to generate personalized outreach and a Telegram workflow for manual approval, ensuring high-quality, human-in-the-loop campaigns.\n\n### Features\n\n-   **Smart Lead Selection**: Fetches leads with an \"Available\" status from a designated Google Sheet.\n-   **AI Email Generation**: Google Gemini creates a personalized subject line and email body based on lead data.\n-   **Telegram Approval**: Sends each generated email to a Telegram chat for a one-click \"Approve\" or \"Reject\" decision.\n-   **Edit & Regenerate**: Allows users to provide feedback on rejected emails, which the AI uses to regenerate a new version for re-approval.\n-   **Auto-Send**: Approved emails are automatically dispatched via a configured SMTP server, including a professional signature.\n-   **Complete Tracking**: Updates three separate Google Sheets (Filtered Leads, Sent Leads, Emails Sent) to maintain a clear audit trail.\n-   **Rate Limiting**: A one-second delay between email sends helps avoid spam filters and protects sender reputation.\n-   **Batch Processing**: Handles three leads per execution by default, which is configurable to scale up or down.\n\n### How It Works\n\n1.  A manual trigger initiates the workflow and captures the current date and time for logging.\n2.  The system fetches a set number of leads (default is three) from the `Filtered Leads` sheet where the status is \"Available\".\n3.  It loops through each lead individually to generate and send a unique email.\n4.  The AI generates a personalized email (Subject + Body) using the lead's data.\n5.  A preview of the email is sent to a specified Telegram chat with \"Approve\" and \"Reject\" buttons.\n6.  **If approved**: The email is sent via SMTP. The lead's status is updated, and logs are written to the `Sent Leads` and `Emails Sent` sheets. The system waits one second before processing the next lead.\n7.  **If rejected**: The system prompts the user for feedback in Telegram. The feedback is combined with the original prompt to generate a new email draft, which is sent for re-approval.\n8.  A final notification is sent to Telegram when the batch is complete.\n\n### Requirements\n\n-   Google Sheets with three tabs (see structure below).\n-   Telegram Bot Token and user/group Chat ID.\n-   Google Gemini API Key.\n-   SMTP Email Account credentials (server, port, username, password).\n\n---\n\n## Setup Instructions\n\n1.  **Google Sheets Setup**: Create a new Google Sheet. Rename three tabs to exactly `Filtered Leads`, `Sent Leads`, and `Emails Sent`. Populate the `Filtered Leads` sheet with your lead data according to the structure specified below.\n2.  **API Credentials**:\n    * **Google Gemini**: Generate an API key from your Google AI Studio account.\n    * **Telegram Bot**: Create a new bot by messaging `@BotFather` on Telegram and follow the prompts to get your API token. Get your Chat ID by messaging `@userinfobot`.\n3.  **SMTP Configuration**: Obtain the SMTP server address, port, username, and password from your email provider (e.g., Google Workspace, Outlook).\n4.  **Automation Platform**: In your automation platform (e.g., n8n, Make), create a new workflow.\n    * Connect your Google Sheets account using OAuth2.\n    * Add the Gemini API Key, Telegram Bot Token, Chat ID, and SMTP credentials into the respective modules or credential stores.\n    * Map the sheet columns to the variables in the workflow modules.\n\n## Google Sheets Structure\n\nThe automation requires the following column headers in each sheet. The names must be exact.\n\n* **1. Filtered Leads (Input Sheet)**\n    * `FirstName`: Lead's first name.\n    * `LastName`: Lead's last name.\n    * `Email`: Lead's email address.\n    * `CompanyName`: Name of the lead's company.\n    * `JobTitle`: Lead's current job title.\n    * `Website`: Company website (for AI context).\n    * `LinkedIn`: URL of the lead's LinkedIn profile.\n    * `Notes`: Any specific details or pain points for personalization.\n    * `Status`: Workflow status. Set to `Available` for leads ready to be processed.\n\n* **2. Sent Leads (Tracking Sheet)**\n    * `Email`: Email address of the contacted lead.\n    * `CompanyName`: Name of the company.\n    * `TimestampSent`: Date and time the email was sent.\n\n* **3. Emails Sent (Archive Sheet)**\n    * `RecipientEmail`: The lead's email address.\n    * `Subject`: The exact subject line that was sent.\n    * `Body`: The full email body that was sent.\n    * `TimestampSent`: Date and time the email was sent.\n\n## Customization Guide\n\nThis template can be adapted to fit specific campaign needs.\n\n* **Batch Size**: The number of leads processed per execution is controlled by the initial \"Get Leads\" module. Change the `Limit` parameter from 3 to your desired number.\n* **AI Prompt**: The core of the personalization is the prompt sent to the Gemini API. Modify this prompt to change the email's tone, structure, or call-to-action. You can instruct the AI to focus on specific data from the `Notes` column or reference a different value proposition.\n* **Lead Filtering**: The trigger condition is set to pull leads where `Status = \"Available\"`. This can be changed to any other logic, such as `Priority = \"High\"` or `Campaign = \"Q4-Push\"`, by adjusting the filter in the Google Sheets module.\n* **Email Signature**: The signature is typically configured within the SMTP \"Send Email\" module. Update the HTML or plain text here to change the signature across all sends.\n* **Telegram Notifications**: The text and buttons sent to Telegram for approval can be modified. You can add more lead data to the approval message (e.g., Job Title, Company Name) to give the approver more context.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Setup Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Wait3",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Send a text message9",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send message and wait for response",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Simple Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filtered Leads Update",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sent Leads Append",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "AI Agent2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send message and wait for response1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Agent3",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Data and Agent output for",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Add Email Draft to Google Sheet",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Limit Sheets Get Function",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Lead from Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    }
+  ]
+}

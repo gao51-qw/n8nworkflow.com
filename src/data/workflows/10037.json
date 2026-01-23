@@ -1,0 +1,170 @@
+{
+  "id": 10037,
+  "slug": "10037",
+  "title": "Audio transcription with Telegram and Groq Whisper",
+  "description": "## Short description\nTranscribe Telegram voice/audio messages to text using Groq’s OpenAI-compatible Whisper endpoint. Replies are delivered either as a Telegram message or as a downloadable `.txt` file, plug-and-play for n8n with minimal setup.\n\n## Who’s it for / Uses\n- Educators, podcasters, interviewers, and support teams who need quick voice → text conversions.  \n- Automating meeting notes, voice feedback, voicemail transcription, or speech logging.  \n- Useful when you want transcripts pushed to chat or saved as files for archiving.\n\n## How it works (overview)\n1. **Telegram Trigger** — workflow starts on incoming message.  \n2. **Switch (Audio/Voice)** — detects `voice` or `audio`. If neither, replies “Wrong file type” and stops.  \n3. **Telegram Download** — downloads the audio using the `file_id`, outputs file path/binary.  \n4. **Set Node (credentials + options)** — stores `Groq_API` and `Telegram_access_token` (required) and `transcript_output_format` (`message` or `file`).  \n5. **HTTP Request → Groq (Whisper)** — uploads audio (multipart/form-data) to Groq’s transcription endpoint and receives text.  \n6. **Reply Switch** — routes to either:  \n   - **Message branch:** send transcribed text as a Telegram message.  \n   - **File branch:** convert transcript to `.txt` and send as a document.\n\n## Requirements\n- n8n instance (cloud or self-hosted) with internet access  \n- Telegram bot token (create via BotFather)  \n- Groq API key (create at https://console.groq.com/keys)  \n- Basic n8n nodes: Telegram Trigger, Switch, Telegram Download, Set, HTTP Request, Convert to File, Telegram Send Message/Document\n\n## Important setup & notes\n- **Mandatory:** Add `Groq_API` and `Telegram_access_token` in the **Set** node (or use n8n Credentials). The workflow will fail without them.  \n- **Do not hardcode** keys in HTTP node fields that will be exported/shared. Use Set fields or n8n Credentials.  \n- Include **sticky notes** explaining each node (yellow note with full description recommended). Sticky notes should show setup steps and required fields.  \n- Before publishing: remove personal IDs and secrets, test with sample voice messages, and verify Groq response schema to map the transcript field correctly.\n\n## Security & best practices\n- Use n8n Credentials or environment variables in production.  \n- Rotate API keys if they become exposed.  \n- Keep the Set node private when sharing templates; instruct users to replace keys with their own.\n",
+  "featuredImage": "/data/workflows/10037/10037.webp",
+  "author": {
+    "id": 101,
+    "slug": "abhimangs",
+    "name": "Abhiman",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 602,
+  "downloads": 60,
+  "createdAt": "2025-10-22T11:21:07.783Z",
+  "updatedAt": "2026-01-16T09:03:05.223Z",
+  "publishedAt": "2025-10-22T11:21:07.783Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10037",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Audio transcription with Telegram and Groq Whisper",
+    "workflowName": "Audio transcription with Telegram and Groq Whisper",
+    "description": "## Short description\nTranscribe Telegram voice/audio messages to text using Groq’s OpenAI-compatible Whisper endpoint. Replies are delivered either as a Telegram message or as a downloadable `.txt` file, plug-and-play for n8n with minimal setup.\n\n## Who’s it for / Uses\n- Educators, podcasters, interviewers, and support teams who need quick voice → text conversions.  \n- Automating meeting notes, voice feedback, voicemail transcription, or speech logging.  \n- Useful when you want transcripts pushed to chat or saved as files for archiving.\n\n## How it works (overview)\n1. **Telegram Trigger** — workflow starts on incoming message.  \n2. **Switch (Audio/Voice)** — detects `voice` or `audio`. If neither, replies “Wrong file type” and stops.  \n3. **Telegram Download** — downloads the audio using the `file_id`, outputs file path/binary.  \n4. **Set Node (credentials + options)** — stores `Groq_API` and `Telegram_access_token` (required) and `transcript_output_format` (`message` or `file`).  \n5. **HTTP Request → Groq (Whisper)** — uploads audio (multipart/form-data) to Groq’s transcription endpoint and receives text.  \n6. **Reply Switch** — routes to either:  \n   - **Message branch:** send transcribed text as a Telegram message.  \n   - **File branch:** convert transcript to `.txt` and send as a document.\n\n## Requirements\n- n8n instance (cloud or self-hosted) with internet access  \n- Telegram bot token (create via BotFather)  \n- Groq API key (create at https://console.groq.com/keys)  \n- Basic n8n nodes: Telegram Trigger, Switch, Telegram Download, Set, HTTP Request, Convert to File, Telegram Send Message/Document\n\n## Important setup & notes\n- **Mandatory:** Add `Groq_API` and `Telegram_access_token` in the **Set** node (or use n8n Credentials). The workflow will fail without them.  \n- **Do not hardcode** keys in HTTP node fields that will be exported/shared. Use Set fields or n8n Credentials.  \n- Include **sticky notes** explaining each node (yellow note with full description recommended). Sticky notes should show setup steps and required fields.  \n- Before publishing: remove personal IDs and secrets, test with sample voice messages, and verify Groq response schema to map the transcript field correctly.\n\n## Security & best practices\n- Use n8n Credentials or environment variables in production.  \n- Rotate API keys if they become exposed.  \n- Keep the Set node private when sharing templates; instruct users to replace keys with their own.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram: Receive Message",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Switch (Check Message Type)",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Telegram: Unsupported Type Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Node (audio type)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Node (voice type)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Telegram: Download Audio File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "HTTP - Transcribe Audio (Groq)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Set Credentials (Groq + Telegram)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Telegram: Send Output Options",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If: Output Type Selected",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Telegram: Send Transcript Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set: Transcribed Audio Text",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert to TXT File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send Transcript File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

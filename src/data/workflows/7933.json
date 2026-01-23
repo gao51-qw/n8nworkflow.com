@@ -1,0 +1,122 @@
+{
+  "id": 7933,
+  "slug": "7933",
+  "title": "Classify Intercom messages & route to ClickUp or Slack with GPT-4o-mini",
+  "description": "## How it works\nThis workflow automates the classification and routing of incoming Intercom conversations. When a new customer message arrives, it is analyzed by AI to determine category, sentiment, urgency, and tags. Based on this classification, the workflow creates tasks in ClickUp for Support or Product requests, or sends real-time alerts to Slack for Sales inquiries.\n\n## Step-by-step\n\n**Webhook Intake**\n\n- Triggered when Intercom sends a new conversation payload.\n\n- Captures customer details, message content, and metadata.\n\n**AI Classification**\n\n- Sends the conversation JSON to OpenAI (gpt-4o-mini) with a structured prompt.\n\n- AI returns a JSON object with category (Support, Product, Sales, Other), sentiment, urgency, reasoning, and tags.\n\n**Processing & Structuring**\n\n- A Code node parses the AI output and merges it with conversation details.\n\n- Prepares formatted task fields such as title, description, customer info, and priority.\n\n**Conditional Routing**\n\n- Support requests → Task created in ClickUp with urgency and tags.\n\n- Product requests → Task created in ClickUp with structured details.\n\n- Sales inquiries → Slack alert sent to the Sales channel with context and AI reasoning.\n\n- Other → No task/action triggered.\n\n## Benefits\n\n- Automates Intercom ticket triage and routing in real time.\n\n- Ensures consistent, AI-driven classification of all customer conversations.\n\n- Reduces manual review time for Support, Product, and Sales teams.\n\n- Creates structured tasks with enriched metadata for faster resolution.\n\n- Keeps Sales teams instantly informed with Slack alerts for urgent leads.",
+  "featuredImage": "/data/workflows/7933/7933.webp",
+  "author": {
+    "id": 101,
+    "slug": "itechnotion",
+    "name": "Avkash Kakdiya",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 115,
+  "downloads": 11,
+  "createdAt": "2025-08-27T06:23:34.581Z",
+  "updatedAt": "2026-01-16T08:53:06.356Z",
+  "publishedAt": "2025-08-27T06:23:34.581Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7933",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Classify Intercom messages & route to ClickUp or Slack with GPT-4o-mini",
+    "workflowName": "Classify Intercom messages & route to ClickUp or Slack with GPT-4o-mini",
+    "description": "## How it works\nThis workflow automates the classification and routing of incoming Intercom conversations. When a new customer message arrives, it is analyzed by AI to determine category, sentiment, urgency, and tags. Based on this classification, the workflow creates tasks in ClickUp for Support or Product requests, or sends real-time alerts to Slack for Sales inquiries.\n\n## Step-by-step\n\n**Webhook Intake**\n\n- Triggered when Intercom sends a new conversation payload.\n\n- Captures customer details, message content, and metadata.\n\n**AI Classification**\n\n- Sends the conversation JSON to OpenAI (gpt-4o-mini) with a structured prompt.\n\n- AI returns a JSON object with category (Support, Product, Sales, Other), sentiment, urgency, reasoning, and tags.\n\n**Processing & Structuring**\n\n- A Code node parses the AI output and merges it with conversation details.\n\n- Prepares formatted task fields such as title, description, customer info, and priority.\n\n**Conditional Routing**\n\n- Support requests → Task created in ClickUp with urgency and tags.\n\n- Product requests → Task created in ClickUp with structured details.\n\n- Sales inquiries → Slack alert sent to the Sales channel with context and AI reasoning.\n\n- Other → No task/action triggered.\n\n## Benefits\n\n- Automates Intercom ticket triage and routing in real time.\n\n- Ensures consistent, AI-driven classification of all customer conversations.\n\n- Reduces manual review time for Support, Product, and Sales teams.\n\n- Creates structured tasks with enriched metadata for faster resolution.\n\n- Keeps Sales teams instantly informed with Slack alerts for urgent leads.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "📨 Intercom Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🧠 Classifier – AI prompt",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GPT model (gpt-4o-mini)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "🧮 Process Classification",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "🛠️ Is Support Request?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "📦 Is Product Request?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "💼 Is Sales Request?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "🧾 Create Support Task",
+      "type": "n8n-nodes-base.clickUp",
+      "role": "clickUp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🛍️ Create Product Task",
+      "type": "n8n-nodes-base.clickUp",
+      "role": "clickUp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📣 Slack – Notify Sales team",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

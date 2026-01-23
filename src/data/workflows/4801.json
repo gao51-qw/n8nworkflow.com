@@ -1,0 +1,278 @@
+{
+  "id": 4801,
+  "slug": "4801",
+  "title": "Digest new YouTube videos to Slack with Google Sheets, RapidAPI & GPT-4o-mini",
+  "description": "## Who is this for?\n\nMarketing, content, and enablement teams that need a **quick, human-readable summary of every new video** published by the YouTube channels they care about—without leaving Slack.\n\n## What problem does this workflow solve?\n\nManually checking multiple channels, skimming long videos, and pasting the highlights into Slack wastes time. This template **automates the whole loop**: detect a fresh upload from your selected channels → pull subtitles → distill the key take-aways with GPT-4o-mini → drop a neatly-formatted digest in Slack.\n\n## What this workflow does\n\n1. **Schedule Trigger** fires every 10 min, then grabs a list of YouTube RSS feeds from a Google Sheet.\n2. **HTTP + XML** fetch & parse each feed; only brand-new videos continue.\n3. **YouTube API** fetches title/description, **RapidAPI** grabs English subtitles.\n4. Code nodes build an AI payload; **OpenAI** returns a JSON summary + article.\n5. A formatter turns that JSON into Slack Block Kit, and **Slack** posts it.\n6. Processed links are appended back to the “Video Links” sheet to prevent dupes.\n\n## Setup\n\n1. **Make a copy** of this [Google Sheet](https://docs.google.com/spreadsheets/d/1i3jZ_0npsEVtrMUSzGPV3Lbta3q7sArHHeNomlAuSMg/edit?usp=sharing) and connect a **Google Sheets OAuth2** credential with edit rights.\n2. **Slack App**: create → add `chat:write`, `channels:read`, `app_mention`; enable Event Subscriptions; install and store the **Bot OAuth token** in an n8n Slack credential.\n3. **RapidAPI key** for `https://yt-api.p.rapidapi.com/subtitles` (300 free calls/mo) → save as HTTP Header Auth.\n4. **OpenAI key** → save in an OpenAI credential.\n5. Add your RSS feed URLs to the “RSS Feed URLs” tab; press *Execute Workflow*.\n\n## How to customise\n\n* Adjust the schedule interval or freshness window in **“If newly published”**.\n* Swap the OpenAI model or prompt for shorter/longer digests.\n* Point the Slack node at a different channel or DM.\n* Extend the AI payload to include thumbnails or engagement stats.\n\n## Use-case ideas\n\n* **Product marketing**: Instantly brief sales & CS teams when a competitor uploads a feature demo.\n* **Internal learning hub**: Auto-summarise conference talks and share bullet-point notes with engineers.\n* **Social media managers**: Get ready-to-post captions and key moments for re-purposing across platforms.\n",
+  "featuredImage": "/data/workflows/4801/4801.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8nstein",
+    "name": "Naveen Choudhary",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1026,
+  "downloads": 102,
+  "createdAt": "2025-06-08T19:11:14.172Z",
+  "updatedAt": "2026-01-16T08:36:17.435Z",
+  "publishedAt": "2025-06-08T19:11:14.172Z",
+  "nodes": 40,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4801",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Digest new YouTube videos to Slack with Google Sheets, RapidAPI & GPT-4o-mini",
+    "workflowName": "Digest new YouTube videos to Slack with Google Sheets, RapidAPI & GPT-4o-mini",
+    "description": "## Who is this for?\n\nMarketing, content, and enablement teams that need a **quick, human-readable summary of every new video** published by the YouTube channels they care about—without leaving Slack.\n\n## What problem does this workflow solve?\n\nManually checking multiple channels, skimming long videos, and pasting the highlights into Slack wastes time. This template **automates the whole loop**: detect a fresh upload from your selected channels → pull subtitles → distill the key take-aways with GPT-4o-mini → drop a neatly-formatted digest in Slack.\n\n## What this workflow does\n\n1. **Schedule Trigger** fires every 10 min, then grabs a list of YouTube RSS feeds from a Google Sheet.\n2. **HTTP + XML** fetch & parse each feed; only brand-new videos continue.\n3. **YouTube API** fetches title/description, **RapidAPI** grabs English subtitles.\n4. Code nodes build an AI payload; **OpenAI** returns a JSON summary + article.\n5. A formatter turns that JSON into Slack Block Kit, and **Slack** posts it.\n6. Processed links are appended back to the “Video Links” sheet to prevent dupes.\n\n## Setup\n\n1. **Make a copy** of this [Google Sheet](https://docs.google.com/spreadsheets/d/1i3jZ_0npsEVtrMUSzGPV3Lbta3q7sArHHeNomlAuSMg/edit?usp=sharing) and connect a **Google Sheets OAuth2** credential with edit rights.\n2. **Slack App**: create → add `chat:write`, `channels:read`, `app_mention`; enable Event Subscriptions; install and store the **Bot OAuth token** in an n8n Slack credential.\n3. **RapidAPI key** for `https://yt-api.p.rapidapi.com/subtitles` (300 free calls/mo) → save as HTTP Header Auth.\n4. **OpenAI key** → save in an OpenAI credential.\n5. Add your RSS feed URLs to the “RSS Feed URLs” tab; press *Execute Workflow*.\n\n## How to customise\n\n* Adjust the schedule interval or freshness window in **“If newly published”**.\n* Swap the OpenAI model or prompt for shorter/longer digests.\n* Point the Slack node at a different channel or DM.\n* Extend the AI payload to include thumbnails or engagement stats.\n\n## Use-case ideas\n\n* **Product marketing**: Instantly brief sales & CS teams when a competitor uploads a feature demo.\n* **Internal learning hub**: Auto-summarise conference talks and share bullet-point notes with engineers.\n* **Social media managers**: Get ready-to-post captions and key moments for re-purposing across platforms.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Subtitles",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Timestamps",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Formatted Chapter Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate Slack Blocks - Detailed Summary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Formatted Transcript w/o Chapters",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If newly published",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check for new videos",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get RSS Links",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Filter for New Video",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Check if the Video Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Batch RSS Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Fetch RSS Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse RSS XML",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Video Details",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log New Videos",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Generate Summary",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Build AI Payload",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check for Timestamps",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch Subtitles URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Link is Processed",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "role": "slackTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Get Rows",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Delete Row",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Append Row",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Get Channel ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "RSS Feed URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

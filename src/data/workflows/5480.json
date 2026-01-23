@@ -1,0 +1,170 @@
+{
+  "id": 5480,
+  "slug": "5480",
+  "title": "Automated resume scoring with Gemini LLM, Gmail and Notion job profiles",
+  "description": "**This n8n template demonstrates how to use AI to score the all Resumes by matching it with Job profile**\n\nProblem Statement: A Hr person is flooded with resume and spends hours manually checking each to find most suitable ones.\n\n**How it works**\n1. It is linked to Gmail Trigger which upon receving any mail with specific subject will check for the attachment.\n2. Attachment will be parsed to understand the resume\n3. Candidate informtion will be broken into Personal, Eductional and Professional type\n4. Job profile will be pulled from Notion Board\n5. A HR expert powered by Gemini LLM will score each profile on basis on its relevancy \n6. Information will be updated back to Gsheet \n7. Message lable will be updated back for clarity\n\n**How to use**\n1. The gmail trigger node is used as an example but feel free to replace this with other triggers such as webhook or even a form.\n\n\n**Requirements**\nGemini account for LLM\nGoogle sheet for upload\nGmail as trigger\nLlama parse credentials\n",
+  "featuredImage": "/data/workflows/5480/5480.webp",
+  "author": {
+    "id": 101,
+    "slug": "arpanjain29",
+    "name": "Agentick AI",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3416,
+  "downloads": 341,
+  "createdAt": "2025-06-30T13:03:09.720Z",
+  "updatedAt": "2026-01-16T08:39:55.383Z",
+  "publishedAt": "2025-06-30T13:03:09.720Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5480",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated resume scoring with Gemini LLM, Gmail and Notion job profiles",
+    "workflowName": "Automated resume scoring with Gemini LLM, Gmail and Notion job profiles",
+    "description": "**This n8n template demonstrates how to use AI to score the all Resumes by matching it with Job profile**\n\nProblem Statement: A Hr person is flooded with resume and spends hours manually checking each to find most suitable ones.\n\n**How it works**\n1. It is linked to Gmail Trigger which upon receving any mail with specific subject will check for the attachment.\n2. Attachment will be parsed to understand the resume\n3. Candidate informtion will be broken into Personal, Eductional and Professional type\n4. Job profile will be pulled from Notion Board\n5. A HR expert powered by Gemini LLM will score each profile on basis on its relevancy \n6. Information will be updated back to Gsheet \n7. Message lable will be updated back for clarity\n\n**How to use**\n1. The gmail trigger node is used as an example but feel free to replace this with other triggers such as webhook or even a form.\n\n\n**Requirements**\nGemini account for LLM\nGoogle sheet for upload\nGmail as trigger\nLlama parse credentials",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Upload to LlamaParse",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Processing Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait to stay within service limits",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Is Job Ready?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Personal Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Professional Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Educational Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get Parsed Resume",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Job Profile",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HR Expert LLM",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Update Gsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Add label to message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

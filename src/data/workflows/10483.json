@@ -1,0 +1,134 @@
+{
+  "id": 10483,
+  "slug": "10483",
+  "title": "Moderate your Discord server using chatGPT-5 & Google Sheets (Learning system)",
+  "description": "# Discord AI Content Moderator with Learning System\n\nThis n8n template demonstrates how to automatically moderate Discord messages using AI-powered content analysis that learns from your community standards. It continuously monitors your server, intelligently flags problematic content while allowing context-appropriate language, and provides a complete audit trail for all moderation actions.\n\n## Use cases are many:\n\nTry moderating a forex trading community where enthusiasm runs high, protecting a gaming server from toxic behavior while keeping banter alive, or maintaining professional standards in a business Discord without being overly strict!\n\n## Good to know\n\n* This workflow uses OpenAI's GPT-5 Mini model which incurs API costs per message analyzed (approximately $0.001-0.003 per moderation check depending on message volume)\n* The workflow runs every minute by default - adjust the Schedule Trigger interval based on your server activity and budget\n* Discord API rate limits apply - the batch processor includes 1.5-second delays between deletions to prevent rate limiting\n* You'll need a Google Sheet to store training examples - a template link is provided in the workflow notes\n* The AI analyzes context and intent, not just keywords - \"I **cking love this community\" won't be deleted, but \"you guys are sh*t\" will be\n* Deleted messages cannot be recovered from Discord - the admin notification channel preserves the content for review\n\n## How it works\n\n* The Schedule Trigger activates every minute to check for new messages requiring moderation\n* We'll fetch training data from Google Sheets containing labeled examples of messages to delete (with reasons) and messages to keep\n* The workflow retrieves the last 10 messages from your specified Discord channel using the Discord API\n* A preparation node formats both the training examples and recent messages into a structured prompt with unique indices for each message\n* The AI Agent (powered by GPT-5 Mini) analyzes each message against your community standards, considering intent and context rather than just keywords\n* The AI returns a JSON array of message indices that violate guidelines (e.g., [0, 2, 5])\n* A parsing node extracts these indices, validates them, removes duplicates, and maps them to actual Discord message objects\n* The batch processor loops through each flagged message one at a time to prevent API rate limiting and ensure proper error handling\n* Each message is deleted from Discord using the exact message ID\n* A 1.5-second wait prevents hitting Discord's rate limits between operations\n* Finally, an admin notification is posted to your designated admin channel with the deleted message's author, ID, and original content for audit purposes\n\n## How to use\n\n* Replace the Discord Server ID, Moderated Channel ID, and Admin Channel ID in the \"Edit Fields\" node with your server's specific IDs\n* Create a copy of the provided Google Sheets template with columns: message_content, should_delete (YES/NO), and reason\n* Connect your Discord OAuth2 credentials (requires bot permissions for reading messages, deleting messages, and posting to channels)\n* Add your OpenAI API key to access GPT-5 Mini\n* Customize the AI Agent's system message to reflect your specific community standards and tone\n* Adjust the message fetch limit (default: 10) based on your server activity - higher limits cost more per run but catch more violations\n* Consider changing the Schedule Trigger from every minute to every 3-5 minutes if you have a smaller community\n\n## Requirements\n\n* Discord OAuth2 credentials for bot authentication with message read, delete, and send permissions\n* Google Sheets API connection for accessing the training data knowledge base\n* OpenAI API key for GPT-5 Mini model access\n* A Google Sheet formatted with message examples, deletion labels, and reasoning\n* Discord Server ID, Channel IDs (moderated + admin) which you can get by enabling Developer Mode in Discord\n\n## Customising this workflow\n\n* Try building an emoji-based feedback system where admins can react to notifications with ✅ (correct deletion) or ❌ (wrong deletion) to automatically update your training data\n* Add a severity scoring system that issues warnings for minor violations before deleting messages\n* Implement a user strike system that tracks repeat offenders and automatically applies temporary mutes or bans\n* Expand the AI prompt to categorize violations (spam, harassment, profanity, etc.) and route different types to different admin channels\n* Create a weekly digest that summarizes moderation statistics and trending violation types\n* Add support for monitoring multiple channels by duplicating the Discord message fetch nodes with different channel IDs\n* Integrate with a database instead of Google Sheets for faster lookups and more sophisticated training data management\n\n\n## If you have questions \nFeel free to contact me here:\n\nelijahmamuri@gmail.com\nelijahfxtrading@gmail.com",
+  "featuredImage": "/data/workflows/10483/10483.webp",
+  "author": {
+    "id": 101,
+    "slug": "elijahbuilds-ai",
+    "name": "Cj Elijah Garay",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 82,
+  "downloads": 8,
+  "createdAt": "2025-11-03T21:38:31.499Z",
+  "updatedAt": "2026-01-16T09:05:13.118Z",
+  "publishedAt": "2025-11-03T21:38:31.499Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10483",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Moderate your Discord server using chatGPT-5 & Google Sheets (Learning system)",
+    "workflowName": "Moderate your Discord server using chatGPT-5 & Google Sheets (Learning system)",
+    "description": "# Discord AI Content Moderator with Learning System\n\nThis n8n template demonstrates how to automatically moderate Discord messages using AI-powered content analysis that learns from your community standards. It continuously monitors your server, intelligently flags problematic content while allowing context-appropriate language, and provides a complete audit trail for all moderation actions.\n\n## Use cases are many:\n\nTry moderating a forex trading community where enthusiasm runs high, protecting a gaming server from toxic behavior while keeping banter alive, or maintaining professional standards in a business Discord without being overly strict!\n\n## Good to know\n\n* This workflow uses OpenAI's GPT-5 Mini model which incurs API costs per message analyzed (approximately $0.001-0.003 per moderation check depending on message volume)\n* The workflow runs every minute by default - adjust the Schedule Trigger interval based on your server activity and budget\n* Discord API rate limits apply - the batch processor includes 1.5-second delays between deletions to prevent rate limiting\n* You'll need a Google Sheet to store training examples - a template link is provided in the workflow notes\n* The AI analyzes context and intent, not just keywords - \"I **cking love this community\" won't be deleted, but \"you guys are sh*t\" will be\n* Deleted messages cannot be recovered from Discord - the admin notification channel preserves the content for review\n\n## How it works\n\n* The Schedule Trigger activates every minute to check for new messages requiring moderation\n* We'll fetch training data from Google Sheets containing labeled examples of messages to delete (with reasons) and messages to keep\n* The workflow retrieves the last 10 messages from your specified Discord channel using the Discord API\n* A preparation node formats both the training examples and recent messages into a structured prompt with unique indices for each message\n* The AI Agent (powered by GPT-5 Mini) analyzes each message against your community standards, considering intent and context rather than just keywords\n* The AI returns a JSON array of message indices that violate guidelines (e.g., [0, 2, 5])\n* A parsing node extracts these indices, validates them, removes duplicates, and maps them to actual Discord message objects\n* The batch processor loops through each flagged message one at a time to prevent API rate limiting and ensure proper error handling\n* Each message is deleted from Discord using the exact message ID\n* A 1.5-second wait prevents hitting Discord's rate limits between operations\n* Finally, an admin notification is posted to your designated admin channel with the deleted message's author, ID, and original content for audit purposes\n\n## How to use\n\n* Replace the Discord Server ID, Moderated Channel ID, and Admin Channel ID in the \"Edit Fields\" node with your server's specific IDs\n* Create a copy of the provided Google Sheets template with columns: message_content, should_delete (YES/NO), and reason\n* Connect your Discord OAuth2 credentials (requires bot permissions for reading messages, deleting messages, and posting to channels)\n* Add your OpenAI API key to access GPT-5 Mini\n* Customize the AI Agent's system message to reflect your specific community standards and tone\n* Adjust the message fetch limit (default: 10) based on your server activity - higher limits cost more per run but catch more violations\n* Consider changing the Schedule Trigger from every minute to every 3-5 minutes if you have a smaller community\n\n## Requirements\n\n* Discord OAuth2 credentials for bot authentication with message read, delete, and send permissions\n* Google Sheets API connection for accessing the training data knowledge base\n* OpenAI API key for GPT-5 Mini model access\n* A Google Sheet formatted with message examples, deletion labels, and reasoning\n* Discord Server ID, Channel IDs (moderated + admin) which you can get by enabling Developer Mode in Discord\n\n## Customising this workflow\n\n* Try building an emoji-based feedback system where admins can react to notifications with ✅ (correct deletion) or ❌ (wrong deletion) to automatically update your training data\n* Add a severity scoring system that issues warnings for minor violations before deleting messages\n* Implement a user strike system that tracks repeat offenders and automatically applies temporary mutes or bans\n* Expand the AI prompt to categorize violations (spam, harassment, profanity, etc.) and route different types to different admin channels\n* Create a weekly digest that summarizes moderation statistics and trending violation types\n* Add support for monitoring multiple channels by duplicating the Discord message fetch nodes with different channel IDs\n* Integrate with a database instead of Google Sheets for faster lookups and more sophisticated training data management\n\n\n## If you have questions \nFeel free to contact me here:\n\nelijahmamuri@gmail.com\nelijahfxtrading@gmail.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "update admin channel about moderation",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "delete bad content",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GPT5 mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get only the bad messages",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get sheet knowledgebase",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Main Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Training Data Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analysis Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Processing Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get recent messages",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "prep messages for AI",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set Credentials Here",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "id": 6373,
+  "slug": "6373",
+  "title": "Yelp business scraper by URL with Bright Data API and Google Sheets",
+  "description": "# Yelp Business Scraper by URL via Bright Data API with Google Sheets Storage\n\n## Overview\n\nThis n8n workflow automates the process of scraping comprehensive business information from Yelp using individual business URLs. It integrates with Bright Data for professional web scraping and Google Sheets for centralized data storage, providing detailed business intelligence for market research, competitor analysis, and lead generation.\n\n## Workflow Components\n\n### 1. 📥 **Form Trigger**\n- **Type**: Form Trigger\n- **Purpose**: Initiates the workflow with user-submitted Yelp business URL\n- **Input Fields**:\n  - URL (Yelp business page URL)\n- **Function**: Captures target business URL to start the scraping process\n\n### 2. 🔍 **Trigger Bright Data Scrape**\n- **Type**: HTTP Request (POST)\n- **Purpose**: Sends scraping request to Bright Data API for Yelp business data\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/trigger`\n- **Parameters**:\n  - Dataset ID: `gd_lgugwl0519h1p14rwk`\n  - Include errors: true\n  - Limit multiple results: 5\n  - Limit per input: 20\n- **Function**: Initiates comprehensive business data extraction from Yelp\n\n### 3. 📡 **Monitor Snapshot Status**\n- **Type**: HTTP Request (GET)\n- **Purpose**: Monitors the progress of the Yelp scraping job\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/progress/{snapshot_id}`\n- **Function**: Checks if the business data scraping is complete\n\n### 4. ⏳ **Wait 30 Sec for Snapshot**\n- **Type**: Wait Node\n- **Purpose**: Implements intelligent polling mechanism\n- **Duration**: 30 seconds\n- **Function**: Pauses workflow before rechecking scraping status to optimize API usage\n\n### 5. 🔁 **Retry Until Ready**\n- **Type**: IF Condition\n- **Purpose**: Evaluates scraping completion status\n- **Condition**: `status === \"ready\"`\n- **Logic**:\n  - True: Proceeds to data retrieval\n  - False: Loops back to status monitoring with wait\n\n### 6. 📥 **Fetch Scraped Business Data**\n- **Type**: HTTP Request (GET)\n- **Purpose**: Retrieves the final scraped business information\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}`\n- **Format**: JSON\n- **Function**: Downloads completed Yelp business data with comprehensive details\n\n### 7. 📊 **Store to Google Sheet**\n- **Type**: Google Sheets Node\n- **Purpose**: Stores scraped business data for analysis and storage\n- **Operation**: Append rows\n- **Target**: \"Yelp scraper data by URL\" sheet\n- **Data Mapping**:\n  - Business Name, Overall Rating, Reviews Count\n  - Business URL, Images/Videos URLs\n  - Additional business metadata fields\n\n## Workflow Flow\n\n```\nForm Input → Trigger Scrape → Monitor Status → Wait 30s → Check Ready\n                                    ↑              ↓\n                                    └─── Loop ─────┘\n                                           ↓\n                              Fetch Data → Store to Sheet\n```\n\n## Configuration Requirements\n\n### API Keys & Credentials\n- **Bright Data API Key**: Required for Yelp business scraping\n- **Google Sheets OAuth2**: For data storage and export access\n- **n8n Form Webhook**: For user input collection\n\n### Setup Parameters\n- **Google Sheet ID**: Target spreadsheet identifier\n- **Dataset ID**: `gd_lgugwl0519h1p14rwk` (Yelp business scraper)\n- **Form Webhook ID**: User input form identifier\n- **Google Sheets Credential ID**: OAuth2 authentication\n\n## Key Features\n\n### **Comprehensive Business Data Extraction**\n- Complete business profile information\n- Customer ratings and review counts\n- Contact details and business hours\n- Photo and video content URLs\n- Location and category information\n\n### **Intelligent Status Monitoring**\n- Real-time scraping progress tracking\n- Automatic retry mechanisms with 30-second intervals\n- Status validation before data retrieval\n- Error handling and timeout management\n\n### **Centralized Data Storage**\n- Automatic Google Sheets export\n- Organized business data format\n- Historical scraping records\n- Easy sharing and collaboration\n\n### **URL-Based Processing**\n- Direct Yelp business URL input\n- Single business deep-dive analysis\n- Flexible input through web form\n- Real-time workflow triggering\n\n## Use Cases\n\n### **Market Research**\n- Competitor business analysis\n- Local market intelligence gathering\n- Industry benchmark establishment\n- Service offering comparison\n\n### **Lead Generation**\n- Business contact information extraction\n- Potential client identification\n- Market opportunity assessment\n- Sales prospect development\n\n### **Business Intelligence**\n- Customer sentiment analysis through ratings\n- Competitor performance monitoring\n- Market positioning research\n- Brand reputation tracking\n\n### **Location Analysis**\n- Geographic business distribution\n- Local competition assessment\n- Market saturation evaluation\n- Expansion opportunity identification\n\n## Data Output Fields\n\n| Field | Description | Example |\n|-------|-------------|---------|\n| Name | Business name | \"Joe's Pizza Restaurant\" |\n| Overall Rating | Average customer rating | \"4.5\" |\n| Reviews Count | Total number of reviews | \"247\" |\n| URL | Original Yelp business URL | \"https://www.yelp.com/biz/joes-pizza...\" |\n| Images/Videos URLs | Media content links | \"https://s3-media1.fl.yelpcdn.com/...\" |\n\n## Technical Notes\n\n- **Polling Interval**: 30-second status checks for optimal API usage\n- **Result Limiting**: Maximum 20 businesses per input, 5 multiple results\n- **Data Format**: JSON with structured field mapping\n- **Error Handling**: Comprehensive error tracking in all API requests\n- **Retry Logic**: Automatic status rechecking until completion\n- **Form Input**: Single URL field with validation\n- **Storage Format**: Structured Google Sheets with predefined columns\n\n## Setup Instructions\n\n### Step 1: Import Workflow\n1. Copy the JSON workflow configuration\n2. Import into n8n: **Workflows** → **Import from JSON**\n3. Paste configuration and save\n\n### Step 2: Configure Bright Data\n1. **Set up credentials:**\n   - Navigate to **Credentials** → **Add Bright Data API**\n   - Enter your Bright Data API key\n   - Test connection\n\n2. **Update API key references:**\n   - Replace `BRIGHT_DATA_API_KEY` in all HTTP request nodes\n   - Verify dataset access for `gd_lgugwl0519h1p14rwk`\n\n### Step 3: Configure Google Sheets\n1. **Create target spreadsheet:**\n   - Create new Google Sheet named \"Yelp Business Data\" or similar\n   - Copy the Sheet ID from URL\n\n2. **Set up OAuth2 credentials:**\n   - Add **Google Sheets OAuth2** credential in n8n\n   - Complete authentication process\n\n3. **Update workflow references:**\n   - Replace `YOUR_GOOGLE_SHEET_ID` with actual Sheet ID\n   - Update `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID` with credential reference\n\n### Step 4: Test and Activate\n1. **Test with sample URL:**\n   - Use a known Yelp business URL\n   - Monitor execution progress\n   - Verify data appears in Google Sheet\n\n2. **Activate workflow:**\n   - Toggle workflow to \"Active\"\n   - Share form URL with users\n\n## Sample Business Data\n\nThe workflow captures comprehensive business information including:\n\n- **Basic Information**: Name, category, location\n- **Performance Metrics**: Ratings, review counts, popularity\n- **Contact Details**: Phone, website, address\n- **Visual Content**: Photos, videos, gallery URLs\n- **Operational Data**: Hours, services, amenities\n- **Customer Feedback**: Review summaries, sentiment indicators\n\n## Advanced Configuration\n\n### **Batch Processing**\nModify the input to accept multiple URLs:\n```json\n[\n  {\"url\": \"https://www.yelp.com/biz/business-1\"},\n  {\"url\": \"https://www.yelp.com/biz/business-2\"},\n  {\"url\": \"https://www.yelp.com/biz/business-3\"}\n]\n```\n\n### **Enhanced Data Fields**\nAdd more extraction fields by updating the dataset configuration:\n- Business hours and schedule\n- Menu items and pricing\n- Customer photos and reviews\n- Special offers and promotions\n\n### **Notification Integration**\nAdd alert mechanisms:\n- Email notifications for completed scrapes\n- Slack messages for team updates\n- Webhook triggers for external systems\n\n## Error Handling\n\n### **Common Issues**\n- **Invalid URL**: Ensure URL is a valid Yelp business page\n- **Rate Limiting**: Bright Data API usage limits exceeded\n- **Authentication**: Google Sheets or Bright Data credential issues\n- **Data Format**: Unexpected response structure from Yelp\n\n### **Troubleshooting Steps**\n1. **Verify URLs**: Ensure Yelp business URLs are correctly formatted\n2. **Check Credentials**: Validate all API keys and OAuth tokens\n3. **Monitor Logs**: Review n8n execution logs for detailed errors\n4. **Test Connectivity**: Verify network access to all external services\n\n## Performance Specifications\n\n- **Processing Time**: 2-5 minutes per business URL\n- **Data Accuracy**: 95%+ for publicly available business information\n- **Success Rate**: 90%+ for valid Yelp business URLs\n- **Concurrent Processing**: Depends on Bright Data plan limits\n- **Storage Capacity**: Unlimited (Google Sheets based)\n\n---\n\n**For any questions or support, please contact:  \n[info@incrementors.com](mailto:info@incrementors.com)  \nor fill out this form: [https://www.incrementors.com/contact-us/](https://www.incrementors.com/contact-us/)\n",
+  "featuredImage": "/data/workflows/6373/6373.webp",
+  "author": {
+    "id": 101,
+    "slug": "incrementors",
+    "name": "Incrementors",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 321,
+  "downloads": 32,
+  "createdAt": "2025-07-24T09:22:25.419Z",
+  "updatedAt": "2026-01-16T08:44:39.618Z",
+  "publishedAt": "2025-07-24T09:22:25.419Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6373",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Yelp business scraper by URL with Bright Data API and Google Sheets",
+    "workflowName": "Yelp business scraper by URL with Bright Data API and Google Sheets",
+    "description": "# Yelp Business Scraper by URL via Bright Data API with Google Sheets Storage\n\n## Overview\n\nThis n8n workflow automates the process of scraping comprehensive business information from Yelp using individual business URLs. It integrates with Bright Data for professional web scraping and Google Sheets for centralized data storage, providing detailed business intelligence for market research, competitor analysis, and lead generation.\n\n## Workflow Components\n\n### 1. 📥 **Form Trigger**\n- **Type**: Form Trigger\n- **Purpose**: Initiates the workflow with user-submitted Yelp business URL\n- **Input Fields**:\n  - URL (Yelp business page URL)\n- **Function**: Captures target business URL to start the scraping process\n\n### 2. 🔍 **Trigger Bright Data Scrape**\n- **Type**: HTTP Request (POST)\n- **Purpose**: Sends scraping request to Bright Data API for Yelp business data\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/trigger`\n- **Parameters**:\n  - Dataset ID: `gd_lgugwl0519h1p14rwk`\n  - Include errors: true\n  - Limit multiple results: 5\n  - Limit per input: 20\n- **Function**: Initiates comprehensive business data extraction from Yelp\n\n### 3. 📡 **Monitor Snapshot Status**\n- **Type**: HTTP Request (GET)\n- **Purpose**: Monitors the progress of the Yelp scraping job\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/progress/{snapshot_id}`\n- **Function**: Checks if the business data scraping is complete\n\n### 4. ⏳ **Wait 30 Sec for Snapshot**\n- **Type**: Wait Node\n- **Purpose**: Implements intelligent polling mechanism\n- **Duration**: 30 seconds\n- **Function**: Pauses workflow before rechecking scraping status to optimize API usage\n\n### 5. 🔁 **Retry Until Ready**\n- **Type**: IF Condition\n- **Purpose**: Evaluates scraping completion status\n- **Condition**: `status === \"ready\"`\n- **Logic**:\n  - True: Proceeds to data retrieval\n  - False: Loops back to status monitoring with wait\n\n### 6. 📥 **Fetch Scraped Business Data**\n- **Type**: HTTP Request (GET)\n- **Purpose**: Retrieves the final scraped business information\n- **Endpoint**: `https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}`\n- **Format**: JSON\n- **Function**: Downloads completed Yelp business data with comprehensive details\n\n### 7. 📊 **Store to Google Sheet**\n- **Type**: Google Sheets Node\n- **Purpose**: Stores scraped business data for analysis and storage\n- **Operation**: Append rows\n- **Target**: \"Yelp scraper data by URL\" sheet\n- **Data Mapping**:\n  - Business Name, Overall Rating, Reviews Count\n  - Business URL, Images/Videos URLs\n  - Additional business metadata fields\n\n## Workflow Flow\n\n```\nForm Input → Trigger Scrape → Monitor Status → Wait 30s → Check Ready\n                                    ↑              ↓\n                                    └─── Loop ─────┘\n                                           ↓\n                              Fetch Data → Store to Sheet\n```\n\n## Configuration Requirements\n\n### API Keys & Credentials\n- **Bright Data API Key**: Required for Yelp business scraping\n- **Google Sheets OAuth2**: For data storage and export access\n- **n8n Form Webhook**: For user input collection\n\n### Setup Parameters\n- **Google Sheet ID**: Target spreadsheet identifier\n- **Dataset ID**: `gd_lgugwl0519h1p14rwk` (Yelp business scraper)\n- **Form Webhook ID**: User input form identifier\n- **Google Sheets Credential ID**: OAuth2 authentication\n\n## Key Features\n\n### **Comprehensive Business Data Extraction**\n- Complete business profile information\n- Customer ratings and review counts\n- Contact details and business hours\n- Photo and video content URLs\n- Location and category information\n\n### **Intelligent Status Monitoring**\n- Real-time scraping progress tracking\n- Automatic retry mechanisms with 30-second intervals\n- Status validation before data retrieval\n- Error handling and timeout management\n\n### **Centralized Data Storage**\n- Automatic Google Sheets export\n- Organized business data format\n- Historical scraping records\n- Easy sharing and collaboration\n\n### **URL-Based Processing**\n- Direct Yelp business URL input\n- Single business deep-dive analysis\n- Flexible input through web form\n- Real-time workflow triggering\n\n## Use Cases\n\n### **Market Research**\n- Competitor business analysis\n- Local market intelligence gathering\n- Industry benchmark establishment\n- Service offering comparison\n\n### **Lead Generation**\n- Business contact information extraction\n- Potential client identification\n- Market opportunity assessment\n- Sales prospect development\n\n### **Business Intelligence**\n- Customer sentiment analysis through ratings\n- Competitor performance monitoring\n- Market positioning research\n- Brand reputation tracking\n\n### **Location Analysis**\n- Geographic business distribution\n- Local competition assessment\n- Market saturation evaluation\n- Expansion opportunity identification\n\n## Data Output Fields\n\n| Field | Description | Example |\n|-------|-------------|---------|\n| Name | Business name | \"Joe's Pizza Restaurant\" |\n| Overall Rating | Average customer rating | \"4.5\" |\n| Reviews Count | Total number of reviews | \"247\" |\n| URL | Original Yelp business URL | \"https://www.yelp.com/biz/joes-pizza...\" |\n| Images/Videos URLs | Media content links | \"https://s3-media1.fl.yelpcdn.com/...\" |\n\n## Technical Notes\n\n- **Polling Interval**: 30-second status checks for optimal API usage\n- **Result Limiting**: Maximum 20 businesses per input, 5 multiple results\n- **Data Format**: JSON with structured field mapping\n- **Error Handling**: Comprehensive error tracking in all API requests\n- **Retry Logic**: Automatic status rechecking until completion\n- **Form Input**: Single URL field with validation\n- **Storage Format**: Structured Google Sheets with predefined columns\n\n## Setup Instructions\n\n### Step 1: Import Workflow\n1. Copy the JSON workflow configuration\n2. Import into n8n: **Workflows** → **Import from JSON**\n3. Paste configuration and save\n\n### Step 2: Configure Bright Data\n1. **Set up credentials:**\n   - Navigate to **Credentials** → **Add Bright Data API**\n   - Enter your Bright Data API key\n   - Test connection\n\n2. **Update API key references:**\n   - Replace `BRIGHT_DATA_API_KEY` in all HTTP request nodes\n   - Verify dataset access for `gd_lgugwl0519h1p14rwk`\n\n### Step 3: Configure Google Sheets\n1. **Create target spreadsheet:**\n   - Create new Google Sheet named \"Yelp Business Data\" or similar\n   - Copy the Sheet ID from URL\n\n2. **Set up OAuth2 credentials:**\n   - Add **Google Sheets OAuth2** credential in n8n\n   - Complete authentication process\n\n3. **Update workflow references:**\n   - Replace `YOUR_GOOGLE_SHEET_ID` with actual Sheet ID\n   - Update `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID` with credential reference\n\n### Step 4: Test and Activate\n1. **Test with sample URL:**\n   - Use a known Yelp business URL\n   - Monitor execution progress\n   - Verify data appears in Google Sheet\n\n2. **Activate workflow:**\n   - Toggle workflow to \"Active\"\n   - Share form URL with users\n\n## Sample Business Data\n\nThe workflow captures comprehensive business information including:\n\n- **Basic Information**: Name, category, location\n- **Performance Metrics**: Ratings, review counts, popularity\n- **Contact Details**: Phone, website, address\n- **Visual Content**: Photos, videos, gallery URLs\n- **Operational Data**: Hours, services, amenities\n- **Customer Feedback**: Review summaries, sentiment indicators\n\n## Advanced Configuration\n\n### **Batch Processing**\nModify the input to accept multiple URLs:\n```json\n[\n  {\"url\": \"https://www.yelp.com/biz/business-1\"},\n  {\"url\": \"https://www.yelp.com/biz/business-2\"},\n  {\"url\": \"https://www.yelp.com/biz/business-3\"}\n]\n```\n\n### **Enhanced Data Fields**\nAdd more extraction fields by updating the dataset configuration:\n- Business hours and schedule\n- Menu items and pricing\n- Customer photos and reviews\n- Special offers and promotions\n\n### **Notification Integration**\nAdd alert mechanisms:\n- Email notifications for completed scrapes\n- Slack messages for team updates\n- Webhook triggers for external systems\n\n## Error Handling\n\n### **Common Issues**\n- **Invalid URL**: Ensure URL is a valid Yelp business page\n- **Rate Limiting**: Bright Data API usage limits exceeded\n- **Authentication**: Google Sheets or Bright Data credential issues\n- **Data Format**: Unexpected response structure from Yelp\n\n### **Troubleshooting Steps**\n1. **Verify URLs**: Ensure Yelp business URLs are correctly formatted\n2. **Check Credentials**: Validate all API keys and OAuth tokens\n3. **Monitor Logs**: Review n8n execution logs for detailed errors\n4. **Test Connectivity**: Verify network access to all external services\n\n## Performance Specifications\n\n- **Processing Time**: 2-5 minutes per business URL\n- **Data Accuracy**: 95%+ for publicly available business information\n- **Success Rate**: 90%+ for valid Yelp business URLs\n- **Concurrent Processing**: Depends on Bright Data plan limits\n- **Storage Capacity**: Unlimited (Google Sheets based)\n\n---\n\n**For any questions or support, please contact:  \n[info@incrementors.com](mailto:info@incrementors.com)  \nor fill out this form: [https://www.incrementors.com/contact-us/](https://www.incrementors.com/contact-us/)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📥 Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🔍 Trigger Bright Data Scrape",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📡 Monitor Snapshot Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "⏳ Wait 30 Sec for Snapshot",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🔁 Retry Until Ready",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📥 Fetch Scraped Business Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📊 Store to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

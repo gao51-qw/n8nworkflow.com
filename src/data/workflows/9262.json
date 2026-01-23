@@ -1,0 +1,145 @@
+{
+  "id": 9262,
+  "slug": "9262",
+  "title": "Send automatic WhatsApp order confirmations from Shopify with Rapiwa API",
+  "description": "# Send Automatic WhatsApp Order Confirmations from Shopify with Rapiwa API\n\n## Who’s it for\nThis **n8n workflow** helps Shopify store owners and teams **automatically confirm orders via WhatsApp**. It checks if the customer's number is valid using **Rapiwa API**, sends a personalized message, and logs every attempt in **Google Sheets**—saving time and reducing manual work.\n\nWhether you're a solo entrepreneur or managing a small team, this solution gives you a **low-cost alternative** to the official WhatsApp Business API, without losing control or personalization.\n\n## Features\n- Receives new order details via webhook upon order creation or update.\n- Iterates over incoming data in manageable batches for smoother processing.\n- Extracts and formats customer and order details from the Shopify webhook payload.\n- Strips non-numeric characters from WhatsApp numbers for consistent formatting.\n- Uses Rapiwa API to check if the WhatsApp number is valid and active.\n- Branches the workflow based on number validity — separates verified from unverified.\n- Sends a custom WhatsApp confirmation message to verified customers using Rapiwa.\n- Updates Google Sheet rows with `status` and `validity`\n\n## How it Works / What It Does\n* Triggered by a **Shopify webhook** or by reading rows from a **Google Sheet**.\n* **Normalizes and cleans** the order payload.\n* Extracts details like customer name, phone, items, shipping, and payment info.\n* Cleans phone numbers (removes special characters).\n* Verifies if the number is registered on WhatsApp via **Rapiwa API**.\n* If valid:\n\n  * Sends a **templated WhatsApp message**.\n  * Updates Google Sheet with `validity = verified` and `status = sent`.\n* If invalid:\n\n  * Skips sending.\n  * Updates sheet with `validity = unverified` and `status = not sent`.\n* Adds **wait/delay between sends** to prevent rate limits.\n* Keeps an **audit trail** in the connected Google Sheet.\n\n---\n\n## How to Set Up\n1. Set up a **Shopify webhook** for new orders (or connect a Google Sheet).\n2. Create a Google Sheet with columns:\n\n   * `name`, `number`, `order id`, `item name`, `total price`, `validity`, `status`\n3. Create and configure a **Rapiwa Bearer token** in n8n.\n4. Add **Google Sheets OAuth2 credential** in n8n.\n5. Import the workflow in n8n and configure these nodes:\n   * Webhook or Sheet Trigger\n   * Loop Over Items (SplitInBatches)\n   * Normalize Payload (Code)\n   * Clean WhatsApp Number (Code)\n   * Rapiwa WhatsApp Check (HTTP Request)\n   * Conditional Branch (If)\n   * Send WhatsApp Message (HTTP Request)\n   * Update Google Sheet (Google Sheets)\n   * Wait Node (delay per send)\n\n---\n\n## Requirements\n* Shopify store with order webhook enabled (or order list in Google Sheet)\n* A verified **Rapiwa API token**\n* A working **n8n instance** with HTTP and Google Sheets nodes enabled\n* A Google Sheet with required structure and valid OAuth credentials in n8n\n\n---\n\n## How to Customize the Workflow\n* Modify the **message template** with your own brand tone or emojis.\n* Add **country-code logic** in the Clean Number node if needed.\n* Use a **unique `order id`** in your Google Sheet to prevent mismatches.\n* Increase or decrease delay in the Wait node (e.g., 5–10 seconds).\n* Use additional logic in Code nodes to handle discounts, promotions, or more line items.\n\n---\n\n## Workflow Highlights\n- Triggered by **Shopify webhook** update.\n- Receiving new order data form Shopify using webhook\n- Cleans and extracts order data from raw payload.\n- Normalizing and validating the customer’s WhatsApp number using the **Rapiwa API**\n- Verifies WhatsApp number using **Rapiwa's `verify-whatsapp` endpoint**.\n- Sends order confirmation via **Rapiwa's `send-message` endpoint**.\n- Logs every result into **Google Sheets** (verified/unverified + sent/not sent).\n\n---\n\n## Setup in n8n\n\n### 1. Check WhatsApp Registration\n* Use an HTTP Request node:\n\n  * URL: `https://app.rapiwa.com/api/verify-whatsapp`\n  * Method: `POST`\n  * Auth: `httpBearerAuth` using your Rapiwa token\n  * Body: `{ \"number\": \"cleaned_number\" }`\n\n### 2. Branch Based on Validity\n* Use an `If` node:\n\n  * Condition: `{{ $json.data.exists }} == true` (or `\"true\"` if string)\n\n### 3. Send Message via Rapiwa\n* Endpoint: `https://app.rapiwa.com/api/send-message`\n* Method: `POST`\n* Body:\n\n ```\n Hi *{{ $json.customer_full_name }}*,\n Thank you for shopping with *SpaGreen Creative*! We're happy to confirm that your order has been successfully placed.\n 🧾 Order Details\n • Product: {{ $json.line_item.title }}\n • SKU: {{ $json.line_item.sku }}\n • Quantity: {{ $json.line_item.quantity }}\n • Vendor: {{ $json.line_item.vendor }}\n • Order ID: {{ $json.name }}\n • Product ID: {{ $json.line_item.product_id }}\n 📦 Shipping Information\n {{ $json.shipping_address.address1 }} {{ $json.shipping_address.address2 }}\n {{ $json.shipping_address.city }}, {{ $json.shipping_address.country }} - {{ $json.shipping_address.zip }}\n 💳 Payment Summary\n • Subtotal: {{ $json.subtotal_price }} BDT\n • Tax (VAT): {{ $json.total_tax_amount }} BDT\n • Shipping: {{ $json.total_shipping_amount }} BDT\n • Discount: {{ $json.total_discount_amount }} BDT\n • Total Paid: {{ $json.total_price }} BDT\n Order Date: {{ $json.created_date }}\n Warm wishes,\n *Team SpaGreen Creative*\n ```\n\n## Sample Google Sheet Structure\n- **A Google Sheet** formatted like this ➤ [Sample](https://docs.google.com/spreadsheets/d/1b5b9kvkfuCMtZ-7Z-w21sXOmHFmQ30N1iQPc2WMStEo/edit?usp=sharing)  \n\n\n| name        | number        | order id      | item name                      | total price | validity | status |\n| ----------- | ------------- | ------------- | ------------------------------ | ----------- | -------- | ------ |\n| Abdul Mannan | 8801322827799| 8986469695806 | Iphone 10                      | 1150        | verified | sent   |\n| Abdul Mannan | 8801322827799| 8986469695806 | S25 UltraXXXXeen Android Phone | 23000       | verified | sent   |\n\n---\n\n## Tips\n* Always ensure phone numbers have a country code (e.g., 880 for BD).\n* Clean numbers with regex: `replace(/\\D/g, '')`\n* Adjust Rapiwa API response parsing depending on actual structure (`true` vs `\"true\"`).\n* Use `row_number` for sheet updates, or unique `order id` for better targeting.\n* Use the Wait node to add 3–10 seconds between sends.\n\n---\n\n## Important Notes\n* Avoid reordering sheet rows—updates rely on consistent `row_number`.\n* `shopify-app-auth` is the credential name used in the export—make sure it's your Rapiwa token.\n* Use a test sheet before going live.\n* Rapiwa has request limits—avoid rapid sending.\n* Add media/image logic later using `message_type: media`.\n\n---\n\n## Future Enhancements (Ideas)\n* Add Telegram/Slack alert once the batch finishes.\n* Include media (e.g., product image, invoice) in the message.\n* Detect and resend failed messages.\n* Integrate with Shopify’s GraphQL API for additional data.\n* Auto-mark fulfillment status based on WhatsApp confirmation.\n\n---\n\n## Support & Community\n* WhatsApp: [8801322827799](https://wa.me/8801322827799)\n* Discord: [discord](https://discord.gg/SsCChWEP)\n* Facebook Group: [facebook group](https://www.facebook.com/groups/spagreenbd)\n* Website: [https://spagreen.net](https://spagreen.net)\n* Envato/Codecanyon: [codecanyon portfolio](https://codecanyon.net/user/spagreen/portfolio)\n\n---",
+  "featuredImage": "/data/workflows/9262/9262.webp",
+  "author": {
+    "id": 101,
+    "slug": "spagreen",
+    "name": "SpaGreen Creative",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 695,
+  "downloads": 69,
+  "createdAt": "2025-10-04T15:42:49.853Z",
+  "updatedAt": "2026-01-16T08:59:43.170Z",
+  "publishedAt": "2025-10-04T15:42:49.853Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9262",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Send automatic WhatsApp order confirmations from Shopify with Rapiwa API",
+    "workflowName": "Send automatic WhatsApp order confirmations from Shopify with Rapiwa API",
+    "description": "# Send Automatic WhatsApp Order Confirmations from Shopify with Rapiwa API\n\n## Who’s it for\nThis **n8n workflow** helps Shopify store owners and teams **automatically confirm orders via WhatsApp**. It checks if the customer's number is valid using **Rapiwa API**, sends a personalized message, and logs every attempt in **Google Sheets**—saving time and reducing manual work.\n\nWhether you're a solo entrepreneur or managing a small team, this solution gives you a **low-cost alternative** to the official WhatsApp Business API, without losing control or personalization.\n\n## Features\n- Receives new order details via webhook upon order creation or update.\n- Iterates over incoming data in manageable batches for smoother processing.\n- Extracts and formats customer and order details from the Shopify webhook payload.\n- Strips non-numeric characters from WhatsApp numbers for consistent formatting.\n- Uses Rapiwa API to check if the WhatsApp number is valid and active.\n- Branches the workflow based on number validity — separates verified from unverified.\n- Sends a custom WhatsApp confirmation message to verified customers using Rapiwa.\n- Updates Google Sheet rows with `status` and `validity`\n\n## How it Works / What It Does\n* Triggered by a **Shopify webhook** or by reading rows from a **Google Sheet**.\n* **Normalizes and cleans** the order payload.\n* Extracts details like customer name, phone, items, shipping, and payment info.\n* Cleans phone numbers (removes special characters).\n* Verifies if the number is registered on WhatsApp via **Rapiwa API**.\n* If valid:\n\n  * Sends a **templated WhatsApp message**.\n  * Updates Google Sheet with `validity = verified` and `status = sent`.\n* If invalid:\n\n  * Skips sending.\n  * Updates sheet with `validity = unverified` and `status = not sent`.\n* Adds **wait/delay between sends** to prevent rate limits.\n* Keeps an **audit trail** in the connected Google Sheet.\n\n---\n\n## How to Set Up\n1. Set up a **Shopify webhook** for new orders (or connect a Google Sheet).\n2. Create a Google Sheet with columns:\n\n   * `name`, `number`, `order id`, `item name`, `total price`, `validity`, `status`\n3. Create and configure a **Rapiwa Bearer token** in n8n.\n4. Add **Google Sheets OAuth2 credential** in n8n.\n5. Import the workflow in n8n and configure these nodes:\n   * Webhook or Sheet Trigger\n   * Loop Over Items (SplitInBatches)\n   * Normalize Payload (Code)\n   * Clean WhatsApp Number (Code)\n   * Rapiwa WhatsApp Check (HTTP Request)\n   * Conditional Branch (If)\n   * Send WhatsApp Message (HTTP Request)\n   * Update Google Sheet (Google Sheets)\n   * Wait Node (delay per send)\n\n---\n\n## Requirements\n* Shopify store with order webhook enabled (or order list in Google Sheet)\n* A verified **Rapiwa API token**\n* A working **n8n instance** with HTTP and Google Sheets nodes enabled\n* A Google Sheet with required structure and valid OAuth credentials in n8n\n\n---\n\n## How to Customize the Workflow\n* Modify the **message template** with your own brand tone or emojis.\n* Add **country-code logic** in the Clean Number node if needed.\n* Use a **unique `order id`** in your Google Sheet to prevent mismatches.\n* Increase or decrease delay in the Wait node (e.g., 5–10 seconds).\n* Use additional logic in Code nodes to handle discounts, promotions, or more line items.\n\n---\n\n## Workflow Highlights\n- Triggered by **Shopify webhook** update.\n- Receiving new order data form Shopify using webhook\n- Cleans and extracts order data from raw payload.\n- Normalizing and validating the customer’s WhatsApp number using the **Rapiwa API**\n- Verifies WhatsApp number using **Rapiwa's `verify-whatsapp` endpoint**.\n- Sends order confirmation via **Rapiwa's `send-message` endpoint**.\n- Logs every result into **Google Sheets** (verified/unverified + sent/not sent).\n\n---\n\n## Setup in n8n\n\n### 1. Check WhatsApp Registration\n* Use an HTTP Request node:\n\n  * URL: `https://app.rapiwa.com/api/verify-whatsapp`\n  * Method: `POST`\n  * Auth: `httpBearerAuth` using your Rapiwa token\n  * Body: `{ \"number\": \"cleaned_number\" }`\n\n### 2. Branch Based on Validity\n* Use an `If` node:\n\n  * Condition: `{{ $json.data.exists }} == true` (or `\"true\"` if string)\n\n### 3. Send Message via Rapiwa\n* Endpoint: `https://app.rapiwa.com/api/send-message`\n* Method: `POST`\n* Body:\n\n ```\n Hi *{{ $json.customer_full_name }}*,\n Thank you for shopping with *SpaGreen Creative*! We're happy to confirm that your order has been successfully placed.\n 🧾 Order Details\n • Product: {{ $json.line_item.title }}\n • SKU: {{ $json.line_item.sku }}\n • Quantity: {{ $json.line_item.quantity }}\n • Vendor: {{ $json.line_item.vendor }}\n • Order ID: {{ $json.name }}\n • Product ID: {{ $json.line_item.product_id }}\n 📦 Shipping Information\n {{ $json.shipping_address.address1 }} {{ $json.shipping_address.address2 }}\n {{ $json.shipping_address.city }}, {{ $json.shipping_address.country }} - {{ $json.shipping_address.zip }}\n 💳 Payment Summary\n • Subtotal: {{ $json.subtotal_price }} BDT\n • Tax (VAT): {{ $json.total_tax_amount }} BDT\n • Shipping: {{ $json.total_shipping_amount }} BDT\n • Discount: {{ $json.total_discount_amount }} BDT\n • Total Paid: {{ $json.total_price }} BDT\n Order Date: {{ $json.created_date }}\n Warm wishes,\n *Team SpaGreen Creative*\n ```\n\n## Sample Google Sheet Structure\n- **A Google Sheet** formatted like this ➤ [Sample](https://docs.google.com/spreadsheets/d/1b5b9kvkfuCMtZ-7Z-w21sXOmHFmQ30N1iQPc2WMStEo/edit?usp=sharing)  \n\n\n| name        | number        | order id      | item name                      | total price | validity | status |\n| ----------- | ------------- | ------------- | ------------------------------ | ----------- | -------- | ------ |\n| Abdul Mannan | 8801322827799| 8986469695806 | Iphone 10                      | 1150        | verified | sent   |\n| Abdul Mannan | 8801322827799| 8986469695806 | S25 UltraXXXXeen Android Phone | 23000       | verified | sent   |\n\n---\n\n## Tips\n* Always ensure phone numbers have a country code (e.g., 880 for BD).\n* Clean numbers with regex: `replace(/\\D/g, '')`\n* Adjust Rapiwa API response parsing depending on actual structure (`true` vs `\"true\"`).\n* Use `row_number` for sheet updates, or unique `order id` for better targeting.\n* Use the Wait node to add 3–10 seconds between sends.\n\n---\n\n## Important Notes\n* Avoid reordering sheet rows—updates rely on consistent `row_number`.\n* `shopify-app-auth` is the credential name used in the export—make sure it's your Rapiwa token.\n* Use a test sheet before going live.\n* Rapiwa has request limits—avoid rapid sending.\n* Add media/image logic later using `message_type: media`.\n\n---\n\n## Future Enhancements (Ideas)\n* Add Telegram/Slack alert once the batch finishes.\n* Include media (e.g., product image, invoice) in the message.\n* Detect and resend failed messages.\n* Integrate with Shopify’s GraphQL API for additional data.\n* Auto-mark fulfillment status based on WhatsApp confirmation.\n\n---\n\n## Support & Community\n* WhatsApp: [8801322827799](https://wa.me/8801322827799)\n* Discord: [discord](https://discord.gg/SsCChWEP)\n* Facebook Group: [facebook group](https://www.facebook.com/groups/spagreenbd)\n* Website: [https://spagreen.net](https://spagreen.net)\n* Envato/Codecanyon: [codecanyon portfolio](https://codecanyon.net/user/spagreen/portfolio)\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean WhatsApp Number",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check valid whatsapp number Using Rapiwa1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Change State of Rows in Unverified & Not Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Send Message Using Rapiwa",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Change State of Rows in Verified & Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clean Webhooks Response Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

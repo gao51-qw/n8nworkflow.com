@@ -1,0 +1,308 @@
+{
+  "id": 9007,
+  "slug": "9007",
+  "title": "Create a self-updating RAG chatbot with Google Drive, Gemini, and Supabase",
+  "description": "This template creates a comprehensive, production-ready Retrieval-Augmented Generation (RAG) system. It builds a sophisticated AI agent that can answer questions based on documents stored in a specific Google Drive folder, and it automatically keeps its knowledge base up-to-date as you add, update, or remove files.\n\n**Who’s it for?**\n\nThis workflow is perfect for developers, businesses, and AI agencies looking to:\n\nCreate an internal knowledge base chatbot for employees (e.g., for HR policies, technical documentation, or project information).\n\nBuild an intelligent support agent that uses your company's official documents as its source of truth.\n\nDevelop advanced AI solutions for clients that require a self-maintaining knowledge base.\n\n**How it works?**\n\nThis workflow is divided into three distinct, powerful systems:\n\nThe RAG Agent: This is the core chatbot. It receives a user's question, uses a Supabase Vector Store to find the most relevant document snippets, leverages a Cohere Reranker to improve accuracy, and uses a Postgres database to maintain conversation history (memory). It then uses Google Gemini to generate a final, context-aware answer.\n\nThe Ingestion Pipeline: This system automates the process of learning new information. It triggers whenever a file is created or updated in your designated Google Drive folder. It intelligently detects the file type (Google Doc or PDF), extracts the text, splits it into manageable chunks, generates embeddings using Gemini, and stores them in your Supabase vector database.\n\nThe Cleanup System: To ensure your knowledge base remains accurate, a scheduled process runs periodically to find and remove data from Supabase that corresponds to files that have been deleted from the Google Drive folder. This prevents the agent from using outdated information.\n\n**How to set up**\n\nTo get this workflow running, you will need to configure the following:\n\nCredentials: Connect your accounts in the n8n credential manager for:\n\nGoogle Drive (OAuth2)\n\nSupabase (API Key)\n\nPostgres\n\nGoogle Gemini (API Key from Google AI Studio)\n\nCohere (API Key)\n\nGoogle Drive Folder: In the Search files and folders node, replace the placeholder folder ID with the ID of the Google Drive folder you want to monitor.\n\nDatabase Setup: Ensure your Supabase and Postgres instances are set up with the necessary tables. You'll need a documents table in Supabase for the vectors and a document_metadata table in Postgres.\n\nHow to customize the workflow\nThis template is a powerful starting point. You can easily customize it by:\n\nSwapping out the LLM (e.g., use OpenAI or Anthropic instead of Gemini).\n\nChanging the vector database (e.g., Pinecone, Weaviate).\n\nAdding more data sources, such as Notion, Slack, or websites.\n\n",
+  "featuredImage": "/data/workflows/9007/9007.webp",
+  "author": {
+    "id": 101,
+    "slug": "anirudhaeran",
+    "name": "Anirudh Aeran",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1223,
+  "downloads": 122,
+  "createdAt": "2025-09-27T08:59:54.454Z",
+  "updatedAt": "2026-01-16T08:58:41.596Z",
+  "publishedAt": "2025-09-27T08:59:54.454Z",
+  "nodes": 45,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9007",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create a self-updating RAG chatbot with Google Drive, Gemini, and Supabase",
+    "workflowName": "Create a self-updating RAG chatbot with Google Drive, Gemini, and Supabase",
+    "description": "This template creates a comprehensive, production-ready Retrieval-Augmented Generation (RAG) system. It builds a sophisticated AI agent that can answer questions based on documents stored in a specific Google Drive folder, and it automatically keeps its knowledge base up-to-date as you add, update, or remove files.\n\n**Who’s it for?**\n\nThis workflow is perfect for developers, businesses, and AI agencies looking to:\n\nCreate an internal knowledge base chatbot for employees (e.g., for HR policies, technical documentation, or project information).\n\nBuild an intelligent support agent that uses your company's official documents as its source of truth.\n\nDevelop advanced AI solutions for clients that require a self-maintaining knowledge base.\n\n**How it works?**\n\nThis workflow is divided into three distinct, powerful systems:\n\nThe RAG Agent: This is the core chatbot. It receives a user's question, uses a Supabase Vector Store to find the most relevant document snippets, leverages a Cohere Reranker to improve accuracy, and uses a Postgres database to maintain conversation history (memory). It then uses Google Gemini to generate a final, context-aware answer.\n\nThe Ingestion Pipeline: This system automates the process of learning new information. It triggers whenever a file is created or updated in your designated Google Drive folder. It intelligently detects the file type (Google Doc or PDF), extracts the text, splits it into manageable chunks, generates embeddings using Gemini, and stores them in your Supabase vector database.\n\nThe Cleanup System: To ensure your knowledge base remains accurate, a scheduled process runs periodically to find and remove data from Supabase that corresponds to files that have been deleted from the Google Drive folder. This prevents the agent from using outdated information.\n\n**How to set up**\n\nTo get this workflow running, you will need to configure the following:\n\nCredentials: Connect your accounts in the n8n credential manager for:\n\nGoogle Drive (OAuth2)\n\nSupabase (API Key)\n\nPostgres\n\nGoogle Gemini (API Key from Google AI Studio)\n\nCohere (API Key)\n\nGoogle Drive Folder: In the Search files and folders node, replace the placeholder folder ID with the ID of the Google Drive folder you want to monitor.\n\nDatabase Setup: Ensure your Supabase and Postgres instances are set up with the necessary tables. You'll need a documents table in Supabase for the vectors and a document_metadata table in Postgres.\n\nHow to customize the workflow\nThis template is a powerful starting point. You can easily customize it by:\n\nSwapping out the LLM (e.g., use OpenAI or Anthropic instead of Gemini).\n\nChanging the vector database (e.g., Pinecone, Weaviate).\n\nAdding more data sources, such as Notion, Slack, or websites.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Reranker Cohere",
+      "type": "@n8n/n8n-nodes-langchain.rerankerCohere",
+      "role": "rerankerCohere",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RAG Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "File Created",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "File Updated",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Document Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete Old Doc Rows",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set File ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Insert into Supabase Vectorstore",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Insert Document Metadata",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Default Data Loader1",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download File1",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get File IDs",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete Rows",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get File IDs2",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Supabase2",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete Rows2",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search files and folders",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Google Gemini1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

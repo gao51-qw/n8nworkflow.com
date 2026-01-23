@@ -1,0 +1,146 @@
+{
+  "id": 3796,
+  "slug": "3796",
+  "title": "Auto-generate meeting attendee research with GPT-4o, Google Calendar, and Gmail",
+  "description": "### How it works:\n\nWhenever a new event is scheduled on your Google Calendar, this workflow generates a Meeting Briefing email, giving an overview of each person on the call and the company they work for.\n\nIt makes use of the [web search](https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses) tool on the OpenAI Responses API to make lookups.\n\nThe workflow triggers when a new event is added to the calendar, loops over each attendee, generating reports on each person and their company, collates the results, and sends the briefing as an email.\n\n### Set up steps:\n\n- Add your credentials for Google Calendar (for viewing events) and Gmail (to send the email)\n- Add your OpenAI credentials as a Header Auth on the Company Search and Person Search nodes.\n\t- Name: Authorization\n\t- Value: Bearer {{ YOUR_API_KEY }}\n- Edit the \"Edit Fields\" node with the email that you want to send the briefing to, and a short bit of context about yourself.",
+  "featuredImage": "/data/workflows/3796/3796.webp",
+  "author": {
+    "id": 101,
+    "slug": "adamjanes",
+    "name": "Adam Janes",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8199,
+  "downloads": 819,
+  "createdAt": "2025-04-30T03:54:36.015Z",
+  "updatedAt": "2026-01-16T08:31:30.588Z",
+  "publishedAt": "2025-04-30T03:54:36.015Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3796",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-generate meeting attendee research with GPT-4o, Google Calendar, and Gmail",
+    "workflowName": "Auto-generate meeting attendee research with GPT-4o, Google Calendar, and Gmail",
+    "description": "### How it works:\n\nWhenever a new event is scheduled on your Google Calendar, this workflow generates a Meeting Briefing email, giving an overview of each person on the call and the company they work for.\n\nIt makes use of the [web search](https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses) tool on the OpenAI Responses API to make lookups.\n\nThe workflow triggers when a new event is added to the calendar, loops over each attendee, generating reports on each person and their company, collates the results, and sends the briefing as an email.\n\n### Set up steps:\n\n- Add your credentials for Google Calendar (for viewing events) and Gmail (to send the email)\n- Add your OpenAI credentials as a Header Auth on the Company Search and Person Search nodes.\n\t- Name: Authorization\n\t- Value: Bearer {{ YOUR_API_KEY }}\n- Edit the \"Edit Fields\" node with the email that you want to send the briefing to, and a short bit of context about yourself.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Research Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Research Person",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Calendar Trigger",
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "role": "googleCalendarTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Out Myself",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Split Out Attendees",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "For Each Attendee",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Is Company Email?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Combine All Research",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Collect Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Write HTML",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Report",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Person Prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Company Prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "id": 10949,
+  "slug": "10949",
+  "title": "Compare hotel prices across booking platforms with Scrape.do and Google Sheets",
+  "description": "# 🏨 Hotel Price Comparison Workflow with Scrape.do\n\nThis template requires a self-hosted n8n instance to run.\n\nA complete n8n automation that extracts hotel prices from multiple booking platforms (Booking.com, Hotels.com, Expedia, etc.) using [Scrape.do](https://scrape.do/) API, compares prices across platforms, and saves structured results into Google Sheets for price monitoring and decision-making.\n\n## 📋 Overview\n\nThis workflow provides an automated hotel price comparison solution that monitors hotel rates across different booking platforms for specific destinations and dates. Ideal for travel agencies, price comparison websites, travelers, and hospitality analysts who need real-time pricing insights without manual searching.\n\n### Who is this for?\n\n- Travel agencies automating price comparisons\n- Price comparison website operators\n- Budget-conscious travelers tracking best deals\n- Hospitality analysts monitoring market pricing\n- Hotel managers tracking competitor rates\n- Travel bloggers researching accommodation options\n\n### What problem does this workflow solve?\n\n- Eliminates manual price checking across multiple sites\n- Processes multiple hotels and date ranges automatically\n- Extracts structured pricing data (price, rating, amenities)\n- Identifies the cheapest option across platforms\n- Automates saving results into Google Sheets\n- Ensures consistent and repeatable price monitoring\n\n## ⚙️ What this workflow does\n\n1. **Manual Trigger** → Starts the workflow manually or on schedule\n2. **Get Search Parameters from Sheet** → Reads hotel names, destinations, check-in/check-out dates from Google Sheet\n3. **URL Encode Parameters** → Converts search parameters into URL-safe format\n4. **Process Hotels in Batches** → Handles multiple searches sequentially to avoid rate limits\n5. **Fetch Hotel Data from Multiple Platforms** → Calls [Scrape.do](https://scrape.do/) API to retrieve pricing from Booking.com, Hotels.com, and Expedia\n6. **Extract and Structure Price Data** → Parses HTML into structured hotel data (name, price, rating, amenities)\n7. **Compare Prices Across Platforms** → Identifies best price and calculates savings\n8. **Append Results to Sheet** → Writes comparison results into Google Sheet\n\n## 📊 Output Data Points\n\n| Field | Description | Example |\n|-------|-------------|---------|\n| Hotel Name | Name of the hotel | Hilton Garden Inn Downtown |\n| Destination | City or location | New York, NY |\n| Check-in Date | Arrival date | 2025-12-15 |\n| Check-out Date | Departure date | 2025-12-18 |\n| Nights | Number of nights | 3 |\n| Booking.com Price | Price from Booking.com | $450 |\n| Hotels.com Price | Price from Hotels.com | $425 |\n| Expedia Price | Price from Expedia | $440 |\n| Best Price | Lowest price found | $425 |\n| Best Platform | Platform with lowest price | Hotels.com |\n| Savings | Difference from highest price | $25 |\n| Average Rating | Average customer rating | 8.5/10 |\n| Total Reviews | Number of reviews | 1,247 |\n| Free Cancellation | Cancellation policy | Yes |\n| Breakfast Included | Breakfast availability | No |\n\n## ⚙️ Setup\n\n### Prerequisites\n\n- n8n instance (self-hosted)\n- Google account with Sheets access\n- [Scrape.do](https://scrape.do/) account with API token\n\n### Google Sheet Structure\n\nThis workflow uses one Google Sheet with two tabs:\n\n#### Input Tab: \"Search Parameters\"\n\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| Hotel Name | Text | Name of hotel (optional) | Hilton Garden Inn |\n| Destination | Text | City or location | New York, NY |\n| Check-in Date | Date | Arrival date (YYYY-MM-DD) | 2025-12-15 |\n| Check-out Date | Date | Departure date (YYYY-MM-DD) | 2025-12-18 |\n| Guests | Number | Number of guests | 2 |\n| Rooms | Number | Number of rooms | 1 |\n\n#### Output Tab: \"Price Comparison\"\n\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| Search Date | Timestamp | When search was performed | 2025-11-17 10:30:00 |\n| Hotel Name | Text | Name of the hotel | Hilton Garden Inn Downtown |\n| Destination | Text | City/location | New York, NY |\n| Check-in | Date | Arrival date | 2025-12-15 |\n| Check-out | Date | Departure date | 2025-12-18 |\n| Nights | Number | Number of nights | 3 |\n| Booking.com Price | Currency | Price from Booking.com | $450 |\n| Hotels.com Price | Currency | Price from Hotels.com | $425 |\n| Expedia Price | Currency | Price from Expedia | $440 |\n| Best Price | Currency | Lowest price | $425 |\n| Best Platform | Text | Cheapest platform | Hotels.com |\n| Savings | Currency | Potential savings | $25 |\n| Rating | Number | Average rating | 8.5 |\n| Reviews | Number | Total reviews | 1,247 |\n\n## 🛠 Step-by-Step Setup\n\n1. **Import Workflow**: Copy the JSON → n8n → Workflows → + Add → Import from JSON\n2. **Configure [Scrape.do](https://scrape.do/) API**:\n   - Endpoint: `https://api.scrape.do/`\n   - Parameter: `token=YOUR_SCRAPEDO_TOKEN`\n   - Add `render=true` for JavaScript-heavy booking sites\n   - Add `country=US` (or target country) for localized results\n3. **Configure Google Sheets**:\n   - Create a sheet with two tabs: **Search Parameters** (input), **Price Comparison** (output)\n   - Set up Google Sheets OAuth2 credentials in n8n\n   - Replace placeholders: `YOUR_GOOGLE_SHEET_ID` and `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID`\n4. **Configure Platform URLs**:\n   - Update base URLs for Booking.com, Hotels.com, Expedia in HTTP Request nodes\n   - Customize search parameters based on platform URL structure\n5. **Run & Test**:\n   - Add test data in Search Parameters tab\n   - Execute workflow → Check results in Price Comparison tab\n\n## 🧰 How to Customize\n\n- **Add more platforms**: Include Agoda, Trivago, or direct hotel websites by adding new HTTP Request nodes\n- **Price alerts**: Add conditional logic to send email/Slack notification when price drops below threshold\n- **Historical tracking**: Store daily snapshots to track price trends over time\n- **Filtering**: Add filters for amenities (pool, gym, parking) or star ratings\n- **Batch Size**: Adjust \"Process Hotels in Batches\" based on API rate limits\n- **Rate Limiting**: Insert Wait nodes (20–30 seconds) between platform requests\n- **Currency conversion**: Add currency API integration for multi-currency comparison\n- **Scheduling**: Add Schedule Trigger to run automatically (daily/weekly)\n\n## 📊 Use Cases\n\n- **Travel Planning**: Find the best hotel deals for upcoming trips\n- **Price Monitoring**: Track price changes for specific hotels over time\n- **Agency Operations**: Automate price research for client bookings\n- **Market Analysis**: Monitor competitor pricing in hospitality market\n- **Deal Alerts**: Get notified when prices drop below target threshold\n- **Budget Planning**: Compare costs across multiple destinations\n\n## 📈 Performance & Limits\n\n- **Single Hotel (3 platforms)**: ~30–45 seconds (depends on [Scrape.do](https://scrape.do/) response)\n- **Batch of 10 hotels**: 8–12 minutes typical\n- **Large Sets (50+ hotels)**: 45–90 minutes depending on API credits & batching\n- **API Calls**: 3 [Scrape.do](https://scrape.do/) requests per hotel (one per platform)\n- **Reliability**: 90%+ extraction success, 95%+ price accuracy\n\n## 🧩 Troubleshooting\n\n- **API error** → Check `YOUR_SCRAPEDO_TOKEN` and API credits on [Scrape.do](https://scrape.do/) dashboard\n- **No hotels loaded** → Verify Google Sheet ID & tab name = **Search Parameters**\n- **Permission denied** → Re-authenticate Google Sheets OAuth2 in n8n\n- **Empty prices** → Check if [Scrape.do](https://scrape.do/) rendered JavaScript (`render=true`)\n- **Parsing errors** → Booking sites change HTML structure; update CSS selectors in Extract nodes\n- **Workflow timeout** → Reduce batch size or add more Wait nodes between requests\n- **Wrong currency** → Add `country` parameter to [Scrape.do](https://scrape.do/) request for localized pricing\n\n## 🤝 Support & Community\n\n- **n8n Forum**: https://community.n8n.io\n- **n8n Docs**: https://docs.n8n.io\n- **[Scrape.do](https://scrape.do/) Dashboard**: https://dashboard.scrape.do\n- **[Scrape.do](https://scrape.do/) Documentation**: https://scrape.do/docs\n\n## 🎯 Final Notes\n\nThis workflow provides a powerful foundation for automated hotel price comparison across multiple booking platforms using [Scrape.do](https://scrape.do/) and Google Sheets.\n\nYou can extend it with:\n- Real-time price alerts via email/Slack\n- Historical price tracking and trend analysis\n- Integration with travel planning dashboards\n- Automated booking when price threshold is met\n- Multi-destination comparison for trip planning\n\n**Pro Tip**: Schedule this workflow to run daily to catch early-bird discounts and flash sales automatically!",
+  "featuredImage": "/data/workflows/10949/10949.webp",
+  "author": {
+    "id": 101,
+    "slug": "onurpolat05",
+    "name": "Onur",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 274,
+  "downloads": 27,
+  "createdAt": "2025-11-18T07:09:43.848Z",
+  "updatedAt": "2026-01-16T09:06:55.455Z",
+  "publishedAt": "2025-11-18T07:09:43.848Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10949",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Compare hotel prices across booking platforms with Scrape.do and Google Sheets",
+    "workflowName": "Compare hotel prices across booking platforms with Scrape.do and Google Sheets",
+    "description": "# 🏨 Hotel Price Comparison Workflow with Scrape.do\n\nThis template requires a self-hosted n8n instance to run.\n\nA complete n8n automation that extracts hotel prices from multiple booking platforms (Booking.com, Hotels.com, Expedia, etc.) using [Scrape.do](https://scrape.do/) API, compares prices across platforms, and saves structured results into Google Sheets for price monitoring and decision-making.\n\n## 📋 Overview\n\nThis workflow provides an automated hotel price comparison solution that monitors hotel rates across different booking platforms for specific destinations and dates. Ideal for travel agencies, price comparison websites, travelers, and hospitality analysts who need real-time pricing insights without manual searching.\n\n### Who is this for?\n\n- Travel agencies automating price comparisons\n- Price comparison website operators\n- Budget-conscious travelers tracking best deals\n- Hospitality analysts monitoring market pricing\n- Hotel managers tracking competitor rates\n- Travel bloggers researching accommodation options\n\n### What problem does this workflow solve?\n\n- Eliminates manual price checking across multiple sites\n- Processes multiple hotels and date ranges automatically\n- Extracts structured pricing data (price, rating, amenities)\n- Identifies the cheapest option across platforms\n- Automates saving results into Google Sheets\n- Ensures consistent and repeatable price monitoring\n\n## ⚙️ What this workflow does\n\n1. **Manual Trigger** → Starts the workflow manually or on schedule\n2. **Get Search Parameters from Sheet** → Reads hotel names, destinations, check-in/check-out dates from Google Sheet\n3. **URL Encode Parameters** → Converts search parameters into URL-safe format\n4. **Process Hotels in Batches** → Handles multiple searches sequentially to avoid rate limits\n5. **Fetch Hotel Data from Multiple Platforms** → Calls [Scrape.do](https://scrape.do/) API to retrieve pricing from Booking.com, Hotels.com, and Expedia\n6. **Extract and Structure Price Data** → Parses HTML into structured hotel data (name, price, rating, amenities)\n7. **Compare Prices Across Platforms** → Identifies best price and calculates savings\n8. **Append Results to Sheet** → Writes comparison results into Google Sheet\n\n## 📊 Output Data Points\n\n| Field | Description | Example |\n|-------|-------------|---------|\n| Hotel Name | Name of the hotel | Hilton Garden Inn Downtown |\n| Destination | City or location | New York, NY |\n| Check-in Date | Arrival date | 2025-12-15 |\n| Check-out Date | Departure date | 2025-12-18 |\n| Nights | Number of nights | 3 |\n| Booking.com Price | Price from Booking.com | $450 |\n| Hotels.com Price | Price from Hotels.com | $425 |\n| Expedia Price | Price from Expedia | $440 |\n| Best Price | Lowest price found | $425 |\n| Best Platform | Platform with lowest price | Hotels.com |\n| Savings | Difference from highest price | $25 |\n| Average Rating | Average customer rating | 8.5/10 |\n| Total Reviews | Number of reviews | 1,247 |\n| Free Cancellation | Cancellation policy | Yes |\n| Breakfast Included | Breakfast availability | No |\n\n## ⚙️ Setup\n\n### Prerequisites\n\n- n8n instance (self-hosted)\n- Google account with Sheets access\n- [Scrape.do](https://scrape.do/) account with API token\n\n### Google Sheet Structure\n\nThis workflow uses one Google Sheet with two tabs:\n\n#### Input Tab: \"Search Parameters\"\n\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| Hotel Name | Text | Name of hotel (optional) | Hilton Garden Inn |\n| Destination | Text | City or location | New York, NY |\n| Check-in Date | Date | Arrival date (YYYY-MM-DD) | 2025-12-15 |\n| Check-out Date | Date | Departure date (YYYY-MM-DD) | 2025-12-18 |\n| Guests | Number | Number of guests | 2 |\n| Rooms | Number | Number of rooms | 1 |\n\n#### Output Tab: \"Price Comparison\"\n\n| Column | Type | Description | Example |\n|--------|------|-------------|---------|\n| Search Date | Timestamp | When search was performed | 2025-11-17 10:30:00 |\n| Hotel Name | Text | Name of the hotel | Hilton Garden Inn Downtown |\n| Destination | Text | City/location | New York, NY |\n| Check-in | Date | Arrival date | 2025-12-15 |\n| Check-out | Date | Departure date | 2025-12-18 |\n| Nights | Number | Number of nights | 3 |\n| Booking.com Price | Currency | Price from Booking.com | $450 |\n| Hotels.com Price | Currency | Price from Hotels.com | $425 |\n| Expedia Price | Currency | Price from Expedia | $440 |\n| Best Price | Currency | Lowest price | $425 |\n| Best Platform | Text | Cheapest platform | Hotels.com |\n| Savings | Currency | Potential savings | $25 |\n| Rating | Number | Average rating | 8.5 |\n| Reviews | Number | Total reviews | 1,247 |\n\n## 🛠 Step-by-Step Setup\n\n1. **Import Workflow**: Copy the JSON → n8n → Workflows → + Add → Import from JSON\n2. **Configure [Scrape.do](https://scrape.do/) API**:\n   - Endpoint: `https://api.scrape.do/`\n   - Parameter: `token=YOUR_SCRAPEDO_TOKEN`\n   - Add `render=true` for JavaScript-heavy booking sites\n   - Add `country=US` (or target country) for localized results\n3. **Configure Google Sheets**:\n   - Create a sheet with two tabs: **Search Parameters** (input), **Price Comparison** (output)\n   - Set up Google Sheets OAuth2 credentials in n8n\n   - Replace placeholders: `YOUR_GOOGLE_SHEET_ID` and `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID`\n4. **Configure Platform URLs**:\n   - Update base URLs for Booking.com, Hotels.com, Expedia in HTTP Request nodes\n   - Customize search parameters based on platform URL structure\n5. **Run & Test**:\n   - Add test data in Search Parameters tab\n   - Execute workflow → Check results in Price Comparison tab\n\n## 🧰 How to Customize\n\n- **Add more platforms**: Include Agoda, Trivago, or direct hotel websites by adding new HTTP Request nodes\n- **Price alerts**: Add conditional logic to send email/Slack notification when price drops below threshold\n- **Historical tracking**: Store daily snapshots to track price trends over time\n- **Filtering**: Add filters for amenities (pool, gym, parking) or star ratings\n- **Batch Size**: Adjust \"Process Hotels in Batches\" based on API rate limits\n- **Rate Limiting**: Insert Wait nodes (20–30 seconds) between platform requests\n- **Currency conversion**: Add currency API integration for multi-currency comparison\n- **Scheduling**: Add Schedule Trigger to run automatically (daily/weekly)\n\n## 📊 Use Cases\n\n- **Travel Planning**: Find the best hotel deals for upcoming trips\n- **Price Monitoring**: Track price changes for specific hotels over time\n- **Agency Operations**: Automate price research for client bookings\n- **Market Analysis**: Monitor competitor pricing in hospitality market\n- **Deal Alerts**: Get notified when prices drop below target threshold\n- **Budget Planning**: Compare costs across multiple destinations\n\n## 📈 Performance & Limits\n\n- **Single Hotel (3 platforms)**: ~30–45 seconds (depends on [Scrape.do](https://scrape.do/) response)\n- **Batch of 10 hotels**: 8–12 minutes typical\n- **Large Sets (50+ hotels)**: 45–90 minutes depending on API credits & batching\n- **API Calls**: 3 [Scrape.do](https://scrape.do/) requests per hotel (one per platform)\n- **Reliability**: 90%+ extraction success, 95%+ price accuracy\n\n## 🧩 Troubleshooting\n\n- **API error** → Check `YOUR_SCRAPEDO_TOKEN` and API credits on [Scrape.do](https://scrape.do/) dashboard\n- **No hotels loaded** → Verify Google Sheet ID & tab name = **Search Parameters**\n- **Permission denied** → Re-authenticate Google Sheets OAuth2 in n8n\n- **Empty prices** → Check if [Scrape.do](https://scrape.do/) rendered JavaScript (`render=true`)\n- **Parsing errors** → Booking sites change HTML structure; update CSS selectors in Extract nodes\n- **Workflow timeout** → Reduce batch size or add more Wait nodes between requests\n- **Wrong currency** → Add `country` parameter to [Scrape.do](https://scrape.do/) request for localized pricing\n\n## 🤝 Support & Community\n\n- **n8n Forum**: https://community.n8n.io\n- **n8n Docs**: https://docs.n8n.io\n- **[Scrape.do](https://scrape.do/) Dashboard**: https://dashboard.scrape.do\n- **[Scrape.do](https://scrape.do/) Documentation**: https://scrape.do/docs\n\n## 🎯 Final Notes\n\nThis workflow provides a powerful foundation for automated hotel price comparison across multiple booking platforms using [Scrape.do](https://scrape.do/) and Google Sheets.\n\nYou can extend it with:\n- Real-time price alerts via email/Slack\n- Historical price tracking and trend analysis\n- Integration with travel planning dashboards\n- Automated booking when price threshold is met\n- Multi-destination comparison for trip planning\n\n**Pro Tip**: Schedule this workflow to run daily to catch early-bird discounts and flash sales automatically!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Parse & Validate Request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scrape Booking.com",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Parse Booking.com Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scrape Agoda",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Parse Agoda Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scrape Expedia",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Parse Expedia Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note Main",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Section 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Section 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Section 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Warning",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

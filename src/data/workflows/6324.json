@@ -1,0 +1,85 @@
+{
+  "id": 6324,
+  "slug": "6324",
+  "title": "Create & send client session summaries from Zoom meetings via Gmail and Airtable",
+  "description": "## Description\nWhenever a Zoom “Meeting assets” email arrives in your Gmail inbox, this workflow will:\n\n1) Trigger on new Gmail messages filtered by the subject “Meeting assets”.\n\n2) Extract from the email (HTML or plain text):\n\n3) Type of session (e.g. “1 hour”, “2 hours”, or “exploratory call”).\n\n\t- Client’s full name.\n\t- Session date & time (from the GMT… timestamp).\n\t- Duration (HH:MM:SS).\n\t- Recording link.\n\t- Quick summary.\n\t- Detailed summary.\n\t- List of next steps.\n\n4) Lookup the client in your Master Airtable base, table People, by full name.\n\n5) Send a personalized Gmail to the client with all extracted details.\n\n6) Create a new record in your Sessions table in Airtable, linking back to that client.\n\n## Quick Start\n1. Import this JSON into n8n as a new workflow.\n2. Connect your Gmail credentials (OAuth2).\n3. Connect your Airtable credentials (Personal Access Token).\n4. In the Search Records node:\n5. Base → your Master base ID.\n6. Table → “Your people table”.\n7. Filter By Formula → ={Full Name} = '{{ $json.clientName }}'.\n8. In the Create Record node: Table → “Sessions”.\n9. Map each field (dateTime, duration, summaries, next steps, client link).\n10. Activate the workflow.\n\n## Prerequisites\n\t- n8n v1.50 or higher\n\t- A Gmail account with OAuth2 credentials configured\n\t- An Airtable base containing:\n\t- Table People with a Full Name field (and email).\n\t- Table Sessions with fields: DateTime, Duration, Quick Summary, Detailed Summary, Next Steps, and a Linked Record to People.\n\t- An Airtable Personal Access Token with read/write access to that base.\n\n## Tips & Extensions\n\n- Timezone conversion: Use a Function node with moment-timezone to convert UTC if needed.\n\n- Error handling: Add a catch node to log or notify if any field fails to parse.\n\n- Alternate notifications: Swap the Gmail node for Slack, Microsoft Teams, or SMS integrations.\n\n- With this documentation, your team can import and deploy the workflow in minutes. \n\n## Enjoy!",
+  "featuredImage": "/data/workflows/6324/6324.webp",
+  "author": {
+    "id": 101,
+    "slug": "luisbetancourtco",
+    "name": "LuisBetancourt.co",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 135,
+  "downloads": 13,
+  "createdAt": "2025-07-23T15:22:15.995Z",
+  "updatedAt": "2026-01-16T08:44:26.242Z",
+  "publishedAt": "2025-07-23T15:22:15.995Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6324",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create & send client session summaries from Zoom meetings via Gmail and Airtable",
+    "workflowName": "Create & send client session summaries from Zoom meetings via Gmail and Airtable",
+    "description": "## Description\nWhenever a Zoom “Meeting assets” email arrives in your Gmail inbox, this workflow will:\n\n1) Trigger on new Gmail messages filtered by the subject “Meeting assets”.\n\n2) Extract from the email (HTML or plain text):\n\n3) Type of session (e.g. “1 hour”, “2 hours”, or “exploratory call”).\n\n\t- Client’s full name.\n\t- Session date & time (from the GMT… timestamp).\n\t- Duration (HH:MM:SS).\n\t- Recording link.\n\t- Quick summary.\n\t- Detailed summary.\n\t- List of next steps.\n\n4) Lookup the client in your Master Airtable base, table People, by full name.\n\n5) Send a personalized Gmail to the client with all extracted details.\n\n6) Create a new record in your Sessions table in Airtable, linking back to that client.\n\n## Quick Start\n1. Import this JSON into n8n as a new workflow.\n2. Connect your Gmail credentials (OAuth2).\n3. Connect your Airtable credentials (Personal Access Token).\n4. In the Search Records node:\n5. Base → your Master base ID.\n6. Table → “Your people table”.\n7. Filter By Formula → ={Full Name} = '{{ $json.clientName }}'.\n8. In the Create Record node: Table → “Sessions”.\n9. Map each field (dateTime, duration, summaries, next steps, client link).\n10. Activate the workflow.\n\n## Prerequisites\n\t- n8n v1.50 or higher\n\t- A Gmail account with OAuth2 credentials configured\n\t- An Airtable base containing:\n\t- Table People with a Full Name field (and email).\n\t- Table Sessions with fields: DateTime, Duration, Quick Summary, Detailed Summary, Next Steps, and a Linked Record to People.\n\t- An Airtable Personal Access Token with read/write access to that base.\n\n## Tips & Extensions\n\n- Timezone conversion: Use a Function node with moment-timezone to convert UTC if needed.\n\n- Error handling: Add a catch node to log or notify if any field fails to parse.\n\n- Alternate notifications: Swap the Gmail node for Slack, Microsoft Teams, or SMS integrations.\n\n- With this documentation, your team can import and deploy the workflow in minutes. \n\n## Enjoy!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Note: Gmail Creds",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Fields",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Exploratory",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airtable: Search People",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airtable: Create Session",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note: Airtable Creds",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

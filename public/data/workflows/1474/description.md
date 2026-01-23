@@ -1,0 +1,1 @@
+This is the third bot for the Mattermost Standup Bot. This workflow will override or update the configuration file as needed. This workflow is called by the 'Standup Bot - Worker' workflow.

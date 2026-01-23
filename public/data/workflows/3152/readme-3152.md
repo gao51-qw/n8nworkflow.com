@@ -1,0 +1,79 @@
+# Track n8n community topics with keywords and save to Google Sheets
+
+> This template is designed for community managers, developers, and enthusiasts who want to monitor and capture discussions on the n8n community forum by specific keywords. By tracking new topics that match your provided keyword, the workflow automatically logs them into a Google Sheet, helping you keep a pulse on trending discussions and manage community insights effortlessly.
+
+### How it Works
+**Keyword Monitoring:** The workflow continuously monitors the n8n community forum for new topics containing your specified keyword.
+
+**Data Extraction:** When a matching topic is found, relevant details such as id, title, URL, and posting time are extracted.
+
+**Google Sheets Integration:** The extracted information is automatically appended as a new row in your Google Sheet, providing an organized log of community discussions.
+
+**Alert Option:** Optionally, you can add notifications (e.g., Slack messages or emails) to alert you when a new topic is captured, ensuring you never miss an important update.
+
+### Set Up Steps
+
+**Import the Workflow:** Download and import the workflow into your n8n instance.
+
+**Configure Keyword Monitoring:** In the HTTP Request node, set your desired keyword to filter the n8n community topics.
+
+**Set Up Google Sheets:** Connect your Google Sheets account and specify the target sheet where the new topics should be logged.
+
+**Customize Data Fields:** Adjust the data extraction node parameters if you wish to capture additional details from each topic.
+
+**Deploy and Test:** Deploy the workflow and perform a test run to confirm that new topics matching the keyword are correctly added to your Google Sheet.
+
+**Set Up Messaging Channels (Optional):** Connect to Slack, Email or other providers to get instant messages when new topics are added into your Google Sheet.
+
+This template streamlines the process of tracking community discussions, ensuring you have timely and organized insights to enhance your community engagement and strategic decision-making. Enjoy seamless monitoring and easy data management with this ready-to-use n8n workflow template!
+
+
+
+
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3152
+- **Complexity:** intermediate
+- **Node Count:** 10
+- **Views:** 869
+- **Downloads:** 86
+- **Created:** 2025/3/13
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3152)
+
+## 👤 Author
+
+- **Name:** Hostinger
+- **Username:** @hostinger
+
+## 🏷️ Categories
+
+- Market Research
+
+## 🔗 Nodes Used
+
+- **googleSheets** 
+- **scheduleTrigger** 
+- **stickyNote** (×3)
+- **splitOut** 
+- **httpRequest** 
+- **googleSheetsTrigger** 
+- **slack** 
+- **emailSend** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 10 nodes with 4 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

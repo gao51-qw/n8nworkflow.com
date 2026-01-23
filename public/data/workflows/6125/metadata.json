@@ -1,0 +1,26 @@
+{
+  "id": 6125,
+  "slug": "6125",
+  "title": "Syncing contacts with CentralStationCRM, Rapidmail, and Slack",
+  "description": "## Workflow Overview\nThis workflow benefits anyone who:\n* wants to automate writing new contacts (with an associated 'Newsletter' tag) in CentralStationCRM to a Rapidmail list\n\n## Tools in this workflow\n* [CentralStationCRM](https://centralstationcrm.de), the simple and intuitive CRM for small teams. [Here is our API documentation](https://api.centralstationcrm.net/api-docs/index.html) if you want to modify the workflow.\n* [Slack](https://slack.com/intl/de-de), brings people and information together\n* [Rapidmail](https://rapidmail.de), the really good newsletter software\n\n## Workflow Screenshot\n![CSCRMtoRapidmailwithslackapproval.jpg](fileId:1847)\n\n## Workflow Description\nThis workflow consists of:\n* a schedule trigger (set to 5 pm/daily)\n* three HTTP Requests to the CentralStationCRM API\n* two if-Nodes as logic gates\n* a Slack node\n* a \"Do nothing, end workflow\" node\n\n### The schedule trigger\nThe schedule trigger is set to trigger at 5 pm, every day.\n\nThe thinking here: If you added new contacts into CentralStationCRM during your workday, the workflow will collect them afterwards. You can of course set your own time.\n\n### First HTTP Request: Get new people of the day\nThis node talks to the CentralStationCRM API and gets every newly created person of the day. Included are the tags, adresses, associated companies, and emails of the person.\n\n### First if-gate: Does the person have a \"Newsletter\" tag?\nIf you tagged your person with \"Newsletter\" in CentralStationCRM after creating it, this if-node will see it.\n-&gt; if true: go to last HTTP Request (Rapidmail list)\n-&gt; if false: go to Slack node\n\n### Slack node: ask if the person should get a \"Newsletter\" tag\nPretty much what the title says. The slack user sees a private message with the question \"Should &lt;person&gt; be on your newsletter list\" and can click \"yes\" or \"no\".\n\n### second if-gate: Did the user click the \"Yes\"-button?\n-&gt; if false: end workflow (do nothing node)\n-&gt; if true: go to second HTTP request node\n\n### second HTTP request: give person a \"Newsletter\" tag in CentralStationCRM\nThis node again talks to the CentralStationCRM API and creates a new tag for the person, called \"Newsletter\". This is so you know later that this person is also receiving your newsletter.\n\n### last HTTP request node: write person's name and email on Rapidmail list\nThis node uses the Rapidmail API and the Rapidmail list ID to write a person with the \"Newsletter\" tag on a pre-created Rapidmail list for your newsletter.\n\n## Customization ideas\nWith this workflow, you could\n* change the interval the workflow triggers, i.e. to once per week. you'd have to change the JSON code in the second node to fetch all the new people per week instead of per day\n* customize the slack approval message to include more information on the person than the name, i.e. the company the person works for\n* take the beginning - give tag to person in CentralStationCRM, trigger workflow, check for tag, ask for approval in slack - and then do something else with the last node, i.e. write the person a mail in Gmail or write their info in a Google sheet or do a web research with ai on the person. Go experiment ab bit!\n\n## Preconditions\nFor this workflow, you need:\n* a CentralStationCRM account with API access\n* an n8n account with API access\n* a Rapidmail account with API access\n* a Rapidmail recipient list\n\n## Have fun with our workflow!",
+  "featuredImage": "/data/workflows/6125/6125.webp",
+  "author": {
+    "id": 101,
+    "slug": "centralstationcrm",
+    "name": "CentralStationCRM",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 113,
+  "downloads": 11,
+  "createdAt": "2025-07-18T08:48:05.637Z",
+  "updatedAt": "2026-01-16T08:43:17.604Z",
+  "publishedAt": "2025-07-18T08:48:05.637Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6125"
+}

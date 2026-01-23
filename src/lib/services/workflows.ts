@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { formatShortDate } from '../utils/date';
 import { fetchWorkflowsFromGitHub } from './n8n';
+import { getAuthors, getAuthorBySlug, getAuthorById } from './authors';
 
 /**
  * 工作流数据服务
@@ -32,17 +33,35 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
     type,
   } = params;
 
+  // 获取所有作者以获取最新的 workflowCount
+  const allAuthors = await getAuthors();
+  const authorsMap = new Map(allAuthors.map(a => [a.slug, a]));
+
   // 优先尝试从本地 JSON 获取数据
   if (workflowsData && Array.isArray(workflowsData) && workflowsData.length > 0) {
-    let filtered = (workflowsData as any[]).map(formatWorkflowData);
+    let filtered = (workflowsData as any[]).map(w => {
+      const formatted = formatWorkflowData(w);
+      // 注入最新的作者信息（包含正确的 workflowCount）
+      if (formatted.author && formatted.author.slug && authorsMap.has(formatted.author.slug)) {
+        formatted.author = authorsMap.get(formatted.author.slug)!;
+      }
+      return formatted;
+    });
 
     // 分类筛选
-    if (category) {
-      filtered = filtered.filter((w) => w.categories.includes(category));
+    if (category && category !== 'all') {
+      filtered = filtered.filter((w) => 
+        w.categories.some((c: string) => c.toLowerCase().trim().replace(/\s+/g, '-') === category.toLowerCase())
+      );
+    }
+
+    // 作者筛选
+    if (author) {
+      filtered = filtered.filter((w) => w.author?.slug === author);
     }
 
     // 复杂度筛选
-    if (complexity) {
+    if (complexity && complexity !== 'all') {
       filtered = filtered.filter((w) => w.complexityLevel === complexity);
     }
 
@@ -51,6 +70,27 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
       filtered = filtered.filter((w) => w.price === 0);
     } else if (price === 'paid') {
       filtered = filtered.filter((w) => w.price > 0);
+    }
+
+    // 时间筛选
+    if (time && time !== 'all') {
+      const now = new Date();
+      let days = 0;
+      switch (time) {
+        case '7d': case '7days': case 'week': days = 7; break;
+        case '30d': case '30days': case '1m': case 'month': days = 30; break;
+        case '90d': case '90days': case 'quarter': days = 90; break;
+        case '6m': case '6months': days = 180; break;
+        case '1y': case 'year': days = 365; break;
+        case '2y': days = 730; break;
+        case '3y': days = 1095; break;
+        case 'today': days = 1; break;
+      }
+
+      if (days > 0) {
+        const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter((w) => new Date(w.publishedAt || w.createdAt) >= cutoff);
+      }
     }
 
     // 排序
@@ -81,9 +121,16 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
     if (githubWorkflows.length > 0) {
       let filtered = githubWorkflows;
 
-      // 分类筛选
+      // 分类筛选（不区分大小写）
       if (category) {
-        filtered = filtered.filter((w) => w.categories.includes(category));
+        filtered = filtered.filter((w) => 
+          w.categories.some((c: string) => c.toLowerCase().trim().replace(/\s+/g, '-') === category.toLowerCase())
+        );
+      }
+
+      // 作者筛选
+      if (author) {
+        filtered = filtered.filter((w) => w.author?.slug === author);
       }
 
       // 复杂度筛选
@@ -96,6 +143,27 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
         filtered = filtered.filter((w) => w.price === 0);
       } else if (price === 'paid') {
         filtered = filtered.filter((w) => w.price > 0);
+      }
+
+      // 时间筛选
+      if (time && time !== 'all') {
+        const now = new Date();
+        let days = 0;
+        switch (time) {
+          case '7d': case '7days': case 'week': days = 7; break;
+          case '30d': case '30days': case '1m': case 'month': days = 30; break;
+          case '90d': case '90days': case 'quarter': days = 90; break;
+          case '6m': case '6months': days = 180; break;
+          case '1y': case 'year': days = 365; break;
+          case '2y': days = 730; break;
+          case '3y': days = 1095; break;
+          case 'today': days = 1; break;
+        }
+
+        if (days > 0) {
+          const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+          filtered = filtered.filter((w) => new Date(w.publishedAt || w.createdAt) >= cutoff);
+        }
       }
 
       // 排序
@@ -172,11 +240,28 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
           case 'today':
             startDate = new Date(now.setHours(0, 0, 0, 0));
             break;
+          case '7d':
+          case '7days':
           case 'week':
             startDate = new Date(now.setDate(now.getDate() - 7));
             break;
+          case '1m':
           case 'month':
             startDate = new Date(now.setMonth(now.getMonth() - 1));
+            break;
+          case '6m':
+          case '6months':
+            startDate = new Date(now.setMonth(now.getMonth() - 6));
+            break;
+          case '1y':
+          case 'year':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+            break;
+          case '2y':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 2));
+            break;
+          case '3y':
+            startDate = new Date(now.setFullYear(now.getFullYear() - 3));
             break;
           default:
             startDate = new Date(0);
@@ -240,7 +325,8 @@ export async function getWorkflows(params: Partial<LoadMoreParams> = {}): Promis
 export async function getWorkflowBySlug(slug: string): Promise<Workflow | null> {
   // 优先尝试从本地 JSON 获取数据
   if (workflowsData && Array.isArray(workflowsData)) {
-    const workflow = workflowsData.find((w) => w.slug === slug);
+    // 同时检查 slug 和 id，以支持新的 ID 格式 slug
+    const workflow = workflowsData.find((w) => w.slug === slug || w.id.toString() === slug);
     if (workflow) return formatWorkflowData(workflow);
   }
 
@@ -251,7 +337,7 @@ export async function getWorkflowBySlug(slug: string): Promise<Workflow | null> 
 
   try {
     return await withRetry(async () => {
-      const { data, error } = await supabase!
+      let query = supabase!
         .from('workflows')
         .select(
           `
@@ -259,9 +345,16 @@ export async function getWorkflowBySlug(slug: string): Promise<Workflow | null> 
           author:authors(*),
           workflow_categories(category:categories(*))
         `
-        )
-        .eq('slug', slug)
-        .single();
+        );
+
+      // 如果 slug 是纯数字，尝试按 ID 查询，否则按 slug 查询
+      if (/^\d+$/.test(slug)) {
+        query = query.eq('id', parseInt(slug, 10));
+      } else {
+        query = query.eq('slug', slug);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -326,6 +419,45 @@ export async function searchWorkflows(
   } = {}
 ): Promise<{ workflows: Workflow[]; total: number }> {
   const { offset = 0, limit = 12, category, complexity, price } = params;
+
+  // 优先尝试从本地 JSON 获取数据
+  if (workflowsData && Array.isArray(workflowsData) && workflowsData.length > 0) {
+    let filtered = (workflowsData as any[]).map(w => formatWorkflowData(w));
+
+    // 搜索关键词
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      filtered = filtered.filter(
+        (w) =>
+          w.title.toLowerCase().includes(lowerQuery) ||
+          w.description.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    // 分类筛选
+    if (category && category !== 'all') {
+      filtered = filtered.filter((w) => 
+        w.categories.some((c: string) => c.toLowerCase().trim().replace(/\s+/g, '-') === category.toLowerCase())
+      );
+    }
+
+    // 复杂度筛选
+    if (complexity && (complexity as any) !== 'all') {
+      filtered = filtered.filter((w) => w.complexityLevel === complexity);
+    }
+
+    // 价格筛选
+    if (price === 'free') {
+      filtered = filtered.filter((w) => w.price === 0);
+    } else if (price === 'paid') {
+      filtered = filtered.filter((w) => w.price > 0);
+    }
+
+    return {
+      workflows: filtered.slice(offset, offset + limit),
+      total: filtered.length,
+    };
+  }
 
   // 如果未配置 Supabase，使用模拟数据搜索
   if (!isSupabaseConfigured()) {
@@ -407,8 +539,22 @@ export async function getRecentWorkflows(
  * 格式化工作流数据
  */
 function formatWorkflowData(data: any): Workflow {
+  const id = data.id;
+  
+  // 自动索引图片路径
+  // 优先使用数据中已有的 featuredImage，如果没有则尝试构建默认路径
+  let featuredImage = data.featuredImage || data.thumbnail;
+  
+  // 如果图片路径包含旧的错误路径格式，或者没有图片，则自动修正
+  if (!featuredImage || featuredImage.includes('placeholder') || featuredImage.includes('workflow-') || featuredImage.startsWith('/data/workflows/workflow-')) {
+    // 统一使用标准路径: /data/workflows/{id}/{id}.webp
+    featuredImage = `/data/workflows/${id}/${id}.webp`;
+  }
+
   return {
     ...data,
+    slug: id.toString(), // 修复工作流的 slug 逻辑，使用 ID 作为 slug
+    featuredImage,
     date: formatShortDate(data.publishedAt || data.createdAt),
     categories: data.workflow_categories?.map((wc: any) => wc.category.name) || data.categories || [],
   };
@@ -425,9 +571,11 @@ function getMockWorkflows(params: Partial<LoadMoreParams>): {
 
   let workflows = getAllMockWorkflows(200);
 
-  // 筛选
-  if (category) {
-    workflows = workflows.filter((w) => w.categories.includes(category));
+  // 筛选（分类不区分大小写）
+  if (category && category !== 'all') {
+    workflows = workflows.filter((w) => 
+      w.categories.some((c: string) => c.toLowerCase() === category.toLowerCase())
+    );
   }
 
   if (complexity) {
@@ -490,9 +638,11 @@ function searchMockWorkflows(
       w.description.toLowerCase().includes(lowerQuery)
   );
 
-  // 筛选
-  if (category) {
-    workflows = workflows.filter((w) => w.categories.includes(category));
+  // 筛选（分类不区分大小写）
+  if (category && category !== 'all') {
+    workflows = workflows.filter((w) => 
+      w.categories.some((c: string) => c.toLowerCase() === category.toLowerCase())
+    );
   }
 
   if (complexity) {
@@ -518,12 +668,27 @@ function searchMockWorkflows(
  * 获取各筛选项的匹配数量统计
  */
 export async function getFilterCounts(): Promise<{
-  time: { '7days': number; 'month': number; '6months': number; 'year': number; '2years': number; '3years': number };
+  time: { '7d': number; '1m': number; '6m': number; '1y': number; '2y': number; '3y': number };
   price: { all: number; free: number; paid: number };
   complexity: { all: number; beginner: number; intermediate: number; advanced: number };
   categories: { [categorySlug: string]: number };
 }> {
-  // 如果未配置 Supabase，使用模拟数据
+  // 优先尝试从本地 JSON 获取数据
+  if (workflowsData && Array.isArray(workflowsData) && workflowsData.length > 0) {
+    return calculateFilterCounts(workflowsData);
+  }
+
+  // 尝试从 GitHub 获取数据
+  try {
+    const githubWorkflows = await fetchWorkflowsFromGitHub();
+    if (githubWorkflows.length > 0) {
+      return calculateFilterCounts(githubWorkflows);
+    }
+  } catch (error) {
+    console.error('Failed to fetch workflows from GitHub for counts:', error);
+  }
+
+  // 如果未配置 Supabase，优先使用模拟数据计算
   if (!isSupabaseConfigured()) {
     return getMockFilterCounts();
   }
@@ -554,7 +719,7 @@ export async function getFilterCounts(): Promise<{
  * 辅助函数：处理模拟数据的筛选项统计
  */
 function getMockFilterCounts(): {
-  time: { '7days': number; 'month': number; '6months': number; 'year': number; '2years': number; '3years': number };
+  time: { '7d': number; '1m': number; '6m': number; '1y': number; '2y': number; '3y': number };
   price: { all: number; free: number; paid: number };
   complexity: { all: number; beginner: number; intermediate: number; advanced: number };
   categories: { [categorySlug: string]: number };
@@ -569,7 +734,7 @@ function getMockFilterCounts(): {
 function calculateFilterCounts(
   workflows: any[]
 ): {
-  time: { '7days': number; 'month': number; '6months': number; 'year': number; '2years': number; '3years': number };
+  time: { '7d': number; '1m': number; '6m': number; '1y': number; '2y': number; '3y': number };
   price: { all: number; free: number; paid: number };
   complexity: { all: number; beginner: number; intermediate: number; advanced: number };
   categories: { [categorySlug: string]: number };
@@ -577,12 +742,12 @@ function calculateFilterCounts(
   const now = new Date();
   const counts = {
     time: {
-      '7days': 0,
-      'month': 0,
-      '6months': 0,
-      'year': 0,
-      '2years': 0,
-      '3years': 0,
+      '7d': 0,
+      '1m': 0,
+      '6m': 0,
+      '1y': 0,
+      '2y': 0,
+      '3y': 0,
     },
     price: {
       all: workflows.length,
@@ -604,17 +769,17 @@ function calculateFilterCounts(
     const daysDiff = Math.floor((now.getTime() - publishedDate.getTime()) / (1000 * 60 * 60 * 24));
 
     // 时间统计
-    if (daysDiff <= 7) counts.time['7days']++;
-    if (daysDiff <= 30) counts.time['month']++;
-    if (daysDiff <= 180) counts.time['6months']++;
-    if (daysDiff <= 365) counts.time['year']++;
-    if (daysDiff <= 730) counts.time['2years']++;
-    if (daysDiff <= 1095) counts.time['3years']++;
+    if (daysDiff <= 7) counts.time['7d']++;
+    if (daysDiff <= 30) counts.time['1m']++;
+    if (daysDiff <= 180) counts.time['6m']++;
+    if (daysDiff <= 365) counts.time['1y']++;
+    if (daysDiff <= 730) counts.time['2y']++;
+    if (daysDiff <= 1095) counts.time['3y']++;
 
     // 价格统计
     if (workflow.price === 0) {
       counts.price.free++;
-    } else {
+    } else if (workflow.price > 0) {
       counts.price.paid++;
     }
 
@@ -648,9 +813,9 @@ function calculateFilterCounts(
 }
 
 /**
- * ============================================================================
+ * ========================================================================
  * P0 阶段改版 - 新增服务函数
- * ============================================================================
+ * ========================================================================
  */
 
 /**
@@ -699,7 +864,8 @@ export async function getFilterCountsV2(filters?: {
     // 如果有活跃筛选条件，计算受影响的计数
     if (Object.keys(queryParams).length > 0) {
       // 获取应用了当前筛选的工作流以计算其他选项的交叉计数
-      const filtered = await getWorkflows(queryParams);
+      // 注意：这里需要获取所有匹配的工作流以确保计数准确，所以设置一个较大的 limit
+      const filtered = await getWorkflows({ ...queryParams, limit: 10000 });
       const filteredWorkflows = filtered.workflows;
       
       // 重新计算受当前筛选影响的其他选项的计数
@@ -738,7 +904,7 @@ export async function getFilterCountsV2(filters?: {
     console.error('Error in getFilterCountsV2:', error);
     // 返回默认计数以保证 API 鲁棒性
     return {
-      timePeriods: { all: 7947, '7days': 8, month: 374, '6months': 4508, year: 6758 },
+      timePeriods: { all: 7947, '7d': 8, '1m': 374, '6m': 4508, '1y': 6758 },
       categories: { 'multimodal-ai': 2270, ai: 1600 },
       complexities: { all: 7947, beginner: 500, intermediate: 2835, advanced: 4602 },
       price: { all: 7947, free: 6898, paid: 1049 },
@@ -787,18 +953,28 @@ export async function getWorkflowDetailedById(workflowId: number): Promise<any> 
   // 优先尝试从本地 JSON 文件获取详情
   try {
     // 获取基础信息以确保有最新的 featuredImage
-    const baseWorkflow = workflowsData?.find((w: any) => w.id === workflowId);
+    const baseWorkflow = (workflowsData as any)?.find((w: any) => w.id === workflowId);
 
     // 注意：在 Astro 服务端渲染时可以使用 fs
     const detailPath = path.join(process.cwd(), `src/data/workflows/${workflowId}.json`);
     if (fs.existsSync(detailPath)) {
       const detailData = JSON.parse(fs.readFileSync(detailPath, 'utf-8'));
-      return {
+      const merged = {
         ...detailData,
         ...(baseWorkflow || {}),
         // 确保优先使用 baseWorkflow 中的 featuredImage
         featuredImage: baseWorkflow?.featuredImage || detailData.featuredImage
       };
+
+      // 注入最新的作者信息（包含正确的 workflowCount）
+      if (merged.author && merged.author.slug) {
+        const author = await getAuthorBySlug(merged.author.slug);
+        if (author) {
+          merged.author = author;
+        }
+      }
+
+      return merged;
     }
   } catch (err) {
     console.error(`Error reading local workflow detail for ${workflowId}:`, err);

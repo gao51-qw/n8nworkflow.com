@@ -1,0 +1,368 @@
+{
+  "id": 8728,
+  "slug": "8728",
+  "title": "Route equipment requests to Procurement with manager approval via Gmail",
+  "description": "This workflow streamlines how employees request **equipment/items** and how those requests reach the **Procurement** team. It validates the employee by enrollment number, detects whether a **manager** exists, and then either requests approval (if the requester has a manager) or routes the request **directly to Procurement** (if the requester is a manager). All messages are written in a professional tone using an LLM, and emails are sent via Gmail with a built-in **approve/deny** step for managers.\n\n## Who’s it for\n\nHR/IT/Operations teams that handle equipment requests, need a lightweight approval flow, and want clean, professional emails without manual drafting.\n\n## How it works\n\n1. Employee submits their **enrollment number**.\n2. Workflow fetches employee (and manager, if any).\n3. Employee describes the requested item(s).\n4. If a manager exists → an **approval email** (double opt-in) is sent to the manager.\n\n   * Approved → notify employee and forward a polished request to **Procurement**.\n   * Denied → notify employee.\n5. If the requester is a **manager** → skip approval and send directly to **Procurement**.\n6. End pages confirm the outcome.\n\n## Requirements\n\n* MySQL (or compatible DB) with an `employees` table (`id, name, email, enrollment_number, manager`).\n* Gmail credentials (OAuth) in n8n.\n* LLM provider (OpenAI or compatible) for message polishing.\n\n## How to customize\n\n* Replace the Procurement **NoOp** nodes with your email, helpdesk, or ERP integration.\n* Adjust email copy and tone in the LLM prompt nodes.\n* Add tracking IDs, SLA text, or CCs for auditing.\n* Style the forms with your brand (CSS blocks provided).\n",
+  "featuredImage": "/data/workflows/8728/8728.webp",
+  "author": {
+    "id": 101,
+    "slug": "gabrielhmsantos",
+    "name": "Gabriel Santos",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 330,
+  "downloads": 33,
+  "createdAt": "2025-09-18T16:06:49.260Z",
+  "updatedAt": "2026-01-16T08:57:26.060Z",
+  "publishedAt": "2025-09-18T16:06:49.260Z",
+  "nodes": 55,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8728",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Route equipment requests to Procurement with manager approval via Gmail",
+    "workflowName": "Route equipment requests to Procurement with manager approval via Gmail",
+    "description": "This workflow streamlines how employees request **equipment/items** and how those requests reach the **Procurement** team. It validates the employee by enrollment number, detects whether a **manager** exists, and then either requests approval (if the requester has a manager) or routes the request **directly to Procurement** (if the requester is a manager). All messages are written in a professional tone using an LLM, and emails are sent via Gmail with a built-in **approve/deny** step for managers.\n\n## Who’s it for\n\nHR/IT/Operations teams that handle equipment requests, need a lightweight approval flow, and want clean, professional emails without manual drafting.\n\n## How it works\n\n1. Employee submits their **enrollment number**.\n2. Workflow fetches employee (and manager, if any).\n3. Employee describes the requested item(s).\n4. If a manager exists → an **approval email** (double opt-in) is sent to the manager.\n\n   * Approved → notify employee and forward a polished request to **Procurement**.\n   * Denied → notify employee.\n5. If the requester is a **manager** → skip approval and send directly to **Procurement**.\n6. End pages confirm the outcome.\n\n## Requirements\n\n* MySQL (or compatible DB) with an `employees` table (`id, name, email, enrollment_number, manager`).\n* Gmail credentials (OAuth) in n8n.\n* LLM provider (OpenAI or compatible) for message polishing.\n\n## How to customize\n\n* Replace the Procurement **NoOp** nodes with your email, helpdesk, or ERP integration.\n* Adjust email copy and tone in the LLM prompt nodes.\n* Add tracking IDs, SLA text, or CCs for auditing.\n* Style the forms with your brand (CSS blocks provided).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Question form",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Return Employee not found",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Get request information",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Employee",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Employee data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Is approval required?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Manager",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Employee and Manager",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Set Manager field",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge Employee data and request",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Approval request message",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create approval message",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Data and message",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "End employee request",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Notify approved request",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Notify denied request",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create request message",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create request approved message",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Send request approved to the purchasing department",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send request to the purchasing department",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "End manager request",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send request to approve",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Request approved?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

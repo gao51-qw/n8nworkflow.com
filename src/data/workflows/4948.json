@@ -1,0 +1,325 @@
+{
+  "id": 4948,
+  "slug": "4948",
+  "title": "Bulk delete Slack messages with smart filtering and confirmations",
+  "description": "# 🧹 Jedi Cleaner for Slack\n\n## ❌ Slack's Limitation\n\nSlack lacks a native bulk delete feature. Users must delete messages manually, which is time-consuming and inefficient for large volumes.\n\n## ✅ Our Solution\n\n**Jedi Cleaner** automates Slack message deletion using smart filters, safety confirmations, and enterprise-grade reliability.\n\n---\n\n## 🚀 Key Features & Capabilities\n\n### ⚡ Lightning-Fast Bulk Operations\n\n* Delete hundreds of messages in minutes\n* Intelligent rate limiting prevents API throttling\n* Auto-retry on failure ensures reliable operation\n\n### 🎯 Smart Message Filtering\n\n* **Keyword match** – Find messages with specific terms\n* **User mentions** – Target messages that mention specific users\n* **Exact phrases** – Use quotes for precision\n* **Bot/User content** – Handle mixed sources seamlessly\n\n---\n\n## 🛡️ Enterprise-Grade Safety\n\n* **Confirmation workflow** – No accidental deletions\n* **Timeout** – Requests expire after 5 minutes\n* **Preview-first** – Review messages before deletion\n* **Granular control** – Choose exactly what to delete\n\n---\n\n## 🔍 Intelligent Search & Preview\n\n* Flexible filters (words, phrases, patterns)\n* Preview + count before deletion\n* Multi-channel support with context isolation\n\n## 📊 Complete Workflow Management\n\n* Auto-cleanup of bot messages after execution\n* Real-time progress tracking\n* Debug logs and audit trail\n* Static data persistence and cleanup\n\n---\n\n## 🧪 How It Works\n\n### Phase 1: Search Request\n\n```plaintext\nUser: /cleanup \"error messages\"\nBot Response:\n🔍 Found 15 messages containing \"error messages\"\n📊 Breakdown:\n• Will be permanently deleted\n• Cannot be undone\n• Respond within 5 minutes\n\n✅ Type: @cleaner_jedi yes\n❌ Type: @cleaner_jedi cancel\n```\n\n### Phase 2: User Confirmation\n\n```plaintext\nUser: @cleaner_jedi yes\nBot: 🗑️ Deleting 15 messages containing \"error messages\"\n```\n\n### Phase 3: Completion\n\n```plaintext\n✅ Cleanup Complete\n• 15 messages deleted\n• Channel cleaned\n• Auto-deletes this message in 5 seconds\n```\n\n---\n\n## 🛠️ Technical Architecture\n\n### Core Components\n\n* **Unified Webhook Handler**\n  Handles slash commands & mentions, deduplicates events\n* **Search Engine**\n  Integrates Slack API, parses & filters search terms\n* **Safety & Confirmation System**\n  Temporary storage, expiration logic, user auth\n* **Bulk Operations Engine**\n  Message deletion, progress tracking, error handling\n* **Cleanup & Memory Management**\n  Deletes bot messages, static data cleanup\n\n---\n\n## 📱 User Commands\n\n| Command                | Description                         | Example                    |\n| ---------------------- | ----------------------------------- | -------------------------- |\n| `/cleanup [term]`      | Search messages containing `[term]` | `/cleanup \"webhook error\"` |\n| `@cleaner_jedi yes`    | Confirm deletion                    | After preview              |\n| `@cleaner_jedi cancel` | Cancel pending deletion             | Cancels active request     |\n\n### 🧩 Edge Cases\n\n| Scenario             | Bot Response                                   |\n| -------------------- | ---------------------------------------------- |\n| No messages found    | \"No messages found containing '\\[term]'\"       |\n| Expired confirmation | \"Request expired. Please run /cleanup again\"   |\n| No pending request   | \"No pending cleanup found. Run /cleanup first\" |\n| Invalid search term  | \"Please provide a valid search term\"           |\n\n---\n\n## ⚙️ Setup Requirements\n\n### Slack App Configuration\n\n**OAuth Scopes:**\n\n```plaintext\n✅ chat:write\n✅ chat:write.public\n✅ channels:history\n✅ groups:history\n✅ app_mentions:read\n✅ commands\n```\n\n**Event Subscriptions:**\n\n```plaintext\n✅ app_mention\n✅ message.channels\n```\n\n**Slash Command:**\n\n```plaintext\nCommand: /cleanup\nURL: https://your-n8n.app.cloud/webhook/cleanerjedi\nHint: [search term]\n```\n\n### n8n Workflow Setup\n\nRequired Nodes:\n\n* **Webhook Trigger** – Captures Slack events\n* **Respond to Webhook** – Handles routing\n* **Switch Node** – Event type routing\n* **Slack API Nodes** – Search, delete, notify\n* **JavaScript Nodes** – Logic & validation\n\n---\n\n## ⚡ Advanced Features\n\n### 🧠 Intelligent Deduplication\n\n```javascript\neventId = `cmd_${body.command}_${body.user_id}_${body.trigger_id}`;\nif (staticData.recentEvents.includes(eventId)) {\n  return []; // Skip duplicate\n}\n```\n\n### 🔍 Flexible Search Terms\n\n* **Single words:** `test`\n* **Phrases:** `\"error message\"`\n* **Special characters:** `webhook-failed`\n* Case-insensitive by default\n\n### ♻️ Auto-Cleanup\n\n```javascript\nsetTimeout(() =&gt; {\n  deleteMessage(completionMessage.ts);\n  deleteMessage(progressMessage.ts);\n}, 5000);\n```\n\n### 🧠 Storage Management\n\n* Temp storage for requests\n* Auto-expiry cleanup\n* Memory-safe event trimming\n\n---\n\n## 📊 Error Handling & Logging\n\n### Error Scenarios\n\n```plaintext\n❌ Invalid term\n⏰ Expired request\n🚫 Access denied\n⚠️ Rate limit hit\n```\n\n### Debugging & Monitoring\n\n* Event IDs, timestamps\n* Key-value storage info\n* API response codes\n\n---\n\n## ✅ Usage Examples\n\n### Example 1: Delete Error Messages\n\n```plaintext\n/cleanup \"error\"\n→ Bot: Found 23 messages\n→ @cleaner_jedi yes\n→ ✅ Deleted 23 messages\n```\n\n### Example 2: Cancel Midway\n\n```plaintext\n/cleanup \"from:@john\"\n→ Bot: Found 8 messages\n→ @cleaner_jedi cancel\n→ ❌ Operation cancelled\n```\n\n### Example 3: Search by Date\n\n```plaintext\n/cleanup \"2024-01-15\"\n→ Bot: Found 12 messages\n→ @cleaner_jedi yes\n→ ✅ 12 messages deleted\n```\n\n---\n\n## 🔒 Security & Safety\n\n* ✅ **User confirmation required**\n* ✅ **5-minute time limits**\n* ✅ **Permission-aware deletions**\n* ✅ **Audit trail logging**\n\n---\n\n## 🚀 Performance Optimizations\n\n* Minimal webhook/API usage\n* Batch deletion\n* Cached recent events\n\n**Memory Handling:**\n\n* Temp data cleanup\n* Key expiration\n* Cache trimming\n\n---\n\n## 📈 Monitoring & Analytics\n\n### Metrics Tracked\n\n* Messages per operation\n* User response times\n* Failure & error rates\n* Storage performance\n\n### Logging\n\n```javascript\nconsole.log('✅ SUCCESS:', operationDetails);\nconsole.warn('⚠️ WARNING:', warningDetails);\nconsole.error('❌ ERROR:', errorDetails);\nconsole.info('ℹ️ INFO:', informationDetails);\n```\n\n---\n\n## 🎉 Summary\n\n### For Users\n\n* ✅ Simple commands\n* ✅ Preview + safety\n* ✅ Fast processing\n* ✅ Clear status feedback\n\n### For Admins\n\n* ✅ Lower API load\n* ✅ Full logging\n* ✅ Resilient to errors\n* ✅ Lightweight memory footprint\n\n### For Developers\n\n* ✅ Modular, clean code\n* ✅ Well-documented\n* ✅ Scalable & robust\n* ✅ Easy to extend\n\n---\n\nPDF how to do Document Included\n",
+  "featuredImage": "/data/workflows/4948/4948.webp",
+  "author": {
+    "id": 101,
+    "slug": "solutionflows",
+    "name": "Elie Kattar",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 88,
+  "downloads": 8,
+  "createdAt": "2025-06-15T23:39:38.879Z",
+  "updatedAt": "2026-01-16T08:37:03.216Z",
+  "publishedAt": "2025-06-15T23:39:38.879Z",
+  "nodes": 48,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4948",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Bulk delete Slack messages with smart filtering and confirmations",
+    "workflowName": "Bulk delete Slack messages with smart filtering and confirmations",
+    "description": "# 🧹 Jedi Cleaner for Slack\n\n## ❌ Slack's Limitation\n\nSlack lacks a native bulk delete feature. Users must delete messages manually, which is time-consuming and inefficient for large volumes.\n\n## ✅ Our Solution\n\n**Jedi Cleaner** automates Slack message deletion using smart filters, safety confirmations, and enterprise-grade reliability.\n\n---\n\n## 🚀 Key Features & Capabilities\n\n### ⚡ Lightning-Fast Bulk Operations\n\n* Delete hundreds of messages in minutes\n* Intelligent rate limiting prevents API throttling\n* Auto-retry on failure ensures reliable operation\n\n### 🎯 Smart Message Filtering\n\n* **Keyword match** – Find messages with specific terms\n* **User mentions** – Target messages that mention specific users\n* **Exact phrases** – Use quotes for precision\n* **Bot/User content** – Handle mixed sources seamlessly\n\n---\n\n## 🛡️ Enterprise-Grade Safety\n\n* **Confirmation workflow** – No accidental deletions\n* **Timeout** – Requests expire after 5 minutes\n* **Preview-first** – Review messages before deletion\n* **Granular control** – Choose exactly what to delete\n\n---\n\n## 🔍 Intelligent Search & Preview\n\n* Flexible filters (words, phrases, patterns)\n* Preview + count before deletion\n* Multi-channel support with context isolation\n\n## 📊 Complete Workflow Management\n\n* Auto-cleanup of bot messages after execution\n* Real-time progress tracking\n* Debug logs and audit trail\n* Static data persistence and cleanup\n\n---\n\n## 🧪 How It Works\n\n### Phase 1: Search Request\n\n```plaintext\nUser: /cleanup \"error messages\"\nBot Response:\n🔍 Found 15 messages containing \"error messages\"\n📊 Breakdown:\n• Will be permanently deleted\n• Cannot be undone\n• Respond within 5 minutes\n\n✅ Type: @cleaner_jedi yes\n❌ Type: @cleaner_jedi cancel\n```\n\n### Phase 2: User Confirmation\n\n```plaintext\nUser: @cleaner_jedi yes\nBot: 🗑️ Deleting 15 messages containing \"error messages\"\n```\n\n### Phase 3: Completion\n\n```plaintext\n✅ Cleanup Complete\n• 15 messages deleted\n• Channel cleaned\n• Auto-deletes this message in 5 seconds\n```\n\n---\n\n## 🛠️ Technical Architecture\n\n### Core Components\n\n* **Unified Webhook Handler**\n  Handles slash commands & mentions, deduplicates events\n* **Search Engine**\n  Integrates Slack API, parses & filters search terms\n* **Safety & Confirmation System**\n  Temporary storage, expiration logic, user auth\n* **Bulk Operations Engine**\n  Message deletion, progress tracking, error handling\n* **Cleanup & Memory Management**\n  Deletes bot messages, static data cleanup\n\n---\n\n## 📱 User Commands\n\n| Command                | Description                         | Example                    |\n| ---------------------- | ----------------------------------- | -------------------------- |\n| `/cleanup [term]`      | Search messages containing `[term]` | `/cleanup \"webhook error\"` |\n| `@cleaner_jedi yes`    | Confirm deletion                    | After preview              |\n| `@cleaner_jedi cancel` | Cancel pending deletion             | Cancels active request     |\n\n### 🧩 Edge Cases\n\n| Scenario             | Bot Response                                   |\n| -------------------- | ---------------------------------------------- |\n| No messages found    | \"No messages found containing '\\[term]'\"       |\n| Expired confirmation | \"Request expired. Please run /cleanup again\"   |\n| No pending request   | \"No pending cleanup found. Run /cleanup first\" |\n| Invalid search term  | \"Please provide a valid search term\"           |\n\n---\n\n## ⚙️ Setup Requirements\n\n### Slack App Configuration\n\n**OAuth Scopes:**\n\n```plaintext\n✅ chat:write\n✅ chat:write.public\n✅ channels:history\n✅ groups:history\n✅ app_mentions:read\n✅ commands\n```\n\n**Event Subscriptions:**\n\n```plaintext\n✅ app_mention\n✅ message.channels\n```\n\n**Slash Command:**\n\n```plaintext\nCommand: /cleanup\nURL: https://your-n8n.app.cloud/webhook/cleanerjedi\nHint: [search term]\n```\n\n### n8n Workflow Setup\n\nRequired Nodes:\n\n* **Webhook Trigger** – Captures Slack events\n* **Respond to Webhook** – Handles routing\n* **Switch Node** – Event type routing\n* **Slack API Nodes** – Search, delete, notify\n* **JavaScript Nodes** – Logic & validation\n\n---\n\n## ⚡ Advanced Features\n\n### 🧠 Intelligent Deduplication\n\n```javascript\neventId = `cmd_${body.command}_${body.user_id}_${body.trigger_id}`;\nif (staticData.recentEvents.includes(eventId)) {\n  return []; // Skip duplicate\n}\n```\n\n### 🔍 Flexible Search Terms\n\n* **Single words:** `test`\n* **Phrases:** `\"error message\"`\n* **Special characters:** `webhook-failed`\n* Case-insensitive by default\n\n### ♻️ Auto-Cleanup\n\n```javascript\nsetTimeout(() =&gt; {\n  deleteMessage(completionMessage.ts);\n  deleteMessage(progressMessage.ts);\n}, 5000);\n```\n\n### 🧠 Storage Management\n\n* Temp storage for requests\n* Auto-expiry cleanup\n* Memory-safe event trimming\n\n---\n\n## 📊 Error Handling & Logging\n\n### Error Scenarios\n\n```plaintext\n❌ Invalid term\n⏰ Expired request\n🚫 Access denied\n⚠️ Rate limit hit\n```\n\n### Debugging & Monitoring\n\n* Event IDs, timestamps\n* Key-value storage info\n* API response codes\n\n---\n\n## ✅ Usage Examples\n\n### Example 1: Delete Error Messages\n\n```plaintext\n/cleanup \"error\"\n→ Bot: Found 23 messages\n→ @cleaner_jedi yes\n→ ✅ Deleted 23 messages\n```\n\n### Example 2: Cancel Midway\n\n```plaintext\n/cleanup \"from:@john\"\n→ Bot: Found 8 messages\n→ @cleaner_jedi cancel\n→ ❌ Operation cancelled\n```\n\n### Example 3: Search by Date\n\n```plaintext\n/cleanup \"2024-01-15\"\n→ Bot: Found 12 messages\n→ @cleaner_jedi yes\n→ ✅ 12 messages deleted\n```\n\n---\n\n## 🔒 Security & Safety\n\n* ✅ **User confirmation required**\n* ✅ **5-minute time limits**\n* ✅ **Permission-aware deletions**\n* ✅ **Audit trail logging**\n\n---\n\n## 🚀 Performance Optimizations\n\n* Minimal webhook/API usage\n* Batch deletion\n* Cached recent events\n\n**Memory Handling:**\n\n* Temp data cleanup\n* Key expiration\n* Cache trimming\n\n---\n\n## 📈 Monitoring & Analytics\n\n### Metrics Tracked\n\n* Messages per operation\n* User response times\n* Failure & error rates\n* Storage performance\n\n### Logging\n\n```javascript\nconsole.log('✅ SUCCESS:', operationDetails);\nconsole.warn('⚠️ WARNING:', warningDetails);\nconsole.error('❌ ERROR:', errorDetails);\nconsole.info('ℹ️ INFO:', informationDetails);\n```\n\n---\n\n## 🎉 Summary\n\n### For Users\n\n* ✅ Simple commands\n* ✅ Preview + safety\n* ✅ Fast processing\n* ✅ Clear status feedback\n\n### For Admins\n\n* ✅ Lower API load\n* ✅ Full logging\n* ✅ Resilient to errors\n* ✅ Lightweight memory footprint\n\n### For Developers\n\n* ✅ Modular, clean code\n* ✅ Well-documented\n* ✅ Scalable & robust\n* ✅ Easy to extend\n\n---\n\nPDF how to do Document Included",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Parse Command",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check if Valid Command",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Error Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Get Channel Messages",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Filter Messages by Search Term",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Messages Found?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "No Messages Found",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send Confirmation Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Store Pending Deletion",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete or Cancel?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Cancel Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Loop Over Messages",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait Between Deletes",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send Completion Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check User Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Code Count",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Error Report",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Prase Set",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Clean Up Workflow Messages",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Delete Workflow Messages",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Delete Error Final",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait for Error Final",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Post Error Final",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait Error Final",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Error Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait No.M Final",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete No Messages",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait Cancel Message",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Cancel Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait Error Report",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Report Error",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Delete Progress M",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait Progress M",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send Progress Confirmation",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait Conf",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Conf",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Instruction Message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Delete Instruction",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Store Message Info",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Messages for Deletion Node",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

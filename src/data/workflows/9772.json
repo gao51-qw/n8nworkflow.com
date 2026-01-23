@@ -1,0 +1,145 @@
+{
+  "id": 9772,
+  "slug": "9772",
+  "title": "Automatic invoice generation and email with Airtable and CustomJS PDF generator",
+  "description": "\n&gt; ⚠️ **Notice:**  \n&gt; This workflow uses the **CustomJS Invoice Generator node** from [customjs.space](https://www.customjs.space), which requires a self-hosted n8n instance and a CustomJS API key.\n\n---\n\n# Google Spreadsheet → Invoice Generation → Email Workflow\n\nThis workflow demonstrates how to:\n\n1. Pull **invoices ready to be sent** from Airtable.  \n2. Retrieve **client details** and **invoice items** from Airtable.  \n3. Generate a **professional invoice PDF** using CustomJS Invoice Generator.  \n4. Send the completed invoice via **email** to the client.  \n5. Update the invoice status in Airtable automatically.\n\n![InvoiceGeneratorWorkflow.png](fileId:2981)\n[Public Airtable Example](https://airtable.com/apphyDa3uYAq0VOMW/shrSe39NZYrqm4gtE)\n\n---\n\n## Workflow Overview\n\n### 1. Trigger Workflow\n- **Node:** `When clicking ‘Execute workflow’` (Manual Trigger)  \n- Starts the workflow when executed manually in n8n.\n\n### 2. Get Ready Invoices\n- **Node:** `Get Ready Invoices` (Airtable)  \n- Retrieves all invoices from Airtable where `Status = 'Ready'`.\n\n### 3. Loop Over Items\n- **Node:** `Loop Over Items` (Split In Batches)  \n- Processes each invoice individually.\n\n### 4. Get Clients\n- **Node:** `Get Clients` (Airtable)  \n- Fetches client details for the current invoice:  \n  - Name  \n  - Address  \n  - Tax ID  \n\n### 5. Get Invoice Items\n- **Node:** `Get Invoice Items` (Airtable)  \n- Retrieves all items associated with the invoice and passes them for aggregation.\n\n### 6. Map Fields\n- **Node:** `Map Fields` (Set)  \n- Maps the invoice items into a structured format for the invoice generator:  \n  - Description  \n  - Quantity / Hours  \n  - Unit Price  \n  - Invoice ID  \n\n### 7. Aggregate\n- **Node:** `Aggregate`  \n- Aggregates all invoice items into a single JSON array for the invoice.\n\n### 8. Set Company Details\n- **Node:** `Set Company Details` (Set)  \n- Defines issuer and payment information:  \n  - Company Name  \n  - Address  \n  - Tax ID  \n  - Email & Phone  \n  - Bank Details  \n\n### 9. Generate Invoice\n- **Node:** `Generate Invoice` (CustomJS Invoice Generator)  \n- Generates a **PDF invoice** using all collected data:  \n  - Issuer / Company information  \n  - Recipient / Client information  \n  - Invoice items  \n  - Billing information (Invoice number, date, currency, tax, notes)  \n\n### 10. Send Email With Attachment\n- **Node:** `Send Email With Attachment` (Email Send)  \n- Sends the generated invoice PDF to the client:  \n  - From: `{{ $json.InvoiceEmail }}`  \n  - To: `info@yourcomp.org`  \n  - Subject: `Your Invoice for Last Month`  \n  - Body Text:\n\n    ```\n    Hello,\n\n    Please find attached your invoice for the last month. Thank you very much for your cooperation.\n\n    Best regards,\n    Henrik\n    ```\n\n- Uses SMTP credentials for sending emails.\n\n### 11. Update Record\n- **Node:** `Update record` (Airtable)  \n- Marks the invoice as `Sent` in Airtable.\n\n---\n\n\n## Requirements\n\n- Self-hosted n8n instance  \n- CustomJS API key  \n- SMTP credentials  \n- Airtable API key and base access  \n\n---\n\n",
+  "featuredImage": "/data/workflows/9772/9772.webp",
+  "author": {
+    "id": 101,
+    "slug": "customjs",
+    "name": "CustomJS",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 157,
+  "downloads": 15,
+  "createdAt": "2025-10-16T10:05:14.859Z",
+  "updatedAt": "2026-01-16T09:01:50.391Z",
+  "publishedAt": "2025-10-16T10:05:14.859Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9772",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatic invoice generation and email with Airtable and CustomJS PDF generator",
+    "workflowName": "Automatic invoice generation and email with Airtable and CustomJS PDF generator",
+    "description": "&gt; ⚠️ **Notice:**  \n&gt; This workflow uses the **CustomJS Invoice Generator node** from [customjs.space](https://www.customjs.space), which requires a self-hosted n8n instance and a CustomJS API key.\n\n---\n\n# Google Spreadsheet → Invoice Generation → Email Workflow\n\nThis workflow demonstrates how to:\n\n1. Pull **invoices ready to be sent** from Airtable.  \n2. Retrieve **client details** and **invoice items** from Airtable.  \n3. Generate a **professional invoice PDF** using CustomJS Invoice Generator.  \n4. Send the completed invoice via **email** to the client.  \n5. Update the invoice status in Airtable automatically.\n\n![InvoiceGeneratorWorkflow.png](fileId:2981)\n[Public Airtable Example](https://airtable.com/apphyDa3uYAq0VOMW/shrSe39NZYrqm4gtE)\n\n---\n\n## Workflow Overview\n\n### 1. Trigger Workflow\n- **Node:** `When clicking ‘Execute workflow’` (Manual Trigger)  \n- Starts the workflow when executed manually in n8n.\n\n### 2. Get Ready Invoices\n- **Node:** `Get Ready Invoices` (Airtable)  \n- Retrieves all invoices from Airtable where `Status = 'Ready'`.\n\n### 3. Loop Over Items\n- **Node:** `Loop Over Items` (Split In Batches)  \n- Processes each invoice individually.\n\n### 4. Get Clients\n- **Node:** `Get Clients` (Airtable)  \n- Fetches client details for the current invoice:  \n  - Name  \n  - Address  \n  - Tax ID  \n\n### 5. Get Invoice Items\n- **Node:** `Get Invoice Items` (Airtable)  \n- Retrieves all items associated with the invoice and passes them for aggregation.\n\n### 6. Map Fields\n- **Node:** `Map Fields` (Set)  \n- Maps the invoice items into a structured format for the invoice generator:  \n  - Description  \n  - Quantity / Hours  \n  - Unit Price  \n  - Invoice ID  \n\n### 7. Aggregate\n- **Node:** `Aggregate`  \n- Aggregates all invoice items into a single JSON array for the invoice.\n\n### 8. Set Company Details\n- **Node:** `Set Company Details` (Set)  \n- Defines issuer and payment information:  \n  - Company Name  \n  - Address  \n  - Tax ID  \n  - Email & Phone  \n  - Bank Details  \n\n### 9. Generate Invoice\n- **Node:** `Generate Invoice` (CustomJS Invoice Generator)  \n- Generates a **PDF invoice** using all collected data:  \n  - Issuer / Company information  \n  - Recipient / Client information  \n  - Invoice items  \n  - Billing information (Invoice number, date, currency, tax, notes)  \n\n### 10. Send Email With Attachment\n- **Node:** `Send Email With Attachment` (Email Send)  \n- Sends the generated invoice PDF to the client:  \n  - From: `{{ $json.InvoiceEmail }}`  \n  - To: `info@yourcomp.org`  \n  - Subject: `Your Invoice for Last Month`  \n  - Body Text:\n\n    ```\n    Hello,\n\n    Please find attached your invoice for the last month. Thank you very much for your cooperation.\n\n    Best regards,\n    Henrik\n    ```\n\n- Uses SMTP credentials for sending emails.\n\n### 11. Update Record\n- **Node:** `Update record` (Airtable)  \n- Marks the invoice as `Sent` in Airtable.\n\n---\n\n\n## Requirements\n\n- Self-hosted n8n instance  \n- CustomJS API key  \n- SMTP credentials  \n- Airtable API key and base access  \n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Ready Invoices",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Clients",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Invoice Items",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Generate Invoice",
+      "type": "@custom-js/n8n-nodes-pdf-toolkit.invoiceGenerator",
+      "role": "invoiceGenerator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Company Details",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Map Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Email With Attachment",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

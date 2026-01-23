@@ -1,0 +1,116 @@
+{
+  "id": 4379,
+  "slug": "4379",
+  "title": "Website downtime alert via LINE + Supabase log",
+  "description": "This workflow automatically checks the status of your websites using UptimeRobot API. If any site is down or unstable, it will:\n- Generate a natural-language alert message using GPT-4o\n- Push the message to a LINE group (with funny IT-style encouragement)\n- Log all DOWN status entries into your Supabase database\n- Wait 30 minutes before repeating\n\n🔧 How It Works\n1. Schedule Trigger – Runs on a fixed interval (every few minutes).\n2. UptimeRobot Node – Fetches website monitor data.\n3. Code Node (Filter) – Filters only websites with status 8 (may be down) or 9 (down).\n4. IF Node – If any site is down, proceed.\n5. LangChain LLM Node – Formats alert with a humorous message using GPT-4o.\n6. Line Notify (HTTP Request) – Sends the alert to your LINE group.\n7. Loop Over Items – Loops through all monitors.\n8. Filter Down (Status = 9) – Selects only “fully down” sites.\n9. Supabase Node – Logs these into synlora_uptime_down table.\n10. Wait Node – Delays next alert by 30 minutes to avoid spamming.\n\n⚙️ Setup Steps\n\nRequired:\n- 🔗 UptimeRobot API Key\n- 📲 LINE Channel Access Token and Group ID\n- 🧠 OpenAI Key (GPT-4o Mini)\n- 🗃️ Supabase Project & Table \n\nStep-by-step:\n1. Go to UptimeRobot → Get API key and ensure monitors are set up.\n2. Create a Supabase table with fields: website, status, uptime_id.\n3. Create a LINE Messaging API bot, join it to your group, and get:\n\t1. Access Token\n\t2. Group ID (userId or groupId)\n4. Add your OpenAI API Key for GPT-4o Mini (or switch to your preferred LLM).\n5. Import the workflow JSON into n8n.\n6. Set credentials in all necessary nodes.\n7. Activate the workflow.\n\n",
+  "featuredImage": "/data/workflows/4379/4379.webp",
+  "author": {
+    "id": 101,
+    "slug": "sayamol",
+    "name": "sayamol thiramonpaphakul",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 961,
+  "downloads": 96,
+  "createdAt": "2025-05-25T08:04:40.906Z",
+  "updatedAt": "2026-01-16T08:34:05.788Z",
+  "publishedAt": "2025-05-25T08:04:40.906Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4379",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Website downtime alert via LINE + Supabase log",
+    "workflowName": "Website downtime alert via LINE + Supabase log",
+    "description": "This workflow automatically checks the status of your websites using UptimeRobot API. If any site is down or unstable, it will:\n- Generate a natural-language alert message using GPT-4o\n- Push the message to a LINE group (with funny IT-style encouragement)\n- Log all DOWN status entries into your Supabase database\n- Wait 30 minutes before repeating\n\n🔧 How It Works\n1. Schedule Trigger – Runs on a fixed interval (every few minutes).\n2. UptimeRobot Node – Fetches website monitor data.\n3. Code Node (Filter) – Filters only websites with status 8 (may be down) or 9 (down).\n4. IF Node – If any site is down, proceed.\n5. LangChain LLM Node – Formats alert with a humorous message using GPT-4o.\n6. Line Notify (HTTP Request) – Sends the alert to your LINE group.\n7. Loop Over Items – Loops through all monitors.\n8. Filter Down (Status = 9) – Selects only “fully down” sites.\n9. Supabase Node – Logs these into synlora_uptime_down table.\n10. Wait Node – Delays next alert by 30 minutes to avoid spamming.\n\n⚙️ Setup Steps\n\nRequired:\n- 🔗 UptimeRobot API Key\n- 📲 LINE Channel Access Token and Group ID\n- 🧠 OpenAI Key (GPT-4o Mini)\n- 🗃️ Supabase Project & Table \n\nStep-by-step:\n1. Go to UptimeRobot → Get API key and ensure monitors are set up.\n2. Create a Supabase table with fields: website, status, uptime_id.\n3. Create a LINE Messaging API bot, join it to your group, and get:\n\t1. Access Token\n\t2. Group ID (userId or groupId)\n4. Add your OpenAI API Key for GPT-4o Mini (or switch to your preferred LLM).\n5. Import the workflow JSON into n8n.\n6. Set credentials in all necessary nodes.\n7. Activate the workflow.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Monitors",
+      "type": "n8n-nodes-base.uptimeRobot",
+      "role": "uptimeRobot",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "LLM Message Format",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "OpenAI GPT-4o Mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Escape Newlines",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send to LINE",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter Down Monitors",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If Down",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait 30 Min",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Loop Over Monitors",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Filter Status 9",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Save to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    }
+  ]
+}

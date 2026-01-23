@@ -1,0 +1,253 @@
+{
+  "id": 11812,
+  "slug": "11812",
+  "title": "Discord server anti-impersonation / scammer tracker with data tables",
+  "description": "# Discord Member Change Tracker\n\nThis n8n template demonstrates how to automatically monitor and track username and nickname changes across your Discord server members. Perfect for community moderation, security monitoring, and maintaining accountability in large servers!\n\n## Use cases are many\n\nTry tracking suspicious account behavior, maintaining audit logs for member identity changes, or monitoring impersonation attempts in your community!\n\n## Good to know\n\n* This workflow runs hourly by default - adjust the schedule trigger based on your server size and needs\n* Discord API rate limits apply - large servers (1000+ members) may need longer intervals between checks\n* Admin notifications are sent to a designated channel - ensure your bot has proper permissions\n* The workflow maintains two separate databases: one for current member data and one for change history\n* Protected usernames and admin roles can be configured to prevent false alerts\n\n## How it works\n\n* The Schedule Trigger initiates the workflow every hour to check for member changes\n* Configuration Settings node stores your Discord server ID, admin channel ID, and protected user lists\n* We'll fetch all server members using the Discord API, including their roles, nicknames, and user information\n* The Edit Fields node extracts only the relevant data (user ID, username, nickname, roles) for processing\n* Loop Over Items processes each member individually to compare against stored records\n* If userID does not exist checks the main database - new members are added automatically\n* The Switch node evaluates whether username or nickname has changed by comparing current data with stored records\n* For first-time changes, a Discord message is sent to the admin channel and the change is logged in the tracking database\n* If the user has changed their identity before, the workflow checks if this specific change is already recorded\n* The aggregate all necessary data node compiles both old and new information for detailed comparison\n* Multiple conditional branches determine exactly what changed (both fields, username only, nickname only, or neither)\n* Database updates append new changes to existing records, creating a comma-separated history of all identity modifications\n* Error handling catches edge cases where triggers fire but no actual changes occurred\n\n## How to use\n\n* Replace the Schedule Trigger with a Webhook or Manual Trigger for testing before enabling hourly automation\n* Customize the admin notification messages in the Discord nodes to match your server's tone and formatting preferences\n* Adjust the protected usernames list to exclude staff members or bots from change tracking\n* Consider adding filtering logic to ignore members with specific roles (like \"Verified\" or \"Trusted\")\n* Scale the workflow for larger servers by increasing the batch size in Loop Over Items or adding rate limit delays\n\n## Requirements\n\n* Discord OAuth2 credentials for authenticating API requests\n* Two n8n Data Tables: one for main member records (\"main member records\") and one for tracking changes (\"user member changes\")\n* Discord bot permissions: Read Messages/View Channels, Send Messages in the admin channel, and Read Message History\n* Server admin access to configure the Discord server ID and admin channel ID\n\n## Data Table Setup\n\n### Main Database Table: \"zft member list\"\n\nCreate a data table with these columns:\n\n* **userID** (string) - Discord user ID (unique identifier)\n* **userName** (string) - Current Discord username\n* **nickname** (string) - Current server nickname (null if not set)\n* **role_or_roles** (string) - Comma-separated list of role IDs\n* **isAdmin** (string) - Flag for admin status (optional)\n* **unusual_dm_activity_until** (string) - Timestamp for DM activity monitoring (optional)\n\n### Change Tracking Table: \"user member changes\"\n\nCreate a data table with these columns:\n\n* **user_id** (string) - Discord user ID (links to main database)\n* **user_init_username** (string) - Original username when first change detected\n* **user_init_nickname** (string) - Original nickname when first change detected\n* **user_new_username** (string) - Comma-separated history of all username changes\n* **user_new_nickname** (string) - Comma-separated history of all nickname changes\n\n**Important:** After creating your tables, update all Data Table node configurations with your actual table IDs. You can find these IDs in the n8n Data Table URLs.\n\n## Customising this workflow\n\n* Add email or Slack notifications alongside Discord messages for critical identity changes\n* Implement a threshold system that flags users who change their identity more than X times per month\n* Create a dashboard artifact that visualizes change frequency and patterns across your server\n* Try a popular use-case such as automatically assigning a \"Name Changed\" role to flagged users for manual review\n* Extend the workflow to compare profile pictures or account creation dates for additional security monitoring\n* Add webhook integration to sync change logs with external security tools or moderation dashboards\n\n## Questions?\n\nIf you have questions or need help with this workflow, feel free to reach out:\n\n* elijahmamuri@gmail.com\n* elijahfxtrading@gmail.com",
+  "featuredImage": "/data/workflows/11812/11812.webp",
+  "author": {
+    "id": 101,
+    "slug": "elijahbuilds-ai",
+    "name": "Cj Elijah Garay",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 44,
+  "downloads": 4,
+  "createdAt": "2025-12-15T04:08:40.651Z",
+  "updatedAt": "2026-01-16T09:10:12.055Z",
+  "publishedAt": "2025-12-15T04:08:40.651Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11812",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Discord server anti-impersonation / scammer tracker with data tables",
+    "workflowName": "Discord server anti-impersonation / scammer tracker with data tables",
+    "description": "# Discord Member Change Tracker\n\nThis n8n template demonstrates how to automatically monitor and track username and nickname changes across your Discord server members. Perfect for community moderation, security monitoring, and maintaining accountability in large servers!\n\n## Use cases are many\n\nTry tracking suspicious account behavior, maintaining audit logs for member identity changes, or monitoring impersonation attempts in your community!\n\n## Good to know\n\n* This workflow runs hourly by default - adjust the schedule trigger based on your server size and needs\n* Discord API rate limits apply - large servers (1000+ members) may need longer intervals between checks\n* Admin notifications are sent to a designated channel - ensure your bot has proper permissions\n* The workflow maintains two separate databases: one for current member data and one for change history\n* Protected usernames and admin roles can be configured to prevent false alerts\n\n## How it works\n\n* The Schedule Trigger initiates the workflow every hour to check for member changes\n* Configuration Settings node stores your Discord server ID, admin channel ID, and protected user lists\n* We'll fetch all server members using the Discord API, including their roles, nicknames, and user information\n* The Edit Fields node extracts only the relevant data (user ID, username, nickname, roles) for processing\n* Loop Over Items processes each member individually to compare against stored records\n* If userID does not exist checks the main database - new members are added automatically\n* The Switch node evaluates whether username or nickname has changed by comparing current data with stored records\n* For first-time changes, a Discord message is sent to the admin channel and the change is logged in the tracking database\n* If the user has changed their identity before, the workflow checks if this specific change is already recorded\n* The aggregate all necessary data node compiles both old and new information for detailed comparison\n* Multiple conditional branches determine exactly what changed (both fields, username only, nickname only, or neither)\n* Database updates append new changes to existing records, creating a comma-separated history of all identity modifications\n* Error handling catches edge cases where triggers fire but no actual changes occurred\n\n## How to use\n\n* Replace the Schedule Trigger with a Webhook or Manual Trigger for testing before enabling hourly automation\n* Customize the admin notification messages in the Discord nodes to match your server's tone and formatting preferences\n* Adjust the protected usernames list to exclude staff members or bots from change tracking\n* Consider adding filtering logic to ignore members with specific roles (like \"Verified\" or \"Trusted\")\n* Scale the workflow for larger servers by increasing the batch size in Loop Over Items or adding rate limit delays\n\n## Requirements\n\n* Discord OAuth2 credentials for authenticating API requests\n* Two n8n Data Tables: one for main member records (\"main member records\") and one for tracking changes (\"user member changes\")\n* Discord bot permissions: Read Messages/View Channels, Send Messages in the admin channel, and Read Message History\n* Server admin access to configure the Discord server ID and admin channel ID\n\n## Data Table Setup\n\n### Main Database Table: \"zft member list\"\n\nCreate a data table with these columns:\n\n* **userID** (string) - Discord user ID (unique identifier)\n* **userName** (string) - Current Discord username\n* **nickname** (string) - Current server nickname (null if not set)\n* **role_or_roles** (string) - Comma-separated list of role IDs\n* **isAdmin** (string) - Flag for admin status (optional)\n* **unusual_dm_activity_until** (string) - Timestamp for DM activity monitoring (optional)\n\n### Change Tracking Table: \"user member changes\"\n\nCreate a data table with these columns:\n\n* **user_id** (string) - Discord user ID (links to main database)\n* **user_init_username** (string) - Original username when first change detected\n* **user_init_nickname** (string) - Original nickname when first change detected\n* **user_new_username** (string) - Comma-separated history of all username changes\n* **user_new_nickname** (string) - Comma-separated history of all nickname changes\n\n**Important:** After creating your tables, update all Data Table node configurations with your actual table IDs. You can find these IDs in the n8n Data Table URLs.\n\n## Customising this workflow\n\n* Add email or Slack notifications alongside Discord messages for critical identity changes\n* Implement a threshold system that flags users who change their identity more than X times per month\n* Create a dashboard artifact that visualizes change frequency and patterns across your server\n* Try a popular use-case such as automatically assigning a \"Name Changed\" role to flagged users for manual review\n* Extend the workflow to compare profile pictures or account creation dates for additional security monitoring\n* Add webhook integration to sync change logs with external security tools or moderation dashboards\n\n## Questions?\n\nIf you have questions or need help with this workflow, feel free to reach out:\n\n* elijahmamuri@gmail.com\n* elijahfxtrading@gmail.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Hourly Check Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Configuration Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get All Server Members",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Collection Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If userid does not exist",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "nickname changed",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "add new user to database",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "insert user changes to new database",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get row(s) from main DB",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get row(s) from new DB",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If userID does not exist",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "is the new change recorded already",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "new name and un is recorded, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Analysis Section1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "nickname changed again",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "aggregate all necessary data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Analysis Section2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If both username and nickname was changed but user ID is the same",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If username and nickname hasn't been changed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Analysis Section3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "if username is the same but nickname is diff",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "if username is the same but nickname is diff1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "update both column in records",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "update only nickname column",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "update only username on record",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analysis Section4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "error handling",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Comparison Logic Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analysis Section5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analysis Section",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

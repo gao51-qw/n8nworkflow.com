@@ -1,0 +1,212 @@
+{
+  "id": 8139,
+  "slug": "8139",
+  "title": "Automate invoice processing with OCR.Space, GPT-4 & Google Drive to Gmail",
+  "description": "# How it works\n- Watches a Google Drive folder for new (scanned) invoices. Each new file automatically triggers the workflow.\n- Downloads and processes each invoice through OCR Space to extract the text.\n- Extracts the company name (e.g. from the “billed to” field) and uses an AI agent to cross-reference it against a database in Google Sheets.\n- If a match is found, retrieves the correct recipient email and sends the invoice as an attachment.\n- If no match or an error occurs, the workflow alerts an operator by email for manual review.\n\n\n## Setting up the workflow\n\n1. Connect Google Drive\n\t•\tIn n8n, connect your Google Drive account.\n\t•\tCreate or select a folder where you will upload scanned invoices.\n\n2. Connect Gmail (or another email service)\n\t•\tAdd your Gmail account as a credential in n8n.\n\t•\tThis will be used to send the processed invoice to the correct recipient.\n\n3. Set up OCR.Space\n\t•\tCreate a free OCR.Space account: https://ocr.space\n\t•\tIn n8n, create a Generic Credential (Header Auth).\n\t•\tUse apikey as the name and your OCR API key as the value.\n\n4. Connect the AI Agent\n\t•\tAdd your OpenAI API key as a credential in n8n.\n\t•\tThe AI Agent will extract the company name from the invoice text and match it against your database.\n\t•\tIf a match is found, it retrieves the correct email.\n\n5. Prepare the Google Sheet database\n\t•\tMake a copy of the database sheet: Google Sheet Template\n\t•\tFill it with company names and recipient emails.\n\t•\tConnect your Google account to n8n and link this sheet to the workflow.\n\n6. Run the workflow\n\t•\tWhen a new invoice is uploaded to your Google Drive folder, the workflow will:\n\t•\tExtract the text with OCR.Space\n\t•\tUse the AI Agent to identify the company name\n\t•\tCross-reference it with your Google Sheet database\n\t•\tSend the invoice automatically to the correct recipient via Gmail\n\t•\tIf no match is found, an error email is sent to you for manual review",
+  "featuredImage": "/data/workflows/8139/8139.webp",
+  "author": {
+    "id": 101,
+    "slug": "michaeltaleb",
+    "name": "Michael Taleb",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 306,
+  "downloads": 30,
+  "createdAt": "2025-09-02T01:39:55.989Z",
+  "updatedAt": "2026-01-16T08:54:20.966Z",
+  "publishedAt": "2025-09-02T01:39:55.989Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8139",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate invoice processing with OCR.Space, GPT-4 & Google Drive to Gmail",
+    "workflowName": "Automate invoice processing with OCR.Space, GPT-4 & Google Drive to Gmail",
+    "description": "# How it works\n- Watches a Google Drive folder for new (scanned) invoices. Each new file automatically triggers the workflow.\n- Downloads and processes each invoice through OCR Space to extract the text.\n- Extracts the company name (e.g. from the “billed to” field) and uses an AI agent to cross-reference it against a database in Google Sheets.\n- If a match is found, retrieves the correct recipient email and sends the invoice as an attachment.\n- If no match or an error occurs, the workflow alerts an operator by email for manual review.\n\n\n## Setting up the workflow\n\n1. Connect Google Drive\n\t•\tIn n8n, connect your Google Drive account.\n\t•\tCreate or select a folder where you will upload scanned invoices.\n\n2. Connect Gmail (or another email service)\n\t•\tAdd your Gmail account as a credential in n8n.\n\t•\tThis will be used to send the processed invoice to the correct recipient.\n\n3. Set up OCR.Space\n\t•\tCreate a free OCR.Space account: https://ocr.space\n\t•\tIn n8n, create a Generic Credential (Header Auth).\n\t•\tUse apikey as the name and your OCR API key as the value.\n\n4. Connect the AI Agent\n\t•\tAdd your OpenAI API key as a credential in n8n.\n\t•\tThe AI Agent will extract the company name from the invoice text and match it against your database.\n\t•\tIf a match is found, it retrieves the correct email.\n\n5. Prepare the Google Sheet database\n\t•\tMake a copy of the database sheet: Google Sheet Template\n\t•\tFill it with company names and recipient emails.\n\t•\tConnect your Google account to n8n and link this sheet to the workflow.\n\n6. Run the workflow\n\t•\tWhen a new invoice is uploaded to your Google Drive folder, the workflow will:\n\t•\tExtract the text with OCR.Space\n\t•\tUse the AI Agent to identify the company name\n\t•\tCross-reference it with your Google Sheet database\n\t•\tSend the invoice automatically to the correct recipient via Gmail\n\t•\tIf no match is found, an error email is sent to you for manual review",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Error1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Drive Trigger1",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    }
+  ]
+}

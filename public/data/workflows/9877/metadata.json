@@ -1,0 +1,26 @@
+{
+  "id": 9877,
+  "slug": "9877",
+  "title": "Automated asteroid alerts with NASA API, Slack & Google Calendar",
+  "description": "This n8n template creates an automated alert system that checks NASA's data for near-Earth asteroids twice a day. When it finds asteroids meeting specific criteria, it sends a summary alert to Slack and creates individual events in Google Calendar for each object.\n\n## Use cases\n\n- **Automated Monitoring**: Keep track of potentially hazardous asteroids without manually checking websites.\n- **Team or Community Alerts**: Automatically inform a team, a group of friends, or a community about significant celestial events via Slack.\n- **Personalized Space Calendar**: Populate your Google Calendar with upcoming asteroid close approaches, creating a personal \"what's up in space\" agenda.\n- **Educational Tool**: Use this as a foundation to learn about API data fetching, data processing, and multi-channel notifications in n8n.\n\n## Good to know\n\n- This workflow runs on a **schedule** (every 12 hours by default) and does not require a manual trigger.\n- **NASA API Key is highly recommended**. The default `DEMO_KEY` has strict rate limits. Get a free key from [api.nasa.gov](https://api.nasa.gov/).\n- The filtering logic for what constitutes an \"alert-worthy\" asteroid (distance and size) is fully customizable within the \"Filter and Process Asteroids\" Code node.\n\n## How it works\n\n1.  A **Schedule Trigger** starts the workflow every 12 hours.\n2.  The \"Calculate Date Range\" **Code node** generates the start and end dates for the API query (today to 14 days from now).\n3.  The **NASA node** uses these dates to query the Near Earth Object Web Service (NeoWs) API, retrieving a list of all asteroids that will pass by Earth in that period.\n4.  The \"Filter and Process Asteroids\" **Code node** iterates through the list. It filters out objects that are too small or too far away, based on thresholds defined in the code. It then formats and sorts the remaining \"interesting\" asteroids by their closest approach distance.\n5.  An **If node** checks if any asteroids were found after filtering.\n    - If **true** (asteroids were found), the flow continues to the alert steps.\n    - If **false**, the workflow ends quietly via a **NoOp node**.\n6.  The \"Format Alert Messages\" **Code node** compiles a single, well-formatted summary message for Slack and prepares the data for other notifications.\n7.  The workflow then splits into two parallel branches:\n    - **Slack Alert**: The **Slack node** sends the summary message to a specified channel.\n    - **Calendar Events**: The **Split Out node** separates the data so that each asteroid is processed individually. For each asteroid, the **Google Calendar node** creates an all-day event on its close-approach date.\n\n## How to use\n\n1.  **Configure the NASA Node**:\n    - Open the \"Get an asteroid neo feed\" (NASA) node.\n    - Create new credentials and replace the default `DEMO_KEY` with your own NASA API key.\n\n2.  **Customize Filtering (Optional)**:\n    - Open the \"Filter and Process Asteroids\" Code node.\n    - Adjust the `MAX_DISTANCE_KM` and `MIN_DIAMETER_METERS` variables to make the alerts more or less sensitive.\n      ```javascript\n      // Example: For closer, larger objects\n      const MAX_DISTANCE_KM = 7500000; // 7.5 million km (approx. 19.5 lunar distances)\n      const MIN_DIAMETER_METERS = 100;   // 100 meters\n      ```\n\n3.  **Configure Slack Alerts**:\n    - Open the \"Send Slack Alert\" node.\n    - Add your Slack OAuth2 credentials.\n    - Select the channel where you want to receive alerts (e.g., `#asteroid-watch`).\n\n4.  **Configure Google Calendar Events**:\n    - Open the \"Create an event\" (Google Calendar) node.\n    - Add your Google Calendar OAuth2 credentials.\n    - Select the calendar where events should be created.\n\n5.  **Activate the workflow**.\n\n## Requirements\n\n- A free **NASA API Key**.\n- **Slack credentials** (OAuth2) and a workspace to post alerts.\n- **Google Calendar credentials** (OAuth2) to create events.\n\n## Customising this workflow\n\n- **Add More Notification Channels**: Add nodes for Discord, Telegram, or email to send alerts to other platforms.\n- **Create a Dashboard**: Instead of just sending alerts, use the processed data to populate a database (like Baserow or Postgres) to power a simple dashboard.\n- **Different Data Source**: Modify the HTTP Request node to pull data from other space-related APIs, like a feed of upcoming rocket launches.",
+  "featuredImage": "/data/workflows/9877/9877.webp",
+  "author": {
+    "id": 101,
+    "slug": "yusuke-yamamoto",
+    "name": "Yusuke Yamamoto",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 51,
+  "downloads": 5,
+  "createdAt": "2025-10-19T03:06:11.743Z",
+  "updatedAt": "2026-01-16T09:02:25.911Z",
+  "publishedAt": "2025-10-19T03:06:11.743Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9877"
+}

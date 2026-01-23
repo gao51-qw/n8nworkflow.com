@@ -1,0 +1,182 @@
+{
+  "id": 11191,
+  "slug": "11191",
+  "title": "Automate weekly timesheet reporting with Salesforce, OpenAI and Gmail",
+  "description": "# Weekly Timesheet Report + Pending Submissions Workflow\n\n## Overview\nThis workflow automates the entire weekly timesheet reporting cycle by integrating Salesforce, OpenAI, Gmail, and n8n. It retrieves employee timesheets for the previous week, identifies which were submitted or not, summarizes all line-item activities using OpenAI, and delivers a consolidated, manager-ready summary that mirrors the final email output.\n\nThe workflow eliminates manual checking, reduces repeated follow-ups, and ensures leadership receives an accurate, structured, and consistent weekly report.\n\n---\n\n## Workflow Structure\n\n### **Data Source: Salesforce DBT Timesheet App**\nThis workflow requires the **Digital Biz Tech – Simple Timesheet** managed package to be installed in Salesforce.\n\n**Install the Timesheet App:**\n[https://appexchange.salesforce.com/appxListingDetail?listingId=a077704c-2e99-4653-8bde-d32e1fafd8c6](https://appexchange.salesforce.com/appxListingDetail?listingId=a077704c-2e99-4653-8bde-d32e1fafd8c6)\n\n**The workflow retrieves:**\n\n- `dbt__Timesheet__c` — weekly timesheet records  \n- `dbt__Timesheet_Line_Item__c` — project and activity entries  \n- `dbt__Employee__c` — employee reference and metadata  \n- Billable, non-billable, and absence hour details  \n- Attendance information  \n\nThese combined objects form the complete dataset used for both submitted and pending sections.\n\n### **Trigger**\nWeekly **n8n Schedule Trigger** — runs once every week.\n\n### **Submitted Path**\nRetrieve submitted timesheets → Fetch line items → Convert to HTML → OpenAI summary → Merge with employee details.\n\n### **Pending Path**\nIdentify “New” timesheets → Fetch employee details → Generate pending submission list.\n\n### **Final Output**\nMerge both paths → Build formatted report → Gmail sends weekly email to managers.\n\n---\n\n## Detailed Node-by-Node Explanation\n\n### **1. Schedule Trigger**\nRuns weekly without manual intervention and targets the previous full week.\n\n### **2. Timesheet – Salesforce GetAll**\nFetches all `dbt__Timesheet__c` records matching:\n**Timesheet for &lt;week-start&gt; to &lt;week-end&gt;**\n\nExtracted fields include:\n\n- Employee reference  \n- Status  \n- Billable, non-billable, absence hours  \n- Total hours  \n- Reporting period  \n\nFeeds both processing paths.\n\n---\n\n# Processing Path A — Submitted Timesheets\n\n### **3. Filter Submitted**\nFilters timesheets where `dbt__Status__c == \"Submitted\"`.\n\n### **4. Loop Through Each Submitted Record**\nEach employee’s timesheet is processed individually.\n\n### **5. Retrieve Line Items**\nFetches all `dbt__Timesheet_Line_Item__c` entries:\n\n- Project / Client  \n- Activity  \n- Duration  \n- Work description  \n- Billable category  \n\n### **6. Convert Line Items to HTML (Code Node)**\nTransforms line items into well-structured HTML tables for clean LLM input.\n\n### **7. OpenAI — Weekly Activity Summary**\nOpenAI receives the HTML + Employee ID and returns a **4-point activity summary** avoiding:\n\n- Hours  \n- Dates  \n- Repeated or irrelevant metadata  \n\n### **8. Fetch Employee Details**\nRetrieves employee name, email, and additional fields if needed.\n\n### **9. Merge Employee + Summary**\nCombines:\n\n- Timesheet data  \n- Employee details  \n- OpenAI summary  \n\nCreates a unified object.\n\n### **10. Prepare Submitted Section (Code Node)**\nProduces the formatted block used in the final email:\n\n```\nEmployee: Name  \nPeriod: Start → End  \nStatus: Submitted  \nTotal Hours: ...  \n\nTimesheet Line Items Breakdown:\n - summary point  \n - summary point  \n - summary point  \n - summary point  \n```\n\n---\n\n# Processing Path B — Not Submitted Timesheets\n\n### **11. Identify Not Submitted**\nTimesheets still in `dbt__Status__c == \"New\"` are flagged.\n\n### **12. Retrieve Employee Information**\nFetches employee name and email.\n\n### **13. Merge Pending Information**\nMaps each missing submission with its reporting period.\n\n### **14. Prepare Pending Reporting Block**\nCreates formatted pending entries:\n\n```\nTIMESHEET NOT SUBMITTED\nEmployee Name\nEmail: user@example.com\n```\n\n---\n\n# Final Assembly & Report Delivery\n\n### **15. Merge Submitted + Pending Sections**\nCombines all processed data.\n\n### **16. Create Final Email (Code Node)**\nBuilds:\n\n- Subject  \n- HTML body  \n- Section headers  \n- Manager recipient group  \n\nMatches the final email layout.\n\n### **17. Send Email via Gmail**\nAutomatically delivers the weekly summary to managers via Gmail OAuth.\n\nNo manual involvement required.\n\n---\n\n## What Managers Receive Each Week\n\n```\n👤 Employee: Name\n📅 Period: Start Date → End Date\n📌 Status: Submitted\n🕒 Total Hours: XX hrs\n- Billable: XX hrs\n- Non-Billable: XX hrs\n- Absence: XX hrs\nWeekly Requirement Met: ✔️ / ❌\n\n📂 Timesheet Line Items Breakdown:\n• Summary point 1\n• Summary point 2\n• Summary point 3\n• Summary point 4\n==========================================================\n🟥 TIMESHEET NOT SUBMITTED 🟥\nEmployee Name\n📧 Email: user@example.com\n```\n\n---\n\n## Data Flow Summary\n\n```\nSalesforce\n → Filter Submitted / Not Submitted\n      ↳ Submitted → Line Items → HTML → OpenAI Summary → Merge\n      ↳ Not Submitted → Employee Lookup → Merge\n → Code Node formats unified report\n → Gmail sends professional weekly summary\n```\n\n---\n\n## Technologies & Integrations\n\n| System     | Purpose                         | Authentication |\n|------------|----------------------------------|----------------|\n| Salesforce | Timesheets, Employees, Timesheet Line Items | Salesforce OAuth |\n| OpenAI     | Weekly activity summarization     | API Key |\n| Gmail      | Automated email delivery          | Gmail OAuth |\n| n8n        | Workflow automation & scheduling  | Native |\n\n---\n\n## Agent System Prompt Summary\n&gt; You are an AI assistant that extracts and summarizes weekly timesheet line items. Produce a clean, structured summary of work done for each employee. Focus only on project activities, tasks, accomplishments, and notable positives or negatives. Follow a strict JSON-only output format with four short points and no extra text or symbols.\n\n---\n\n## Key Features\n- AI-driven extraction: Converts raw line items into clean weekly summaries.\n- Strict formatting: Always returns controlled 4-point JSON summaries.\n- Error-tolerant: Works even when timesheet entries are incomplete or messy.\n- Seamless integration: Works smoothly with Salesforce, n8n, Gmail, or OpenAI.\n\n---\n\n\n\n## Setup Checklist\n\n1. Install DBT Timesheet App from Salesforce AppExchange  \n2. Configure Salesforce OAuth  \n3. Configure Gmail OAuth  \n4. Set OpenAI model for summarization  \n5. Update manager recipient list  \n6. Activate the weekly schedule  \n\n---\n\n## Summary\nThis unified workflow delivers a complete, automated weekly reporting system that:\n\n- Eliminates manual timesheet checking  \n- Identifies missing submissions instantly  \n- Generates high-quality AI summaries  \n- Improves visibility into employee productivity  \n- Ensures accurate billable/non-billable tracking  \n- Automates end-to-end weekly reporting  \n\n---\n\n## Need Help or More Workflows?\n\nWe can integrate this into your environment, tune the agent prompt, or extend it for more automation.\n\nWe can also help you set it up for free — from connecting credentials to deployment.\n\nContact: [shilpa.raju@digitalbiz.tech](mailto:shilpa.raju@digitalbiz.tech)  \nWebsite: [https://www.digitalbiz.tech](https://www.digitalbiz.tech)  \nLinkedIn: [https://www.linkedin.com/company/digital-biz-tech/](https://www.linkedin.com/company/digital-biz-tech/)   \nYou can also DM us on LinkedIn for any help.\n",
+  "featuredImage": "/data/workflows/11191/11191.webp",
+  "author": {
+    "id": 101,
+    "slug": "dbt",
+    "name": "DIGITAL BIZ TECH",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 24,
+  "downloads": 2,
+  "createdAt": "2025-11-24T15:41:42.158Z",
+  "updatedAt": "2026-01-16T09:07:53.181Z",
+  "publishedAt": "2025-11-24T15:41:42.158Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11191",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate weekly timesheet reporting with Salesforce, OpenAI and Gmail",
+    "workflowName": "Automate weekly timesheet reporting with Salesforce, OpenAI and Gmail",
+    "description": "# Weekly Timesheet Report + Pending Submissions Workflow\n\n## Overview\nThis workflow automates the entire weekly timesheet reporting cycle by integrating Salesforce, OpenAI, Gmail, and n8n. It retrieves employee timesheets for the previous week, identifies which were submitted or not, summarizes all line-item activities using OpenAI, and delivers a consolidated, manager-ready summary that mirrors the final email output.\n\nThe workflow eliminates manual checking, reduces repeated follow-ups, and ensures leadership receives an accurate, structured, and consistent weekly report.\n\n---\n\n## Workflow Structure\n\n### **Data Source: Salesforce DBT Timesheet App**\nThis workflow requires the **Digital Biz Tech – Simple Timesheet** managed package to be installed in Salesforce.\n\n**Install the Timesheet App:**\n[https://appexchange.salesforce.com/appxListingDetail?listingId=a077704c-2e99-4653-8bde-d32e1fafd8c6](https://appexchange.salesforce.com/appxListingDetail?listingId=a077704c-2e99-4653-8bde-d32e1fafd8c6)\n\n**The workflow retrieves:**\n\n- `dbt__Timesheet__c` — weekly timesheet records  \n- `dbt__Timesheet_Line_Item__c` — project and activity entries  \n- `dbt__Employee__c` — employee reference and metadata  \n- Billable, non-billable, and absence hour details  \n- Attendance information  \n\nThese combined objects form the complete dataset used for both submitted and pending sections.\n\n### **Trigger**\nWeekly **n8n Schedule Trigger** — runs once every week.\n\n### **Submitted Path**\nRetrieve submitted timesheets → Fetch line items → Convert to HTML → OpenAI summary → Merge with employee details.\n\n### **Pending Path**\nIdentify “New” timesheets → Fetch employee details → Generate pending submission list.\n\n### **Final Output**\nMerge both paths → Build formatted report → Gmail sends weekly email to managers.\n\n---\n\n## Detailed Node-by-Node Explanation\n\n### **1. Schedule Trigger**\nRuns weekly without manual intervention and targets the previous full week.\n\n### **2. Timesheet – Salesforce GetAll**\nFetches all `dbt__Timesheet__c` records matching:\n**Timesheet for &lt;week-start&gt; to &lt;week-end&gt;**\n\nExtracted fields include:\n\n- Employee reference  \n- Status  \n- Billable, non-billable, absence hours  \n- Total hours  \n- Reporting period  \n\nFeeds both processing paths.\n\n---\n\n# Processing Path A — Submitted Timesheets\n\n### **3. Filter Submitted**\nFilters timesheets where `dbt__Status__c == \"Submitted\"`.\n\n### **4. Loop Through Each Submitted Record**\nEach employee’s timesheet is processed individually.\n\n### **5. Retrieve Line Items**\nFetches all `dbt__Timesheet_Line_Item__c` entries:\n\n- Project / Client  \n- Activity  \n- Duration  \n- Work description  \n- Billable category  \n\n### **6. Convert Line Items to HTML (Code Node)**\nTransforms line items into well-structured HTML tables for clean LLM input.\n\n### **7. OpenAI — Weekly Activity Summary**\nOpenAI receives the HTML + Employee ID and returns a **4-point activity summary** avoiding:\n\n- Hours  \n- Dates  \n- Repeated or irrelevant metadata  \n\n### **8. Fetch Employee Details**\nRetrieves employee name, email, and additional fields if needed.\n\n### **9. Merge Employee + Summary**\nCombines:\n\n- Timesheet data  \n- Employee details  \n- OpenAI summary  \n\nCreates a unified object.\n\n### **10. Prepare Submitted Section (Code Node)**\nProduces the formatted block used in the final email:\n\n```\nEmployee: Name  \nPeriod: Start → End  \nStatus: Submitted  \nTotal Hours: ...  \n\nTimesheet Line Items Breakdown:\n - summary point  \n - summary point  \n - summary point  \n - summary point  \n```\n\n---\n\n# Processing Path B — Not Submitted Timesheets\n\n### **11. Identify Not Submitted**\nTimesheets still in `dbt__Status__c == \"New\"` are flagged.\n\n### **12. Retrieve Employee Information**\nFetches employee name and email.\n\n### **13. Merge Pending Information**\nMaps each missing submission with its reporting period.\n\n### **14. Prepare Pending Reporting Block**\nCreates formatted pending entries:\n\n```\nTIMESHEET NOT SUBMITTED\nEmployee Name\nEmail: user@example.com\n```\n\n---\n\n# Final Assembly & Report Delivery\n\n### **15. Merge Submitted + Pending Sections**\nCombines all processed data.\n\n### **16. Create Final Email (Code Node)**\nBuilds:\n\n- Subject  \n- HTML body  \n- Section headers  \n- Manager recipient group  \n\nMatches the final email layout.\n\n### **17. Send Email via Gmail**\nAutomatically delivers the weekly summary to managers via Gmail OAuth.\n\nNo manual involvement required.\n\n---\n\n## What Managers Receive Each Week\n\n```\n👤 Employee: Name\n📅 Period: Start Date → End Date\n📌 Status: Submitted\n🕒 Total Hours: XX hrs\n- Billable: XX hrs\n- Non-Billable: XX hrs\n- Absence: XX hrs\nWeekly Requirement Met: ✔️ / ❌\n\n📂 Timesheet Line Items Breakdown:\n• Summary point 1\n• Summary point 2\n• Summary point 3\n• Summary point 4\n==========================================================\n🟥 TIMESHEET NOT SUBMITTED 🟥\nEmployee Name\n📧 Email: user@example.com\n```\n\n---\n\n## Data Flow Summary\n\n```\nSalesforce\n → Filter Submitted / Not Submitted\n      ↳ Submitted → Line Items → HTML → OpenAI Summary → Merge\n      ↳ Not Submitted → Employee Lookup → Merge\n → Code Node formats unified report\n → Gmail sends professional weekly summary\n```\n\n---\n\n## Technologies & Integrations\n\n| System     | Purpose                         | Authentication |\n|------------|----------------------------------|----------------|\n| Salesforce | Timesheets, Employees, Timesheet Line Items | Salesforce OAuth |\n| OpenAI     | Weekly activity summarization     | API Key |\n| Gmail      | Automated email delivery          | Gmail OAuth |\n| n8n        | Workflow automation & scheduling  | Native |\n\n---\n\n## Agent System Prompt Summary\n&gt; You are an AI assistant that extracts and summarizes weekly timesheet line items. Produce a clean, structured summary of work done for each employee. Focus only on project activities, tasks, accomplishments, and notable positives or negatives. Follow a strict JSON-only output format with four short points and no extra text or symbols.\n\n---\n\n## Key Features\n- AI-driven extraction: Converts raw line items into clean weekly summaries.\n- Strict formatting: Always returns controlled 4-point JSON summaries.\n- Error-tolerant: Works even when timesheet entries are incomplete or messy.\n- Seamless integration: Works smoothly with Salesforce, n8n, Gmail, or OpenAI.\n\n---\n\n\n\n## Setup Checklist\n\n1. Install DBT Timesheet App from Salesforce AppExchange  \n2. Configure Salesforce OAuth  \n3. Configure Gmail OAuth  \n4. Set OpenAI model for summarization  \n5. Update manager recipient list  \n6. Activate the weekly schedule  \n\n---\n\n## Summary\nThis unified workflow delivers a complete, automated weekly reporting system that:\n\n- Eliminates manual timesheet checking  \n- Identifies missing submissions instantly  \n- Generates high-quality AI summaries  \n- Improves visibility into employee productivity  \n- Ensures accurate billable/non-billable tracking  \n- Automates end-to-end weekly reporting  \n\n---\n\n## Need Help or More Workflows?\n\nWe can integrate this into your environment, tune the agent prompt, or extend it for more automation.\n\nWe can also help you set it up for free — from connecting credentials to deployment.\n\nContact: [shilpa.raju@digitalbiz.tech](mailto:shilpa.raju@digitalbiz.tech)  \nWebsite: [https://www.digitalbiz.tech](https://www.digitalbiz.tech)  \nLinkedIn: [https://www.linkedin.com/company/digital-biz-tech/](https://www.linkedin.com/company/digital-biz-tech/)   \nYou can also DM us on LinkedIn for any help.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Timesheet",
+      "type": "n8n-nodes-base.salesforce",
+      "role": "salesforce",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Salesforce - Get Employee Details",
+      "type": "n8n-nodes-base.salesforce",
+      "role": "salesforce",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Salesforce - Get Employee Details1",
+      "type": "n8n-nodes-base.salesforce",
+      "role": "salesforce",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Timesheet Line Items",
+      "type": "n8n-nodes-base.salesforce",
+      "role": "salesforce",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate HTML Table",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge AI Summary",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Prepare Submitted Section",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Pending Info",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge Submitted + Pending",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Prepare Pending Section",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Final Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If New Timesheet",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If Submitted Timesheet",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "id": 7501,
+  "slug": "7501",
+  "title": "Send Slack alerts for AWS IAM access keys older than 365 days",
+  "description": "# AWS IAM Access Key Rotation Reminder Automation Workflow\n### Watch the demo video below:\n[![Watch the video](https://s3.ap-southeast-1.amazonaws.com/automatewith.me/aws-iam-access-key-rotation-alert-with-n8n.jpg)](https://youtu.be/tW2y_dRvcs0)\n## **Who’s it for**\n- DevOps/SRE teams responsible for AWS account security.  \n- Security/compliance officers ensuring key rotation policies are followed.  \n- Any AWS account owner who wants automatic detection of stale access keys. \n\n## **How it works / What it does**\n1. **Weekly Scheduler** — triggers the workflow on a recurring basis.  \n2. **Get Many Users** — fetches all IAM users in the AWS account.  \n3. **Get User Access Key(s)** — retrieves the access keys associated with each user.  \n4. **Filter Out Inactive Keys** — removes keys that are not active (e.g., status `Inactive`).  \n5. **Access Key Older Than 365 Days** — checks the key creation date and flags keys older than one year.  \n6. **Send Slack Message** — notifies a Slack channel with details of the outdated key(s) for review and action.  \n7. **No Operation** — safely ends the workflow if no keys match the condition.  \n\n## **How to set up**\n- Configure the **Weekly Scheduler** to run at your desired cadence (e.g., every Monday).  \n- Use **Get Many Users** to list all IAM users.  \n- For each user, call **ListAccessKeys** (`Get User Access Key(s)`) to fetch their key metadata.  \n- Apply a filter to keep only keys with status `Active`.  \n- Add a condition to compare `CreateDate` against `today - 365 days`.  \n- Send results to Slack using the **Slack Post Message** node.  \n\n## **Requirements**\n- n8n (latest version).  \n- AWS credential in n8n configured for **us-east-1** (IAM requires signing with this region).  \n- IAM permissions:  \n  - `iam:ListUsers`  \n  - `iam:ListAccessKeys`  \n- Slack bot credentials with permission to post messages in the desired channel.  \n\n## **How to customize the workflow**\n- **Change threshold** — adjust the `365 days` condition to 90, 180, or any other rotation policy.  \n- **Escalation** — mention `@security` or create a Jira/Ticket when old keys are found.  \n- **Logging** — push flagged results into a Google Sheet, database, or log management system for audit.  \n- **Automation** — instead of only notifying, add a step to automatically deactivate keys older than the threshold (after approval).  \n- **Multi-account support** — duplicate or loop across multiple AWS credentials if you manage several AWS accounts.  ",
+  "featuredImage": "/data/workflows/7501/7501.webp",
+  "author": {
+    "id": 101,
+    "slug": "trungtran",
+    "name": "Trung Tran",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 132,
+  "downloads": 13,
+  "createdAt": "2025-08-17T07:03:25.274Z",
+  "updatedAt": "2026-01-16T08:50:39.199Z",
+  "publishedAt": "2025-08-17T07:03:25.274Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7501",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Send Slack alerts for AWS IAM access keys older than 365 days",
+    "workflowName": "Send Slack alerts for AWS IAM access keys older than 365 days",
+    "description": "# AWS IAM Access Key Rotation Reminder Automation Workflow\n### Watch the demo video below:\n[![Watch the video](https://s3.ap-southeast-1.amazonaws.com/automatewith.me/aws-iam-access-key-rotation-alert-with-n8n.jpg)](https://youtu.be/tW2y_dRvcs0)\n## **Who’s it for**\n- DevOps/SRE teams responsible for AWS account security.  \n- Security/compliance officers ensuring key rotation policies are followed.  \n- Any AWS account owner who wants automatic detection of stale access keys. \n\n## **How it works / What it does**\n1. **Weekly Scheduler** — triggers the workflow on a recurring basis.  \n2. **Get Many Users** — fetches all IAM users in the AWS account.  \n3. **Get User Access Key(s)** — retrieves the access keys associated with each user.  \n4. **Filter Out Inactive Keys** — removes keys that are not active (e.g., status `Inactive`).  \n5. **Access Key Older Than 365 Days** — checks the key creation date and flags keys older than one year.  \n6. **Send Slack Message** — notifies a Slack channel with details of the outdated key(s) for review and action.  \n7. **No Operation** — safely ends the workflow if no keys match the condition.  \n\n## **How to set up**\n- Configure the **Weekly Scheduler** to run at your desired cadence (e.g., every Monday).  \n- Use **Get Many Users** to list all IAM users.  \n- For each user, call **ListAccessKeys** (`Get User Access Key(s)`) to fetch their key metadata.  \n- Apply a filter to keep only keys with status `Active`.  \n- Add a condition to compare `CreateDate` against `today - 365 days`.  \n- Send results to Slack using the **Slack Post Message** node.  \n\n## **Requirements**\n- n8n (latest version).  \n- AWS credential in n8n configured for **us-east-1** (IAM requires signing with this region).  \n- IAM permissions:  \n  - `iam:ListUsers`  \n  - `iam:ListAccessKeys`  \n- Slack bot credentials with permission to post messages in the desired channel.  \n\n## **How to customize the workflow**\n- **Change threshold** — adjust the `365 days` condition to 90, 180, or any other rotation policy.  \n- **Escalation** — mention `@security` or create a Jira/Ticket when old keys are found.  \n- **Logging** — push flagged results into a Google Sheet, database, or log management system for audit.  \n- **Automation** — instead of only notifying, add a step to automatically deactivate keys older than the threshold (after approval).  \n- **Multi-account support** — duplicate or loop across multiple AWS credentials if you manage several AWS accounts.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Weekly scheduler",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get many users",
+      "type": "n8n-nodes-base.awsIam",
+      "role": "awsIam",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get User Access Key(s)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter out inactive keys",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Access Key Older Than 365 days ",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

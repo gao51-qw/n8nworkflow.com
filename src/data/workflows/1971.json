@@ -1,0 +1,211 @@
+{
+  "id": 1971,
+  "slug": "1971",
+  "title": "URL and IP lookups through Greynoise and VirusTotal",
+  "description": "This n8n workflow serves as a powerful cybersecurity and threat intelligence tool to look up URLs or IP addresses through industry standard threat intelligence vendors. It starts with either a form submission or a webhook trigger, allowing users to input data, URLs or IPs that require analysis. The workflow then splits into two paths depending on whether the input data is an IP or URL. If an IP was given, it sets the ip variable to the IP; however if a URL was given the workflow will perform a DNS lookup using Google Public DNS and sets the ip variable based on the results from Google.\n\nThe workflow then checks the obtained IP addresses against GreyNoise services, with one branch utilizing GreyNoise RIOT IP Lookup to assess IP reputation and association with known benign services, and the other using GreyNoise IP Context to evaluate potential threats. The results from both GreyNoise services are merged to create a comprehensive analysis which includes the IP, classification (benign, malicious, or unknown), IP location, tags to identify activity or malware, category, and trust level. \n\nIn parallel, a VirusTotal scan is initiated for the URL/IP to identify if it is malicious. A 5-second wait ensures proper processing, and the workflow subsequently polls the scan result to determine when the analysis is complete. The workflow then summarizes the analysis including the overall security vendor analysis results, blockList analysis, OpenPhish analysis, the URL, and the IP.\n\nFinally, the workflow combines the summarized intelligence from both GreyNoise and VirusTotal to provide a thorough analysis of the URL/IP. This summarized intelligence can then be emailed to the user that filled out the form via Gmail or it can be sent to the user via a Slack message.\n\nSetting up this workflow may require proper configuration of the form submission or webhook trigger, and ensuring that the GreyNoise and VirusTotal API credentials are correctly integrated. Users should also consider the potential volume of data and API rate limits, as excessive requests could lead to issues. Proper documentation and validation of input data are crucial to ensure accurate and meaningful results in the final report.",
+  "featuredImage": "/data/workflows/1971/1971.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8n-team",
+    "name": "n8n Team",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 9668,
+  "downloads": 966,
+  "createdAt": "2023-11-07T06:29:01.198Z",
+  "updatedAt": "2026-01-16T08:22:30.210Z",
+  "publishedAt": "2023-11-07T06:29:01.198Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/1971",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "URL and IP lookups through Greynoise and VirusTotal",
+    "workflowName": "URL and IP lookups through Greynoise and VirusTotal",
+    "description": "This n8n workflow serves as a powerful cybersecurity and threat intelligence tool to look up URLs or IP addresses through industry standard threat intelligence vendors. It starts with either a form submission or a webhook trigger, allowing users to input data, URLs or IPs that require analysis. The workflow then splits into two paths depending on whether the input data is an IP or URL. If an IP was given, it sets the ip variable to the IP; however if a URL was given the workflow will perform a DNS lookup using Google Public DNS and sets the ip variable based on the results from Google.\n\nThe workflow then checks the obtained IP addresses against GreyNoise services, with one branch utilizing GreyNoise RIOT IP Lookup to assess IP reputation and association with known benign services, and the other using GreyNoise IP Context to evaluate potential threats. The results from both GreyNoise services are merged to create a comprehensive analysis which includes the IP, classification (benign, malicious, or unknown), IP location, tags to identify activity or malware, category, and trust level. \n\nIn parallel, a VirusTotal scan is initiated for the URL/IP to identify if it is malicious. A 5-second wait ensures proper processing, and the workflow subsequently polls the scan result to determine when the analysis is complete. The workflow then summarizes the analysis including the overall security vendor analysis results, blockList analysis, OpenPhish analysis, the URL, and the IP.\n\nFinally, the workflow combines the summarized intelligence from both GreyNoise and VirusTotal to provide a thorough analysis of the URL/IP. This summarized intelligence can then be emailed to the user that filled out the form via Gmail or it can be sent to the user via a Slack message.\n\nSetting up this workflow may require proper configuration of the form submission or webhook trigger, and ensuring that the GreyNoise and VirusTotal API credentials are correctly integrated. Users should also consider the potential volume of data and API rate limits, as excessive requests could lead to issues. Proper documentation and validation of input data are crucial to ensure accurate and meaningful results in the final report.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "VirusTotal result",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "DNS Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Set IP From Lookup",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set IP",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge VirusTotal & Greynoise results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Is IP?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Start VirusTotal Scan",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "VirusTotal Summary",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "VirusTotal ready?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait 5s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get List of URLs",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Email",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Greynoise results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Report Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Greynoise Summary",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Combine looped items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GreyNoise RIOT lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "GreyNoise IP Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2"
+    }
+  ]
+}

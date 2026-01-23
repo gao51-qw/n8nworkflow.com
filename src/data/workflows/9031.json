@@ -1,0 +1,151 @@
+{
+  "id": 9031,
+  "slug": "9031",
+  "title": "Automate Shopify abandoned cart WhatsApp reminders with product links via Rapiwa",
+  "description": "# Automate Shopify Abandoned Cart WhatsApp Reminders with Product Links via Rapiwa\n\n## Who’s it for\nThis n8n workflow automatically identifies customers who have abandoned their carts on your Shopify store, cleans and verifies their WhatsApp numbers, and sends them personalized reminders via the Rapiwa API. It also logs each interaction—whether the number was valid or not—into a connected Google Sheet. Designed for marketers, small business owners, freelancers, and support teams, this solution makes it easy to run bulk WhatsApp campaigns using just a Google Sheet and your own WhatsApp number—no need for the official WhatsApp Business API. It’s a budget-friendly, scalable, and easy-to-manage alternative for anyone looking to automate WhatsApp follow-ups without the tech hassle.\n\n## How it Works / What It Does\n- Reads rows from a Google Sheet where the Status column is marked as \"pending\".\n- Cleans each phone number (removes special characters, spaces, etc.).\n- Verifies whether the number is a WhatsApp user using the Rapiwa API.\n- If valid:\n  - Sends the message via Rapiwa.\n  - Updates Status = sent and Verification = verified.\n- If invalid:\n  - Skips sending.\n  - Updates Status = not sent and Verification = unverified.\n- Waits a configurable delay between sends to avoid rate limits.\n- Processes rows in small batches and repeats on schedule (default every 5 minutes).\n\n---\n\n## How to Set Up\n1. Duplicate the sample Google Sheet format and populate it with contacts and messages.\n2. Fill required columns such as WhatsApp No, Name, Message, Image URL, and set Status = pending.\n3. Connect Google Sheets in n8n and grant the required OAuth scopes.\n4. Create an HTTP Bearer credential in n8n and paste your Rapiwa API key.\n5. Configure the workflow nodes (Trigger, Google Sheets, Limit, SplitInBatches, Code, HTTP Request, If, Update Google Sheets, Wait).\n6. Enable the workflow in n8n.\n\n---\n\n## Requirements\n- Google Sheets API credentials (OAuth2) configured in n8n\n- Google Sheet matching the template (WhatsApp No, Name, Message, Status, Verification)\n- Rapiwa account and Bearer token\n- n8n instance with HTTP Request and Google Sheets nodes enabled\n\n---\n\n## How to Customize the Workflow\n- Add or increase delay between messages using the Wait node (e.g., 5–10 seconds).\n- Change message content or include media by editing the HTTP Request body.\n- Personalize messages using sheet columns (Name, product details, coupon codes).\n- Add error handling nodes to retry failed sends or log errors.\n- Adjust the Limit node to control how many rows are processed per run.\n\n---\n\n## Workflow Highlights\n- Triggered every 5 minutes using the Schedule Trigger node.\n- Filters sheet rows where Status = pending.\n- Cleans numbers and verifies WhatsApp existence before sending.\n- Sends messages via Rapiwa (unofficial API).\n- Updates Google Sheet rows with Status = sent/not sent and Verification = verified/unverified.\n- Uses a Wait node to prevent rapid-fire sending.\n\n---\n\n## Setup in n8n\n\n### 1. Connect Google Sheets\n- Add a Google Sheets node.\n- Authenticate with your Google account.\n- Select the document and worksheet.\n- Use a filter or query to fetch rows with `Status = pending`.\n\n### 2. Loop Through Rows\n- Use SplitInBatches to process rows in small chunks (e.g., 5 rows per batch).\n- Add a Code node to clean phone numbers (remove non-digits).\n- Add a Wait node to pause between individual sends (recommended 5 seconds).\n\n### 3. Send Message via HTTP Node\n- Configure an HTTP Request node to POST to:\n  `https://app.rapiwa.com/api/send-message`\n- Use Bearer Token authentication with your Rapiwa API key.\n- Example JSON body:\n```\n{\n  \"number\": \"{{ $json['WhatsApp No'] }}\",\n  \"message\": \"{{ $json['Message'] }}\"\n}\n```\n- After the send, update the row in Google Sheets with the result.\n\n---\n\n## Sample Google Sheet Structure\n - A Google Sheet formatted like this ➤ [sample](https://docs.google.com/spreadsheets/d/1zsVzniJTeiFOafCI_V0B3_7VnlAPQ2CTWQa-N30qCqs/edit?usp=sharing)\n\n| name | number | order id | item name | coupon | item link | total price | validity | status |\n| -------------- | ------------- | -------------- | --------------------------------- | ------ | -------------------------------------------------------------------------------- | ------------ | ---------- | -------- |\n| Abdul Mannan | 8801400620056 | 39248398811454 | S25 Ultra 5XXXXX Price Cell Phone | | [Product Link](https://your-shop-domain.myshopify.com/946181xxxxxx&locale=en-BD) | 11500.00 BDT | unverified | not sent |\n| Abdul Mannan | 8801400620055 | 39248402153790 | S25 Ultra 5XXXXX Price Cell Phone | | [Product Link](https://your-shop-domain.myshopify.com/946181xxxxxx&locale=en-BD) | 11500.00 BDT | verified | sent |\n| Abdul Mannan | 8801400620055 | 39248403431742 | S25 Ultra 5XXXXX Price Cell Phone | | [Product Link](https://your-shop-domain.myshopify.com/946181xxxxxx&locale=en-BD) | 11500.00 BDT | verified | sent |\n\n---\n\n## Tips\n- Ensure numbers are in proper format (e.g., 8801XXXXXXXXX — no +, no spaces).\n- Use public image URLs if sending media.\n- Store Rapiwa API key securely in n8n credentials.\n- Test with a small batch before scaling up.\n- Mark processed rows as \"sent\" to avoid duplicates.\n- Increase Wait time or reduce batch size if you encounter rate limiting.\n\n## Important Notes\n- Avoid Duplicates: The Google Sheet serves as a ledger. Sent messages won’t be repeated in the next cycle.\n- Rate Limit Awareness: Use Wait nodes to space out requests and avoid getting banned.\n- Add Delay for Safety: If needed, increase wait times or limit message batches.\n- Extendable: You can add product images, links, or even abandon cart discounts dynamically.\n\n## Future Enhancements (Ideas)\n- Add delay between batches (e.g., 60 messages/hour)\n- Auto-update Shopify checkout status (via GraphQL API)\n- Use more advanced templates or media (via Rapiwa)\n- Add error handling to log failed API calls\n- Use Telegram/Slack node to notify when process ends\n---\n\n## Useful Links\n- **Dashboard:** [https://app.rapiwa.com](https://app.rapiwa.com/login)\n- **Official Website:** [https://rapiwa.com](https://rapiwa.com/)\n- **Documentation:** [https://docs.rapiwa.com](https://docs.rapiwa.com/)\n\n## Support\n- WhatsApp Support: [Chat Now](https://wa.me/8801322827799)  \n- Discord: [Join SpaGreen Community](https://discord.gg/SsCChWEP)  \n- Facebook Group: [SpaGreen Support](https://www.facebook.com/groups/spagreenbd)  \n- Website: [https://spagreen.net](https://spagreen.net)  \n- Developer Portfolio: [Codecanyon SpaGreen](https://codecanyon.net/user/spagreen/portfolio)",
+  "featuredImage": "/data/workflows/9031/9031.webp",
+  "author": {
+    "id": 101,
+    "slug": "spagreen",
+    "name": "SpaGreen Creative",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 392,
+  "downloads": 39,
+  "createdAt": "2025-09-28T05:00:04.423Z",
+  "updatedAt": "2026-01-16T08:58:47.369Z",
+  "publishedAt": "2025-09-28T05:00:04.423Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9031",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate Shopify abandoned cart WhatsApp reminders with product links via Rapiwa",
+    "workflowName": "Automate Shopify abandoned cart WhatsApp reminders with product links via Rapiwa",
+    "description": "# Automate Shopify Abandoned Cart WhatsApp Reminders with Product Links via Rapiwa\n\n## Who’s it for\nThis n8n workflow automatically identifies customers who have abandoned their carts on your Shopify store, cleans and verifies their WhatsApp numbers, and sends them personalized reminders via the Rapiwa API. It also logs each interaction—whether the number was valid or not—into a connected Google Sheet. Designed for marketers, small business owners, freelancers, and support teams, this solution makes it easy to run bulk WhatsApp campaigns using just a Google Sheet and your own WhatsApp number—no need for the official WhatsApp Business API. It’s a budget-friendly, scalable, and easy-to-manage alternative for anyone looking to automate WhatsApp follow-ups without the tech hassle.\n\n## How it Works / What It Does\n- Reads rows from a Google Sheet where the Status column is marked as \"pending\".\n- Cleans each phone number (removes special characters, spaces, etc.).\n- Verifies whether the number is a WhatsApp user using the Rapiwa API.\n- If valid:\n  - Sends the message via Rapiwa.\n  - Updates Status = sent and Verification = verified.\n- If invalid:\n  - Skips sending.\n  - Updates Status = not sent and Verification = unverified.\n- Waits a configurable delay between sends to avoid rate limits.\n- Processes rows in small batches and repeats on schedule (default every 5 minutes).\n\n---\n\n## How to Set Up\n1. Duplicate the sample Google Sheet format and populate it with contacts and messages.\n2. Fill required columns such as WhatsApp No, Name, Message, Image URL, and set Status = pending.\n3. Connect Google Sheets in n8n and grant the required OAuth scopes.\n4. Create an HTTP Bearer credential in n8n and paste your Rapiwa API key.\n5. Configure the workflow nodes (Trigger, Google Sheets, Limit, SplitInBatches, Code, HTTP Request, If, Update Google Sheets, Wait).\n6. Enable the workflow in n8n.\n\n---\n\n## Requirements\n- Google Sheets API credentials (OAuth2) configured in n8n\n- Google Sheet matching the template (WhatsApp No, Name, Message, Status, Verification)\n- Rapiwa account and Bearer token\n- n8n instance with HTTP Request and Google Sheets nodes enabled\n\n---\n\n## How to Customize the Workflow\n- Add or increase delay between messages using the Wait node (e.g., 5–10 seconds).\n- Change message content or include media by editing the HTTP Request body.\n- Personalize messages using sheet columns (Name, product details, coupon codes).\n- Add error handling nodes to retry failed sends or log errors.\n- Adjust the Limit node to control how many rows are processed per run.\n\n---\n\n## Workflow Highlights\n- Triggered every 5 minutes using the Schedule Trigger node.\n- Filters sheet rows where Status = pending.\n- Cleans numbers and verifies WhatsApp existence before sending.\n- Sends messages via Rapiwa (unofficial API).\n- Updates Google Sheet rows with Status = sent/not sent and Verification = verified/unverified.\n- Uses a Wait node to prevent rapid-fire sending.\n\n---\n\n## Setup in n8n\n\n### 1. Connect Google Sheets\n- Add a Google Sheets node.\n- Authenticate with your Google account.\n- Select the document and worksheet.\n- Use a filter or query to fetch rows with `Status = pending`.\n\n### 2. Loop Through Rows\n- Use SplitInBatches to process rows in small chunks (e.g., 5 rows per batch).\n- Add a Code node to clean phone numbers (remove non-digits).\n- Add a Wait node to pause between individual sends (recommended 5 seconds).\n\n### 3. Send Message via HTTP Node\n- Configure an HTTP Request node to POST to:\n  `https://app.rapiwa.com/api/send-message`\n- Use Bearer Token authentication with your Rapiwa API key.\n- Example JSON body:\n```\n{\n  \"number\": \"{{ $json['WhatsApp No'] }}\",\n  \"message\": \"{{ $json['Message'] }}\"\n}\n```\n- After the send, update the row in Google Sheets with the result.\n\n---\n\n## Sample Google Sheet Structure\n - A Google Sheet formatted like this ➤ [sample](https://docs.google.com/spreadsheets/d/1zsVzniJTeiFOafCI_V0B3_7VnlAPQ2CTWQa-N30qCqs/edit?usp=sharing)\n\n| name | number | order id | item name | coupon | item link | total price | validity | status |\n| -------------- | ------------- | -------------- | --------------------------------- | ------ | -------------------------------------------------------------------------------- | ------------ | ---------- | -------- |\n| Abdul Mannan | 8801400620056 | 39248398811454 | S25 Ultra 5XXXXX Price Cell Phone | | [Product Link](https://your-shop-domain.myshopify.com/946181xxxxxx&locale=en-BD) | 11500.00 BDT | unverified | not sent |\n| Abdul Mannan | 8801400620055 | 39248402153790 | S25 Ultra 5XXXXX Price Cell Phone | | [Product Link](https://your-shop-domain.myshopify.com/946181xxxxxx&locale=en-BD) | 11500.00 BDT | verified | sent |\n| Abdul Mannan | 8801400620055 | 39248403431742 | S25 Ultra 5XXXXX Price Cell Phone | | [Product Link](https://your-shop-domain.myshopify.com/946181xxxxxx&locale=en-BD) | 11500.00 BDT | verified | sent |\n\n---\n\n## Tips\n- Ensure numbers are in proper format (e.g., 8801XXXXXXXXX — no +, no spaces).\n- Use public image URLs if sending media.\n- Store Rapiwa API key securely in n8n credentials.\n- Test with a small batch before scaling up.\n- Mark processed rows as \"sent\" to avoid duplicates.\n- Increase Wait time or reduce batch size if you encounter rate limiting.\n\n## Important Notes\n- Avoid Duplicates: The Google Sheet serves as a ledger. Sent messages won’t be repeated in the next cycle.\n- Rate Limit Awareness: Use Wait nodes to space out requests and avoid getting banned.\n- Add Delay for Safety: If needed, increase wait times or limit message batches.\n- Extendable: You can add product images, links, or even abandon cart discounts dynamically.\n\n## Future Enhancements (Ideas)\n- Add delay between batches (e.g., 60 messages/hour)\n- Auto-update Shopify checkout status (via GraphQL API)\n- Use more advanced templates or media (via Rapiwa)\n- Add error handling to log failed API calls\n- Use Telegram/Slack node to notify when process ends\n---\n\n## Useful Links\n- **Dashboard:** [https://app.rapiwa.com](https://app.rapiwa.com/login)\n- **Official Website:** [https://rapiwa.com](https://rapiwa.com/)\n- **Documentation:** [https://docs.rapiwa.com](https://docs.rapiwa.com/)\n\n## Support\n- WhatsApp Support: [Chat Now](https://wa.me/8801322827799)  \n- Discord: [Join SpaGreen Community](https://discord.gg/SsCChWEP)  \n- Facebook Group: [SpaGreen Support](https://www.facebook.com/groups/spagreenbd)  \n- Website: [https://spagreen.net](https://spagreen.net)  \n- Developer Portfolio: [Codecanyon SpaGreen](https://codecanyon.net/user/spagreen/portfolio)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Rapiwa Sender",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Clean WhatsApp Number",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check valid whatsapp number Using Rapiwa1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Change State of Rows in Verified & Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Change State of Rows in Unverified & Not Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Format HTTP Response Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

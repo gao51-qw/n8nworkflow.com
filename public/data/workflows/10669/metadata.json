@@ -1,0 +1,26 @@
+{
+  "id": 10669,
+  "slug": "10669",
+  "title": "Send scheduled financial digests to Telegram from Notion with multi-schedule alerts",
+  "description": "### Who’s it for\nSolo founders and spreadsheet gremlins who track everything in **Notion** and want crisp **Telegram** pings without opening a single page.\n\n### What it does\nThis workflow runs on **daily**, **weekly**, and **monthly** schedules, queries multiple Notion databases, summarizes key numbers, formats human‑readable messages, and sends them to Telegram.\n\n**Out of the box it sends:**\n- **Daily**: *Total Expenses Today* (sum of `Debit` in **Financial Transaction** since start of day).\n- **Weekly**: *Total Expenses This Week*, *Monthly Budget Left/Spent* per budget item, *Financial Obligations due* (from **Scheduler**).\n- **Month End (28th by default)**: *Total Expenses This Month*, *Total Income This Month*, *Funds status*.\n- **Month Start**: *Liquidity snapshot* — balances for **Liquid** and **Semi Liquid** assets (from **Assets and Liabilities**).\n\nMessages are built via **Code** nodes (simple JS) and delivered to Telegram.\n\n---\n\n## How it works (nodes & flow)\n- **Schedule Triggers**: Daily, Weekly, Monthly (start & end).\n- **Notion queries** (selected DBs):\n  - **Financial Transaction**: filters on `Created time`, `Type` = `Debit`/`Invoice`.\n  - **Budget**: `Currently Applicable = true`, `Payment Schedule Type = Monthly`, formula: `Monthly Budget Left`.\n  - **Income**: month-to-date `Created time` filter.\n  - **Funds**: reads `Amount Left`, `Amount Spent`, `Amount Needed`.\n  - **Scheduler**: `Next Date` on or before now, `Type = Financial`, `Repeat Type != off`.\n  - **Assets and Liabilities**: `Liquidity` = `Liquid` or `Semi Liquid`.\n- **Summarize nodes**: sum `property_cost` / `property_balance` fields.\n- **Set/Code nodes**: reshape Notion properties (e.g., `property_next_date.start` → `next-date`) and format text blocks like:\n  - `Total Expenses Today - Rs X`\n  - `Monthly Budget Left - &lt;list&gt;`\n  - `Invoices still to pay - &lt;list&gt;`\n  - `Funds Info - spent/needed`\n  - `Liquidity Balance - &lt;list&gt;`\n- **Telegram**: sends the composed message to `chatId`.\n\n&gt; Tip: If your Notion property names differ, adjust the `filters` and `Set` node mappings accordingly.\n\n---\n\n## Requirements\n- n8n (Cloud or self‑hosted)\n- Notion workspace with **[Personal Finance System Notion template](https://www.notion.so/templates/personal-finance-system)** cloned into your workspace. \n- Telegram account (for bot + chat)\n\n---\n\n## Setup (quick)\n1. **Telegram**\n   - Create a bot via **@BotFather** → get **Bot Token**.\n   - Get your **Chat ID** (n8n Telegram Trigger “Run once”, then message your bot, copy `chat.id`).\n   - In the Telegram **Send** node, set `chatId` (or use an env var/secret).\n\n2. **Notion**\n   - Create an **Internal Integration**, copy the token, and **share** each DB with the integration.\n   - In the Notion nodes, select your **Notion credential** and map the DB IDs (already present in the JSON).\n\n3. **n8n Credentials**\n   - **Notion API** credential: paste the integration token.\n   - **Telegram API** credential: paste Bot Token and set `chatId` in the node or via expression.\n\n4. **Time windows**\n   - Daily: `on_or_after: $now.startOf('day')`\n   - Weekly: `on_or_after: $now.startOf('week')`\n   - Monthly: `on_or_after: $now.startOf('month')`\n   - Monthly end trigger runs on day `28` by default — change in the **Schedule** node.\n\n---\n\n## Customization\n- Change the **date ranges**, add **currency symbol**, or swap **summaries** for **tables**.\n- Add more **filters** (labels, categories) to the Notion nodes.\n- Replace Telegram with Slack/Email by swapping the final node.\n- To avoid “expects dateTime but got object”, convert `$now` to string: `{{$now.toISO()}}` or parse Notion dates with `DateTime.fromISO(...)` as needed.\n\n---\n\n## Example messages\n```\nTotal Expenses Today - Rs 1,840\nMonthly Budget Left - 3\n1) Groceries: Rs 4,500\n2) Dining Out: Rs 1,200\n3) Utilities: Rs 800\n\nInvoices still to pay - 2\n1) Figma Pro: Rs 3,000\n2) AWS: Rs 2,450\n```\n\n---\n\n## Why this is useful\n- Keeps your **spend & cash** visibility tight without opening Notion.\n- Turns your financial system into **low‑effort telemetry** — you just look at Telegram.\n\n---\n\n### Credentials you’ll likely name in n8n\n- **Notion**: `Notion account`\n- **Telegram**: `Accountant AI`\n\n&gt; Works great with the “Personal Finance System” style schemas. Adjust property keys (`property_*`) if your Notion columns differ.",
+  "featuredImage": "/data/workflows/10669/10669.webp",
+  "author": {
+    "id": 101,
+    "slug": "anoop",
+    "name": "Anoop",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 30,
+  "downloads": 3,
+  "createdAt": "2025-11-10T02:56:56.882Z",
+  "updatedAt": "2026-01-16T09:05:54.127Z",
+  "publishedAt": "2025-11-10T02:56:56.882Z",
+  "nodes": 46,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10669"
+}

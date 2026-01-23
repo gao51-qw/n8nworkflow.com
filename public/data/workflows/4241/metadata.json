@@ -1,0 +1,27 @@
+{
+  "id": 4241,
+  "slug": "4241",
+  "title": "Generate audio from text scripts using self-hosted Bark model and Google Drive",
+  "description": "## Audio Generator – Documentation\n\n🎯 Purpose:\nGenerate audio files from text scripts stored in Google Drive.\n\n🔁 Flow:\n1. Receive repo IDs.\n2. Fetch text scripts.\n3. Generate .wav files using local Bark model.\n4. Upload back to Drive.\n\n📦 Dependencies:\n- Python script: `/scripts/generate_voice.py`\n- Bark (voice generation system)\n- n8n instance with access to local shell\n- Google Drive OAuth2 credentials\n\n✏️ Notes:\n- Script filenames must end with `.txt`\n- Only works with plain text\n- No external API used = 100% free\n\n📦 `/scripts/generate_voice.py`:\n```python\nimport sys\nimport torch\nimport numpy\nimport re\nfrom bark import SAMPLE_RATE, generate_audio, preload_models\nfrom scipy.io.wavfile import write as write_wav\n\n# Patch to allow numpy._core.multiarray.scalar during loading\ntorch.serialization.add_safe_globals([numpy._core.multiarray.scalar])\n\n# Monkey patch torch.load to force weights_only=False\n_original_torch_load = torch.load\ndef patched_torch_load(f, *args, **kwargs):\n    if 'weights_only' not in kwargs:\n        kwargs['weights_only'] = False\n    return _original_torch_load(f, *args, **kwargs)\ntorch.load = patched_torch_load\n\n# Preload Bark models\npreload_models()\n\ndef split_text(text, max_len=300):\n    # Split on punctuation to avoid mid-sentence cuts\n    sentences = re.split(r'(?&lt;=[.?!])\\s+', text)\n    chunks = []\n    current = \"\"\n    for sentence in sentences:\n        if len(current) + len(sentence) &lt; max_len:\n            current += sentence + \" \"\n        else:\n            chunks.append(current.strip())\n            current = sentence + \" \"\n    if current:\n        chunks.append(current.strip())\n    return chunks\n\n# Input text file and output path\ninput_text_path = sys.argv[1]\noutput_wav_path = sys.argv[2]\n\nwith open(input_text_path, 'r', encoding='utf-8') as f:\n    full_text = f.read()\n\nvoice_preset = \"v2/en_speaker_7\"\n\nchunks = split_text(full_text)\n\n# Generate and concatenate audio chunks\naudio_arrays = []\nfor chunk in chunks:\n    print(f\"Generating audio for chunk: {chunk[:50]}...\")\n    audio = generate_audio(chunk, history_prompt=voice_preset)\n    audio_arrays.append(audio)\n\n# Merge all audio chunks\nfinal_audio = numpy.concatenate(audio_arrays)\n\n# Write final .wav file\nwrite_wav(output_wav_path, SAMPLE_RATE, final_audio)\n\nprint(f\"Full audio generated at: {output_wav_path}\")\n```",
+  "featuredImage": "/data/workflows/4241/4241.webp",
+  "author": {
+    "id": 101,
+    "slug": "flavien",
+    "name": "Flavien",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 761,
+  "downloads": 76,
+  "createdAt": "2025-05-20T11:40:14.482Z",
+  "updatedAt": "2026-01-16T08:33:28.705Z",
+  "publishedAt": "2025-05-20T11:40:14.482Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4241"
+}

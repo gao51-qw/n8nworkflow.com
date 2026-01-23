@@ -1,0 +1,103 @@
+{
+  "id": 7050,
+  "slug": "7050",
+  "title": "Export Amazon product reviews in bulk to Google Sheets via RapidAPI",
+  "description": "**What it does**\nPulls up to 700 Amazon reviews per product (recent and top-rated) and writes them straight into a Google Sheet tab you choose.\n\n**Perfect for**\n• Brand and product managers tracking sentiment\n• Marketplace sellers analysing competitor feedback\n• Agencies building product-review dashboards\n\n**Apps used**\nRapidAPI Real-Time Amazon Data, Google Sheets, n8n Form Trigger\n\n**How it works**\n\n1. Form Trigger collects brand, product and sheet info.\n2. Code node extracts the ASIN and builds 70 API requests (10 pages × star ratings).\n3. Split-in-batches loops through the request list, throttled by two Wait nodes.\n4. HTTP Request fetches reviews from RapidAPI.\n5. IF node drops empty or error responses.\n6. Split Out breaks arrays into single reviews.\n7. Google Sheets appends every review to the target tab.\n8. Loop continues until all pages finish.\n\n**Setup**\n\n1. Fill in **Brand name, Product / Model Name, Amazon Product URL, Tab URL to insert reviews** in the form.\n2. Grab your `X-RapidAPI-Key` from RapidAPI → **Add as httpHeaderAuth credential**.\n3. Connect Google Sheets OAuth2 and make the spreadsheet **Anyone with the link can edit**.\n4. Open Workflow Settings → set timezone if you plan to schedule runs.\n5. Hit *Execute workflow* or share the form link.\n\n**Credentials**\n• Real-Time Amazon Data (RapidAPI HTTP Header Auth)\n• Google Sheets OAuth2\n\n**Limits and notes**\n• \\~100 RapidAPI calls for the free plan. Plan quota accordingly.\n• Assumes Amazon returns 10 pages per star rating; fewer pages skip silently.\n• Large sheets may hit Google API write quotas.\n\n\n**If you have any questions in running the workflow, feel free to reach out to me at my youtube channel:** https://www.youtube.com/@hunyaochong",
+  "featuredImage": "/data/workflows/7050/7050.webp",
+  "author": {
+    "id": 101,
+    "slug": "hun-yao",
+    "name": "Hunyao",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1760,
+  "downloads": 176,
+  "createdAt": "2025-08-06T13:17:05.340Z",
+  "updatedAt": "2026-01-16T08:48:23.176Z",
+  "publishedAt": "2025-08-06T13:17:05.340Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7050",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Export Amazon product reviews in bulk to Google Sheets via RapidAPI",
+    "workflowName": "Export Amazon product reviews in bulk to Google Sheets via RapidAPI",
+    "description": "**What it does**\nPulls up to 700 Amazon reviews per product (recent and top-rated) and writes them straight into a Google Sheet tab you choose.\n\n**Perfect for**\n• Brand and product managers tracking sentiment\n• Marketplace sellers analysing competitor feedback\n• Agencies building product-review dashboards\n\n**Apps used**\nRapidAPI Real-Time Amazon Data, Google Sheets, n8n Form Trigger\n\n**How it works**\n\n1. Form Trigger collects brand, product and sheet info.\n2. Code node extracts the ASIN and builds 70 API requests (10 pages × star ratings).\n3. Split-in-batches loops through the request list, throttled by two Wait nodes.\n4. HTTP Request fetches reviews from RapidAPI.\n5. IF node drops empty or error responses.\n6. Split Out breaks arrays into single reviews.\n7. Google Sheets appends every review to the target tab.\n8. Loop continues until all pages finish.\n\n**Setup**\n\n1. Fill in **Brand name, Product / Model Name, Amazon Product URL, Tab URL to insert reviews** in the form.\n2. Grab your `X-RapidAPI-Key` from RapidAPI → **Add as httpHeaderAuth credential**.\n3. Connect Google Sheets OAuth2 and make the spreadsheet **Anyone with the link can edit**.\n4. Open Workflow Settings → set timezone if you plan to schedule runs.\n5. Hit *Execute workflow* or share the form link.\n\n**Credentials**\n• Real-Time Amazon Data (RapidAPI HTTP Header Auth)\n• Google Sheets OAuth2\n\n**Limits and notes**\n• \\~100 RapidAPI calls for the free plan. Plan quota accordingly.\n• Assumes Amazon returns 10 pages per star rating; fewer pages skip silently.\n• Large sheets may hit Google API write quotas.\n\n\n**If you have any questions in running the workflow, feel free to reach out to me at my youtube channel:** https://www.youtube.com/@hunyaochong",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Split Out Reviews",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If status \"OK\" and contains reviews",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Store reviews",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set Constants",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Build Parameter Sets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

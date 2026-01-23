@@ -1,0 +1,188 @@
+{
+  "id": 9748,
+  "slug": "9748",
+  "title": "Auto-post X videos with OpenRouter AI captions & Google Sheets deduplication",
+  "description": "Who’s it for\n\nMarketers, creators, and social managers who want hands-off reposting of a specific X (Twitter) user’s videos — with on-brand AI captions and clean, deduplicated logs.\n\nWhat it does / How it works\n\nOn a schedule, the workflow resolves a target user, fetches recent tweets with media, filters to video posts, and writes them to Google Sheets for tracking and dedupe. It then builds a shareable video URL, generates a short caption via an AI model (OpenRouter), posts to your X account, and updates the sheet with completion status. Sticky notes inside the workflow explain each step, setup tasks, and best practices.\n\nHow to set up\n\nAdd credentials: Twitter (X) OAuth2, Google Sheets OAuth2, OpenRouter.\n\nReplace the demo Google Sheet with your own (document ID & sheet name).\n\nSet the target X username (or parameterize it).\n\nAdjust the schedule (interval/cron) and run a test execution.\n\nVerify logs and posting format, then enable.\n\nRequirements\n\nTwitter (X) OAuth2 credential\n\nGoogle Sheets OAuth2 credential\n\nOpenRouter credential (choose an affordable model)\n\nHow to customize\n\nEdit the caption prompt (tone, hashtags count, CTAs, compliance lines).\n\nAdd filters (language, min/max tweet age, exclude replies/retweets, since_id).\n\nExtend logging (timestamps, posted text, account, errors).\n\nIntroduce a dry-run boolean to skip posting while testing.\n\nSwap the caption model or add retry rules for robustness.\n\nSecurity: Don’t hardcode tokens in HTTP nodes. Use n8n Credentials only and remove personal IDs before publishing.",
+  "featuredImage": "/data/workflows/9748/9748.webp",
+  "author": {
+    "id": 101,
+    "slug": "kawabe03",
+    "name": "masaya kawabe",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 104,
+  "downloads": 10,
+  "createdAt": "2025-10-16T04:29:51.219Z",
+  "updatedAt": "2026-01-16T09:01:44.188Z",
+  "publishedAt": "2025-10-16T04:29:51.219Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9748",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-post X videos with OpenRouter AI captions & Google Sheets deduplication",
+    "workflowName": "Auto-post X videos with OpenRouter AI captions & Google Sheets deduplication",
+    "description": "Who’s it for\n\nMarketers, creators, and social managers who want hands-off reposting of a specific X (Twitter) user’s videos — with on-brand AI captions and clean, deduplicated logs.\n\nWhat it does / How it works\n\nOn a schedule, the workflow resolves a target user, fetches recent tweets with media, filters to video posts, and writes them to Google Sheets for tracking and dedupe. It then builds a shareable video URL, generates a short caption via an AI model (OpenRouter), posts to your X account, and updates the sheet with completion status. Sticky notes inside the workflow explain each step, setup tasks, and best practices.\n\nHow to set up\n\nAdd credentials: Twitter (X) OAuth2, Google Sheets OAuth2, OpenRouter.\n\nReplace the demo Google Sheet with your own (document ID & sheet name).\n\nSet the target X username (or parameterize it).\n\nAdjust the schedule (interval/cron) and run a test execution.\n\nVerify logs and posting format, then enable.\n\nRequirements\n\nTwitter (X) OAuth2 credential\n\nGoogle Sheets OAuth2 credential\n\nOpenRouter credential (choose an affordable model)\n\nHow to customize\n\nEdit the caption prompt (tone, hashtags count, CTAs, compliance lines).\n\nAdd filters (language, min/max tweet age, exclude replies/retweets, since_id).\n\nExtend logging (timestamps, posted text, account, errors).\n\nIntroduce a dry-run boolean to skip posting while testing.\n\nSwap the caption model or add retry rules for robustness.\n\nSecurity: Don’t hardcode tokens in HTTP nodes. Use n8n Credentials only and remove personal IDs before publishing.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get User ID",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Tweets with Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter Video Tweets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Existing URLs",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Check New Videos",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate Tweet Text",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post to X",
+      "type": "n8n-nodes-base.twitter",
+      "role": "twitter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🟨 Sticky: Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Schedule Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Get User ID",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Get Tweets with Videos",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Filter Video Tweets",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Check Existing URLs",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Edit Fields",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Append/Update (setURL)",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Check New Videos",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: OpenRouter Chat Model",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Generate Tweet Text",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Post to X",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Update Spreadsheet",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

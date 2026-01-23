@@ -1,0 +1,175 @@
+{
+  "id": 12242,
+  "slug": "12242",
+  "title": "Back up self-hosted workflows to Google Drive daily with change detection",
+  "description": "This workflow creates a **daily, automated backup** of all workflows in a self-hosted n8n instance and stores them in Google Drive. Instead of exporting every workflow on every run, it uses **content hashing** to detect meaningful changes and only updates backups when a workflow has actually been modified.\n\nTo keep Google Drive clean and predictable, the workflow intentionally **deletes the existing backup file before uploading the updated version**. This avoids duplicate files and ensures there is always *one authoritative backup per workflow*.\n\nA **Data Table** is used as an index to track workflow IDs, hash values, and timestamps. This allows the workflow to quickly determine whether a workflow already exists, whether its content has changed, or whether it should be skipped entirely.\n\n### How it works\n- Runs daily using a Cron Trigger.\n- Fetches all workflows from the n8n API.\n- Processes workflows one-by-one for reliability.\n- Generates a SHA-256 hash for each workflow.\n- Compares hashes against a stored Data Table.\n- Deletes existing Google Drive backups when changes are detected.\n- Uploads updated workflows and skips unchanged ones.\n- Store new or updated workflows details in Data Table.\n-  Filters workflows based on the configured backup scope (all | active | tagged ). Backs up all workflows, only active workflows, or only workflows matching a specific tag.\n- Applies the scope filter before hashing and comparison, ensuring only relevant workflows are processed.\n\n### Setup steps\n- **Set the Cron schedule**\nOpen the Cron Trigger node and choose the time you want the backup to run (for example, once daily during off-peak hours).\n\n- **Create a Data Table**\nCreate a new n8n Data Table with the title defined in dataTableTitle. This table stores workflowId, workflowName, hashCode,  and DriveFiveId.\n\n- **Configure the Set node**\nIn the Set Backup Configuration node, provide the following values:\n{\n  \"n8nHost\": \"https://your-n8n-domain\",\n  \"apiKey\": \"your-n8n-api-key\",\n  \"backupFolder\": \"/n8n/workflow-backups\",\n  \"hashAlgorithm\": \"sha256\",\n  \"dataTableTitle\": \"n8n_workflow_backup_index\",\n \"backupScope\" : \"\",  \n  \"requiredTag\" : \"\"\n}\n\n- In the Set Backup Configuration node, choose how workflows should be selected for backup:\n**all** – backs up every workflow (default)\n**active** – backs up only enabled workflows\n**tagged** – backs up only workflows containing a specific tag\nIf using the tagged option, provide the required tag name to match.\n{\n  \"backupScope\": \"tagged\",\n  \"requiredTag\": \"production\"\n}\n\n- **Connect Google Drive credentials**\nAuthorize your Google Drive account and ensure the backup folder exists.\n\n- **Activate the workflow**\nOnce enabled, backups run automatically with no further action required.",
+  "featuredImage": "/data/workflows/12242/12242.webp",
+  "author": {
+    "id": 101,
+    "slug": "coolchandan62",
+    "name": "Chandan Singh",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 4,
+  "downloads": 0,
+  "createdAt": "2025-12-28T21:13:13.739Z",
+  "updatedAt": "2026-01-16T09:11:50.237Z",
+  "publishedAt": "2025-12-28T21:13:13.739Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12242",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Back up self-hosted workflows to Google Drive daily with change detection",
+    "workflowName": "Back up self-hosted workflows to Google Drive daily with change detection",
+    "description": "This workflow creates a **daily, automated backup** of all workflows in a self-hosted n8n instance and stores them in Google Drive. Instead of exporting every workflow on every run, it uses **content hashing** to detect meaningful changes and only updates backups when a workflow has actually been modified.\n\nTo keep Google Drive clean and predictable, the workflow intentionally **deletes the existing backup file before uploading the updated version**. This avoids duplicate files and ensures there is always *one authoritative backup per workflow*.\n\nA **Data Table** is used as an index to track workflow IDs, hash values, and timestamps. This allows the workflow to quickly determine whether a workflow already exists, whether its content has changed, or whether it should be skipped entirely.\n\n### How it works\n- Runs daily using a Cron Trigger.\n- Fetches all workflows from the n8n API.\n- Processes workflows one-by-one for reliability.\n- Generates a SHA-256 hash for each workflow.\n- Compares hashes against a stored Data Table.\n- Deletes existing Google Drive backups when changes are detected.\n- Uploads updated workflows and skips unchanged ones.\n- Store new or updated workflows details in Data Table.\n-  Filters workflows based on the configured backup scope (all | active | tagged ). Backs up all workflows, only active workflows, or only workflows matching a specific tag.\n- Applies the scope filter before hashing and comparison, ensuring only relevant workflows are processed.\n\n### Setup steps\n- **Set the Cron schedule**\nOpen the Cron Trigger node and choose the time you want the backup to run (for example, once daily during off-peak hours).\n\n- **Create a Data Table**\nCreate a new n8n Data Table with the title defined in dataTableTitle. This table stores workflowId, workflowName, hashCode,  and DriveFiveId.\n\n- **Configure the Set node**\nIn the Set Backup Configuration node, provide the following values:\n{\n  \"n8nHost\": \"https://your-n8n-domain\",\n  \"apiKey\": \"your-n8n-api-key\",\n  \"backupFolder\": \"/n8n/workflow-backups\",\n  \"hashAlgorithm\": \"sha256\",\n  \"dataTableTitle\": \"n8n_workflow_backup_index\",\n \"backupScope\" : \"\",  \n  \"requiredTag\" : \"\"\n}\n\n- In the Set Backup Configuration node, choose how workflows should be selected for backup:\n**all** – backs up every workflow (default)\n**active** – backs up only enabled workflows\n**tagged** – backs up only workflows containing a specific tag\nIf using the tagged option, provide the required tag name to match.\n{\n  \"backupScope\": \"tagged\",\n  \"requiredTag\": \"production\"\n}\n\n- **Connect Google Drive credentials**\nAuthorize your Google Drive account and ensure the backup folder exists.\n\n- **Activate the workflow**\nOnce enabled, backups run automatically with no further action required.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Daily Backup Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Set Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get All n8n Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Prepare Workflow",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Workflow Exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Hash Changed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Upload New Workflow Backup",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Upsert Workflow Records",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Workflows",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Each Workflow",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Generate Workflow Hash",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Lookup Workflow in Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete Existing Workflow Backup",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Backup scope all?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Backup scope active?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "If workflow active?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Backup scope tagged?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Config Validation",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+# Automate product Hunt discovery with Airtop and Slack
+
+> ### About The Product Hunt Automation
+
+Staying up-to-date with specific topics and launches on Product Hunt can be time-consuming. Manually checking the site multiple times a day interrupts your workflow and risks missing important launches. What if you could automatically get relevant launches delivered to your Slack workspace?
+
+### How to Monitor Product Hunt
+
+In this guide, you'll learn how to create a Product Hunt monitoring system using Airtop's built-in node in n8n. This automation will scan Product Hunt for your chosen topics and deliver the most relevant launches directly to Slack.
+
+
+### What You'll Need
+
+- A free [Airtop API key](https://portal.airtop.ai/?utm_campaign=n8n)
+- A Slack workspace with permissions to add incoming webhooks
+- Estimated setup time: 5 minutes
+
+### Understanding the Process
+
+The Monitor Product Hunt automation uses Airtop's cloud browser capabilities to access Product Hunt and extract launch information. Here's what happens:
+
+- Airtop visits Product Hunt and navigates the page
+- It searches for and extracts up to 5 launches related to your chosen topic
+- The information is formatted and sent to your specified Slack channel
+
+This process can run on your preferred schedule, ensuring you never miss relevant launches.
+
+![image.png](fileId:1101)
+
+
+### Setting Up Your Automation
+
+We've created a ready-to-use template that handles all the complex parts. Here's how to get started:
+
+- Connect your Airtop account by adding the API key you created
+- Connect your Slack account
+- Set your prompt in the Airtop node. For this example, we’ve set it to be _“Extract up to 5 launches related to AI products”_
+- Choose your preferred monitoring schedule.
+
+### Customization Options
+
+While our template works immediately, you might want to customize it for your specific needs:
+
+- Adjust the prompt and the maximum number of launches to monitor
+- Customize the Slack message format
+- Change the monitoring frequency
+- Add filters for particular keywords or companies
+
+### Real-World Applications
+
+Here's how teams can use this automation:
+
+- A **startup's engineering team** could track trends in other product’s tech stack, helping them stay informed about potential issues and improvements.
+
+- A **product manager** can track launches of competitor products, enabling them to gather valuable market insights and user feedback directly from the tech community on that launch.
+
+### Best Practices
+
+To get the most out of this automation:
+
+- **Choose Specific Search Terms**: For more relevant results, instead of broad terms like "AI," use specific phrases like "machine learning for healthcare"
+- **Optimize Scheduling**: When setting the monitoring frequency, consider your team's workflow. Running the scenario every 4 hours during working hours often provides a good balance between staying updated and avoiding notification fatigue.
+- **Set Up Error Handling**: Enable n8n's error output to alert you if the automation encounters any issues with accessing Product Hunt or sending messages to Slack.
+- **Regular Topic Review**: Schedule a monthly review of your monitored topics to ensure they're still relevant to your needs and adjust as necessary.
+
+
+### What's Next?
+
+Now that you've set up your Product Hunt monitor automation, you might be interested in:
+
+- Creating a similar monitor for other tech websites
+- Setting up automated content curation for your team's newsletter
+- Building a competitive intelligence dashboard using web monitoring
+
+Happy Automating!
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3481
+- **Complexity:** intermediate
+- **Node Count:** 5
+- **Views:** 1215
+- **Downloads:** 121
+- **Created:** 2025/4/9
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3481)
+
+## 👤 Author
+
+- **Name:** Airtop
+- **Username:** @cesar-at-airtop
+
+## 🏷️ Categories
+
+- Market Research
+
+## 🔗 Nodes Used
+
+- **set** 
+- **if** 
+- **airtop** 
+- **slack** 
+- **scheduleTrigger** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 5 nodes with 4 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

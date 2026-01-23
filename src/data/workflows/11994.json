@@ -1,0 +1,212 @@
+{
+  "id": 11994,
+  "slug": "11994",
+  "title": "Optimize Instagram hashtags with GPT-4o & real engagement data via Graph API",
+  "description": "# Instagram Hashtag Generator Workflow\n\nThis workflow automatically generates optimal hashtags for your Instagram posts by analyzing captions and fetching real-time engagement data.\n\n## Key Features\n*   **100% Official API & Free**: Uses ONLY the official Instagram Graph API. No expensive third-party tools or risky scraping methods are required.\n*   **Safe & Reliable**: Relying on the official API ensures compliance and long-term stability.\n*   **Smart Caching**: Includes a Google Sheets caching mechanism to maximize the value of the official API's rate limits (30 searches/7 days).\n\n## Workflow Overview \n\n1.  **Caption Input**: Set your caption manually or via a workflow trigger.\n2.  **AI Suggestions**: GPT-4o-mini analyzes the caption and suggests 10 relevant hashtags, balancing popular (big words) and niche keywords.\n3.  **Official API Search (Instagram Graph API)**:\n    -   Fetches Hashtag IDs using the `ig_hashtag_search` endpoint.\n    -   Retrieves engagement metrics (Average Likes, Average Comments) using the ID.\n4.  **Selection & Sorting**:\n    -   Sorts candidates by engagement metrics.\n    -   Selects the top 5 most effective hashtags that balance relevance and engagement.\n5.  **Output**: Returns the final list of hashtags as text.\n\n## Setup Steps\n\n1.  **Import to n8n**:\n    -   Copy the content of `workflow_hashtag_generator.json` and paste it into your n8n canvas, or import the file directly.\n\n2.  **Credentials**:\n    -   **OpenAI account**: Connect your OpenAI credentials.\n    -   **Facebook Graph account**: Connect your Facebook Graph API credentials.\n\n3.  **Configuration**:\n    -   **Instagram Business ID**: Update the `YOUR_INSTAGRAM_BUSINESS_ACCOUNT_ID` placeholder in the **Get Hashtag Info** and **Get Hashtag Metrics** nodes with your actual Business Account ID.\n    -   **Google Spreadsheet ID**: Update the `YOUR_SPREADSHEET_ID` placeholder in the **Fetch Cached Hashtags** and **Save to Cache** nodes.\n\n4.  **Adjustments**:\n    -   **Filter Logic**: You can adjust the sorting or filtering logic in the `Aggregate & Rank Candidates` node's JavaScript code (e.g., exclude tags with fewer than 1000 posts) if needed.\n\n## Important Notes on API Limits\nThe official **Instagram Hashtag Search API** (`ig_hashtag_search`) allows for **30 unique hashtag queries per rolling 7-day period**.\n*   **Why this is fine**: This workflow caches results in Google Sheets. Once a tag is fetched, it doesn't need to be queried again for a while, allowing you to build up a large database of tags over time without hitting the limit.\n*   **Recommendation**: Use mock data during initial testing to save your API quota.\n",
+  "featuredImage": "/data/workflows/11994/11994.webp",
+  "author": {
+    "id": 101,
+    "slug": "nakayama",
+    "name": "Shun Nakayama",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 120,
+  "downloads": 12,
+  "createdAt": "2025-12-21T06:35:43.523Z",
+  "updatedAt": "2026-01-16T09:10:55.487Z",
+  "publishedAt": "2025-12-21T06:35:43.523Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11994",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Optimize Instagram hashtags with GPT-4o & real engagement data via Graph API",
+    "workflowName": "Optimize Instagram hashtags with GPT-4o & real engagement data via Graph API",
+    "description": "# Instagram Hashtag Generator Workflow\n\nThis workflow automatically generates optimal hashtags for your Instagram posts by analyzing captions and fetching real-time engagement data.\n\n## Key Features\n*   **100% Official API & Free**: Uses ONLY the official Instagram Graph API. No expensive third-party tools or risky scraping methods are required.\n*   **Safe & Reliable**: Relying on the official API ensures compliance and long-term stability.\n*   **Smart Caching**: Includes a Google Sheets caching mechanism to maximize the value of the official API's rate limits (30 searches/7 days).\n\n## Workflow Overview \n\n1.  **Caption Input**: Set your caption manually or via a workflow trigger.\n2.  **AI Suggestions**: GPT-4o-mini analyzes the caption and suggests 10 relevant hashtags, balancing popular (big words) and niche keywords.\n3.  **Official API Search (Instagram Graph API)**:\n    -   Fetches Hashtag IDs using the `ig_hashtag_search` endpoint.\n    -   Retrieves engagement metrics (Average Likes, Average Comments) using the ID.\n4.  **Selection & Sorting**:\n    -   Sorts candidates by engagement metrics.\n    -   Selects the top 5 most effective hashtags that balance relevance and engagement.\n5.  **Output**: Returns the final list of hashtags as text.\n\n## Setup Steps\n\n1.  **Import to n8n**:\n    -   Copy the content of `workflow_hashtag_generator.json` and paste it into your n8n canvas, or import the file directly.\n\n2.  **Credentials**:\n    -   **OpenAI account**: Connect your OpenAI credentials.\n    -   **Facebook Graph account**: Connect your Facebook Graph API credentials.\n\n3.  **Configuration**:\n    -   **Instagram Business ID**: Update the `YOUR_INSTAGRAM_BUSINESS_ACCOUNT_ID` placeholder in the **Get Hashtag Info** and **Get Hashtag Metrics** nodes with your actual Business Account ID.\n    -   **Google Spreadsheet ID**: Update the `YOUR_SPREADSHEET_ID` placeholder in the **Fetch Cached Hashtags** and **Save to Cache** nodes.\n\n4.  **Adjustments**:\n    -   **Filter Logic**: You can adjust the sorting or filtering logic in the `Aggregate & Rank Candidates` node's JavaScript code (e.g., exclude tags with fewer than 1000 posts) if needed.\n\n## Important Notes on API Limits\nThe official **Instagram Hashtag Search API** (`ig_hashtag_search`) allows for **30 unique hashtag queries per rolling 7-day period**.\n*   **Why this is fine**: This workflow caches results in Google Sheets. Once a tag is fetched, it doesn't need to be queried again for a while, allowing you to build up a large database of tags over time without hitting the limit.\n*   **Recommendation**: Use mock data during initial testing to save your API quota.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Dummy Caption",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Generate Initial Hashtags",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Parse & Clean Tags",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch Cached Hashtags",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check if Tag Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Save to Cache",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Rate Limit Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Cache & Fresh",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Aggregate & Rank Candidates",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format New Hashtag Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check Cache Status",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Input",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Route Cached vs New",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Hashtag Info",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Hashtag Metrics",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculate Average Metrics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Model Selector",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Top 5 Hashtags",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Format Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

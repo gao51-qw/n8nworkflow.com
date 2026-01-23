@@ -1,0 +1,206 @@
+{
+  "id": 8778,
+  "slug": "8778",
+  "title": "Workflow for submitting changed sitemap URLs using Google Indexing API and Bing IndexNow",
+  "description": "### This n8n template saves you hours of manual SEO work by automatically parsing your sitemap and submitting updated URLs to Google and Bing (IndexNow).\n\n### Who’s it for\n\nSite owners, SEOs, and marketers who want a single automation to notify Google (Indexing API) and Bing (via IndexNow) whenever site URLs are added or updated. No more need to update it manually. Hours saved\n\n### What it does\n\nThis workflow parses your sitemap.xml, and for each URLs that have been changed on the last X days (this is a setting from Config node), submit them to Google and Bing via IndexNow. Before submitting to Google it checks the status. For IndexNow it just submits based on the last updated date it can find on the sitemap.\n\n\n### How it works\n\n* Parses your sitemap(s)to generate a list of urls ordered by lastmod date.\n* Create a batch of the urls updated in the last X days (settings DAYS_BACK from the \"Config\" node)\n* For Google, it first aks the current indexing notification status of this exact URL. If the sitemap shows the page was modified after the last submission, the workflow sends a new \"URL_UPDATED\" notification to Google. If Google has no record (404), it means the URL was never submitted and the workflow treats it as new and submits it. \n* For Bing through IndexNow, it only sends “recently changed URLs” based on the sitemap’s &lt;lastmod&gt; and the variable DAYS_BACK from the Config Node, by batches of 500 (current limit recommendation by Bing). IndexNow doesn't have an API to check the status of the url. \n\nRequirements\n\n* Google Indexing API credentials (Service Account with https://www.googleapis.com/auth/indexing scope, added as Owner in Search Console).\n* IndexNow API key: you can create it here https://www.bing.com/indexnow/getstarted.\n\nHow to use\n\n* Edit the \"Config\" node with your data & preferences (everything explain in the workflow).\n* Edit the \"Check status (Google)\" and \"URL updated (Google)\" node with your Google service account credentials.\n* Execute the workflow to test it \n* Set up a cron with the \"Schedule Trigger\" node depending on your needs",
+  "featuredImage": "/data/workflows/8778/8778.webp",
+  "author": {
+    "id": 101,
+    "slug": "jojoq42",
+    "name": "Geoffroy",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 574,
+  "downloads": 57,
+  "createdAt": "2025-09-20T14:59:02.218Z",
+  "updatedAt": "2026-01-16T08:57:38.271Z",
+  "publishedAt": "2025-09-20T14:59:02.218Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8778",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Workflow for submitting changed sitemap URLs using Google Indexing API and Bing IndexNow",
+    "workflowName": "Workflow for submitting changed sitemap URLs using Google Indexing API and Bing IndexNow",
+    "description": "### This n8n template saves you hours of manual SEO work by automatically parsing your sitemap and submitting updated URLs to Google and Bing (IndexNow).\n\n### Who’s it for\n\nSite owners, SEOs, and marketers who want a single automation to notify Google (Indexing API) and Bing (via IndexNow) whenever site URLs are added or updated. No more need to update it manually. Hours saved\n\n### What it does\n\nThis workflow parses your sitemap.xml, and for each URLs that have been changed on the last X days (this is a setting from Config node), submit them to Google and Bing via IndexNow. Before submitting to Google it checks the status. For IndexNow it just submits based on the last updated date it can find on the sitemap.\n\n\n### How it works\n\n* Parses your sitemap(s)to generate a list of urls ordered by lastmod date.\n* Create a batch of the urls updated in the last X days (settings DAYS_BACK from the \"Config\" node)\n* For Google, it first aks the current indexing notification status of this exact URL. If the sitemap shows the page was modified after the last submission, the workflow sends a new \"URL_UPDATED\" notification to Google. If Google has no record (404), it means the URL was never submitted and the workflow treats it as new and submits it. \n* For Bing through IndexNow, it only sends “recently changed URLs” based on the sitemap’s &lt;lastmod&gt; and the variable DAYS_BACK from the Config Node, by batches of 500 (current limit recommendation by Bing). IndexNow doesn't have an API to check the status of the url. \n\nRequirements\n\n* Google Indexing API credentials (Service Account with https://www.googleapis.com/auth/indexing scope, added as Owner in Search Console).\n* IndexNow API key: you can create it here https://www.bing.com/indexnow/getstarted.\n\nHow to use\n\n* Edit the \"Config\" node with your data & preferences (everything explain in the workflow).\n* Edit the \"Check status (Google)\" and \"URL updated (Google)\" node with your Google service account credentials.\n* Execute the workflow to test it \n* Set up a cron with the \"Schedule Trigger\" node depending on your needs",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Get sitemap.xml",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Convert sitemap to JSON",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get content-specific sitemaps",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get content of each sitemap",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "convert page data to JSON",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Force urlset.url to array",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sort",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Assign mandatory sitemap fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Filter: lastmod within DAYS_BACK",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items (Google)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check status (Google)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "is new? (Google)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "URL Updated (Google)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Wait (Google jitter)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split In Batches (IndexNow ≤500)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Build IndexNow payload",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IndexNow Submit",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Wait (IndexNow jitter)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gate: Google",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Gate: IndexNow",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

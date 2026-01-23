@@ -1,0 +1,95 @@
+# Automate peer review assignments with Sonar Pro AI & multi-channel deadline reminders
+
+> ## Introduction
+Automate peer review assignment and grading with AI-powered evaluation. Designed for educators managing collaborative assessments efficiently.
+
+## How It Works
+Webhook receives assignments, distributes them, AI generates review rubrics, emails reviewers, collects responses, calculates scores, stores results, emails reports, updates dashboards, and posts analytics to Slack.
+
+## Workflow Template
+Webhook → Store Assignment → Distribute → Generate Review Rubric → Notify Slack → Email Reviewers → Prepare Response → Calculate Score → Store Results → Check Status → Generate Report → Email Report → Update Dashboard → Analytics → Post to Slack → Respond to Webhook
+## Workflow Steps
+1. Receive & Store: Webhook captures assignments, stores data.
+2. Distribute & Generate: Assigns peer reviewers, AI creates rubrics.
+3. Notify & Email: Alerts via Slack, sends review requests.
+4. Collect & Score: Gathers responses, calculates peer scores.
+5. Report & Update: Generates reports, emails results, updates dashboard.
+6. Analyze & Alert: Posts analytics to Slack, confirms completion.
+## Setup Instructions
+1. Webhook & Storage: Configure endpoint, set up database.
+2. AI Configuration: Add OpenAI key, customize rubric prompts.
+3. Communication: Connect Gmail, Slack credentials.
+4. Dashboard: Link analytics platform, configure metrics.
+## Prerequisites
+- OpenAI API key
+- Gmail account
+- Slack workspace
+- Database or storage system
+- Dashboard tool
+## Use Cases
+- University peer review assignments
+- Corporate training evaluations
+- Research paper assessments
+## Customization
+- Multi-round review cycles
+- Custom scoring algorithms
+- LMS integration (Canvas, Moodle)
+## Benefits
+- Eliminates manual distribution
+- Ensures consistent evaluation
+- Provides instant feedback and analytics
+
+## 📊 Basic Information
+
+- **Workflow ID:** 10312
+- **Complexity:** advanced
+- **Node Count:** 23
+- **Views:** 186
+- **Downloads:** 18
+- **Created:** 2025/10/30
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/10312)
+
+## 👤 Author
+
+- **Name:** Cheng Siong Chin
+- **Username:** @cschin
+
+## 🏷️ Categories
+
+- Document Extraction
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **scheduleTrigger** 
+- **webhook** 
+- **set** (×3)
+- **readPDF** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **splitOut** 
+- **microsoftTeams** (×2)
+- **discord** (×2)
+- **emailSend** (×2)
+- **googleSheets** (×2)
+- **filter** 
+- **respondToWebhook** 
+- **stickyNote** (×2)
+- **@n8n/n8n-nodes-langchain.lmChatOpenRouter** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 23 nodes with 14 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,96 @@
+# Query your Trello board using natural language with OpenAI GPT
+
+> # 💬 Chat with Your Trello Board (n8n + OpenAI)
+
+## 📖 Description
+Turn your Trello board into a conversational assistant. This workflow pulls your board → lists → cards, aggregates the context, and lets you **ask natural-language questions** (“what’s overdue?”, “summarize In Progress”, “what changed this week?”). OpenAI reasons over the live board data and replies with concise answers or summaries. Great for standups, planning, and quick status checks—without opening Trello.
+
+&gt; Setup steps are already embedded in the workflow (Trello API + OpenAI + board URL). Just follow the sticky notes inside the canvas.
+
+---
+
+## 🧪 Example prompts
+- “Give me a one-paragraph summary of the board.”
+- “List all cards due this week with their lists.”
+- “What’s blocking items in ‘In Progress’?”
+- “Show new cards added in the last 2 days.”
+
+---
+
+
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Connect Trello (Developer API)
+1. Get your **API key**: https://trello.com/app-key  
+2. Generate a **token** (from the same page → **Token**)
+3. In n8n → **Credentials → New → Trello API**, paste **API Key** and **Token**, save.  
+4. Open each Trello node (**Get Board**, **Get Lists**, **Get Cards**) and select your Trello credential.
+
+### 2️⃣ Set Up OpenAI Connection
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)  
+2. Navigate to [OpenAI Billing](https://platform.openai.com/settings/organization/billing/overview)  
+3. Add funds to your billing account  
+4. Copy your API key into the **OpenAI credentials** in n8n  
+
+### 3️⃣ Add Your Board URL to “Get Board”
+1. Copy your Trello board URL (e.g., `https://trello.com/b/DCpuJbnd/administrative-tasks`).  
+2. Open the **Get Board** node → **Resource: Board**, **Operation: Get**.  
+3. In **ID**, choose **URL** mode and paste the **board URL**.  
+   - The node will resolve the board and output its `id` → used by **Get Lists** / **Get Cards**.
+
+## 📬 Contact
+Need help customizing this or adding Slack/Email outputs?
+
+- 📧 **robert@ynteractive.com**
+- 🔗 **[Robert Breen](https://www.linkedin.com/in/robert-breen-29429625/)**
+- 🌐 **[ynteractive.com](https://ynteractive.com)**
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7618
+- **Complexity:** advanced
+- **Node Count:** 15
+- **Views:** 554
+- **Downloads:** 55
+- **Created:** 2025/8/20
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7618)
+
+## 👤 Author
+
+- **Name:** Robert Breen
+- **Username:** @rbreen
+
+## 🏷️ Categories
+
+- AI Chatbot
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** 
+- **stickyNote** (×4)
+- **trello** (×3)
+- **set** (×2)
+- **aggregate** 
+- **@n8n/n8n-nodes-langchain.chatTrigger** 
+- **@n8n/n8n-nodes-langchain.memoryBufferWindow** 
+- **merge** 
+- **@n8n/n8n-nodes-langchain.agent** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 15 nodes with 11 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

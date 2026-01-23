@@ -1,0 +1,115 @@
+{
+  "id": 5702,
+  "slug": "5702",
+  "title": "🚀 Automated Stripe payment recovery: track failures & follow-up emails",
+  "description": "# 🚀 **Automated Stripe Payment Recovery Workflow (n8n)**\n\nDetect failed payments, log them, and send polite follow-up emails to recover revenue — all automated with n8n.\n\n---\n\n## ✅ **Part A – Detect & log failed payments**\n\n**What it does:**\n\n* Listens for failed Stripe payments.\n* Extracts customer & payment info.\n* Logs them neatly in Google Sheets for follow-up.\n\n**🧩 Nodes:**\n\n1️⃣ **Stripe Trigger**\n\n* Listens to:\n\n  ```\n  payment_intent.payment_failed\n  ```\n\n2️⃣ **Set node**\n\n* Extracts & maps fields:\n\n  * Name, Email, Amount (in cents), Currency\n  * payment\\_intent\\_id\n  * added\\_at → `{{ $now }}`\n  * email\\_sent\\_count → `0`\n\n3️⃣ **Remove Duplicates**\n\n* Keeps the sheet clean (avoids duplicate rows).\n\n4️⃣ **Google Sheets node**\n\n* Append or update row:\n\n  * Name, Email, Amount/100, Currency, payment\\_intent\\_id, added\\_at, email\\_sent\\_count\n\n&gt; 📌 This builds your “failed payments queue” to drive the follow-up emails later.\n\n---\n\n## 🔁 **Part B – Daily follow-up emails**\n\n**What it does:**\n\n* Runs daily.\n* Checks which users haven’t received 2 emails yet.\n* Sends reminder emails and tracks how many were sent.\n\n**🧩 Nodes:**\n1️⃣ **Schedule Trigger**\n\n* Runs every day at 10 AM (`0 10 * * *`)\n\n2️⃣ **Get Payment Failure Leads**\n\n* Reads rows from Google Sheet.\n\n3️⃣ **Switch node (Check for no. of emails sent)**\n\n* If `email_sent_count &lt; 1` → send first email.\n* Else if `email_sent_count &lt; 2` → send second email.\n* Else → mark as \"quit sending emails\".\n\n4️⃣ **Send First Email**\n\n* Sends a gentle reminder with billing page button.\n\n5️⃣ **Update Email Count**\n\n* Increments `email_sent_count` by +1 in Google Sheets.\n\n6️⃣ **Send Second Email**\n\n* Sends final, urgent reminder.\n\n7️⃣ **Quit Sending Emails to these Leads**\n\n* Marks that no more emails should be sent.\n\n---\n\n## 📝 **Headline**\n\n&gt; **🚀 Automated Stripe Payment Recovery: Track Failures & Send Follow-Up Emails via n8n**\n\n---\n\n## ✅ **Why this matters:**\n\n* Catch failed payments automatically.\n* Log every attempt & follow-up count.\n* Recover lost revenue while staying polite and respectful.\n* Avoid spamming by capping follow-ups to 2 emails.",
+  "featuredImage": "/data/workflows/5702/5702.webp",
+  "author": {
+    "id": 101,
+    "slug": "iamvaar",
+    "name": "iamvaar",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 298,
+  "downloads": 29,
+  "createdAt": "2025-07-05T16:27:30.617Z",
+  "updatedAt": "2026-01-16T08:40:59.975Z",
+  "publishedAt": "2025-07-05T16:27:30.617Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5702",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "🚀 Automated Stripe payment recovery: track failures & follow-up emails",
+    "workflowName": "🚀 Automated Stripe payment recovery: track failures & follow-up emails",
+    "description": "# 🚀 **Automated Stripe Payment Recovery Workflow (n8n)**\n\nDetect failed payments, log them, and send polite follow-up emails to recover revenue — all automated with n8n.\n\n---\n\n## ✅ **Part A – Detect & log failed payments**\n\n**What it does:**\n\n* Listens for failed Stripe payments.\n* Extracts customer & payment info.\n* Logs them neatly in Google Sheets for follow-up.\n\n**🧩 Nodes:**\n\n1️⃣ **Stripe Trigger**\n\n* Listens to:\n\n  ```\n  payment_intent.payment_failed\n  ```\n\n2️⃣ **Set node**\n\n* Extracts & maps fields:\n\n  * Name, Email, Amount (in cents), Currency\n  * payment\\_intent\\_id\n  * added\\_at → `{{ $now }}`\n  * email\\_sent\\_count → `0`\n\n3️⃣ **Remove Duplicates**\n\n* Keeps the sheet clean (avoids duplicate rows).\n\n4️⃣ **Google Sheets node**\n\n* Append or update row:\n\n  * Name, Email, Amount/100, Currency, payment\\_intent\\_id, added\\_at, email\\_sent\\_count\n\n&gt; 📌 This builds your “failed payments queue” to drive the follow-up emails later.\n\n---\n\n## 🔁 **Part B – Daily follow-up emails**\n\n**What it does:**\n\n* Runs daily.\n* Checks which users haven’t received 2 emails yet.\n* Sends reminder emails and tracks how many were sent.\n\n**🧩 Nodes:**\n1️⃣ **Schedule Trigger**\n\n* Runs every day at 10 AM (`0 10 * * *`)\n\n2️⃣ **Get Payment Failure Leads**\n\n* Reads rows from Google Sheet.\n\n3️⃣ **Switch node (Check for no. of emails sent)**\n\n* If `email_sent_count &lt; 1` → send first email.\n* Else if `email_sent_count &lt; 2` → send second email.\n* Else → mark as \"quit sending emails\".\n\n4️⃣ **Send First Email**\n\n* Sends a gentle reminder with billing page button.\n\n5️⃣ **Update Email Count**\n\n* Increments `email_sent_count` by +1 in Google Sheets.\n\n6️⃣ **Send Second Email**\n\n* Sends final, urgent reminder.\n\n7️⃣ **Quit Sending Emails to these Leads**\n\n* Marks that no more emails should be sent.\n\n---\n\n## 📝 **Headline**\n\n&gt; **🚀 Automated Stripe Payment Recovery: Track Failures & Send Follow-Up Emails via n8n**\n\n---\n\n## ✅ **Why this matters:**\n\n* Catch failed payments automatically.\n* Log every attempt & follow-up count.\n* Recover lost revenue while staying polite and respectful.\n* Avoid spamming by capping follow-ups to 2 emails.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Detect Failed Payments",
+      "type": "n8n-nodes-base.stripeTrigger",
+      "role": "stripeTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract User and Payment Info",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Email Count",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Get Payment Failure Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Check for no. of emails sent",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send First Email",
+      "type": "n8n-nodes-base.sendInBlue",
+      "role": "sendInBlue",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Second Email",
+      "type": "n8n-nodes-base.sendInBlue",
+      "role": "sendInBlue",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Quit Sending Emails to these Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

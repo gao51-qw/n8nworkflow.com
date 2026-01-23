@@ -1,0 +1,200 @@
+{
+  "id": 8724,
+  "slug": "8724",
+  "title": "Automated daily stock market report with Bright Data, GPT-4.1, Airtable/Gmail",
+  "description": "# 📘 Workflow Documentation – Stock Market Daily Digest\n\n![automatisationrapportboursierquotidienbaptistefort.png](fileId:2661)\n\n## 👋 Introduction\nWake up to a clean, analyst-style stock digest in your inbox—top gainers/losers, a readable performance table, 3–5 insights, and upcoming events—**no spreadsheets, no manual scraping, no copy-paste**.  \nThis article explains, step by step, how to build a robust, daily, end-to-end automation that collects market data (Bright Data), waits until scraping is done, aggregates results, asks an AI model (OpenAI) to draft a **styled HTML email**, logs everything to Airtable, and finally sends the report via Gmail.\n\nYou’ll find a friendly but technical tour of **every single node**, so you can rebuild or adapt the same pipeline with confidence.\n\n---\n\n## 🎯 Who is this workflow for?\n- **Investors & traders** who want a quick, readable daily summary.  \n- **Finance/Product teams** building data-driven alerts/digests.  \n- **Consultants & agencies** sending recurring client updates.  \n- **Automation builders** prototyping finance ops quickly.\n\n---\n\n## 🧰 Tools you’ll need\n- **Bright Data** — dataset triggers & snapshots for reliable web data.  \n- ** OpenAI (GPT)** — to generate a professional HTML digest.  \n- **Airtable** — store daily rows for history, filters, dashboards.  \n\n### Example Airtable Table: `Daily Stocks`\n\n| Ticker | Company                  | Price   | Change % | Sentiment | Date                |\n|--------|--------------------------|---------|----------|-----------|---------------------|\n| AAPL   | Apple Inc.               | 225.80  | +1.4%    | 🟢 Positive | 2025-09-18 09:00    |\n| MSFT   | Microsoft Corporation    | 415.20  | -0.7%    | 🔴 Negative | 2025-09-18 09:00    |\n| NVDA   | NVIDIA Corporation       | 124.55  | +2.1%    | 🟢 Positive | 2025-09-18 09:00    |\n| TSLA   | Tesla Inc.               | 260.00  | -3.0%    | 🔴 Negative | 2025-09-18 09:00    |\n| META   | Meta Platforms Inc.      | 310.45  | +0.5%    | 🟡 Neutral  | 2025-09-18 09:00    |\n\n\n\n- **Gmail** — deliver the final HTML email to stakeholders.  \n- **n8n** — the automation engine that orchestrates every step.\n\n&gt; Keep API keys in n8n **Credentials** (never hard-code secrets).\n\n---\n\n## 🗺️ Architecture at a glance\n1. **Schedule** fires daily  \n2. **Seed list** of tickers  \n3. **Split** into one item per stock  \n4. **Prepare keyword** for scraping  \n5. **Launch Bright Data** job  \n6. **Poll progress** with a **wait-loop**  \n7. **Fetch snapshot data**  \n8. **Aggregate** for the AI  \n9. **Generate HTML summary** (GPT)  \n10. **Save rows to Airtable**  \n11. **Send email via Gmail**\n\n---\n\n# ⚙️ Step-by-step — Every node explained\n\n## ⏰ Daily Run Trigger (Schedule Trigger)\n\n\n![baptistefortautomatisationscrapingboursierbrightdata.png](fileId:2658)\n\n### Purpose\nStart the automation at a precise time each day so nobody needs to push a button.\n\n### Parameters (English)\n- **Trigger Type**: `Time Interval` or `Cron`  \n- **Every X**: `1 Day` (or your preferred cadence)  \n- **Timezone**: `UTC` (or your own)  \n- **Start Time**: optional (e.g., `09:00`)\n\n---\n\n## 📝 Set Stock List (Set Node – SAMPLE DATA)\n\n### Purpose\nDefine the universe of stocks to monitor. This acts as the **seed data** for scraping.\n\n### Parameters\n- **Values to Set**: `Fixed JSON (array of objects)`  \n- **Keep Only Set**: `true`  \n- **Fields per item**: `ticker`, `name`, `market_cap` (you may add `sector`, `isin`, etc.)\n\n---\n\n## 🔀 Split Stocks (Split Out)\n\n### Purpose\nTurn the array into **individual items** so each ticker is processed independently (scraping, polling, results).\n\n### Parameters\n- **Operation**: `Split Out Items`  \n- **Field to Split**: the array defined in the previous Set node\n\n---\n\n## 🏷 Prepare Stock Keyword (Set Node)\n\n### Purpose\nCreate a `keyword` field (typically equal to `ticker`) for Bright Data discovery.\n\n### Parameters\n- **Values to Set**: `Add Field`  \n- **Field Name**: `keyword`  \n- **Value**: use an expression referencing the current item’s ticker (e.g., `` {{ $json.ticker }} ``)\n\n---\n\n## 🕸 Bright Data Scraper (HTTP Request)\n\n### Purpose\nTrigger the Bright Data dataset to start collecting information for the `keyword`. Returns a `snapshot_id` to poll later.\n\n### Parameters\n- **Method**: `POST`  \n- **Endpoint**: `https://api.brightdata.com/datasets/v1/trigger`  \n- **Authentication**: `Authorization: Bearer &lt;token&gt;` (header)  \n- **Body Fields**:  \n  - `dataset_id`: your Bright Data dataset ID  \n  - `discover_by`: usually `keyword`  \n  - `keyword`: the value prepared above\n\n&gt; Add a retry/backoff policy on 429/5xx in node options.\n\n---\n\n## 🔄 Check Scraper Progress (HTTP Request)\n\n![baptistefortautomatisationdigestboursier.png](fileId:2660)\n\n### Purpose\nPoll Bright Data to see whether the snapshot is `running` or `ready`.\n\n### Parameters\n- **Method**: `GET`  \n- **Endpoint**: `https://api.brightdata.com/datasets/v1/snapshots/{snapshot_id}`  \n- **Authentication**: `Authorization: Bearer &lt;token&gt;`  \n- **Expected Output**: a `status` field (`running`, `ready`)\n\n---\n\n## ⏳ Wait for Data (Wait Node)\n\n### Purpose\nPause between progress checks to avoid rate limits and give Bright Data time to finish.\n\n### Parameters\n- **Mode**: `Wait a fixed amount of time`  \n- **Time**: e.g., `30 seconds` (tune to your dataset size)\n\n---\n\n## 🔀 Scraper Status Switch (Switch Node)\n\n### Purpose\nRoute logic based on the polled `status`.\n\n### Parameters\n- **Value to Check**: `status`  \n- **Rules**:  \n  - Equals `running` → go to **Wait for Data** (then re-check)  \n  - Equals `ready` → proceed to **Fetch Scraper Results**\n\n&gt; Loop pattern: **Check → Wait → Check**, until `ready`.\n\n---\n\n## 📥 Fetch Scraper Results (HTTP Request)\n\n### Purpose\nDownload the completed snapshot data once Bright Data marks it `ready`.\n\n### Parameters\n- **Method**: `GET`  \n- **Endpoint**: `https://api.brightdata.com/datasets/v1/snapshots/{snapshot_id}/data`  \n- **Authentication**: `Authorization: Bearer &lt;token&gt;`  \n- **Query**: `format=json`  \n- **Output**: array of rows per ticker (price, change %, any fields your dataset yields)\n\n&gt; Normalize fields with a **Set/Code** node if needed.\n\n---\n\n## 📊 Aggregate Stock Data (Aggregate Node)\n\n### Purpose\nCombine all individual items into **one consolidated object** so the AI can analyze the entire market snapshot.\n\n### Parameters\n- **Mode**: `Aggregate` (merge to a single item)  \n- **Fields to Include**: `ticker`, `name`, `price`, `change`, `sentiment` (plus any extra fields captured)  \n- **Output**: one JSON item containing an array/map of the day’s stocks\n\n---\n\n## 🤖 Generate Daily Summary (AI Node – OpenAI)\n\n### Purpose\nAsk the model to convert raw data into a **styled HTML email**: headline, top movers, table, insights, and (optional) upcoming events.\n\n### Parameters\n- **Model**: gpt-4.1 \n- **Input**: the aggregated JSON from the previous node  \n- **Prompt guidelines**:  \n  - Output **HTML only** with inline styles (email-safe)  \n  - Include a **table** (Ticker, Company, % Change with ↑/↓ & color, Market Cap, Sentiment icon)  \n  - Highlight **top 2 gainers & 2 losers** with short reasoning if present  \n  - Provide **3–5 insights** (sector rotation, volatility, outliers)  \n  - Add **upcoming events** when available (earnings, launches, macro)  \n  - Footer: “Generated automatically by your AI-powered stock monitor”  \n- **Output field**: confirm the exact property that contains the HTML (e.g., `output`, `message`, `text`)\n\n---\n\n## 🗂 Save to Airtable (Airtable – Create Record)\n\n### Purpose\nLog each item (or the roll-up) to Airtable for history, filtering, and dashboards.\n\n### Parameters\n- **Operation**: `Create Record`  \n- **Base ID**: from your Airtable URL  \n- **Table**: e.g., `Daily Stocks`  \n- **Field Mapping**:  \n  - `Ticker` ← `` {{ $json.ticker }} ``  \n  - `Company` ← `` {{ $json.name }} ``  \n  - `Price` ← `` {{ $json.price }} ``  \n  - `Change %` ← `` {{ $json.change }} ``  \n  - `Sentiment` ← `` {{ $json.sentiment }} ``  \n  - `Date` ← `` {{ $now.toISO() }} ``\n\n&gt; Use a Single-Select for `Sentiment` (🟢 / 🟡 / 🔴) to build clean Airtable views.\n\n---\n\n## 📧 Send Report via Gmail (Gmail Node)\n\n![automatisationenvoiemailrapportboursierbaptistefort.png](fileId:2659)\n\n### Purpose\nDeliver the AI-generated HTML digest to your recipients.\n\n### Parameters\n- **Operation**: `Send Email`  \n- **Send To**: one or more recipients (e.g., `investor@domain.com`)  \n- **Subject**: `Daily Stock Market Digest – {{ $now.format(\"yyyy-MM-dd\") }}`  \n- **Message (HTML)**: reference the AI node’s HTML property (e.g., `` {{ $('Generate Daily Summary').first().json.output }} ``)  \n- **Options**: set **Append Attribution** to `false` (keep the email clean)\n\n&gt; Test in Gmail, Outlook, and mobile to validate inline CSS.\n\n---\n\n# 🧪 Error handling & reliability tips\n- **Backoff on Bright Data** — If scraping many tickers, increase **Wait** or batch requests.  \n- **Guard against empty results** — If a snapshot returns 0 rows, branch to a fallback email (“No data today”).  \n- **AI guardrails** — Enforce “HTML-only” and skip missing sections gracefully.  \n- **Airtable normalization** — Strip `%`, cast numbers to float before insert.  \n- **Observability** — Add a final Slack/Email **On Fail** node with run ID and error message.\n\n---\n\n# 🧩 Customization ideas\n- **Sector deep-dives**: add sector fields and a second AI paragraph on sector rotation.  \n- **CSV attachment**: generate & attach a CSV for power users.  \n- **Multiple lists**: run parallel branches for Tech, Healthcare, or regions.  \n- **Other asset classes**: Crypto, ETFs, Indices, FX.  \n- **Audience targeting**: different “To” lists and slightly different prompts per audience.\n\n---\n\n# ✅ Why this workflow is powerful\n- **Hands-off** — the report simply shows up every day.  \n- **Analyst-grade** — clean HTML, top movers, tidy table, actionable insights.  \n- **Auditable** — rows archived in Airtable for history and dashboards.  \n- **Composable** — swap scrapers, LLMs, storage, or email service.  \n- **Scalable** — start with 10 tickers, grow to many lists using the same loop.\n\nFor advanced no-code & AI projects, see [0vni – Agence automatisation](https://www.0vni.fr/). ",
+  "featuredImage": "/data/workflows/8724/8724.webp",
+  "author": {
+    "id": 101,
+    "slug": "baptistefort",
+    "name": "Baptiste Fort",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1329,
+  "downloads": 132,
+  "createdAt": "2025-09-18T14:02:05.882Z",
+  "updatedAt": "2026-01-16T08:57:24.722Z",
+  "publishedAt": "2025-09-18T14:02:05.882Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8724",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated daily stock market report with Bright Data, GPT-4.1, Airtable/Gmail",
+    "workflowName": "Automated daily stock market report with Bright Data, GPT-4.1, Airtable/Gmail",
+    "description": "# 📘 Workflow Documentation – Stock Market Daily Digest\n\n![automatisationrapportboursierquotidienbaptistefort.png](fileId:2661)\n\n## 👋 Introduction\nWake up to a clean, analyst-style stock digest in your inbox—top gainers/losers, a readable performance table, 3–5 insights, and upcoming events—**no spreadsheets, no manual scraping, no copy-paste**.  \nThis article explains, step by step, how to build a robust, daily, end-to-end automation that collects market data (Bright Data), waits until scraping is done, aggregates results, asks an AI model (OpenAI) to draft a **styled HTML email**, logs everything to Airtable, and finally sends the report via Gmail.\n\nYou’ll find a friendly but technical tour of **every single node**, so you can rebuild or adapt the same pipeline with confidence.\n\n---\n\n## 🎯 Who is this workflow for?\n- **Investors & traders** who want a quick, readable daily summary.  \n- **Finance/Product teams** building data-driven alerts/digests.  \n- **Consultants & agencies** sending recurring client updates.  \n- **Automation builders** prototyping finance ops quickly.\n\n---\n\n## 🧰 Tools you’ll need\n- **Bright Data** — dataset triggers & snapshots for reliable web data.  \n- ** OpenAI (GPT)** — to generate a professional HTML digest.  \n- **Airtable** — store daily rows for history, filters, dashboards.  \n\n### Example Airtable Table: `Daily Stocks`\n\n| Ticker | Company                  | Price   | Change % | Sentiment | Date                |\n|--------|--------------------------|---------|----------|-----------|---------------------|\n| AAPL   | Apple Inc.               | 225.80  | +1.4%    | 🟢 Positive | 2025-09-18 09:00    |\n| MSFT   | Microsoft Corporation    | 415.20  | -0.7%    | 🔴 Negative | 2025-09-18 09:00    |\n| NVDA   | NVIDIA Corporation       | 124.55  | +2.1%    | 🟢 Positive | 2025-09-18 09:00    |\n| TSLA   | Tesla Inc.               | 260.00  | -3.0%    | 🔴 Negative | 2025-09-18 09:00    |\n| META   | Meta Platforms Inc.      | 310.45  | +0.5%    | 🟡 Neutral  | 2025-09-18 09:00    |\n\n\n\n- **Gmail** — deliver the final HTML email to stakeholders.  \n- **n8n** — the automation engine that orchestrates every step.\n\n&gt; Keep API keys in n8n **Credentials** (never hard-code secrets).\n\n---\n\n## 🗺️ Architecture at a glance\n1. **Schedule** fires daily  \n2. **Seed list** of tickers  \n3. **Split** into one item per stock  \n4. **Prepare keyword** for scraping  \n5. **Launch Bright Data** job  \n6. **Poll progress** with a **wait-loop**  \n7. **Fetch snapshot data**  \n8. **Aggregate** for the AI  \n9. **Generate HTML summary** (GPT)  \n10. **Save rows to Airtable**  \n11. **Send email via Gmail**\n\n---\n\n# ⚙️ Step-by-step — Every node explained\n\n## ⏰ Daily Run Trigger (Schedule Trigger)\n\n\n![baptistefortautomatisationscrapingboursierbrightdata.png](fileId:2658)\n\n### Purpose\nStart the automation at a precise time each day so nobody needs to push a button.\n\n### Parameters (English)\n- **Trigger Type**: `Time Interval` or `Cron`  \n- **Every X**: `1 Day` (or your preferred cadence)  \n- **Timezone**: `UTC` (or your own)  \n- **Start Time**: optional (e.g., `09:00`)\n\n---\n\n## 📝 Set Stock List (Set Node – SAMPLE DATA)\n\n### Purpose\nDefine the universe of stocks to monitor. This acts as the **seed data** for scraping.\n\n### Parameters\n- **Values to Set**: `Fixed JSON (array of objects)`  \n- **Keep Only Set**: `true`  \n- **Fields per item**: `ticker`, `name`, `market_cap` (you may add `sector`, `isin`, etc.)\n\n---\n\n## 🔀 Split Stocks (Split Out)\n\n### Purpose\nTurn the array into **individual items** so each ticker is processed independently (scraping, polling, results).\n\n### Parameters\n- **Operation**: `Split Out Items`  \n- **Field to Split**: the array defined in the previous Set node\n\n---\n\n## 🏷 Prepare Stock Keyword (Set Node)\n\n### Purpose\nCreate a `keyword` field (typically equal to `ticker`) for Bright Data discovery.\n\n### Parameters\n- **Values to Set**: `Add Field`  \n- **Field Name**: `keyword`  \n- **Value**: use an expression referencing the current item’s ticker (e.g., `` {{ $json.ticker }} ``)\n\n---\n\n## 🕸 Bright Data Scraper (HTTP Request)\n\n### Purpose\nTrigger the Bright Data dataset to start collecting information for the `keyword`. Returns a `snapshot_id` to poll later.\n\n### Parameters\n- **Method**: `POST`  \n- **Endpoint**: `https://api.brightdata.com/datasets/v1/trigger`  \n- **Authentication**: `Authorization: Bearer &lt;token&gt;` (header)  \n- **Body Fields**:  \n  - `dataset_id`: your Bright Data dataset ID  \n  - `discover_by`: usually `keyword`  \n  - `keyword`: the value prepared above\n\n&gt; Add a retry/backoff policy on 429/5xx in node options.\n\n---\n\n## 🔄 Check Scraper Progress (HTTP Request)\n\n![baptistefortautomatisationdigestboursier.png](fileId:2660)\n\n### Purpose\nPoll Bright Data to see whether the snapshot is `running` or `ready`.\n\n### Parameters\n- **Method**: `GET`  \n- **Endpoint**: `https://api.brightdata.com/datasets/v1/snapshots/{snapshot_id}`  \n- **Authentication**: `Authorization: Bearer &lt;token&gt;`  \n- **Expected Output**: a `status` field (`running`, `ready`)\n\n---\n\n## ⏳ Wait for Data (Wait Node)\n\n### Purpose\nPause between progress checks to avoid rate limits and give Bright Data time to finish.\n\n### Parameters\n- **Mode**: `Wait a fixed amount of time`  \n- **Time**: e.g., `30 seconds` (tune to your dataset size)\n\n---\n\n## 🔀 Scraper Status Switch (Switch Node)\n\n### Purpose\nRoute logic based on the polled `status`.\n\n### Parameters\n- **Value to Check**: `status`  \n- **Rules**:  \n  - Equals `running` → go to **Wait for Data** (then re-check)  \n  - Equals `ready` → proceed to **Fetch Scraper Results**\n\n&gt; Loop pattern: **Check → Wait → Check**, until `ready`.\n\n---\n\n## 📥 Fetch Scraper Results (HTTP Request)\n\n### Purpose\nDownload the completed snapshot data once Bright Data marks it `ready`.\n\n### Parameters\n- **Method**: `GET`  \n- **Endpoint**: `https://api.brightdata.com/datasets/v1/snapshots/{snapshot_id}/data`  \n- **Authentication**: `Authorization: Bearer &lt;token&gt;`  \n- **Query**: `format=json`  \n- **Output**: array of rows per ticker (price, change %, any fields your dataset yields)\n\n&gt; Normalize fields with a **Set/Code** node if needed.\n\n---\n\n## 📊 Aggregate Stock Data (Aggregate Node)\n\n### Purpose\nCombine all individual items into **one consolidated object** so the AI can analyze the entire market snapshot.\n\n### Parameters\n- **Mode**: `Aggregate` (merge to a single item)  \n- **Fields to Include**: `ticker`, `name`, `price`, `change`, `sentiment` (plus any extra fields captured)  \n- **Output**: one JSON item containing an array/map of the day’s stocks\n\n---\n\n## 🤖 Generate Daily Summary (AI Node – OpenAI)\n\n### Purpose\nAsk the model to convert raw data into a **styled HTML email**: headline, top movers, table, insights, and (optional) upcoming events.\n\n### Parameters\n- **Model**: gpt-4.1 \n- **Input**: the aggregated JSON from the previous node  \n- **Prompt guidelines**:  \n  - Output **HTML only** with inline styles (email-safe)  \n  - Include a **table** (Ticker, Company, % Change with ↑/↓ & color, Market Cap, Sentiment icon)  \n  - Highlight **top 2 gainers & 2 losers** with short reasoning if present  \n  - Provide **3–5 insights** (sector rotation, volatility, outliers)  \n  - Add **upcoming events** when available (earnings, launches, macro)  \n  - Footer: “Generated automatically by your AI-powered stock monitor”  \n- **Output field**: confirm the exact property that contains the HTML (e.g., `output`, `message`, `text`)\n\n---\n\n## 🗂 Save to Airtable (Airtable – Create Record)\n\n### Purpose\nLog each item (or the roll-up) to Airtable for history, filtering, and dashboards.\n\n### Parameters\n- **Operation**: `Create Record`  \n- **Base ID**: from your Airtable URL  \n- **Table**: e.g., `Daily Stocks`  \n- **Field Mapping**:  \n  - `Ticker` ← `` {{ $json.ticker }} ``  \n  - `Company` ← `` {{ $json.name }} ``  \n  - `Price` ← `` {{ $json.price }} ``  \n  - `Change %` ← `` {{ $json.change }} ``  \n  - `Sentiment` ← `` {{ $json.sentiment }} ``  \n  - `Date` ← `` {{ $now.toISO() }} ``\n\n&gt; Use a Single-Select for `Sentiment` (🟢 / 🟡 / 🔴) to build clean Airtable views.\n\n---\n\n## 📧 Send Report via Gmail (Gmail Node)\n\n![automatisationenvoiemailrapportboursierbaptistefort.png](fileId:2659)\n\n### Purpose\nDeliver the AI-generated HTML digest to your recipients.\n\n### Parameters\n- **Operation**: `Send Email`  \n- **Send To**: one or more recipients (e.g., `investor@domain.com`)  \n- **Subject**: `Daily Stock Market Digest – {{ $now.format(\"yyyy-MM-dd\") }}`  \n- **Message (HTML)**: reference the AI node’s HTML property (e.g., `` {{ $('Generate Daily Summary').first().json.output }} ``)  \n- **Options**: set **Append Attribution** to `false` (keep the email clean)\n\n&gt; Test in Gmail, Outlook, and mobile to validate inline CSS.\n\n---\n\n# 🧪 Error handling & reliability tips\n- **Backoff on Bright Data** — If scraping many tickers, increase **Wait** or batch requests.  \n- **Guard against empty results** — If a snapshot returns 0 rows, branch to a fallback email (“No data today”).  \n- **AI guardrails** — Enforce “HTML-only” and skip missing sections gracefully.  \n- **Airtable normalization** — Strip `%`, cast numbers to float before insert.  \n- **Observability** — Add a final Slack/Email **On Fail** node with run ID and error message.\n\n---\n\n# 🧩 Customization ideas\n- **Sector deep-dives**: add sector fields and a second AI paragraph on sector rotation.  \n- **CSV attachment**: generate & attach a CSV for power users.  \n- **Multiple lists**: run parallel branches for Tech, Healthcare, or regions.  \n- **Other asset classes**: Crypto, ETFs, Indices, FX.  \n- **Audience targeting**: different “To” lists and slightly different prompts per audience.\n\n---\n\n# ✅ Why this workflow is powerful\n- **Hands-off** — the report simply shows up every day.  \n- **Analyst-grade** — clean HTML, top movers, tidy table, actionable insights.  \n- **Auditable** — rows archived in Airtable for history and dashboards.  \n- **Composable** — swap scrapers, LLMs, storage, or email service.  \n- **Scalable** — start with 10 tickers, grow to many lists using the same loop.\n\nFor advanced no-code & AI projects, see [0vni – Agence automatisation](https://www.0vni.fr/).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Daily Run Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Stock List",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split Stocks",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Stock Keyword",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Bright Data Scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Check Scraper Progress",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Scraper Status Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Wait for Data",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Fetch Scraper Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Aggregate Stock Data",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Daily Summary (AI)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Report via Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Save to Airtable (Daily Stocks)",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "id": 7862,
+  "slug": "7862",
+  "title": "Extract invoice data from Google Drive to Sheets using PDF.co AI parser",
+  "description": "This workflow looks inside a **Google Drive folder**, parses each PDF invoice with **PDF.co’s AI Invoice Parser**, and appends vendor, amount, dates, and a link to the file into a **Google Sheet**.\n\n---\n\n## ⚙️ Setup Instructions\n\n### 1) Connect Google Drive (OAuth2)\n1. In **n8n → Credentials → New → Google Drive (OAuth2)**  \n2. Sign in to the Google account that owns your invoice PDFs and **allow access**.  \n3. In the **Get Parent Folder ID** node, set your search to the folder name (e.g., `n8n Invoices`).  \n4. In **Get Invoice ID’s**, ensure **Filter → folderId** uses the ID from the previous node (already wired in this template).\n\n&gt; **Tip:** The workflow builds a Drive link like  \n&gt; `https://drive.google.com/file/d/&lt;FILE_ID&gt;`  \n&gt; Make sure those files are at least viewable via link (e.g., **Anyone with the link – Viewer**) so PDF.co can fetch them.\n\n---\n\n### 2) Connect PDF.co (AI Invoice Parser)\n1. Create a **PDF.co** account and copy your **API Key**.  \n2. In **n8n → Credentials → New → PDF.co API**, paste your key and **Save**.  \n3. In the **AI Invoice Parser** node, keep **URL** mapped to the Drive link coming from **Convert to URL**. The node is already set to use your PDF.co credentials.\n\n&gt; **What it does:** Sends each Drive file URL to PDF.co’s **AI Invoice Parser** and returns structured JSON (vendor, totals, dates, line items, etc.). The next **Set Fields** node maps those fields to simple columns for Sheets.\n\n---\n\n### 3) Connect Google Sheets (OAuth2)\n1. In **n8n → Credentials → New → Google Sheets (OAuth2)**  \n2. Log in with your Google account and **grant access**.  \n3. In the **Store Data in Google Sheets** node, select your **Spreadsheet** and **Sheet** (this template is set to:  \n   - Spreadsheet: `Invoice Template` (`1a6QBIQkr7RsZtUZBi87NwhwgTbnr5hQl4J_ZOkr3F1U`)  \n   - Tab: `Due` (gid: `1002294955`)  \n4. The node is configured to **Append or Update** by `Url` so repeats won’t duplicate.\n\n**Expected columns on the `Due` tab:**\n- `Url` (Drive link we generated)\n- `Vendor`\n- `Invoice Date`\n- `Total`\n- `Due Date`\n\n---\n\n## ▶️ How to Run\n1. Put your PDF invoices in the **“n8n Invoices”** folder (or the folder name you used).  \n2. Click **Execute Workflow** in n8n.  \n3. Watch items flow:  \n   - **Get Parent Folder ID** → finds folder  \n   - **Get Invoice ID’s** → lists files in that folder  \n   - **Convert to URL** → turns each file ID into a shareable link  \n   - **AI Invoice Parser** → extracts JSON from each PDF  \n   - **Set Fields** → maps fields for Sheets  \n   - **Store Data in Google Sheets** → appends/updates the `Due` sheet\n\n---\n\n## 🧩 Troubleshooting\n- **PDF.co can’t fetch the file:** Ensure your Drive file link is accessible (e.g., **Anyone with the link – Viewer**), or use a URL that PDF.co can reach.  \n- **No rows added:** Confirm the **Google Sheets** credential is selected and the **Sheet tab** (gid) matches your target.  \n- **Wrong folder:** Update the search string in **Get Parent Folder ID** to match your Drive folder name.\n\n---\n\n## 📬 Contact\nNeed help customizing this (e.g., auto-sharing Drive links, enriching the Sheet, or pushing to Slack/Email)?\n\n- 📧 **robert@ynteractive.com**  \n- 🔗 **[Robert Breen](https://www.linkedin.com/in/robert-breen-29429625/)**  \n- 🌐 **[ynteractive.com](https://ynteractive.com)**\n",
+  "featuredImage": "/data/workflows/7862/7862.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 339,
+  "downloads": 33,
+  "createdAt": "2025-08-26T01:21:59.861Z",
+  "updatedAt": "2026-01-16T08:52:44.142Z",
+  "publishedAt": "2025-08-26T01:21:59.861Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7862",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract invoice data from Google Drive to Sheets using PDF.co AI parser",
+    "workflowName": "Extract invoice data from Google Drive to Sheets using PDF.co AI parser",
+    "description": "This workflow looks inside a **Google Drive folder**, parses each PDF invoice with **PDF.co’s AI Invoice Parser**, and appends vendor, amount, dates, and a link to the file into a **Google Sheet**.\n\n---\n\n## ⚙️ Setup Instructions\n\n### 1) Connect Google Drive (OAuth2)\n1. In **n8n → Credentials → New → Google Drive (OAuth2)**  \n2. Sign in to the Google account that owns your invoice PDFs and **allow access**.  \n3. In the **Get Parent Folder ID** node, set your search to the folder name (e.g., `n8n Invoices`).  \n4. In **Get Invoice ID’s**, ensure **Filter → folderId** uses the ID from the previous node (already wired in this template).\n\n&gt; **Tip:** The workflow builds a Drive link like  \n&gt; `https://drive.google.com/file/d/&lt;FILE_ID&gt;`  \n&gt; Make sure those files are at least viewable via link (e.g., **Anyone with the link – Viewer**) so PDF.co can fetch them.\n\n---\n\n### 2) Connect PDF.co (AI Invoice Parser)\n1. Create a **PDF.co** account and copy your **API Key**.  \n2. In **n8n → Credentials → New → PDF.co API**, paste your key and **Save**.  \n3. In the **AI Invoice Parser** node, keep **URL** mapped to the Drive link coming from **Convert to URL**. The node is already set to use your PDF.co credentials.\n\n&gt; **What it does:** Sends each Drive file URL to PDF.co’s **AI Invoice Parser** and returns structured JSON (vendor, totals, dates, line items, etc.). The next **Set Fields** node maps those fields to simple columns for Sheets.\n\n---\n\n### 3) Connect Google Sheets (OAuth2)\n1. In **n8n → Credentials → New → Google Sheets (OAuth2)**  \n2. Log in with your Google account and **grant access**.  \n3. In the **Store Data in Google Sheets** node, select your **Spreadsheet** and **Sheet** (this template is set to:  \n   - Spreadsheet: `Invoice Template` (`1a6QBIQkr7RsZtUZBi87NwhwgTbnr5hQl4J_ZOkr3F1U`)  \n   - Tab: `Due` (gid: `1002294955`)  \n4. The node is configured to **Append or Update** by `Url` so repeats won’t duplicate.\n\n**Expected columns on the `Due` tab:**\n- `Url` (Drive link we generated)\n- `Vendor`\n- `Invoice Date`\n- `Total`\n- `Due Date`\n\n---\n\n## ▶️ How to Run\n1. Put your PDF invoices in the **“n8n Invoices”** folder (or the folder name you used).  \n2. Click **Execute Workflow** in n8n.  \n3. Watch items flow:  \n   - **Get Parent Folder ID** → finds folder  \n   - **Get Invoice ID’s** → lists files in that folder  \n   - **Convert to URL** → turns each file ID into a shareable link  \n   - **AI Invoice Parser** → extracts JSON from each PDF  \n   - **Set Fields** → maps fields for Sheets  \n   - **Store Data in Google Sheets** → appends/updates the `Due` sheet\n\n---\n\n## 🧩 Troubleshooting\n- **PDF.co can’t fetch the file:** Ensure your Drive file link is accessible (e.g., **Anyone with the link – Viewer**), or use a URL that PDF.co can reach.  \n- **No rows added:** Confirm the **Google Sheets** credential is selected and the **Sheet tab** (gid) matches your target.  \n- **Wrong folder:** Update the search string in **Get Parent Folder ID** to match your Drive folder name.\n\n---\n\n## 📬 Contact\nNeed help customizing this (e.g., auto-sharing Drive links, enriching the Sheet, or pushing to Slack/Email)?\n\n- 📧 **robert@ynteractive.com**  \n- 🔗 **[Robert Breen](https://www.linkedin.com/in/robert-breen-29429625/)**  \n- 🌐 **[ynteractive.com](https://ynteractive.com)**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note55",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Parent Folder ID",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Invoice ID's",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Convert to URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "AI Invoice Parser",
+      "type": "n8n-nodes-pdfco.PDFco Api",
+      "role": "PDFco Api",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Store Data in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note61",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note62",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note64",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

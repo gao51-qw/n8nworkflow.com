@@ -1,0 +1,176 @@
+{
+  "id": 11888,
+  "slug": "11888",
+  "title": "Audio transcription & chat bot with AssemblyAI, Gemini, and Pinecone RAG",
+  "description": "## Who’s it for\nThis template is designed for podcasters, researchers, educators, product teams, and support teams who work with audio content and want to turn it into searchable knowledge. It is especially useful for users who need automated transcription, structured summaries, and conversational access to audio data.\n\n## What it does / How it works\nThis workflow starts with a public form where users upload an audio file.  \nThe audio is sent to AssemblyAI for speech-to-text processing, including speaker labels and bullet-point summarization.  \nOnce transcription is complete, the full text is converted into a document, split into chunks, and embedded using Google Gemini.  \nThe embeddings are stored in a Pinecone vector database along with metadata, making the content retrievable for future use.\n\nIn parallel, the workflow logs uploaded file information into Google Sheets for tracking.  \nA separate chat trigger allows users to ask questions about the uploaded audio files.  \nAn AI agent retrieves relevant context from Pinecone and responds using Gemini, enabling conversational search over audio transcripts.\n\n## Requirements\n- AssemblyAI API credentials  \n- Google Gemini (PaLM) API credentials  \n- Pinecone API credentials  \n- Google Sheets OAuth2 credentials  \n- A Pinecone index for storing audio embeddings  \n\n## How to set up\n1. Connect AssemblyAI, Gemini, Pinecone, and Google Sheets credentials in n8n.  \n2. Configure the Pinecone index for storing transcripts.  \n3. Verify the Google Sheet has columns for file name and status.  \n4. Test by uploading an audio file through the form.  \n5. Enable the workflow for continuous use.\n\n## How to customize the workflow\n- Change summary style or transcript options in AssemblyAI  \n- Adjust chunk size and overlap for better retrieval  \n- Add email or Slack notifications after processing  \n- Extend the chatbot to support multiple knowledge bases  ",
+  "featuredImage": "/data/workflows/11888/11888.webp",
+  "author": {
+    "id": 101,
+    "slug": "pixcelsthemes",
+    "name": "Pixcels Themes",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 346,
+  "downloads": 34,
+  "createdAt": "2025-12-17T12:23:12.132Z",
+  "updatedAt": "2026-01-16T09:10:34.015Z",
+  "publishedAt": "2025-12-17T12:23:12.132Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11888",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Audio transcription & chat bot with AssemblyAI, Gemini, and Pinecone RAG",
+    "workflowName": "Audio transcription & chat bot with AssemblyAI, Gemini, and Pinecone RAG",
+    "description": "## Who’s it for\nThis template is designed for podcasters, researchers, educators, product teams, and support teams who work with audio content and want to turn it into searchable knowledge. It is especially useful for users who need automated transcription, structured summaries, and conversational access to audio data.\n\n## What it does / How it works\nThis workflow starts with a public form where users upload an audio file.  \nThe audio is sent to AssemblyAI for speech-to-text processing, including speaker labels and bullet-point summarization.  \nOnce transcription is complete, the full text is converted into a document, split into chunks, and embedded using Google Gemini.  \nThe embeddings are stored in a Pinecone vector database along with metadata, making the content retrievable for future use.\n\nIn parallel, the workflow logs uploaded file information into Google Sheets for tracking.  \nA separate chat trigger allows users to ask questions about the uploaded audio files.  \nAn AI agent retrieves relevant context from Pinecone and responds using Gemini, enabling conversational search over audio transcripts.\n\n## Requirements\n- AssemblyAI API credentials  \n- Google Gemini (PaLM) API credentials  \n- Pinecone API credentials  \n- Google Sheets OAuth2 credentials  \n- A Pinecone index for storing audio embeddings  \n\n## How to set up\n1. Connect AssemblyAI, Gemini, Pinecone, and Google Sheets credentials in n8n.  \n2. Configure the Pinecone index for storing transcripts.  \n3. Verify the Google Sheet has columns for file name and status.  \n4. Test by uploading an audio file through the form.  \n5. Enable the workflow for continuous use.\n\n## How to customize the workflow\n- Change summary style or transcript options in AssemblyAI  \n- Adjust chunk size and overlap for better retrieval  \n- Add email or Slack notifications after processing  \n- Extend the chatbot to support multiple knowledge bases",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "HTTP Request2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Pinecone Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings Google Gemini1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

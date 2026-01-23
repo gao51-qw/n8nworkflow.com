@@ -186,49 +186,192 @@ const breadcrumbItems = [
     const category = urlParams.get('category');
     const complexity = urlParams.get('complexity');
     const price = urlParams.get('price');
+    const currentPage = parseInt(urlParams.get('page') || '1', 10);
     
     if (!query && !category && !complexity && !price) return;
 
     const resultsContainer = document.getElementById('search-results');
     if (!resultsContainer) return;
 
-    try {
-      // 构建 API URL
-      const apiUrl = new URL('/api/search.json', window.location.origin);
-      if (query) apiUrl.searchParams.set('q', query);
-      if (category && category !== 'all') apiUrl.searchParams.set('category', category);
-      if (complexity && complexity !== 'all') apiUrl.searchParams.set('complexity', complexity);
-      if (price && price !== 'all') apiUrl.searchParams.set('price', price);
+    const limit = 12;
 
-      // 调用搜索 API
-      const response = await fetch(apiUrl.toString());
-      const data = await response.json();
+    async function fetchResults(page = 1) {
+      try {
+        const offset = (page - 1) * limit;
+        // 构建 API URL
+        const apiUrl = new URL('/api/search.json', window.location.origin);
+        if (query) apiUrl.searchParams.set('q', query);
+        if (category && category !== 'all') apiUrl.searchParams.set('category', category);
+        if (complexity && complexity !== 'all') apiUrl.searchParams.set('complexity', complexity);
+        if (price && price !== 'all') apiUrl.searchParams.set('price', price);
+        apiUrl.searchParams.set('offset', offset.toString());
+        apiUrl.searchParams.set('limit', limit.toString());
 
-      if (data.results && data.results.length > 0) {
-        // 显示结果
+        // 调用搜索 API
+        const response = await fetch(apiUrl.toString());
+        if (!response.ok) throw new Error('Search failed');
+        return await response.json();
+      } catch (error) {
+        console.error('Search error:', error);
+        return null;
+      }
+    }
+
+    function updateUrl(page) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', page.toString());
+      window.history.pushState({}, '', url);
+    }
+
+    function renderPagination(total, currentPage, limit) {
+      const totalPages = Math.ceil(total / limit);
+      if (totalPages <= 1) return '';
+
+      let paginationHtml = `
+        <nav class="flex items-center justify-center space-x-2 mt-12" aria-label="Pagination">
+          <button 
+            data-page="${currentPage - 1}"
+            ${currentPage === 1 ? 'disabled' : ''}
+            class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Previous
+          </button>
+      `;
+
+      // Page numbers
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + 4);
+      const adjustedStartPage = Math.max(1, endPage - 4);
+
+      for (let i = adjustedStartPage; i <= endPage; i++) {
+        if (i < 1) continue;
+        paginationHtml += `
+          <button 
+            data-page="${i}"
+            class="inline-flex items-center px-4 py-2 rounded-lg border ${i === currentPage ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20 text-primary-600' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'} text-sm font-medium transition-colors"
+          >
+            ${i}
+          </button>
+        `;
+      }
+
+      paginationHtml += `
+          <button 
+            data-page="${currentPage + 1}"
+            ${currentPage === totalPages ? 'disabled' : ''}
+            class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+            <svg class="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </nav>
+      `;
+
+      return paginationHtml;
+    }
+
+    async function handlePageChange(newPage) {
+      resultsContainer.innerHTML = `
+        <div class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p class="mt-4 text-gray-600 dark:text-gray-400">Loading page ${newPage}...</p>
+        </div>
+      `;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      const data = await fetchResults(newPage);
+      updateUrl(newPage);
+      renderResults(data, newPage);
+    }
+
+    function renderResults(data, page = 1) {
+      if (!data) {
         resultsContainer.innerHTML = `
-          <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-            Found <strong class="text-gray-900 dark:text-white">${data.total}</strong> result${data.total !== 1 ? 's' : ''}
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${data.results.map((workflow) => `
-              <a href="/workflows/${workflow.slug}" class="group">
-                <div class="flex flex-col overflow-hidden rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 bg-white dark:bg-gray-800 dark:border-gray-700 h-full">
-                  <div class="aspect-video bg-gray-100 dark:bg-gray-700 overflow-hidden relative">
-                    <img src="${workflow.featuredImage || workflow.thumbnail || '/placeholder-workflow.webp'}" alt="${workflow.title}" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                  </div>
-                  <div class="flex flex-col p-4 flex-1">
-                    <h3 class="text-lg font-black text-gray-900 dark:text-white mb-2">${workflow.title}</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 flex-1">${workflow.description}</p>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                      ${workflow.author?.name || 'Anonymous'} • ${workflow.date}
-                    </div>
-                  </div>
-                </div>
-              </a>
-            `).join('')}
+          <div class="text-center py-12">
+            <p class="text-red-600 dark:text-red-400">An error occurred while searching. Please try again.</p>
           </div>
         `;
+        return;
+      }
+
+      if (data.results && data.results.length > 0) {
+        // 初始化容器结构
+        resultsContainer.innerHTML = `
+          <div class="mb-6 flex justify-between items-center">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Found <strong class="text-gray-900 dark:text-white">${data.total}</strong> result${data.total !== 1 ? 's' : ''}
+            </div>
+          </div>
+          <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          </div>
+          <div id="pagination-container">
+          </div>
+        `;
+
+        const grid = document.getElementById('results-grid');
+        const paginationContainer = document.getElementById('pagination-container');
+
+        // 生成结果 HTML
+        grid.innerHTML = data.results.map((workflow) => `
+          <a href="/workflows/${workflow.slug}" class="group block h-full">
+            <div class="flex flex-col bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
+              <div class="aspect-video bg-gray-50 dark:bg-gray-900 overflow-hidden relative">
+                <img 
+                  src="${workflow.featuredImage || workflow.thumbnail || '/placeholder-workflow.webp'}" 
+                  alt="${workflow.title}" 
+                  class="object-contain w-full h-full group-hover:scale-105 transition-transform duration-500" 
+                  loading="lazy" 
+                />
+                <div class="absolute top-3 left-3 flex flex-wrap gap-2">
+                  <span class="px-2.5 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-sm text-primary-600">
+                    ${workflow.price ? 'Paid' : 'Free'}
+                  </span>
+                  <span class="px-2.5 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider rounded-lg shadow-sm text-gray-600 dark:text-gray-400">
+                    ${workflow.complexityLevel || 'Beginner'}
+                  </span>
+                </div>
+              </div>
+              <div class="p-5 flex flex-col flex-1">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+                  ${workflow.title}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 line-clamp-2 flex-1">
+                  ${workflow.description}
+                </p>
+                <div class="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-gray-700">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 overflow-hidden">
+                      ${workflow.author?.name?.charAt(0) || 'A'}
+                    </div>
+                    <span class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[100px]">
+                      ${workflow.author?.name || 'Anonymous'}
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-gray-500 dark:text-gray-400 font-medium">
+                    ${workflow.date || ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        `).join('');
+
+        paginationContainer.innerHTML = renderPagination(data.total, page, limit);
+
+        // 添加分页事件监听
+        paginationContainer.addEventListener('click', (e) => {
+          const button = e.target.closest('button[data-page]');
+          if (button && !button.disabled) {
+            const newPage = parseInt(button.getAttribute('data-page'), 10);
+            handlePageChange(newPage);
+          }
+        });
       } else {
         // 无结果
         resultsContainer.innerHTML = `
@@ -244,13 +387,10 @@ const breadcrumbItems = [
           </div>
         `;
       }
-    } catch (error) {
-      console.error('Search error:', error);
-      resultsContainer.innerHTML = `
-        <div class="text-center py-12">
-          <p class="text-red-600 dark:text-red-400">An error occurred while searching. Please try again.</p>
-        </div>
-      `;
     }
+
+    // 初始加载
+    const initialData = await fetchResults(currentPage);
+    renderResults(initialData, currentPage);
   });
 </script>

@@ -1,0 +1,127 @@
+{
+  "id": 11450,
+  "slug": "11450",
+  "title": "Extract premium & verified LinkedIn group members to Google Sheets with ConnectSafely.AI",
+  "description": "# Extract LinkedIn Group Members to Google Sheets - Premium & Verified Only using ConnectSafely.AI API\n\n## Who's it for\n\nThis workflow is built for sales professionals, community managers, recruiters, and growth marketers who want to extract high-quality leads from LinkedIn groups without the manual grind. Perfect for anyone who needs to identify decision-makers, founders, and serious professionals within large LinkedIn communities.\n\nIf you're running targeted outreach campaigns, building prospect lists, researching competitor communities, or looking to connect with verified industry leaders, this automation filters the noise and delivers only Premium and Verified members straight to your spreadsheet.\n\n## How it works\n\nThe workflow automates LinkedIn group member extraction by combining pagination handling with intelligent filtering through ConnectSafely.ai's API.\n\n**The process flow:**\n1. Initializes pagination variables with your target group ID\n2. Fetches group members in batches of 50 via ConnectSafely.ai API\n3. Filters each batch for Premium OR Verified members only\n4. Extracts profile data (name, headline, follower count, profile URL, etc.)\n5. Checks if more pages exist and loops back automatically\n6. Once complete, splits all members into individual items\n7. Appends or updates records in Google Sheets (deduplicates by Profile ID)\n\nThe pagination loop handles groups of any size - whether 500 or 50,000 members.\n\n---\n\n## Setup steps\n\n### Step 1: Prepare Your Google Sheet\n\nStructure your Google Sheet with the following columns:\n\n| Column Name | Description | Required |\n|------------|-------------|----------|\n| `Profile ID` | Unique LinkedIn profile identifier | Yes |\n| `First Name` | Member's first name | Yes |\n| `Last Name` | Member's last name | Yes |\n| `Full Name` | Combined first and last name | Yes |\n| `Headline` | Professional headline/tagline | Yes |\n| `Public Identifier` | LinkedIn username | Yes |\n| `Profile URL` | Direct link to LinkedIn profile | Yes |\n| `Follower Count` | Number of followers | Yes |\n| `Is Premium` | Premium subscription status | Yes |\n| `Is Verified` | Verification badge status | Yes |\n| `Relationship Status` | Connection degree (1st, 2nd, 3rd) | Yes |\n\n**Pro Tip**: The workflow uses \"Append or Update\" operation with Profile ID as the matching column, so running it multiple times won't create duplicates.\n\n\n### Step 2: Configure ConnectSafely.ai API Credentials\n\n#### Obtain API Key\n\n1. Log into [ConnectSafely.ai Dashboard](https://connectsafely.ai/dashboard)\n2. Navigate to **Settings** → **API Keys**\n3. Generate a new API key\n\n#### Add Bearer Auth Credential in n8n\n\n1. Go to **Credentials** in n8n\n2. Click **Add Credential** → **Header Auth** or **Bearer Auth**\n3. Paste your ConnectSafely.ai API key\n4. Save the credential\n\nThis credential is used by the \"Fetch Group Members\" HTTP Request node.\n\n\n### Step 3: Configure Google Sheets Integration\n\n#### 3.1 Connect Google Sheets Account\n\n1. Go to **Credentials** → **Add Credential** → **Google Sheets OAuth2**\n2. Follow the OAuth flow to connect your Google account\n3. Grant access to Google Sheets\n\n#### 3.2 Configure \"Append to Google Sheets\" Node\n\n1. Open the **Append to Google Sheets** node\n2. Select your Google Sheets credential\n3. Enter your **Document ID** (from the sheet URL)\n4. Select the **Sheet Name**\n5. Configure column mapping to match the extracted fields\n6. Set **Matching Column** to `Profile ID` for deduplication\n\n\n### Step 4: Set Your Target LinkedIn Group\n\n1. Open the **Initialize Pagination** node\n2. Locate the `groupId` variable in the code\n3. Replace `\"9357376\"` with your target group ID\n\n**Finding Your Group ID:**\n- Go to your LinkedIn group\n- Look at the URL: `linkedin.com/groups/XXXXXXX/`\n- The numbers are your group ID\n\n```javascript\n// Change this value to your target group\ngroupId: \"9357376\",  // Replace with your group ID\n```\n\n\n### Step 5: Test the Workflow\n\n1. Click the **Start Workflow** manual trigger node\n2. Click **Test Workflow**\n3. Verify:\n   - API returns member data correctly\n   - Filtering captures only Premium/Verified members\n   - Pagination loops for additional pages (if applicable)\n   - Google Sheets populates with extracted data\n\n---\n\n## Customization\n\n### Filter Criteria\n\nEdit the filter logic in the **Process & Filter Members** node to adjust:\n\n- **Premium Only**: Remove the `isVerified` checks to capture only Premium subscribers\n- **Verified Only**: Remove the `isPremium` checks to capture only Verified profiles\n- **All Members**: Remove the filter entirely to extract everyone (modify the `return` statement)\n- **Minimum Followers**: Add a follower count threshold for influencer targeting\n\n```javascript\n// Example: Filter for Premium members with 1000+ followers\nconst filteredMembers = members.filter(member =&gt; {\n  const isPremium = member.isPremium === true;\n  const hasMinFollowers = member.followerCount &gt;= 1000;\n  return isPremium && hasMinFollowers;\n});\n```\n\n### Batch Size\n\n- **Default**: 50 members per API request\n- **Adjust**: Modify the `count` value in Initialize Pagination node\n- **Note**: 50 is the maximum allowed by the API\n\n### Additional Fields\n\nThe API returns more fields than extracted by default. Edit the **Process & Filter Members** node to include:\n\n- `creator` - Whether they're a LinkedIn creator\n- `badges` - Full list of profile badges\n- `fetchedAt` - Timestamp of extraction\n\n---\n\n## Use Cases\n\n- **Sales Prospecting**: Build targeted prospect lists from industry-specific groups with verified decision-makers\n- **Competitor Research**: Analyze who's active in competitor communities and their professional backgrounds\n- **Influencer Identification**: Find Premium creators and verified professionals for partnership opportunities\n- **Recruiting**: Source passive candidates who are active in professional development groups\n- **Event Marketing**: Identify engaged professionals in niche communities for webinar and conference promotion\n- **Content Strategy**: Research headlines and titles to understand what resonates in your industry\n\n---\n\n## Troubleshooting\n\n### Common Issues & Solutions\n\n**Issue**: Empty results returned\n- **Solution**: Verify you're a member of the target group; API can only access groups you've joined\n\n**Issue**: \"401 Unauthorized\" errors\n- **Solution**: Check that your ConnectSafely.ai API key is valid and the Bearer Auth credential is properly configured\n\n**Issue**: Pagination loop seems infinite\n- **Solution**: This is expected behavior until `hasMore` returns false; large groups may take several minutes to fully process\n\n**Issue**: Duplicate entries in Google Sheets\n- **Solution**: Ensure the \"Append or Update\" operation is selected with `Profile ID` as the matching column\n\n**Issue**: Missing data in certain columns\n- **Solution**: Not all profiles have complete data; the workflow handles null values gracefully\n\n**Issue**: Google Sheets not updating\n- **Solution**: Verify OAuth credentials are valid and the sheet/document IDs are correctly configured\n\n---\n\n## Documentation & Resources\n\n### Official Documentation\n- **ConnectSafely.ai Docs**: [https://connectsafely.ai/docs](https://connectsafely.ai/docs)\n- **API Reference**: Available in ConnectSafely.ai dashboard\n- **n8n Google Sheets Node**: [https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/)\n\n### Support Channels\n- **Email Support**: [support@connectsafely.ai](mailto:support@connectsafely.ai)\n- **Documentation**: [https://connectsafely.ai/docs](https://connectsafely.ai/docs)\n- **Custom Workflows**: [Contact us for custom automation](https://connectsafely.ai/contact)\n\n---\n\n## Connect With Us\n\nStay updated with the latest automation tips, LinkedIn strategies, and platform updates:\n\n- **LinkedIn**: [linkedin.com/company/connectsafelyai](https://www.linkedin.com/company/connectsafelyai)\n- **YouTube**: [youtube.com/@ConnectSafelyAI-v2x](https://www.youtube.com/@ConnectSafelyAI-v2x)\n- **Instagram**: [instagram.com/connectsafely.ai](https://www.instagram.com/connectsafely.ai/)\n- **Facebook**: [facebook.com/connectsafelyai](https://www.facebook.com/profile.php?id=61582550884724)\n- **X (Twitter)**: [x.com/AiConnectsafely](https://x.com/AiConnectsafely)\n- **Bluesky**: [connectsafelyai.bsky.social](https://bsky.app/profile/connectsafelyai.bsky.social)\n- **Mastodon**: [mastodon.social/@connectsafely](https://mastodon.social/@connectsafely)\n\n---\n\n## Need Custom Workflows?\n\nLooking to build sophisticated LinkedIn automation workflows tailored to your business needs?\n\n**[Contact our team](https://connectsafely.ai/contact)** for custom automation development, strategy consulting, and enterprise solutions.\n\nWe specialize in:\n- Multi-channel engagement workflows\n- AI-powered personalization at scale\n- Lead scoring and qualification automation\n- CRM integration and data synchronization\n- Custom reporting and analytics pipelines",
+  "featuredImage": "/data/workflows/11450/11450.webp",
+  "author": {
+    "id": 101,
+    "slug": "connectsafely",
+    "name": "ConnectSafely",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 32,
+  "downloads": 3,
+  "createdAt": "2025-12-03T05:58:22.329Z",
+  "updatedAt": "2026-01-16T09:08:43.486Z",
+  "publishedAt": "2025-12-03T05:58:22.329Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11450",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract premium & verified LinkedIn group members to Google Sheets with ConnectSafely.AI",
+    "workflowName": "Extract premium & verified LinkedIn group members to Google Sheets with ConnectSafely.AI",
+    "description": "# Extract LinkedIn Group Members to Google Sheets - Premium & Verified Only using ConnectSafely.AI API\n\n## Who's it for\n\nThis workflow is built for sales professionals, community managers, recruiters, and growth marketers who want to extract high-quality leads from LinkedIn groups without the manual grind. Perfect for anyone who needs to identify decision-makers, founders, and serious professionals within large LinkedIn communities.\n\nIf you're running targeted outreach campaigns, building prospect lists, researching competitor communities, or looking to connect with verified industry leaders, this automation filters the noise and delivers only Premium and Verified members straight to your spreadsheet.\n\n## How it works\n\nThe workflow automates LinkedIn group member extraction by combining pagination handling with intelligent filtering through ConnectSafely.ai's API.\n\n**The process flow:**\n1. Initializes pagination variables with your target group ID\n2. Fetches group members in batches of 50 via ConnectSafely.ai API\n3. Filters each batch for Premium OR Verified members only\n4. Extracts profile data (name, headline, follower count, profile URL, etc.)\n5. Checks if more pages exist and loops back automatically\n6. Once complete, splits all members into individual items\n7. Appends or updates records in Google Sheets (deduplicates by Profile ID)\n\nThe pagination loop handles groups of any size - whether 500 or 50,000 members.\n\n---\n\n## Setup steps\n\n### Step 1: Prepare Your Google Sheet\n\nStructure your Google Sheet with the following columns:\n\n| Column Name | Description | Required |\n|------------|-------------|----------|\n| `Profile ID` | Unique LinkedIn profile identifier | Yes |\n| `First Name` | Member's first name | Yes |\n| `Last Name` | Member's last name | Yes |\n| `Full Name` | Combined first and last name | Yes |\n| `Headline` | Professional headline/tagline | Yes |\n| `Public Identifier` | LinkedIn username | Yes |\n| `Profile URL` | Direct link to LinkedIn profile | Yes |\n| `Follower Count` | Number of followers | Yes |\n| `Is Premium` | Premium subscription status | Yes |\n| `Is Verified` | Verification badge status | Yes |\n| `Relationship Status` | Connection degree (1st, 2nd, 3rd) | Yes |\n\n**Pro Tip**: The workflow uses \"Append or Update\" operation with Profile ID as the matching column, so running it multiple times won't create duplicates.\n\n\n### Step 2: Configure ConnectSafely.ai API Credentials\n\n#### Obtain API Key\n\n1. Log into [ConnectSafely.ai Dashboard](https://connectsafely.ai/dashboard)\n2. Navigate to **Settings** → **API Keys**\n3. Generate a new API key\n\n#### Add Bearer Auth Credential in n8n\n\n1. Go to **Credentials** in n8n\n2. Click **Add Credential** → **Header Auth** or **Bearer Auth**\n3. Paste your ConnectSafely.ai API key\n4. Save the credential\n\nThis credential is used by the \"Fetch Group Members\" HTTP Request node.\n\n\n### Step 3: Configure Google Sheets Integration\n\n#### 3.1 Connect Google Sheets Account\n\n1. Go to **Credentials** → **Add Credential** → **Google Sheets OAuth2**\n2. Follow the OAuth flow to connect your Google account\n3. Grant access to Google Sheets\n\n#### 3.2 Configure \"Append to Google Sheets\" Node\n\n1. Open the **Append to Google Sheets** node\n2. Select your Google Sheets credential\n3. Enter your **Document ID** (from the sheet URL)\n4. Select the **Sheet Name**\n5. Configure column mapping to match the extracted fields\n6. Set **Matching Column** to `Profile ID` for deduplication\n\n\n### Step 4: Set Your Target LinkedIn Group\n\n1. Open the **Initialize Pagination** node\n2. Locate the `groupId` variable in the code\n3. Replace `\"9357376\"` with your target group ID\n\n**Finding Your Group ID:**\n- Go to your LinkedIn group\n- Look at the URL: `linkedin.com/groups/XXXXXXX/`\n- The numbers are your group ID\n\n```javascript\n// Change this value to your target group\ngroupId: \"9357376\",  // Replace with your group ID\n```\n\n\n### Step 5: Test the Workflow\n\n1. Click the **Start Workflow** manual trigger node\n2. Click **Test Workflow**\n3. Verify:\n   - API returns member data correctly\n   - Filtering captures only Premium/Verified members\n   - Pagination loops for additional pages (if applicable)\n   - Google Sheets populates with extracted data\n\n---\n\n## Customization\n\n### Filter Criteria\n\nEdit the filter logic in the **Process & Filter Members** node to adjust:\n\n- **Premium Only**: Remove the `isVerified` checks to capture only Premium subscribers\n- **Verified Only**: Remove the `isPremium` checks to capture only Verified profiles\n- **All Members**: Remove the filter entirely to extract everyone (modify the `return` statement)\n- **Minimum Followers**: Add a follower count threshold for influencer targeting\n\n```javascript\n// Example: Filter for Premium members with 1000+ followers\nconst filteredMembers = members.filter(member =&gt; {\n  const isPremium = member.isPremium === true;\n  const hasMinFollowers = member.followerCount &gt;= 1000;\n  return isPremium && hasMinFollowers;\n});\n```\n\n### Batch Size\n\n- **Default**: 50 members per API request\n- **Adjust**: Modify the `count` value in Initialize Pagination node\n- **Note**: 50 is the maximum allowed by the API\n\n### Additional Fields\n\nThe API returns more fields than extracted by default. Edit the **Process & Filter Members** node to include:\n\n- `creator` - Whether they're a LinkedIn creator\n- `badges` - Full list of profile badges\n- `fetchedAt` - Timestamp of extraction\n\n---\n\n## Use Cases\n\n- **Sales Prospecting**: Build targeted prospect lists from industry-specific groups with verified decision-makers\n- **Competitor Research**: Analyze who's active in competitor communities and their professional backgrounds\n- **Influencer Identification**: Find Premium creators and verified professionals for partnership opportunities\n- **Recruiting**: Source passive candidates who are active in professional development groups\n- **Event Marketing**: Identify engaged professionals in niche communities for webinar and conference promotion\n- **Content Strategy**: Research headlines and titles to understand what resonates in your industry\n\n---\n\n## Troubleshooting\n\n### Common Issues & Solutions\n\n**Issue**: Empty results returned\n- **Solution**: Verify you're a member of the target group; API can only access groups you've joined\n\n**Issue**: \"401 Unauthorized\" errors\n- **Solution**: Check that your ConnectSafely.ai API key is valid and the Bearer Auth credential is properly configured\n\n**Issue**: Pagination loop seems infinite\n- **Solution**: This is expected behavior until `hasMore` returns false; large groups may take several minutes to fully process\n\n**Issue**: Duplicate entries in Google Sheets\n- **Solution**: Ensure the \"Append or Update\" operation is selected with `Profile ID` as the matching column\n\n**Issue**: Missing data in certain columns\n- **Solution**: Not all profiles have complete data; the workflow handles null values gracefully\n\n**Issue**: Google Sheets not updating\n- **Solution**: Verify OAuth credentials are valid and the sheet/document IDs are correctly configured\n\n---\n\n## Documentation & Resources\n\n### Official Documentation\n- **ConnectSafely.ai Docs**: [https://connectsafely.ai/docs](https://connectsafely.ai/docs)\n- **API Reference**: Available in ConnectSafely.ai dashboard\n- **n8n Google Sheets Node**: [https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/)\n\n### Support Channels\n- **Email Support**: [support@connectsafely.ai](mailto:support@connectsafely.ai)\n- **Documentation**: [https://connectsafely.ai/docs](https://connectsafely.ai/docs)\n- **Custom Workflows**: [Contact us for custom automation](https://connectsafely.ai/contact)\n\n---\n\n## Connect With Us\n\nStay updated with the latest automation tips, LinkedIn strategies, and platform updates:\n\n- **LinkedIn**: [linkedin.com/company/connectsafelyai](https://www.linkedin.com/company/connectsafelyai)\n- **YouTube**: [youtube.com/@ConnectSafelyAI-v2x](https://www.youtube.com/@ConnectSafelyAI-v2x)\n- **Instagram**: [instagram.com/connectsafely.ai](https://www.instagram.com/connectsafely.ai/)\n- **Facebook**: [facebook.com/connectsafelyai](https://www.facebook.com/profile.php?id=61582550884724)\n- **X (Twitter)**: [x.com/AiConnectsafely](https://x.com/AiConnectsafely)\n- **Bluesky**: [connectsafelyai.bsky.social](https://bsky.app/profile/connectsafelyai.bsky.social)\n- **Mastodon**: [mastodon.social/@connectsafely](https://mastodon.social/@connectsafely)\n\n---\n\n## Need Custom Workflows?\n\nLooking to build sophisticated LinkedIn automation workflows tailored to your business needs?\n\n**[Contact our team](https://connectsafely.ai/contact)** for custom automation development, strategy consulting, and enterprise solutions.\n\nWe specialize in:\n- Multi-channel engagement workflows\n- AI-powered personalization at scale\n- Lead scoring and qualification automation\n- CRM integration and data synchronization\n- Custom reporting and analytics pipelines",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "📋 Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "⚙️ Configuration",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🌐 API Details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🔍 Filter Logic",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📄 Pagination Flow",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📊 Google Sheets",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Start Workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Initialize Pagination",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch Group Members",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Process & Filter Members",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Continue Pagination",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare for Sheets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "✅ Workflow Complete",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    }
+  ]
+}

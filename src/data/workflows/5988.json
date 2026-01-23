@@ -1,0 +1,332 @@
+{
+  "id": 5988,
+  "slug": "5988",
+  "title": "Bilingual newsletters with GPT-4o, AI images & videos for HubSpot & SP",
+  "description": "## Who’s it for  \nMarketing, growth, and automation teams that need to ship polished bilingual newsletters—complete with images, optional video, and multi-channel distribution—without writing a line of code.\n\n## How it works / What it does  \n1. A **Webhook** receives a plain-language request (e.g. “Create a newsletter about XYZ and store it in SharePoint”). The **Webhook** can be changed to another trigger, fr example **Manual Trigger**.\n2. An **AI Agent** (OpenAI GPT-4o) drafts German & English newsletter copy following a strict JSON schema.  \n3. **SharePoint** fetches an HTML template; a **Code** node injects AI copy into the placeholders.  \n4. Optional creative assets:  \n   - **Pollinations AI** → image (resolution check & frame overlay)  \n   - **FAL AI** → short video + Lyria2 audio → merged via FFmpeg API  \n5. A **Gmail Approval** step sends the draft to an approver; the flow continues only on “Approve”.  \n6. Depending on user intent the workflow:  \n   - Emails the newsletter to **HubSpot** contacts, and/or  \n   - Saves HTML (+ JPG/Video URL) to a **SharePoint** library.  \n\n## How to set up  \n1. Import the template\n2. Open the yellow sticky note and follow the checklist \n   - Create credentials for OpenAI, HubSpot (App Token), Microsoft 365, Gmail, and FAL AI.  \n   - Enter them in n8n Credential Manager (never in the HTTP node).  \n3. Edit the **Configuration Settings** Set node with your ENV_* variables.   \n4. Activate the workflow, copy the production Webhook URL, and trigger it with JSON body `{ \"text\": \"…\" }` or with a desired trigger.\n\n## Requirements  \n- OpenAI account\n- Microsoft 365 tenant (SharePoint & Outlook)  \n- HubSpot App Token  \n- FAL AI API Key (video & audio generation)  \n\n## How to customize  \n- Want a different language? Tweak the AI prompt inside **AI Agent**.  \n- Want a different storage provider? Change the SharePoint nodes to Google Drive or Dropbox.\n- Skip video generation: set `include_video` to `false` in the incoming prompt.  \n- Change the distribution logic by adjusting the **WF Result** Switch node.  \n- Add more channels (e.g. Slack) by inserting additional branches after the Switch and modifying the intent determination at the beginning of the workflow.\n",
+  "featuredImage": "/data/workflows/5988/5988.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 295,
+  "downloads": 29,
+  "createdAt": "2025-07-14T09:15:48.670Z",
+  "updatedAt": "2026-01-16T08:42:32.180Z",
+  "publishedAt": "2025-07-14T09:15:48.670Z",
+  "nodes": 49,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5988",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Bilingual newsletters with GPT-4o, AI images & videos for HubSpot & SP",
+    "workflowName": "Bilingual newsletters with GPT-4o, AI images & videos for HubSpot & SP",
+    "description": "## Who’s it for  \nMarketing, growth, and automation teams that need to ship polished bilingual newsletters—complete with images, optional video, and multi-channel distribution—without writing a line of code.\n\n## How it works / What it does  \n1. A **Webhook** receives a plain-language request (e.g. “Create a newsletter about XYZ and store it in SharePoint”). The **Webhook** can be changed to another trigger, fr example **Manual Trigger**.\n2. An **AI Agent** (OpenAI GPT-4o) drafts German & English newsletter copy following a strict JSON schema.  \n3. **SharePoint** fetches an HTML template; a **Code** node injects AI copy into the placeholders.  \n4. Optional creative assets:  \n   - **Pollinations AI** → image (resolution check & frame overlay)  \n   - **FAL AI** → short video + Lyria2 audio → merged via FFmpeg API  \n5. A **Gmail Approval** step sends the draft to an approver; the flow continues only on “Approve”.  \n6. Depending on user intent the workflow:  \n   - Emails the newsletter to **HubSpot** contacts, and/or  \n   - Saves HTML (+ JPG/Video URL) to a **SharePoint** library.  \n\n## How to set up  \n1. Import the template\n2. Open the yellow sticky note and follow the checklist \n   - Create credentials for OpenAI, HubSpot (App Token), Microsoft 365, Gmail, and FAL AI.  \n   - Enter them in n8n Credential Manager (never in the HTTP node).  \n3. Edit the **Configuration Settings** Set node with your ENV_* variables.   \n4. Activate the workflow, copy the production Webhook URL, and trigger it with JSON body `{ \"text\": \"…\" }` or with a desired trigger.\n\n## Requirements  \n- OpenAI account\n- Microsoft 365 tenant (SharePoint & Outlook)  \n- HubSpot App Token  \n- FAL AI API Key (video & audio generation)  \n\n## How to customize  \n- Want a different language? Tweak the AI prompt inside **AI Agent**.  \n- Want a different storage provider? Change the SharePoint nodes to Google Drive or Dropbox.\n- Skip video generation: set `include_video` to `false` in the incoming prompt.  \n- Change the distribution logic by adjusting the **WF Result** Switch node.  \n- Add more channels (e.g. Slack) by inserting additional branches after the Switch and modifying the intent determination at the beginning of the workflow.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Build Newsletter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Newsletter Template",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create FAL Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create Merge Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait for Merge",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Merged Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Configuration Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Video and Audio Prompt",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Determine Intent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Fields",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Intent Fields",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "HTML to Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "TXT to Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "JPG to Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Save Video URL if exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Upload HTML",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload JPG",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload Video URL",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "WF Result",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Base64 Field",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert Base64 to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send message and wait for response",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "chatgpt-4o",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "chatgpt-4o-2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "gpt-4o-mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait For Video",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait For Audio",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Video Still Processing",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Audio Still Processing",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Newsletter Approved",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Data to Download Service",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Template Content",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    }
+  ]
+}

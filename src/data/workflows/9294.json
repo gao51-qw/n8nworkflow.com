@@ -1,0 +1,475 @@
+{
+  "id": 9294,
+  "slug": "9294",
+  "title": "Calory tracker & meal logger with Telegram, Gemini AI and data tables",
+  "description": "# This can be your Alternative to Cal AI App\n\n## Overview:\nA comprehensive n8n workflow demonstrating advanced AI agent orchestration, stateful conversation management, and multi-modal input processing for nutrition tracking applications.\n\n#### Technical Architecture:\nThis workflow showcases production-ready patterns for building complex conversational AI systems in n8n:\n\n1. Multi-Agent System Design\n\nRouter Agent: Analyzes user intent and routes to specialized sub-agents\nRegistration Agent: Handles new user onboarding with guided data collection\nMeal Logging Agent: Processes text, image, and voice inputs for nutrition analysis\nUpdate Agent: Manages multi-turn conversations for meal corrections\nReport Agent: Generates daily nutrition summaries\nProfile Agent: Handles user preference updates\n\n2. Stateful Conversation Management\nThe workflow implements a state machine using n8n Data Tables:\n\nTracks conversation context across messages\nEnables multi-step workflows (e.g., \"get meal ID → ask for new description → update\")\nPrevents context loss in long conversations\nAuto-resets state after task completion\n\n3. Multi-Modal Input Processing\n\nText: Direct AI analysis using Google Gemini\nImages: Gemini Vision API with specialized nutrition analysis prompts\nVoice: Audio-to-text transcription followed by analysis\nUnified output format regardless of input type\n\n4. Advanced Prompt Engineering\n\nSpecialized system prompts for each agent role\nStructured output formatting for reliable data extraction\nRegional cuisine knowledge (African/West African foods)\nError handling and clarification requests built into prompts\n\n5. Data Persistence Layer\nUses n8n Data Tables for:\n\nUser profiles (calories, protein targets, preferences)\nMeal logs (descriptions, macros, timestamps)\nConversation state (current step, context variables)\n\n6. Telegram Integration\n\nMarkdownV2 formatting with auto-chunking for long messages\nHandles all Telegram message types (text, photo, voice)\n\"Typing\" indicators for better UX\n\n#### Learning Outcomes:\nBy studying this workflow, you'll understand:\n\nHow to build agent hierarchies with specialized roles\nState management patterns for complex conversations\nMulti-modal AI input processing techniques\nProduction data persistence strategies in n8n\nScalable webhook-based bot architecture\n\n#### Technical Requirements:\n\nn8n version 1.0+ (uses Data Tables feature)\nGoogle Gemini API access\nTelegram Bot Token\nBasic understanding of: AI agents, webhook triggers, data tables\n\n#### Difficulty Level: Intermediate to Advanced\nUse Cases Beyond Nutrition:\nThe patterns here apply to any domain requiring:\n\nMulti-step user onboarding\nData collection through conversation\nRecord updates via natural language\nReport generation\nProfile management\n\n#### Components:\n\n50+ nodes demonstrating n8n AI features\n6 specialized AI agents\n3 data tables with structured schemas\nCustom JavaScript for MIME type handling and markdown formatting\nIntegration with Google Gemini (text + vision + audio models)\n\n#### What Makes This Workflow Unique:\nMost n8n AI examples show simple Q&A bots. This demonstrates enterprise-grade conversation management with real data persistence, making it suitable for actual production deployment.\n\n### SETUP GUIDE\n\n### Need Help?\n\n### Reach me: https://www.linkedin.com/in/gerald-akhidenor-1ab1a45/\n\n### Work with me: https://dominixai.com/\n\n### My website: https://jobmonkey.dev\n\n### My email: denorgerald@gmail.com\n\n\nCal AI Nutrition Bot - Complete Setup Guide\n\nWho This Guide Is For:\nThis workflow is designed for beginner to intermediate no-code builders who want to launch a nutrition tracking bot. You should be comfortable:\n\nCreating accounts on platforms (n8n, Google Cloud, Telegram)\nFollowing step-by-step instructions\nCopy-pasting API keys\nBasic JSON importing\n\nNo programming experience required. If you can use Zapier or Make.com, you can set this up.\n\nPrerequisites (30 minutes to gather)\n1. n8n Account\n\nOption A (Easiest): Sign up for n8n Cloud at n8n.io (14-day free trial, then $20/month)\nOption B (Free): Self-host n8n on DigitalOcean/Railway/your server\n\n2. Google Gemini API Key\n\nGo to ai.google.dev\nClick \"Get API Key\"\nCreate new project (free tier: 15 requests/minute)\nCopy your API key\n\n3. Telegram Bot\n\nOpen Telegram and search for @BotFather\nSend /newbot command\nFollow prompts to create your bot\nCopy the bot token (looks like: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz)\n\n\nStep 1: Import the Workflow (5 minutes)\n\nLog into your n8n instance\nClick \"New Workflow\" in top left\nClick the three-dot menu → Import from File\nUpload the My_workflow.json file you downloaded\nThe workflow will appear with all nodes connected\n\n\nStep 2: Create Data Tables (10 minutes)\nThe workflow uses three data tables to store information. Create them exactly as shown:\nTable 1: Cal AI Profiles\n\nNavigate to n8n Data Tables section\nClick Create Data Table\nName: Cal AI Profiles\nAdd columns:\n\nUser_ID (Text)\nName (Text)\nEmail (Text)\nCalories_target (Number)\nProtein_target (Number)\nCountry (Text)\n\nTable 2: Cal AI Meals\n\nCreate new table: Cal AI Meals\nAdd columns:\n\nMeal_ID (Text)\nUser_ID (Text)\nDate (Text)\nMeal_description (Text)\nCalories (Number)\nProteins (Number)\nCarbs (Text)\nFats (Text)\n\n\nTable 3: Cal AI StateManagement\n\nCreate new table: Cal AI StateManagement\nAdd columns:\n\nUser_ID (Text)\nState (Text)\nLast_Interaction (DateTime)\nContext_MealID (Text)\n\n\nStep 3: Configure Credentials (15 minutes)\nA. Add Google Gemini Credential\n\nIn any Google Gemini node, click \"Create New Credential\"\nPaste your Gemini API key\nClick Save\nThis credential will auto-apply to all Gemini nodes\n\nB. Add Telegram Credential\n\nOpen any Telegram node\nClick \"Create New Credential\"\nPaste your bot token\nClick Save\n\nC. Link Data Tables\n\nOpen the \"Is User Registered?\" node\nClick the Data Table dropdown\nSelect \"Cal AI Profiles\"\nRepeat for all nodes with data table connections (n8n will show which ones need updating)\n\n\nStep 4: Activate Telegram Webhook (5 minutes)\n\nOpen the \"Telegram Trigger\" node\nClick \"Execute Node\" to register the webhook\nYou'll see \"Webhook registered successfully\"\nClick \"Listen for Test Event\" to verify\nSend a message to your bot on Telegram\nYou should see the message appear in n8n\n\n\nStep 5: Test Each Function (20 minutes)\nTest 1: User Registration\n\nSend any message to your bot\nBot should ask for your name\nFollow the prompts to complete registration\nCheck the \"Cal AI Profiles\" data table to confirm your data was saved\n\nTest 2: Meal Logging (Text)\n\nSend: \"I had 2 eggs and toast\"\nBot should respond with nutrition breakdown\n\nTest 3: Meal Logging (Image)\n\nTake a photo of food\nSend it to the bot\nBot should analyze and log the meal\n\nTest 4: Meal Logging (Voice)\n\nRecord a voice message: \"I had chicken and rice\"\nSend it to your bot\nBot should transcribe and analyze\n\nTest 5: Update Meal\n\nSend: \"update meal\"\nFollow prompts to provide meal ID and new description\n\nTest 6: Get Report\n\nSend: \"show my report\"\nBot should ask for a date and generate summary\n\n\nStep 6: Customize (Optional)\nChange Bot Personality\n\nEdit the systemMessage in each Agent node\nAdjust tone, add emojis, change coaching style\n\nAdd Your Branding\n\nUpdate bot responses to mention your app name\nCustomize welcome messages\n\nModify Cuisine Focus\n\nUpdate the nutrition analysis prompts to focus on your target cuisine\nCurrent default: African/West African/Nigerian foods\n\nAdjust Nutrition Calculations\n\nEdit the Gemini Vision prompt in \"Analyze image\" node\nModify portion size assumptions or macro ratios\n\n\nTroubleshooting\nBot doesn't respond:\n\nCheck webhook is activated in Telegram Trigger node\nVerify Telegram credential is correct\nCheck execution logs for errors\n\n\"Data Table not found\" errors:\n\nEnsure all three tables are created with exact names\nRelink tables in each node\n\nGemini API errors:\n\nVerify API key is active\nCheck you haven't exceeded free tier limits (15/min)\nTry regenerating API key\n\nMeals not saving:\n\nCheck \"Append Meal Data\" node is connected\nVerify User_ID matches between tables\n\n\nGoing Live\nOnce testing is complete:\n\nClick \"Active\" toggle in top right\nShare your bot link: t.me/YourBotUsername\nMonitor the Executions tab for any errors\n\n\nTarget Users & Support\nThis workflow is perfect for:\n\nFitness coaches wanting client nutrition tracking without monthly SaaS fees\nHealth tech entrepreneurs building MVP before hiring developers\nNo-code builders learning advanced n8n AI patterns\nBootcamp graduates needing portfolio projects with real-world complexity\nSmall app studios prototyping before committing to custom development\n\nYou'll succeed with this if you:\n\nCan follow detailed instructions\nAre comfortable with web-based tools\nWant to learn by doing (the workflow itself is educational)\nNeed a production-ready solution quickly\n\nYou might struggle if:\n\nYou've never used n8n before (recommend taking their free course first)\nYou're not comfortable with API concepts (keys, webhooks)\nYou need 100% hand-holding (this assumes basic technical literacy)\n\nSupport:\n\nReach me:  https://www.linkedin.com/in/gerald-akhidenor-1ab1a45/\nReview Google Gemini documentation for AI customization\nTelegram Bot API docs for advanced features\n\n\nNext Steps After Setup\n\nInvite Beta Users - Start with friends/clients to gather feedback\nMonitor Usage - Watch which features get used most\nCustomize Prompts - Refine AI responses based on real conversations\nAdd Features - Use this as foundation for recipe suggestions, meal planning, etc.\nScale Infrastructure - Move to dedicated hosting as user base grows\n\nEstimated total setup time: 1-2 hours for complete beginners, 30 minutes for experienced n8n users.",
+  "featuredImage": "/data/workflows/9294/9294.webp",
+  "author": {
+    "id": 101,
+    "slug": "dominixai",
+    "name": "Gerald Denor",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 70,
+  "downloads": 7,
+  "createdAt": "2025-10-06T05:35:18.921Z",
+  "updatedAt": "2026-01-16T08:59:53.515Z",
+  "publishedAt": "2025-10-06T05:35:18.921Z",
+  "nodes": 73,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9294",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Calory tracker & meal logger with Telegram, Gemini AI and data tables",
+    "workflowName": "Calory tracker & meal logger with Telegram, Gemini AI and data tables",
+    "description": "# This can be your Alternative to Cal AI App\n\n## Overview:\nA comprehensive n8n workflow demonstrating advanced AI agent orchestration, stateful conversation management, and multi-modal input processing for nutrition tracking applications.\n\n#### Technical Architecture:\nThis workflow showcases production-ready patterns for building complex conversational AI systems in n8n:\n\n1. Multi-Agent System Design\n\nRouter Agent: Analyzes user intent and routes to specialized sub-agents\nRegistration Agent: Handles new user onboarding with guided data collection\nMeal Logging Agent: Processes text, image, and voice inputs for nutrition analysis\nUpdate Agent: Manages multi-turn conversations for meal corrections\nReport Agent: Generates daily nutrition summaries\nProfile Agent: Handles user preference updates\n\n2. Stateful Conversation Management\nThe workflow implements a state machine using n8n Data Tables:\n\nTracks conversation context across messages\nEnables multi-step workflows (e.g., \"get meal ID → ask for new description → update\")\nPrevents context loss in long conversations\nAuto-resets state after task completion\n\n3. Multi-Modal Input Processing\n\nText: Direct AI analysis using Google Gemini\nImages: Gemini Vision API with specialized nutrition analysis prompts\nVoice: Audio-to-text transcription followed by analysis\nUnified output format regardless of input type\n\n4. Advanced Prompt Engineering\n\nSpecialized system prompts for each agent role\nStructured output formatting for reliable data extraction\nRegional cuisine knowledge (African/West African foods)\nError handling and clarification requests built into prompts\n\n5. Data Persistence Layer\nUses n8n Data Tables for:\n\nUser profiles (calories, protein targets, preferences)\nMeal logs (descriptions, macros, timestamps)\nConversation state (current step, context variables)\n\n6. Telegram Integration\n\nMarkdownV2 formatting with auto-chunking for long messages\nHandles all Telegram message types (text, photo, voice)\n\"Typing\" indicators for better UX\n\n#### Learning Outcomes:\nBy studying this workflow, you'll understand:\n\nHow to build agent hierarchies with specialized roles\nState management patterns for complex conversations\nMulti-modal AI input processing techniques\nProduction data persistence strategies in n8n\nScalable webhook-based bot architecture\n\n#### Technical Requirements:\n\nn8n version 1.0+ (uses Data Tables feature)\nGoogle Gemini API access\nTelegram Bot Token\nBasic understanding of: AI agents, webhook triggers, data tables\n\n#### Difficulty Level: Intermediate to Advanced\nUse Cases Beyond Nutrition:\nThe patterns here apply to any domain requiring:\n\nMulti-step user onboarding\nData collection through conversation\nRecord updates via natural language\nReport generation\nProfile management\n\n#### Components:\n\n50+ nodes demonstrating n8n AI features\n6 specialized AI agents\n3 data tables with structured schemas\nCustom JavaScript for MIME type handling and markdown formatting\nIntegration with Google Gemini (text + vision + audio models)\n\n#### What Makes This Workflow Unique:\nMost n8n AI examples show simple Q&A bots. This demonstrates enterprise-grade conversation management with real data persistence, making it suitable for actual production deployment.\n\n### SETUP GUIDE\n\n### Need Help?\n\n### Reach me: https://www.linkedin.com/in/gerald-akhidenor-1ab1a45/\n\n### Work with me: https://dominixai.com/\n\n### My website: https://jobmonkey.dev\n\n### My email: denorgerald@gmail.com\n\n\nCal AI Nutrition Bot - Complete Setup Guide\n\nWho This Guide Is For:\nThis workflow is designed for beginner to intermediate no-code builders who want to launch a nutrition tracking bot. You should be comfortable:\n\nCreating accounts on platforms (n8n, Google Cloud, Telegram)\nFollowing step-by-step instructions\nCopy-pasting API keys\nBasic JSON importing\n\nNo programming experience required. If you can use Zapier or Make.com, you can set this up.\n\nPrerequisites (30 minutes to gather)\n1. n8n Account\n\nOption A (Easiest): Sign up for n8n Cloud at n8n.io (14-day free trial, then $20/month)\nOption B (Free): Self-host n8n on DigitalOcean/Railway/your server\n\n2. Google Gemini API Key\n\nGo to ai.google.dev\nClick \"Get API Key\"\nCreate new project (free tier: 15 requests/minute)\nCopy your API key\n\n3. Telegram Bot\n\nOpen Telegram and search for @BotFather\nSend /newbot command\nFollow prompts to create your bot\nCopy the bot token (looks like: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz)\n\n\nStep 1: Import the Workflow (5 minutes)\n\nLog into your n8n instance\nClick \"New Workflow\" in top left\nClick the three-dot menu → Import from File\nUpload the My_workflow.json file you downloaded\nThe workflow will appear with all nodes connected\n\n\nStep 2: Create Data Tables (10 minutes)\nThe workflow uses three data tables to store information. Create them exactly as shown:\nTable 1: Cal AI Profiles\n\nNavigate to n8n Data Tables section\nClick Create Data Table\nName: Cal AI Profiles\nAdd columns:\n\nUser_ID (Text)\nName (Text)\nEmail (Text)\nCalories_target (Number)\nProtein_target (Number)\nCountry (Text)\n\nTable 2: Cal AI Meals\n\nCreate new table: Cal AI Meals\nAdd columns:\n\nMeal_ID (Text)\nUser_ID (Text)\nDate (Text)\nMeal_description (Text)\nCalories (Number)\nProteins (Number)\nCarbs (Text)\nFats (Text)\n\n\nTable 3: Cal AI StateManagement\n\nCreate new table: Cal AI StateManagement\nAdd columns:\n\nUser_ID (Text)\nState (Text)\nLast_Interaction (DateTime)\nContext_MealID (Text)\n\n\nStep 3: Configure Credentials (15 minutes)\nA. Add Google Gemini Credential\n\nIn any Google Gemini node, click \"Create New Credential\"\nPaste your Gemini API key\nClick Save\nThis credential will auto-apply to all Gemini nodes\n\nB. Add Telegram Credential\n\nOpen any Telegram node\nClick \"Create New Credential\"\nPaste your bot token\nClick Save\n\nC. Link Data Tables\n\nOpen the \"Is User Registered?\" node\nClick the Data Table dropdown\nSelect \"Cal AI Profiles\"\nRepeat for all nodes with data table connections (n8n will show which ones need updating)\n\n\nStep 4: Activate Telegram Webhook (5 minutes)\n\nOpen the \"Telegram Trigger\" node\nClick \"Execute Node\" to register the webhook\nYou'll see \"Webhook registered successfully\"\nClick \"Listen for Test Event\" to verify\nSend a message to your bot on Telegram\nYou should see the message appear in n8n\n\n\nStep 5: Test Each Function (20 minutes)\nTest 1: User Registration\n\nSend any message to your bot\nBot should ask for your name\nFollow the prompts to complete registration\nCheck the \"Cal AI Profiles\" data table to confirm your data was saved\n\nTest 2: Meal Logging (Text)\n\nSend: \"I had 2 eggs and toast\"\nBot should respond with nutrition breakdown\n\nTest 3: Meal Logging (Image)\n\nTake a photo of food\nSend it to the bot\nBot should analyze and log the meal\n\nTest 4: Meal Logging (Voice)\n\nRecord a voice message: \"I had chicken and rice\"\nSend it to your bot\nBot should transcribe and analyze\n\nTest 5: Update Meal\n\nSend: \"update meal\"\nFollow prompts to provide meal ID and new description\n\nTest 6: Get Report\n\nSend: \"show my report\"\nBot should ask for a date and generate summary\n\n\nStep 6: Customize (Optional)\nChange Bot Personality\n\nEdit the systemMessage in each Agent node\nAdjust tone, add emojis, change coaching style\n\nAdd Your Branding\n\nUpdate bot responses to mention your app name\nCustomize welcome messages\n\nModify Cuisine Focus\n\nUpdate the nutrition analysis prompts to focus on your target cuisine\nCurrent default: African/West African/Nigerian foods\n\nAdjust Nutrition Calculations\n\nEdit the Gemini Vision prompt in \"Analyze image\" node\nModify portion size assumptions or macro ratios\n\n\nTroubleshooting\nBot doesn't respond:\n\nCheck webhook is activated in Telegram Trigger node\nVerify Telegram credential is correct\nCheck execution logs for errors\n\n\"Data Table not found\" errors:\n\nEnsure all three tables are created with exact names\nRelink tables in each node\n\nGemini API errors:\n\nVerify API key is active\nCheck you haven't exceeded free tier limits (15/min)\nTry regenerating API key\n\nMeals not saving:\n\nCheck \"Append Meal Data\" node is connected\nVerify User_ID matches between tables\n\n\nGoing Live\nOnce testing is complete:\n\nClick \"Active\" toggle in top right\nShare your bot link: t.me/YourBotUsername\nMonitor the Executions tab for any errors\n\n\nTarget Users & Support\nThis workflow is perfect for:\n\nFitness coaches wanting client nutrition tracking without monthly SaaS fees\nHealth tech entrepreneurs building MVP before hiring developers\nNo-code builders learning advanced n8n AI patterns\nBootcamp graduates needing portfolio projects with real-world complexity\nSmall app studios prototyping before committing to custom development\n\nYou'll succeed with this if you:\n\nCan follow detailed instructions\nAre comfortable with web-based tools\nWant to learn by doing (the workflow itself is educational)\nNeed a production-ready solution quickly\n\nYou might struggle if:\n\nYou've never used n8n before (recommend taking their free course first)\nYou're not comfortable with API concepts (keys, webhooks)\nYou need 100% hand-holding (this assumes basic technical literacy)\n\nSupport:\n\nReach me:  https://www.linkedin.com/in/gerald-akhidenor-1ab1a45/\nReview Google Gemini documentation for AI customization\nTelegram Bot API docs for advanced features\n\n\nNext Steps After Setup\n\nInvite Beta Users - Start with friends/clients to gather feedback\nMonitor Usage - Watch which features get used most\nCustomize Prompts - Refine AI responses based on real conversations\nAdd Features - Use this as foundation for recipe suggestions, meal planning, etc.\nScale Infrastructure - Move to dedicated hosting as user base grows\n\nEstimated total setup time: 1-2 hours for complete beginners, 30 minutes for experienced n8n users.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Typing…",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a text message1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "MarkdownV",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "get_message (register)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Register Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Cal AI Router Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "The Log Meal Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Report Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Profile Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "MarkdownV2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Simple Memory3",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Simple Memory4",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sequential Routing",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "logMealAnalysis(tool)",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is User Registered?",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Register User",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Conversation State",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Meal Data",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "fetchmealdetails",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "updateMeal",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "getUserData",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "getDailyMealReport",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Profile Data",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Standardize Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Conversation State Router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Download Voice Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Download IMAGE",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze voice message",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_message (Audio/Video message)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "get_message (Media  message)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fix mime",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fix mime5",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Analyze Text Message",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Input Message Router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "get_error_message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Re-Analyze Meal",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse AI Output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Save Updated Meal",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Text Analysis",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "State-Setting Node #1",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clear the State",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Meal Agent (Step 1 - Ask for ID)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update Meal Agent (Step 2 - Ask for Desc)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update Meal Agent (Step 3 - Final Output)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a text message2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send a text message3",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "MarkdownV3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "MarkdownV4",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "New Description State-Setting Node #2",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Success Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Update Profile State",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

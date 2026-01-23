@@ -1,0 +1,398 @@
+{
+  "id": 4813,
+  "slug": "4813",
+  "title": "Save time hiring with AI: automate screening, assessments & interviews",
+  "description": "## AI Recruitment Automation Pipeline – Resume Parsing, GPT-4 Evaluation, Assessment Triggers & Interview Scheduling\n\nThis end-to-end **AI-powered recruitment automation workflow** helps HR and talent acquisition teams automate the complete hiring pipeline—from **resume intake and parsing** to **GPT-4-based evaluation**, **TA approvals**, **assessment delivery**, and **interview scheduling**.\n\nBuilt using **n8n**, this template integrates with **OpenAI GPT-4**, **Google Sheets**, **Google Drive**, **Slack**, and **SMTP** to reduce time-to-hire, improve candidate quality, and eliminate repetitive manual tasks. The workflow enables scalable, consistent, and intelligent decision-making by automating resume evaluation, semantic fit analysis, and candidate communication.\n\nThis template is ideal for **recruiters**, **TA teams**, and **founders** looking to optimize hiring for tech, sales, support, and other roles with high applicant volume.\n\n---\n\n### Who is this for?\n\n- HR and TA teams handling high-volume recruitment\n- Startups and SMBs looking to reduce hiring time and cost\n- Hiring managers seeking to automate CV parsing and candidate evaluation\n\n---\n\n### What problem does this solve?\n\n- Eliminates manual resume screening\n- Sends real-time updates to TA team on assessment completion\n- Automates assessments, scoring, and interview scheduling\n- Keeps candidate communication consistent and timely\n\n---\n\n### What this workflow does\n\n#### Smart Resume Intake Form\n- Collects candidate data: name, email, phone, LinkedIn, job role, and CV (PDF).\n- Custom-designed UI with branding-ready CSS.\n\n#### PDF Resume Parsing & Storage\n- CV is uploaded to a dedicated **Google Drive** folder.\n- Resume text is extracted for semantic analysis.\n\n#### AI-Based Candidate Evaluation (GPT-4 via LangChain)\n- Extracts: City, Education, Job History, Skills.\n- Summarizes candidate profile (100 words).\n- Retrieves and summarizes job description from **Google Sheets**.\n- Performs detailed evaluation:\n  - ✅ Semantic fit scoring (0–100%)\n  - ✅ Key matches and skill gaps\n  - ✅ Soft skills extraction\n  - ✅ Red flag detection (job-hopping, missing info)\n  - ✅ Final score (1–10) with rationale\n\n#### Google Sheets Integration\n- Logs and updates candidate data at each stage:\n  `CV Submitted → Scored → Shortlisted → Assessment Sent → Interview Scheduled → Rejected`\n\n#### TA Approval via Email (Send & Wait)\n- TA receives evaluation summary and gives one-click **approve/reject**.\n- ✅ Approved → Status: Resume Selected  \n- ❌ Rejected → Status: Resume Rejected\n\n#### Assessment Trigger (Post Approval)\n- Sends assessment link to shortlisted candidates.\n- Notifies TA via **Slack and Email** when assessment is submitted.\n\n#### Interview Scheduling\n- Sends **Calendly link** for self-scheduled interview booking.\n- Candidate receives detailed next-step instructions.\n\n#### Status-Based Candidate Emails\n- Automatically sends:\n  - ✔️ Shortlisting confirmation + interview setup\n  - ❌ Rejection email with branded message\n\n---\n\n### Business Benefits\n\n- **Save 80%+ time** spent on manual resume reviews and coordination\n- **Reduce cost-per-hire** by eliminating manual tasks\n- **Improve hiring accuracy** with structured, AI-based decision-making\n- **Scalable recruitment** for 100s of candidates per week\n- **Enhance candidate experience** with instant status updates\n- **Centralize data** in Google Sheets for full team visibility\n\n---\n\n### 🔧 Setup Instructions\n\n#### 1. Google Service Account Setup (One-Time)\n\nBefore using Google Sheets or Google Drive in n8n:\n\n- Go to [Google Cloud Console](https://console.cloud.google.com/).\n- Create a **Service Account** under your project.\n- Enable these APIs:\n  - Google Sheets API\n  - Google Drive API\n- Download the **JSON credentials** for the service account.\n- IMPORTANT:  \n  Share your target Google Sheets and Docs with the **service account email**  \n  (e.g., `your-service-account@your-project.iam.gserviceaccount.com`).\n\n---\n\n#### Add Applicant's Details to Google Sheet\n\n- **Document**: Select the `Profiles` Google Sheet document.\n- **Sheet**: Select the `Applicant's Details` sheet.\n- **Fields to Map**:\n  - `EMAIL`: `{{ $('On form submission').item.json.Email }}`\n  - `DATE`: `{{ $now.format('dd-MM-yyyy') }}`\n  - `NAME`: `{{ $('On form submission').item.json.Name }}`\n  - `LINKEDIN URL`: `{{ $('On form submission').item.json[\"LinkedIn Profile URL\"] }}`\n  - `JOB PROFILE`: `{{ $('On form submission').item.json[\"Job Openings\"] }}`\n  - `STATUS`: `CV SUBMITTED`\n  - `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n---\n\n#### Extract Applicant's Resume Text\n\n- **Text**:  \n  `{{ $('Extract from File').item.json.text }}`\n\n---\n\n#### Get Job Description from Google Sheet\n\n- **Document**: `Profiles`\n- **Sheet**: `Job Openings`\n- **Filter**:\n- **Column**: `Job Profile`\n- **Value**: `{{ $('On form submission').item.json[\"Job Openings\"] }}`\n\n---\n\n#### Save Evaluation Results in Google Sheets\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Column Match On**: `EMAIL`\n- **Fields to Map**:\n- `EMAIL`: `{{ $('On form submission').item.json.Email }}`\n- `CITY`: `{{ $('Applicant\\'s Details').item.json.output.City }}`\n- `EDUCATIONAL`: `{{ $('Applicant\\'s Details').item.json.output[\"Educational Qualification\"] }}`\n- `JOB HISTORY`: `{{ $('Applicant\\'s Details').item.json.output[\"Job History\"] }}`\n- `SKILLS`: `{{ $('Applicant\\'s Details').item.json.output.Skills }}`\n- `SUMMARIZE`: `{{ $('Summarize Applicant\\'s Profile').item.json.response.text }}`\n- `SEMANTIC FIT SCORE`: `{{ $json.output.semantic_fit.score }}`\n- `KEY MATCHES`: `{{ $json.output.semantic_fit.key_matches.toJsonString() }}`\n- `KEY GAPS`: `{{ $json.output.semantic_fit.key_gaps.toJsonString() }}`\n- `SEMANTIC FIT CONSIDERATION`: `{{ $json.output.semantic_fit.consideration }}`\n- `SOFT SKILLS`: `{{ $json.output.soft_skills.toJsonString() }}`\n- `EXPERIENCE GAP DETECTED`: `{{ $json.output.experience_analysis.experience_gap_detected }}`\n- `OVER QUALIFICATION DETECTED`: `{{ $json.output.experience_analysis.overqualification_detected }}`\n- `EXPERIENCE ANALYSIS CONSIDERATION`: `{{ $json.output.experience_analysis.consideration }}`\n- `RED FLAGS ISSUES DETECTED`: `{{ $json.output.red_flags.issues_detected.toJsonString() }}`\n- `RED FLAGS CONSIDERATION`: `{{ $json.output.red_flags.consideration }}`\n- `VOTE`: `{{ $json.output.overall_evaluation.final_vote }}`\n- `FINAL CONSIDERATION`: `{{ $json.output.overall_evaluation.consideration }}`\n- `STATUS`: `CV SCORED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n---\n\n### Update Applicant Statuses\n\n#### Resume Selected\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Column Match On**: `EMAIL`\n- **Update**:\n- `STATUS`: `RESUME SELECTED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Resume Rejected\n\n- **Update**:\n- `STATUS`: `RESUME REJECTED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Assessment Sent\n\n- **Email**: `{{ $('Loop to Send Assessment Link to Each Candidate').item.json.EMAIL }}`\n- **Update**:\n- `STATUS`: `ASSESSMENT SENT`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Assessment Submitted\n\n- **Email**: `{{ $json[\"Enter Your Email Address\"] }}`\n- **Update**:\n- `STATUS`: `ASSESSMENT SUBMITTED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Interview Booked\n\n- **Email**: `{{ $json.payload.email }}`\n- **Update**:\n- `STATUS`: `INTERVIEW BOOKED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n---\n\n#### Fetch Applicants with Specific Status\n\n#### Status: `RESUME SELECTED`\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Filter**:\n- **Column**: `STATUS`\n- **Value**: `RESUME SELECTED`\n\n---\n\n#### Get Assessment Form URL from Job Profile\n\n- **Document**: `Profiles`\n- **Sheet**: `Job Openings`\n- **Filter**:\n- **Column**: `Job Profile`\n- **Value**: `{{ $json[\"JOB PROFILE\"] }}`\n\n---\n\n#### Trigger on Applicant Status Update\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Trigger Settings**:\n- **Columns to Watch**: `STATUS`\n\n---\n\n#### ⚠️ Important Notes\n\n- Always use **“Select Document from List”** instead of manually pasting the sheet/document ID.\n- Share your Sheets/Docs with the **Google Service Account email** for proper access.\n- Keep your date formats consistent using `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`.\n\n---\n\n1. Add credentials for:\n   - Google Drive\n   - Google Sheets\n   - SMTP (for emails)\n   - OpenAI API Key (GPT-4)\n2. Replace placeholders:\n   - Google Sheet & Folder IDs\n   - Calendly Link\n   - Assessment Link\n3. (Optional) Customize GPT-4 prompts for domain-specific scoring\n4. (Optional) Use your Slack webhook for TA notifications\n\n---\n\n### 🛠️ Tools & Integrations\n\n- **Form Trigger** – Candidate form with file upload  \n- **Google Drive + Extract PDF** – CV parsing  \n- **Google Sheets** – Database for all applicant statuses  \n- **LangChain GPT-4 Nodes** – AI profile + job analysis  \n- **Email Send & Send & Wait** – Candidate/TA communication  \n- **IF Node** – Logic for approve/reject  \n- **Slack Integration** – TA notification  \n- **Calendly Link** – Interview scheduling\n\n---\n\n`AI resume screening`, `GPT-4 recruitment workflow`, `automated hiring pipeline`, `semantic fit evaluation`, `LangChain for HR`, `resume parsing automation`, `AI in talent acquisition`, `assessment workflow automation`, `interview scheduling automation`, `candidate shortlisting automation`, `OpenAI HR integration`, `Google Sheets recruitment tracker`, `n8n HR automation template`, `self-scheduling interviews with Calendly`, `Slack notifications in recruitment`\n\n",
+  "featuredImage": "/data/workflows/4813/4813.webp",
+  "author": {
+    "id": 101,
+    "slug": "ajstyle0411",
+    "name": "Aayushman Sharma",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2139,
+  "downloads": 213,
+  "createdAt": "2025-06-09T11:01:53.274Z",
+  "updatedAt": "2026-01-16T08:36:20.549Z",
+  "publishedAt": "2025-06-09T11:01:53.274Z",
+  "nodes": 60,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4813",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Save time hiring with AI: automate screening, assessments & interviews",
+    "workflowName": "Save time hiring with AI: automate screening, assessments & interviews",
+    "description": "## AI Recruitment Automation Pipeline – Resume Parsing, GPT-4 Evaluation, Assessment Triggers & Interview Scheduling\n\nThis end-to-end **AI-powered recruitment automation workflow** helps HR and talent acquisition teams automate the complete hiring pipeline—from **resume intake and parsing** to **GPT-4-based evaluation**, **TA approvals**, **assessment delivery**, and **interview scheduling**.\n\nBuilt using **n8n**, this template integrates with **OpenAI GPT-4**, **Google Sheets**, **Google Drive**, **Slack**, and **SMTP** to reduce time-to-hire, improve candidate quality, and eliminate repetitive manual tasks. The workflow enables scalable, consistent, and intelligent decision-making by automating resume evaluation, semantic fit analysis, and candidate communication.\n\nThis template is ideal for **recruiters**, **TA teams**, and **founders** looking to optimize hiring for tech, sales, support, and other roles with high applicant volume.\n\n---\n\n### Who is this for?\n\n- HR and TA teams handling high-volume recruitment\n- Startups and SMBs looking to reduce hiring time and cost\n- Hiring managers seeking to automate CV parsing and candidate evaluation\n\n---\n\n### What problem does this solve?\n\n- Eliminates manual resume screening\n- Sends real-time updates to TA team on assessment completion\n- Automates assessments, scoring, and interview scheduling\n- Keeps candidate communication consistent and timely\n\n---\n\n### What this workflow does\n\n#### Smart Resume Intake Form\n- Collects candidate data: name, email, phone, LinkedIn, job role, and CV (PDF).\n- Custom-designed UI with branding-ready CSS.\n\n#### PDF Resume Parsing & Storage\n- CV is uploaded to a dedicated **Google Drive** folder.\n- Resume text is extracted for semantic analysis.\n\n#### AI-Based Candidate Evaluation (GPT-4 via LangChain)\n- Extracts: City, Education, Job History, Skills.\n- Summarizes candidate profile (100 words).\n- Retrieves and summarizes job description from **Google Sheets**.\n- Performs detailed evaluation:\n  - ✅ Semantic fit scoring (0–100%)\n  - ✅ Key matches and skill gaps\n  - ✅ Soft skills extraction\n  - ✅ Red flag detection (job-hopping, missing info)\n  - ✅ Final score (1–10) with rationale\n\n#### Google Sheets Integration\n- Logs and updates candidate data at each stage:\n  `CV Submitted → Scored → Shortlisted → Assessment Sent → Interview Scheduled → Rejected`\n\n#### TA Approval via Email (Send & Wait)\n- TA receives evaluation summary and gives one-click **approve/reject**.\n- ✅ Approved → Status: Resume Selected  \n- ❌ Rejected → Status: Resume Rejected\n\n#### Assessment Trigger (Post Approval)\n- Sends assessment link to shortlisted candidates.\n- Notifies TA via **Slack and Email** when assessment is submitted.\n\n#### Interview Scheduling\n- Sends **Calendly link** for self-scheduled interview booking.\n- Candidate receives detailed next-step instructions.\n\n#### Status-Based Candidate Emails\n- Automatically sends:\n  - ✔️ Shortlisting confirmation + interview setup\n  - ❌ Rejection email with branded message\n\n---\n\n### Business Benefits\n\n- **Save 80%+ time** spent on manual resume reviews and coordination\n- **Reduce cost-per-hire** by eliminating manual tasks\n- **Improve hiring accuracy** with structured, AI-based decision-making\n- **Scalable recruitment** for 100s of candidates per week\n- **Enhance candidate experience** with instant status updates\n- **Centralize data** in Google Sheets for full team visibility\n\n---\n\n### 🔧 Setup Instructions\n\n#### 1. Google Service Account Setup (One-Time)\n\nBefore using Google Sheets or Google Drive in n8n:\n\n- Go to [Google Cloud Console](https://console.cloud.google.com/).\n- Create a **Service Account** under your project.\n- Enable these APIs:\n  - Google Sheets API\n  - Google Drive API\n- Download the **JSON credentials** for the service account.\n- IMPORTANT:  \n  Share your target Google Sheets and Docs with the **service account email**  \n  (e.g., `your-service-account@your-project.iam.gserviceaccount.com`).\n\n---\n\n#### Add Applicant's Details to Google Sheet\n\n- **Document**: Select the `Profiles` Google Sheet document.\n- **Sheet**: Select the `Applicant's Details` sheet.\n- **Fields to Map**:\n  - `EMAIL`: `{{ $('On form submission').item.json.Email }}`\n  - `DATE`: `{{ $now.format('dd-MM-yyyy') }}`\n  - `NAME`: `{{ $('On form submission').item.json.Name }}`\n  - `LINKEDIN URL`: `{{ $('On form submission').item.json[\"LinkedIn Profile URL\"] }}`\n  - `JOB PROFILE`: `{{ $('On form submission').item.json[\"Job Openings\"] }}`\n  - `STATUS`: `CV SUBMITTED`\n  - `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n---\n\n#### Extract Applicant's Resume Text\n\n- **Text**:  \n  `{{ $('Extract from File').item.json.text }}`\n\n---\n\n#### Get Job Description from Google Sheet\n\n- **Document**: `Profiles`\n- **Sheet**: `Job Openings`\n- **Filter**:\n- **Column**: `Job Profile`\n- **Value**: `{{ $('On form submission').item.json[\"Job Openings\"] }}`\n\n---\n\n#### Save Evaluation Results in Google Sheets\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Column Match On**: `EMAIL`\n- **Fields to Map**:\n- `EMAIL`: `{{ $('On form submission').item.json.Email }}`\n- `CITY`: `{{ $('Applicant\\'s Details').item.json.output.City }}`\n- `EDUCATIONAL`: `{{ $('Applicant\\'s Details').item.json.output[\"Educational Qualification\"] }}`\n- `JOB HISTORY`: `{{ $('Applicant\\'s Details').item.json.output[\"Job History\"] }}`\n- `SKILLS`: `{{ $('Applicant\\'s Details').item.json.output.Skills }}`\n- `SUMMARIZE`: `{{ $('Summarize Applicant\\'s Profile').item.json.response.text }}`\n- `SEMANTIC FIT SCORE`: `{{ $json.output.semantic_fit.score }}`\n- `KEY MATCHES`: `{{ $json.output.semantic_fit.key_matches.toJsonString() }}`\n- `KEY GAPS`: `{{ $json.output.semantic_fit.key_gaps.toJsonString() }}`\n- `SEMANTIC FIT CONSIDERATION`: `{{ $json.output.semantic_fit.consideration }}`\n- `SOFT SKILLS`: `{{ $json.output.soft_skills.toJsonString() }}`\n- `EXPERIENCE GAP DETECTED`: `{{ $json.output.experience_analysis.experience_gap_detected }}`\n- `OVER QUALIFICATION DETECTED`: `{{ $json.output.experience_analysis.overqualification_detected }}`\n- `EXPERIENCE ANALYSIS CONSIDERATION`: `{{ $json.output.experience_analysis.consideration }}`\n- `RED FLAGS ISSUES DETECTED`: `{{ $json.output.red_flags.issues_detected.toJsonString() }}`\n- `RED FLAGS CONSIDERATION`: `{{ $json.output.red_flags.consideration }}`\n- `VOTE`: `{{ $json.output.overall_evaluation.final_vote }}`\n- `FINAL CONSIDERATION`: `{{ $json.output.overall_evaluation.consideration }}`\n- `STATUS`: `CV SCORED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n---\n\n### Update Applicant Statuses\n\n#### Resume Selected\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Column Match On**: `EMAIL`\n- **Update**:\n- `STATUS`: `RESUME SELECTED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Resume Rejected\n\n- **Update**:\n- `STATUS`: `RESUME REJECTED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Assessment Sent\n\n- **Email**: `{{ $('Loop to Send Assessment Link to Each Candidate').item.json.EMAIL }}`\n- **Update**:\n- `STATUS`: `ASSESSMENT SENT`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Assessment Submitted\n\n- **Email**: `{{ $json[\"Enter Your Email Address\"] }}`\n- **Update**:\n- `STATUS`: `ASSESSMENT SUBMITTED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n#### Interview Booked\n\n- **Email**: `{{ $json.payload.email }}`\n- **Update**:\n- `STATUS`: `INTERVIEW BOOKED`\n- `LAST UPDATED DATE`: `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`\n\n---\n\n#### Fetch Applicants with Specific Status\n\n#### Status: `RESUME SELECTED`\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Filter**:\n- **Column**: `STATUS`\n- **Value**: `RESUME SELECTED`\n\n---\n\n#### Get Assessment Form URL from Job Profile\n\n- **Document**: `Profiles`\n- **Sheet**: `Job Openings`\n- **Filter**:\n- **Column**: `Job Profile`\n- **Value**: `{{ $json[\"JOB PROFILE\"] }}`\n\n---\n\n#### Trigger on Applicant Status Update\n\n- **Document**: `Profiles`\n- **Sheet**: `Applicant's Details`\n- **Trigger Settings**:\n- **Columns to Watch**: `STATUS`\n\n---\n\n#### ⚠️ Important Notes\n\n- Always use **“Select Document from List”** instead of manually pasting the sheet/document ID.\n- Share your Sheets/Docs with the **Google Service Account email** for proper access.\n- Keep your date formats consistent using `{{ $now.format('dd-MM-yyyy hh:mm:ss') }}`.\n\n---\n\n1. Add credentials for:\n   - Google Drive\n   - Google Sheets\n   - SMTP (for emails)\n   - OpenAI API Key (GPT-4)\n2. Replace placeholders:\n   - Google Sheet & Folder IDs\n   - Calendly Link\n   - Assessment Link\n3. (Optional) Customize GPT-4 prompts for domain-specific scoring\n4. (Optional) Use your Slack webhook for TA notifications\n\n---\n\n### 🛠️ Tools & Integrations\n\n- **Form Trigger** – Candidate form with file upload  \n- **Google Drive + Extract PDF** – CV parsing  \n- **Google Sheets** – Database for all applicant statuses  \n- **LangChain GPT-4 Nodes** – AI profile + job analysis  \n- **Email Send & Send & Wait** – Candidate/TA communication  \n- **IF Node** – Logic for approve/reject  \n- **Slack Integration** – TA notification  \n- **Calendly Link** – Interview scheduling\n\n---\n\n`AI resume screening`, `GPT-4 recruitment workflow`, `automated hiring pipeline`, `semantic fit evaluation`, `LangChain for HR`, `resume parsing automation`, `AI in talent acquisition`, `assessment workflow automation`, `interview scheduling automation`, `candidate shortlisting automation`, `OpenAI HR integration`, `Google Sheets recruitment tracker`, `n8n HR automation template`, `self-scheduling interviews with Calendly`, `Slack notifications in recruitment`",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Upload CV",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Applicant's Details",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add Applicant's Details in Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize Applicant's Profile",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "role": "chainSummarization",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Job Description from Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize Job Role Description",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "role": "chainSummarization",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Semantic Fit & Evaluation by HR Expert",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Evaluation Results in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Notify TA for Approval via Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Approval Check - IF Condition",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Shortlist Email to Candidate",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Rejection Email to Candidate",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Applicant's Status as REJECTED",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Run Daily at 09:00 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Fetch Records with Status \"Resume Selected\"",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Loop to Send Assessment Link to Each Candidate",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Assessment Form URL",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Send Assessment Submission Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update Status to Assessment Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Technical Support Engineer Assessment Trigger",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "role": "typeformTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Technical Project Manager Assessment Trigger",
+      "type": "n8n-nodes-base.typeformTrigger",
+      "role": "typeformTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Update Applicant Status to Assessment Submitted",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Notify TA via Email for Assessment Submission",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Notify TA via Slack for Assessment Submission",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Trigger when Interview booked by applicant in calendly",
+      "type": "n8n-nodes-base.calendlyTrigger",
+      "role": "calendlyTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Status to Interview Booked",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Get Triggered when Applicant Status Update in Google Sheet",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Route actions based on Status",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Send Interview Invite Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Assessment Failed Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Interview Cancelled Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Interview Reschedule Invite Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Interview Passed/Shortlisted Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Interview Failed Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Applicant's Status as RESUME SELECTED",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    }
+  ]
+}

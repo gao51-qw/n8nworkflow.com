@@ -1,0 +1,86 @@
+{
+  "id": 2318,
+  "slug": "2318",
+  "title": "Enrich Pipedrive's Organization Data with OpenAI GPT-4o & Notify it in Slack",
+  "description": "This workflow **enriches new Pipedrive organization's data by adding a note to the organization object in Pipedrive**. It assumes there is a custom \"website\" field in your Pipedrive setup, as data will be scraped from this website to generate a note using OpenAI. Then, a notification is sent in Slack.\n\n## ⚠️ Disclaimer\n**This workflow uses a scraping API. Before using it, ensure you comply with the regulations regarding web scraping in your country or state**.\n\n## Important Notes\n- The **OpenAI model used is GPT-4o**, chosen for its large input token capacity. However, it is not the cheapest model if cost is very important to you.\n\n- The system prompt in the OpenAI Node generates output with relevant information, but feel free to improve or **modify it according to your needs**.\n\n## **How It Works**\n\n### Node 1: `Pipedrive Trigger - An Organization is Created`\nThis is the trigger of the workflow. When **an organization object is created in Pipedrive**, this node is triggered and retrieves the data. **Make sure you have a \"website\" custom field in Pipedrive** (the name of the field in the n8n node will appear as a random ID and not with the Pipedrive custom field name).\n\n### Node 2: `ScrapingBee - Get Organization's Website's Homepage Content`\nThis node **scrapes the content** from the URL of the website associated with the **Pipedrive Organization** created in Node 1. The workflow uses the [ScrapingBee](https://www.scrapingbee.com/) API, but **you can use any preferred API or simply the HTTP request node in n8n**.\n\n### Node 3: `OpenAI - Message GPT-4o with Scraped Data`\nThis node sends HTML-scraped data from the previous node to the **OpenAI GPT-4o model**. The system prompt instructs the model to **extract company data**, such as products or services offered and competitors (if known by the model), and format it as HTML for optimal use in a Pipedrive Note.\n\n### Node 4: `Pipedrive - Create a Note with OpenAI Output`\nThis node **adds a Note to the Organization created in Pipedrive** using the OpenAI node output. The Note will include the company description, target market, selling products, and competitors (if GPT-4o was able to determine them).\n\n### Node 5 & 6: `HTML To Markdown` & `Code - Markdown to Slack Markdown`\nThese two nodes **format the HTML output to Slack Markdown**.\n\nThe Note created in Pipedrive is in HTML format, **as specified by the System Prompt of the OpenAI Node**. To send it to Slack, it needs to be converted to Markdown and then to Slack Markdown.\n\n### Node 7: `Slack - Notify`\nThis node **sends a message in Slack containing the Pipedrive Organization Note** created with this workflow.\n",
+  "featuredImage": "/data/workflows/2318/2318.webp",
+  "author": {
+    "id": 101,
+    "slug": "dataki",
+    "name": "Dataki",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 2177,
+  "downloads": 217,
+  "createdAt": "2024-07-06T16:24:36.463Z",
+  "updatedAt": "2026-01-16T08:23:59.554Z",
+  "publishedAt": "2024-07-06T16:24:36.463Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2318",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Enrich Pipedrive's Organization Data with OpenAI GPT-4o & Notify it in Slack",
+    "workflowName": "Enrich Pipedrive's Organization Data with OpenAI GPT-4o & Notify it in Slack",
+    "description": "This workflow **enriches new Pipedrive organization's data by adding a note to the organization object in Pipedrive**. It assumes there is a custom \"website\" field in your Pipedrive setup, as data will be scraped from this website to generate a note using OpenAI. Then, a notification is sent in Slack.\n\n## ⚠️ Disclaimer\n**This workflow uses a scraping API. Before using it, ensure you comply with the regulations regarding web scraping in your country or state**.\n\n## Important Notes\n- The **OpenAI model used is GPT-4o**, chosen for its large input token capacity. However, it is not the cheapest model if cost is very important to you.\n\n- The system prompt in the OpenAI Node generates output with relevant information, but feel free to improve or **modify it according to your needs**.\n\n## **How It Works**\n\n### Node 1: `Pipedrive Trigger - An Organization is Created`\nThis is the trigger of the workflow. When **an organization object is created in Pipedrive**, this node is triggered and retrieves the data. **Make sure you have a \"website\" custom field in Pipedrive** (the name of the field in the n8n node will appear as a random ID and not with the Pipedrive custom field name).\n\n### Node 2: `ScrapingBee - Get Organization's Website's Homepage Content`\nThis node **scrapes the content** from the URL of the website associated with the **Pipedrive Organization** created in Node 1. The workflow uses the [ScrapingBee](https://www.scrapingbee.com/) API, but **you can use any preferred API or simply the HTTP request node in n8n**.\n\n### Node 3: `OpenAI - Message GPT-4o with Scraped Data`\nThis node sends HTML-scraped data from the previous node to the **OpenAI GPT-4o model**. The system prompt instructs the model to **extract company data**, such as products or services offered and competitors (if known by the model), and format it as HTML for optimal use in a Pipedrive Note.\n\n### Node 4: `Pipedrive - Create a Note with OpenAI Output`\nThis node **adds a Note to the Organization created in Pipedrive** using the OpenAI node output. The Note will include the company description, target market, selling products, and competitors (if GPT-4o was able to determine them).\n\n### Node 5 & 6: `HTML To Markdown` & `Code - Markdown to Slack Markdown`\nThese two nodes **format the HTML output to Slack Markdown**.\n\nThe Note created in Pipedrive is in HTML format, **as specified by the System Prompt of the OpenAI Node**. To send it to Slack, it needs to be converted to Markdown and then to Slack Markdown.\n\n### Node 7: `Slack - Notify`\nThis node **sends a message in Slack containing the Pipedrive Organization Note** created with this workflow.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Pipedrive Trigger - An Organization is created",
+      "type": "n8n-nodes-base.pipedriveTrigger",
+      "role": "pipedriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pipedrive - Create a Note with OpenAI output",
+      "type": "n8n-nodes-base.pipedrive",
+      "role": "pipedrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code - Markdown to Slack Markdown",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Scrapingbee - Get Organization's URL content",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTML To Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack - Notify ",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI - Message GPT-4o with Scraped Data",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.3"
+    }
+  ]
+}

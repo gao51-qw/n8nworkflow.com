@@ -1,0 +1,27 @@
+{
+  "id": 8445,
+  "slug": "8445",
+  "title": "Migrate Pinecone index to Weaviate class with Airtable pagination",
+  "description": "## Who’s it for  \nThis workflow is designed for developers, data engineers, and AI teams who need to migrate a Pinecone Cloud index into a Weaviate Cloud class index **without recalculating the vectors (embeddings)**.  \nIt’s especially useful if you are consolidating vector databases, moving from Pinecone to Weaviate for hybrid search, or preparing to deprecate Pinecone.  \n⚠️ Note: The dimensions of the two indexes must match.\n\n## How it works  \nThe workflow automates migration by batching, formatting, and transferring vectors along with their metadata:  \n\n1. **Initialization** – Uses Airtable to store the pagination token. The token starts with a record initialized as `INIT` (Name=`INIT`, Number=`0`).  \n2. **Pagination handling** – Reads batches of vector IDs from the Pinecone index using `/vectors/list`, resuming from the last stored token.  \n3. **Vector fetching** – For each batch, retrieves embeddings and metadata fields from Pinecone via `/vectors/fetch`.  \n4. **Data transformation** – Two **Code nodes** (`Prepare Fetch Body` and `Format2Weaviate`) are included to correctly structure the body of each HTTP request and map metadata into Weaviate-compatible objects.  \n5. **Data loading** – Inserts embeddings and metadata into the target Weaviate class through its REST API.  \n6. **State persistence** – Updates the pagination token in Airtable, ensuring the next run resumes from the correct point.  \n7. **Scheduling** – The workflow runs on a defined schedule (e.g., every 15 seconds) until all data has been migrated.\n\n## How to set up  \n1. **Airtable setup**  \n   - Create a Base (e.g., `Cycle`) and a Table (e.g., `NextPage`).  \n   - The table should have two columns:  \n     - `Name` (text) → stores the pagination token.  \n     - `Number` (number) → stores the row ID to update.  \n   - Initialize the first and only row with (`INIT`, `0`).  \n\n2. **Source and target configuration**  \n   - Make sure you have a Pinecone index and namespace with embeddings.  \n   - Manually create a target Weaviate Cluster and a target Weaviate Class with the same vector dimensions.  \n   - In the **Parameters** node of the workflow, configure the following values:  \n\n   | Parameter           | Description                                                                                  | Example Value |\n   |---------------------|----------------------------------------------------------------------------------------------|---------------|\n   | **pineconeIndex**   | The name of your Pinecone index to read vectors from.                                        | `my-index` |\n   | **pineconeNamespace** | The namespace inside the Pinecone index (leave empty if unused).                            | `default` |\n   | **batchlimit**      | Number of records fetched per iteration. Higher = faster migration but heavier API calls.    | `100` |\n   | **weaviateCluster** | REST endpoint of your Weaviate Cloud instance.                                               | `https://dbbqrc9itXXXXXXXXX.c0.europe-west3.gcp.weaviate.cloud` |\n   | **weaviateClass**   | Target class name in Weaviate where objects will be inserted.                                | `MyClass` |\n\n3. **Credentials**  \n   - Configure Pinecone API credentials.  \n   - Configure Weaviate Bearer token.  \n   - Configure Airtable API key.  \n\n4. **Activate**  \n   - Import the workflow into n8n, update the parameters, and start the schedule trigger.\n\n## Requirements  \n- Pinecone Cloud account with a configured index and namespace.  \n- Weaviate Cloud cluster with a class defined and matching vector dimensions.  \n- Airtable account and base to store pagination state.  \n- n8n instance with credentials for Pinecone, Weaviate, and Airtable.\n\n## How to customize the workflow  \n- Adjust the **batchlimit** parameter to control performance (higher values = fewer API calls, but heavier requests).  \n- Adapt the `Format2Weaviate` Code node if you want to change or expand the metadata stored.  \n- Replace Airtable with another persistence store (e.g., Google Sheets, PostgreSQL) if preferred.  \n- Extend the workflow to send migration progress updates via Slack, email, or another channel.  \n",
+  "featuredImage": "/data/workflows/8445/8445.webp",
+  "author": {
+    "id": 101,
+    "slug": "bruno-menegolli",
+    "name": "Br1",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 90,
+  "downloads": 9,
+  "createdAt": "2025-09-10T09:01:52.604Z",
+  "updatedAt": "2026-01-16T08:55:50.074Z",
+  "publishedAt": "2025-09-10T09:01:52.604Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8445"
+}

@@ -1,0 +1,338 @@
+{
+  "id": 10132,
+  "slug": "10132",
+  "title": "Nested PDF analysis with Mistral AI & OneDrive for document summarization",
+  "description": "# Description\nAutomate the discovery and analysis of PDF files across a deeply nested OneDrive folder structure. This workflow recursively searches folders, filters for new or updated PDFs, extracts text, and uses a Mistral AI agent to generate a concise Executive Summary, Key Findings, and Structured Metadata (Date, Location, etc.), storing all insights into a n8n Data Table for easy access and further automation.\n\n# Key Features & How It Works\n#### Scheduled Trigger & Recursive Folder Search:\n\n- The workflow runs automatically (scheduled for 8 PM in this template) to monitor a specified main folder on OneDrive.\n\n- It performs a deep, multi-level search (up to 8 layers) across subfolders to ensure no documents are missed.\n\n#### Smart Deduplication & Filtering:\n\n- It checks new files against an internal n8n Data Table using the Compare Datasets node, ensuring only new or unique PDF files are processed, saving AI credits and processing time.\n\n- A size check is also included, preventing attempts to process excessively large files.\n\n- AI-Powered Document Intelligence (Mistral LLM):\n\n#### For each new PDF, the workflow extracts the text and passes it to a Mistral AI model for dual-stream analysis:\n\n- Overview Agent: Generates an impartial, professional Executive Summary, a list of Key Findings & Data Points, and the document's Scope/Context.\n\n- Document Information Agent: Extracts crucial metadata, including the single most relevant date, location (City/State/Country), and professional information (Name, Title, Organization).\n\n#### Structured Output and Archiving:\n\n- AI outputs are meticulously validated and reformatted into a clean JSON object using Structured Output Parsers.\n\n- The complete analysis, along with the original file name and path, is then logged as a new row in an n8n Data Table.\n\n# Setup Notes\nOneDrive Folder: You must specify the exact name of your main folder in the 'Search for Main Folder' node.\n\nData Table: Ensure your n8n Data Table exists with the required columns: Summary, Key_Findings, Scope, Date, Location, File_Name, and Path.\n\nDeep Folder Structure: The current configuration supports up to 8 levels of subfolders. If your files go deeper, you may need to add more \"Get items in a folder\" and \"If\" nodes.\n\nAI Customization: Review the AI agent prompts and the structured output schemas to customize the fields you want to extract or the summary style you require.\n\n# Extend This Workflow\n#### The final output is organized data. You can easily extend this workflow to:\n\n- Send daily/weekly digest emails with new summaries.\n\n- Sync the extracted data to a Google Sheet, Airtable, or other database.\n\n- Add a secondary AI agent to perform follow-up actions based on the \"Key Findings.\"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+  "featuredImage": "/data/workflows/10132/10132.webp",
+  "author": {
+    "id": 101,
+    "slug": "jordanhoyle",
+    "name": "Jordan Hoyle",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 628,
+  "downloads": 62,
+  "createdAt": "2025-10-24T17:26:08.778Z",
+  "updatedAt": "2026-01-16T09:03:35.321Z",
+  "publishedAt": "2025-10-24T17:26:08.778Z",
+  "nodes": 50,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10132",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Nested PDF analysis with Mistral AI & OneDrive for document summarization",
+    "workflowName": "Nested PDF analysis with Mistral AI & OneDrive for document summarization",
+    "description": "# Description\nAutomate the discovery and analysis of PDF files across a deeply nested OneDrive folder structure. This workflow recursively searches folders, filters for new or updated PDFs, extracts text, and uses a Mistral AI agent to generate a concise Executive Summary, Key Findings, and Structured Metadata (Date, Location, etc.), storing all insights into a n8n Data Table for easy access and further automation.\n\n# Key Features & How It Works\n#### Scheduled Trigger & Recursive Folder Search:\n\n- The workflow runs automatically (scheduled for 8 PM in this template) to monitor a specified main folder on OneDrive.\n\n- It performs a deep, multi-level search (up to 8 layers) across subfolders to ensure no documents are missed.\n\n#### Smart Deduplication & Filtering:\n\n- It checks new files against an internal n8n Data Table using the Compare Datasets node, ensuring only new or unique PDF files are processed, saving AI credits and processing time.\n\n- A size check is also included, preventing attempts to process excessively large files.\n\n- AI-Powered Document Intelligence (Mistral LLM):\n\n#### For each new PDF, the workflow extracts the text and passes it to a Mistral AI model for dual-stream analysis:\n\n- Overview Agent: Generates an impartial, professional Executive Summary, a list of Key Findings & Data Points, and the document's Scope/Context.\n\n- Document Information Agent: Extracts crucial metadata, including the single most relevant date, location (City/State/Country), and professional information (Name, Title, Organization).\n\n#### Structured Output and Archiving:\n\n- AI outputs are meticulously validated and reformatted into a clean JSON object using Structured Output Parsers.\n\n- The complete analysis, along with the original file name and path, is then logged as a new row in an n8n Data Table.\n\n# Setup Notes\nOneDrive Folder: You must specify the exact name of your main folder in the 'Search for Main Folder' node.\n\nData Table: Ensure your n8n Data Table exists with the required columns: Summary, Key_Findings, Scope, Date, Location, File_Name, and Path.\n\nDeep Folder Structure: The current configuration supports up to 8 levels of subfolders. If your files go deeper, you may need to add more \"Get items in a folder\" and \"If\" nodes.\n\nAI Customization: Review the AI agent prompts and the structured output schemas to customize the fields you want to extract or the summary style you require.\n\n# Extend This Workflow\n#### The final output is organized data. You can easily extend this workflow to:\n\n- Send daily/weekly digest emails with new summaries.\n\n- Sync the extracted data to a Google Sheet, Airtable, or other database.\n\n- Add a secondary AI agent to perform follow-up actions based on the \"Key Findings.\"",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get items in a folder1",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder2",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder3",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder4",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder5",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder6",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get items in a folder7",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "2nd Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "role": "lmChatMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Insert row",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get row(s)",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search for Main Folder",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder9",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If PDF 1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 4",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 5",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 6",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 7",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If PDF 8",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If Size",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set File ID 3",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set File ID 2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set File ID 1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Compare Datasets",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Loop Over Items 3",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Loop Over Items 2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Overview",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Overview LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Document Information",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Document LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "id": 11697,
+  "slug": "11697",
+  "title": "AI-powered bug triage system with OpenAI, Jira and Slack alerts",
+  "description": "# Webhook → OpenAI → Jira “Bug Suspicion” → Slack QA Escalation\n\nThis workflow ingests bug reports via a webhook, uses OpenAI to triage and tag them, creates a Jira Bug in project `APP` with AI-driven labels and alerts QA in Slack. Import the JSON, add OpenAI + Jira + Slack credentials, set the webhook path, choose your Slack channels and activate.\n\n### Quick Start – Implement in 60 Seconds\n1. Import the JSON into n8n.\n2. Add credentials to **AI Bug Analysis** (OpenAI), **Create Jira** nodes and both **Slack Alert** nodes.\n3. Set webhook path `advanced-bug-triage`; test with a POST body containing `priority`, `summary` and `category`.\n4. Adjust Slack channels `qa-alerts-high` and `qa-general` if needed.\n5. Activate and verify a test POST flows through Jira and Slack.\n\nThat’s it. Jira issue gets created and Slack gets notified instantly.\n\n## What It Does\n\nThe workflow acts as an AI-assisted bug triage bridge. A webhook receives incoming bug suspicions, which are then analyzed by OpenAI to determine priority and category. Based on the AI output, the flow routes to the appropriate Jira creation path and applies standardized labels for consistent reporting.\n\nAfter creating the Jira Bug in project `APP`, the workflow escalates to Slack: high-priority items go to `qa-alerts-high`, while normal items go to `qa-general`. The result is a fast, low-friction path from external bug signals to actionable Jira issues with immediate QA visibility.\n\n## Who’s It For\n\n- QA teams wanting automated Jira escalation.\n- Developers integrating external systems with Jira.\n- Product teams capturing automated “bug suspicion” signals.\n- Monitoring or Sentry-like pipelines.\n- Companies wanting lightweight reporting without building custom infrastructure.\n\n\n## Pre-Requisites\n- n8n (cloud or self-hosted).\n- Jira account with permission to create Bug issues.\n- Jira project key: APP (or customize).\n- OpenAI credentials (for **AI Bug Analysis**) \n- Slack Workspace + Bot token.\n- Ability to send POST request to n8n Webhook endpoint.\n\n\n## How It Works & Setup Instructions\n\n- **Webhook Trigger** (`advanced-bug-triage`): Accepts POST payloads (e.g., summary, description, priority, category).\n- **AI Bug Analysis** (OpenAI): Analyzes the payload for sentiment/priority/category (configure your prompt/fields as needed).\n- **Priority Switch**: Routes items to the correct Jira creation path (High/Medium/Low).\n- **Create Jira (High/Medium/Low)**: Creates Bug issues in project `APP`, labeling with `ai-triaged` and the AI-detected category.\n- **Slack Alert (High / Normal)**: Notifies QA with the Jira key; high priority goes to `qa-alerts-high`, others to `qa-general`.  \n\n### Step 1: Configure Webhook Node\n- Method: POST  \n- Path: `bug-suspicion`  \n- Endpoint example:  \n  ```\n  https://YOUR-N8N-URL/webhook/bug-suspicion\n  ```\n\n### Step 2: Add OpenAI Credentials\n- Open **OpenAI** node  \n- Select credentials\n- Modify the prompts as needed\n\n\n### Step 3: Add Jira Credentials\n- Open **Create Jira Bug** node  \n- Select credentials  \n- Ensure access to project `APP`  \n- Ensure permission to create `Bug` issue type  \n\n### Step 4: Add Slack Credentials\n- Open **Slack QA Escalation** node  \n- Choose Slack Bot credentials  \n- Set QA channel  \n- Slack message uses:  \n  ```\n  Issue is created in jira for this key &lt;ISSUE-KEY&gt;\n  ```\n\n### Step 5: Test Webhook\n```json\n{\n  \"title\": \"Login button unresponsive\"\n}\n```\n\n### Step 6: Activate Workflow\nEnable **Active** toggle.\n\n\n## How to Customize Nodes\n\n### Webhook Trigger\n- Add API keys, tokens or Basic Auth  \n- Add JSON validation  \n\n### Jira Node\nYou may add:\n```json\n\"additionalFields\": {\n  \"labels\": \"bug-suspicion,auto-detected\",\n  \"description\": \"={{$json[\"details\"]}}\"\n}\n```\n\n### Slack Node\nCustomize formatting, attachments, mentions or channels.\n\n### AI Node for Bug Analysis\n\nTune the prompt, map input fields or adjust model parameters for stricter/looser triage.  \n\n### Priority Switch\nModify routing thresholds, add more branches or change default fallback.  \n\n\n## Add-ons (Optional Enhancements)\n\n- Email alerts.\n- Severity scoring using AI.\n- Push bug data to Notion or Google Sheets.\n- Add screenshots/logs.\n- Multi-channel notifications.\n- Auto-assign Jira issues based on category or component.  \n- Add a fallback email notification for high-priority tickets.  \n- Push payloads to a data store (e.g., Sheets/DB) for analytics.  \n- Add a secondary Slack DM to on-call for P1.  \n- Enrich tickets with logs/links/screenshots from the payload.  \n\n\n## Use Case Examples\n1. Automated QA test failures → Jira + Slack.\n2. Monitoring system detects abnormal activity.\n3. Browser extension for internal bug reporting.\n4. CI/CD pipeline error → instant QA alert.\n5. External scripts or tools triggering bug reports.\n6. Monitoring alerts auto-create Jira bugs with AI-prioritized severity and Slack escalation.\n7. Customer support form pushes suspected bugs directly into Jira with category labels.\n8. QA automation failures stream into Jira with priority-based Slack alerts.\n9. SRE on-call receives P1 Slack alerts while lower priorities route to the general QA channel.\n10. Product beta feedback is categorized by AI and logged as Jira bugs for triage.\n\n\n## Troubleshooting Guide\n\n| Issue | Cause | Solution |\n|-------|--------|-----------|\n| Webhook not receiving data | Wrong URL/method | Use POST + correct path |\n| Jira issue not created | Wrong credentials/project | Verify Jira credentials + APP project |\n| Slack message not sent | Bot not allowed in channel | Invite bot to channel |\n| Jira fields empty | Missing JSON field | Ensure payload includes `\"title\"` |\n| Slack shows undefined | Jira response changed | Add Debug node to inspect output |\n| Workflow not running | Not activated | Turn ON \"Active\" |\n\n\n## Need Help?\n\nIf you want help customizing this workflow or building similar [n8n workflow automations](https://www.weblineindia.com/n8n-automation/), the WeblineIndia team can assist with:  \n\n- Jira integrations  \n- Slack automation  \n- API-based bug pipelines  \n- DevOps automation  \n- AI-driven severity scoring  \n- And so much more.\n\nReach out anytime for implementation or enhancements.",
+  "featuredImage": "/data/workflows/11697/11697.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 25,
+  "downloads": 2,
+  "createdAt": "2025-12-11T11:25:11.712Z",
+  "updatedAt": "2026-01-16T09:09:46.081Z",
+  "publishedAt": "2025-12-11T11:25:11.712Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11697",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered bug triage system with OpenAI, Jira and Slack alerts",
+    "workflowName": "AI-powered bug triage system with OpenAI, Jira and Slack alerts",
+    "description": "# Webhook → OpenAI → Jira “Bug Suspicion” → Slack QA Escalation\n\nThis workflow ingests bug reports via a webhook, uses OpenAI to triage and tag them, creates a Jira Bug in project `APP` with AI-driven labels and alerts QA in Slack. Import the JSON, add OpenAI + Jira + Slack credentials, set the webhook path, choose your Slack channels and activate.\n\n### Quick Start – Implement in 60 Seconds\n1. Import the JSON into n8n.\n2. Add credentials to **AI Bug Analysis** (OpenAI), **Create Jira** nodes and both **Slack Alert** nodes.\n3. Set webhook path `advanced-bug-triage`; test with a POST body containing `priority`, `summary` and `category`.\n4. Adjust Slack channels `qa-alerts-high` and `qa-general` if needed.\n5. Activate and verify a test POST flows through Jira and Slack.\n\nThat’s it. Jira issue gets created and Slack gets notified instantly.\n\n## What It Does\n\nThe workflow acts as an AI-assisted bug triage bridge. A webhook receives incoming bug suspicions, which are then analyzed by OpenAI to determine priority and category. Based on the AI output, the flow routes to the appropriate Jira creation path and applies standardized labels for consistent reporting.\n\nAfter creating the Jira Bug in project `APP`, the workflow escalates to Slack: high-priority items go to `qa-alerts-high`, while normal items go to `qa-general`. The result is a fast, low-friction path from external bug signals to actionable Jira issues with immediate QA visibility.\n\n## Who’s It For\n\n- QA teams wanting automated Jira escalation.\n- Developers integrating external systems with Jira.\n- Product teams capturing automated “bug suspicion” signals.\n- Monitoring or Sentry-like pipelines.\n- Companies wanting lightweight reporting without building custom infrastructure.\n\n\n## Pre-Requisites\n- n8n (cloud or self-hosted).\n- Jira account with permission to create Bug issues.\n- Jira project key: APP (or customize).\n- OpenAI credentials (for **AI Bug Analysis**) \n- Slack Workspace + Bot token.\n- Ability to send POST request to n8n Webhook endpoint.\n\n\n## How It Works & Setup Instructions\n\n- **Webhook Trigger** (`advanced-bug-triage`): Accepts POST payloads (e.g., summary, description, priority, category).\n- **AI Bug Analysis** (OpenAI): Analyzes the payload for sentiment/priority/category (configure your prompt/fields as needed).\n- **Priority Switch**: Routes items to the correct Jira creation path (High/Medium/Low).\n- **Create Jira (High/Medium/Low)**: Creates Bug issues in project `APP`, labeling with `ai-triaged` and the AI-detected category.\n- **Slack Alert (High / Normal)**: Notifies QA with the Jira key; high priority goes to `qa-alerts-high`, others to `qa-general`.  \n\n### Step 1: Configure Webhook Node\n- Method: POST  \n- Path: `bug-suspicion`  \n- Endpoint example:  \n  ```\n  https://YOUR-N8N-URL/webhook/bug-suspicion\n  ```\n\n### Step 2: Add OpenAI Credentials\n- Open **OpenAI** node  \n- Select credentials\n- Modify the prompts as needed\n\n\n### Step 3: Add Jira Credentials\n- Open **Create Jira Bug** node  \n- Select credentials  \n- Ensure access to project `APP`  \n- Ensure permission to create `Bug` issue type  \n\n### Step 4: Add Slack Credentials\n- Open **Slack QA Escalation** node  \n- Choose Slack Bot credentials  \n- Set QA channel  \n- Slack message uses:  \n  ```\n  Issue is created in jira for this key &lt;ISSUE-KEY&gt;\n  ```\n\n### Step 5: Test Webhook\n```json\n{\n  \"title\": \"Login button unresponsive\"\n}\n```\n\n### Step 6: Activate Workflow\nEnable **Active** toggle.\n\n\n## How to Customize Nodes\n\n### Webhook Trigger\n- Add API keys, tokens or Basic Auth  \n- Add JSON validation  \n\n### Jira Node\nYou may add:\n```json\n\"additionalFields\": {\n  \"labels\": \"bug-suspicion,auto-detected\",\n  \"description\": \"={{$json[\"details\"]}}\"\n}\n```\n\n### Slack Node\nCustomize formatting, attachments, mentions or channels.\n\n### AI Node for Bug Analysis\n\nTune the prompt, map input fields or adjust model parameters for stricter/looser triage.  \n\n### Priority Switch\nModify routing thresholds, add more branches or change default fallback.  \n\n\n## Add-ons (Optional Enhancements)\n\n- Email alerts.\n- Severity scoring using AI.\n- Push bug data to Notion or Google Sheets.\n- Add screenshots/logs.\n- Multi-channel notifications.\n- Auto-assign Jira issues based on category or component.  \n- Add a fallback email notification for high-priority tickets.  \n- Push payloads to a data store (e.g., Sheets/DB) for analytics.  \n- Add a secondary Slack DM to on-call for P1.  \n- Enrich tickets with logs/links/screenshots from the payload.  \n\n\n## Use Case Examples\n1. Automated QA test failures → Jira + Slack.\n2. Monitoring system detects abnormal activity.\n3. Browser extension for internal bug reporting.\n4. CI/CD pipeline error → instant QA alert.\n5. External scripts or tools triggering bug reports.\n6. Monitoring alerts auto-create Jira bugs with AI-prioritized severity and Slack escalation.\n7. Customer support form pushes suspected bugs directly into Jira with category labels.\n8. QA automation failures stream into Jira with priority-based Slack alerts.\n9. SRE on-call receives P1 Slack alerts while lower priorities route to the general QA channel.\n10. Product beta feedback is categorized by AI and logged as Jira bugs for triage.\n\n\n## Troubleshooting Guide\n\n| Issue | Cause | Solution |\n|-------|--------|-----------|\n| Webhook not receiving data | Wrong URL/method | Use POST + correct path |\n| Jira issue not created | Wrong credentials/project | Verify Jira credentials + APP project |\n| Slack message not sent | Bot not allowed in channel | Invite bot to channel |\n| Jira fields empty | Missing JSON field | Ensure payload includes `\"title\"` |\n| Slack shows undefined | Jira response changed | Add Debug node to inspect output |\n| Workflow not running | Not activated | Turn ON \"Active\" |\n\n\n## Need Help?\n\nIf you want help customizing this workflow or building similar [n8n workflow automations](https://www.weblineindia.com/n8n-automation/), the WeblineIndia team can assist with:  \n\n- Jira integrations  \n- Slack automation  \n- API-based bug pipelines  \n- DevOps automation  \n- AI-driven severity scoring  \n- And so much more.\n\nReach out anytime for implementation or enhancements.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Section - Issue Creation",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section - Notification",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Bug Analysis",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Priority Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create High Jira",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Medium Jira",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Low Jira",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Alert (High)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Alert (Normal)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note AI",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Main Overview1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

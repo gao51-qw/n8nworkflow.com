@@ -1,0 +1,27 @@
+{
+  "id": 8179,
+  "slug": "8179",
+  "title": "Generate multilingual Shopify product descriptions with Gemini 2.5 Vision AI",
+  "description": "# Shopify Multilingual Product Copy with n8n & Gemini 2.5 Flash-Lite  \nUse for free\n\n**Created by** &lt;Weiser22&gt; · **Last update** 2025-09-02  \n**Categories:** E-commerce, Product Content, Translation, Computer Vision\n\n## Description\nGenerate language-specific Shopify product copy (ES, DE, EN, FR, IT, PT) from each product’s main image and metadata. The workflow performs a vision analysis to extract objective, verifiable details, then produces product names, descriptions, and handles per language, and stores the results in Google Sheets for review or publishing.\n\n## Good to know\n- **Model:** `models/gemini-2.5-flash-lite` (supports image input). Confirm pricing/limits in your account before scaling.  \n- **Image requirement:** products should have `images[0].src`; add a fallback if some products lack a primary image.  \n- **Sheets mapping:** the sheet node uses Auto-map; ensure your matching column aligns with the field you emit (`id` vs `product_id`).  \n- **Strict output:** the Agent enforces a multilingual JSON contract (`es,de,en,fr,it,pt`), each with `shopify_product_name`, `shopify_description`, `handle`.\n\n## How it works\n- **Manual Trigger:** start a test run on demand.  \n- **Get many products (Shopify):** fetch products and their images.  \n- **Analyze image (Gemini Vision):** send `images[0].src` with an objective, 3–5 sentence prompt.  \n- **AI Agent (Gemini Chat):** merge Shopify fields + vision text under anti-hallucination rules and a strict JSON schema.  \n- **Structured Output Parser:** validates the exact JSON shape.  \n- **Expand Languages & Sanitize (Code):** split into 6 items and normalize handles/HTML content as needed.  \n- **Append row in sheet (Google Sheets):** add one row per language to your spreadsheet.\n\n## Requirements\n- Shopify Access Token with product read permissions.  \n- Google AI Studio (Gemini) API key for Vision + Chat Model nodes.  \n- Google Sheets credentials (OAuth or Service Account) with access to the target spreadsheet.\n\n## How to use\n1. **Connect credentials:** Shopify, Gemini (same key for Vision and Chat), and Google Sheets.  \n2. **Configure nodes:**  \n   - **Get many products:** adjust `limit`/filters.  \n   - **Analyze image:** verify `={{ $json.images[0].src }}` resolves to a public image URL.  \n   - **AI Agent & Parser:** keep the strict JSON contract as provided.  \n   - **Code (Expand & Sanitize):** emits `product_id`, `lang`, `handle`, `shopify_product_name`, `shopify_description`, `base_handle_es`.  \n   - **Google Sheets (Append):** set `documentId` and tab name; confirm the matching column.  \n3. **Run a test:** execute the workflow and confirm six rows per product (one per language) appear in the sheet.\n\n## Data contract (Agent output)\n```json\n{\n  \"es\": {\"shopify_product_name\": \"\", \"shopify_description\": \"\", \"handle\": \"\"},\n  \"de\": {\"shopify_product_name\": \"\", \"shopify_description\": \"\", \"handle\": \"\"},\n  \"en\": {\"shopify_product_name\": \"\", \"shopify_description\": \"\", \"handle\": \"\"},\n  \"fr\": {\"shopify_product_name\": \"\", \"shopify_description\": \"\", \"handle\": \"\"},\n  \"it\": {\"shopify_product_name\": \"\", \"shopify_description\": \"\", \"handle\": \"\"},\n  \"pt\": {\"shopify_product_name\": \"\", \"shopify_description\": \"\", \"handle\": \"\"}\n}\n```\n\n## Customising this workflow\n- **Publish to Shopify:** after review in Sheets, add a `product.update` step to write finalized copy/handles.  \n- **Handle policy:** tweak slug rules (diacritics, separators, max length) in the Code node to match store conventions.  \n- **No-image fallback:** add an IF/Switch to skip vision when `images[0].src` is missing and generate copy from title + body only.  \n- **Tone/length:** adjust temperature and token limits on the Chat Model for brand-fit.\n\n## Troubleshooting\n- **No rows in Sheets:** confirm spreadsheet ID, tab name, Auto-map status, and that the matching column matches your emitted field.  \n- **Vision errors:** ensure `images[0].src` is reachable.  \n- **Parser failures:** the Agent must return **bare JSON** with the six root keys and three fields per language—no extra text.\n",
+  "featuredImage": "/data/workflows/8179/8179.webp",
+  "author": {
+    "id": 101,
+    "slug": "weiser22",
+    "name": "Weiser22",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 870,
+  "downloads": 87,
+  "createdAt": "2025-09-02T14:29:01.253Z",
+  "updatedAt": "2026-01-16T08:54:31.606Z",
+  "publishedAt": "2025-09-02T14:29:01.253Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8179"
+}

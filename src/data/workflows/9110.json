@@ -1,0 +1,157 @@
+{
+  "id": 9110,
+  "slug": "9110",
+  "title": "Automate paid Zoom meetings with Stripe, Gmail & Google Sheets tracking",
+  "description": "### **Streamline Your Zoom Meetings with Secure, Automated Stripe Payments**\n\nThis comprehensive workflow automates the entire process of setting up a paid online event, from scheduling a Zoom meeting and creating a Stripe payment link to tracking participants and sending confirmation emails.\n\n#### **How it Works**\n\nThis workflow has two primary, distinct branches: Event Creation and Participant Registration.\n\n**Event Creation Flow (Triggered via Form):**\n- An administrator submits details (title, price, date/time) via a form.\n- The workflow creates a new Zoom meeting with a unique password.\n- It creates a Stripe Product and a Payment Link.\n- A dedicated Google Sheet tab is created for tracking participants.\n- An email is sent to the event organizer with all the details, including the Zoom link, payment link, and participant list URL.\n\n**Participant Registration Flow (Triggered via Stripe Webhook):**\n- A webhook is triggered when a Stripe payment is completed (checkout.session.completed).\n- The participant's details are added to the dedicated Google Sheet tab.\n- A confirmation email is sent to the participant with the Zoom link and password.\n- A notification email is sent to the event organizer about the new registration.\n\n#### **Use Cases**\n\n- **Webinar Sales**: Automate setup and registration for paid webinars.\n\n- **Consulting/Coaching Sessions**: Streamline the booking and payment process for group coaching calls.\n\n- **Online Classes**: Handle registration, payment, and access distribution for online courses or classes.\n\n#### **Setup Instructions**\n\n1. **Credentials**: Add credentials for:\n   - **Zoom**: For creating the meeting.\n   - **Google**: You need both Gmail and Google Sheets credentials.\n   - **Stripe**: For creating products and handling payment webhooks.\n\n2. **Google Sheet**: Create a new, blank Google Sheet to hold meeting and participant information.\n\n3. **Config Node**: Fill the Config node with:\n   - currency (e.g., EUR).\n   - sheet_url (the URL of the Google Sheet you created).\n   - teacher_email (the organizer/host's email).\n\n#### **Workflow Logic**\n\nThe workflow splits into two logical parts handled by an if node:\n\n**Part A: Event Creation (Triggered by Creation Form)**\n\n1. **Trigger**: Creation Form (Form Trigger).\n\n2. **Check**: if is creation flow (If) evaluates to true.\n\n3. **Zoom**: Create Zoom meeting creates the session.\n\n4. **Stripe Product**: Create Stripe Product creates a product and price in Stripe.\n\n5. **Stripe Link**: Create payment link generates the public payment link, embedding Zoom and sheet metadata.\n\n6. **Google Sheet**: Create participant list creates a new sheet tab for the event.\n\n7. **Email Host**: Send email to teacher notifies the host of the successful setup.\n\n**Part B: Participant Registration (Triggered by On payment)**\n\n1. **Trigger**: On payment (Stripe Trigger - checkout.session.completed).\n\n2. **Format**: Format participant extracts customer details.\n\n3. **Google Sheet**: Add participant to list appends the new participant's info to the event's sheet.\n\n4. **Email Participant**: Send confirmation to participant sends the Zoom access details.\n\n5. **Email Host**: Notify teacher sends a registration alert.\n\n#### **Node Descriptions**\n\n| Node Name | Description |\n|-----------|-------------|\n| **Creation Form** | A form trigger used to input the event's required details (title, price, start date/time). |\n| **On payment** | A Stripe trigger that listens for the checkout.session.completed event, indicating a successful payment. |\n| **Create Zoom meeting** | Creates a new Zoom meeting, calculating the start time based on the form inputs. |\n| **Create Stripe Product** | Posts to the Stripe API to create a new product and price based on the form data. |\n| **Create payment link** | Creates a Stripe Payment Link, embedding Zoom meeting and Google Sheet ID metadata. |\n| **Create participant list** | Creates a new tab (named dynamically) in the configured Google Sheet for event tracking. |\n| **Add participant to list** | Appends a new row to the event's Google Sheet tab upon payment completion. |\n| **Send email to teacher / Notify teacher** | Sends emails to the host/organizer for creation confirmation and new participant registration, respectively. |\n| **Send confirmation to participant** | Sends the welcome email to the paying customer with the Zoom access details retrieved from the Stripe metadata. |\n\n#### **Customization Tips**\n\n- **Email Content**: You are encouraged to adapt the email contents in the Gmail nodes to fit your branding and tone.\n\n- **Currency**: Change the currency in the Config node.\n\n- **Zoom Password**: The password is set to a random 4-character string; you can modify the logic in the Create Zoom meeting node.\n\n- **Stripe Price**: The price is sent to Stripe in the smallest currency unit (e.g., cents, * 100).\n\n#### **Suggested Sticky Notes for Workflow**\n\n- **Setup**: \"Add Your credentials [Zoom, Google, Stripe]. Note: For Google, you need to add Gmail and Google Sheet. Create a new Google Sheet. Keep this sheet blank for now. And fill the config node.\"\n\n- **Creation Form**: \"Your journey to easy event management starts here. Click this node, copy the production URL, and keep it handy. It's your personal admin tool for quickly creating new meetings.\"\n\n- **Customize**: \"Feel free to adapt email contents to your needs.\"\n\n- **Config**: \"Setup your flow\".\n\n#### **Required Files**\n\n- 2DT5BW5tOdy87AUl_Streamline_Your_Zoom_Meetings_with_Secure,_Automated_Stripe_Payments.json: The n8n workflow export file.\n\n- A new, blank Google Sheet (URL configured in the Config node).\n\n#### **Testing Tips**\n\n- **Test Creation**: Run the Creation Form to trigger the Part A flow. Verify that a Zoom meeting and Stripe Payment Link are created, a new Google Sheet tab appears, and the host receives the setup email.\n\n- **Test Registration**: Simulate a successful payment to the generated Stripe link to trigger the Part B flow. Verify that the participant is added to the Google Sheet, receives the confirmation email with Zoom details, and the host receives the notification.\n\n#### **Suggested Tags & Categories**\n\n- #Stripe\n\n- #Zoom\n\n- #Payment\n\n- #E-commerce\n\n- #GoogleSheets\n\n- #Gmail\n\n- #Automation\n\n- #Webinar",
+  "featuredImage": "/data/workflows/9110/9110.webp",
+  "author": {
+    "id": 101,
+    "slug": "amitswba",
+    "name": "Amit Mehta",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 127,
+  "downloads": 12,
+  "createdAt": "2025-09-30T12:43:11.439Z",
+  "updatedAt": "2026-01-16T08:59:02.376Z",
+  "publishedAt": "2025-09-30T12:43:11.439Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9110",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate paid Zoom meetings with Stripe, Gmail & Google Sheets tracking",
+    "workflowName": "Automate paid Zoom meetings with Stripe, Gmail & Google Sheets tracking",
+    "description": "### **Streamline Your Zoom Meetings with Secure, Automated Stripe Payments**\n\nThis comprehensive workflow automates the entire process of setting up a paid online event, from scheduling a Zoom meeting and creating a Stripe payment link to tracking participants and sending confirmation emails.\n\n#### **How it Works**\n\nThis workflow has two primary, distinct branches: Event Creation and Participant Registration.\n\n**Event Creation Flow (Triggered via Form):**\n- An administrator submits details (title, price, date/time) via a form.\n- The workflow creates a new Zoom meeting with a unique password.\n- It creates a Stripe Product and a Payment Link.\n- A dedicated Google Sheet tab is created for tracking participants.\n- An email is sent to the event organizer with all the details, including the Zoom link, payment link, and participant list URL.\n\n**Participant Registration Flow (Triggered via Stripe Webhook):**\n- A webhook is triggered when a Stripe payment is completed (checkout.session.completed).\n- The participant's details are added to the dedicated Google Sheet tab.\n- A confirmation email is sent to the participant with the Zoom link and password.\n- A notification email is sent to the event organizer about the new registration.\n\n#### **Use Cases**\n\n- **Webinar Sales**: Automate setup and registration for paid webinars.\n\n- **Consulting/Coaching Sessions**: Streamline the booking and payment process for group coaching calls.\n\n- **Online Classes**: Handle registration, payment, and access distribution for online courses or classes.\n\n#### **Setup Instructions**\n\n1. **Credentials**: Add credentials for:\n   - **Zoom**: For creating the meeting.\n   - **Google**: You need both Gmail and Google Sheets credentials.\n   - **Stripe**: For creating products and handling payment webhooks.\n\n2. **Google Sheet**: Create a new, blank Google Sheet to hold meeting and participant information.\n\n3. **Config Node**: Fill the Config node with:\n   - currency (e.g., EUR).\n   - sheet_url (the URL of the Google Sheet you created).\n   - teacher_email (the organizer/host's email).\n\n#### **Workflow Logic**\n\nThe workflow splits into two logical parts handled by an if node:\n\n**Part A: Event Creation (Triggered by Creation Form)**\n\n1. **Trigger**: Creation Form (Form Trigger).\n\n2. **Check**: if is creation flow (If) evaluates to true.\n\n3. **Zoom**: Create Zoom meeting creates the session.\n\n4. **Stripe Product**: Create Stripe Product creates a product and price in Stripe.\n\n5. **Stripe Link**: Create payment link generates the public payment link, embedding Zoom and sheet metadata.\n\n6. **Google Sheet**: Create participant list creates a new sheet tab for the event.\n\n7. **Email Host**: Send email to teacher notifies the host of the successful setup.\n\n**Part B: Participant Registration (Triggered by On payment)**\n\n1. **Trigger**: On payment (Stripe Trigger - checkout.session.completed).\n\n2. **Format**: Format participant extracts customer details.\n\n3. **Google Sheet**: Add participant to list appends the new participant's info to the event's sheet.\n\n4. **Email Participant**: Send confirmation to participant sends the Zoom access details.\n\n5. **Email Host**: Notify teacher sends a registration alert.\n\n#### **Node Descriptions**\n\n| Node Name | Description |\n|-----------|-------------|\n| **Creation Form** | A form trigger used to input the event's required details (title, price, start date/time). |\n| **On payment** | A Stripe trigger that listens for the checkout.session.completed event, indicating a successful payment. |\n| **Create Zoom meeting** | Creates a new Zoom meeting, calculating the start time based on the form inputs. |\n| **Create Stripe Product** | Posts to the Stripe API to create a new product and price based on the form data. |\n| **Create payment link** | Creates a Stripe Payment Link, embedding Zoom meeting and Google Sheet ID metadata. |\n| **Create participant list** | Creates a new tab (named dynamically) in the configured Google Sheet for event tracking. |\n| **Add participant to list** | Appends a new row to the event's Google Sheet tab upon payment completion. |\n| **Send email to teacher / Notify teacher** | Sends emails to the host/organizer for creation confirmation and new participant registration, respectively. |\n| **Send confirmation to participant** | Sends the welcome email to the paying customer with the Zoom access details retrieved from the Stripe metadata. |\n\n#### **Customization Tips**\n\n- **Email Content**: You are encouraged to adapt the email contents in the Gmail nodes to fit your branding and tone.\n\n- **Currency**: Change the currency in the Config node.\n\n- **Zoom Password**: The password is set to a random 4-character string; you can modify the logic in the Create Zoom meeting node.\n\n- **Stripe Price**: The price is sent to Stripe in the smallest currency unit (e.g., cents, * 100).\n\n#### **Suggested Sticky Notes for Workflow**\n\n- **Setup**: \"Add Your credentials [Zoom, Google, Stripe]. Note: For Google, you need to add Gmail and Google Sheet. Create a new Google Sheet. Keep this sheet blank for now. And fill the config node.\"\n\n- **Creation Form**: \"Your journey to easy event management starts here. Click this node, copy the production URL, and keep it handy. It's your personal admin tool for quickly creating new meetings.\"\n\n- **Customize**: \"Feel free to adapt email contents to your needs.\"\n\n- **Config**: \"Setup your flow\".\n\n#### **Required Files**\n\n- 2DT5BW5tOdy87AUl_Streamline_Your_Zoom_Meetings_with_Secure,_Automated_Stripe_Payments.json: The n8n workflow export file.\n\n- A new, blank Google Sheet (URL configured in the Config node).\n\n#### **Testing Tips**\n\n- **Test Creation**: Run the Creation Form to trigger the Part A flow. Verify that a Zoom meeting and Stripe Payment Link are created, a new Google Sheet tab appears, and the host receives the setup email.\n\n- **Test Registration**: Simulate a successful payment to the generated Stripe link to trigger the Part B flow. Verify that the participant is added to the Google Sheet, receives the confirmation email with Zoom details, and the host receives the notification.\n\n#### **Suggested Tags & Categories**\n\n- #Stripe\n\n- #Zoom\n\n- #Payment\n\n- #E-commerce\n\n- #GoogleSheets\n\n- #Gmail\n\n- #Automation\n\n- #Webinar",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Create Zoom meeting",
+      "type": "n8n-nodes-base.zoom",
+      "role": "zoom",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Stripe Product",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Send email to teacher",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create participant list",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Add participant to list",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Send confirmation to participant",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Notify teacher",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create payment link",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Format participant",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Format event",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Store event",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Creation Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "On payment",
+      "type": "n8n-nodes-base.stripeTrigger",
+      "role": "stripeTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "if is creation flow",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "the end",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    }
+  ]
+}

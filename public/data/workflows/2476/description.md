@@ -1,0 +1,27 @@
+## Use Case
+Transform web pages into AI-friendly markdown format:
+- You need to process webpage content for LLM analysis
+- You want to extract both content and links from web pages
+- You need clean, formatted text without HTML markup
+- You want to respect API rate limits while crawling pages
+
+## What this Workflow Does
+The workflow uses Firecrawl.dev API to process webpages:
+- Converts HTML content to markdown format
+- Extracts all links from each webpage
+- Handles API rate limiting automatically
+- Processes URLs in batches from your database
+
+## Setup
+1. Create a [Firecrawl.dev](https://www.firecrawl.dev/) account and get your API key
+2. Add your Firecrawl API key to the HTTP Request node's Authorization header
+3. Connect your URL database to the input node (column name must be "Page") or edit the array in `Example fields from data source`
+4. Configure your preferred output database connection
+
+## How to Adjust it to Your Needs
+- Modify input source to pull URLs from different databases
+- Adjust rate limiting parameters if needed
+- Customize output format for your specific use case
+
+
+More templates and n8n workflows &gt;&gt;&gt; [@simonscrapes](https://www.youtube.com/@simonscrapes?sub_confirmation=1)

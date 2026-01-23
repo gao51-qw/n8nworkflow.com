@@ -1,0 +1,170 @@
+{
+  "id": 8024,
+  "slug": "8024",
+  "title": "Summarize RSS news with Gemini AI and store in Google Sheets",
+  "description": "This workflow pulls articles from multiple RSS feeds, filters them by date, fetches the full webpage content, and summarizes each article into a clean, structured Markdown format using **Google Gemini (via LangChain)**. Summaries are automatically saved into Google Sheets for long-term storage and into a daily sheet for fresh news.\n\n👉 Example Google Sheet (pre-configured for this workflow):\n[News Summaries Sheet](https://docs.google.com/spreadsheets/d/1SGYctcCWYHDxpuzv5o2Hp1uveRuOrnpRJ1DmaSUii7g/edit?gid=1944615086#gid=1944615086)\n\n### Key Features\n\n* **RSS Feeds from Google Sheets** – Flexible feed management.\n* **Date Filtering** – Only process articles from the last X days.\n* **Duplicate Checking** – Avoids re-processing links already stored.\n* **Full Article Parsing** – Extracts clean body content, ignoring ads and images.\n* **AI Summarization** – Uses a Gemini LLM to create concise, structured summaries with takeaways and insights.\n* **Multi-Sheet Output** – Saves summaries to both a permanent “Articles” sheet and a “Today” sheet for daily highlights.\n* **Scheduled or Manual Run** – Can run daily at a set time or on demand.\n\n### Requirements\n\n* Google Sheets account (for storing feeds, articles, and daily news).\n* Google Gemini (PaLM) API credentials.\n\n### Possible Use Cases\n\n* Personal daily news digest.\n* Team knowledge hub for curated, AI-summarized articles.\n* Automated research assistant for niche topics.",
+  "featuredImage": "/data/workflows/8024/8024.webp",
+  "author": {
+    "id": 101,
+    "slug": "j4t35h",
+    "name": "Jayesh Kaithwas",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 811,
+  "downloads": 81,
+  "createdAt": "2025-08-29T12:08:55.480Z",
+  "updatedAt": "2026-01-16T08:53:40.236Z",
+  "publishedAt": "2025-08-29T12:08:55.480Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8024",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Summarize RSS news with Gemini AI and store in Google Sheets",
+    "workflowName": "Summarize RSS news with Gemini AI and store in Google Sheets",
+    "description": "This workflow pulls articles from multiple RSS feeds, filters them by date, fetches the full webpage content, and summarizes each article into a clean, structured Markdown format using **Google Gemini (via LangChain)**. Summaries are automatically saved into Google Sheets for long-term storage and into a daily sheet for fresh news.\n\n👉 Example Google Sheet (pre-configured for this workflow):\n[News Summaries Sheet](https://docs.google.com/spreadsheets/d/1SGYctcCWYHDxpuzv5o2Hp1uveRuOrnpRJ1DmaSUii7g/edit?gid=1944615086#gid=1944615086)\n\n### Key Features\n\n* **RSS Feeds from Google Sheets** – Flexible feed management.\n* **Date Filtering** – Only process articles from the last X days.\n* **Duplicate Checking** – Avoids re-processing links already stored.\n* **Full Article Parsing** – Extracts clean body content, ignoring ads and images.\n* **AI Summarization** – Uses a Gemini LLM to create concise, structured summaries with takeaways and insights.\n* **Multi-Sheet Output** – Saves summaries to both a permanent “Articles” sheet and a “Today” sheet for daily highlights.\n* **Scheduled or Manual Run** – Can run daily at a set time or on demand.\n\n### Requirements\n\n* Google Sheets account (for storing feeds, articles, and daily news).\n* Google Gemini (PaLM) API credentials.\n\n### Possible Use Cases\n\n* Personal daily news digest.\n* Team knowledge hub for curated, AI-summarized articles.\n* Automated research assistant for niche topics.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get RSS Feed List",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Read RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Rss Elements",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Row for URL is in Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Convert HTML to Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Aummary to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Combine Rss with source name",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check If Article Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Summarize Content",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Format Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Filter Last X Days",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "End of worfklow",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Webpage HTML Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Body Content in HTML",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Aummary to Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Clear sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Loop Over RSS Feed",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+This workflow allows a LINE user to send either text or an image of food to a connected LINE bot.
+
+If text is sent, the AI agent responds directly via LINE.
+
+If an image is sent, the workflow downloads it from LINE’s API, analyzes it using OpenAI’s Vision model, estimates calories (only if the image contains food), and formats the result into JSON.
+
+Detected dishes and calories are appended to a Google Sheet, and a confirmation message is sent back to the user via LINE.
+
+Key Features:
+
+Integrates LINE Messaging API webhook with n8n
+
+Uses OpenAI Vision to detect food and estimate calories
+
+Automatically logs results into Google Sheets
+
+Sends real-time feedback to the LINE user
+
+How to use:
+
+Set up a LINE Messaging API channel and get your channel access token.
+
+Add your OpenAI API credentials in n8n.
+
+Replace placeholders for {channel access token}, {your id}, and Google Sheet IDs with your own.
+
+Activate the workflow and send a food image or text message to your LINE bot.

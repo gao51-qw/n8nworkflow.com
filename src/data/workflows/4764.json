@@ -1,0 +1,86 @@
+{
+  "id": 4764,
+  "slug": "4764",
+  "title": "🌐 Firecrawl website content extractor",
+  "description": "# 🌐 Firecrawl Website Content Extractor (n8n Workflow)\n\nThis n8n automation workflow uses **Firecrawl API** to extract structured data (e.g., quotes and authors) from web pages — such as [Quotes to Scrape](https://quotes.toscrape.com/) — and handles retries in case of delayed extraction.\n\n---\n\n## 🔁 Workflow Overview\n\n### 🎯 Purpose:\n- Crawl and extract **structured web data** using Firecrawl\n- Wait for asynchronous scraping to complete\n- Retrieve and validate results\n- Support retries if content is not ready\n\n---\n\n## 🔧 Step-by-Step Node Breakdown\n\n### 1. 🧪 **Manual Trigger**\n- Node: `When clicking ‘Test workflow’`\n- Used to **manually test** or execute the workflow during setup or debugging.\n\n---\n\n### 2. 📤 **Firecrawl Extract API Request**\n- Node: `Extract`\n- Sends a `POST` request to `https://api.firecrawl.dev/v1/extract`\n- Payload includes:\n  - `urls`: List of pages to crawl (`https://quotes.toscrape.com/*`)\n  - `prompt`: \"Extract all quotes and their corresponding authors from the website.\"\n  - `schema`: JSON schema defining expected structure (`quotes[]`, each with `text` and `author`)\n\n&gt; 📌 Uses an **HTTP Header Auth** credential for Firecrawl API\n\n---\n\n### 3. ⏱️ **Wait for 30 Seconds**\n- Node: `30 Secs`\n- Gives Firecrawl time to finish processing in the background\n- Prevents hitting the API before results are ready\n\n---\n\n### 4. 📥 **Get Results**\n- Node: `Get Results`\n- Performs a `GET` request to the status URL using `{{ $('Extract').item.json.id }}` to retrieve extraction results.\n\n---\n\n### 5. ✅❌ **Condition Check**\n- Node: `If`\n- Checks if the `data` array is empty (i.e., no results yet)\n- If **data is empty**:\n  - Waits **10 more seconds** and retries\n- If **data is available**:\n  - Passes data to the next step (e.g., processing or storage)\n\n---\n\n### 6. 🔁 **Retry Delay**\n- Node: `10 Seconds`\n- Waits briefly before sending another `GET` request to Firecrawl\n\n---\n\n### 7. 🛠️ **Edit Fields (Optional Output Formatting)**\n- Node: `Edit Fields`\n- Placeholder to structure or format the extracted results (quotes and authors)\n\n---\n\n## 🧾 Sticky Note: Firecrawl Setup Guide\n\nIncluded as an embedded reference:\n- 🔗 [10% Firecrawl Discount](https://firecrawl.link/nateherk)\n- 🧰 Instructions to:\n  - Add Firecrawl API credentials in **n8n**\n  - Use Firecrawl Community Node for **self-hosted** instances\n  - Set up the schema and prompt for targeted data extraction\n\n---\n\n## ✅ Key Features\n\n- 🔌 API-based crawling with schema-structured output\n- ⏱️ Smart waiting + retry mechanism\n- 🧠 AI prompt integration for intelligent data parsing\n- ⚙️ Flexible for different URLs, prompts, and schemas\n\n---\n\n## 📦 Sample Output Schema\n\n```json\n{\n  \"quotes\": [\n    {\n      \"text\": \"The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.\",\n      \"author\": \"Albert Einstein\"\n    },\n    {\n      \"text\": \"It is our choices, Harry, that show what we truly are, far more than our abilities.\",\n      \"author\": \"J.K. Rowling\"\n    }\n  ]\n}\n",
+  "featuredImage": "/data/workflows/4764/4764.webp",
+  "author": {
+    "id": 101,
+    "slug": "aashitsharma",
+    "name": "Aashit Sharma",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 674,
+  "downloads": 67,
+  "createdAt": "2025-06-07T17:56:19.339Z",
+  "updatedAt": "2026-01-16T08:36:05.225Z",
+  "publishedAt": "2025-06-07T17:56:19.339Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4764",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "🌐 Firecrawl website content extractor",
+    "workflowName": "🌐 Firecrawl website content extractor",
+    "description": "# 🌐 Firecrawl Website Content Extractor (n8n Workflow)\n\nThis n8n automation workflow uses **Firecrawl API** to extract structured data (e.g., quotes and authors) from web pages — such as [Quotes to Scrape](https://quotes.toscrape.com/) — and handles retries in case of delayed extraction.\n\n---\n\n## 🔁 Workflow Overview\n\n### 🎯 Purpose:\n- Crawl and extract **structured web data** using Firecrawl\n- Wait for asynchronous scraping to complete\n- Retrieve and validate results\n- Support retries if content is not ready\n\n---\n\n## 🔧 Step-by-Step Node Breakdown\n\n### 1. 🧪 **Manual Trigger**\n- Node: `When clicking ‘Test workflow’`\n- Used to **manually test** or execute the workflow during setup or debugging.\n\n---\n\n### 2. 📤 **Firecrawl Extract API Request**\n- Node: `Extract`\n- Sends a `POST` request to `https://api.firecrawl.dev/v1/extract`\n- Payload includes:\n  - `urls`: List of pages to crawl (`https://quotes.toscrape.com/*`)\n  - `prompt`: \"Extract all quotes and their corresponding authors from the website.\"\n  - `schema`: JSON schema defining expected structure (`quotes[]`, each with `text` and `author`)\n\n&gt; 📌 Uses an **HTTP Header Auth** credential for Firecrawl API\n\n---\n\n### 3. ⏱️ **Wait for 30 Seconds**\n- Node: `30 Secs`\n- Gives Firecrawl time to finish processing in the background\n- Prevents hitting the API before results are ready\n\n---\n\n### 4. 📥 **Get Results**\n- Node: `Get Results`\n- Performs a `GET` request to the status URL using `{{ $('Extract').item.json.id }}` to retrieve extraction results.\n\n---\n\n### 5. ✅❌ **Condition Check**\n- Node: `If`\n- Checks if the `data` array is empty (i.e., no results yet)\n- If **data is empty**:\n  - Waits **10 more seconds** and retries\n- If **data is available**:\n  - Passes data to the next step (e.g., processing or storage)\n\n---\n\n### 6. 🔁 **Retry Delay**\n- Node: `10 Seconds`\n- Waits briefly before sending another `GET` request to Firecrawl\n\n---\n\n### 7. 🛠️ **Edit Fields (Optional Output Formatting)**\n- Node: `Edit Fields`\n- Placeholder to structure or format the extracted results (quotes and authors)\n\n---\n\n## 🧾 Sticky Note: Firecrawl Setup Guide\n\nIncluded as an embedded reference:\n- 🔗 [10% Firecrawl Discount](https://firecrawl.link/nateherk)\n- 🧰 Instructions to:\n  - Add Firecrawl API credentials in **n8n**\n  - Use Firecrawl Community Node for **self-hosted** instances\n  - Set up the schema and prompt for targeted data extraction\n\n---\n\n## ✅ Key Features\n\n- 🔌 API-based crawling with schema-structured output\n- ⏱️ Smart waiting + retry mechanism\n- 🧠 AI prompt integration for intelligent data parsing\n- ⚙️ Flexible for different URLs, prompts, and schemas\n\n---\n\n## 📦 Sample Output Schema\n\n```json\n{\n  \"quotes\": [\n    {\n      \"text\": \"The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.\",\n      \"author\": \"Albert Einstein\"\n    },\n    {\n      \"text\": \"It is our choices, Harry, that show what we truly are, far more than our abilities.\",\n      \"author\": \"J.K. Rowling\"\n    }\n  ]\n}",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "30 Secs",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "10 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

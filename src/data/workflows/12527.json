@@ -1,0 +1,170 @@
+{
+  "id": 12527,
+  "slug": "12527",
+  "title": "Extract meeting details with GPT-4.1-mini and evaluate accuracy in Google Sheets",
+  "description": "## Who's it for\n\nDevelopers building AI-powered workflows who want to ensure their agents work reliably. If you need to validate AI outputs, test agent behavior systematically, or build maintainable automation, this template shows you how.\n\n## What it does\n\nThis subworkflow extracts structured meeting details (title, date, time, location, links, attendees) from natural language messages using an AI agent. It demonstrates production-ready patterns:\n\n- **Structured output validation**: JSON schema enforcement prevents malformed responses\n- **Error handling**: Graceful failures with full execution traceability\n- **Automated evaluation**: Test agent accuracy against expected outputs using Google Sheets\n- **Dual execution modes**: Normal extraction + evaluation/testing mode\n\nThe AI resolves relative time (\"tomorrow\", \"next Friday\") using timezone context and handles incomplete data gracefully.\n\n## How to set it up\n\n1. Connect OpenAI API credential to the AI agent node\n2. Copy the test data sheet: https://docs.google.com/spreadsheets/d/1U89nPsasM2WNv1D7gEYINhDwylyxYw7BOd_i8ipFC0M/edit?usp=sharing\n3. Update Google Sheet IDs in `load_eval_data` and `record_eval_output` nodes\n4. Test normal mode: Execute workflow \"from trigger\"\n5. Test evaluation mode: Execute workflow \"from load_eval_data\"\n\n## Requirements\n\n- OpenAI API key\n- Google Sheets OAuth credential\n\n\n## Why subworkflow architecture?\n\n**Reusability**: Wrap AI agents in subworkflows to call them from multiple parent workflows. Extract meetings from Slack, email, or webhooks—same agent, consistent results.\n\n**Testability**: This pattern enables isolated testing for each AI component. Set up evaluation datasets, run automated tests, and validate accuracy before deploying to production. You can't do this easily with inline agents.\n\n**Maintainability**: Update the agent logic once, and all parent workflows benefit. Error handling and validation are built-in, so failures are traceable with execution IDs.\n\n**This framework includes**:\n- Dual-trigger pattern (normal + evaluation modes)\n- Output validation that catches silent AI failures\n- Error bubbling with execution metadata for debugging\n- Evaluation framework with semantic/exact matching\n- Proper routing that returns output to parent workflows\n\n## Following this pattern for other agents\n\nTo adapt this for any AI task (contact extraction, invoice processing, sentiment analysis, etc.):\n\n1. Replace `extract_meeting_details` with your AI agent (add tools, memory, etc. as needed)\n2. Update `Structured Output Parser` schema to match your data structure\n3. Modify `evaluate_match` prompt for your validation criteria\n4. Create test cases in Google Sheets with your inputs/expected outputs\n5. Adjust `normalize_eval_data` timezone/reference time if needed\n\nThe validation, error handling, and evaluation infrastructure stays the same regardless of what your agent does.",
+  "featuredImage": "/data/workflows/12527/12527.webp",
+  "author": {
+    "id": 101,
+    "slug": "sergey-filippov",
+    "name": "Sergey Filippov",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3,
+  "downloads": 0,
+  "createdAt": "2026-01-06T19:15:07.829Z",
+  "updatedAt": "2026-01-16T09:12:35.099Z",
+  "publishedAt": "2026-01-06T19:15:07.829Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12527",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract meeting details with GPT-4.1-mini and evaluate accuracy in Google Sheets",
+    "workflowName": "Extract meeting details with GPT-4.1-mini and evaluate accuracy in Google Sheets",
+    "description": "## Who's it for\n\nDevelopers building AI-powered workflows who want to ensure their agents work reliably. If you need to validate AI outputs, test agent behavior systematically, or build maintainable automation, this template shows you how.\n\n## What it does\n\nThis subworkflow extracts structured meeting details (title, date, time, location, links, attendees) from natural language messages using an AI agent. It demonstrates production-ready patterns:\n\n- **Structured output validation**: JSON schema enforcement prevents malformed responses\n- **Error handling**: Graceful failures with full execution traceability\n- **Automated evaluation**: Test agent accuracy against expected outputs using Google Sheets\n- **Dual execution modes**: Normal extraction + evaluation/testing mode\n\nThe AI resolves relative time (\"tomorrow\", \"next Friday\") using timezone context and handles incomplete data gracefully.\n\n## How to set it up\n\n1. Connect OpenAI API credential to the AI agent node\n2. Copy the test data sheet: https://docs.google.com/spreadsheets/d/1U89nPsasM2WNv1D7gEYINhDwylyxYw7BOd_i8ipFC0M/edit?usp=sharing\n3. Update Google Sheet IDs in `load_eval_data` and `record_eval_output` nodes\n4. Test normal mode: Execute workflow \"from trigger\"\n5. Test evaluation mode: Execute workflow \"from load_eval_data\"\n\n## Requirements\n\n- OpenAI API key\n- Google Sheets OAuth credential\n\n\n## Why subworkflow architecture?\n\n**Reusability**: Wrap AI agents in subworkflows to call them from multiple parent workflows. Extract meetings from Slack, email, or webhooks—same agent, consistent results.\n\n**Testability**: This pattern enables isolated testing for each AI component. Set up evaluation datasets, run automated tests, and validate accuracy before deploying to production. You can't do this easily with inline agents.\n\n**Maintainability**: Update the agent logic once, and all parent workflows benefit. Error handling and validation are built-in, so failures are traceable with execution IDs.\n\n**This framework includes**:\n- Dual-trigger pattern (normal + evaluation modes)\n- Output validation that catches silent AI failures\n- Error bubbling with execution metadata for debugging\n- Evaluation framework with semantic/exact matching\n- Proper routing that returns output to parent workflows\n\n## Following this pattern for other agents\n\nTo adapt this for any AI task (contact extraction, invoice processing, sentiment analysis, etc.):\n\n1. Replace `extract_meeting_details` with your AI agent (add tools, memory, etc. as needed)\n2. Update `Structured Output Parser` schema to match your data structure\n3. Modify `evaluate_match` prompt for your validation criteria\n4. Create test cases in Google Sheets with your inputs/expected outputs\n5. Adjust `normalize_eval_data` timezone/reference time if needed\n\nThe validation, error handling, and evaluation infrastructure stays the same regardless of what your agent does.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "normalize_trigger_input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "load_eval_data",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "role": "evaluationTrigger",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "merged_inputs",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "output_fixer",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "not_evaluating",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "handle_error",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "normalize_eval_data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "record_eval_output",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "evaluate_match",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "extract_meeting_details",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "validate_output",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "normalize_agent_output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

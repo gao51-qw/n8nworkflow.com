@@ -1,0 +1,260 @@
+{
+  "id": 7945,
+  "slug": "7945",
+  "title": "Index legal documents for hybrid search with Qdrant, OpenAI & BM25",
+  "description": "## Index Legal Dataset to Qdrant for Hybrid Retrieval\n*This pipeline is the first part of **\"Hybrid Search with Qdrant & n8n, Legal AI\"**.  \nThe second part, [**\"Hybrid Search with Qdrant & n8n, Legal AI: Retrieval\"**](https://n8n.io/workflows/7946-hybrid-search-with-qdrant-and-n8n-legal-ai-retrieval/), covers retrieval and simple evaluation.* \n\n### Overview\nThis pipeline transforms a [Q&A legal corpus from Hugging Face (isaacus)](https://huggingface.co/datasets/isaacus/LegalQAEval) into vector representations and indexes them to Qdrant, providing the foundation for running [**Hybrid Search**](https://qdrant.tech/articles/hybrid-search/), combining:\n\n- [**Dense vectors**](https://qdrant.tech/documentation/concepts/vectors/#dense-vectors) (embeddings) for semantic similarity search;  \n- [**Sparse vectors**](https://qdrant.tech/documentation/concepts/vectors/#sparse-vectors) for keyword-based exact search.\n\n\nAfter running this pipeline, you will have a Qdrant collection with your legal dataset ready for hybrid retrieval on [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) and dense embeddings: either [mxbai-embed-large-v1](https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1) or [text-embedding-3-small](https://platform.openai.com/docs/models/text-embedding-3-small).\n\n#### Options for Embedding Inference\nThis pipeline equips you with two approaches for generating dense vectors:\n\n1. Using [**Qdrant Cloud Inference**](https://qdrant.tech/documentation/cloud/inference/), conversion to vectors handled directly in Qdrant;\n2. Using external provider, e.g. OpenAI for generating embeddings.\n\n#### Prerequisites\n- A cluster on [Qdrant Cloud](https://cloud.qdrant.io/)  \n  - Paid cluster in the US region if you want to use **Qdrant Cloud Inference**  \n  - Free Tier Cluster if using an external provider (here OpenAI)  \n- Qdrant Cluster credentials: \n  - You'll be guided on how to obtain both the **URL** and **API_KEY** from the Qdrant Cloud UI when setting up your cluster;  \n- An **OpenAI API key** (if you’re not using Qdrant’s Cloud Inference);  \n\n#### P.S.\n- To ask retrieval in Qdrant-related questions, join the [Qdrant Discord](https://discord.gg/ArVgNHV6).  \n- Star [Qdrant n8n community node repo](https://github.com/qdrant/n8n-nodes-qdrant) &lt;3",
+  "featuredImage": "/data/workflows/7945/7945.webp",
+  "author": {
+    "id": 101,
+    "slug": "mrscoopers",
+    "name": "Jenny ",
+    "avatar": ""
+  },
+  "categories": [
+    "AI RAG",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1992,
+  "downloads": 199,
+  "createdAt": "2025-08-27T11:48:31.351Z",
+  "updatedAt": "2026-01-16T08:53:10.799Z",
+  "publishedAt": "2025-08-27T11:48:31.351Z",
+  "nodes": 37,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7945",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Index legal documents for hybrid search with Qdrant, OpenAI & BM25",
+    "workflowName": "Index legal documents for hybrid search with Qdrant, OpenAI & BM25",
+    "description": "## Index Legal Dataset to Qdrant for Hybrid Retrieval\n*This pipeline is the first part of **\"Hybrid Search with Qdrant & n8n, Legal AI\"**.  \nThe second part, [**\"Hybrid Search with Qdrant & n8n, Legal AI: Retrieval\"**](https://n8n.io/workflows/7946-hybrid-search-with-qdrant-and-n8n-legal-ai-retrieval/), covers retrieval and simple evaluation.* \n\n### Overview\nThis pipeline transforms a [Q&A legal corpus from Hugging Face (isaacus)](https://huggingface.co/datasets/isaacus/LegalQAEval) into vector representations and indexes them to Qdrant, providing the foundation for running [**Hybrid Search**](https://qdrant.tech/articles/hybrid-search/), combining:\n\n- [**Dense vectors**](https://qdrant.tech/documentation/concepts/vectors/#dense-vectors) (embeddings) for semantic similarity search;  \n- [**Sparse vectors**](https://qdrant.tech/documentation/concepts/vectors/#sparse-vectors) for keyword-based exact search.\n\n\nAfter running this pipeline, you will have a Qdrant collection with your legal dataset ready for hybrid retrieval on [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) and dense embeddings: either [mxbai-embed-large-v1](https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1) or [text-embedding-3-small](https://platform.openai.com/docs/models/text-embedding-3-small).\n\n#### Options for Embedding Inference\nThis pipeline equips you with two approaches for generating dense vectors:\n\n1. Using [**Qdrant Cloud Inference**](https://qdrant.tech/documentation/cloud/inference/), conversion to vectors handled directly in Qdrant;\n2. Using external provider, e.g. OpenAI for generating embeddings.\n\n#### Prerequisites\n- A cluster on [Qdrant Cloud](https://cloud.qdrant.io/)  \n  - Paid cluster in the US region if you want to use **Qdrant Cloud Inference**  \n  - Free Tier Cluster if using an external provider (here OpenAI)  \n- Qdrant Cluster credentials: \n  - You'll be guided on how to obtain both the **URL** and **API_KEY** from the Qdrant Cloud UI when setting up your cluster;  \n- An **OpenAI API key** (if you’re not using Qdrant’s Cloud Inference);  \n\n#### P.S.\n- To ask retrieval in Qdrant-related questions, join the [Qdrant Discord](https://discord.gg/ArVgNHV6).  \n- Star [Qdrant n8n community node repo](https://github.com/qdrant/n8n-nodes-qdrant) &lt;3",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Create Collection",
+      "type": "n8n-nodes-qdrant.qdrant",
+      "role": "qdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Collection Exists",
+      "type": "n8n-nodes-qdrant.qdrant",
+      "role": "qdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Index Dataset from HuggingFace",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Them All Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Dataset Splits",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Divide Per Row",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate a Batch",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upsert Points",
+      "type": "n8n-nodes-qdrant.qdrant",
+      "role": "qdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sum them Up",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get the Average Text Length",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Upsert Points1",
+      "type": "n8n-nodes-qdrant.qdrant",
+      "role": "qdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Collection1",
+      "type": "n8n-nodes-qdrant.qdrant",
+      "role": "qdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Collection Exists1",
+      "type": "n8n-nodes-qdrant.qdrant",
+      "role": "qdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get OpenAI embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Dataset Rows (Pagination)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Restructure for Deduplicating",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Restructure for Batching",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Deduplicate Texts",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Calculate #words in Each Text",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate a Batch to Embed",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate a Batch to Upsert",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "id": 8963,
+  "slug": "8963",
+  "title": "Automate influencer evaluation & campaign management with Instagram/YouTube APIs",
+  "description": "# Automated Influencer Campaign Management System\n\nA comprehensive **n8n workflow template** for streamlining influencer application processing with **real-time social media data validation**, **intelligent scoring algorithms**, and **automated onboarding workflows**.\n\n---\n\n## Who’s It For\n\n* Marketing agencies managing high-volume influencer applications\n* Brand marketing teams screening social media creators\n* Influencer platforms automating creator onboarding\n* Digital marketing consultants reducing manual workload\n* E-commerce brands building creator partnerships\n* Social media management companies scaling operations\n\n---\n\n## How It Works\n\n1. Capture influencer applications via **Webhook** (connected to forms/websites).\n2. Validate applicant emails using **VerifiEmail** to prevent fake submissions.\n3. Fetch real-time social data from **Instagram (via Instagram120 API)** and **YouTube (via YouTube138 API)**.\n4. Calculate **engagement scores** using a weighted algorithm (Instagram 60% + YouTube 40%).\n5. Auto-approve qualified influencers based on follower count & engagement thresholds.\n6. Log approved applications in **Google Sheets** with complete metrics.\n7. Send **personalized welcome emails** with campaign information & next steps.\n8. Reject low-quality applications with detailed reasoning (for internal tracking).\n9. Generate **scoring breakdown** with platform-specific analytics & tier classification.\n10. Track **application volume and approval rates** for performance optimization.\n\n**Offers:** Real-time API integration, intelligent scoring, automated actions, scalable processing.\n\n---\n\n## 🛠️ How to Set Up\n\n1. Connect your application form to Webhook:\n\n   ```http\n   POST → https://[your-n8n-url]/webhook/influencer-signup\n   ```\n2. Sign up for **RapidAPI** and subscribe to **Instagram120 + YouTube138 APIs**.\n3. Get **VerifiEmail API key** (100 free verifications/month).\n4. Configure **Gmail OAuth2** in Google Cloud Console for email automation.\n5. Create a **Google Sheets database** for approved influencer storage.\n6. Add credentials in n8n: RapidAPI, VerifiEmail, Gmail, Google Sheets.\n7. Customize **scoring thresholds** & **email templates** in Function nodes.\n8. Test with sample data:\n\n   ```json\n   {\n     \"name\": \"Test Creator\",\n     \"email\": \"test@gmail.com\",\n     \"social_handles\": {\n       \"instagram\": \"testuser\",\n       \"youtube\": \"testchannel\"\n     },\n     \"niche\": \"fitness\",\n     \"rate_card\": 500\n   }\n   ```\n\n---\n\n## Requirements\n\n* **n8n instance** (cloud or self-hosted)\n* **API credentials**:\n\n  * RapidAPI (Instagram120 + YouTube138 APIs)\n  * VerifiEmail\n  * Gmail OAuth2\n  * Google Sheets access\n* **Form/website integration** → sends webhook data\n* **Google Sheets** for database & reporting\n\n---\n\n## RapidAPI Integration Details\n\n### Instagram120 API\n\n* **Pricing Plans:**\n\n  * Free: 1,000 requests/month\n  * Pro: 10,000 requests/month ($10/mo)\n  * Ultra: 100,000 requests/month ($50/mo)\n* **n8n Example:**\n\n  ```json\n  {\n    \"method\": \"POST\",\n    \"url\": \"https://instagram120.p.rapidapi.com/api/instagram/profile\",\n    \"headers\": {\n      \"X-RapidAPI-Host\": \"instagram120.p.rapidapi.com\",\n      \"X-RapidAPI-Key\": \"YOUR_RAPIDAPI_KEY\",\n      \"Content-Type\": \"application/json\"\n    },\n    \"body\": {\n      \"username\": \"{{ $('Data Sanitizer').item.json.social_handles.instagram }}\"\n    }\n  }\n  ```\n\n### YouTube138 API\n\n* **Pricing Plans:**\n\n  * Free: 1,000 requests/month\n  * Pro: 10,000 requests/month ($15/mo)\n  * Ultra: 100,000 requests/month ($75/mo)\n* **n8n Example:**\n\n  ```json\n  {\n    \"method\": \"GET\",\n    \"url\": \"https://youtube138.p.rapidapi.com/channel/details\",\n    \"headers\": {\n      \"X-RapidAPI-Host\": \"youtube138.p.rapidapi.com\",\n      \"X-RapidAPI-Key\": \"YOUR_RAPIDAPI_KEY\"\n    },\n    \"queryParameters\": {\n      \"id\": \"{{ $('Webhook').item.json.body.social_handles.youtube }}\",\n      \"hl\": \"en\",\n      \"gl\": \"US\"\n    }\n  }\n  ```\n\n---\n\n## Core Features\n\n* **Social Media Validation**\n\n  * Instagram follower counts, engagement, verification\n  * YouTube subscriber counts, channel stats\n  * Cross-platform scoring algorithm\n  * Fraud prevention via email validation\n\n* **Intelligent Scoring**\n\n  * Multi-tier classification (Nano, Micro, Macro, Mega)\n  * Engagement analysis per platform\n  * Customizable approval thresholds\n\n* **Automation Actions**\n\n  * Auto-approve/reject with reasoning\n  * Store results in Google Sheets\n  * Send onboarding emails\n  * Track performance stats\n\n---\n\n## Use Cases & Applications\n\n* **Marketing Agencies** → Process 100+ daily influencer applications automatically\n* **Brands** → Validate influencer metrics before partnerships\n* **Platforms** → Qualify creators for platform admission automatically\n* **E-commerce** → Build authentic influencer partnerships\n\n---\n\n## Key Benefits\n\n✔️ Saves 80-90% processing costs\n✔️ Cuts manual review time from **15 minutes → 30 seconds**\n✔️ Prevents fraud with real-time validation\n✔️ Scales infinitely with no extra staffing\n\n---\n\n## Technical Specifications\n\n* **Execution time:** 30–45 sec per application\n* **Throughput:** 100+ applications/hour\n* **Success rate:** 95%+ valid applications\n* **Cost:** ~$0.05–$0.15 per application\n\n---\n\n## ROI & Cost Breakdown\n\n* **Manual:** $15–25/hour human review\n* **Automated:** $0.05–0.15/application\n* **Savings:** 80–90% at scale\n* **Break-even:** 50–100 apps/month\n\n---\n\n## Integration Example\n\n```javascript\n// Example website form submission\nfetch('https://your-n8n-instance.com/webhook/influencer-signup', {\n  method: 'POST',\n  headers: {'Content-Type': 'application/json'},\n  body: JSON.stringify(formData)\n});\n```\n\nSample Application Data:\n\n```json\n{\n  \"name\": \"Sarah Johnson\",\n  \"email\": \"sarah.fitness@gmail.com\",\n  \"social_handles\": {\n    \"instagram\": \"sarahfitlife\",\n    \"youtube\": \"SarahFitnessJourney\"\n  },\n  \"niche\": \"fitness\",\n  \"country\": \"US\",\n  \"rate_card\": 750\n}\n```\n\n---\n\n## Installation\n\n1. Import workflow JSON file into n8n\n2. Add API credentials (RapidAPI, VerifiEmail, Gmail, Sheets)\n3. Configure Sheets with correct columns\n4. Customize scoring & emails\n5. Test with sample apps\n6. Activate workflow\n\n---\n\n## Disclaimers\n\n* Requires paid **RapidAPI plans** for scale\n* API rate limiting applies\n* Data accuracy depends on APIs\n* Ensure **GDPR/CCPA compliance** before production\n* Always test before live deployment\n\n---\n\n## License\n\nThis template is provided **as-is** for educational and commercial use.\nUsers are responsible for ensuring compliance with laws, platform TOS, and data privacy rules.",
+  "featuredImage": "/data/workflows/8963/8963.webp",
+  "author": {
+    "id": 101,
+    "slug": "jiteshdugar",
+    "name": "Jitesh Dugar",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 745,
+  "downloads": 74,
+  "createdAt": "2025-09-26T15:28:03.640Z",
+  "updatedAt": "2026-01-16T08:58:34.399Z",
+  "publishedAt": "2025-09-26T15:28:03.640Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8963",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate influencer evaluation & campaign management with Instagram/YouTube APIs",
+    "workflowName": "Automate influencer evaluation & campaign management with Instagram/YouTube APIs",
+    "description": "# Automated Influencer Campaign Management System\n\nA comprehensive **n8n workflow template** for streamlining influencer application processing with **real-time social media data validation**, **intelligent scoring algorithms**, and **automated onboarding workflows**.\n\n---\n\n## Who’s It For\n\n* Marketing agencies managing high-volume influencer applications\n* Brand marketing teams screening social media creators\n* Influencer platforms automating creator onboarding\n* Digital marketing consultants reducing manual workload\n* E-commerce brands building creator partnerships\n* Social media management companies scaling operations\n\n---\n\n## How It Works\n\n1. Capture influencer applications via **Webhook** (connected to forms/websites).\n2. Validate applicant emails using **VerifiEmail** to prevent fake submissions.\n3. Fetch real-time social data from **Instagram (via Instagram120 API)** and **YouTube (via YouTube138 API)**.\n4. Calculate **engagement scores** using a weighted algorithm (Instagram 60% + YouTube 40%).\n5. Auto-approve qualified influencers based on follower count & engagement thresholds.\n6. Log approved applications in **Google Sheets** with complete metrics.\n7. Send **personalized welcome emails** with campaign information & next steps.\n8. Reject low-quality applications with detailed reasoning (for internal tracking).\n9. Generate **scoring breakdown** with platform-specific analytics & tier classification.\n10. Track **application volume and approval rates** for performance optimization.\n\n**Offers:** Real-time API integration, intelligent scoring, automated actions, scalable processing.\n\n---\n\n## 🛠️ How to Set Up\n\n1. Connect your application form to Webhook:\n\n   ```http\n   POST → https://[your-n8n-url]/webhook/influencer-signup\n   ```\n2. Sign up for **RapidAPI** and subscribe to **Instagram120 + YouTube138 APIs**.\n3. Get **VerifiEmail API key** (100 free verifications/month).\n4. Configure **Gmail OAuth2** in Google Cloud Console for email automation.\n5. Create a **Google Sheets database** for approved influencer storage.\n6. Add credentials in n8n: RapidAPI, VerifiEmail, Gmail, Google Sheets.\n7. Customize **scoring thresholds** & **email templates** in Function nodes.\n8. Test with sample data:\n\n   ```json\n   {\n     \"name\": \"Test Creator\",\n     \"email\": \"test@gmail.com\",\n     \"social_handles\": {\n       \"instagram\": \"testuser\",\n       \"youtube\": \"testchannel\"\n     },\n     \"niche\": \"fitness\",\n     \"rate_card\": 500\n   }\n   ```\n\n---\n\n## Requirements\n\n* **n8n instance** (cloud or self-hosted)\n* **API credentials**:\n\n  * RapidAPI (Instagram120 + YouTube138 APIs)\n  * VerifiEmail\n  * Gmail OAuth2\n  * Google Sheets access\n* **Form/website integration** → sends webhook data\n* **Google Sheets** for database & reporting\n\n---\n\n## RapidAPI Integration Details\n\n### Instagram120 API\n\n* **Pricing Plans:**\n\n  * Free: 1,000 requests/month\n  * Pro: 10,000 requests/month ($10/mo)\n  * Ultra: 100,000 requests/month ($50/mo)\n* **n8n Example:**\n\n  ```json\n  {\n    \"method\": \"POST\",\n    \"url\": \"https://instagram120.p.rapidapi.com/api/instagram/profile\",\n    \"headers\": {\n      \"X-RapidAPI-Host\": \"instagram120.p.rapidapi.com\",\n      \"X-RapidAPI-Key\": \"YOUR_RAPIDAPI_KEY\",\n      \"Content-Type\": \"application/json\"\n    },\n    \"body\": {\n      \"username\": \"{{ $('Data Sanitizer').item.json.social_handles.instagram }}\"\n    }\n  }\n  ```\n\n### YouTube138 API\n\n* **Pricing Plans:**\n\n  * Free: 1,000 requests/month\n  * Pro: 10,000 requests/month ($15/mo)\n  * Ultra: 100,000 requests/month ($75/mo)\n* **n8n Example:**\n\n  ```json\n  {\n    \"method\": \"GET\",\n    \"url\": \"https://youtube138.p.rapidapi.com/channel/details\",\n    \"headers\": {\n      \"X-RapidAPI-Host\": \"youtube138.p.rapidapi.com\",\n      \"X-RapidAPI-Key\": \"YOUR_RAPIDAPI_KEY\"\n    },\n    \"queryParameters\": {\n      \"id\": \"{{ $('Webhook').item.json.body.social_handles.youtube }}\",\n      \"hl\": \"en\",\n      \"gl\": \"US\"\n    }\n  }\n  ```\n\n---\n\n## Core Features\n\n* **Social Media Validation**\n\n  * Instagram follower counts, engagement, verification\n  * YouTube subscriber counts, channel stats\n  * Cross-platform scoring algorithm\n  * Fraud prevention via email validation\n\n* **Intelligent Scoring**\n\n  * Multi-tier classification (Nano, Micro, Macro, Mega)\n  * Engagement analysis per platform\n  * Customizable approval thresholds\n\n* **Automation Actions**\n\n  * Auto-approve/reject with reasoning\n  * Store results in Google Sheets\n  * Send onboarding emails\n  * Track performance stats\n\n---\n\n## Use Cases & Applications\n\n* **Marketing Agencies** → Process 100+ daily influencer applications automatically\n* **Brands** → Validate influencer metrics before partnerships\n* **Platforms** → Qualify creators for platform admission automatically\n* **E-commerce** → Build authentic influencer partnerships\n\n---\n\n## Key Benefits\n\n✔️ Saves 80-90% processing costs\n✔️ Cuts manual review time from **15 minutes → 30 seconds**\n✔️ Prevents fraud with real-time validation\n✔️ Scales infinitely with no extra staffing\n\n---\n\n## Technical Specifications\n\n* **Execution time:** 30–45 sec per application\n* **Throughput:** 100+ applications/hour\n* **Success rate:** 95%+ valid applications\n* **Cost:** ~$0.05–$0.15 per application\n\n---\n\n## ROI & Cost Breakdown\n\n* **Manual:** $15–25/hour human review\n* **Automated:** $0.05–0.15/application\n* **Savings:** 80–90% at scale\n* **Break-even:** 50–100 apps/month\n\n---\n\n## Integration Example\n\n```javascript\n// Example website form submission\nfetch('https://your-n8n-instance.com/webhook/influencer-signup', {\n  method: 'POST',\n  headers: {'Content-Type': 'application/json'},\n  body: JSON.stringify(formData)\n});\n```\n\nSample Application Data:\n\n```json\n{\n  \"name\": \"Sarah Johnson\",\n  \"email\": \"sarah.fitness@gmail.com\",\n  \"social_handles\": {\n    \"instagram\": \"sarahfitlife\",\n    \"youtube\": \"SarahFitnessJourney\"\n  },\n  \"niche\": \"fitness\",\n  \"country\": \"US\",\n  \"rate_card\": 750\n}\n```\n\n---\n\n## Installation\n\n1. Import workflow JSON file into n8n\n2. Add API credentials (RapidAPI, VerifiEmail, Gmail, Sheets)\n3. Configure Sheets with correct columns\n4. Customize scoring & emails\n5. Test with sample apps\n6. Activate workflow\n\n---\n\n## Disclaimers\n\n* Requires paid **RapidAPI plans** for scale\n* API rate limiting applies\n* Data accuracy depends on APIs\n* Ensure **GDPR/CCPA compliance** before production\n* Always test before live deployment\n\n---\n\n## License\n\nThis template is provided **as-is** for educational and commercial use.\nUsers are responsible for ensuring compliance with laws, platform TOS, and data privacy rules.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Data Sanitizer",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Verifi Email",
+      "type": "n8n-nodes-verifiemail.verifiEmail",
+      "role": "verifiEmail",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Instagram Profile Stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse Instagram Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "YouTube Channel Stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse YouTube Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Calculate Influencer Score",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Stop and Error1",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add to Approved Database",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

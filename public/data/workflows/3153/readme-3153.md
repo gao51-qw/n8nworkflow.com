@@ -1,0 +1,129 @@
+# Generate complete stories with GPT-4o and save them in Google Drive
+
+> **AI Story Generator with GPT-4o and Google Drive Integration**
+
+Automatically generate complete stories with GPT-4o and seamlessly save them to Google Drive.
+
+**Who is this for?**
+
+- Creative writers and authors
+- Marketing and sales professionals
+- Educators and content creators
+- Fan fiction enthusiasts
+- Anyone interested in automating storytelling with AI
+
+**What problem is this workflow solving?**
+
+Manually creating engaging, structured narratives can be time-consuming. Writers and content creators often struggle to maintain consistency, depth, and engaging storytelling structure. This workflow solves these challenges by automating story creation using advanced AI (GPT-4o) and proven storytelling techniques.
+
+**What this workflow does**
+
+This n8n automation generates comprehensive stories through an iterative AI-driven process:
+
+**Step 1: Provide Your Story Idea**
+Users input a clear description and specify their desired story format (short story, fan fiction, sales email, etc.).
+
+**Step 2: AI-Driven Analysis**
+GPT-4o analyzes the provided idea, categorizes the story, selects relevant storytelling frameworks inspired by PipDeck Storyteller Tactics, and determines narrative tone and direction.
+
+**Step 3: Story and Character**
+FoundationEstablishes core themes, emotional hooks, and detailed character backgrounds.
+
+**Step 4: Initial Story Development**
+Creates a structured plot outline including engaging elements such as hooks, twists, and resolutions.
+
+**Step 5: Iterative Enhancement**
+Refines the story through multiple automated prompts, improving narrative depth, character development, dialogue, and realism.
+
+**Step 6: Editorial Feedback**
+Generates automated critiques highlighting clichés, weak dialogues, and areas for improvement.
+
+**Step 7: Final Polished Version**
+Incorporates editorial feedback to produce a complete, polished, ready-to-use narrative.
+
+**Step 8: Instant Google Drive**
+OrganizationAutomatically saves the final story directly to your specified Google Drive folder for easy access and management.
+
+**Setup Instructions**
+
+**Prerequisites**:
+- n8n account (cloud or self-hosted)
+- GPT-4o API access via OpenAI
+- Google Drive account
+
+**Configure OpenAI Node:**
+- Add your GPT-4o API key in the OpenAI node settings.
+- Configure Google Drive Node:
+- Connect your Google Drive account by authenticating with n8n.
+- Specify the folder where generated stories should be saved.
+
+**Test Workflow:**
+
+Run the workflow with a simple story prompt to ensure proper setup.
+
+How to Customize this Workflow
+
+Adjust Prompt Details: Modify AI prompt instructions to suit your specific story style and audience.
+
+Expand or Narrow Iterations: Change the number of iterations to balance between speed and story complexity.
+
+Customize Feedback Level: Adjust the level of editorial feedback provided.
+
+**Dependencies and Requirements**
+
+- GPT-4o API from OpenAI
+- Google Drive integration enabled in n8n
+
+**Get Started**
+
+Download and deploy this template today to streamline your storytelling process and produce consistently engaging, high-quality content effortlessly.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3153
+- **Complexity:** advanced
+- **Node Count:** 57
+- **Views:** 1409
+- **Downloads:** 140
+- **Created:** 2025/3/13
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3153)
+
+## 👤 Author
+
+- **Name:** Ian Dikhtiar
+- **Username:** @ian-dikhtiar
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **set** (×10)
+- **@n8n/n8n-nodes-langchain.sentimentAnalysis** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** (×10)
+- **manualTrigger** 
+- **@n8n/n8n-nodes-langchain.agent** (×10)
+- **splitOut** 
+- **splitInBatches** 
+- **aggregate** 
+- **stickyNote** (×20)
+- **@n8n/n8n-nodes-langchain.lmChatAzureOpenAi** 
+- **googleDrive** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 57 nodes with 36 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

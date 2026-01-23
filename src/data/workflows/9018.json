@@ -1,0 +1,260 @@
+{
+  "id": 9018,
+  "slug": "9018",
+  "title": "Automated blog post generator with GPT-4, DALL-E, and Wikipedia for WordPress",
+  "description": "# WordPress AI Content Creator\n\n## Overview\nTransform a few keywords into professionally written, SEO-optimized WordPress blog posts with custom featured images. This workflow leverages AI to research topics, structure content, write engaging articles, and publish them directly to your WordPress site as drafts ready for review.\n\n## What This Workflow Does\n\n### Core Features\n- **Keyword-to-Article Generation**: Converts simple keywords into comprehensive, well-structured articles\n- **Intelligent Content Planning**: Uses AI to create logical chapter structures and content flow\n- **Wikipedia Integration**: Researches factual information to ensure content accuracy and depth\n- **Multi-Chapter Writing**: Generates coherent, contextually-aware content across multiple sections\n- **Custom Image Creation**: Generates relevant featured images using DALL-E based on article content\n- **SEO Optimization**: Creates titles, subtitles, and content optimized for search engines\n- **WordPress Integration**: Automatically publishes articles as drafts with proper formatting and featured images\n\n### Business Value\n- **Content Scale**: Produce high-quality blog posts in minutes instead of hours\n- **Research Efficiency**: Automatically incorporates factual information from reliable sources\n- **Consistency**: Maintains professional tone and structure across all generated content\n- **SEO Benefits**: Creates search-engine friendly content with proper HTML formatting\n- **Cost Savings**: Reduces need for external content creation services\n\n## Prerequisites\n\n### Required Accounts & Credentials\n1. **WordPress Site** with REST API enabled\n2. **OpenAI API** access (GPT-4 and DALL-E models)\n3. **WordPress Application Password** or JWT authentication\n4. **Public-facing n8n instance** for form access (or n8n Cloud)\n\n### Technical Requirements\n- WordPress REST API v2 enabled (standard on most WordPress sites)\n- WordPress user account with publishing permissions\n- n8n instance with LangChain nodes package installed\n\n## Setup Instructions\n\n### Step 1: WordPress Configuration\n1. **Enable REST API** (usually enabled by default):\n   - Check that `yoursite.com/wp-json/wp/v2/` returns JSON data\n   - If not, contact hosting provider or install REST API plugin\n\n2. **Create Application Password**:\n   - In WordPress Admin: Users &gt; Profile\n   - Scroll to \"Application Passwords\"\n   - Add new password with name \"n8n Integration\"\n   - Copy the generated password (save securely)\n\n3. **Get WordPress Site URL**:\n   - Note your full WordPress site URL (e.g., `https://yourdomain.com`)\n\n### Step 2: OpenAI Configuration\n1. **Obtain OpenAI API Key**:\n   - Visit [OpenAI Platform](https://platform.openai.com/)\n   - Create API key with access to:\n     - GPT-4 models (for content generation)\n     - DALL-E (for image creation)\n\n2. **Add OpenAI Credentials in n8n**:\n   - Navigate to Settings &gt; Credentials\n   - Add \"OpenAI API\" credential\n   - Enter your API key\n\n### Step 3: WordPress Credentials in n8n\n1. **Add WordPress API Credentials**:\n   - In n8n: Settings &gt; Credentials &gt; \"WordPress API\"\n   - **URL**: Your WordPress site URL\n   - **Username**: Your WordPress username\n   - **Password**: Application password from Step 1\n\n### Step 4: Update Workflow Settings\n1. **Configure Settings Node**:\n   - Open the \"Settings\" node\n   - Replace `wordpress_url` value with your actual WordPress URL\n   - Keep other settings as default or customize as needed\n\n2. **Update Credential References**:\n   - Ensure all WordPress nodes reference your WordPress credentials\n   - Verify OpenAI nodes use your OpenAI credentials\n\n### Step 5: Deploy Form (Production Use)\n1. **Activate Workflow**:\n   - Toggle workflow to \"Active\" status\n   - Note the webhook URL from Form Trigger node\n\n2. **Test Form Access**:\n   - Copy the form URL\n   - Test form submission with sample data\n   - Verify workflow execution completes successfully\n\n## Configuration Details\n\n### Form Customization\nThe form accepts three key inputs:\n- **Keywords**: Comma-separated topics for article generation\n- **Number of Chapters**: 1-10 chapters for content structure\n- **Max Word Count**: Total article length control\n\nYou can modify form fields by editing the \"Form\" trigger node:\n- Add additional input fields (category, author, publish date)\n- Change field types (dropdown, checkboxes, file upload)\n- Modify validation rules and requirements\n\n### AI Content Parameters\n\n#### Article Structure Generation\nThe \"Create post title and structure\" node uses these parameters:\n- **Model**: GPT-4-1106-preview for enhanced reasoning\n- **Max Tokens**: 2048 for comprehensive structure planning\n- **JSON Output**: Structured data for subsequent processing\n\n#### Chapter Writing\nThe \"Create chapters text\" node configuration:\n- **Model**: GPT-4-0125-preview for consistent writing quality\n- **Context Awareness**: Each chapter knows about preceding/following content\n- **Word Count Distribution**: Automatically calculates per-chapter length\n- **Coherence Checking**: Ensures smooth transitions between sections\n\n### Image Generation Settings\nDALL-E parameters in \"Generate featured image\":\n- **Size**: 1792x1024 (optimized for WordPress featured images)\n- **Style**: Natural (photographic look)\n- **Quality**: HD (higher quality output)\n- **Prompt Enhancement**: Adds photography keywords for better results\n\n## Usage Instructions\n\n### Basic Workflow\n1. **Access the Form**:\n   - Navigate to the form URL provided by the Form Trigger\n   - Enter your desired keywords (e.g., \"artificial intelligence, machine learning, automation\")\n   - Select number of chapters (3-5 recommended for most topics)\n   - Set word count (1000-2000 words typical)\n\n2. **Submit and Wait**:\n   - Click submit to trigger the workflow\n   - Processing takes 2-5 minutes depending on article length\n   - Monitor n8n execution log for progress\n\n3. **Review Generated Content**:\n   - Check WordPress admin for new draft post\n   - Review article structure and content quality\n   - Verify featured image is properly attached\n   - Edit as needed before publishing\n\n### Advanced Usage\n\n#### Custom Prompts\nModify AI prompts to change:\n- **Writing Style**: Formal, casual, technical, conversational\n- **Target Audience**: Beginners, experts, general public\n- **Content Focus**: How-to guides, opinion pieces, news analysis\n- **SEO Strategy**: Keyword density, meta descriptions, heading structure\n\n#### Bulk Content Creation\nFor multiple articles:\n1. Create separate form submissions for each topic\n2. Schedule workflow executions with different keywords\n3. Use CSV upload to process multiple keyword sets\n4. Implement queue system for high-volume processing\n\n## Expected Outputs\n\n### Article Structure\nGenerated articles include:\n- **SEO-Optimized Title**: Compelling, keyword-rich headline\n- **Descriptive Subtitle**: Supporting context for the main title\n- **Introduction**: ~60 words introducing the topic\n- **Chapter Sections**: Logical flow with HTML formatting\n- **Conclusions**: ~60 words summarizing key points\n- **Featured Image**: Custom DALL-E generated visual\n\n### Content Quality Features\n- **Factual Accuracy**: Wikipedia integration ensures reliable information\n- **Proper HTML Formatting**: Bold, italic, and list elements for readability\n- **Logical Flow**: Chapters build upon each other coherently\n- **SEO Elements**: Optimized for search engine visibility\n- **Professional Tone**: Consistent, engaging writing style\n\n### WordPress Integration\n- **Draft Status**: Articles saved as drafts for review\n- **Featured Image**: Automatically uploaded and assigned\n- **Proper Formatting**: HTML preserved in WordPress editor\n- **Metadata**: Title and content properly structured\n\n## Troubleshooting\n\n### Common Issues\n\n#### \"No Article Structure Generated\"\n**Cause**: AI couldn't create valid structure from keywords\n**Solutions**:\n- Use more specific, descriptive keywords\n- Reduce number of chapters requested\n- Check OpenAI API quotas and usage\n- Verify keywords are in English (default language)\n\n#### \"Chapter Content Missing\"\n**Cause**: Individual chapter generation failed\n**Solutions**:\n- Increase max tokens in chapter generation node\n- Simplify chapter prompts\n- Check for API rate limiting\n- Verify internet connectivity for Wikipedia tool\n\n#### \"WordPress Publication Failed\"\n**Cause**: Authentication or permission issues\n**Solutions**:\n- Verify WordPress credentials are correct\n- Check WordPress user has publishing permissions\n- Ensure WordPress REST API is accessible\n- Test WordPress URL accessibility\n\n#### \"Featured Image Not Attached\"\n**Cause**: Image generation or upload failure\n**Solutions**:\n- Check DALL-E API access and quotas\n- Verify image upload permissions in WordPress\n- Review image file size and format compatibility\n- Test manual image upload to WordPress\n\n### Performance Optimization\n\n#### Large Articles (2000+ words)\n- Increase timeout values in HTTP request nodes\n- Consider splitting very long articles into multiple posts\n- Implement progress tracking for user feedback\n- Add retry mechanisms for failed API calls\n\n#### High-Volume Usage\n- Implement queue system for multiple simultaneous requests\n- Add rate limiting to respect OpenAI API limits\n- Consider batch processing for efficiency\n- Monitor and optimize token usage\n\n## Customization Examples\n\n### Different Content Types\n\n#### Product Reviews\nModify prompts to include:\n- Pros and cons sections\n- Feature comparisons\n- Rating systems\n- Purchase recommendations\n\n#### Technical Tutorials\nAdjust structure for:\n- Step-by-step instructions\n- Code examples\n- Prerequisites sections\n- Troubleshooting guides\n\n#### News Articles\nConfigure for:\n- Who, what, when, where, why structure\n- Quote integration\n- Fact checking emphasis\n- Timeline organization\n\n### Alternative Platforms\n\n#### Replace WordPress with Other CMS\n- **Ghost**: Use Ghost API for publishing\n- **Webflow**: Integrate with Webflow CMS\n- **Strapi**: Connect to headless CMS\n- **Medium**: Publish to Medium platform\n\n#### Different AI Models\n- **Claude**: Replace OpenAI with Anthropic's Claude\n- **Gemini**: Use Google's Gemini for content generation\n- **Local Models**: Integrate with self-hosted AI models\n- **Multiple Models**: Use different models for different tasks\n\n### Enhanced Features\n\n#### SEO Optimization\nAdd nodes for:\n- **Meta Description Generation**: AI-created descriptions\n- **Tag Suggestions**: Relevant WordPress tags\n- **Internal Linking**: Suggest related content links\n- **Schema Markup**: Add structured data\n\n#### Content Enhancement\nInclude additional processing:\n- **Plagiarism Checking**: Verify content originality\n- **Readability Analysis**: Assess content accessibility\n- **Fact Verification**: Multiple source confirmation\n- **Image Optimization**: Compress and optimize images\n\n## Security Considerations\n\n### API Security\n- Store all credentials securely in n8n credential system\n- Use environment variables for sensitive configuration\n- Regularly rotate API keys and passwords\n- Monitor API usage for unusual activity\n\n### Content Moderation\n- Review generated content before publishing\n- Implement content filtering for inappropriate material\n- Consider legal implications of auto-generated content\n- Maintain editorial oversight and fact-checking\n\n### WordPress Security\n- Use application passwords instead of main account password\n- Limit WordPress user permissions to minimum required\n- Keep WordPress and plugins updated\n- Monitor for unauthorized access attempts\n\n## Legal and Ethical Considerations\n\n### Content Ownership\n- Understand OpenAI's terms regarding generated content\n- Consider copyright implications for Wikipedia-sourced information\n- Implement proper attribution where required\n- Review content licensing requirements\n\n### Disclosure Requirements\n- Consider disclosing AI-generated content to readers\n- Follow platform-specific guidelines for automated content\n- Ensure compliance with advertising and content standards\n- Respect intellectual property rights\n\n## Support and Maintenance\n\n### Regular Maintenance\n- Monitor OpenAI API usage and costs\n- Update AI prompts based on output quality\n- Review and update Wikipedia search strategies\n- Optimize workflow performance based on usage patterns\n\n### Quality Assurance\n- Regularly review generated content quality\n- Implement feedback loops for improvement\n- Test workflow with diverse keyword sets\n- Monitor WordPress site performance impact\n\n### Updates and Improvements\n- Stay updated with OpenAI model improvements\n- Monitor n8n platform updates for new features\n- Engage with community for workflow enhancements\n- Document custom modifications for future reference\n\n## Cost Optimization\n\n### OpenAI Usage\n- Monitor token consumption patterns\n- Optimize prompts for efficiency\n- Consider using different models for different tasks\n- Implement usage limits and budgets\n\n### Alternative Approaches\n- Use local AI models for cost reduction\n- Implement caching for repeated topics\n- Batch similar requests for efficiency\n- Consider hybrid human-AI content creation\n\n## License and Attribution\n\nThis workflow template is provided under MIT license. Attribution to original creator appreciated when sharing or modifying. Generated content is subject to OpenAI's usage policies and terms of service.",
+  "featuredImage": "/data/workflows/9018/9018.webp",
+  "author": {
+    "id": 101,
+    "slug": "punitkumar",
+    "name": "Punit",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1124,
+  "downloads": 112,
+  "createdAt": "2025-09-27T18:47:21.742Z",
+  "updatedAt": "2026-01-16T08:58:44.697Z",
+  "publishedAt": "2025-09-27T18:47:21.742Z",
+  "nodes": 37,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9018",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated blog post generator with GPT-4, DALL-E, and Wikipedia for WordPress",
+    "workflowName": "Automated blog post generator with GPT-4, DALL-E, and Wikipedia for WordPress",
+    "description": "# WordPress AI Content Creator\n\n## Overview\nTransform a few keywords into professionally written, SEO-optimized WordPress blog posts with custom featured images. This workflow leverages AI to research topics, structure content, write engaging articles, and publish them directly to your WordPress site as drafts ready for review.\n\n## What This Workflow Does\n\n### Core Features\n- **Keyword-to-Article Generation**: Converts simple keywords into comprehensive, well-structured articles\n- **Intelligent Content Planning**: Uses AI to create logical chapter structures and content flow\n- **Wikipedia Integration**: Researches factual information to ensure content accuracy and depth\n- **Multi-Chapter Writing**: Generates coherent, contextually-aware content across multiple sections\n- **Custom Image Creation**: Generates relevant featured images using DALL-E based on article content\n- **SEO Optimization**: Creates titles, subtitles, and content optimized for search engines\n- **WordPress Integration**: Automatically publishes articles as drafts with proper formatting and featured images\n\n### Business Value\n- **Content Scale**: Produce high-quality blog posts in minutes instead of hours\n- **Research Efficiency**: Automatically incorporates factual information from reliable sources\n- **Consistency**: Maintains professional tone and structure across all generated content\n- **SEO Benefits**: Creates search-engine friendly content with proper HTML formatting\n- **Cost Savings**: Reduces need for external content creation services\n\n## Prerequisites\n\n### Required Accounts & Credentials\n1. **WordPress Site** with REST API enabled\n2. **OpenAI API** access (GPT-4 and DALL-E models)\n3. **WordPress Application Password** or JWT authentication\n4. **Public-facing n8n instance** for form access (or n8n Cloud)\n\n### Technical Requirements\n- WordPress REST API v2 enabled (standard on most WordPress sites)\n- WordPress user account with publishing permissions\n- n8n instance with LangChain nodes package installed\n\n## Setup Instructions\n\n### Step 1: WordPress Configuration\n1. **Enable REST API** (usually enabled by default):\n   - Check that `yoursite.com/wp-json/wp/v2/` returns JSON data\n   - If not, contact hosting provider or install REST API plugin\n\n2. **Create Application Password**:\n   - In WordPress Admin: Users &gt; Profile\n   - Scroll to \"Application Passwords\"\n   - Add new password with name \"n8n Integration\"\n   - Copy the generated password (save securely)\n\n3. **Get WordPress Site URL**:\n   - Note your full WordPress site URL (e.g., `https://yourdomain.com`)\n\n### Step 2: OpenAI Configuration\n1. **Obtain OpenAI API Key**:\n   - Visit [OpenAI Platform](https://platform.openai.com/)\n   - Create API key with access to:\n     - GPT-4 models (for content generation)\n     - DALL-E (for image creation)\n\n2. **Add OpenAI Credentials in n8n**:\n   - Navigate to Settings &gt; Credentials\n   - Add \"OpenAI API\" credential\n   - Enter your API key\n\n### Step 3: WordPress Credentials in n8n\n1. **Add WordPress API Credentials**:\n   - In n8n: Settings &gt; Credentials &gt; \"WordPress API\"\n   - **URL**: Your WordPress site URL\n   - **Username**: Your WordPress username\n   - **Password**: Application password from Step 1\n\n### Step 4: Update Workflow Settings\n1. **Configure Settings Node**:\n   - Open the \"Settings\" node\n   - Replace `wordpress_url` value with your actual WordPress URL\n   - Keep other settings as default or customize as needed\n\n2. **Update Credential References**:\n   - Ensure all WordPress nodes reference your WordPress credentials\n   - Verify OpenAI nodes use your OpenAI credentials\n\n### Step 5: Deploy Form (Production Use)\n1. **Activate Workflow**:\n   - Toggle workflow to \"Active\" status\n   - Note the webhook URL from Form Trigger node\n\n2. **Test Form Access**:\n   - Copy the form URL\n   - Test form submission with sample data\n   - Verify workflow execution completes successfully\n\n## Configuration Details\n\n### Form Customization\nThe form accepts three key inputs:\n- **Keywords**: Comma-separated topics for article generation\n- **Number of Chapters**: 1-10 chapters for content structure\n- **Max Word Count**: Total article length control\n\nYou can modify form fields by editing the \"Form\" trigger node:\n- Add additional input fields (category, author, publish date)\n- Change field types (dropdown, checkboxes, file upload)\n- Modify validation rules and requirements\n\n### AI Content Parameters\n\n#### Article Structure Generation\nThe \"Create post title and structure\" node uses these parameters:\n- **Model**: GPT-4-1106-preview for enhanced reasoning\n- **Max Tokens**: 2048 for comprehensive structure planning\n- **JSON Output**: Structured data for subsequent processing\n\n#### Chapter Writing\nThe \"Create chapters text\" node configuration:\n- **Model**: GPT-4-0125-preview for consistent writing quality\n- **Context Awareness**: Each chapter knows about preceding/following content\n- **Word Count Distribution**: Automatically calculates per-chapter length\n- **Coherence Checking**: Ensures smooth transitions between sections\n\n### Image Generation Settings\nDALL-E parameters in \"Generate featured image\":\n- **Size**: 1792x1024 (optimized for WordPress featured images)\n- **Style**: Natural (photographic look)\n- **Quality**: HD (higher quality output)\n- **Prompt Enhancement**: Adds photography keywords for better results\n\n## Usage Instructions\n\n### Basic Workflow\n1. **Access the Form**:\n   - Navigate to the form URL provided by the Form Trigger\n   - Enter your desired keywords (e.g., \"artificial intelligence, machine learning, automation\")\n   - Select number of chapters (3-5 recommended for most topics)\n   - Set word count (1000-2000 words typical)\n\n2. **Submit and Wait**:\n   - Click submit to trigger the workflow\n   - Processing takes 2-5 minutes depending on article length\n   - Monitor n8n execution log for progress\n\n3. **Review Generated Content**:\n   - Check WordPress admin for new draft post\n   - Review article structure and content quality\n   - Verify featured image is properly attached\n   - Edit as needed before publishing\n\n### Advanced Usage\n\n#### Custom Prompts\nModify AI prompts to change:\n- **Writing Style**: Formal, casual, technical, conversational\n- **Target Audience**: Beginners, experts, general public\n- **Content Focus**: How-to guides, opinion pieces, news analysis\n- **SEO Strategy**: Keyword density, meta descriptions, heading structure\n\n#### Bulk Content Creation\nFor multiple articles:\n1. Create separate form submissions for each topic\n2. Schedule workflow executions with different keywords\n3. Use CSV upload to process multiple keyword sets\n4. Implement queue system for high-volume processing\n\n## Expected Outputs\n\n### Article Structure\nGenerated articles include:\n- **SEO-Optimized Title**: Compelling, keyword-rich headline\n- **Descriptive Subtitle**: Supporting context for the main title\n- **Introduction**: ~60 words introducing the topic\n- **Chapter Sections**: Logical flow with HTML formatting\n- **Conclusions**: ~60 words summarizing key points\n- **Featured Image**: Custom DALL-E generated visual\n\n### Content Quality Features\n- **Factual Accuracy**: Wikipedia integration ensures reliable information\n- **Proper HTML Formatting**: Bold, italic, and list elements for readability\n- **Logical Flow**: Chapters build upon each other coherently\n- **SEO Elements**: Optimized for search engine visibility\n- **Professional Tone**: Consistent, engaging writing style\n\n### WordPress Integration\n- **Draft Status**: Articles saved as drafts for review\n- **Featured Image**: Automatically uploaded and assigned\n- **Proper Formatting**: HTML preserved in WordPress editor\n- **Metadata**: Title and content properly structured\n\n## Troubleshooting\n\n### Common Issues\n\n#### \"No Article Structure Generated\"\n**Cause**: AI couldn't create valid structure from keywords\n**Solutions**:\n- Use more specific, descriptive keywords\n- Reduce number of chapters requested\n- Check OpenAI API quotas and usage\n- Verify keywords are in English (default language)\n\n#### \"Chapter Content Missing\"\n**Cause**: Individual chapter generation failed\n**Solutions**:\n- Increase max tokens in chapter generation node\n- Simplify chapter prompts\n- Check for API rate limiting\n- Verify internet connectivity for Wikipedia tool\n\n#### \"WordPress Publication Failed\"\n**Cause**: Authentication or permission issues\n**Solutions**:\n- Verify WordPress credentials are correct\n- Check WordPress user has publishing permissions\n- Ensure WordPress REST API is accessible\n- Test WordPress URL accessibility\n\n#### \"Featured Image Not Attached\"\n**Cause**: Image generation or upload failure\n**Solutions**:\n- Check DALL-E API access and quotas\n- Verify image upload permissions in WordPress\n- Review image file size and format compatibility\n- Test manual image upload to WordPress\n\n### Performance Optimization\n\n#### Large Articles (2000+ words)\n- Increase timeout values in HTTP request nodes\n- Consider splitting very long articles into multiple posts\n- Implement progress tracking for user feedback\n- Add retry mechanisms for failed API calls\n\n#### High-Volume Usage\n- Implement queue system for multiple simultaneous requests\n- Add rate limiting to respect OpenAI API limits\n- Consider batch processing for efficiency\n- Monitor and optimize token usage\n\n## Customization Examples\n\n### Different Content Types\n\n#### Product Reviews\nModify prompts to include:\n- Pros and cons sections\n- Feature comparisons\n- Rating systems\n- Purchase recommendations\n\n#### Technical Tutorials\nAdjust structure for:\n- Step-by-step instructions\n- Code examples\n- Prerequisites sections\n- Troubleshooting guides\n\n#### News Articles\nConfigure for:\n- Who, what, when, where, why structure\n- Quote integration\n- Fact checking emphasis\n- Timeline organization\n\n### Alternative Platforms\n\n#### Replace WordPress with Other CMS\n- **Ghost**: Use Ghost API for publishing\n- **Webflow**: Integrate with Webflow CMS\n- **Strapi**: Connect to headless CMS\n- **Medium**: Publish to Medium platform\n\n#### Different AI Models\n- **Claude**: Replace OpenAI with Anthropic's Claude\n- **Gemini**: Use Google's Gemini for content generation\n- **Local Models**: Integrate with self-hosted AI models\n- **Multiple Models**: Use different models for different tasks\n\n### Enhanced Features\n\n#### SEO Optimization\nAdd nodes for:\n- **Meta Description Generation**: AI-created descriptions\n- **Tag Suggestions**: Relevant WordPress tags\n- **Internal Linking**: Suggest related content links\n- **Schema Markup**: Add structured data\n\n#### Content Enhancement\nInclude additional processing:\n- **Plagiarism Checking**: Verify content originality\n- **Readability Analysis**: Assess content accessibility\n- **Fact Verification**: Multiple source confirmation\n- **Image Optimization**: Compress and optimize images\n\n## Security Considerations\n\n### API Security\n- Store all credentials securely in n8n credential system\n- Use environment variables for sensitive configuration\n- Regularly rotate API keys and passwords\n- Monitor API usage for unusual activity\n\n### Content Moderation\n- Review generated content before publishing\n- Implement content filtering for inappropriate material\n- Consider legal implications of auto-generated content\n- Maintain editorial oversight and fact-checking\n\n### WordPress Security\n- Use application passwords instead of main account password\n- Limit WordPress user permissions to minimum required\n- Keep WordPress and plugins updated\n- Monitor for unauthorized access attempts\n\n## Legal and Ethical Considerations\n\n### Content Ownership\n- Understand OpenAI's terms regarding generated content\n- Consider copyright implications for Wikipedia-sourced information\n- Implement proper attribution where required\n- Review content licensing requirements\n\n### Disclosure Requirements\n- Consider disclosing AI-generated content to readers\n- Follow platform-specific guidelines for automated content\n- Ensure compliance with advertising and content standards\n- Respect intellectual property rights\n\n## Support and Maintenance\n\n### Regular Maintenance\n- Monitor OpenAI API usage and costs\n- Update AI prompts based on output quality\n- Review and update Wikipedia search strategies\n- Optimize workflow performance based on usage patterns\n\n### Quality Assurance\n- Regularly review generated content quality\n- Implement feedback loops for improvement\n- Test workflow with diverse keyword sets\n- Monitor WordPress site performance impact\n\n### Updates and Improvements\n- Stay updated with OpenAI model improvements\n- Monitor n8n platform updates for new features\n- Engage with community for workflow enhancements\n- Document custom modifications for future reference\n\n## Cost Optimization\n\n### OpenAI Usage\n- Monitor token consumption patterns\n- Optimize prompts for efficiency\n- Consider using different models for different tasks\n- Implement usage limits and budgets\n\n### Alternative Approaches\n- Use local AI models for cost reduction\n- Implement caching for repeated topics\n- Batch similar requests for efficiency\n- Consider hybrid human-AI content creation\n\n## License and Attribution\n\nThis workflow template is provided under MIT license. Attribution to original creator appreciated when sharing or modifying. Generated content is subject to OpenAI's usage policies and terms of service.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check data consistency",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split out chapters",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge chapters title and text",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Final article text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post on Wordpress",
+      "type": "n8n-nodes-base.wordpress",
+      "role": "wordpress",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload media",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Set image ID for the post",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Respond: Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond: Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate featured image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "role": "toolWikipedia",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create post title and structure",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create chapters text",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    }
+  ]
+}

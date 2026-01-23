@@ -1,0 +1,380 @@
+{
+  "id": 7653,
+  "slug": "7653",
+  "title": "Calculate Embodied Carbon (CO2) for Revit/IFC Models using AI Classification",
+  "description": "Estimate **embodied carbon (CO2e)** for grouped BIM/CAD elements. The workflow accepts an existing **XLSX** (grouped element data) or, if missing, can trigger a local **RvtExporter.exe** to generate one. It detects category fields, filters out non-building elements, infers **aggregation rules** with AI, computes **CO2** using densities & emission factors, and exports a **multi-sheet Excel** plus a clean **HTML** report.\n\n## What it does\n- **Reads or builds XLSX** (from your model via `RvtExporter.exe` when needed).\n- **Finds category/volumetric fields**; separates building vs. annotation elements.\n- Uses AI to **infer aggregation rules** (sum/mean/first) per header.\n- **Groups** rows by your `group_by` field and aggregates totals.\n- Prepares **enhanced prompts** and calls your LLM to classify materials and estimate CO2 (A1-A3 minimum).\n- **Computes project totals** and generates a **multi-sheet XLSX** + **HTML** report with charts and hotspots.\n\n## Prerequisites\n- **LLM credentials** for one provider (e.g., OpenAI, Anthropic, Gemini, Grok/OpenRouter). Enable one chat node and connect credentials.\n- **Windows host** only if you want to auto-extract from `.rvt/.ifc` via `RvtExporter.exe`. If you already have an XLSX, Windows is **not required**.\n- Optional: mapping/classifier files (XLSX/CSV/PDF) to improve material classification.\n\n## How to use\n1. **Import** this JSON into n8n.\n2. Open the **Setup/Parameters** node(s) and set:\n   - `project_file` — path to your `.rvt/.ifc` **or** to an existing grouped `*_rvt.xlsx`\n   - `path_to_converter` — `C:\\\\DDC_Converter_Revit\\\\datadrivenlibs\\\\RvtExporter.exe` (optional)\n   - `group_by` — e.g., `Type Name` / `Category` / `IfcType`\n   - `sheet_name` — default `Summary` (if reading from XLSX)\n3. **Enable one LLM node** and attach credentials; keep others disabled.\n4. **Execute** (Manual Trigger). The workflow detects/builds the XLSX, analyzes, classifies, estimates CO2, then writes **Excel** and opens the **HTML** report.\n\n## Outputs\n- **Excel** (`CO2_Analysis_Report_YYYY-MM-DD.xlsx`, ~8 sheets): Executive Summary, All Elements, Material Summary, Category Analysis, Impact Analysis, Top 20 Hotspots, Data Quality, Recommendations.\n- **HTML**: executive report with key KPIs and charts.\n- Per-group fields include: *Material (EU/DE/US), Quantity & Unit, Density, Mass, CO2 Factor, Total CO2 (kg/tonnes), CO2 %, Confidence, Assumptions*.\n\n## Notes & tips\n- Input quantities (volumes/areas) are **already aggregated per group** — do **not** multiply by element count.\n- Use `-no-collada` upstream if you only need XLSX in extraction.\n- Prefer ASCII-safe paths and ensure write permissions to output folder.\n\n## Categories\nData Extraction · Files & Storage · ETL · CAD/BIM · Carbon/ESG\n\n## Tags\n`cad-bim`, `co2`, `carbon`, `embodied-carbon`, `lca`, `revit`, `ifc`, `xlsx`, `html-report`, `llm`\n\n## Author\n [DataDrivenConstruction.io ](https://DataDrivenConstruction.io )\n [info@datadrivenconstruction.io](mailto:info@datadrivenconstruction.io)\n\n\n## Consulting and Training\nWe work with leading construction, engineering, consulting agencies and technology firms around the world to help them implement open data principles, automate CAD/BIM processing and build robust ETL pipelines.\n\nIf you would like to test this solution with your own data, or are interested in adapting the workflow to real project tasks, feel free to contact us.\n\n\n**Docs & Issues:**  \n  [Full Readme on GitHub](https://github.com/datadrivenconstruction/cad2data-Revit-IFC-DWG-DGN-pipeline-with-conversion-validation-qto)",
+  "featuredImage": "/data/workflows/7653/7653.webp",
+  "author": {
+    "id": 101,
+    "slug": "datadrivenconstruction",
+    "name": "Artem Boiko",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 325,
+  "downloads": 32,
+  "createdAt": "2025-08-20T15:31:58.694Z",
+  "updatedAt": "2026-01-16T08:51:37.705Z",
+  "publishedAt": "2025-08-20T15:31:58.694Z",
+  "nodes": 57,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7653",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Calculate Embodied Carbon (CO2) for Revit/IFC Models using AI Classification",
+    "workflowName": "Calculate Embodied Carbon (CO2) for Revit/IFC Models using AI Classification",
+    "description": "Estimate **embodied carbon (CO2e)** for grouped BIM/CAD elements. The workflow accepts an existing **XLSX** (grouped element data) or, if missing, can trigger a local **RvtExporter.exe** to generate one. It detects category fields, filters out non-building elements, infers **aggregation rules** with AI, computes **CO2** using densities & emission factors, and exports a **multi-sheet Excel** plus a clean **HTML** report.\n\n## What it does\n- **Reads or builds XLSX** (from your model via `RvtExporter.exe` when needed).\n- **Finds category/volumetric fields**; separates building vs. annotation elements.\n- Uses AI to **infer aggregation rules** (sum/mean/first) per header.\n- **Groups** rows by your `group_by` field and aggregates totals.\n- Prepares **enhanced prompts** and calls your LLM to classify materials and estimate CO2 (A1-A3 minimum).\n- **Computes project totals** and generates a **multi-sheet XLSX** + **HTML** report with charts and hotspots.\n\n## Prerequisites\n- **LLM credentials** for one provider (e.g., OpenAI, Anthropic, Gemini, Grok/OpenRouter). Enable one chat node and connect credentials.\n- **Windows host** only if you want to auto-extract from `.rvt/.ifc` via `RvtExporter.exe`. If you already have an XLSX, Windows is **not required**.\n- Optional: mapping/classifier files (XLSX/CSV/PDF) to improve material classification.\n\n## How to use\n1. **Import** this JSON into n8n.\n2. Open the **Setup/Parameters** node(s) and set:\n   - `project_file` — path to your `.rvt/.ifc` **or** to an existing grouped `*_rvt.xlsx`\n   - `path_to_converter` — `C:\\\\DDC_Converter_Revit\\\\datadrivenlibs\\\\RvtExporter.exe` (optional)\n   - `group_by` — e.g., `Type Name` / `Category` / `IfcType`\n   - `sheet_name` — default `Summary` (if reading from XLSX)\n3. **Enable one LLM node** and attach credentials; keep others disabled.\n4. **Execute** (Manual Trigger). The workflow detects/builds the XLSX, analyzes, classifies, estimates CO2, then writes **Excel** and opens the **HTML** report.\n\n## Outputs\n- **Excel** (`CO2_Analysis_Report_YYYY-MM-DD.xlsx`, ~8 sheets): Executive Summary, All Elements, Material Summary, Category Analysis, Impact Analysis, Top 20 Hotspots, Data Quality, Recommendations.\n- **HTML**: executive report with key KPIs and charts.\n- Per-group fields include: *Material (EU/DE/US), Quantity & Unit, Density, Mass, CO2 Factor, Total CO2 (kg/tonnes), CO2 %, Confidence, Assumptions*.\n\n## Notes & tips\n- Input quantities (volumes/areas) are **already aggregated per group** — do **not** multiply by element count.\n- Use `-no-collada` upstream if you only need XLSX in extraction.\n- Prefer ASCII-safe paths and ensure write permissions to output folder.\n\n## Categories\nData Extraction · Files & Storage · ETL · CAD/BIM · Carbon/ESG\n\n## Tags\n`cad-bim`, `co2`, `carbon`, `embodied-carbon`, `lca`, `revit`, `ifc`, `xlsx`, `html-report`, `llm`\n\n## Author\n [DataDrivenConstruction.io ](https://DataDrivenConstruction.io )\n [info@datadrivenconstruction.io](mailto:info@datadrivenconstruction.io)\n\n\n## Consulting and Training\nWe work with leading construction, engineering, consulting agencies and technology firms around the world to help them implement open data principles, automate CAD/BIM processing and build robust ETL pipelines.\n\nIf you would like to test this solution with your own data, or are interested in adapting the workflow to real project tasks, feel free to contact us.\n\n\n**Docs & Issues:**  \n  [Full Readme on GitHub](https://github.com/datadrivenconstruction/cad2data-Revit-IFC-DWG-DGN-pipeline-with-conversion-validation-qto)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Find Category Fields1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Apply Classification to Groups1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Non-Building Elements Output1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Headers and Data1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Analyze All Headers1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Process AI Response1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Group Data with AI Rules1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Classify Categories1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Is Building Element1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check If All Batches Done",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Collect All Results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process in Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clean Empty Values1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Agent Enhanced",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Accumulate Results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Anthropic Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Calculate Project Totals4",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Enhance Excel Output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Excel Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Excel File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "role": "spreadsheetFile",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Enhanced Prompts",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Enhanced Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Read Excel File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "role": "readBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Excel",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "role": "spreadsheetFile",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Setup - Define file paths",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create - Excel filename",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check - Does Excel file exist?",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "role": "readBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If - File exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract - Run converter",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Info - Skip conversion",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check - Did extraction succeed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Error - Show what went wrong",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set xlsx_filename after success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge - Continue workflow",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Parameters",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Conversion Block",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Data Loading Block",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Element Classification Block",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Material Analysis Block",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "CO2 Calculation and Reporting Block",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setup Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Important Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare HTML Path",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Write HTML to Project Folder",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "role": "writeBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Open HTML in Browser",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Excel Path",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Write Excel to Project Folder",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "role": "writeBinaryFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate HTML Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "HTML to Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Conversion Block1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "xAI Grok Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatXAiGrok",
+      "role": "lmChatXAiGrok",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On the standard 3D View",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Non-3D View Elements Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

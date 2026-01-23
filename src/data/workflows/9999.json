@@ -1,0 +1,164 @@
+{
+  "id": 9999,
+  "slug": "9999",
+  "title": "AI-powered feedback triage: Jotform to Trello, Airtable & Slack with Gemini",
+  "description": "Turn raw feedback into actionable product insights. This workflow collects feedback from both customers and staff via a single **Jotform**, uses **Gemini AI** to analyze and categorize it, then intelligently routes it:\n\n* **Actionable bugs and feature requests** become tasks in specific **Trello** lists, tagged with source and priority.\n* **General feedback** is logged in a structured **Airtable** base for later review.\n* **Urgent bugs** trigger instant **Slack** alerts for your dev team.\n* An **optional confirmation email** is sent via **Gmail** if the submitter provides their address.\n\nStop manually sorting feedback and ensure nothing falls through the cracks. This workflow centralizes input, automates triage, and delivers structured data directly to your product and development teams.\n\n### **Features**\n\n* **Unified Feedback Collection:** Uses a single Jotform for customers and staff.\n* **AI-Powered Triage:** Gemini AI categorizes feedback (Bug, Feature Request, General), suggests priority, and extracts keyword tags.\n* **Intelligent Filtering:** An IF node separates actionable tasks from general comments.\n* **Automated Task Creation:** Creates Trello cards in specific lists (\"Bugs,\" \"Feature Backlog\") with relevant labels (Source, Urgent).\n* **Structured Logging:** Saves all general feedback to an Airtable base for review and trend analysis.\n* **Conditional Alerts:** Notifies a Slack channel *only* for high-priority bugs.\n* **Optional Email Confirmation:** Sends a thank-you email if the submitter provides their address.\n\n### **Nodes Used**\n\n* 🟣 **Jotform Trigger** (`Jotform Trigger`)\n* ✉️ **Gmail** (`Send Confirmation Email`)\n* 🧠 **AI Agent** (`AI Feedback Triage`)\n* 🃏 **Trello** (`Create Trello Card`)\n* 📣 **Slack** (`Alert Dev Team`)\n* 🗂️ **Airtable** (`Log General Feedback to Airtable`)\n* **🔧 Set**, **❓ IF**, **🚫 No Operation, do nothing**\n\n---\n\n### **How to use this template**\n\nFollow these steps to configure the workflow with your accounts and specific IDs.\n\n**1. Set up Jotform, Trello, and Airtable (CRITICAL)**\n* Before starting, you **must** create the Jotform form, Trello board, and Airtable base exactly as described in the **\"Required Setup\"** section at the end of this document.\n\n**2. Configure the `Jotform Trigger` Node**\n* **Credentials:** Connect your Jotform account.\n* **Form:** Select your \"Help us improve IdeaToBiz\" form (replace the title with your company name).\n* **Resolve Data:** Ensure the **\"Resolve Data\"** toggle in the node's parameters is turned **ON**.\n\n**3. Configure the `Config` (Set) Node**\n* This node stores your Trello IDs. You **must** replace the placeholder values.\n* **Find Your IDs:** Open your Trello board, add `.json` to the URL, and press Enter. Search the JSON page for your List names (\"Bugs,\" \"Feature Backlog\") and Label names (\"Customer,\" \"Staff,\" \"Other,\" \"Urgent\") to find their corresponding `\"id\"` values.\n* **Action:** Paste your unique IDs into the value fields in this node.\n\n**4. Configure the `Email Provided?` (IF) and `Send Confirmation Email` (Gmail) Nodes**\n* **IF Node:** No configuration needed.\n* **Gmail Node:**\n    * **Credentials:** Connect your Gmail (or other email service) account.\n    * **Customize:** Edit the **Subject** and **Body** to match your company's voice.\n\n**5. Configure the `AI Feedback Triage` Node**\n* **Credentials:** Connect your Google AI (Gemini) credentials.\n* **Check Prompt:** Ensure the prompt correctly references your feedback field (e.g., `{{ $('Jotform Trigger').item.json['Feedback Details'] }}`).\n* **Check Schema:** Ensure the \"Structured Output\" JSON schema matches the required fields (`task_title`, `category`, `suggested_priority`, `tags`).\n\n**6. Configure the `Is it a Bug or Feature?` (IF) Node**\n* No configuration needed. This node filters based on the AI output.\n\n**7. Configure the `Create Trello Card` Node**\n* **Credentials:** Connect your Trello credentials.\n* **Board ID:** Select your `Product Feedback` board.\n* **Check Expressions:** Verify that the expressions for `List ID` and `Labels` correctly pull the IDs from your `Config` node and data from the `AI Feedback Triage` and `Jotform Trigger` nodes. The template should be pre-filled, but double-check node names if you renamed them.\n\n**8. Configure the `Is it an Urgent Bug?` (IF) Node**\n* No configuration needed. This checks the AI output before alerting Slack.\n\n**9. Configure the `Alert Dev Team` (Slack) Node**\n* **Credentials:** Connect your Slack credentials.\n* **Channel:** Select the channel for urgent bug alerts (e.g., `#dev-alerts`).\n* **Customize:** Edit the message text if desired. Ensure the Trello card URL expression (`{{ $('Create Trello Card').item.json.shortUrl }}`) is correct.\n\n**10. Configure the `Log General Feedback to Airtable` Node**\n* **Credentials:** Connect your Airtable credentials.\n* **Base ID:** Select your `Product Feedback Log` base.\n* **Table ID:** Select your `Feedback Submissions` table.\n* **Enable Typecast:** In the node's **Options**, ensure the **`Typecast`** toggle is **ON**. This is crucial for allowing n8n to create new tag options in Airtable.\n* **Check Field Mappings:** Verify that the field mappings correctly reference the `AI Feedback Triage` and `Jotform Trigger` nodes.\n\n**11. Activate Your Workflow!**\n* Once all credentials and IDs are configured, save and activate your workflow.\n\n---\n\n### **How to Adapt the Template**\n\n* **Change Task Destination:** Replace the Trello node with **ClickUp**, **Asana**, **Jira**, or another task manager. You'll need to adapt the field mappings.\n* **Change Logging Destination:** Replace the Airtable node with **Google Sheets**, **Notion**, or send logs via **Email** or **Discord**.\n* **Adjust AI Prompt:** Modify the prompt in the `AI Feedback Triage` node to change how feedback is categorized, prioritized, or tagged.\n* **Modify Filtering Logic:** Change the conditions in the `Is it a Bug or Feature?` IF node (e.g., maybe you also want \"UI/UX Issue\" to go to Trello).\n* **Refine Alerting:** Change the conditions in the `Is it an Urgent Bug?` IF node or send alerts for different categories (e.g., alert the design team for UI issues).\n\n---\n\n### **Required Setup**\n\n#### **Jotform Form Setup**\n\n1.  **Create Account:** If needed, sign up at [Jotform](https://www.jotform.com/?partner=atakhalighi).\n2.  **Create Form:** Build a form titled \"Help us improve IdeaToBiz\" (or similar).\n3.  **Add Fields:**\n    * **Radio Button:** Label `I am a...`, Options `Customer`, `Staff`, `Other` (Required: ON).\n    * **Email:** Label `Your Email (Optional)` (Required: OFF).\n    * **Long Text:** Label `Feedback Details` (Required: ON).\n    * **Submit Button:** Label `Submit Feedback`.\n\n#### **Trello Board Setup**\n\n1.  **Create Board:** Create a new Trello board named `Product Feedback`.\n2.  **Create Lists (Columns):** Add at least these two lists:\n    * `Feature Backlog`\n    * `Bugs`\n3.  **Create Labels:** Go to Menu -&gt; More -&gt; Labels and create:\n    * `Urgent` (Red recommended)\n    * `Customer` (Blue recommended)\n    * `Staff` (Green recommended)\n    * `Other` (Grey recommended)\n\n#### **Airtable Base Setup**\n\n1.  **Create Base:** Create a new Airtable base named `Product Feedback Log`.\n2.  **Create Table:** Name the table `Feedback Submissions`.\n3.  **Configure Fields:**\n    * Rename the primary field (`Name`) to **`Feedback Summary`** (Type: Single line text).\n    * Rename `Notes` to **`Full Feedback`** (Type: Long text).\n    * Delete `Assignee`.\n    * Rename `Status` to **`Source`** (Type: Single select, Options: `Customer`, `Staff`, `Other`).\n    * Add **`Email`** field (Type: Email).\n    * Add **`AI Tags`** field (Type: Multiple select).\n    * Add **`Submitted At`** field (Type: Created time).",
+  "featuredImage": "/data/workflows/9999/9999.webp",
+  "author": {
+    "id": 101,
+    "slug": "attakhalighi",
+    "name": "Atta",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 287,
+  "downloads": 28,
+  "createdAt": "2025-10-21T20:14:50.965Z",
+  "updatedAt": "2026-01-16T09:02:57.134Z",
+  "publishedAt": "2025-10-21T20:14:50.965Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9999",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered feedback triage: Jotform to Trello, Airtable & Slack with Gemini",
+    "workflowName": "AI-powered feedback triage: Jotform to Trello, Airtable & Slack with Gemini",
+    "description": "Turn raw feedback into actionable product insights. This workflow collects feedback from both customers and staff via a single **Jotform**, uses **Gemini AI** to analyze and categorize it, then intelligently routes it:\n\n* **Actionable bugs and feature requests** become tasks in specific **Trello** lists, tagged with source and priority.\n* **General feedback** is logged in a structured **Airtable** base for later review.\n* **Urgent bugs** trigger instant **Slack** alerts for your dev team.\n* An **optional confirmation email** is sent via **Gmail** if the submitter provides their address.\n\nStop manually sorting feedback and ensure nothing falls through the cracks. This workflow centralizes input, automates triage, and delivers structured data directly to your product and development teams.\n\n### **Features**\n\n* **Unified Feedback Collection:** Uses a single Jotform for customers and staff.\n* **AI-Powered Triage:** Gemini AI categorizes feedback (Bug, Feature Request, General), suggests priority, and extracts keyword tags.\n* **Intelligent Filtering:** An IF node separates actionable tasks from general comments.\n* **Automated Task Creation:** Creates Trello cards in specific lists (\"Bugs,\" \"Feature Backlog\") with relevant labels (Source, Urgent).\n* **Structured Logging:** Saves all general feedback to an Airtable base for review and trend analysis.\n* **Conditional Alerts:** Notifies a Slack channel *only* for high-priority bugs.\n* **Optional Email Confirmation:** Sends a thank-you email if the submitter provides their address.\n\n### **Nodes Used**\n\n* 🟣 **Jotform Trigger** (`Jotform Trigger`)\n* ✉️ **Gmail** (`Send Confirmation Email`)\n* 🧠 **AI Agent** (`AI Feedback Triage`)\n* 🃏 **Trello** (`Create Trello Card`)\n* 📣 **Slack** (`Alert Dev Team`)\n* 🗂️ **Airtable** (`Log General Feedback to Airtable`)\n* **🔧 Set**, **❓ IF**, **🚫 No Operation, do nothing**\n\n---\n\n### **How to use this template**\n\nFollow these steps to configure the workflow with your accounts and specific IDs.\n\n**1. Set up Jotform, Trello, and Airtable (CRITICAL)**\n* Before starting, you **must** create the Jotform form, Trello board, and Airtable base exactly as described in the **\"Required Setup\"** section at the end of this document.\n\n**2. Configure the `Jotform Trigger` Node**\n* **Credentials:** Connect your Jotform account.\n* **Form:** Select your \"Help us improve IdeaToBiz\" form (replace the title with your company name).\n* **Resolve Data:** Ensure the **\"Resolve Data\"** toggle in the node's parameters is turned **ON**.\n\n**3. Configure the `Config` (Set) Node**\n* This node stores your Trello IDs. You **must** replace the placeholder values.\n* **Find Your IDs:** Open your Trello board, add `.json` to the URL, and press Enter. Search the JSON page for your List names (\"Bugs,\" \"Feature Backlog\") and Label names (\"Customer,\" \"Staff,\" \"Other,\" \"Urgent\") to find their corresponding `\"id\"` values.\n* **Action:** Paste your unique IDs into the value fields in this node.\n\n**4. Configure the `Email Provided?` (IF) and `Send Confirmation Email` (Gmail) Nodes**\n* **IF Node:** No configuration needed.\n* **Gmail Node:**\n    * **Credentials:** Connect your Gmail (or other email service) account.\n    * **Customize:** Edit the **Subject** and **Body** to match your company's voice.\n\n**5. Configure the `AI Feedback Triage` Node**\n* **Credentials:** Connect your Google AI (Gemini) credentials.\n* **Check Prompt:** Ensure the prompt correctly references your feedback field (e.g., `{{ $('Jotform Trigger').item.json['Feedback Details'] }}`).\n* **Check Schema:** Ensure the \"Structured Output\" JSON schema matches the required fields (`task_title`, `category`, `suggested_priority`, `tags`).\n\n**6. Configure the `Is it a Bug or Feature?` (IF) Node**\n* No configuration needed. This node filters based on the AI output.\n\n**7. Configure the `Create Trello Card` Node**\n* **Credentials:** Connect your Trello credentials.\n* **Board ID:** Select your `Product Feedback` board.\n* **Check Expressions:** Verify that the expressions for `List ID` and `Labels` correctly pull the IDs from your `Config` node and data from the `AI Feedback Triage` and `Jotform Trigger` nodes. The template should be pre-filled, but double-check node names if you renamed them.\n\n**8. Configure the `Is it an Urgent Bug?` (IF) Node**\n* No configuration needed. This checks the AI output before alerting Slack.\n\n**9. Configure the `Alert Dev Team` (Slack) Node**\n* **Credentials:** Connect your Slack credentials.\n* **Channel:** Select the channel for urgent bug alerts (e.g., `#dev-alerts`).\n* **Customize:** Edit the message text if desired. Ensure the Trello card URL expression (`{{ $('Create Trello Card').item.json.shortUrl }}`) is correct.\n\n**10. Configure the `Log General Feedback to Airtable` Node**\n* **Credentials:** Connect your Airtable credentials.\n* **Base ID:** Select your `Product Feedback Log` base.\n* **Table ID:** Select your `Feedback Submissions` table.\n* **Enable Typecast:** In the node's **Options**, ensure the **`Typecast`** toggle is **ON**. This is crucial for allowing n8n to create new tag options in Airtable.\n* **Check Field Mappings:** Verify that the field mappings correctly reference the `AI Feedback Triage` and `Jotform Trigger` nodes.\n\n**11. Activate Your Workflow!**\n* Once all credentials and IDs are configured, save and activate your workflow.\n\n---\n\n### **How to Adapt the Template**\n\n* **Change Task Destination:** Replace the Trello node with **ClickUp**, **Asana**, **Jira**, or another task manager. You'll need to adapt the field mappings.\n* **Change Logging Destination:** Replace the Airtable node with **Google Sheets**, **Notion**, or send logs via **Email** or **Discord**.\n* **Adjust AI Prompt:** Modify the prompt in the `AI Feedback Triage` node to change how feedback is categorized, prioritized, or tagged.\n* **Modify Filtering Logic:** Change the conditions in the `Is it a Bug or Feature?` IF node (e.g., maybe you also want \"UI/UX Issue\" to go to Trello).\n* **Refine Alerting:** Change the conditions in the `Is it an Urgent Bug?` IF node or send alerts for different categories (e.g., alert the design team for UI issues).\n\n---\n\n### **Required Setup**\n\n#### **Jotform Form Setup**\n\n1.  **Create Account:** If needed, sign up at [Jotform](https://www.jotform.com/?partner=atakhalighi).\n2.  **Create Form:** Build a form titled \"Help us improve IdeaToBiz\" (or similar).\n3.  **Add Fields:**\n    * **Radio Button:** Label `I am a...`, Options `Customer`, `Staff`, `Other` (Required: ON).\n    * **Email:** Label `Your Email (Optional)` (Required: OFF).\n    * **Long Text:** Label `Feedback Details` (Required: ON).\n    * **Submit Button:** Label `Submit Feedback`.\n\n#### **Trello Board Setup**\n\n1.  **Create Board:** Create a new Trello board named `Product Feedback`.\n2.  **Create Lists (Columns):** Add at least these two lists:\n    * `Feature Backlog`\n    * `Bugs`\n3.  **Create Labels:** Go to Menu -&gt; More -&gt; Labels and create:\n    * `Urgent` (Red recommended)\n    * `Customer` (Blue recommended)\n    * `Staff` (Green recommended)\n    * `Other` (Grey recommended)\n\n#### **Airtable Base Setup**\n\n1.  **Create Base:** Create a new Airtable base named `Product Feedback Log`.\n2.  **Create Table:** Name the table `Feedback Submissions`.\n3.  **Configure Fields:**\n    * Rename the primary field (`Name`) to **`Feedback Summary`** (Type: Single line text).\n    * Rename `Notes` to **`Full Feedback`** (Type: Long text).\n    * Delete `Assignee`.\n    * Rename `Status` to **`Source`** (Type: Single select, Options: `Customer`, `Staff`, `Other`).\n    * Add **`Email`** field (Type: Email).\n    * Add **`AI Tags`** field (Type: Multiple select).\n    * Add **`Submitted At`** field (Type: Created time).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "JotForm Trigger",
+      "type": "n8n-nodes-base.jotFormTrigger",
+      "role": "jotFormTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Feedback Triage",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is it a Bug or Feature?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Trello Card",
+      "type": "n8n-nodes-base.trello",
+      "role": "trello",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Log General Feedback to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Is it an Urgent Bug?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Alert Dev Team",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "No Alert Needed",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email Provided?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Skip Confirmation Email",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

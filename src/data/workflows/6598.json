@@ -1,0 +1,146 @@
+{
+  "id": 6598,
+  "slug": "6598",
+  "title": "Sync HubSpot, Pipedrive & Salesforce to Google Sheets with OpenAI deduplication",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## How it works\n\nThis workflow automatically synchronizes contact data from multiple CRM systems (HubSpot, Pipedrive, and Salesforce) into a unified Google Sheets database. The system runs on a daily schedule or can be triggered manually via webhook. It uses AI-powered data processing to intelligently deduplicate records, calculate data quality scores, and merge similar contacts. The workflow generates comprehensive quality reports and sends notifications via Slack, ensuring your master database stays clean and up-to-date.\n\n## Who is this for\n\nThis template is designed for revenue operations teams, data managers, and business analysts who need to consolidate customer data from multiple CRM platforms. It's particularly valuable for organizations using multiple sales tools simultaneously or during CRM migration projects. The workflow helps maintain data integrity while providing insights into data quality across different systems.\n\n## Requirements\n\n- **Google Sheets Account**: For storing master database and quality reports\n- **CRM Platform Access**: API credentials for HubSpot, Pipedrive, and/or Salesforce\n- **OpenAI API Key**: For AI-powered data processing and deduplication\n- **MCP Server**: Github:marlonluo2018/pandas-mcp-server (optional - can be replaced with Code node)\n- **Slack Webhook**: For receiving sync completion and error notifications\n\n\n## How to set up\n\n1. **Configure Environment Variables** - Set up secure credential storage for all API keys: HUBSPOT_API_KEY, PIPEDRIVE_API_KEY, SALESFORCE_ACCESS_TOKEN, OPENAI_API_KEY, and SLACK_WEBHOOK_URL\n\n2. **Create Google Sheets Structure** - Create a master Google Sheet with two tabs: \"Master_CRM_Data\" for the unified contact database and \"Quality_Reports\" for tracking sync statistics and data quality metrics\n\n3. **Set Up MCP Server** - Install and configure \"marlonluo2018/pandas-mcp-server\" \n\n4. **Update Configuration Center** - Modify all placeholder values in the Configuration Center node with your actual Google Sheet IDs, quality thresholds, deduplication keys, and batch processing settings\n\n",
+  "featuredImage": "/data/workflows/6598/6598.webp",
+  "author": {
+    "id": 101,
+    "slug": "grace-bola",
+    "name": "Grace Gbadamosi",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 185,
+  "downloads": 18,
+  "createdAt": "2025-07-28T20:36:54.327Z",
+  "updatedAt": "2026-01-16T08:45:54.323Z",
+  "publishedAt": "2025-07-28T20:36:54.327Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6598",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sync HubSpot, Pipedrive & Salesforce to Google Sheets with OpenAI deduplication",
+    "workflowName": "Sync HubSpot, Pipedrive & Salesforce to Google Sheets with OpenAI deduplication",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## How it works\n\nThis workflow automatically synchronizes contact data from multiple CRM systems (HubSpot, Pipedrive, and Salesforce) into a unified Google Sheets database. The system runs on a daily schedule or can be triggered manually via webhook. It uses AI-powered data processing to intelligently deduplicate records, calculate data quality scores, and merge similar contacts. The workflow generates comprehensive quality reports and sends notifications via Slack, ensuring your master database stays clean and up-to-date.\n\n## Who is this for\n\nThis template is designed for revenue operations teams, data managers, and business analysts who need to consolidate customer data from multiple CRM platforms. It's particularly valuable for organizations using multiple sales tools simultaneously or during CRM migration projects. The workflow helps maintain data integrity while providing insights into data quality across different systems.\n\n## Requirements\n\n- **Google Sheets Account**: For storing master database and quality reports\n- **CRM Platform Access**: API credentials for HubSpot, Pipedrive, and/or Salesforce\n- **OpenAI API Key**: For AI-powered data processing and deduplication\n- **MCP Server**: Github:marlonluo2018/pandas-mcp-server (optional - can be replaced with Code node)\n- **Slack Webhook**: For receiving sync completion and error notifications\n\n\n## How to set up\n\n1. **Configure Environment Variables** - Set up secure credential storage for all API keys: HUBSPOT_API_KEY, PIPEDRIVE_API_KEY, SALESFORCE_ACCESS_TOKEN, OPENAI_API_KEY, and SLACK_WEBHOOK_URL\n\n2. **Create Google Sheets Structure** - Create a master Google Sheet with two tabs: \"Master_CRM_Data\" for the unified contact database and \"Quality_Reports\" for tracking sync statistics and data quality metrics\n\n3. **Set Up MCP Server** - Install and configure \"marlonluo2018/pandas-mcp-server\" \n\n4. **Update Configuration Center** - Modify all placeholder values in the Configuration Center node with your actual Google Sheet IDs, quality thresholds, deduplication keys, and batch processing settings",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Daily Sync Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Manual Sync Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Trigger Router",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Configuration Center",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Parallel CRM Fetcher",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Master Database Writer",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Quality Report Generator",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Report Writer",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Processor",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "CRM Data Processing Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "pandas-mcp-server",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

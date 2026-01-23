@@ -1,0 +1,224 @@
+{
+  "id": 7781,
+  "slug": "7781",
+  "title": "Automated client onboarding system with Notion, email & CRM integration",
+  "description": "# Graceful Client Onboarding Concierge — Pro \n\nA warm, reliable onboarding system for small businesses and studios. Captures a form submission via webhook, creates a Client record in Notion, sends a concierge-style welcome email (with scheduler + optional contract link), optionally pings the owner on Telegram, mirrors the lead to Airtable/HubSpot, places a temporary Google Calendar hold, and includes a double opt-in confirmation link.\n\n**Made for:** coaches, designers, boutique agencies, e-commerce and service providers who want consistent follow-up without manual busywork.\n\n---\n\n## What it does (flow)\n\n* **Trigger:** Form ➜ `POST /client-intake` (or Manual Trigger for instant demo)\n* **Normalize & Score:** Map fields, auto-generate `optInToken`, compute `score` and `tier`\n* **Create in Notion:** `Clients` page (Name, Email, Package, Notes, Status, Score, Tier, OptInToken, Consent=false)\n* **Welcome Email:** industry-tuned copy + scheduler link (+ contract link for Growth/Pro/Custom packages)\n* **Owner Notify (optional):** Telegram ping with tier + score\n* **CRM Mirrors (optional):** Create Airtable row and/or HubSpot contact\n* **Calendar Hold (optional):** 30-min “Intro Hold” event (e.g., now + 48h)\n* **Double Opt-In:** `/optin-confirm?token=...&email=...` sets Consent=true & Status=Confirmed in Notion\n* **Error Handling:** On failure, send an email to the owner\n\n```mermaid\nflowchart TD\n A[Form → Webhook /client-intake] --&gt; B[Map Intake + Score Lead]\n B --&gt; C[Notion: Create Client]\n B --&gt; D[Build Welcome Email]\n D --&gt; E[Email: Send Welcome]\n D --&gt; F{Optional actions}\n F --&gt;|Telegram| G[Telegram: Notify Owner]\n F --&gt;|Airtable| H[Airtable: Create Row]\n F --&gt;|HubSpot| I[HubSpot: Create Contact]\n F --&gt;|Calendar Hold| J[Google Calendar: Create Hold]\n K[GET /optin-confirm] --&gt; L[Find Notion by OptInToken] --&gt; M[Update: Consent=true, Status=Confirmed]\n ER[Error Trigger] --&gt; EH[Email Owner]\n```\n\n---\n\n## Prerequisites\n\n* **Notion** database **`Clients`** with properties:\n  `Name (title)`, `Email (email)`, `Package (select)`, `Notes (rich text)`, `Status (select)`, `Score (number)`, `Tier (select)`, `OptInToken (text)`, `Consent (checkbox)`\n  *(CSV header provided in the Sticky note on canvas.)*\n* **Email** (SMTP or Gmail OAuth)\n* **Optional:** Telegram Bot + Chat ID, Airtable (Base ID + Table), HubSpot (Contacts), Google Calendar (Calendar ID)\n\n---\n\n## Configuration (Set these in **Set: User Config**)\n\n```\nNOTION_DB_ID             = your Notion Clients DB ID\nFROM_EMAIL               = sender address for welcome email\nOWNER_EMAIL              = where error notifications go\nSCHEDULER_URL            = booking link (Calendly, Once, etc.)\nBASE_URL                 = your public n8n domain (for opt-in link)\nCONTRACT_BASE_URL        = (optional) proposal/contract URL base\n\nENABLE_TELEGRAM          = true|false\nTELEGRAM_CHAT_ID         = (if enabled)\n\nENABLE_AIRTABLE          = true|false\nAIRTABLE_BASE_ID         = (if enabled)\nAIRTABLE_TABLE           = (if enabled)\n\nENABLE_HUBSPOT           = true|false\n\nENABLE_CAL_HOLD          = true|false\nCALENDAR_ID              = \"primary\" or calendar ID\nHOLD_HOURS_FROM_NOW      = number of hours (default 48)\n\nINDUSTRY                 = coaching | design_studio | ecommerce | services\n```\n\n**Credentials:** Attach in node credentials panels (no secrets in JSON).\n\n---\n\n## How to use\n\n1. **Import** the workflow JSON.\n2. Open **Set: User Config** and fill required values (see above).\n3. **Attach credentials**: Notion + Email; optional Telegram/Airtable/HubSpot/Google Calendar.\n4. **Run Manual Trigger** to simulate an intake and verify:\n\n   * Notion page created\n   * Welcome email received\n   * Optional Telegram/CRM/Calendar actions\n5. Switch your form to the Production **Webhook URL** shown in the **Client Intake Webhook** node.\n\n**Sample JSON (for testing the live webhook):**\n\n```json\n{\"name\":\"Ava Laurent\",\"email\":\"ava@example.com\",\"package\":\"Growth\",\"message\":\"Excited to begin!\"}\n```\n\n**Double opt-in:** The welcome email includes a link like\n`https://YOUR-N8N-DOMAIN/webhook/optin-confirm?token=...&email=...`\nClicking it sets Consent=true and Status=Confirmed on the Notion record.\n\n---\n\n## Industry-tuned welcome copy\n\nSet `INDUSTRY` to control phrasing automatically:\n\n* `coaching` – gentle goals/blocks framing\n* `design_studio` – asset handoff + milestone language\n* `ecommerce` – store link + quick-win focus\n* `services` – general service language\n\n---\n\n## Submission compliance\n\n* ✅ **Manual Trigger** path for instant demo\n* ✅ **Markdown sticky notes** with clear H2 sections (README, Prereqs + CSV, Setup, Testing, Compliance, Changelog)\n* ✅ **No hardcoded API keys** (credentials only)\n* ✅ **Timezone-safe** ISO times for calendar hold\n* ✅ **Clear placeholders** and copy-paste CSV headers included\n\n---\n\n## Troubleshooting (quick)\n\n* **No email:** attach Email creds; ensure `FROM_EMAIL` is allowed by your provider.\n* **No Notion page:** verify `NOTION_DB_ID` and property names; check Notion permissions.\n* **Webhook issues:** ensure your form sends **JSON**; adapt mapping for form-encoded payloads.\n* **Opt-in link fails:** `BASE_URL` must be your public n8n domain; workflow must be active.\n* **Calendar hold not created:** set `ENABLE_CAL_HOLD=true`, attach Google Calendar creds, confirm `CALENDAR_ID`.\n\n---\n\n**Tags:** onboarding, notion, email, crm, telegram, airtable, hubspot, calendar, double-opt-in, small business, concierge, women-led brands\n\n**Version:** v3 (see Changelog sticky on canvas)\n",
+  "featuredImage": "/data/workflows/7781/7781.webp",
+  "author": {
+    "id": 101,
+    "slug": "SheCodesFlow",
+    "name": "Shelly-Ann Davy",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 247,
+  "downloads": 24,
+  "createdAt": "2025-08-24T09:56:33.936Z",
+  "updatedAt": "2026-01-16T08:52:21.309Z",
+  "publishedAt": "2025-08-24T09:56:33.936Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7781",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated client onboarding system with Notion, email & CRM integration",
+    "workflowName": "Automated client onboarding system with Notion, email & CRM integration",
+    "description": "# Graceful Client Onboarding Concierge — Pro \n\nA warm, reliable onboarding system for small businesses and studios. Captures a form submission via webhook, creates a Client record in Notion, sends a concierge-style welcome email (with scheduler + optional contract link), optionally pings the owner on Telegram, mirrors the lead to Airtable/HubSpot, places a temporary Google Calendar hold, and includes a double opt-in confirmation link.\n\n**Made for:** coaches, designers, boutique agencies, e-commerce and service providers who want consistent follow-up without manual busywork.\n\n---\n\n## What it does (flow)\n\n* **Trigger:** Form ➜ `POST /client-intake` (or Manual Trigger for instant demo)\n* **Normalize & Score:** Map fields, auto-generate `optInToken`, compute `score` and `tier`\n* **Create in Notion:** `Clients` page (Name, Email, Package, Notes, Status, Score, Tier, OptInToken, Consent=false)\n* **Welcome Email:** industry-tuned copy + scheduler link (+ contract link for Growth/Pro/Custom packages)\n* **Owner Notify (optional):** Telegram ping with tier + score\n* **CRM Mirrors (optional):** Create Airtable row and/or HubSpot contact\n* **Calendar Hold (optional):** 30-min “Intro Hold” event (e.g., now + 48h)\n* **Double Opt-In:** `/optin-confirm?token=...&email=...` sets Consent=true & Status=Confirmed in Notion\n* **Error Handling:** On failure, send an email to the owner\n\n```mermaid\nflowchart TD\n A[Form → Webhook /client-intake] --&gt; B[Map Intake + Score Lead]\n B --&gt; C[Notion: Create Client]\n B --&gt; D[Build Welcome Email]\n D --&gt; E[Email: Send Welcome]\n D --&gt; F{Optional actions}\n F --&gt;|Telegram| G[Telegram: Notify Owner]\n F --&gt;|Airtable| H[Airtable: Create Row]\n F --&gt;|HubSpot| I[HubSpot: Create Contact]\n F --&gt;|Calendar Hold| J[Google Calendar: Create Hold]\n K[GET /optin-confirm] --&gt; L[Find Notion by OptInToken] --&gt; M[Update: Consent=true, Status=Confirmed]\n ER[Error Trigger] --&gt; EH[Email Owner]\n```\n\n---\n\n## Prerequisites\n\n* **Notion** database **`Clients`** with properties:\n  `Name (title)`, `Email (email)`, `Package (select)`, `Notes (rich text)`, `Status (select)`, `Score (number)`, `Tier (select)`, `OptInToken (text)`, `Consent (checkbox)`\n  *(CSV header provided in the Sticky note on canvas.)*\n* **Email** (SMTP or Gmail OAuth)\n* **Optional:** Telegram Bot + Chat ID, Airtable (Base ID + Table), HubSpot (Contacts), Google Calendar (Calendar ID)\n\n---\n\n## Configuration (Set these in **Set: User Config**)\n\n```\nNOTION_DB_ID             = your Notion Clients DB ID\nFROM_EMAIL               = sender address for welcome email\nOWNER_EMAIL              = where error notifications go\nSCHEDULER_URL            = booking link (Calendly, Once, etc.)\nBASE_URL                 = your public n8n domain (for opt-in link)\nCONTRACT_BASE_URL        = (optional) proposal/contract URL base\n\nENABLE_TELEGRAM          = true|false\nTELEGRAM_CHAT_ID         = (if enabled)\n\nENABLE_AIRTABLE          = true|false\nAIRTABLE_BASE_ID         = (if enabled)\nAIRTABLE_TABLE           = (if enabled)\n\nENABLE_HUBSPOT           = true|false\n\nENABLE_CAL_HOLD          = true|false\nCALENDAR_ID              = \"primary\" or calendar ID\nHOLD_HOURS_FROM_NOW      = number of hours (default 48)\n\nINDUSTRY                 = coaching | design_studio | ecommerce | services\n```\n\n**Credentials:** Attach in node credentials panels (no secrets in JSON).\n\n---\n\n## How to use\n\n1. **Import** the workflow JSON.\n2. Open **Set: User Config** and fill required values (see above).\n3. **Attach credentials**: Notion + Email; optional Telegram/Airtable/HubSpot/Google Calendar.\n4. **Run Manual Trigger** to simulate an intake and verify:\n\n   * Notion page created\n   * Welcome email received\n   * Optional Telegram/CRM/Calendar actions\n5. Switch your form to the Production **Webhook URL** shown in the **Client Intake Webhook** node.\n\n**Sample JSON (for testing the live webhook):**\n\n```json\n{\"name\":\"Ava Laurent\",\"email\":\"ava@example.com\",\"package\":\"Growth\",\"message\":\"Excited to begin!\"}\n```\n\n**Double opt-in:** The welcome email includes a link like\n`https://YOUR-N8N-DOMAIN/webhook/optin-confirm?token=...&email=...`\nClicking it sets Consent=true and Status=Confirmed on the Notion record.\n\n---\n\n## Industry-tuned welcome copy\n\nSet `INDUSTRY` to control phrasing automatically:\n\n* `coaching` – gentle goals/blocks framing\n* `design_studio` – asset handoff + milestone language\n* `ecommerce` – store link + quick-win focus\n* `services` – general service language\n\n---\n\n## Submission compliance\n\n* ✅ **Manual Trigger** path for instant demo\n* ✅ **Markdown sticky notes** with clear H2 sections (README, Prereqs + CSV, Setup, Testing, Compliance, Changelog)\n* ✅ **No hardcoded API keys** (credentials only)\n* ✅ **Timezone-safe** ISO times for calendar hold\n* ✅ **Clear placeholders** and copy-paste CSV headers included\n\n---\n\n## Troubleshooting (quick)\n\n* **No email:** attach Email creds; ensure `FROM_EMAIL` is allowed by your provider.\n* **No Notion page:** verify `NOTION_DB_ID` and property names; check Notion permissions.\n* **Webhook issues:** ensure your form sends **JSON**; adapt mapping for form-encoded payloads.\n* **Opt-in link fails:** `BASE_URL` must be your public n8n domain; workflow must be active.\n* **Calendar hold not created:** set `ENABLE_CAL_HOLD=true`, attach Google Calendar creds, confirm `CALENDAR_ID`.\n\n---\n\n**Tags:** onboarding, notion, email, crm, telegram, airtable, hubspot, calendar, double-opt-in, small business, concierge, women-led brands\n\n**Version:** v3 (see Changelog sticky on canvas)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky: README",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Prereqs + CSV",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Setup Checklist",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Testing Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Compliance + Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Changelog",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Client Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set: User Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Function: Simulate Intake",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Function: Map Intake",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Function: Score Lead",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notion: Create Client",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Function: Build Welcome Email",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email: Send Welcome",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If: Telegram Enabled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Telegram: Notify Owner",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If: Airtable Enabled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Airtable: Create Row",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If: HubSpot Enabled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "HubSpot: Create Contact",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If: Calendar Hold Enabled?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Function: Hold Times",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Calendar: Create Hold",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Opt-in Confirm Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Function: Parse Optin",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notion: Find by Token",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Function: Pick Page",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notion: Set Consent + Status",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "On Error",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On Error → Email Owner",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2"
+    }
+  ]
+}

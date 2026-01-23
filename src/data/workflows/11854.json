@@ -1,0 +1,224 @@
+{
+  "id": 11854,
+  "slug": "11854",
+  "title": "AI-powered ticket triage with multi-model classification & knowledge base",
+  "description": "## How It Works\nThis workflow automates enterprise ticket management by combining AI-powered classification with knowledge base retrieval. It receives support tickets via webhook, routes them through multiple AI models (OpenAI ChatGPT, NVIDIA's text classification APIs, and embeddings-based search) to determine optimal resolution strategies. The system generates contextual diagnostic logs, formats responses, updates ticket systems, notifies engineers when escalation is needed, and seamlessly integrates with knowledge bases for continuous learning. It solves the critical problem of manual ticket sorting and delayed responses by automating intelligent triage, reducing resolution time, and ensuring consistent quality across support operations. Target audience includes support operations teams, technical support managers, and enterprises managing high-volume ticket queues seeking to improve efficiency and SLA compliance.\n\n## Setup Steps\n1. Configure the OpenAI API key in credentials.\n2. Add NVIDIA API credentials for embedding and classification models.\n3. Set up Google Sheets for knowledge base storage and retrieval.\n4. Connect your ticketing system (Jira, Zendesk, or webhook) for incoming tickets.\n5. Link a notification service (Gmail or Slack) for engineer alerts.\n6. Map custom fields to your ticket system schema.\n\n \n## Prerequisites\nOpenAI API account with GPT access. NVIDIA API credentials (Embeddings & Classification). Google Sheets for KB management. Ticketing system with webhook capability.  \n\n## Use Cases\nSaaS support teams triaging 100+ daily tickets, reducing manual sorting by 80%. Technical support escalating complex issues intelligently while documenting solutions.  \n\n## Customization\nSwap OpenAI models for Claude or Anthropic APIs. Replace Google Sheets with database systems (PostgreSQL, Airtable).  \n\n## Benefits\nReduces manual ticket sorting by 70-80%, freeing support staff for complex issues. Decreases average resolution time through intelligent routing. \n",
+  "featuredImage": "/data/workflows/11854/11854.webp",
+  "author": {
+    "id": 101,
+    "slug": "cschin",
+    "name": "Cheng Siong Chin",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 94,
+  "downloads": 9,
+  "createdAt": "2025-12-16T09:30:51.267Z",
+  "updatedAt": "2026-01-16T09:10:22.592Z",
+  "publishedAt": "2025-12-16T09:30:51.267Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11854",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered ticket triage with multi-model classification & knowledge base",
+    "workflowName": "AI-powered ticket triage with multi-model classification & knowledge base",
+    "description": "## How It Works\nThis workflow automates enterprise ticket management by combining AI-powered classification with knowledge base retrieval. It receives support tickets via webhook, routes them through multiple AI models (OpenAI ChatGPT, NVIDIA's text classification APIs, and embeddings-based search) to determine optimal resolution strategies. The system generates contextual diagnostic logs, formats responses, updates ticket systems, notifies engineers when escalation is needed, and seamlessly integrates with knowledge bases for continuous learning. It solves the critical problem of manual ticket sorting and delayed responses by automating intelligent triage, reducing resolution time, and ensuring consistent quality across support operations. Target audience includes support operations teams, technical support managers, and enterprises managing high-volume ticket queues seeking to improve efficiency and SLA compliance.\n\n## Setup Steps\n1. Configure the OpenAI API key in credentials.\n2. Add NVIDIA API credentials for embedding and classification models.\n3. Set up Google Sheets for knowledge base storage and retrieval.\n4. Connect your ticketing system (Jira, Zendesk, or webhook) for incoming tickets.\n5. Link a notification service (Gmail or Slack) for engineer alerts.\n6. Map custom fields to your ticket system schema.\n\n \n## Prerequisites\nOpenAI API account with GPT access. NVIDIA API credentials (Embeddings & Classification). Google Sheets for KB management. Ticketing system with webhook capability.  \n\n## Use Cases\nSaaS support teams triaging 100+ daily tickets, reducing manual sorting by 80%. Technical support escalating complex issues intelligently while documenting solutions.  \n\n## Customization\nSwap OpenAI models for Claude or Anthropic APIs. Replace Google Sheets with database systems (PostgreSQL, Airtable).  \n\n## Benefits\nReduces manual ticket sorting by 70-80%, freeing support staff for complex issues. Decreases average resolution time through intelligent routing.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Incoming Ticket Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Ticket Classifier Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model - Classifier",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Classification Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "MCP Server Tools",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Knowledge Base Search",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "role": "vectorStorePGVector",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings OpenAI - Search",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check If Solution Found",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Format Auto-Resolution",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "AI Solution Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model - Solution",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Solution Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create Diagnostic Logs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check If Engineer Needed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Notify Engineer",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Update Ticket Status",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Add to Knowledge Base",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "role": "vectorStorePGVector",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings OpenAI - Insert",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Document Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare KB Entry",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "MCP Server Tools1",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

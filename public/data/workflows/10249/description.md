@@ -1,0 +1,15 @@
+## What's the problem?
+
+Imagine you want to **automate a task** where, based on a TikTok video link, **you must retrieve the username of the creator of that video**.
+
+Many people may think that it's enough to get the "@" part of the link but that's not the case always. TikTok's iOS and Android app have **specific link formats** that are easier to share with others but, at the same time, it makes our task of retrieving creators way harder.
+
+## Our solution:
+
+**In solution to this problem, this simple workflow** makes a HTTP protocol request to retrieve the original link of the video hosted on _www.tiktok.com_ instead of the default mobile app's subdomain _vm.tiktok.com_. Then, we can in fact remove the attributes of the link and extract the handle correctly.
+
+## Good things to know:
+
+**Note that we extract the username** (and not the profile's nickname) **without the "@"**.
+
+Once we have our username, we can simply access to their profile from then on using _"https://www.tiktok.com/@{{ $json.username }}"_.

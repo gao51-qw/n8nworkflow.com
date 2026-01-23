@@ -1,0 +1,265 @@
+{
+  "id": 10643,
+  "slug": "10643",
+  "title": "Monitor multiple YouTube channels with real-time RocketChat alerts",
+  "description": "## Workflow Overview\n\nThis n8n workflow provides automated monitoring of YouTube channels and sends real-time notifications to RocketChat when new videos are published. It supports all YouTube URL formats, uses dual-source video fetching for reliability, and intelligently filters videos to prevent duplicate notifications.\n\n### Key Features\n\n- **Multi-Format URL Support**: Handles @handle, /user/, and /channel/ URL formats\n- **Dual Fetching Strategy**: Uses both RSS feeds and HTML scraping for maximum reliability\n- **Smart Filtering**: Only notifies about videos published in the last hour\n- **Shorts Exclusion**: Automatically excludes YouTube Shorts from notifications\n- **Rate Limiting**: 30-second delay between notifications to prevent spam\n- **Batch Processing**: Processes multiple channels sequentially\n- **Error Handling**: Continues execution even if one channel fails\n- **Customizable Schedule**: Default hourly checks, adjustable as needed\n\n### Use Cases\n\nMonitor competitor channels, track favorite creators, aggregate content from multiple channels, build content curation workflows, stay updated on educational channels, monitor brand mentions, track news channels for breaking updates.\n\n---\n\n## Setup Instructions\n\n### Prerequisites\n\n- n8n instance (self-hosted or cloud) version 1.0+\n- RocketChat server with admin or bot access\n- RocketChat API credentials\n- Internet connectivity for YouTube access\n\n### Step 1: Obtain RocketChat Credentials\n\n**Create Bot User:**\n1. Log in to RocketChat as administrator\n2. Navigate to Administration → Users → New\n3. Fill in details: Name (YouTube Monitor Bot), Username (youtube-bot), Email, Password, Roles (bot)\n4. Click Save\n\n**Get API Credentials:**\n1. Log in as bot user\n2. Navigate to My Account → Personal Access Tokens\n3. Click Generate New Token\n4. Enter token name: n8n YouTube Monitor\n5. Copy generated token immediately\n6. Note User ID from account settings\n\n### Step 2: Configure RocketChat in n8n\n\n1. Open n8n web interface\n2. Navigate to Credentials section\n3. Click Add Credential → RocketChat API\n4. Fill in:\n   - Domain: Your RocketChat URL (e.g., https://rocket.yourdomain.com)\n   - User: Bot username (e.g., youtube-bot)\n   - Password: Bot password or personal access token\n5. Click Save and test connection\n\n### Step 3: Prepare RocketChat Channel\n\n1. Create new channel in RocketChat: youtube-notifications\n2. Add bot user to channel:\n   - Click channel menu → Members → Add Users\n   - Search for bot username\n   - Click Add\n\n### Step 4: Collect YouTube Channel URLs\n\n**Handle Format:** `https://www.youtube.com/@ChannelHandle`\n**User Format:** `https://www.youtube.com/user/Username`\n**Channel ID Format:** `https://www.youtube.com/channel/UCxxxxxxxxxx`\n\nAll formats supported. Find channel ID in page source or use browser extension.\n\n### Step 5: Import Workflow\n\n1. Copy workflow JSON\n2. In n8n: Workflows → Import from File/URL\n3. Paste JSON or upload file\n4. Click Import\n\n### Step 6: Configure Channel List\n\n1. Locate Channel List node\n2. Enter YouTube URLs in channel_urls field, one per line:\n```\nhttps://www.youtube.com/@NoCopyrightSounds/videos\nhttps://www.youtube.com/@chillnation/videos\n```\n3. Include /videos suffix or workflow adds it automatically\n\n### Step 7: Configure RocketChat Notification\n\n1. Locate RocketChat Notification node\n2. Replace YOUR-CHANNEL-NAME with your channel name\n3. Select RocketChat credential\n4. Customize message template if needed\n\n### Step 8: Configure Schedule (Optional)\n\nDefault: Every 1 hour\n\nTo change:\n1. Open Hourly Check node\n2. Modify interval (Minutes, Hours, Days)\n\n**Recommended Intervals:**\n- Every hour (default): Good balance\n- Every 30 minutes: More frequent\n- Every 2 hours: Less frequent\n- Avoid intervals less than 15 minutes\n\n**Important:** YouTube RSS updates every 15 minutes. Hourly checks match 1-hour filter window.\n\n### Step 9: Test the Workflow\n\n1. Click Execute Workflow button\n2. Monitor execution (green = success, red = errors)\n3. Check node outputs:\n   - Channel List: Shows URLs\n   - Filter New Videos: Shows found videos (may be empty)\n   - RocketChat Notification: Shows sent messages\n4. Verify notifications in RocketChat\n\n**No notifications is normal if no videos posted in last hour.**\n\n### Step 10: Activate Workflow\n\n1. Toggle Active switch in top-right\n2. Workflow runs on schedule automatically\n3. Monitor RocketChat channel for notifications\n\n---\n\n## How to Use\n\n### Understanding Workflow Execution\n\n**Default Schedule: Hourly**\n- Executes every hour\n- Checks all channels\n- Processes videos from last 60 minutes\n- Prevents duplicate notifications\n\n**Execution Duration:** 1-5 minutes for 10 channels. Rate limiting adds 30 seconds per video.\n\n### Adding New Channels\n\n1. Open Channel List node\n2. Add new URL on new line\n3. Save (Ctrl+S)\n4. Change takes effect on next run\n\n### Removing Channels\n\n1. Open Channel List node\n2. Delete line or comment out with # at start\n3. Save changes\n\n### Changing Check Frequency\n\n1. Open Hourly Check node\n2. Modify interval\n3. If changing from hourly, update Filter New Videos node:\n   - Find: `cutoffDate.setHours(cutoffDate.getHours() - 1);`\n   - Change -1 to match interval (-2 for 2 hours, -6 for 6 hours)\n\n**Important:** Time window should match or exceed check interval.\n\n### Understanding Video Sources\n\n**RSS Feed (Primary):**\n- Official YouTube RSS\n- Fast and reliable\n- 5-15 minute delay for new videos\n- Structured data\n\n**HTML Scraping (Fallback):**\n- Immediate results\n- Works when RSS unavailable\n- More fragile\n\n**Benefits of dual approach:**\n- Reliability: If one fails, other works\n- Speed: Scraping catches videos immediately\n- Completeness: RSS ensures nothing missed\n- Videos are deduplicated automatically\n\n### Excluding YouTube Shorts\n\nShorts are filtered by checking URL for /shorts/ path.\n\n**To include Shorts:**\n1. Open Filter New Videos node\n2. Find: `if (videoUrl && !videoUrl.includes('/shorts/'))`\n3. Remove the !videoUrl.includes('/shorts/') check\n\n### Rate Limiting\n\n**30-second wait between notifications:**\n- Prevents flooding RocketChat\n- Allows users to read each notification\n- Avoids rate limits\n\n**Impact:** 5 videos = 2.5 minutes, 10 videos = 5 minutes\n\n**To adjust:** Open Wait 30 sec node, change amount field (15-60 seconds recommended)\n\n### Handling Multiple Channels\n\nChannels processed sequentially:\n- Prevents overwhelming workflow\n- Ensures reliable execution\n- One failed channel doesn't stop others\n- Recommend 20-50 channels per workflow\n\n---\n\n## FAQ\n\n**Q: How many channels can I monitor?**\nA: Recommend 20-50 per workflow. Split into multiple workflows for more.\n\n**Q: Why use both RSS and scraping?**\nA: RSS is reliable but delayed. Scraping is immediate but fragile. Both ensures no videos missed.\n\n**Q: Can I exclude specific video types?**\nA: Yes, add filtering logic in Filter New Videos node. Already excludes Shorts.\n\n**Q: Will this get my IP blocked?**\nA: Unlikely with hourly checks. Don't check more than every 15 minutes.\n\n**Q: How do I prevent duplicate notifications?**\nA: Ensure time window matches schedule interval. Already implemented.\n\n**Q: What if channel changes handle?**\nA: Update URL in Channel List node. YouTube maintains redirects.\n\n**Q: Can I monitor playlists?**\nA: Not directly. Would need modifications for playlist RSS feeds.\n\n---\n\n## Technical Reference\n\n### YouTube URL Formats\n\n- Handle: `https://www.youtube.com/@handlename`\n- User: `https://www.youtube.com/user/username`\n- Channel ID: `https://www.youtube.com/channel/UCxxxxxx`\n\n### RSS Feed Format\n\n`https://www.youtube.com/feeds/videos.xml?channel_id=UCxxxxxx`\n\nContains up to 15 recent videos with title, link, publish date, thumbnail.\n\n**APIs Used:** YouTube RSS (public), RocketChat API (requires auth)\n\n**License:** Open for modification and commercial use",
+  "featuredImage": "/data/workflows/10643/10643.webp",
+  "author": {
+    "id": 101,
+    "slug": "vighsandor",
+    "name": "Vigh Sandor",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 98,
+  "downloads": 9,
+  "createdAt": "2025-11-08T22:07:58.210Z",
+  "updatedAt": "2026-01-16T09:05:47.874Z",
+  "publishedAt": "2025-11-08T22:07:58.210Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10643",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor multiple YouTube channels with real-time RocketChat alerts",
+    "workflowName": "Monitor multiple YouTube channels with real-time RocketChat alerts",
+    "description": "This n8n workflow provides automated monitoring of YouTube channels and sends real-time notifications to RocketChat when new videos are published. It supports all YouTube URL formats, uses dual-source video fetching for reliability, and intelligently filters videos to prevent duplicate notifications.\n\n### Key Features\n\n- **Multi-Format URL Support**: Handles @handle, /user/, and /channel/ URL formats\n- **Dual Fetching Strategy**: Uses both RSS feeds and HTML scraping for maximum reliability\n- **Smart Filtering**: Only notifies about videos published in the last hour\n- **Shorts Exclusion**: Automatically excludes YouTube Shorts from notifications\n- **Rate Limiting**: 30-second delay between notifications to prevent spam\n- **Batch Processing**: Processes multiple channels sequentially\n- **Error Handling**: Continues execution even if one channel fails\n- **Customizable Schedule**: Default hourly checks, adjustable as needed\n\n### Use Cases\n\nMonitor competitor channels, track favorite creators, aggregate content from multiple channels, build content curation workflows, stay updated on educational channels, monitor brand mentions, track news channels for breaking updates.\n\n---\n\n## Setup Instructions\n\n### Prerequisites\n\n- n8n instance (self-hosted or cloud) version 1.0+\n- RocketChat server with admin or bot access\n- RocketChat API credentials\n- Internet connectivity for YouTube access\n\n### Step 1: Obtain RocketChat Credentials\n\n**Create Bot User:**\n1. Log in to RocketChat as administrator\n2. Navigate to Administration → Users → New\n3. Fill in details: Name (YouTube Monitor Bot), Username (youtube-bot), Email, Password, Roles (bot)\n4. Click Save\n\n**Get API Credentials:**\n1. Log in as bot user\n2. Navigate to My Account → Personal Access Tokens\n3. Click Generate New Token\n4. Enter token name: n8n YouTube Monitor\n5. Copy generated token immediately\n6. Note User ID from account settings\n\n### Step 2: Configure RocketChat in n8n\n\n1. Open n8n web interface\n2. Navigate to Credentials section\n3. Click Add Credential → RocketChat API\n4. Fill in:\n   - Domain: Your RocketChat URL (e.g., https://rocket.yourdomain.com)\n   - User: Bot username (e.g., youtube-bot)\n   - Password: Bot password or personal access token\n5. Click Save and test connection\n\n### Step 3: Prepare RocketChat Channel\n\n1. Create new channel in RocketChat: youtube-notifications\n2. Add bot user to channel:\n   - Click channel menu → Members → Add Users\n   - Search for bot username\n   - Click Add\n\n### Step 4: Collect YouTube Channel URLs\n\n**Handle Format:** `https://www.youtube.com/@ChannelHandle`\n**User Format:** `https://www.youtube.com/user/Username`\n**Channel ID Format:** `https://www.youtube.com/channel/UCxxxxxxxxxx`\n\nAll formats supported. Find channel ID in page source or use browser extension.\n\n### Step 5: Import Workflow\n\n1. Copy workflow JSON\n2. In n8n: Workflows → Import from File/URL\n3. Paste JSON or upload file\n4. Click Import\n\n### Step 6: Configure Channel List\n\n1. Locate Channel List node\n2. Enter YouTube URLs in channel_urls field, one per line:\n```\nhttps://www.youtube.com/@NoCopyrightSounds/videos\nhttps://www.youtube.com/@chillnation/videos\n```\n3. Include /videos suffix or workflow adds it automatically\n\n### Step 7: Configure RocketChat Notification\n\n1. Locate RocketChat Notification node\n2. Replace YOUR-CHANNEL-NAME with your channel name\n3. Select RocketChat credential\n4. Customize message template if needed\n\n### Step 8: Configure Schedule (Optional)\n\nDefault: Every 1 hour\n\nTo change:\n1. Open Hourly Check node\n2. Modify interval (Minutes, Hours, Days)\n\n**Recommended Intervals:**\n- Every hour (default): Good balance\n- Every 30 minutes: More frequent\n- Every 2 hours: Less frequent\n- Avoid intervals less than 15 minutes\n\n**Important:** YouTube RSS updates every 15 minutes. Hourly checks match 1-hour filter window.\n\n### Step 9: Test the Workflow\n\n1. Click Execute Workflow button\n2. Monitor execution (green = success, red = errors)\n3. Check node outputs:\n   - Channel List: Shows URLs\n   - Filter New Videos: Shows found videos (may be empty)\n   - RocketChat Notification: Shows sent messages\n4. Verify notifications in RocketChat\n\n**No notifications is normal if no videos posted in last hour.**\n\n### Step 10: Activate Workflow\n\n1. Toggle Active switch in top-right\n2. Workflow runs on schedule automatically\n3. Monitor RocketChat channel for notifications\n\n---\n\n## How to Use\n\n### Understanding Workflow Execution\n\n**Default Schedule: Hourly**\n- Executes every hour\n- Checks all channels\n- Processes videos from last 60 minutes\n- Prevents duplicate notifications\n\n**Execution Duration:** 1-5 minutes for 10 channels. Rate limiting adds 30 seconds per video.\n\n### Adding New Channels\n\n1. Open Channel List node\n2. Add new URL on new line\n3. Save (Ctrl+S)\n4. Change takes effect on next run\n\n### Removing Channels\n\n1. Open Channel List node\n2. Delete line or comment out with # at start\n3. Save changes\n\n### Changing Check Frequency\n\n1. Open Hourly Check node\n2. Modify interval\n3. If changing from hourly, update Filter New Videos node:\n   - Find: `cutoffDate.setHours(cutoffDate.getHours() - 1);`\n   - Change -1 to match interval (-2 for 2 hours, -6 for 6 hours)\n\n**Important:** Time window should match or exceed check interval.\n\n### Understanding Video Sources\n\n**RSS Feed (Primary):**\n- Official YouTube RSS\n- Fast and reliable\n- 5-15 minute delay for new videos\n- Structured data\n\n**HTML Scraping (Fallback):**\n- Immediate results\n- Works when RSS unavailable\n- More fragile\n\n**Benefits of dual approach:**\n- Reliability: If one fails, other works\n- Speed: Scraping catches videos immediately\n- Completeness: RSS ensures nothing missed\n- Videos are deduplicated automatically\n\n### Excluding YouTube Shorts\n\nShorts are filtered by checking URL for /shorts/ path.\n\n**To include Shorts:**\n1. Open Filter New Videos node\n2. Find: `if (videoUrl && !videoUrl.includes('/shorts/'))`\n3. Remove the !videoUrl.includes('/shorts/') check\n\n### Rate Limiting\n\n**30-second wait between notifications:**\n- Prevents flooding RocketChat\n- Allows users to read each notification\n- Avoids rate limits\n\n**Impact:** 5 videos = 2.5 minutes, 10 videos = 5 minutes\n\n**To adjust:** Open Wait 30 sec node, change amount field (15-60 seconds recommended)\n\n### Handling Multiple Channels\n\nChannels processed sequentially:\n- Prevents overwhelming workflow\n- Ensures reliable execution\n- One failed channel doesn't stop others\n- Recommend 20-50 channels per workflow\n\n---\n\n## FAQ\n\n**Q: How many channels can I monitor?**\nA: Recommend 20-50 per workflow. Split into multiple workflows for more.\n\n**Q: Why use both RSS and scraping?**\nA: RSS is reliable but delayed. Scraping is immediate but fragile. Both ensures no videos missed.\n\n**Q: Can I exclude specific video types?**\nA: Yes, add filtering logic in Filter New Videos node. Already excludes Shorts.\n\n**Q: Will this get my IP blocked?**\nA: Unlikely with hourly checks. Don't check more than every 15 minutes.\n\n**Q: How do I prevent duplicate notifications?**\nA: Ensure time window matches schedule interval. Already implemented.\n\n**Q: What if channel changes handle?**\nA: Update URL in Channel List node. YouTube maintains redirects.\n\n**Q: Can I monitor playlists?**\nA: Not directly. Would need modifications for playlist RSS feeds.\n\n---\n\n## Technical Reference\n\n### YouTube URL Formats\n\n- Handle: `https://www.youtube.com/@handlename`\n- User: `https://www.youtube.com/user/username`\n- Channel ID: `https://www.youtube.com/channel/UCxxxxxx`\n\n### RSS Feed Format\n\n`https://www.youtube.com/feeds/videos.xml?channel_id=UCxxxxxx`\n\nContains up to 15 recent videos with title, link, publish date, thumbnail.\n\n**APIs Used:** YouTube RSS (public), RocketChat API (requires auth)\n\n**License:** Open for modification and commercial use",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Hourly Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Channel List",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Process URLs",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Channels",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Need Channel ID?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Channel Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Channel ID",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Channels",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Has RSS URL?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch RSS Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Scrape Videos Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse XML",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Scraped Videos",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge RSS & Scraped",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Filter New Videos",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Has Videos?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Videos",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Has New Video?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RocketChat Notification",
+      "type": "n8n-nodes-base.rocketchat",
+      "role": "rocketchat",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No New Video",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Continue Channel",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Wait 30 sec",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Schedule",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Config: Channel URLs",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Performance",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Batch Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Handling",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Time Window",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Shorts Excluded",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Config: RocketChat",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Credentials Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Main Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "URL Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Channel ID Extraction",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Video Fetching",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filtering",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Notification",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

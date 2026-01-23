@@ -1,0 +1,199 @@
+{
+  "id": 10471,
+  "slug": "10471",
+  "title": "Self update Docker-based n8n with email approval and SSH",
+  "description": "# n8n Self-Updater Workflow\n\n&gt; An automated **n8n workflow** originally built for **DigitalOcean-based n8n deployments**, but fully compatible with **any VPS or cloud hosting** (e.g., AWS, Google Cloud, Hetzner, Linode, etc.) where n8n runs via Docker.\n\nThis workflow checks for the latest Docker image of n8n, notifies you via email for approval, and securely updates your n8n instance via SSH once approved.\n\n---\n\n## How It Works\n\n1. **Trigger**: The workflow runs automatically every 3 days at 4 PM UTC (or manually if triggered).\n2. **Check Version**: It retrieves your current n8n Docker version and image digest via SSH.\n3. **Compare**: Fetches the remote digest from Docker Hub and compares it with the local one.\n4. **Notify via Email**: If a new update is available, an approval email is sent with details:\n\n   * Current version\n   * Local digest\n   * Remote digest\n   * What will happen after approval\n5. **Approval Logic**:\n\n   * **Approve** → Workflow connects via SSH and updates the n8n container automatically.\n   * **Decline** → Workflow ends; next check occurs in the next cycle.\n6. **Auto Update Execution**:\n\n   * Creates (if missing) a `update_docker.sh` script on the server.\n   * Runs it in the background (`nohup`) to:\n\n     ```bash\n     cd /opt/n8n-docker-caddy\n     docker compose pull\n     docker compose down\n     docker compose up -d\n     ```\n   * The delay ensures n8n restarts only after workflow completion.\n\n---\n\n## Requirements\n\n* **SSH Access** to your server (where n8n runs).\n\n  * Add your credentials in n8n under *Credentials → SSH Password*.\n* **SMTP Connection** for email notifications.\n\n  * Configure in *Credentials → SMTP*.\n  * Fill in:\n\n    * **From Email** → e.g., `info@yourdomain.com`\n    * **To Email** → your email for receiving approvals\n* **Docker-based n8n Deployment**, e.g., `n8n-docker-caddy` setup.\n* **Docker and docker-compose** installed on the server.\n\n---\n\n## How to Use\n\n1. **Import the Workflow**:\n\n   * Copy the provided JSON file.\n   * In your n8n instance → click **Import Workflow** → paste the JSON.\n\n2. **Set Up Credentials**:\n\n   * Create two credentials in n8n:\n\n     * `SSH Password` → Your server's SSH credentials.\n     * `SMTP` → Your email provider's SMTP credentials.\n\n3. **Edit the Email Node**:\n\n   * Replace:\n\n     * `fromEmail`: `info@yourdomain.com` → with your email.\n     * `toEmail`: `youremail@yourdomain.com` → with your desired recipient.\n\n4. **Enable Auto Trigger** (optional):\n\n   * Go to the **Schedule Trigger** node and set your desired interval/time.\n\n5. **Run the Workflow**:\n\n   * Test manually first.\n   * Once verified, activate it for automatic checks.\n\n---\n\n## Notes\n\n* Originally designed for **DigitalOcean VPS setups**, but can run on **any Docker-based n8n server**.\n* The workflow avoids duplicate updates by comparing digests instead of version tags.\n* If the `update_docker.sh` file already exists, it reuses it safely.\n* Approval emails include full details for transparency.\n* Background execution ensures no interruptions during restart.\n\n---\n\n## Example Behavior\n\n* **Day 1**: Workflow checks → detects update → sends email → user approves.\n* **30 seconds later**: Workflow runs update script → n8n restarts with latest Docker image.\n* **Day 4**: Workflow checks again → digests match → silently completes (no email sent).\n\n---\n\n**Author:** Muhammad Anas Farooq\n",
+  "featuredImage": "/data/workflows/10471/10471.webp",
+  "author": {
+    "id": 101,
+    "slug": "anasn-farooq",
+    "name": "Muhammad Anas Farooq",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 341,
+  "downloads": 34,
+  "createdAt": "2025-11-03T13:19:56.116Z",
+  "updatedAt": "2026-01-16T09:05:11.666Z",
+  "publishedAt": "2025-11-03T13:19:56.116Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10471",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Self update Docker-based n8n with email approval and SSH",
+    "workflowName": "Self update Docker-based n8n with email approval and SSH",
+    "description": "# n8n Self-Updater Workflow\n\n&gt; An automated **n8n workflow** originally built for **DigitalOcean-based n8n deployments**, but fully compatible with **any VPS or cloud hosting** (e.g., AWS, Google Cloud, Hetzner, Linode, etc.) where n8n runs via Docker.\n\nThis workflow checks for the latest Docker image of n8n, notifies you via email for approval, and securely updates your n8n instance via SSH once approved.\n\n---\n\n## How It Works\n\n1. **Trigger**: The workflow runs automatically every 3 days at 4 PM UTC (or manually if triggered).\n2. **Check Version**: It retrieves your current n8n Docker version and image digest via SSH.\n3. **Compare**: Fetches the remote digest from Docker Hub and compares it with the local one.\n4. **Notify via Email**: If a new update is available, an approval email is sent with details:\n\n   * Current version\n   * Local digest\n   * Remote digest\n   * What will happen after approval\n5. **Approval Logic**:\n\n   * **Approve** → Workflow connects via SSH and updates the n8n container automatically.\n   * **Decline** → Workflow ends; next check occurs in the next cycle.\n6. **Auto Update Execution**:\n\n   * Creates (if missing) a `update_docker.sh` script on the server.\n   * Runs it in the background (`nohup`) to:\n\n     ```bash\n     cd /opt/n8n-docker-caddy\n     docker compose pull\n     docker compose down\n     docker compose up -d\n     ```\n   * The delay ensures n8n restarts only after workflow completion.\n\n---\n\n## Requirements\n\n* **SSH Access** to your server (where n8n runs).\n\n  * Add your credentials in n8n under *Credentials → SSH Password*.\n* **SMTP Connection** for email notifications.\n\n  * Configure in *Credentials → SMTP*.\n  * Fill in:\n\n    * **From Email** → e.g., `info@yourdomain.com`\n    * **To Email** → your email for receiving approvals\n* **Docker-based n8n Deployment**, e.g., `n8n-docker-caddy` setup.\n* **Docker and docker-compose** installed on the server.\n\n---\n\n## How to Use\n\n1. **Import the Workflow**:\n\n   * Copy the provided JSON file.\n   * In your n8n instance → click **Import Workflow** → paste the JSON.\n\n2. **Set Up Credentials**:\n\n   * Create two credentials in n8n:\n\n     * `SSH Password` → Your server's SSH credentials.\n     * `SMTP` → Your email provider's SMTP credentials.\n\n3. **Edit the Email Node**:\n\n   * Replace:\n\n     * `fromEmail`: `info@yourdomain.com` → with your email.\n     * `toEmail`: `youremail@yourdomain.com` → with your desired recipient.\n\n4. **Enable Auto Trigger** (optional):\n\n   * Go to the **Schedule Trigger** node and set your desired interval/time.\n\n5. **Run the Workflow**:\n\n   * Test manually first.\n   * Once verified, activate it for automatic checks.\n\n---\n\n## Notes\n\n* Originally designed for **DigitalOcean VPS setups**, but can run on **any Docker-based n8n server**.\n* The workflow avoids duplicate updates by comparing digests instead of version tags.\n* If the `update_docker.sh` file already exists, it reuses it safely.\n* Approval emails include full details for transparency.\n* Background execution ensures no interruptions during restart.\n\n---\n\n## Example Behavior\n\n* **Day 1**: Workflow checks → detects update → sends email → user approves.\n* **30 seconds later**: Workflow runs update script → n8n restarts with latest Docker image.\n* **Day 4**: Workflow checks again → digests match → silently completes (no email sent).\n\n---\n\n**Author:** Muhammad Anas Farooq",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If No Changes",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check Existence of Update Script",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If File Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Update Script",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Approved",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No Updates",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Do Nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Ask For Approval to Update",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note - Auto Update",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note - Script Logic",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note - Final Execution",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute Update Script",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Local Image Digest",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Remote Image Digest",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note 9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Update Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note ",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Current n8n Version",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note - Declined1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setup Requirements",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

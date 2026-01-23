@@ -1,0 +1,95 @@
+# Automate payment tracking with Google Sheets, ClickUp, Gmail and Slack
+
+> ## Description
+This workflow automates the tracking and follow-up process for pending payments. It pulls lead payment data from Google Sheets, checks whether the status is “Open,” and then routes actions accordingly. For open payment cases, it creates a dedicated ClickUp task and sends an email confirmation to stakeholders. For non-open cases, it notifies the team via Slack. This ensures payment verifications are never missed, while keeping all updates transparent and centralized.
+
+## What This Template Does (Step-by-Step)
+- 📊 Fetch Lead Data from Google Sheets
+- Retrieves lead records including:
+  - Lead Name
+  - Company Name
+  - Payment Verification Status
+  - Status (Open/Closed)
+- ⚖️ Check if Status = Open
+- ✅ TRUE (Open): Creates a ClickUp task and sends an email confirmation.
+- ❌ FALSE (Not Open): Sends a Slack notification only.
+- 🗂 Create ClickUp Task for Payment Verification: Adds a task with lead and company details for pending payment follow-up in the specified list.
+- ✉️ Send Email Confirmation: Notifies the assigned watcher (via Gmail) with task details (name, ID, and link).
+- 💬 Send Slack Notification: Alerts the Slack workspace if a lead’s status is not “Open,” providing visibility on non-actionable cases.
+
+## Prerequisites
+- Google Sheet with lead/payment data
+- ClickUp account & API credentials
+- Gmail API credentials
+- Slack API credentials
+- n8n instance (cloud or self-hosted)
+
+## Step-by-Step Setup
+- Connect Google Sheets → Fetch payment verification data.
+- Apply Status Filter (If Node) → Route based on “Open” status.
+- Open Status → Create ClickUp Task → Send Email confirmation.
+- Not Open Status → Send Slack notification.
+
+## Customization Ideas
+🎯 Add additional filtering (e.g., only create tasks if payment verification = “Pending”).
+ 📢 Send Slack alerts for all new leads, not just closed ones.
+ 📚 Log completed payment verifications into Airtable or Notion for reporting.
+ 💡 Include payment due dates or invoice numbers in ClickUp task details.
+
+## Key Benefits
+✅ Automates payment follow-up process
+ ✅ Keeps stakeholders informed via email
+ ✅ Provides real-time Slack alerts for non-actionable cases
+ ✅ Centralizes pending payment tasks in ClickUp
+ ✅ Reduces manual monitoring and ensures no pending case is missed
+
+## Perfect For
+👥 Finance teams handling multiple payment verifications
+ 🏢 Companies wanting a transparent and automated payment tracking process
+ 🎯 Teams already using ClickUp for task management
+ 📊 Managers who need visibility into pending vs. closed payment statuses
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9228
+- **Complexity:** intermediate
+- **Node Count:** 12
+- **Views:** 160
+- **Downloads:** 16
+- **Created:** 2025/10/3
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9228)
+
+## 👤 Author
+
+- **Name:** Rahul Joshi
+- **Username:** @rahul08
+
+## 🏷️ Categories
+
+- CRM
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **googleSheets** 
+- **if** 
+- **slack** 
+- **clickUp** 
+- **gmail** 
+- **stickyNote** (×6)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 12 nodes with 4 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

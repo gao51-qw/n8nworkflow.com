@@ -1,0 +1,106 @@
+# Automate invoice processing & weekly spending reports with GPT-4 and Airtable
+
+> ## Invoice Automation Kit: AI-Powered Invoice Processing and Weekly Reports
+
+This n8n workflow is designed to automate invoice processing and streamline financial management. It leverages AI to extract key invoice data, validate it, and store it in Airtable. Additionally, it generates and emails weekly spending reports.
+
+### Who is it for?
+
+This template is for small businesses, freelancers, or individuals looking to save time on manual invoice processing. It's ideal for anyone who wants to improve the accuracy of their financial data and maintain a clear overview of their spending.
+
+### How it Works / What it Does
+
+This workflow consists of two main parts:
+
+1.  **Invoice Data Extraction and Storage**:
+    *   **Invoice Upload Form**: Upload your invoices (PDF, PNG, JPG) via an n8n form.
+    *   **AI-Powered Data Extraction**: AI extracts key information such as vendor name, invoice date, total amount, currency, and line items (description, quantity, unit price, total) from the uploaded invoice.
+    *   **Data Validation**: The extracted data is validated to ensure it is complete and accurate.
+    *   **Store in Airtable**: Validated invoice data is saved in a structured format to your specified Airtable base and table.
+
+2.  **Weekly Spending Report Generation and Email**:
+    *   **Weekly Report Schedule**: Automatically triggers every Sunday at 6 PM.
+    *   **Fetch Weekly Invoices**: Retrieves all invoices stored in Airtable within the last 7 days.
+    *   **AI-Powered Spending Report Generation**: Based on the retrieved invoice data, AI generates a comprehensive spending report, including total spending for the week, breakdown by vendor, top 5 expenses, spending trends, and any notable observations.
+    *   **Send Weekly Report Email**: The generated report is sent in a professional format to the configured recipient email address.
+
+### How to Set Up
+
+1.  **Update Workflow Configuration Node**:
+    *   Replace `airtableBaseId` with your Airtable Base ID.
+    *   Replace `airtableTableId` with your Airtable Table ID.
+    *   Replace `reportRecipientEmail` with the email address that should receive the weekly reports.
+2.  **Airtable Credentials**:
+    *   Set up your Airtable Personal Access Token credentials in the Airtable nodes.
+3.  **OpenAI Credentials**:
+    *   Set up your OpenAI API key credentials in the OpenAI Chat Model nodes.
+4.  **Email Credentials**:
+    *   Configure your email sending service (e.g., SMTP) credentials in the "Send Weekly Report Email" node and update the `fromEmail`.
+5.  **Airtable Table Setup**:
+    *   Ensure your Airtable has a table set up with appropriate columns to store invoice data, such as "Vendor", "Invoice Date", "Total Amount", "Currency", and "Line Items".
+
+### Requirements
+
+*   An n8n instance
+*   An OpenAI account and API key
+*   An Airtable account and Personal Access Token
+*   An email sending service (e.g., SMTP server)
+
+### How to Customize the Workflow
+
+*   **Adjust Information Extraction**: Edit the prompt in the "Extract Invoice Data" node to include additional information you wish to extract.
+*   **Customize Report**: Adjust the prompt in the "Generate Spending Report" node to change specific analyses or formatting included in the report.
+*   **Add Notifications**: Incorporate notification nodes to other services like Slack or Microsoft Teams to be alerted when an invoice is uploaded or a report is ready.
+*   **Modify Validation Rules**: Edit the conditions in the "Validate Invoice Data" node to implement additional validation rules.
+
+Here's a visual representation of the workflow.
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9744
+- **Complexity:** advanced
+- **Node Count:** 21
+- **Views:** 49
+- **Downloads:** 4
+- **Created:** 2025/10/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9744)
+
+## 👤 Author
+
+- **Name:** 對馬　瑠斗
+- **Username:** @tsushimaryuto2
+
+## 🏷️ Categories
+
+- Invoice Processing
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **formTrigger** 
+- **set** 
+- **@n8n/n8n-nodes-langchain.agent** (×2)
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** (×2)
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **if** 
+- **airtable** (×2)
+- **scheduleTrigger** 
+- **emailSend** 
+- **stickyNote** (×9)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 21 nodes with 10 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

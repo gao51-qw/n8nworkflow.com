@@ -1,0 +1,194 @@
+{
+  "id": 4273,
+  "slug": "4273",
+  "title": "Evaluation metric example: RAG document relevance",
+  "description": "## AI evaluation in n8n\n\nThis is a template for n8n's [evaluation feature](https://docs.n8n.io/advanced-ai/evaluations/overview). \n\nEvaluation is a technique for getting confidence that your AI workflow performs reliably, by running a test dataset containing different inputs through the workflow.\n\nBy calculating a metric (score) for each input, you can see where the workflow is performing well and where it isn't.\n\n## How it works\n\nThis template shows how to calculate a workflow evaluation metric: **retrieved document relevance** (i.e. whether the information retrieved from a vector store is relevant to the question).\n\nThe workflow takes a question and checks whether the information retrieved to answer it is relevant.\n\nTo run this workflow, you need to insert documents into a vector data store, so that they can be retrieved by the agent to answer questions. You can do this by running the top part of the workflow once.\n\nThe main workflow works as follows:\n\n- We use an evaluation trigger to read in our dataset \n- It is wired up in parallel with the regular trigger so that the workflow can be started from either one. [More info](https://docs.n8n.io/advanced-ai/evaluations/tips-and-common-issues/#combining-multiple-triggers)\n- We make sure that the agent outputs the list data from the tools that it used\n- If we’re evaluating (i.e. the execution started from the evaluation trigger), we calculate the relevance metric using AI to compare the retrieved documents with the question\n- We pass this information back to n8n as a metric\n- If we’re not evaluating we avoid calculating the metric, to reduce cost",
+  "featuredImage": "/data/workflows/4273/4273.webp",
+  "author": {
+    "id": 101,
+    "slug": "davidn8n",
+    "name": "David Roberts",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3481,
+  "downloads": 348,
+  "createdAt": "2025-05-21T08:19:43.930Z",
+  "updatedAt": "2026-01-16T08:33:41.440Z",
+  "publishedAt": "2025-05-21T08:19:43.930Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4273",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Evaluation metric example: RAG document relevance",
+    "workflowName": "Evaluation metric example: RAG document relevance",
+    "description": "## AI evaluation in n8n\n\nThis is a template for n8n's [evaluation feature](https://docs.n8n.io/advanced-ai/evaluations/overview). \n\nEvaluation is a technique for getting confidence that your AI workflow performs reliably, by running a test dataset containing different inputs through the workflow.\n\nBy calculating a metric (score) for each input, you can see where the workflow is performing well and where it isn't.\n\n## How it works\n\nThis template shows how to calculate a workflow evaluation metric: **retrieved document relevance** (i.e. whether the information retrieved from a vector store is relevant to the question).\n\nThe workflow takes a question and checks whether the information retrieved to answer it is relevant.\n\nTo run this workflow, you need to insert documents into a vector data store, so that they can be retrieved by the agent to answer questions. You can do this by running the top part of the workflow once.\n\nThe main workflow works as follows:\n\n- We use an evaluation trigger to read in our dataset \n- It is wired up in parallel with the regular trigger so that the workflow can be started from either one. [More info](https://docs.n8n.io/advanced-ai/evaluations/tips-and-common-issues/#combining-multiple-triggers)\n- We make sure that the agent outputs the list data from the tools that it used\n- If we’re evaluating (i.e. the execution started from the evaluation trigger), we calculate the relevance metric using AI to compare the retrieved documents with the question\n- We pass this information back to n8n as a metric\n- If we’re not evaluating we avoid calculating the metric, to reduce cost",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When fetching a dataset row",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "role": "evaluationTrigger",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Evaluating?",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Match chat format",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Return chat response",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set metrics",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Get dataset",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Simple Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculate doc relevance metric",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Extract documents",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Simple Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

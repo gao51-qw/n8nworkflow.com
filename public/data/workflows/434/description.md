@@ -1,0 +1,1 @@
+This workflow uses n8n to extract the names of all the posts from the Hackernoon homepage.

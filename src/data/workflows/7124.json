@@ -1,0 +1,67 @@
+{
+  "id": 7124,
+  "slug": "7124",
+  "title": "Validate mobile app deep links in GitHub PRs with automated testing",
+  "description": "# GitHub PR Deep-Link & Routing Validator (ExecuteCommand + GitHub Comment)\n\n## 🚀 Quick-Start TL;DR\n\n1. **Import** the workflow JSON into n8n (Cloud or self-hosted). \n2. **Create a GitHub Personal Access Token** with `repo:public_repo` (or `repo`) scope and add it to n8n credentials. \n3. Open the **“CONFIG - Variables”** node and tweak:\n   * `manifestPath` – path to your deep-link manifest (AndroidManifest.xml, Info.plist, etc.).\n   * `scriptPath` – helper script that boots the emulator & checks each route.\n4. **Enable** the workflow. Every push to a PR branch triggers validation and posts a Markdown pass/fail matrix back to the PR.\n\n## What It Does\n\nThis workflow delivers an automated, CI-friendly smoke-test of every deep link defined in your mobile app. On each push to an open GitHub PR, it:\n\n1. **Clones** the PR branch.\n2. **Runs** a lightweight validation script (provided) that spins up an emulator/simulator, attempts to open each declared URI, and records **OK**/**FAIL**.\n3. **Generates** a Markdown table summarizing the results.\n4. **Comments** that table in the PR, letting reviewers spot broken schemes at a glance.\n\n## Who’s It For\n\n* Mobile teams maintaining **Android** or **iOS** deep-link manifests. \n* CI engineers who need a **simple, language-agnostic** check they can publish to each PR. \n* OSS maintainers wanting a **template-library-ready** n8n recipe.\n\n## Requirements\n\n| Requirement | Notes |\n|-------------|-------|\n| n8n Cloud / CE | Works everywhere; self-hosted users need Docker with Android / Xcode if validating on-runner. |\n| GitHub Personal Access Token | Used for posting PR comments. |\n| Emulator-capable runner | Local dev hardware or CI image that can run `adb` / `xcrun simctl`. |\n\n## How It Works\n\n1. **GitHub Trigger** fires on `pull_request` → `synchronize` (i.e., each push to the PR branch). \n2. **Set (`CONFIG - Variables`)** centralises repo URL, manifest path, script path, timeout, and comment mode. \n3. **ExecuteCommand** clones the repo and calls the validation script. \n4. **Function** converts CLI CSV output into a Markdown table. \n5. **GitHub** node posts (or appends) the results as a comment on the PR.\n\n## How To Set Up\n\n1. **Auth:** In n8n, add a *GitHub* credential with your PAT named “GitHub Personal Access Token”. \n2. **Import:** `Settings → Import workflow` and paste the JSON above. \n3. **Edit Config:** Double-click **CONFIG - Variables** and change any default values. \n4. **Validation Script:** Commit `scripts/validate_deeplinks.sh` into your repo (see sample below). \n5. **Enable the workflow.** Push to any PR branch and watch the comment appear.\n\n### Sample `validate_deeplinks.sh`\n\n```bash\n#!/usr/bin/env bash\nset -e\nwhile getopts \"m:\" opt; do\n  case $opt in\n    m) MANIFEST=\"$OPTARG\" ;;\n  esac\ndone\n\necho \"⇨ Parsing deep links from $MANIFEST\"\n# rudimentary parser—replace with something smarter for XML/Plist\ngrep -oE 'http[s]?://[^\" ]+' \"$MANIFEST\" | while read -r uri; do\n  if adb shell am start -W -a android.intent.action.VIEW -d \"$uri\" &gt;/dev/null 2&gt;&1; then\n    echo \"$uri,OK\"\n  else\n    echo \"$uri,FAIL\"\n  fi\ndone\n```\n\n## How To Customise\n\n* **Multiple manifests:** duplicate the Execute-Command step or extend the script to accept a list. \n* **Replace-latest comment:** switch `commentMode` to `replace-latest` and update the GitHub node to search for the newest bot comment before editing. \n* **Status checks instead of comments:** call the GitHub → “Create Commit Status” endpoint. \n\n## Add-Ons\n\n| Add-On | Idea |\n|--------|------|\n| Multi-platform sweep | Loop over Android + iOS manifests and aggregate results. |\n| Slack/Teams alert | Push failures into your chat of choice via Incoming-Webhook node. |\n| Parallel device grid | Trigger multiple emulators (API 19 → 34) to catch OS-specific issues. |\n\n## Use Case Examples\n\n1. **Ensure new features don’t break existing URI schemes** before merge. \n2. **Catch mis-typed hosts/paths** introduced by junior devs. \n3. **Baseline check on dependency bumps** (e.g., upgrading Navigation libraries). \n4. **Validate white-label builds** that override path segments. \n5. **Automated QA gate** that blocks merge if any link fails. \n*(…and many more!)*\n\n## Troubleshooting Guide\n\n| Issue | Possible Cause | Solution |\n|-------|---------------|----------|\n| Workflow hangs at “Execute – Validate” | Emulator image isn’t installed | Pre-install SDK & start the emulator in a startup script |\n| PR comment missing | Token lacks `repo` scope | Regenerate PAT with proper scopes |\n| All links marked FAIL | Manifest path incorrect | Update `manifestPath` in CONFIG |\n| Command node hits timeout | Huge manifest / slow CI | Increase `timeoutSecs` in CONFIG |\n\n## Need a Hand? 🤝\n\nStuck or want to extend this with multi-platform coverage? **WeblineIndia’s automation experts can help.** \nDrop us a note to fine-tune or scale out your n8n workflows — fast.",
+  "featuredImage": "/data/workflows/7124/7124.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 156,
+  "downloads": 15,
+  "createdAt": "2025-08-07T07:27:10.742Z",
+  "updatedAt": "2026-01-16T08:48:35.569Z",
+  "publishedAt": "2025-08-07T07:27:10.742Z",
+  "nodes": 5,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7124",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Validate mobile app deep links in GitHub PRs with automated testing",
+    "workflowName": "Validate mobile app deep links in GitHub PRs with automated testing",
+    "description": "# GitHub PR Deep-Link & Routing Validator (ExecuteCommand + GitHub Comment)\n\n## 🚀 Quick-Start TL;DR\n\n1. **Import** the workflow JSON into n8n (Cloud or self-hosted). \n2. **Create a GitHub Personal Access Token** with `repo:public_repo` (or `repo`) scope and add it to n8n credentials. \n3. Open the **“CONFIG - Variables”** node and tweak:\n   * `manifestPath` – path to your deep-link manifest (AndroidManifest.xml, Info.plist, etc.).\n   * `scriptPath` – helper script that boots the emulator & checks each route.\n4. **Enable** the workflow. Every push to a PR branch triggers validation and posts a Markdown pass/fail matrix back to the PR.\n\n## What It Does\n\nThis workflow delivers an automated, CI-friendly smoke-test of every deep link defined in your mobile app. On each push to an open GitHub PR, it:\n\n1. **Clones** the PR branch.\n2. **Runs** a lightweight validation script (provided) that spins up an emulator/simulator, attempts to open each declared URI, and records **OK**/**FAIL**.\n3. **Generates** a Markdown table summarizing the results.\n4. **Comments** that table in the PR, letting reviewers spot broken schemes at a glance.\n\n## Who’s It For\n\n* Mobile teams maintaining **Android** or **iOS** deep-link manifests. \n* CI engineers who need a **simple, language-agnostic** check they can publish to each PR. \n* OSS maintainers wanting a **template-library-ready** n8n recipe.\n\n## Requirements\n\n| Requirement | Notes |\n|-------------|-------|\n| n8n Cloud / CE | Works everywhere; self-hosted users need Docker with Android / Xcode if validating on-runner. |\n| GitHub Personal Access Token | Used for posting PR comments. |\n| Emulator-capable runner | Local dev hardware or CI image that can run `adb` / `xcrun simctl`. |\n\n## How It Works\n\n1. **GitHub Trigger** fires on `pull_request` → `synchronize` (i.e., each push to the PR branch). \n2. **Set (`CONFIG - Variables`)** centralises repo URL, manifest path, script path, timeout, and comment mode. \n3. **ExecuteCommand** clones the repo and calls the validation script. \n4. **Function** converts CLI CSV output into a Markdown table. \n5. **GitHub** node posts (or appends) the results as a comment on the PR.\n\n## How To Set Up\n\n1. **Auth:** In n8n, add a *GitHub* credential with your PAT named “GitHub Personal Access Token”. \n2. **Import:** `Settings → Import workflow` and paste the JSON above. \n3. **Edit Config:** Double-click **CONFIG - Variables** and change any default values. \n4. **Validation Script:** Commit `scripts/validate_deeplinks.sh` into your repo (see sample below). \n5. **Enable the workflow.** Push to any PR branch and watch the comment appear.\n\n### Sample `validate_deeplinks.sh`\n\n```bash\n#!/usr/bin/env bash\nset -e\nwhile getopts \"m:\" opt; do\n  case $opt in\n    m) MANIFEST=\"$OPTARG\" ;;\n  esac\ndone\n\necho \"⇨ Parsing deep links from $MANIFEST\"\n# rudimentary parser—replace with something smarter for XML/Plist\ngrep -oE 'http[s]?://[^\" ]+' \"$MANIFEST\" | while read -r uri; do\n  if adb shell am start -W -a android.intent.action.VIEW -d \"$uri\" &gt;/dev/null 2&gt;&1; then\n    echo \"$uri,OK\"\n  else\n    echo \"$uri,FAIL\"\n  fi\ndone\n```\n\n## How To Customise\n\n* **Multiple manifests:** duplicate the Execute-Command step or extend the script to accept a list. \n* **Replace-latest comment:** switch `commentMode` to `replace-latest` and update the GitHub node to search for the newest bot comment before editing. \n* **Status checks instead of comments:** call the GitHub → “Create Commit Status” endpoint. \n\n## Add-Ons\n\n| Add-On | Idea |\n|--------|------|\n| Multi-platform sweep | Loop over Android + iOS manifests and aggregate results. |\n| Slack/Teams alert | Push failures into your chat of choice via Incoming-Webhook node. |\n| Parallel device grid | Trigger multiple emulators (API 19 → 34) to catch OS-specific issues. |\n\n## Use Case Examples\n\n1. **Ensure new features don’t break existing URI schemes** before merge. \n2. **Catch mis-typed hosts/paths** introduced by junior devs. \n3. **Baseline check on dependency bumps** (e.g., upgrading Navigation libraries). \n4. **Validate white-label builds** that override path segments. \n5. **Automated QA gate** that blocks merge if any link fails. \n*(…and many more!)*\n\n## Troubleshooting Guide\n\n| Issue | Possible Cause | Solution |\n|-------|---------------|----------|\n| Workflow hangs at “Execute – Validate” | Emulator image isn’t installed | Pre-install SDK & start the emulator in a startup script |\n| PR comment missing | Token lacks `repo` scope | Regenerate PAT with proper scopes |\n| All links marked FAIL | Manifest path incorrect | Update `manifestPath` in CONFIG |\n| Command node hits timeout | Huge manifest / slow CI | Increase `timeoutSecs` in CONFIG |\n\n## Need a Hand? 🤝\n\nStuck or want to extend this with multi-platform coverage? **WeblineIndia’s automation experts can help.** \nDrop us a note to fine-tune or scale out your n8n workflows — fast.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "GitHub PR Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "CONFIG - Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Run Validation Script",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Markdown",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GitHub",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1.1"
+    }
+  ]
+}

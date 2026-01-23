@@ -1,0 +1,27 @@
+{
+  "id": 6745,
+  "slug": "6745",
+  "title": "Generate BigQuery SQL from natural language queries using GPT-4o chat",
+  "description": "\nGive business users a chat box; get back **valid BigQuery SQL** and live query results.  \nThe workflow:\n\n1. **Captures** a plain-language question from a chat widget or internal portal.  \n2. **Fetches** the current **table + column schema** from your BigQuery dataset (via `INFORMATION_SCHEMA`).  \n3. **Feeds** both the schema and the question to **GPT-4o** so it can craft a syntactically correct SQL query *using only fields that truly exist*.  \n4. **Executes** the AI-generated SQL in BigQuery and returns the results.  \n5. **Stores** a short-term memory by session, enabling natural follow-up questions.\n\nPerfect for analysts, customer-success teams, or any stakeholder who needs data without writing SQL.\n\n---\n\n#### ⚙️ Setup Instructions\n\n1. **Import the workflow**  \n   - n8n → **Workflows → Import from File** (or **Paste JSON**) → **Save**\n\n2. **Add credentials**  \n   | Service | Where to create credentials | Node(s) to update |\n   |---------|----------------------------|-------------------|\n   | **OpenAI** | &lt;https://platform.openai.com&gt; → Create API key | **OpenAI Chat Model** |\n   | **Google BigQuery** | Google Cloud Console → IAM & Admin → Service Account JSON key | **Google BigQuery** (schema + query) |\n\n3. **Point the schema fetcher to your dataset**  \n   - In **Google BigQuery1** you’ll see:  \n     ```sql\n     SELECT table_name, column_name, data_type\n     FROM `n8nautomation-453001.email_leads_schema.INFORMATION_SCHEMA.COLUMNS`\n     ```  \n   - Replace **`n8nautomation-453001.email_leads_schema`** with **`YOUR_PROJECT.YOUR_DATASET`**.  \n   - Keep the rest of the query the same—BigQuery’s `INFORMATION_SCHEMA` always surfaces `table_name`, `column_name`, and `data_type`.\n\n4. **Update the execution node**  \n   - Open **Google BigQuery** (the second BigQuery node).  \n   - In **Project ID** select your project.  \n   - The **SQL Query** field is already `{{ $json.output.query }}` so it will run whatever the AI returns.\n\n5. **(Optional)Embed the chat interface**  \n\n6. **Test end-to-end**  \n   - Open the embedded chat widget.  \n   - Ask: *“How many distinct email leads were created last week?”*  \n   - After a few seconds the workflow will return a table of results—or an error if the schema lacks the requested fields.\n   - As specific questions about your data\n\n8. **Activate**  \n   - Toggle **Active** so the chat assistant is available 24/7.\n\n\n\n#### 🧩 Customization Ideas\n- **Row-limit safeguard**: automatically append `LIMIT 1000` to every query.  \n- **Chart rendering**: send query results to Google Sheets + Looker Studio for instant visuals.  \n- **Slack bot**: forward both the question and the SQL result to a Slack channel for team visibility.  \n- **Schema caching**: store the INFORMATION_SCHEMA result for 24 hours to cut BigQuery costs.\n\n---\n\n### Contact\n- **Email:** rbreen@ynteractive.com  \n- **Website:** https://ynteractive.com  \n- **YouTube:** https://www.youtube.com/@ynteractivetraining  \n- **LinkedIn:** https://www.linkedin.com/in/robertbreen\n\n\n",
+  "featuredImage": "/data/workflows/6745/6745.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1924,
+  "downloads": 192,
+  "createdAt": "2025-07-31T13:13:34.069Z",
+  "updatedAt": "2026-01-16T08:46:52.070Z",
+  "publishedAt": "2025-07-31T13:13:34.069Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6745"
+}

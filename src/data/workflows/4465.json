@@ -1,0 +1,164 @@
+{
+  "id": 4465,
+  "slug": "4465",
+  "title": "AI-powered document chat with Nextcloud files using LangChain and OpenAI",
+  "description": "### Main Workflow “AI Nextcloud”\n\n* **Entry point**: A public chat-trigger greets the user; every incoming chat message starts the flow.\n* **AI agent**: A LangChain agent (“AI Nextcloud”) uses the configured OpenAI model plus short-term memory to continue the dialogue in context.\n* **Purpose**: Answers questions about files stored in a Nextcloud folder. The user simply includes the folder path in their question.\n* **Tool integration**: Calls the sub-workflow “Nextcloud Tool” whenever it needs to read files and pass their text back to the AI.\n\n---\n\n### Sub-Workflow “Nextcloud Tool”\n\n1. **Invocation**: Triggered by other workflows with the input parameter `path` (folder path).\n2. **File listing**: Retrieves every file in the specified folder via the Nextcloud API.\n3. **Filter**: Allows only readable formats (PDF, Markdown, DOCX).\n4. **Download & text extraction**\n\n   * **PDF** → Text via *Extract From File*\n   * **Markdown** → Raw text\n   * **DOCX** → Text via community node *word2text*\n5. **Aggregation**: Combines all extracted text into a single `output` field and returns it.\n\n&gt; **Outcome**: Each call yields the plain content of every supported file in a Nextcloud folder—providing rich context for the AI agent to answer user questions accurately.\n",
+  "featuredImage": "/data/workflows/4465/4465.webp",
+  "author": {
+    "id": 101,
+    "slug": "johappel",
+    "name": "johappel",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1951,
+  "downloads": 195,
+  "createdAt": "2025-05-28T16:28:03.885Z",
+  "updatedAt": "2026-01-16T08:34:31.086Z",
+  "publishedAt": "2025-05-28T16:28:03.885Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4465",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-powered document chat with Nextcloud files using LangChain and OpenAI",
+    "workflowName": "AI-powered document chat with Nextcloud files using LangChain and OpenAI",
+    "description": "### Main Workflow “AI Nextcloud”\n\n* **Entry point**: A public chat-trigger greets the user; every incoming chat message starts the flow.\n* **AI agent**: A LangChain agent (“AI Nextcloud”) uses the configured OpenAI model plus short-term memory to continue the dialogue in context.\n* **Purpose**: Answers questions about files stored in a Nextcloud folder. The user simply includes the folder path in their question.\n* **Tool integration**: Calls the sub-workflow “Nextcloud Tool” whenever it needs to read files and pass their text back to the AI.\n\n---\n\n### Sub-Workflow “Nextcloud Tool”\n\n1. **Invocation**: Triggered by other workflows with the input parameter `path` (folder path).\n2. **File listing**: Retrieves every file in the specified folder via the Nextcloud API.\n3. **Filter**: Allows only readable formats (PDF, Markdown, DOCX).\n4. **Download & text extraction**\n\n   * **PDF** → Text via *Extract From File*\n   * **Markdown** → Raw text\n   * **DOCX** → Text via community node *word2text*\n5. **Aggregation**: Combines all extracted text into a single `output` field and returns it.\n\n&gt; **Outcome**: Each call yields the plain content of every supported file in a Nextcloud folder—providing rich context for the AI agent to answer user questions accurately.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Nextcloud",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If readable",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Files",
+      "type": "n8n-nodes-base.nextCloud",
+      "role": "nextCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download File",
+      "type": "n8n-nodes-base.nextCloud",
+      "role": "nextCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "add path 1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "add path 2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "add path 3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "test data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Nextcloud Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "DOCX",
+      "type": "n8n-nodes-word2text.word2text",
+      "role": "word2text",
+      "configDescription": "Version 1"
+    }
+  ]
+}

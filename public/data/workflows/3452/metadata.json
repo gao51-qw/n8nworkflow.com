@@ -1,0 +1,27 @@
+{
+  "id": 3452,
+  "slug": "3452",
+  "title": "Monitor GitHub releases with Gemini AI Chinese translation & Slack notifications",
+  "description": "\n## Overview\n\nThis n8n template monitors specified GitHub repositories. When a new release is published, it automatically fetches the information, uses AI (Google Gemini by default) to summarize and translate it into Chinese, and sends a formatted notification to a designated Slack channel.\n\n**Core Features:**\n\n*   **Automated Monitoring**: Checks for updates on a predefined schedule.\n*   **Intelligent Processing**: Uses AI to extract key information and translate.\n*   **Error Handling**: Sends an error notification if fetching RSS for a single repository fails, without affecting others.\n*   **Duplicate Prevention**: Remembers the last processed release ID using Redis to ensure only new content is pushed.\n\n## Prerequisites\n\n*   **Slack**: Configure your Slack app credentials in n8n.\n*   **Redis**: Have an available Redis service and configure its credentials in n8n.\n*   **AI Provider (Gemini)**: Configure credentials for Google Gemini (or your chosen AI model) in n8n.\n\n## Configuration Instructions\n\nAfter importing the template, you need to modify the following key nodes:\n\n1.  **`Cron Trigger`**:\n    *   Adjust the `Rule` setting to change the update check frequency (default is `0 */10 9-23 * * *`, checking every 10 minutes between 9 AM and 11 PM daily).\n2.  **`GitHub Config` (Repository List - Code Node)**:\n    *   Edit the JavaScript array within this node's code area.\n    *   Modify or add the repositories you want to follow. Each repository object needs a `name` (custom display name) and `github` (format: `owner/repo`).\n    *   Example:\n        ```javascript\n        {\n          \"name\": \"n8n\", // Custom display name\n          \"github\": \"n8n-io/n8n\" // GitHub path\n        },\n        {\n          \"name\": \"LobeChat\",\n          \"github\": \"lobehub/lobe-chat\"\n        }\n        // ... add more repositories\n        ```\n3.  **`Redis` and `Redis2` (Redis Connection)**:\n    *   Select your configured Redis credentials in both nodes.\n4.  **`Gemini` (AI Model)**:\n    *   Select your configured Google Gemini credentials.\n    *   (Optional) Replace with a different supported AI model node and select its credentials.\n5.  **`Information Extractor` (AI Processing & Translation)**:\n    *   **Main Configuration**: Review the `System Prompt`. By default, it asks the AI to extract information and translate it into **Chinese**. Modify this prompt if you need a different language or summary style.\n6.  **`Send Message` and `Send Error` (Slack Notifications)**:\n    *   Select your configured Slack credentials in both Slack nodes.\n    *   Set the target `Channel ID` for notifications.\n\n## Workflow Overview\n\n1.  **Start**: `Cron Trigger` initiates the workflow on schedule.\n2.  **Load Config**: `GitHub Config` provides the list of repositories to monitor.\n3.  **Loop**: The `Loop` node iterates through each repository.\n4.  **Fetch & Check**:\n    *   The `RSS` node attempts to fetch the repository's releases feed.\n    *   `If No Error` checks for success:\n        *   **Failure**: `Send Error` posts an error to Slack, skips this repository.\n        *   **Success**: Continues.\n5.  **Check for New Release**:\n    *   The `Redis` node retrieves the last recorded Release ID for this repository.\n    *   The `If New` node compares the latest Release ID with the recorded ID:\n        *   **Different IDs (New Release)**: Proceeds to processing.\n        *   **Same ID (Already Processed)**: Skips this repository.\n6.  **Process & Notify (Only for New Releases)**:\n    *   `Information Extractor` (with `Gemini`) extracts, summarizes, and translates the content.\n    *   The `Code` node formats the information into Slack Block Kit.\n    *   `Send Message` sends the formatted message to Slack.\n    *   The `Redis2` node stores the current Release ID in Redis.\n7.  **End**: The workflow finishes after processing all repositories.\n\n## Conclusion\n\nOnce configured, this template automates GitHub release monitoring, uses AI to distill key information, and delivers it efficiently to your Slack workspace.",
+  "featuredImage": "/data/workflows/3452/3452.webp",
+  "author": {
+    "id": 101,
+    "slug": "tbphp",
+    "name": "tbphp",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 521,
+  "downloads": 52,
+  "createdAt": "2025-04-07T03:07:49.414Z",
+  "updatedAt": "2026-01-16T08:29:50.791Z",
+  "publishedAt": "2025-04-07T03:07:49.414Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3452"
+}

@@ -1,0 +1,27 @@
+{
+  "id": 7935,
+  "slug": "7935",
+  "title": "Sync Notion content to Webflow CMS as draft items with status tracking",
+  "description": "## **How it works:**\n\nThis template takes approved Notion pages and syncs them to a Webflow CMS collection as **draft** items. It reads pages marked **Status = Ready for publish** in a specific Notion database/project, merges JSON content stored across page blocks into a single object, then either **creates** a new CMS item or **updates** the existing one by **name**. On success it sets the Notion page to **5. Done**; on failure it switches the page to **On Hold** for review.&#x20;\n\n## **Step-by-step:**\n\n1. **Manual Trigger**\n   You start the run with **When clicking ‘Execute workflow’**.\n\n2. **Get Notion Pages (Notion → Database: Tech Content Tasks)**\n   Pull all pages with **Status = Ready for publish** scoped to the target **Project**.\n\n3. **Loop Over Items (Split In Batches)**\n   Process one Notion page at a time.\n\n4. **Code (Pass-through)**\n   Expose page fields (e.g., **name**, **id**, **url**, **sector**) for downstream nodes.\n\n5. **Get Notion Block (children)**\n   Fetch all blocks under the page **id**.\n\n6. **Merge Content (Code)**\n   Concatenate code-block fragments, **parse** them into one `mergedContent` JSON, and attach the page metadata.\n\n7. **Get Webflow Items (HTTP GET)**\n   List items in the target Webflow **collection** to see if an item with the same **name** already exists.\n\n8. **Update or Create (Switch)**\n\n   * **No match:** **Create Webflow Item** (POST) with `isDraft: true`, mapping all `fieldData` (e.g., category titles, meta title, excerpt, hero copy/image, benefits, problem pointers, FAQ, ROI).\n   * **Match:** **Update Webflow Item (Draft)** (PATCH) for that **id**. Keep the **existing slug**, write latest `fieldData`, leave `isDraft: true`.\n\n9. **Write Back Status (Notion)**\n\n   * **Success path →** set **Status = 5. Done**.\n   * **Error path →** set **Status = On Hold**.\n\n10. **Log Submission (Code)**\n    Log a compact object with **status**, **notionPageId**, **webflowItemId**, **timestamp**, and **action**.\n\n11. **Wait → Loop**\n    Short pause, then continue with the next page.\n\n## **Tools integration:**\n\n* **Notion** — source database and page blocks for approved content.\n* **Webflow CMS API** — destination collection; items created/updated as **drafts**.\n* **n8n Code** — JSON merge and lightweight logging.\n* **Split In Batches + Wait** — controlled, item-wise processing.\n\nWant hands-free publishing? Add a **Cron** trigger before step 2 to run on a schedule.",
+  "featuredImage": "/data/workflows/7935/7935.webp",
+  "author": {
+    "id": 101,
+    "slug": "snehasish",
+    "name": "Snehasish Konger",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 118,
+  "downloads": 11,
+  "createdAt": "2025-08-27T06:32:28.333Z",
+  "updatedAt": "2026-01-16T08:53:07.592Z",
+  "publishedAt": "2025-08-27T06:32:28.333Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7935"
+}

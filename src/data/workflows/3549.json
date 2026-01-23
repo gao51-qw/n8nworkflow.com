@@ -1,0 +1,151 @@
+{
+  "id": 3549,
+  "slug": "3549",
+  "title": "Audit Google Drive file permissions for access control management",
+  "description": "### This n8n template reviews and audits recently active Google Drive files and reports on files with excessively open permissions. This shows how you can automate simple compliance tasks for access control management.\n\nFile Sharing Permissions are routinely abused when access needs and scopes expand to many colleagues, clients and users. Often, granting excessively open permissions means you can get back to work rather than deal with numerous access request notifications. Whilst sometimes justified, the problem is that the permissions are rarely reverted to a safer setting at a later date when it is no longer needed.\n\nThis template serves to improve your security posture by giving frequent reminders of these open files so that they can be actioned and not forgotten about.\n\n**See example Audit Report here:** [https://docs.google.com/spreadsheets/d/1V2aiLhp3_nH7EBniMn7D0kFHg7-A5NjpDZXMhb4F5UI/edit?gid=503992967](https://docs.google.com/spreadsheets/d/1V2aiLhp3_nH7EBniMn7D0kFHg7-A5NjpDZXMhb4F5UI/edit?gid=503992967)\n\n### How it works\n* A scheduled trigger runs everyday to generate a new audit report. A new sheet is created in a designated Google Sheets document to store the day's results.\n* The Google Drive node is used with Advanced Search params to fetch recently modified files for the user with each file result containing the current permission settings.\n* The results are filtered for those with publicly accessible \"anyone with link\" and sharing with external users via domain.\n* The results are then manipulated into rows so that we can append them to the Sheet we created earlier.\n* The audit Google Sheet is updated with the results and an audit report is sent to the user to action.\n\n### How to use\n* Set the scheduled trigger to a more appropriate interval which works for you or your organisation.\n* Consider using allowlists for organisations you frequently share with to reduce the number of false positives.\n* The results can be forwarded to other security or analytical products as required.\n\n### Requirements\n* Google Drive for Document Management\n* Google Sheet for Reports and Data Collection\n* Gmail to Email Reports\n\n### Customising the workflow\n* Not using Google? Apply the same approach using Microsoft Sharepoint or Dropbox.\n* If your security policies require it, you could automate fixing the file permissions as a proactive action instead and notify the user later.",
+  "featuredImage": "/data/workflows/3549/3549.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2430,
+  "downloads": 243,
+  "createdAt": "2025-04-14T14:38:23.283Z",
+  "updatedAt": "2026-01-16T08:30:18.575Z",
+  "publishedAt": "2025-04-14T14:38:23.283Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3549",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Audit Google Drive file permissions for access control management",
+    "workflowName": "Audit Google Drive file permissions for access control management",
+    "description": "### This n8n template reviews and audits recently active Google Drive files and reports on files with excessively open permissions. This shows how you can automate simple compliance tasks for access control management.\n\nFile Sharing Permissions are routinely abused when access needs and scopes expand to many colleagues, clients and users. Often, granting excessively open permissions means you can get back to work rather than deal with numerous access request notifications. Whilst sometimes justified, the problem is that the permissions are rarely reverted to a safer setting at a later date when it is no longer needed.\n\nThis template serves to improve your security posture by giving frequent reminders of these open files so that they can be actioned and not forgotten about.\n\n**See example Audit Report here:** [https://docs.google.com/spreadsheets/d/1V2aiLhp3_nH7EBniMn7D0kFHg7-A5NjpDZXMhb4F5UI/edit?gid=503992967](https://docs.google.com/spreadsheets/d/1V2aiLhp3_nH7EBniMn7D0kFHg7-A5NjpDZXMhb4F5UI/edit?gid=503992967)\n\n### How it works\n* A scheduled trigger runs everyday to generate a new audit report. A new sheet is created in a designated Google Sheets document to store the day's results.\n* The Google Drive node is used with Advanced Search params to fetch recently modified files for the user with each file result containing the current permission settings.\n* The results are filtered for those with publicly accessible \"anyone with link\" and sharing with external users via domain.\n* The results are then manipulated into rows so that we can append them to the Sheet we created earlier.\n* The audit Google Sheet is updated with the results and an audit report is sent to the user to action.\n\n### How to use\n* Set the scheduled trigger to a more appropriate interval which works for you or your organisation.\n* Consider using allowlists for organisations you frequently share with to reduce the number of false positives.\n* The results can be forwarded to other security or analytical products as required.\n\n### Requirements\n* Google Drive for Document Management\n* Google Sheet for Reports and Data Collection\n* Gmail to Email Reports\n\n### Customising the workflow\n* Not using Google? Apply the same approach using Microsoft Sharepoint or Dropbox.\n* If your security policies require it, you could automate fixing the file permissions as a proactive action instead and notify the user later.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Has Shared with External Users",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create New Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Normalise Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "For Each File",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "File Ref",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Permissions To Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Flatten Rows",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Rows to Items",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Email Report (Execute Once)",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Recently Active Documents",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Out Owner of Document",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Append to New Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

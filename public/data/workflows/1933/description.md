@@ -1,0 +1,3 @@
+This workflow template shows how to load JSON data into a workflow and push that data into an App or convert it into a Spreadsheet file.
+
+Specifically, this workflow shows how to make a generic API request that returns JSON. It then shows how to load that into a **Google Sheets** spreadsheet, or convert it to **.CSV file** format. However, you can use the general pattern to load data into any app or convert to any spreadsheet file format (such as .xlsx). 

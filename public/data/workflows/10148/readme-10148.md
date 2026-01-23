@@ -1,0 +1,104 @@
+# Automated sales leaderboard with HighLevel CRM, GPT-4o, Notion & Slack
+
+> ## 📘 Description:
+This workflow automates sales performance tracking and motivational updates by integrating HighLevel CRM, Notion, GPT-4o, and Slack. It pulls all deals from HighLevel, cleans and summarizes sales data per representative, creates performance dashboards in Notion, and uses GPT-powered AI to generate personalized motivational Slack messages.
+It eliminates manual leaderboard tracking and boosts sales engagement with real-time insights and daily motivation — ensuring every sales rep stays informed, recognized, and inspired.
+
+## What This Workflow Does (Step-by-Step)
+🟢 Manual Trigger – Starts the automation manually for data refresh or testing.
+
+📦 Fetch All Deals from HighLevel CRM – Retrieves all opportunities from HighLevel CRM, including deal names, reps, values, and stages for full visibility.
+
+🔍 Validate Deal Fetch Success (IF Node) – Verifies that fetched data contains valid deal IDs.
+- ✅ True Path: Continues to data cleaning.
+- ❌ False Path: Logs failed records to Google Sheets for debugging.
+
+🧹 Clean & Structure Deal Data – Normalizes raw deal data into a consistent schema (deal ID, rep ID, client name, value, status). Ensures clean inputs for analytics.
+
+📊 Summarize Sales by Representative – Aggregates deals per sales rep and computes:
+- Total deals handled
+- Total deal value
+- Total deals won
+- Average deal value
+
+🧾 Generate Notion Performance Dashboard – Creates personalized Notion dashboards for each rep with daily updated performance summaries and motivation metrics.
+
+⚙️ Transform Data for AI Input – Converts summarized data into AI-readable format for GPT-4o processing.
+
+🧠 GPT-4o Model Configuration – Sets up Azure OpenAI GPT-4o model to generate motivational and contextual Slack messages.
+
+🤖 AI-Generated Motivational Slack Messages – Uses LangChain + GPT-4o to create energetic, emoji-filled messages that celebrate rep achievements and encourage improvement.
+
+💬 Notify Sales Team in Slack – Sends the AI-generated performance summaries and motivational blurbs directly to each rep or the team Slack channel for transparency and engagement.
+
+🚨 Log Fetch or Validation Errors (Error Handling) – Records any fetch or validation failures in the Google Sheets “error log sheet” for easy review and error management.
+
+## Prerequisites
+- HighLevel CRM API credentials
+- Google Sheets for “Error Log” tracking
+- Notion API integration for dashboards
+- Azure OpenAI (GPT-4o) credentials
+- Slack API connection for notifications
+
+
+## Key Benefits
+ ✅ Fully automated daily performance tracking
+ ✅ Personalized AI-powered motivation in Slack
+ ✅ Transparent visibility for managers and reps
+ ✅ Improved accountability and sales performance
+ ✅ Seamless integration across CRM, Notion, and Slack
+
+## 👥 Perfect For
+- Sales teams seeking real-time motivation and transparency
+- Managers who want automated performance dashboards
+- Teams using HighLevel CRM and Slack for daily operations
+- Companies aiming to gamify sales productivity
+
+## 📊 Basic Information
+
+- **Workflow ID:** 10148
+- **Complexity:** advanced
+- **Node Count:** 21
+- **Views:** 300
+- **Downloads:** 30
+- **Created:** 2025/10/25
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/10148)
+
+## 👤 Author
+
+- **Name:** Rahul Joshi
+- **Username:** @rahul08
+
+## 🏷️ Categories
+
+- CRM
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **stickyNote** (×10)
+- **highLevel** 
+- **if** 
+- **googleSheets** 
+- **code** (×3)
+- **notion** 
+- **@n8n/n8n-nodes-langchain.lmChatAzureOpenAi** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **slack** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 21 nodes with 8 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

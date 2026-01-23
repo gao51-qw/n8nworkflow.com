@@ -1,0 +1,27 @@
+{
+  "id": 4689,
+  "slug": "4689",
+  "title": "Build a chatbot with Reinforced Learning Human Feedback (RLHF) and RAG",
+  "description": "### Who is this for?\nThis template is designed for internal support teams, product specialists, and knowledge managers who want to build an AI-powered knowledge assistant with retrieval-augmented generation (RAG) and reinforcement learning from human feedback (RLHF) via Telegram.\n\n### What problem is this workflow solving?\nManual knowledge management and answering support queries can be time-consuming and error-prone. This solution automates importing and indexing official documentation into MongoDB vector search and enhances AI responses with Telegram-based user feedback to continuously improve answer quality.\n\n### What these workflows do\n#### Workflow 1: Document ingestion & indexing\n- Manually triggered workflow imports product documentation from Google Docs.\n- Documents are split into manageable chunks and embedded using OpenAI embeddings.\n- Embedded document chunks are stored in MongoDB Atlas vector store to enable semantic search.\n\n#### Workflow 2: Telegram chat with RLHF feedback loop\n- Listens for user messages via Telegram bot integration.\n- Uses vector similarity search on MongoDB to retrieve relevant documentation chunks.\n- Generates answers with OpenAI GPT-4o-mini model using retrieval-augmented generation.\n- Sends answers back via Telegram and waits for user feedback (approval or disapproval).\n- Captures feedback, maps it as positive or negative, and stores it with the conversation data for future model improvement.\n\n### Setup\n#### Setting up vector embeddings\n1. Authenticate Google Docs and connect your Google Docs URL containing the product documentation you want to index.\n2. Authenticate MongoDB Atlas and connect the collection where you want to store the vector embeddings. Create a search index on this collection to support vector similarity queries. \n3. Ensure the index name matches the one configured in n8n (data_index). \n4. See the example MongoDB search index template below for reference.\n\n#### Setting up chat with Telegram RLHF\n1. Create a bot in Telegram with @botFather using the /newbot command.\n2. Connect the MongoDB database and search index used for vector search in the previous workflow. Also create two new collections in MongoDB Atlas: one for feedback and one for chat history. Create a search index for feedback, copying the provided template.\n3. Configure the AI system prompt in the “Knowledge Base Agent” node, making sure it references all three tools connected (productDocs, feedbackPositive, feedbackNegative) as provided in the template prompt.\n### Make sure\n- Product documentation and feedback collections must connect to the same MongoDB database.\n- There are three distinct MongoDB collections: one for product documentation, one for feedback, and one for chat history (chat history collection can be separate).\n- Telegram API credentials are valid and webhook URLs are correctly set up.\n\n### MongoDB Search Index Templates\n#### Documentation Collection Index\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"_id\": {\n        \"type\": \"string\"\n      },\n      \"text\": {\n        \"type\": \"string\"\n      },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"source\": {\n        \"type\": \"string\"\n      },\n      \"doc_id\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}\n\n#### Feedback Collection Index\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"prompt\": {\n        \"type\": \"string\"\n      },\n      \"response\": {\n        \"type\": \"string\"\n      },\n      \"text\": {\n        \"type\": \"string\"\n      },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"feedback\": {\n        \"type\": \"token\"\n      }\n    }\n  }\n}",
+  "featuredImage": "/data/workflows/4689/4689.webp",
+  "author": {
+    "id": 101,
+    "slug": "thomasgpt",
+    "name": "NovaNode",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 6035,
+  "downloads": 603,
+  "createdAt": "2025-06-05T13:39:18.776Z",
+  "updatedAt": "2026-01-16T08:35:41.768Z",
+  "publishedAt": "2025-06-05T13:39:18.776Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4689"
+}

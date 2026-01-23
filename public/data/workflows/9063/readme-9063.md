@@ -1,0 +1,122 @@
+# Automate digital product sales & delivery with Stripe and Email
+
+> # 💳 Automate Digital Product Sales & Delivery with Stripe and Email 
+
+### Turn Your Automations into Revenue  
+Sell on n8n using Stripe (Fully Automated Delivery) 
+
+Stop manually sending files after payment or struggling with clunky checkout flows.  
+Instead of paying **~10% platform fees**, you keep control of your sales, your brand, and your files — while giving buyers a smooth, professional experience.
+  
+💡 *Turn Stripe into your own Gumroad alternative — sell and deliver workflows instantly.*
+
+This workflow gives you a **ready-made storefront system**: customers pay via Stripe, and your n8n template is **delivered instantly by email with setup guidelines and video instructions**.  
+
+- **Instant delivery** → No waiting, customers receive their purchase within seconds.  
+- **No manual work** → Payment verification, file delivery, and confirmation emails are all automated.  
+- **Professional experience** → Clean emails with branded HTML, Loom walkthroughs, and receipts.  
+- **Scalable sales** → Sell 1 or 100 templates without adding workload.  
+
+---
+
+### Who Benefits Most  
+✅ **Automation creators**: Sell your n8n templates without coding a shop.  
+✅ **Freelancers & consultants**: Package your workflows as digital products.  
+✅ **Agencies**: Offer prebuilt automations to clients on autopilot.  
+✅ **SaaS builders**: Add a self-serve template store for upsells.  
+
+“Stop giving 10% of every sale to marketplaces. Keep your profit.”  
+
+---
+
+### What It Does for You  
+- Customer pays securely.  
+- Logs the purchase for easy tracking.  
+- Pulls the correct workflow.  
+- Sends a **personalized HTML email** with:  
+  - Workflow JSON file attached.  
+  - Installation & setup guidelines.  
+  - Walkthrough video link.  
+  - Support contact details.  
+- Sends you (the seller) an instant purchase notification.  
+
+---
+
+### Why This Template Instead of Building It Yourself  
+- **Save 25–40 hours** of coding, testing, and Stripe API integration.  
+- Avoid errors in file delivery, duplicate checkouts, and failed notifications.  
+- Get a **production-ready digital delivery system** you can brand and deploy in minutes.  
+- Customize effortlessly → add more products, change branding, or connect CRM.  
+- Proven flow: already tested (and using ourselves).  
+
+---
+
+### Requirements  
+- n8n (self-hosted or cloud).  
+- Active **Stripe account** with API key.  
+- Access for file storage & logging.  
+- An **email account** for delivery.  
+
+---
+
+### Bottom Line 💡  
+If you sell even **one automation template**, this workflow pays for itself.  
+Instead of manually emailing JSON files, every customer gets a **smooth, Amazon-like experience**:  
+they pay → they instantly receive → you scale without lifting a finger.  
+
+---
+
+👉 **By purchasing, you get:**  
+- Full workflow JSON file.  
+- Email delivery with setup **guidelines**.  
+- **Contact Us** via services@quantumti.ae.  
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9063
+- **Complexity:** advanced
+- **Node Count:** 20
+- **Views:** 156
+- **Downloads:** 15
+- **Created:** 2025/9/29
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9063)
+
+## 👤 Author
+
+- **Name:** Lenouar
+- **Username:** @aureusr
+
+## 🏷️ Categories
+
+- CRM
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×2)
+- **switch** 
+- **stripeTrigger** 
+- **removeDuplicates** 
+- **httpRequest** 
+- **stripe** 
+- **set** (×2)
+- **googleSheets** (×2)
+- **executeWorkflow** 
+- **googleDrive** (×2)
+- **microsoftOutlook** (×3)
+- **html** (×3)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 20 nodes with 13 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

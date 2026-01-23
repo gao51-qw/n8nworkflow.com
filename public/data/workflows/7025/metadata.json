@@ -1,0 +1,27 @@
+{
+  "id": 7025,
+  "slug": "7025",
+  "title": "Generate Instagram captions from hashtag analysis using Apify + GPT-4o-mini",
+  "description": "This n8n workflow scrapes recent Instagram posts by hashtag and generates new, relevant caption ideas using OpenAI. It avoids making up suggestions by analyzing real-world content and surfacing common patterns.\n\n---\n\n## ✅ Use Case\n\nMarketing teams, content creators, or social media managers can:\n\n- Discover what’s trending for a specific topic\n- Automatically generate Instagram captions based on real posts\n- Understand common caption styles for a niche\n- Save time brainstorming ideas while staying on-brand\n\n---\n\n## 🧠 How It Works\n\n### 1️⃣ Manual Trigger\n\n#### 🧩 Node: `When clicking ‘Execute workflow’`\n- Manually starts the workflow for testing or single-run execution.\n\n---\n\n### 2️⃣ Define the Hashtag\n\n#### 🧩 Node: `Create Search Term`\n- Sets the value of the hashtag you'd like to scan.\n- Default is `n8n`, but you can modify it to anything.\n\n```json\n{\n  \"Search_Term\": \"yourCustomHashtag\"\n}\n```\n\n---\n\n### 3️⃣ Scrape Instagram Posts\n\n#### 🧩 Node: `Find Recent Posts`\n- **API**: [Apify Instagram Hashtag Scraper](https://console.apify.com/actors/apify/instagram-hashtag-scraper)\n- **Setup**:\n  - Visit [Apify Console](https://console.apify.com/)\n  - Create an API token\n  - In n8n, go to Credentials and add `HTTP Query Auth`\n  - Use `?token=yourTokenHere` as the query string\n\n**JSON Body:**\n```json\n{\n  \"hashtags\": [\"{{ $json.Search_Term }}\"],\n  \"resultsLimit\": 20,\n  \"resultsType\": \"posts\"\n}\n```\n\n---\n\n### 4️⃣ Extract Captions\n\n#### 🧩 Node: `Set bio and follower count`\n- Extracts just the `caption` from each post and stores it in a clean variable for the AI agent to use.\n\n---\n\n### 5️⃣ Aggregate Captions\n\n#### 🧩 Node: `Aggregate`\n- Gathers all captions into one list before processing.\n- Useful for passing a large text block into the AI.\n\n---\n\n### 6️⃣ Convert to Single Text Block\n\n#### 🧩 Node: `Convert table names and columns into single text for agent`\n- Uses a `Code` node to combine all captions into a single string for OpenAI to read:\n```javascript\nreturn [\n  {\n    json: {\n      text: items\n        .map(item =&gt; `- ${JSON.stringify(item.json)}`)\n        .join('\\n\\n'),\n    },\n  },\n];\n```\n\n---\n\n### 7️⃣ Generate Caption Ideas with AI\n\n#### 🧩 Node: `AI Agent`\n- Takes the combined post text and sends it to GPT-4o-mini.\n- Includes this system message:\n```text\nI'm looking for ideas for posts about {{ $('Create Search Term').item.json.Search_Term }}.\nHere’s the last 5 posts on Instagram about the topic. Use those to help me generate a list of relevant captions.\n\nDo not make up ideas that are not like the others in the list.\n\nOutput like this:\n{\n  \"Post Idea\": [\"Idea1\", \"Idea2\"],\n  \"Most Common Post\": [\"common post 1\", \"common post 2\"]\n}\n```\n\n---\n\n### 8️⃣ Choose Language Model\n\n#### 🧩 Node: `OpenAI Chat Model`\n- **Model**: `gpt-4o-mini`\n- **Credential**: Use your OpenAI API key.\n  - Get it from: [OpenAI API Keys](https://platform.openai.com/account/api-keys)\n  - Add it in n8n under OpenAI credentials.\n\n---\n\n### 9️⃣ Parse the AI Output\n\n#### 🧩 Node: `Structured Output Parser`\n- Parses the GPT response into structured JSON:\n```json\n{\n  \"Post Idea\": [\"Idea1\", \"Idea2\"],\n  \"Most Common Post\": [\"common post 1\", \"common post 2\"]\n}\n```\n\n---\n\n### 🔟 Split the Outputs\n\n#### 🧩 Nodes: `Split Out`, `Split Out1`\n- Separates the `Post Idea` list and `Most Common Post` list into individual items.\n\n---\n\n### 🔁 Merge for Final Output\n\n#### 🧩 Node: `Merge`\n- Combines the two split lists into one output stream.\n\n---\n\n## 👤 Need More Help?\n\n**Robert Breen**  \nAutomation Consultant | AI Workflow Designer | n8n Expert  \n📧 [robert@ynteractive.com](mailto:robert@ynteractive.com)  \n🔗 [LinkedIn](https://www.linkedin.com/in/robert-breen-29429625/)\n",
+  "featuredImage": "/data/workflows/7025/7025.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 543,
+  "downloads": 54,
+  "createdAt": "2025-08-05T20:21:06.506Z",
+  "updatedAt": "2026-01-16T08:48:12.891Z",
+  "publishedAt": "2025-08-05T20:21:06.506Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7025"
+}

@@ -1,0 +1,157 @@
+{
+  "id": 11220,
+  "slug": "11220",
+  "title": "Automated failed login detection with Jira tasks, Slack alerts & Notion logging",
+  "description": "# Automated Failed Login Detection with Jira Security Tasks, Slack Notifications\n\n*Webhook: Failed Login Attempts → Jira Security Case → Slack Warnings*\n\n---\n\nThis n8n workflow monitors failed login attempts from any application, normalizes incoming data, detects repeated attempts within a configurable time window and automatically:\n\n* Sends detailed alerts to Slack,\n* Creates Jira security tasks (single or grouped based on repetition),\n* Logs all failed login attempts into a Notion database.\n\nIt ensures fast, structured and automated responses to potential account compromise or brute-force attempts while maintaining persistent records.\n\n### Quick Implementation Steps\n\n1. Import this JSON workflow into n8n.\n2. Connect your application to the failed-login webhook endpoint.\n3. Add Jira Cloud API credentials.\n4. Add Slack API credentials.\n5. Add Notion API credentials and configure the database for storing login attempts.\n6. Enable the workflow — done!\n\n## What It Does\n\n1. **Receives Failed Login Data**\n\t* Accepts POST requests containing failed login information.\n\t* Normalizes the data, ensuring consistent fields: username, ip, timestamp and error.\n2. **Validates Input**\n\t* Checks for missing username or IP.\n\t* Sends a Slack alert if any required field is missing.\n3. **Detects Multiple Attempts**\n\t* Uses a sliding time window (default: 5 minutes) to detect multiple failed login attempts from the same username + IP.\n\t* Single attempts → standard Jira task + Slack notification.\n\t* Multiple attempts → grouped Jira task + detailed Slack notification.\n4. **Logs Attempts in Notion**\n\t* Records all failed login events into a Notion database with fields: Username, IP, Total Attempts, Attempt List, Attempt Type.\n5. **Formats Slack Alerts**\n\t* Single attempt → lightweight notification.\n\t* Multiple attempts → summary including timestamps, errors, total attempts, and Jira ticket link.\n\n## Who’s It For\n\nThis workflow is ideal for:\n\n* Security teams monitoring authentication logs.\n* DevOps/SRE teams maintaining infrastructure access logs.\n* SaaS platform teams with high login traffic.\n* Organizations aiming to automate breach detection.\n* Teams using Jira + Slack + Notion + n8n for incident workflows.\n\n## Requirements\n\n* n8n (Self-Hosted or Cloud).\n* Your application must POST failed login data to the webhook.\n* Jira Software Cloud credentials (Email, API Token, Domain).\n* Slack Bot Token with message-posting permissions.\n* Notion API credentials with access to a database.\n* Basic understanding of your login event sources.\n\n## How It Works\n\n1. **Webhook Trigger**: Workflow starts when a failed-login event is sent to the failed-login webhook.\n2. **Normalization**:\n\t* Converts single objects or arrays into a uniform format.\n\t* Ensures username, IP, timestamp and error are present.\n\t* Prepares a logMessage for Slack and Jira nodes.\n3. **Validation**:\n\t* IF node checks whether username and IP exist.\n\t* If missing → Slack alert for missing information.\n4. **Multiple Attempt Detection**:\n\t* Function node detects repeated login attempts within a 5-minute sliding window.\n\t* Flags attempts as multiple: true or false.\n5. **Branching**:\n\t* **Multiple attempts** → build summary, create Jira ticket, format Slack message, store in Notion.\n\t* **Single attempts** → create Jira ticket, format Slack message, store in Notion.\n6. **Slack Alerts**:\n\t* Single attempt → concise message\n\t* Multiple attempts → detailed summary with timestamps and Jira ticket link\n7. **Notion Logging**:\n\t* Stores username, IP, total attempts, attempt list, attempt type in a dedicated database for recordkeeping.\n\n## How To Set Up\n\n1. **Import Workflow** → _Workflows → Import from File_ in n8n.\n2. **Webhook Setup** → copy the URL from Faield Login Trigger node and integrate with your application.\n3. **Jira Credentials** → connect your Jira account to both Jira nodes and configure project/issue type.\n4. **Slack Credentials** → connect your Slack Bot and select the alert channel.\n5. **Notion Credentials** → connect your Notion account and select the database for storing login attempts.\n6. **Test the Workflow** → send sample events: missing fields, single attempts, multiple attempts.\n7. **Enable Workflow** → turn on workflow once testing passes.\n\n## Logic Overview\n\n| Step Node                       | Description                                   |\n|---------------------------------|-----------------------------------------------|\n| Normalize input                 | Normalize Login Event — Ensures each event has required fields and prepares a logMessage. |\n| Validate fields                 | Check Username & IP present — IF node → alerts Slack if data is incomplete. |\n| Detect repeats                  | Detect Multiple Attempts — Finds multiple attempts within a 5-minute window; sets multiple flag. |\n| Multiple attempts               | IF - Multiple Attempts + Build Multi-Attempt Summary — Prepares grouped summary for Slack & Jira. |\n| Single attempt                  | Create Ticket - Single Attempt — Creates Jira task & Slack alert for one-off events. |\n| Multiple attempt ticket         | Create Ticket - Multiple Attempts — Creates detailed Jira task. |\n| Slack alert formatting          | Format Fields For Single/Multiple Attempt — Prepares structured message for Slack. |\n| Slack alert delivery            | Slack Alert - Single/Multiple Attempts — Posts alert in selected Slack channel. |\n| Notion logging                  | Login Attempts Data Store in DB — Stores structured attempt data in Notion database. |\n\n\n## Customization Options\n\n* **Webhook Node** → adjust endpoint path for your application.\n* **Normalization Function** → add fields such as device, OS, location or user-agent.\n* **Multiple Attempt Logic** → change the sliding window duration or repetition threshold.\n* **Jira Nodes** → modify issue type, labels or project.\n* **Slack Nodes** → adjust markdown formatting, channel routing or severity-based channels.\n* **Notion Node** → add or modify database fields to store additional context.\n\n**Optional Enhancements:**\n\n* Geo-IP lookup for country/city info.\n* Automatic IP blocking via firewall or WAF.\n* User notification for suspicious login attempts.\n* Database logging in MySQL/Postgres/MongoDB.\n* Threat intelligence enrichment (e.g., AbuseIPDB).\n\n## Use Case Examples\n\n1. Detect brute-force attacks targeting user accounts.\n2. Identify credential stuffing across multiple users.\n3. Monitor admin portal access failures with Jira task creation.\n4. Alert security teams instantly when login attempts originate from unusual locations.\n5. Centralize failed login monitoring across multiple applications with Notion logging.\n\n## Troubleshooting Guide\n\n| Issue                         | Possible Cause                                   | Solution                                                    |\n|-------------------------------|---------------------------------------------------|-------------------------------------------------------------|\n| Workflow not receiving data   | Webhook misconfigured                             | Verify webhook URL & POST payload format                    |\n| Jira ticket creation fails    | Invalid credentials or insufficient permissions   | Update Jira API token and project access                    |\n| Slack alert not sent          | Incorrect channel ID or missing bot scopes        | Fix Slack credentials and permissions                       |\n| Multiple attempts not detected| Sliding window logic misaligned                   | Adjust Detect Multiple Attempts node code                   |\n| Notion logging fails          | Incorrect database ID or missing credentials      | Update Notion node credentials and database configuration   |\n| Errors in normalization       | Payload format mismatch                           | Update Normalize Login Event function code                  |\n\n## Need Help?\n\nIf you need help setting up, customizing or extending this workflow, WeblineIndia can assist with full n8n development, workflow automation, security event processing and custom integrations.",
+  "featuredImage": "/data/workflows/11220/11220.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 79,
+  "downloads": 7,
+  "createdAt": "2025-11-25T14:36:09.429Z",
+  "updatedAt": "2026-01-16T09:07:59.613Z",
+  "publishedAt": "2025-11-25T14:36:09.429Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11220",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated failed login detection with Jira tasks, Slack alerts & Notion logging",
+    "workflowName": "Automated failed login detection with Jira tasks, Slack alerts & Notion logging",
+    "description": "# Automated Failed Login Detection with Jira Security Tasks, Slack Notifications\n\n*Webhook: Failed Login Attempts → Jira Security Case → Slack Warnings*\n\n---\n\nThis n8n workflow monitors failed login attempts from any application, normalizes incoming data, detects repeated attempts within a configurable time window and automatically:\n\n* Sends detailed alerts to Slack,\n* Creates Jira security tasks (single or grouped based on repetition),\n* Logs all failed login attempts into a Notion database.\n\nIt ensures fast, structured and automated responses to potential account compromise or brute-force attempts while maintaining persistent records.\n\n### Quick Implementation Steps\n\n1. Import this JSON workflow into n8n.\n2. Connect your application to the failed-login webhook endpoint.\n3. Add Jira Cloud API credentials.\n4. Add Slack API credentials.\n5. Add Notion API credentials and configure the database for storing login attempts.\n6. Enable the workflow — done!\n\n## What It Does\n\n1. **Receives Failed Login Data**\n\t* Accepts POST requests containing failed login information.\n\t* Normalizes the data, ensuring consistent fields: username, ip, timestamp and error.\n2. **Validates Input**\n\t* Checks for missing username or IP.\n\t* Sends a Slack alert if any required field is missing.\n3. **Detects Multiple Attempts**\n\t* Uses a sliding time window (default: 5 minutes) to detect multiple failed login attempts from the same username + IP.\n\t* Single attempts → standard Jira task + Slack notification.\n\t* Multiple attempts → grouped Jira task + detailed Slack notification.\n4. **Logs Attempts in Notion**\n\t* Records all failed login events into a Notion database with fields: Username, IP, Total Attempts, Attempt List, Attempt Type.\n5. **Formats Slack Alerts**\n\t* Single attempt → lightweight notification.\n\t* Multiple attempts → summary including timestamps, errors, total attempts, and Jira ticket link.\n\n## Who’s It For\n\nThis workflow is ideal for:\n\n* Security teams monitoring authentication logs.\n* DevOps/SRE teams maintaining infrastructure access logs.\n* SaaS platform teams with high login traffic.\n* Organizations aiming to automate breach detection.\n* Teams using Jira + Slack + Notion + n8n for incident workflows.\n\n## Requirements\n\n* n8n (Self-Hosted or Cloud).\n* Your application must POST failed login data to the webhook.\n* Jira Software Cloud credentials (Email, API Token, Domain).\n* Slack Bot Token with message-posting permissions.\n* Notion API credentials with access to a database.\n* Basic understanding of your login event sources.\n\n## How It Works\n\n1. **Webhook Trigger**: Workflow starts when a failed-login event is sent to the failed-login webhook.\n2. **Normalization**:\n\t* Converts single objects or arrays into a uniform format.\n\t* Ensures username, IP, timestamp and error are present.\n\t* Prepares a logMessage for Slack and Jira nodes.\n3. **Validation**:\n\t* IF node checks whether username and IP exist.\n\t* If missing → Slack alert for missing information.\n4. **Multiple Attempt Detection**:\n\t* Function node detects repeated login attempts within a 5-minute sliding window.\n\t* Flags attempts as multiple: true or false.\n5. **Branching**:\n\t* **Multiple attempts** → build summary, create Jira ticket, format Slack message, store in Notion.\n\t* **Single attempts** → create Jira ticket, format Slack message, store in Notion.\n6. **Slack Alerts**:\n\t* Single attempt → concise message\n\t* Multiple attempts → detailed summary with timestamps and Jira ticket link\n7. **Notion Logging**:\n\t* Stores username, IP, total attempts, attempt list, attempt type in a dedicated database for recordkeeping.\n\n## How To Set Up\n\n1. **Import Workflow** → _Workflows → Import from File_ in n8n.\n2. **Webhook Setup** → copy the URL from Faield Login Trigger node and integrate with your application.\n3. **Jira Credentials** → connect your Jira account to both Jira nodes and configure project/issue type.\n4. **Slack Credentials** → connect your Slack Bot and select the alert channel.\n5. **Notion Credentials** → connect your Notion account and select the database for storing login attempts.\n6. **Test the Workflow** → send sample events: missing fields, single attempts, multiple attempts.\n7. **Enable Workflow** → turn on workflow once testing passes.\n\n## Logic Overview\n\n| Step Node                       | Description                                   |\n|---------------------------------|-----------------------------------------------|\n| Normalize input                 | Normalize Login Event — Ensures each event has required fields and prepares a logMessage. |\n| Validate fields                 | Check Username & IP present — IF node → alerts Slack if data is incomplete. |\n| Detect repeats                  | Detect Multiple Attempts — Finds multiple attempts within a 5-minute window; sets multiple flag. |\n| Multiple attempts               | IF - Multiple Attempts + Build Multi-Attempt Summary — Prepares grouped summary for Slack & Jira. |\n| Single attempt                  | Create Ticket - Single Attempt — Creates Jira task & Slack alert for one-off events. |\n| Multiple attempt ticket         | Create Ticket - Multiple Attempts — Creates detailed Jira task. |\n| Slack alert formatting          | Format Fields For Single/Multiple Attempt — Prepares structured message for Slack. |\n| Slack alert delivery            | Slack Alert - Single/Multiple Attempts — Posts alert in selected Slack channel. |\n| Notion logging                  | Login Attempts Data Store in DB — Stores structured attempt data in Notion database. |\n\n\n## Customization Options\n\n* **Webhook Node** → adjust endpoint path for your application.\n* **Normalization Function** → add fields such as device, OS, location or user-agent.\n* **Multiple Attempt Logic** → change the sliding window duration or repetition threshold.\n* **Jira Nodes** → modify issue type, labels or project.\n* **Slack Nodes** → adjust markdown formatting, channel routing or severity-based channels.\n* **Notion Node** → add or modify database fields to store additional context.\n\n**Optional Enhancements:**\n\n* Geo-IP lookup for country/city info.\n* Automatic IP blocking via firewall or WAF.\n* User notification for suspicious login attempts.\n* Database logging in MySQL/Postgres/MongoDB.\n* Threat intelligence enrichment (e.g., AbuseIPDB).\n\n## Use Case Examples\n\n1. Detect brute-force attacks targeting user accounts.\n2. Identify credential stuffing across multiple users.\n3. Monitor admin portal access failures with Jira task creation.\n4. Alert security teams instantly when login attempts originate from unusual locations.\n5. Centralize failed login monitoring across multiple applications with Notion logging.\n\n## Troubleshooting Guide\n\n| Issue                         | Possible Cause                                   | Solution                                                    |\n|-------------------------------|---------------------------------------------------|-------------------------------------------------------------|\n| Workflow not receiving data   | Webhook misconfigured                             | Verify webhook URL & POST payload format                    |\n| Jira ticket creation fails    | Invalid credentials or insufficient permissions   | Update Jira API token and project access                    |\n| Slack alert not sent          | Incorrect channel ID or missing bot scopes        | Fix Slack credentials and permissions                       |\n| Multiple attempts not detected| Sliding window logic misaligned                   | Adjust Detect Multiple Attempts node code                   |\n| Notion logging fails          | Incorrect database ID or missing credentials      | Update Notion node credentials and database configuration   |\n| Errors in normalization       | Payload format mismatch                           | Update Normalize Login Event function code                  |\n\n## Need Help?\n\nIf you need help setting up, customizing or extending this workflow, WeblineIndia can assist with full n8n development, workflow automation, security event processing and custom integrations.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Faield Login Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Normalize Login Event",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Username & IP present",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IF - Multiple Attempts",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Build Multi-Attempt Summary",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Ticket- Multiple Attempts",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Ticket - Single Attempt",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Alert- Multiple Attempts",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Slack Alert - Single Attempt",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Slack Alert - Missing Username/IP",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Detect Multiple Attempts",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Login Attempt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Login Attempts Data Store in DB",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Fields for Multiple-attempt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Format Fields For Single Attempt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

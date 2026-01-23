@@ -1,0 +1,26 @@
+{
+  "id": 1997,
+  "slug": "1997",
+  "title": "Authenticate a user in a workflow with OpenID Connect",
+  "description": "# Intro\n\nThis workflow needs a user to authenticate by using an openid connect provider in order to call the webhook.\n\nIf the user is not authenticated, it starts a login process by using an Authorization Code with PKCE [https://datatracker.ietf.org/doc/html/rfc7636](https://datatracker.ietf.org/doc/html/rfc7636), a standard way to authenticate users with openid connect.\n\nThen, after the user logs in, the webhook is refreshed and gets the user's token from a cookie. With this token, all details about the user are requested through the userinfo endpoint on the identity provider.\n\n# How to set up with Keycloak\n\n[Keycloak](https://www.keycloak.org) Keycloak is an open source identity and access management solution.\n\nFeel free to get a demo realm at [https://please-open.it](https://please-open.it) or get your own Keycloak server up and running.\n\nAfter creating a realm, go to \"Realm Settings\" and click on \"OpenID Endpoint Configuration\" \n\n![image.png](fileId:718)\n\nRetrieve authorization_endpoint, token_endpoint and userinfo_endpoint values. Set those variables in the \"Set variables\" node.\n\nIn Keycloak, create a new client (name it as you want)\n\n![image.png](fileId:715)\n\nDisable the client authentication, check only \"standard flow\" : \n\n![image.png](fileId:717)\n\nAt the third step, put the webhook url in \"valid redirect URIs\", fill \"Web origins\" with a \"+\".\n\n![image.png](fileId:716)\n\nYou're done, open the webhook and it asks you to authenticate.\n\n# Usage\n\n## User informations\n\nThe userinfo node returns this structure about the user has logged in : \n\n```json\n[\n  {\n    \"sub\":\"73a6543f-f420-4fa6-9811-209e903c348b\",\n    \"email_verified\":true,\n    \"preferred_username\": \"mathieu.passenaud@please-open.it\",\n    \"email\": \"mathieu.passenaud@please-open.it\"\n  }\n]\n```\n\nI can use those infos in my workflow for custom operations.\n\n## APIs calls\n\nthe \"code\" node returns me a cookie named \"n8n-custom-auth\" which is the access_token returned by the identity provider. This access_token can be used to call APIs connected to this identity provider (for example, we call userinfo API with this token).\n\nExample : asks a user to log in with his Google account then call an API (Gmail, drive...) with his own token.\n\n# How it works\n\nWe published a blog post about this flow, how it works and how you can use it : \n[https://blog.please-open.it/n8n-openid-client/](https://blog.please-open.it/n8n-openid-client/)",
+  "featuredImage": "/data/workflows/1997/1997.webp",
+  "author": {
+    "id": 101,
+    "slug": "please-open-it",
+    "name": "please-open.it",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8038,
+  "downloads": 803,
+  "createdAt": "2023-11-29T09:31:35.842Z",
+  "updatedAt": "2026-01-16T08:22:35.621Z",
+  "publishedAt": "2023-11-29T09:31:35.842Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/1997"
+}

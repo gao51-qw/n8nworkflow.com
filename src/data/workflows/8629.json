@@ -1,0 +1,283 @@
+{
+  "id": 8629,
+  "slug": "8629",
+  "title": "Automated Instagram commenting on selected profiles with GPT-4o and Phantombuster",
+  "description": "## Who’s it for  \nInfluencers and social-media teams who want to *comment automatically on posts from selected Instagram profiles*—scaling engagement while staying within platform limits.  \n\n## How it works / What it does  \n1. **Schedule Trigger** runs every 2 h.  \n2. **Profile Post Extractor** fetches up to 20 posts per profile from your CSV.  \n3. **Select Cookie** rotates Instagram session-cookies.  \n4. **Get Random Post** selects one.  \n5. **Create Comment** (GPT-4o) writes ≤150-character reply in your chosen language.  \n6. Builds `instagram_post_to_comment.csv`, uploads to SharePoint.  \n7. **Phantombuster Autocomment Agent** posts it.  \n8. Logged in `instagram_posts_already_commented.csv` to prevent repeats.  \n\n## How to set up  \n- Same as the auto-liker, but also add `instagram_posts_already_commented.csv` (header `postUrl`).  \n- Define tracked profiles in `profiles_instagram.csv`.  \n- Configure comment prompt & language in **Set ENV Variables**.  \n\n## Profile CSV format  \nYour `profiles_instagram.csv` must contain a header `profileUrl` and valid Instagram profile URLs. Example:  \n```csv\nprofileUrl\nhttps://www.instagram.com/brand_account/\nhttps://www.instagram.com/influencer123/",
+  "featuredImage": "/data/workflows/8629/8629.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 487,
+  "downloads": 48,
+  "createdAt": "2025-09-16T07:27:09.766Z",
+  "updatedAt": "2026-01-16T08:56:55.830Z",
+  "publishedAt": "2025-09-16T07:27:09.766Z",
+  "nodes": 41,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8629",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated Instagram commenting on selected profiles with GPT-4o and Phantombuster",
+    "workflowName": "Automated Instagram commenting on selected profiles with GPT-4o and Phantombuster",
+    "description": "## Who’s it for  \nInfluencers and social-media teams who want to *comment automatically on posts from selected Instagram profiles*—scaling engagement while staying within platform limits.  \n\n## How it works / What it does  \n1. **Schedule Trigger** runs every 2 h.  \n2. **Profile Post Extractor** fetches up to 20 posts per profile from your CSV.  \n3. **Select Cookie** rotates Instagram session-cookies.  \n4. **Get Random Post** selects one.  \n5. **Create Comment** (GPT-4o) writes ≤150-character reply in your chosen language.  \n6. Builds `instagram_post_to_comment.csv`, uploads to SharePoint.  \n7. **Phantombuster Autocomment Agent** posts it.  \n8. Logged in `instagram_posts_already_commented.csv` to prevent repeats.  \n\n## How to set up  \n- Same as the auto-liker, but also add `instagram_posts_already_commented.csv` (header `postUrl`).  \n- Define tracked profiles in `profiles_instagram.csv`.  \n- Configure comment prompt & language in **Set ENV Variables**.  \n\n## Profile CSV format  \nYour `profiles_instagram.csv` must contain a header `profileUrl` and valid Instagram profile URLs. Example:  \n```csv\nprofileUrl\nhttps://www.instagram.com/brand_account/\nhttps://www.instagram.com/influencer123/",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Random Post",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Comment",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create CSV Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload CSV",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Autocomment Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Launch AC Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Response",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set ENV Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if in List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare Updated Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Available Session Cookies",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Cookies",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Cookie",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Profile Extractor Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get List of Accounts",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Empty",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Posts",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait3",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Launch Agent1",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

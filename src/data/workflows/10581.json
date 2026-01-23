@@ -1,0 +1,182 @@
+{
+  "id": 10581,
+  "slug": "10581",
+  "title": "Automate bank statement and invoice reconciliation with GPT and Google Sheets",
+  "description": "🟢 Manual Trigger\n\nWorkflow starts manually to initiate the reconciliation process on demand.\n\n📄 Fetch Invoices & Bank Statements\n\nRetrieves invoice data and bank statement data from Google Sheets for comparison.\n\n🔀 Merge Data\n\nCombines both datasets into a single structured dataset for processing.\n\n🧩 Format Payload for AI\n\nFunction node prepares and structures the merged data into a clean JSON payload for AI analysis.\n\n🤖 AI Reconciliation\n\nAI Agent analyzes the invoice and bank statement data to identify matches, discrepancies, and reconciled entries.\n\n🧮 Parse AI Output\n\nParses the AI response into a structured format suitable for adding back to Google Sheets.\n\n📊 Update Sheets\n\nAdds the reconciled data and reconciliation results into the target Google Sheet for recordkeeping.\n\n\n🧾 Prerequisites\n\n✅ OpenAI API Credentials\nRequired for the AI Reconciliation node to process and match transactions.\n\nAdd your OpenAI API key in n8n → Credentials → OpenAI.\n\n✅ Google Sheets Credentials\nNeeded to read invoice and bank statement data and to write reconciled results.\nAdd credentials in n8n → Credentials → Google Sheets.\n\n✅ Google Sheets Setup\nThe connected spreadsheet must contain the following tabs:\nInvoices – for invoice data\nBank_Statement – for bank transaction data\nReconciled_Data – for storing the AI-processed reconciliation output\n\n✅ Tab Structure & Required Headers\n\nInvoices Sheet Columns:\nInvoice_ID\nInvoice_Date\nCustomer_Name\nAmount\nStatus\n\nBank_Statement Sheet Columns:\nTransaction_ID\nTransaction_Date\nDescription\nDebit/Credit\nAmount\n\nReconciled_Data Sheet Columns:\nInvoice_ID\nTransaction_ID\nMatched_Status\nRemarks\nConfidence_Score\n\n⚙️ n8n Environment Setup\n\nEnsure all nodes are connected correctly and the workflow has permission to access the required sheets.\n\nTest each fetch and write operation before running the full workflow.",
+  "featuredImage": "/data/workflows/10581/10581.webp",
+  "author": {
+    "id": 101,
+    "slug": "satva-technolabs",
+    "name": "Chintan Prajapati",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 432,
+  "downloads": 43,
+  "createdAt": "2025-11-07T05:27:00.287Z",
+  "updatedAt": "2026-01-16T09:05:35.630Z",
+  "publishedAt": "2025-11-07T05:27:00.287Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10581",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate bank statement and invoice reconciliation with GPT and Google Sheets",
+    "workflowName": "Automate bank statement and invoice reconciliation with GPT and Google Sheets",
+    "description": "🟢 Manual Trigger\n\nWorkflow starts manually to initiate the reconciliation process on demand.\n\n📄 Fetch Invoices & Bank Statements\n\nRetrieves invoice data and bank statement data from Google Sheets for comparison.\n\n🔀 Merge Data\n\nCombines both datasets into a single structured dataset for processing.\n\n🧩 Format Payload for AI\n\nFunction node prepares and structures the merged data into a clean JSON payload for AI analysis.\n\n🤖 AI Reconciliation\n\nAI Agent analyzes the invoice and bank statement data to identify matches, discrepancies, and reconciled entries.\n\n🧮 Parse AI Output\n\nParses the AI response into a structured format suitable for adding back to Google Sheets.\n\n📊 Update Sheets\n\nAdds the reconciled data and reconciliation results into the target Google Sheet for recordkeeping.\n\n\n🧾 Prerequisites\n\n✅ OpenAI API Credentials\nRequired for the AI Reconciliation node to process and match transactions.\n\nAdd your OpenAI API key in n8n → Credentials → OpenAI.\n\n✅ Google Sheets Credentials\nNeeded to read invoice and bank statement data and to write reconciled results.\nAdd credentials in n8n → Credentials → Google Sheets.\n\n✅ Google Sheets Setup\nThe connected spreadsheet must contain the following tabs:\nInvoices – for invoice data\nBank_Statement – for bank transaction data\nReconciled_Data – for storing the AI-processed reconciliation output\n\n✅ Tab Structure & Required Headers\n\nInvoices Sheet Columns:\nInvoice_ID\nInvoice_Date\nCustomer_Name\nAmount\nStatus\n\nBank_Statement Sheet Columns:\nTransaction_ID\nTransaction_Date\nDescription\nDebit/Credit\nAmount\n\nReconciled_Data Sheet Columns:\nInvoice_ID\nTransaction_ID\nMatched_Status\nRemarks\nConfidence_Score\n\n⚙️ n8n Environment Setup\n\nEnsure all nodes are connected correctly and the workflow has permission to access the required sheets.\n\nTest each fetch and write operation before running the full workflow.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Invoice Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Bank Statements",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Process the Invoice Vs Bank Statement Data1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Combine and Label Merged Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Matched",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Possible Matches",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Unmatched_Invoice",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Unmatched-Bank Transaction",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Summary",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Clean and Format Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add Stream Label Filter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "id": 7780,
+  "slug": "7780",
+  "title": "Declutter Gmail: archive inactive emails with GPT-4 classification",
+  "description": "## Who is this for?\n\nThis workflow is for professionals, entrepreneurs, or anyone overwhelmed by a cluttered Gmail inbox. If you want to automatically archive low-priority emails using AI, this is the perfect hands-free solution.\n\n## What does it solve?\n\nYour inbox fills up with old, read emails that no longer need your attention but manually archiving them takes time. This workflow uses AI to scan and intelligently decide whether each email should be archived, needs a reply, or is spam. It helps you:\n\n- Declutter your Gmail inbox automatically\n- Identify important vs. unimportant emails\n- Save time with smart email triage\n\n## How it works\n\n1. A scheduled trigger runs the workflow (you set how often).\n2. It fetches all **read emails older than 45 days** from Gmail.\n3. Each email is passed to an AI model(GPT-4) that classifies it as:\n   - **Actionable**\n   - **Archive**\n4. If the AI recommends **archiving**, the workflow archives the email from your inbox.\n5. All other emails are left untouched so you can review them as needed.\n\n## How to set up?\n\n1. Connect your **Gmail (OAuth2)** and **OpenAI API** credentials.\n2. Open the \"Schedule Trigger\" node and choose how often the workflow should run (e.g., daily, weekly).\n3. Optionally adjust the Gmail filter in the “List Old Emails” node to change which emails are targeted.\n4. Start the workflow and let AI clean up your inbox automatically.\n\n## How to customize this workflow to your needs\n\n- **Change the Gmail filter**: Edit the query in the Gmail node to include other conditions (e.g., `older_than:30d`, specific labels, unread only).\n- **Update the AI prompt**: Modify the prompt in the Function node to detect more nuanced categories like “Meeting Invite” or “Newsletter.”\n- **Adjust schedule frequency**: Change how often the cleanup runs (e.g., hourly, daily).\n",
+  "featuredImage": "/data/workflows/7780/7780.webp",
+  "author": {
+    "id": 101,
+    "slug": "mattxchong",
+    "name": "Matt Chong | n8n Creator",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 389,
+  "downloads": 38,
+  "createdAt": "2025-08-24T05:17:30.027Z",
+  "updatedAt": "2026-01-16T08:52:19.084Z",
+  "publishedAt": "2025-08-24T05:17:30.027Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7780",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Declutter Gmail: archive inactive emails with GPT-4 classification",
+    "workflowName": "Declutter Gmail: archive inactive emails with GPT-4 classification",
+    "description": "## Who is this for?\n\nThis workflow is for professionals, entrepreneurs, or anyone overwhelmed by a cluttered Gmail inbox. If you want to automatically archive low-priority emails using AI, this is the perfect hands-free solution.\n\n## What does it solve?\n\nYour inbox fills up with old, read emails that no longer need your attention but manually archiving them takes time. This workflow uses AI to scan and intelligently decide whether each email should be archived, needs a reply, or is spam. It helps you:\n\n- Declutter your Gmail inbox automatically\n- Identify important vs. unimportant emails\n- Save time with smart email triage\n\n## How it works\n\n1. A scheduled trigger runs the workflow (you set how often).\n2. It fetches all **read emails older than 45 days** from Gmail.\n3. Each email is passed to an AI model(GPT-4) that classifies it as:\n   - **Actionable**\n   - **Archive**\n4. If the AI recommends **archiving**, the workflow archives the email from your inbox.\n5. All other emails are left untouched so you can review them as needed.\n\n## How to set up?\n\n1. Connect your **Gmail (OAuth2)** and **OpenAI API** credentials.\n2. Open the \"Schedule Trigger\" node and choose how often the workflow should run (e.g., daily, weekly).\n3. Optionally adjust the Gmail filter in the “List Old Emails” node to change which emails are targeted.\n4. Start the workflow and let AI clean up your inbox automatically.\n\n## How to customize this workflow to your needs\n\n- **Change the Gmail filter**: Edit the query in the Gmail node to include other conditions (e.g., `older_than:30d`, specific labels, unread only).\n- **Update the AI prompt**: Modify the prompt in the Function node to detect more nuanced categories like “Meeting Invite” or “Newsletter.”\n- **Adjust schedule frequency**: Change how often the cleanup runs (e.g., hourly, daily).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "List old inbox emails",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Prep Email for AI",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Emails",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Completed",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If - Should archived?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Archive Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

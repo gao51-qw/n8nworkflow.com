@@ -1,0 +1,277 @@
+{
+  "id": 11103,
+  "slug": "11103",
+  "title": "Aggregate crypto and stock market news feed from multiple sources",
+  "description": "## This n8n template helps in making informed decisions for Crypto and Stocks Trading by helping you keep track of breaking changes in the market.\n\n## How it works\n\n- Collects crypto and/or stock market headlines from multiple sources: CoinDesk, CoinTelegraph, Google News, and X (via an RSS proxy).\n- Normalizes all items into a consistent structure with fields like `source`, `kind`, `title`, `url`, `publishedAt`, `matchedKeywords`, `media[]`, and `topic`.\n- Uses topic-specific keyword lists to keep relevant items and a small spam blacklist to drop giveaways / airdrops / obvious noise.\n- Deduplicates items across runs by tracking previously seen links.\n- Bundles everything into a compact `{ topic, items[] }` JSON payload and sends it to your own backend or UI via HTTP.\n\n## Set up steps\n\n- Import the template JSON into a new n8n workflow.\n- In the **Init RunConfig** code node, choose a default `topic` (`crypto` or `stocks`), which platforms to use (CoinDesk / CoinTelegraph / Google News / X), and optionally adjust tickers and keywords.\n- Open the final **HTTP Request - Send to your backend** node and:\n  - Replace the example URL with your own API endpoint.\n  - Either set a `x-webhook-secret` header that your backend validates, or remove this header entirely if you don’t use it.\n- Create any required credentials (for the webhook header auth and for HTTP requests, if needed) – the template does **not** contain real API keys.\n- Enable either the **Schedule Trigger** for periodic runs or the **Webhook** trigger for on-demand runs from your app.\n- Expect roughly 10–20 minutes to import, configure, and test the first run; detailed per-node notes are available as sticky notes inside the workflow canvas.\n",
+  "featuredImage": "/data/workflows/11103/11103.webp",
+  "author": {
+    "id": 101,
+    "slug": "m7abr",
+    "name": "Mohammad Abubakar",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 610,
+  "downloads": 61,
+  "createdAt": "2025-11-21T11:53:23.978Z",
+  "updatedAt": "2026-01-16T09:07:33.719Z",
+  "publishedAt": "2025-11-21T11:53:23.978Z",
+  "nodes": 40,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11103",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Aggregate crypto and stock market news feed from multiple sources",
+    "workflowName": "Aggregate crypto and stock market news feed from multiple sources",
+    "description": "## This n8n template helps in making informed decisions for Crypto and Stocks Trading by helping you keep track of breaking changes in the market.\n\n## How it works\n\n- Collects crypto and/or stock market headlines from multiple sources: CoinDesk, CoinTelegraph, Google News, and X (via an RSS proxy).\n- Normalizes all items into a consistent structure with fields like `source`, `kind`, `title`, `url`, `publishedAt`, `matchedKeywords`, `media[]`, and `topic`.\n- Uses topic-specific keyword lists to keep relevant items and a small spam blacklist to drop giveaways / airdrops / obvious noise.\n- Deduplicates items across runs by tracking previously seen links.\n- Bundles everything into a compact `{ topic, items[] }` JSON payload and sends it to your own backend or UI via HTTP.\n\n## Set up steps\n\n- Import the template JSON into a new n8n workflow.\n- In the **Init RunConfig** code node, choose a default `topic` (`crypto` or `stocks`), which platforms to use (CoinDesk / CoinTelegraph / Google News / X), and optionally adjust tickers and keywords.\n- Open the final **HTTP Request - Send to your backend** node and:\n  - Replace the example URL with your own API endpoint.\n  - Either set a `x-webhook-secret` header that your backend validates, or remove this header entirely if you don’t use it.\n- Create any required credentials (for the webhook header auth and for HTTP requests, if needed) – the template does **not** contain real API keys.\n- Enable either the **Schedule Trigger** for periodic runs or the **Webhook** trigger for on-demand runs from your app.\n- Expect roughly 10–20 minutes to import, configure, and test the first run; detailed per-node notes are available as sticky notes inside the workflow canvas.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "RSS Read - Coindesk",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "RSS Read - Google news",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "RSS Read - X Posts",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Source set - Coindesk",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Source set - Google news",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Source set - Cointelegraph",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Source set - X Posts",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge - Coindesk + Google news",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge - X posts + CoinTelegraph",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge - Merge previous two merges",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Code - Keywords Filter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Array bind",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Init RunConfig",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IF Gate - Coindesk",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "IF Gate - Google news",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "IF Gate - CoinTelegraph",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "IF Gate - X",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "X Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "IF - More X batches?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Code - Finalize X batches (emit combined)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Accumulate X items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Reset X accumulator",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - URL Build - XCancel",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Tag topic - Google news",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Tag topic - Coin desk",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - Tag topic - X",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code - URL build - Google news",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request - Send to your backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Loop back – X Batches",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code - Tag topic - Coin telegraph",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "RSS Read - CoinTelegraph",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

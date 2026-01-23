@@ -1,0 +1,27 @@
+{
+  "id": 8510,
+  "slug": "8510",
+  "title": "Generate AWS IAM policies via chat interface with GPT-4 assistant",
+  "description": "# Chat-Based AWS IAM Policy Generator with OpenAI Agent\n&gt; Chat-driven workflow that lets IT and DevOps teams generate custom AWS IAM policies via AI, automatically apply them to AWS, and send an email notification with policy details.\n## 👤 Who’s it for\nThis workflow is designed for:\n- **Cloud Engineers / DevOps** who need to quickly generate and apply **custom IAM policies** in AWS.  \n- **IT Support / Security teams** who want to create IAM policies through a **chat-based interface** without manually writing JSON.  \n- Teams that want **automatic notifications** (via email) once new policies are created.  \n\n## ⚙️ How it works / What it does\n1. **Trigger** → Workflow starts when a **chat message is received**.  \n2. **IAM Policy Creator Agent** → Uses OpenAI to:\n   - Interpret user requirements (e.g., service, actions, region).  \n   - Generate a valid **IAM policy JSON** following AWS best practices.  \n3. **IAM Policy HTTP Request** → Sends the generated policy to **AWS IAM CreatePolicy API**.  \n4. **Email Notification** → Once AWS responds with a `CreatePolicyResponse`, an email is sent with policy details (name, ARN, ID, timestamps, etc.) using n8n mapping.  \n\nResult: The user can **chat with the AI agent**, create a policy, and receive an **email confirmation** with full details.  \n\n## 🛠 How to set up\n1. **Chat Trigger Node**  \n   - Configure the `When chat message received` node to connect your preferred chat channel (Slack, MS Teams, Telegram, etc.).  \n\n2. **IAM Policy Creator Agent**  \n   - Add **OpenAI Chat Model** as the LLM.  \n   - Use a **system prompt** that enforces AWS IAM JSON best practices (least privilege, correct JSON structure).  \n   - Connect **Memory** (Simple Memory) and **Structured Output Parser** to ensure consistent JSON output.  \n\n3. **IAM Policy HTTP Request**  \n   - Set method: `POST`  \n   - URL: `https://iam.amazonaws.com/`  \n   - Add authentication using **AWS Signature v4** (Access Key + Secret Key).  \n   - Body:  \n     - `Action=CreatePolicy`  \n     - `PolicyName={{ $json.CreatePolicyResponse.CreatePolicyResult.Policy.PolicyName }}`  \n     - `PolicyDocument={{ $json.policyDocument }}`  \n     - `Version=2010-05-08`  \n\n4. **Email for tracking**  \n\n## 📋 Requirements\n- n8n instance (self-hosted or cloud).  \n- AWS IAM user/role with permission to `iam:CreatePolicy`.  \n- AWS Access Key + Secret Key (for SigV4 signing in HTTP request).  \n- OpenAI API key (for the Chat Model).  \n- Email server credentials (SMTP or provider integration).  \n\n## 🎨 How to customize the workflow\n- **Restrict services/actions** → Adjust the IAM Policy Creator Agent system prompt to limit what services/policies can be generated.  \n- **Notification channels** → Replace the email node with Slack, MS Teams, or PagerDuty to alert other teams.  \n- **Tagging policies** → Modify the HTTP request to include `Tags` when creating policies in AWS.  \n- **Human-readable timestamps** → Add a Function or Set node to convert `CreateDate` and `UpdateDate` from Unix epoch to ISO datetime before sending emails.  \n- **Approval step** → Insert a manual approval node before sending the policy to AWS for compliance workflows.  \n",
+  "featuredImage": "/data/workflows/8510/8510.webp",
+  "author": {
+    "id": 101,
+    "slug": "trungtran",
+    "name": "Trung Tran",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 104,
+  "downloads": 10,
+  "createdAt": "2025-09-12T09:36:20.587Z",
+  "updatedAt": "2026-01-16T08:56:15.343Z",
+  "publishedAt": "2025-09-12T09:36:20.587Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8510"
+}

@@ -6,14 +6,43 @@
 import type { Category } from '../types/workflow';
 import { supabase, isSupabaseConfigured, handleSupabaseError, withRetry } from './supabase';
 import { mockCategories, getMockCategoryBySlug, getPopularMockCategories } from '../../data/mock-categories';
+import workflowsData from '../../data/workflows.json';
 
 /**
  * 获取所有分类
  */
 export async function getCategories(): Promise<Category[]> {
-  // 如果未配置 Supabase，使用模拟数据
+  // 从工作流数据中提取所有分类
+  const categoriesMap = new Map<string, Category>();
+  
+  // 从本地工作流数据中提取分类
+  if (workflowsData && Array.isArray(workflowsData)) {
+    workflowsData.forEach((workflow: any) => {
+      if (workflow.categories && Array.isArray(workflow.categories)) {
+        workflow.categories.forEach((catName: string) => {
+          const slug = catName.toLowerCase().trim().replace(/\s+/g, '-');
+          if (!categoriesMap.has(slug)) {
+            // 尝试从模拟数据中获取更详细的信息
+            const mockCat = getMockCategoryBySlug(slug);
+            categoriesMap.set(slug, {
+              id: mockCat?.id || Math.floor(Math.random() * 10000),
+              slug: slug,
+              name: catName,
+              ...(mockCat || {}),
+              workflowCount: 1
+            });
+          } else {
+            const cat = categoriesMap.get(slug)!;
+            cat.workflowCount = (cat.workflowCount || 0) + 1;
+          }
+        });
+      }
+    });
+  }
+
+  // 如果未配置 Supabase，返回提取到的分类列表
   if (!isSupabaseConfigured()) {
-    return mockCategories;
+    return Array.from(categoriesMap.values());
   }
 
   try {
@@ -39,9 +68,13 @@ export async function getCategories(): Promise<Category[]> {
  * 根据 slug 获取分类
  */
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  // 如果未配置 Supabase，使用模拟数据
+  const categories = await getCategories();
+  const category = categories.find(c => c.slug === slug);
+  if (category) return category;
+
+  // 如果未配置 Supabase，返回 null
   if (!isSupabaseConfigured()) {
-    return getMockCategoryBySlug(slug) || null;
+    return null;
   }
 
   try {

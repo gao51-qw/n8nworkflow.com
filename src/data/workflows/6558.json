@@ -1,0 +1,218 @@
+{
+  "id": 6558,
+  "slug": "6558",
+  "title": "Invoice processing: Email to PostgreSQL database with GPT-4o & Discord alerts",
+  "description": "# AI-Powered Invoice Processing: from Email to Database & Chat Notifications\n\nAutomatically process PDF invoices directly from your email inbox. This workflow uses AI to extract key data, saves it to a PostgreSQL database, and instantly notifies you about the new document in your preferred chat application.\n\nThe workflow listens for new emails, fetches PDF attachments, and then passes their content to a Large Language Model (LLM) for intelligent recognition and data extraction. Finally, the information is securely archived in the database, and a summary of the invoice is sent as a notification.\n\n&gt; **📝 This workflow is highly customizable.**  \n&gt; It uses PostgreSQL, OpenAI (GPT), and Discord by default, but you can easily swap these components.  \n&gt; Feel free to use a different database like MySQL or Airtable, another AI model provider, or send notifications to Slack, MS Teams, or any other chat platform.\n\n&gt; ⚠️ **Note:** If the workflow fails to extract data correctly from invoices issued by certain companies, you may need to adjust the prompt used in the **Basic LLM Chain** node to improve parsing accuracy.\n\n---\n\n## Use Case\n\n- Automating accounts payable for small businesses and freelancers  \n- Centralizing financial documents without manual data entry  \n- Creating a searchable database of all incoming invoices  \n- Receiving real-time notifications for new financial commitments  \n\n---\n\n## Features\n\n- **📧 Email Trigger (IMAP):** Monitors a dedicated email inbox for new messages with attachments  \n- **📄 PDF Filtering:** Automatically identifies and processes only PDF attachments  \n- **🤖 AI-Powered Data Extraction:** Uses an LLM (e.g., GPT-4o-mini) to extract invoice number, buyer/seller details, amounts, currency, and due dates  \n- **⚙️ Structured Data Output:** Converts AI output to standardized JSON  \n- **🔍 Database Write Logic:** Prevents duplicates by checking invoice/company combo  \n- **🗄️ PostgreSQL Integration:** Stores extracted data into `company` and `invoice` tables  \n- **💬 Chat Notifications:** Sends invoice summary as message to a designated channel  \n\n---\n\n## Setup Instructions\n\n### ⚠️ API Access & Costs\n\nTo use the AI extraction feature, you need an API key from a provider like OpenAI.  \nMost providers charge for access to language models. You'll likely need a billing account.\n\n---\n\n### 1. PostgreSQL Database Configuration\n\nEnsure your database has the following tables:\n\n```sql\n-- Table for companies (invoice issuers)\nCREATE TABLE company (\n    id SERIAL PRIMARY KEY,\n    tax_number VARCHAR(255) UNIQUE NOT NULL,\n    name VARCHAR(255),\n    address TEXT,\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Table for invoices\nCREATE TABLE invoice (\n    id SERIAL PRIMARY KEY,\n    company_id INTEGER REFERENCES company(id),\n    invoice_number VARCHAR(255) NOT NULL,\n    -- Add other fields: total_to_pay, currency, due_date\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    UNIQUE(company_id, invoice_number)\n);\n\n\n```\n\n\n### Then, in n8n, create a credential for your PostgreSQL DB.\n\n---\n\n### 2. Email (IMAP) Configuration\n\nIn **n8n**, add credentials for the email account that receives invoices:\n\n- IMAP host  \n- IMAP port  \n- Username  \n- Password  \n\n---\n\n### 3. AI Provider Configuration\n\n- Log in to OpenAI (or similar provider)  \n- Generate API key  \n- In **n8n**, create credentials and paste the key  \n\n---\n\n### 4. Chat Notification (Discord)\n\n- Go to **Discord &gt; Server Settings &gt; Integrations &gt; Webhooks &gt; New Webhook**  \n- Select channel  \n- Copy Webhook URL  \n- In **n8n**, paste URL into the Discord node  \n\n---\n\n### Placeholders and Fields to Fill\n\n| Placeholder                | Description                               | Example                                  |\n|---------------------------|-------------------------------------------|------------------------------------------|\n| `YOUR_EMAIL_CREDENTIALS`  | Your IMAP email account in n8n            | My Invoice Mailbox                       |\n| `YOUR_OPENAI_CREDENTIALS` | API credentials for AI model              | My OpenAI Key                            |\n| `YOUR_POSTGRES_CREDENTIALS`| Your PostgreSQL DB credentials in n8n    | My Production DB                         |\n| `YOUR_DISCORD_WEBHOOK`    | Webhook URL for your chat system          | https://discord.com/api/webhooks/...     |\n\n---\n\n### Testing the Workflow\n\n1. **Send a test invoice** to the inbox as a PDF attachment  \n2. **Run the workflow** manually in **n8n** and check if the IMAP node fetches the message  \n3. **Verify AI Extraction** – inspect the LLM output (e.g., GPT node) and confirm structured JSON  \n4. **Check the DB** – ensure new rows appear in `company` and `invoice`  \n5. **Check the chat** – verify the invoice summary appears in the chosen channel  \n\n---\n\n### Customization Tips\n\n- **Change the DB:** Use MySQL, Airtable, or Google Sheets instead of PostgreSQL  \n- **Other notifications:** Swap Discord for Slack, MS Teams, Telegram, etc.  \n- **Expand AI logic:** Extract line items, prices, etc. by customizing the prompt  \n- **Add payment logic:** Allow marking invoices as paid via emoji or a separate webhook  \n",
+  "featuredImage": "/data/workflows/6558/6558.webp",
+  "author": {
+    "id": 101,
+    "slug": "halfbit",
+    "name": "Halfbit 🚀",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 386,
+  "downloads": 38,
+  "createdAt": "2025-07-28T09:26:15.667Z",
+  "updatedAt": "2026-01-16T08:45:41.061Z",
+  "publishedAt": "2025-07-28T09:26:15.667Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6558",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Invoice processing: Email to PostgreSQL database with GPT-4o & Discord alerts",
+    "workflowName": "Invoice processing: Email to PostgreSQL database with GPT-4o & Discord alerts",
+    "description": "# AI-Powered Invoice Processing: from Email to Database & Chat Notifications\n\nAutomatically process PDF invoices directly from your email inbox. This workflow uses AI to extract key data, saves it to a PostgreSQL database, and instantly notifies you about the new document in your preferred chat application.\n\nThe workflow listens for new emails, fetches PDF attachments, and then passes their content to a Large Language Model (LLM) for intelligent recognition and data extraction. Finally, the information is securely archived in the database, and a summary of the invoice is sent as a notification.\n\n&gt; **📝 This workflow is highly customizable.**  \n&gt; It uses PostgreSQL, OpenAI (GPT), and Discord by default, but you can easily swap these components.  \n&gt; Feel free to use a different database like MySQL or Airtable, another AI model provider, or send notifications to Slack, MS Teams, or any other chat platform.\n\n&gt; ⚠️ **Note:** If the workflow fails to extract data correctly from invoices issued by certain companies, you may need to adjust the prompt used in the **Basic LLM Chain** node to improve parsing accuracy.\n\n---\n\n## Use Case\n\n- Automating accounts payable for small businesses and freelancers  \n- Centralizing financial documents without manual data entry  \n- Creating a searchable database of all incoming invoices  \n- Receiving real-time notifications for new financial commitments  \n\n---\n\n## Features\n\n- **📧 Email Trigger (IMAP):** Monitors a dedicated email inbox for new messages with attachments  \n- **📄 PDF Filtering:** Automatically identifies and processes only PDF attachments  \n- **🤖 AI-Powered Data Extraction:** Uses an LLM (e.g., GPT-4o-mini) to extract invoice number, buyer/seller details, amounts, currency, and due dates  \n- **⚙️ Structured Data Output:** Converts AI output to standardized JSON  \n- **🔍 Database Write Logic:** Prevents duplicates by checking invoice/company combo  \n- **🗄️ PostgreSQL Integration:** Stores extracted data into `company` and `invoice` tables  \n- **💬 Chat Notifications:** Sends invoice summary as message to a designated channel  \n\n---\n\n## Setup Instructions\n\n### ⚠️ API Access & Costs\n\nTo use the AI extraction feature, you need an API key from a provider like OpenAI.  \nMost providers charge for access to language models. You'll likely need a billing account.\n\n---\n\n### 1. PostgreSQL Database Configuration\n\nEnsure your database has the following tables:\n\n```sql\n-- Table for companies (invoice issuers)\nCREATE TABLE company (\n    id SERIAL PRIMARY KEY,\n    tax_number VARCHAR(255) UNIQUE NOT NULL,\n    name VARCHAR(255),\n    address TEXT,\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Table for invoices\nCREATE TABLE invoice (\n    id SERIAL PRIMARY KEY,\n    company_id INTEGER REFERENCES company(id),\n    invoice_number VARCHAR(255) NOT NULL,\n    -- Add other fields: total_to_pay, currency, due_date\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    UNIQUE(company_id, invoice_number)\n);\n\n\n```\n\n\n### Then, in n8n, create a credential for your PostgreSQL DB.\n\n---\n\n### 2. Email (IMAP) Configuration\n\nIn **n8n**, add credentials for the email account that receives invoices:\n\n- IMAP host  \n- IMAP port  \n- Username  \n- Password  \n\n---\n\n### 3. AI Provider Configuration\n\n- Log in to OpenAI (or similar provider)  \n- Generate API key  \n- In **n8n**, create credentials and paste the key  \n\n---\n\n### 4. Chat Notification (Discord)\n\n- Go to **Discord &gt; Server Settings &gt; Integrations &gt; Webhooks &gt; New Webhook**  \n- Select channel  \n- Copy Webhook URL  \n- In **n8n**, paste URL into the Discord node  \n\n---\n\n### Placeholders and Fields to Fill\n\n| Placeholder                | Description                               | Example                                  |\n|---------------------------|-------------------------------------------|------------------------------------------|\n| `YOUR_EMAIL_CREDENTIALS`  | Your IMAP email account in n8n            | My Invoice Mailbox                       |\n| `YOUR_OPENAI_CREDENTIALS` | API credentials for AI model              | My OpenAI Key                            |\n| `YOUR_POSTGRES_CREDENTIALS`| Your PostgreSQL DB credentials in n8n    | My Production DB                         |\n| `YOUR_DISCORD_WEBHOOK`    | Webhook URL for your chat system          | https://discord.com/api/webhooks/...     |\n\n---\n\n### Testing the Workflow\n\n1. **Send a test invoice** to the inbox as a PDF attachment  \n2. **Run the workflow** manually in **n8n** and check if the IMAP node fetches the message  \n3. **Verify AI Extraction** – inspect the LLM output (e.g., GPT node) and confirm structured JSON  \n4. **Check the DB** – ensure new rows appear in `company` and `invoice`  \n5. **Check the chat** – verify the invoice summary appears in the chosen channel  \n\n---\n\n### Customization Tips\n\n- **Change the DB:** Use MySQL, Airtable, or Google Sheets instead of PostgreSQL  \n- **Other notifications:** Swap Discord for Slack, MS Teams, Telegram, etc.  \n- **Expand AI logic:** Extract line items, prices, etc. by customizing the prompt  \n- **Add payment logic:** Allow marking invoices as paid via emoji or a separate webhook",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "role": "emailReadImap",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Discord",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract from File1",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Prepare Company Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Company",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "IF Company Does Not Exist",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add Company",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Set Existing Company ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set New Company ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge Company ID",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Invoice",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "IF Invoice Does Not Exist",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add Invoice",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Invoice Exists",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge End",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

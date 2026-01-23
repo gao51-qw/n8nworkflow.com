@@ -1,0 +1,404 @@
+{
+  "id": 2582,
+  "slug": "2582",
+  "title": "Automate sales meeting prep with AI &  APIFY sent to WhatsApp",
+  "description": "This n8n template builds a meeting assistant that compiles timely reminders of upcoming meetings filled with email history and recent LinkedIn activity of other people on the invite. This is then discreetly sent via WhatsApp ensuring the user is always prepared, informed and ready to impress!\n\n## How it works\n* A scheduled trigger fires hourly to check for upcoming personal meetings.\n* When found, the invite is analysed by an AI agent to pull email and LinkedIn details of the other invitees.\n* 2 subworkflows are then triggered for each invitee to (1) search for last email correspondence with them and (2) scrape their LinkedIn profile + recent activity for social updates.\n* Using both available sources, another AI agent is used to summarise this information and generate a short meeting prep message for the user.\n* The notification is finally sent to the user's WhatsApp, allowing them ample time to review.\n\n## How to use\n* There are a lot of moving parts in this template so in it's current form, it's best to use this for personal rather than team calendars.\n* The LinkedIn scraping method used in this workflow requires you to paste in your LinkedIn cookies from your browser which essentially let's n8n impersonate you. You can retrieve this from dev console or ask someone technical for help!\n\n**Note**: It may be wise to switch to other LinkedIn scraping approaches which do not impersonate your own account for production.\n\n## Requirements\n* OpenAI for LLM\n* Gmail for Email\n* Google Calendar for upcoming events\n* WhatsApp Business account for notifications\n\n## Customising this workflow\n* Try adding information sources which are relevant to you and your invitees. Such as company search, other social media sites etc.\n* Create an on-demand version which doesn't rely on the scheduled trigger. Sometimes you want to know prepare for meetings hours or days in advance where this could help immensely.",
+  "featuredImage": "/data/workflows/2582/2582.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 11045,
+  "downloads": 1104,
+  "createdAt": "2024-11-26T23:00:48.040Z",
+  "updatedAt": "2026-01-16T08:25:34.097Z",
+  "publishedAt": "2024-11-26T23:00:48.040Z",
+  "nodes": 61,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2582",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate sales meeting prep with AI &  APIFY sent to WhatsApp",
+    "workflowName": "Automate sales meeting prep with AI &  APIFY sent to WhatsApp",
+    "description": "This n8n template builds a meeting assistant that compiles timely reminders of upcoming meetings filled with email history and recent LinkedIn activity of other people on the invite. This is then discreetly sent via WhatsApp ensuring the user is always prepared, informed and ready to impress!\n\n## How it works\n* A scheduled trigger fires hourly to check for upcoming personal meetings.\n* When found, the invite is analysed by an AI agent to pull email and LinkedIn details of the other invitees.\n* 2 subworkflows are then triggered for each invitee to (1) search for last email correspondence with them and (2) scrape their LinkedIn profile + recent activity for social updates.\n* Using both available sources, another AI agent is used to summarise this information and generate a short meeting prep message for the user.\n* The notification is finally sent to the user's WhatsApp, allowing them ample time to review.\n\n## How to use\n* There are a lot of moving parts in this template so in it's current form, it's best to use this for personal rather than team calendars.\n* The LinkedIn scraping method used in this workflow requires you to paste in your LinkedIn cookies from your browser which essentially let's n8n impersonate you. You can retrieve this from dev console or ask someone technical for help!\n\n**Note**: It may be wise to switch to other LinkedIn scraping approaches which do not impersonate your own account for production.\n\n## Requirements\n* OpenAI for LLM\n* Gmail for Email\n* Google Calendar for upcoming events\n* WhatsApp Business account for notifications\n\n## Customising this workflow\n* Try adding information sources which are relevant to you and your invitees. Such as company search, other social media sites etc.\n* Create an on-demand version which doesn't rely on the scheduled trigger. Sometimes you want to know prepare for meetings hours or days in advance where this could help immensely.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Message Contents",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Simplify Emails",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check For Upcoming Meetings",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Attendee Information",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Last Correspondence",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp Business Cloud",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Return LinkedIn Success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Return LinkedIn Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Return Email Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Return Email Success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Route Email",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Route Linkedin",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Return LinkedIn Error1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Has Emails?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Return Email Error1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sections To List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set LinkedIn Cookie",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Attendees to List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Attendee with Summaries",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Has Email Address?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Has LinkedIn URL?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Correspondance",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate Attendees",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Activities To Array",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Profile Metadata",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Activities To List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "APIFY Web Scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Activity Details",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Sections",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get About Section",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Activity Section",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Activities",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Is Scrape Successful?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract About",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get LinkedIn Profile & Activity",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Correspondance Recap Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Attendee Research Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "LinkedIn Summarizer Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    }
+  ]
+}

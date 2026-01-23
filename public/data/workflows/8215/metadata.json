@@ -1,0 +1,26 @@
+{
+  "id": 8215,
+  "slug": "8215",
+  "title": "Connect Pipedrive deal outcomes to GA4 & Google Ads via Measurement Protocol",
+  "description": "## Who’s it for\n\n**Problem:** Your ads and GA4 often optimize to shallow web events (form fills), while the *real* value sits in Pipedrive (Qualified, Closed Won). That gap means bidding chases cheap leads instead of revenue.\n\n**Solution:** This template turns Pipedrive deal milestones into **server-side GA4 events** (via Measurement Protocol), matched to the original visitor by `client_id`—no external database. You mark them as **Key events** in GA4 and, when ready, import them into Google Ads.\n\n**Business value:** Ads can optimize on **actual CRM outcomes with value** (and currency), improving CAC/ROAS and reducing lead spam. Everything stays GA4-centric, consent-aware, and deduped with deterministic `event_id`, so you get reliable attribution without building a custom Ads integration. If you’re serious about scaling paid spend toward **high-quality, high-value deals**, this is the missing link.\n\nThis is **not plug-and-play**. Expect **\\~2 hours of developer work** to integrate:\n\n\n## What it does\n\nOn **Deal Updated**, the workflow checks for target stages (e.g., Qualified, Closed Won), fetches the linked Person’s **client\\_id**, builds a GA4 **Measurement Protocol** event (with `value`, `currency`, deterministic `event_id`), and posts it server-side. Success updates deal-level dedupe flags; failures are logged to a Pipedrive Note. Credentials use n8n **Credentials**—no hardcoded secrets.\n\n## How it works (high level)\n\nA Pipedrive trigger listens for stage changes → an eligibility check gates sends → a payload builder composes the GA4 event → an HTTP call posts to GA4. Sticky notes in the canvas explain the whole setup and what to edit.\n\n## Requirements\n\n\nGA4 installed on your site; GA4 **Measurement ID** + **API Secret** (same data stream); Pipedrive Person field for `client_id`, optional `consent_granted`; Pipedrive Deal booleans for dedupe; n8n credentials configured (no secrets in nodes).\n\n## How to customize the workflow\n\n* Change which stages send events and the event names.\n* Adjust `value` logic (e.g., margin- or probability-weighted).\n* Choose skip-on-no-consent vs. `non_personalized_ads: true`.\n* Add extra params (`deal_id`, `pipeline_stage`, etc.) to GA4 as custom dimensions (event-scoped).\n\n## Troubleshooting & debugging\n\n* If `client_id` is null: GA4 not initialized yet, consent denied, GTM var not firing, or adblockers—fix site capture first.\n* If GA4 shows events in DebugView but Ads import is empty: events not marked as Key events, GA4↔Ads not linked/imported, or wrong stream/secret pairing.\n* Use `https://www.google-analytics.com/debug/mp/collect` only for payload validation; it won’t verify your API secret. Final sends go to `/mp/collect`.\n\n",
+  "featuredImage": "/data/workflows/8215/8215.webp",
+  "author": {
+    "id": 101,
+    "slug": "arlusm1",
+    "name": "Artur",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 45,
+  "downloads": 4,
+  "createdAt": "2025-09-03T11:59:33.050Z",
+  "updatedAt": "2026-01-16T08:54:44.244Z",
+  "publishedAt": "2025-09-03T11:59:33.050Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8215"
+}

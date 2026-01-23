@@ -1,0 +1,90 @@
+# Generate event marketing content with GPT-4, Google Sheets & Slack
+
+> This n8n workflow automates the generation of personalized marketing content for events, including emails, social media posts, and advertisements. Leveraging AI, it tailors content based on event details and target audience preferences, enhancing promotional efforts and engagement for organizers.
+
+### Key Features
+- Generates customized email, social media, and ad content for event promotion.
+- Personalizes content based on event specifics and audience insights.
+- Streamlines content creation with AI-driven suggestions and formatting.
+- Delivers content ready for distribution across multiple channels.
+- Supports real-time updates and adjustments for campaign optimization.
+
+### Workflow Process
+- The **Webhook for Event Planning** node receives event details and marketing preferences to initiate the workflow.
+- The **Read Event Details** node extracts and organizes event data from Google Sheets for content creation.
+- The **Set Variables** node defines key parameters and audience targeting criteria.
+- The **AI Agent for Event Plan** node uses AI to generate optimized marketing content, including emails, social media posts, and ads.
+- The **Format Plan** node structures the generated content into a polished, actionable format.
+- The **Save to Google Sheets** node stores the generated content for tracking and future use.
+- The **Email Report** node compiles a comprehensive event marketing plan and sends it to organizers via email.
+- The **Send Email Report** node delivers the finalized report to the organizer.
+
+### Setup Instructions
+- Import the workflow into n8n and configure the Webhook for Event Planning with your event management system's API credentials.
+- Set up Google Sheets integration for the Read Event Details and Save to Google Sheets nodes.
+- Configure the AI Agent for Event Plan node with a suitable language model for content generation.
+- Set up email credentials for the Email Report and Send Email Report nodes.
+- Test the workflow by inputting sample event data to verify content generation and delivery.
+- Monitor the output and adjust AI parameters or node settings as needed for optimal results.
+
+### Prerequisites
+- Webhook integration with the event management or input system.
+- Google Sheets account for data storage and retrieval.
+- AI/LLM service for content generation and personalization.
+- Email service for report delivery.
+- Access to event details and audience data for customization.
+
+### Modification Options
+- Modify the **Read Event Details** node to include additional data fields or sources.
+- Adjust the **Set Variables** node to incorporate specific audience segments or branding guidelines.
+- Customize the **AI Agent for Event Plan** node to focus on particular content types (e.g., video scripts, banners).
+- Add social media posting nodes to directly publish content from the **Format Plan** node.
+- Configure the **Email Report** node to include additional metrics or campaign analytics.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 10220
+- **Complexity:** advanced
+- **Node Count:** 24
+- **Views:** 142
+- **Downloads:** 14
+- **Created:** 2025/10/27
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/10220)
+
+## 👤 Author
+
+- **Name:** Oneclick AI Squad
+- **Username:** @oneclick-ai
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **webhook** 
+- **stickyNote** (×12)
+- **set** 
+- **httpRequest** (×3)
+- **code** (×3)
+- **merge** 
+- **googleSheets** 
+- **emailSend** 
+- **slack** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 24 nodes with 9 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

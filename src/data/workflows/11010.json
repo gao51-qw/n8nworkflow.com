@@ -1,0 +1,241 @@
+{
+  "id": 11010,
+  "slug": "11010",
+  "title": "Automated GA4 analytics data backfill to BigQuery with Telegram alerts",
+  "description": "This workflow automates the daily backfill of Google Analytics 4 (GA4) data into BigQuery. It fetches 13 essential pre-processed reports (including User Acquisition, Traffic, and E-commerce) and uploads them to automatically created tables in BigQuery, and then send an alert in telegram.\n\n## How it works\n* **Configuration:** You define your Project ID, Dataset, and Date Range in a central \"Config\" node.\n* **Parallel Fetching:** The workflow runs 13 parallel API calls to GA4 to retrieve key reports (e.g., `ga4_traffic_sources`, `ga4_ecommerce_items`).\n* **Dynamic Tables:** It automatically checks if the target BigQuery table exists and creates it with the correct schema if it's missing.\n* **Telegram Alerts:** After execution, it sends a summary message to Telegram indicating success or failure for the day's run.\n\n## Set up steps\n1.  **Google Credentials (OAuth):** This workflow uses n8n's built-in \"Google OAuth2 API\" credential. You do **not** need a Service Account key. Connect your Google account and ensure you grant scopes for **Google Analytics API** and **BigQuery API**.\n2.  **Config Node:** Open the \"Backfill Config\" node and fill in:\n    * `GA4 Property ID`\n    * `Google Cloud Project ID`\n    * `BigQuery Dataset ID`\n3.  **Telegram Setup (Optional):** If you want alerts, configure the Telegram node with your Bot Token and Chat ID. If not, you can disable/remove this node.\n4.  **Schedule:** By default, this is set to run daily. It is recommended to use a date expression (e.g., `Today - 2 Days`) to allow GA4 time to process data fully before fetching.",
+  "featuredImage": "/data/workflows/11010/11010.webp",
+  "author": {
+    "id": 101,
+    "slug": "aliz",
+    "name": "Aliz",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 160,
+  "downloads": 16,
+  "createdAt": "2025-11-19T11:49:52.598Z",
+  "updatedAt": "2026-01-16T09:07:07.839Z",
+  "publishedAt": "2025-11-19T11:49:52.598Z",
+  "nodes": 34,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11010",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated GA4 analytics data backfill to BigQuery with Telegram alerts",
+    "workflowName": "Automated GA4 analytics data backfill to BigQuery with Telegram alerts",
+    "description": "This workflow automates the daily backfill of Google Analytics 4 (GA4) data into BigQuery. It fetches 13 essential pre-processed reports (including User Acquisition, Traffic, and E-commerce) and uploads them to automatically created tables in BigQuery, and then send an alert in telegram.\n\n## How it works\n* **Configuration:** You define your Project ID, Dataset, and Date Range in a central \"Config\" node.\n* **Parallel Fetching:** The workflow runs 13 parallel API calls to GA4 to retrieve key reports (e.g., `ga4_traffic_sources`, `ga4_ecommerce_items`).\n* **Dynamic Tables:** It automatically checks if the target BigQuery table exists and creates it with the correct schema if it's missing.\n* **Telegram Alerts:** After execution, it sends a summary message to Telegram indicating success or failure for the day's run.\n\n## Set up steps\n1.  **Google Credentials (OAuth):** This workflow uses n8n's built-in \"Google OAuth2 API\" credential. You do **not** need a Service Account key. Connect your Google account and ensure you grant scopes for **Google Analytics API** and **BigQuery API**.\n2.  **Config Node:** Open the \"Backfill Config\" node and fill in:\n    * `GA4 Property ID`\n    * `Google Cloud Project ID`\n    * `BigQuery Dataset ID`\n3.  **Telegram Setup (Optional):** If you want alerts, configure the Telegram node with your Bot Token and Chat ID. If not, you can disable/remove this node.\n4.  **Schedule:** By default, this is set to run daily. It is recommended to use a date expression (e.g., `Today - 2 Days`) to allow GA4 time to process data fully before fetching.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "GA4 - Session Channel Group",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_session_channel_group",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Session Source/Campaign/Medium",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_session_source_campaign_medium",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Country/Language/City",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_country_language_city",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Item Name",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_item_name",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Browser/OS/Device",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_browser_os_device",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - First User Source/Medium",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_first_user_source_medium",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - First User Channel Group",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_data_first_user_channel_group",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Ads Data",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_ads_data",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - All Metrics",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_all_metrics_data",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Event Metrics",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_event_metrics_data",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Page Location",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_page_location_data",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GA4 - Landing Page",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GA4 - Transaction Items",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "role": "googleAnalytics",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BQ - ga4_transaction_items",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Backfill Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "BQ - ga4_landing_page_data",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

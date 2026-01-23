@@ -1,0 +1,27 @@
+{
+  "id": 3832,
+  "slug": "3832",
+  "title": "Message buffer system with Redis for efficient processing",
+  "description": "## 🚀 Message-Batching Buffer Workflow (n8n)\n\n**This workflow implements a lightweight message-batching buffer using Redis for temporary storage and a JavaScript consolidation function to merge messages.** It collects incoming user messages per session, waits for a configurable inactivity window or batch size threshold, consolidates buffered messages via custom code, then clears the buffer and returns the combined response—all without external LLM calls.\n\n---\n\n### 🔑 Key Features\n\n* **Redis-backed buffer** queues incoming messages per `context_id`.\n* **Centralized Config Parameters** node to adjust thresholds and timeouts in one place.\n* **Dynamic wait time** based on message length (configurable `minWords`, `waitLong`, `waitShort`).\n* **Batch trigger** fires on inactivity timeout or when `buffer_count` ≥ `batchThreshold`.\n* **Zero-cost consolidation** via built-in JavaScript Function (`consolidate buffer`)—no GPT-4 or external API required.\n\n---\n\n### ⚙️ Setup Instructions\n\n1. **Extract Session & Message**\n\n   * Trigger: `When chat message received` (webhook) or `When clicking ‘Test workflow’` (manual).\n   * Map inputs: set variables `context_id` and `message` into a Set node named **Mock input data** (for testing) or a proper mapping node in production.\n\n2. **Config Parameters**\n\n   * Add a Set node **Config Parameters** with:\n\n     ```\n     minWords: 3         # Word threshold\n     waitLong: 10        # Timeout (s) for long messages\n     waitShort: 20       # Timeout (s) for short messages\n     batchThreshold: 3   # Messages to trigger batch early\n     ```\n   * All downstream nodes reference these JSON values dynamically.\n\n3. **Determine Wait Time**\n\n   * Node: **get wait seconds** (Code)\n   * JS code:\n\n     ```js\n     const msg = $json.message || '';\n     const wordCount = msg.split(/\\s+/).filter(w =&gt; w).length;\n     const { minWords, waitLong, waitShort } = items[0].json;\n     const waitSeconds = wordCount &lt; minWords ? waitShort : waitLong;\n     return [{ json: { context_id: $json.context_id, message: msg, waitSeconds } }];\n     ```\n\n4. **Buffer Message in Redis**\n\n   * **Buffer messages**: `LPUSH buffer_in:{{$json.context_id}}` with payload `{text, timestamp}`.\n   * **Set buffer\\_count increment**: `INCR buffer_count:{{$json.context_id}}` with TTL `{{$json.waitSeconds + 60}}`.\n   * **Set last\\_seen**: record `last_seen:{{$json.context_id}}` timestamp with same TTL.\n\n5. **Check & Set Waiting Flag**\n\n   * **Get waiting\\_reply**: if null, **Set waiting\\_reply** to `true` with TTL `{{$json.waitSeconds}}`; else exit.\n\n6. **Wait for Inactivity**\n\n   * **WaitSeconds** (webhook): pauses for `{{$json.waitSeconds}}` seconds before batch evaluation.\n\n7. **Check Batch Trigger**\n\n   * **Get last\\_seen** and **Get buffer\\_count**.\n   * IF `(now - last_seen) ≥ waitSeconds * 1000` OR `buffer_count ≥ batchThreshold`, proceed; else use **Wait** node to retry.\n\n8. **Consolidate Buffer**\n\n   * **consolidate buffer** (Code):\n\n     ```js\n     const j = items[0].json;\n     const raw = Array.isArray(j.buffer) ? j.buffer : [];\n     const buffer = raw.map(x =&gt; {\n       try { return typeof x === 'string' ? JSON.parse(x) : x;\n       } catch { return null; }\n     }).filter(Boolean);\n     buffer.sort((a, b) =&gt; new Date(a.timestamp) - new Date(b.timestamp));\n     const texts = buffer.map(e =&gt; e.text?.trim()).filter(Boolean);\n     const unique = [...new Set(texts)];\n     const message = unique.join(' ');\n     return [{ json: { context_id: j.context_id, message } }];\n     ```\n\n9. **Cleanup & Respond**\n\n   * **Delete** Redis keys: `buffer_in`, `buffer_count`, `waiting_reply`, `last_seen` (for the `context_id`).\n   * Return consolidated `message` to the user via your chat integration.\n\n---\n\n### 🛠 Customization Guidance\n\n* **Adjust thresholds** by editing the **Config Parameters** node.\n* **Change concatenation** (e.g., line breaks) by modifying the `join` separator in the consolidation code.\n* **Add filters** (e.g., ignore empty or system messages) inside the consolidation Function.\n* **Monitor performance**: for very high volume, consider sharding Redis keys by date or user segments.\n\n---\n\n© 2025 Innovatex • Automation & AI Solutions • [innovatexiot.carrd.co](https://innovatexiot.carrd.co/) • [LinkedIn](https://www.linkedin.com/in/edisson-andres-garcia-herrera-63a91517b/)\n",
+  "featuredImage": "/data/workflows/3832/3832.webp",
+  "author": {
+    "id": 101,
+    "slug": "eagarciah707",
+    "name": "Edisson Garcia",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2018,
+  "downloads": 201,
+  "createdAt": "2025-05-02T13:42:05.798Z",
+  "updatedAt": "2026-01-16T08:31:41.076Z",
+  "publishedAt": "2025-05-02T13:42:05.798Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3832"
+}

@@ -1,0 +1,98 @@
+{
+  "id": 5160,
+  "slug": "5160",
+  "title": "🤖 Build resilient AI workflows with automatic GPT and Gemini failover chain",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n### How it works\n\nThis workflow demonstrates how to create a resilient AI Agent that automatically falls back to a different language model if the primary one fails. This is useful for handling API errors, rate limits, or model outages without interrupting your process.\n\n1.  **State Initialization:** The `Agent Variables` node initializes a `fail_count` to 0. This counter tracks how many models have been attempted.\n2.  **Dynamic Model Selection:** The `Fallback Models` (a LangChain Code node) acts as a router. It receives a list of all connected AI models and, based on the current `fail_count`, selects which one to use for this attempt (0 for the first model, 1 for the second, etc.).\n3.  **Agent Execution:** The `AI Agent` node attempts to run your prompt using the model selected by the router.\n4.  **The Fallback Loop:**\n    *   **On Success:** The workflow completes successfully.\n    *   **On Error:** If the `AI Agent` node fails, its \"On Error\" output is triggered. This path loops back to the `Agent Variables` node, which increments the `fail_count` by 1. The process then repeats, causing the `Fallback Models` router to select the *next* model in the list.\n5.  **Final Failure:** If all connected models are tried and fail, the workflow will stop with an error.\n\n### Set up steps\n\n**Setup time: ~3-5 minutes**\n\n1.  **Configure Credentials:** Ensure you have the necessary credentials (e.g., for OpenAI, Google AI) configured in your n8n instance.\n2.  **Define Your Model Chain:**\n    *   Add the AI model nodes you want to use to the canvas (e.g., OpenAI, Google Gemini, Anthropic).\n    *   Connect them to the **`Fallback Models`** node.\n    *   **Important:** The order in which you connect the models determines the fallback order. The model nodes first created/connected will be tried first.\n3.  **Set Your Prompt:** Open the **`AI Agent`** node and enter the prompt you want to execute.\n4.  **Test:** Run the workflow. To test the fallback logic, you can temporarily disable the `First Model` node or configure it with invalid credentials to force an error.",
+  "featuredImage": "/data/workflows/5160/5160.webp",
+  "author": {
+    "id": 101,
+    "slug": "lucaspeyrin",
+    "name": "Lucas Peyrin",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1885,
+  "downloads": 188,
+  "createdAt": "2025-06-23T16:33:43.301Z",
+  "updatedAt": "2026-01-16T08:38:00.544Z",
+  "publishedAt": "2025-06-23T16:33:43.301Z",
+  "nodes": 10,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5160",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "🤖 Build resilient AI workflows with automatic GPT and Gemini failover chain",
+    "workflowName": "🤖 Build resilient AI workflows with automatic GPT and Gemini failover chain",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n### How it works\n\nThis workflow demonstrates how to create a resilient AI Agent that automatically falls back to a different language model if the primary one fails. This is useful for handling API errors, rate limits, or model outages without interrupting your process.\n\n1.  **State Initialization:** The `Agent Variables` node initializes a `fail_count` to 0. This counter tracks how many models have been attempted.\n2.  **Dynamic Model Selection:** The `Fallback Models` (a LangChain Code node) acts as a router. It receives a list of all connected AI models and, based on the current `fail_count`, selects which one to use for this attempt (0 for the first model, 1 for the second, etc.).\n3.  **Agent Execution:** The `AI Agent` node attempts to run your prompt using the model selected by the router.\n4.  **The Fallback Loop:**\n    *   **On Success:** The workflow completes successfully.\n    *   **On Error:** If the `AI Agent` node fails, its \"On Error\" output is triggered. This path loops back to the `Agent Variables` node, which increments the `fail_count` by 1. The process then repeats, causing the `Fallback Models` router to select the *next* model in the list.\n5.  **Final Failure:** If all connected models are tried and fail, the workflow will stop with an error.\n\n### Set up steps\n\n**Setup time: ~3-5 minutes**\n\n1.  **Configure Credentials:** Ensure you have the necessary credentials (e.g., for OpenAI, Google AI) configured in your n8n instance.\n2.  **Define Your Model Chain:**\n    *   Add the AI model nodes you want to use to the canvas (e.g., OpenAI, Google Gemini, Anthropic).\n    *   Connect them to the **`Fallback Models`** node.\n    *   **Important:** The order in which you connect the models determines the fallback order. The model nodes first created/connected will be tried first.\n3.  **Set Your Prompt:** Open the **`AI Agent`** node and enter the prompt you want to execute.\n4.  **Test:** Run the workflow. To test the fallback logic, you can temporarily disable the `First Model` node or configure it with invalid credentials to force an error.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Agent Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fallback Models",
+      "type": "@n8n/n8n-nodes-langchain.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "First Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Falback Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

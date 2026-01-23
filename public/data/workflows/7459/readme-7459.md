@@ -1,0 +1,104 @@
+# Track website traffic with Semrush API and log results to Google Sheets
+
+> ## **Automated Seo Website Traffic Checker with Google Sheets Logging (Seo)**
+
+## Description:
+This workflow uses the [**Website Traffic Checker Semrush**](https://rapidapi.com/skdeveloper/api/website-traffic-checker-semrush) API to analyze website traffic and performance. It collects data through a user-submitted website URL and stores the results in Google Sheets for easy access and reporting. Ideal for SEO analysis and data tracking.
+
+---
+
+## Node-by-Node Explanation:
+
+### 1. **On form submission**
+Captures the website URL submitted by the user through a form.  
+Triggers the workflow when a website URL is submitted via the form interface.
+
+### 2. **Check webTraffic**
+Sends a request to the [**Website Traffic Checker Semrush**](https://rapidapi.com/skdeveloper/api/website-traffic-checker-semrush) API to gather traffic data for the submitted website.  
+Uses the provided URL to fetch real-time traffic statistics using the **Semrush API**.
+
+### 3. **Re format output**
+Extracts and reformats the raw traffic data from the API response.  
+Cleans and structures the traffic data for easy readability and reporting.
+
+### 4. **Google Sheets**
+Appends the formatted traffic data into a Google Sheet for storage and further analysis.  
+Stores the data in a Google Sheets document for long-term tracking and analysis.
+
+---
+
+## Benefits of This Flow:
+
+- **Real-Time Data Collection:**  
+  Collects real-time website traffic data directly from the [**Website Traffic Checker Semrush**](https://rapidapi.com/skdeveloper/api/website-traffic-checker-semrush) API, ensuring up-to-date information is always available.
+
+- **Automation:**  
+  Automatically processes and formats the website traffic data into an easily accessible Google Sheet, saving time and effort.
+
+- **Customizable:**  
+  The workflow can be customized to track multiple websites, and the data can be filtered and expanded as per user needs.
+
+- **SEO Insights:**  
+  Get in-depth insights like bounce rate, pages per visit, and visits per user, essential for SEO optimization.
+
+---
+
+## Use Case:
+
+- **SEO Monitoring:**  
+  Track and analyze the traffic of competitor websites or your own website for SEO improvements. This is ideal for digital marketers, SEO professionals, and website owners.
+
+- **Automated Reporting:**  
+  Automatically generate traffic reports for various websites and save them in a Google Sheet for easy reference. No need to manually update data or perform complex calculations.
+
+- **Data-Driven Decisions:**  
+  By utilizing data from the [**Website Traffic Checker Semrush**](https://rapidapi.com/skdeveloper/api/website-traffic-checker-semrush)  API, users can make informed decisions to improve website performance and user experience.
+
+---
+
+
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7459
+- **Complexity:** intermediate
+- **Node Count:** 9
+- **Views:** 442
+- **Downloads:** 44
+- **Created:** 2025/8/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7459)
+
+## 👤 Author
+
+- **Name:** Sk developer 
+- **Username:** @skdeveloper
+
+## 🏷️ Categories
+
+- Market Research
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **formTrigger** 
+- **code** 
+- **googleSheets** 
+- **httpRequest** 
+- **stickyNote** (×5)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 9 nodes with 3 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

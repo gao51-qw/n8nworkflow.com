@@ -1,0 +1,236 @@
+{
+  "id": 7733,
+  "slug": "7733",
+  "title": "Auto-generate & post LinkedIn carousels with Gemini AI and Post Nitro",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## Try It Out!\n### Automatically generate Linkedin Carousal and Upload to Linkedin\n\nUse case : Linkedin Content Creation, specifically carousal. But could be adjusted for many other creations as well.\n\n### How it works\n* It will run automatically every 6:00 AM\n* Get latest News from TechRadar\n* Parse it into readable JSON\n* AI will decide, which news resonates with your profile\n* Then give the title and description of that news to generate the final linkedin carousal content.\n* This step is also trigerred by Form trigger\n* After carousal generation, it will give it to Post Nitro to create images on that content. \n* Post Nitro provides the PDF file.\n* We Upload the PDf file to Linkedin and get the file ID, in next step, it will be used.\n* Finally create the Post description and Post it to Linkedin\n\n### How to use\n* It will run every 6:00 AM automatically. Just make it Live\n* Submit the form, with correct title and description ( i did not added tests for that so must give that correct 😅 )\n\n### Requirements\n* Install Post Nitro community Node\n@postnitro/n8n-nodes-postnitro-ai\n\n* We need the following API keys to make it work\n1. Google Gemini ( for Gemini 2.5-Flash Usage )\nDocs [Google Gemini Key](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatgooglegemini/)\n2. Post Nitro credentials ( API key + Template id +  Brand id )\nDocs [Post Nitro](https://postnitro.ai/docs/embed/obtaining-an-api-key)\n3. Linkedin API key\nDocs [Linkedin API](https://docs.n8n.io/integrations/builtin/credentials/linkedin)\n\n\n### Need Help?\nMessage on Linkedin the [Linkedin](https://www.linkedin.com/in/shayan-khan20/)\n\nHappy Automation!",
+  "featuredImage": "/data/workflows/7733/7733.webp",
+  "author": {
+    "id": 101,
+    "slug": "kshayan091",
+    "name": "Shayan Ali Bakhsh",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 713,
+  "downloads": 71,
+  "createdAt": "2025-08-22T10:53:51.179Z",
+  "updatedAt": "2026-01-16T08:52:04.402Z",
+  "publishedAt": "2025-08-22T10:53:51.179Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7733",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-generate & post LinkedIn carousels with Gemini AI and Post Nitro",
+    "workflowName": "Auto-generate & post LinkedIn carousels with Gemini AI and Post Nitro",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n## Try It Out!\n### Automatically generate Linkedin Carousal and Upload to Linkedin\n\nUse case : Linkedin Content Creation, specifically carousal. But could be adjusted for many other creations as well.\n\n### How it works\n* It will run automatically every 6:00 AM\n* Get latest News from TechRadar\n* Parse it into readable JSON\n* AI will decide, which news resonates with your profile\n* Then give the title and description of that news to generate the final linkedin carousal content.\n* This step is also trigerred by Form trigger\n* After carousal generation, it will give it to Post Nitro to create images on that content. \n* Post Nitro provides the PDF file.\n* We Upload the PDf file to Linkedin and get the file ID, in next step, it will be used.\n* Finally create the Post description and Post it to Linkedin\n\n### How to use\n* It will run every 6:00 AM automatically. Just make it Live\n* Submit the form, with correct title and description ( i did not added tests for that so must give that correct 😅 )\n\n### Requirements\n* Install Post Nitro community Node\n@postnitro/n8n-nodes-postnitro-ai\n\n* We need the following API keys to make it work\n1. Google Gemini ( for Gemini 2.5-Flash Usage )\nDocs [Google Gemini Key](https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatgooglegemini/)\n2. Post Nitro credentials ( API key + Template id +  Brand id )\nDocs [Post Nitro](https://postnitro.ai/docs/embed/obtaining-an-api-key)\n3. Linkedin API key\nDocs [Linkedin API](https://docs.n8n.io/integrations/builtin/credentials/linkedin)\n\n\n### Need Help?\nMessage on Linkedin the [Linkedin](https://www.linkedin.com/in/shayan-khan20/)\n\nHappy Automation!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "6:00 AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "TechRadar News",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Parse HTML",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Gemini Flash 2.5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse LLM Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "ImportSlides embedPost",
+      "type": "@postnitro/n8n-nodes-postnitro-ai.postNitro",
+      "role": "postNitro",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Decide which News to Choose",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Linkedin User URN",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Upload URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Upload PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Gemini Generate",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gemini Generate1",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse LLM Response1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Title and Description",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

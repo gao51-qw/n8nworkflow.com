@@ -1,0 +1,134 @@
+{
+  "id": 11726,
+  "slug": "11726",
+  "title": "Orchestrate security vulnerability remediation with Port, OpenAI, Jira and Slack",
+  "description": "Complete security workflow from vulnerability detection to automated remediation, with severity-based routing and full organizational context from Port's catalog. This template provides end-to-end lifecycle management including automatic Jira ticket creation with appropriate priority, AI-powered remediation planning, and Claude Code-triggered fixes for critical vulnerabilities.\n\nThe full guide is available [here](https://docs.port.io/guides/all/remediate-vulnerability-with-n8n-and-port/).\n\n## How it works\nThe n8n workflow orchestrates the following steps:\n\n- **Webhook trigger**: Receives vulnerability alerts from security scanners (Snyk, Wiz, SonarQube, etc.) via POST request.\n- **Port context enrichment**: Uses Port's n8n node to query your software catalog for service metadata, ownership, environment, SLA requirements, and dependencies related to the vulnerability.\n- **AI remediation planning**: OpenAI analyzes the vulnerability with Port context and generates a remediation plan, determining if automated fixing is possible.\n- **Severity-based routing**: Routes vulnerabilities through different paths based on severity level:\n  - **Critical**: Jira ticket (Highest priority) → Check if auto-fixable → Trigger Claude Code fix → Slack alert with fix status\n  - **High**: Jira ticket (High priority) → Slack notification to team channel\n  - **Medium/Low**: Jira ticket only for tracking\n- **Jira integration**: Creates tickets with full context including vulnerability details, affected service information from Port, and AI-generated remediation steps.\n- **Claude Code remediation**: For auto-fixable critical vulnerabilities, triggers Claude Code via Port action to create a pull request with the security patch, referencing the Jira ticket.\n- **Slack notifications**: Sends contextual alerts to the appropriate team channel (retrieved from Port) with Jira ticket reference and remediation status.\n\n## Prerequisites\n- You have a Port account and have completed the onboarding process.\n- Services and repositories are cataloged in Port with ownership information.\n- Your security scanner (Snyk, Wiz, SonarQube) can send webhooks.\n- You have a working n8n instance (Cloud or self-hosted) with Port's n8n custom node installed.\n- Jira Cloud account with appropriate project permissions.\n- Slack workspace with bot permissions to post messages.\n- OpenAI API key for remediation planning.\n\n## Setup\n- Register for free on [Port.io](https://www.port.io) if you haven't already.\n- Create the Context Retriever Agent in Port following the [guide](https://docs.port.io/guides/all/remediate-vulnerability-with-n8n-and-port/).\n- Import the workflow and configure credentials (Port, Jira, Slack, OpenAI, Bearer Auth).\n- Select your Jira project in each Jira node (Critical, High, Medium/Low).\n- Update `default-organization/repository` with your default repository for Claude Code fixes.\n- Point your security scanner webhook to the workflow URL.\n- Test with a sample vulnerability payload.\n\n⚠️ This template is intended for Self-Hosted instances only.",
+  "featuredImage": "/data/workflows/11726/11726.webp",
+  "author": {
+    "id": 101,
+    "slug": "portio",
+    "name": "Port IO",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5,
+  "downloads": 0,
+  "createdAt": "2025-12-12T05:11:30.141Z",
+  "updatedAt": "2026-01-16T09:09:53.731Z",
+  "publishedAt": "2025-12-12T05:11:30.141Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11726",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Orchestrate security vulnerability remediation with Port, OpenAI, Jira and Slack",
+    "workflowName": "Orchestrate security vulnerability remediation with Port, OpenAI, Jira and Slack",
+    "description": "Complete security workflow from vulnerability detection to automated remediation, with severity-based routing and full organizational context from Port's catalog. This template provides end-to-end lifecycle management including automatic Jira ticket creation with appropriate priority, AI-powered remediation planning, and Claude Code-triggered fixes for critical vulnerabilities.\n\nThe full guide is available [here](https://docs.port.io/guides/all/remediate-vulnerability-with-n8n-and-port/).\n\n## How it works\nThe n8n workflow orchestrates the following steps:\n\n- **Webhook trigger**: Receives vulnerability alerts from security scanners (Snyk, Wiz, SonarQube, etc.) via POST request.\n- **Port context enrichment**: Uses Port's n8n node to query your software catalog for service metadata, ownership, environment, SLA requirements, and dependencies related to the vulnerability.\n- **AI remediation planning**: OpenAI analyzes the vulnerability with Port context and generates a remediation plan, determining if automated fixing is possible.\n- **Severity-based routing**: Routes vulnerabilities through different paths based on severity level:\n  - **Critical**: Jira ticket (Highest priority) → Check if auto-fixable → Trigger Claude Code fix → Slack alert with fix status\n  - **High**: Jira ticket (High priority) → Slack notification to team channel\n  - **Medium/Low**: Jira ticket only for tracking\n- **Jira integration**: Creates tickets with full context including vulnerability details, affected service information from Port, and AI-generated remediation steps.\n- **Claude Code remediation**: For auto-fixable critical vulnerabilities, triggers Claude Code via Port action to create a pull request with the security patch, referencing the Jira ticket.\n- **Slack notifications**: Sends contextual alerts to the appropriate team channel (retrieved from Port) with Jira ticket reference and remediation status.\n\n## Prerequisites\n- You have a Port account and have completed the onboarding process.\n- Services and repositories are cataloged in Port with ownership information.\n- Your security scanner (Snyk, Wiz, SonarQube) can send webhooks.\n- You have a working n8n instance (Cloud or self-hosted) with Port's n8n custom node installed.\n- Jira Cloud account with appropriate project permissions.\n- Slack workspace with bot permissions to post messages.\n- OpenAI API key for remediation planning.\n\n## Setup\n- Register for free on [Port.io](https://www.port.io) if you haven't already.\n- Create the Context Retriever Agent in Port following the [guide](https://docs.port.io/guides/all/remediate-vulnerability-with-n8n-and-port/).\n- Import the workflow and configure credentials (Port, Jira, Slack, OpenAI, Bearer Auth).\n- Select your Jira project in each Jira node (Critical, High, Medium/Low).\n- Update `default-organization/repository` with your default repository for Claude Code fixes.\n- Point your security scanner webhook to the workflow URL.\n- Test with a sample vulnerability payload.\n\n⚠️ This template is intended for Self-Hosted instances only.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Context From Port",
+      "type": "CUSTOM.portApiAi",
+      "role": "portApiAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Remediation Plan",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Severity Level",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Critical Jira Ticket",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create High Jira Ticket",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Medium/Low Jira Ticket",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is Auto-Fixable?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Trigger Fix via Port AI Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Alert Critical to Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Alert Critical (Manual Fix)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Alert High to Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

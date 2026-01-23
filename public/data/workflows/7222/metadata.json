@@ -1,0 +1,27 @@
+{
+  "id": 7222,
+  "slug": "7222",
+  "title": "Generate multiple AI images with DALL·E 2 and upload to Google Drive",
+  "description": "## n8n Workflow: OpenAI DALL·E 2 Image Generation & Google Drive Upload\n\n### Description\nThis n8n workflow automates the process of generating multiple AI-created images from a single prompt using **OpenAI's DALL·E 2**, then uploads the results directly to a **Google Drive folder**. It includes a loop to produce several image variations for the same prompt, making it ideal for creative projects, marketing materials, or content experimentation.\n\n---\n\n## Step-by-Step Setup Instructions\n\n### 1. Prepare Your API Keys\n- **OpenAI API Key**  \n  1. Sign up or log in at https://platform.openai.com/  \n  2. Go to **API Keys** and create a new one.  \n  3. Copy and store this securely — you'll need it in n8n.\n\n- **Google Drive API**  \n  1. Go to https://console.cloud.google.com/  \n  2. Create a project and enable **Google Drive API**.  \n  3. Create OAuth 2.0 credentials and set the redirect URI to your n8n OAuth redirect (found in your n8n Google Drive node setup).  \n  4. Connect your Google account when adding credentials in n8n.\n\n---\n\n### 2. Workflow Nodes Overview\n1. **Manual Trigger** – Starts the workflow manually.  \n2. **Set Image Prompt** – Stores the prompt text and base file name (e.g., “Make an image of an attractive woman standing in New York City”).  \n3. **Duplicate Rows (Code Node)** – Creates multiple \"runs\" of the same prompt for variation.  \n4. **Loop Over Items** – Processes each variation one at a time.  \n5. **Generate an image (OpenAI DALL·E 2)** – Sends the prompt to OpenAI and retrieves an image.  \n6. **Upload to Google Drive** – Saves each generated image to your chosen Google Drive folder.\n\n---\n\n### 3. Building the Workflow in n8n\n\n#### Step 1 — Manual Trigger\nAdd a **Manual Trigger** node to start the workflow manually when testing.\n\n#### Step 2 — Set Image Prompt\nAdd a **Set** node with two fields:  \n- `Prompt` → The image description text.  \n- `Name` → The base name for the saved file.  \n\nExample:  \n| Name   | Value                                                         |\n|--------|---------------------------------------------------------------|\n| Prompt | Make an image of an attractive woman standing in New York City |\n| Name   | woman-nyc                                                      |\n\n#### Step 3 — Duplicate Rows (Code Node)\nUse this JavaScript to create three copies of the prompt (run 1, run 2, run 3):\n```javascript\nconst original = items[0].json;\n\nreturn [\n  { json: { ...original, run: 1 } },\n  { json: { ...original, run: 2 } },\n  { json: { ...original, run: 3 } },\n];\n\n#### Step 4 — Loop Over Items\nInsert a **Split in Batches** node and set the batch size to `1`. This ensures each prompt variation runs through the image generation process individually. Connect this node so it runs after the **Duplicate Rows** node.\n\n#### Step 5 — Generate Image\nAdd the **OpenAI Image Generation** node and configure it as follows:\n- **Model**: `dall-e-2`\n- **Prompt**: `={{ $json.Prompt }}`\n- Leave other options at their defaults unless you want to specify image size or style.\n- Connect your **OpenAI API** credentials created in Step 1.\n\nThis node will send the current prompt in the batch to OpenAI's DALL·E 2 model and return an AI-generated image.\n\n#### Step 6 — Upload to Google Drive\nAdd a **Google Drive** node and configure it to store the generated image:\n- **File Name**:  \n  `={{ $('Set Image Prompt').item.json.Name }} - {{ $('Duplicate Rows').item.json.run }}`\n- **Folder ID**: Select the target Google Drive folder where images should be saved.\n- Connect your **Google Drive OAuth2 API** credentials.\n\nThe node will upload each generated image to your chosen Google Drive location, with a unique filename for each variation.\n\n---\n\n### Running the Workflow\n1. Execute the workflow manually.\n2. The process will:\n   - Loop through each prompt variation.\n   - Generate an image using OpenAI DALL·E 2.\n   - Upload the image to Google Drive with a unique name.\n3. You will find all generated images in the selected Google Drive folder.\n\n---\n\n### Customization Tips\n- Change the number of variations by editing the **Duplicate Rows** code.\n- Adjust the prompt dynamically from other data sources like Google Sheets, webhooks, or forms.\n- Schedule the workflow to run at specific times or trigger it via an API call.\n\n---\n\n**Created by Robert A. – Ynteractive**  \nWebsite: https://ynteractive.com  \nEmail: robert@ynteractive.com\n",
+  "featuredImage": "/data/workflows/7222/7222.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 678,
+  "downloads": 67,
+  "createdAt": "2025-08-10T16:27:16.335Z",
+  "updatedAt": "2026-01-16T08:49:06.588Z",
+  "publishedAt": "2025-08-10T16:27:16.335Z",
+  "nodes": 9,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7222"
+}

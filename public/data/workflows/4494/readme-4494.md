@@ -1,0 +1,101 @@
+# Airbnb Telegram agent - AI-powered accommodation search with voice support
+
+> # Welcome to my Airbnb Telegram Agent Workflow!
+This workflow creates an intelligent Telegram bot that helps users search and find Airbnb accommodations using natural language queries and voice messages.
+
+**DISCLAIMER: This workflow only works with self-hosted n8n instances! You have to install the [n8n-nodes-mcp-client Community Node](https://www.npmjs.com/package/n8n-nodes-mcp)!**
+
+![Screenshot 20250529 175332.png](fileId:1415)
+
+## What this workflow does
+This workflow processes incoming Telegram messages (text or voice) and provides personalized Airbnb accommodation recommendations. The AI agent understands natural language queries, searches through Airbnb data using MCP tools, and returns mobile-optimized results with clickable links, prices, and key details.
+
+**Key Features:**
+- Voice message support (speech-to-text and text-to-speech)
+- Conversation memory for context-aware responses
+- Mobile-optimized formatting for Telegram
+- Real-time Airbnb data access via MCP integration
+
+This workflow has the following sequence:
+1. **Telegram Trigger** - Receives incoming messages from users
+2. **Text or Voice Switch** - Routes based on message type
+3. **Voice Processing** (if applicable) - Downloads and transcribes voice messages
+4. **Text Preparation** - Formats text input for the AI agent
+5. **Airbnb AI Agent** - Core logic that:
+   - Lists available MCP tools for Airbnb data
+   - Executes searches with parsed parameters
+   - Formats results for mobile display
+6. **Response Generation** - Sends formatted text response
+7. **Voice Response** (optional) - Creates and sends audio summary
+
+### Requirements:
+- **Telegram Bot API**: [Documentation](https://docs.n8n.io/integrations/builtin/credentials/telegram/) 
+  - Create a bot via @BotFather on Telegram
+  - Get bot token and configure webhook
+- **OpenAI API**: [Documentation](https://docs.n8n.io/integrations/builtin/credentials/openai/)
+  - Used for speech transcription (Whisper)
+  - Used for chat completion (GPT-4)
+  - Used for text-to-speech generation
+- **MCP Community Client Node**: [Documentation](https://github.com/nerding-io/n8n-nodes-mcp)
+  - Custom integration for Airbnb data
+  - Requires MCP server setup with Airbnb/Airtable connection
+  - Provides tools for accommodation search and details
+
+**Important:** You need to set up an MCP server with Airbnb data access. The workflow uses MCP tools to retrieve real accommodation data, so ensure your MCP server is properly configured with the Airtable/Airbnb integration.
+
+**Configuration Notes:**
+- Update the Telegram chat ID in the trigger for your specific bot
+- Modify the system prompt in the Airbnb Agent for different use cases
+- The workflow supports both individual users and can be extended for group chats
+
+Feel free to [contact me via LinkedIn](https://www.linkedin.com/in/friedemann-schuetz), if you have any questions!
+
+## 📊 Basic Information
+
+- **Workflow ID:** 4494
+- **Complexity:** advanced
+- **Node Count:** 15
+- **Views:** 6276
+- **Downloads:** 627
+- **Created:** 2025/5/30
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/4494)
+
+## 👤 Author
+
+- **Name:** Friedemann Schuetz
+- **Username:** @freddy-schuetz
+
+## 🏷️ Categories
+
+- Support Chatbot
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.memoryBufferWindow** 
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** 
+- **n8n-nodes-mcp.mcpClientTool** (×2)
+- **@n8n/n8n-nodes-langchain.agent** 
+- **telegramTrigger** 
+- **switch** 
+- **telegram** (×3)
+- **set** 
+- **@n8n/n8n-nodes-langchain.openAi** (×2)
+- **@n8n/n8n-nodes-langchain.chainLlm** 
+- **stickyNote** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 15 nodes with 12 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

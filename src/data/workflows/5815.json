@@ -1,0 +1,127 @@
+{
+  "id": 5815,
+  "slug": "5815",
+  "title": "Automated inventory management with Airtable PO creation & supplier emails",
+  "description": "**In-depth description of this automation:**\n\nThis is a fully automated daily supply chain and procurement workflow that keeps product stock levels healthy and suppliers updated, by automatically generating and emailing purchase orders (POs) and syncing PO statuses in Airtable.\n\n---\n\n### **📅 Daily triggers**\n\n* Two `Schedule Trigger` nodes run:\n\n  * One runs at midnight (00:00) to manage low stock and new purchase order creation.\n  * Another runs at 1:00 AM to process existing pending POs and email suppliers.\n\n---\n\n### **🚦 Step-by-step breakdown**\n\n#### 1️⃣ **Get Products with low stock**\n\n* Searches the “Products Table” in Airtable for items where `{stock_level} &lt;= {reorder_threshold}`.\n* Detects products that need restocking.\n\n#### 2️⃣ **Get supplier details**\n\n* Fetches supplier data for each low-stock product using its `supplier_id`.\n\n#### 3️⃣ **Calculate Dynamic Reorder Quantity**\n\n* JS code calculates an optimal reorder quantity:\n\n  * Uses `average_daily_sales × (lead_time × 1.5) × safety_margin (1.2)`\n  * Adds extra buffer so the new order covers both immediate demand and next cycle.\n\n#### 4️⃣ **Search existing POs**\n\n* Looks in the “Purchase Orders” table for active POs (status `Pending` or `Sent`) matching each product.\n* Prevents duplicate orders.\n\n#### 5️⃣ **Remove duplicate product orders**\n\n* JS node compares current low-stock products with existing POs.\n* Filters out products already covered, so new POs are only created for truly uncovered products.\n\n#### 6️⃣ **Create new purchase orders**\n\n* For filtered products, creates new PO records in Airtable with:\n\n  * `product_name`\n  * `product_id`\n  * calculated `reorder_qty`\n  * supplier info and email\n  * initial status `Pending`\n\n---\n\n### **📧 Process existing pending purchase orders and email suppliers**\n\n#### 7️⃣ **Get Purchase Orders which are pending**\n\n* Searches Airtable for all POs with status `Pending`.\n\n#### 8️⃣ **Group products with suppliers**\n\n* JS code groups these POs by `supplier_id`.\n* Builds a summary (total products, total quantity) and an HTML email with a styled table of items.\n\n#### 9️⃣ **Send PO emails to suppliers**\n\n* Uses Brevo (SendInBlue) to send emails.\n* Subject and content include supplier-specific order details.\n\n#### 🔄 **Update PO statuses to Sent**\n\n* Extracts Airtable record IDs of the sent POs.\n* Updates those POs in Airtable, changing status from `Pending` → `Sent`.\n\n---\n\n### **📌 Summary**\n\n✅ Runs every day\n✅ Dynamically calculates reorder needs\n✅ Avoids duplicate purchase orders\n✅ Automatically creates purchase orders in Airtable\n✅ Groups & emails daily PO summaries to suppliers\n✅ Updates PO status after sending email\n\n---\n\n### **⚙ Tables involved**\n\n* **Products Table:** stores products, stock levels, reorder thresholds, average daily sales, supplier references.\n* **Suppliers Table:** stores supplier emails and metadata.\n* **Purchase Orders Table:** tracks product orders with supplier IDs, status, quantities, etc.\n\n---\n\nThis workflow makes daily procurement fully automated: detects risk of stockouts, creates POs smartly, keeps suppliers in sync by email, and updates order statuses in one closed loop — perfect for any small or mid-sized business using Airtable + N8N.\n",
+  "featuredImage": "/data/workflows/5815/5815.webp",
+  "author": {
+    "id": 101,
+    "slug": "iamvaar",
+    "name": "iamvaar",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 389,
+  "downloads": 38,
+  "createdAt": "2025-07-09T09:45:50.624Z",
+  "updatedAt": "2026-01-16T08:41:33.765Z",
+  "publishedAt": "2025-07-09T09:45:50.624Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5815",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated inventory management with Airtable PO creation & supplier emails",
+    "workflowName": "Automated inventory management with Airtable PO creation & supplier emails",
+    "description": "**In-depth description of this automation:**\n\nThis is a fully automated daily supply chain and procurement workflow that keeps product stock levels healthy and suppliers updated, by automatically generating and emailing purchase orders (POs) and syncing PO statuses in Airtable.\n\n---\n\n### **📅 Daily triggers**\n\n* Two `Schedule Trigger` nodes run:\n\n  * One runs at midnight (00:00) to manage low stock and new purchase order creation.\n  * Another runs at 1:00 AM to process existing pending POs and email suppliers.\n\n---\n\n### **🚦 Step-by-step breakdown**\n\n#### 1️⃣ **Get Products with low stock**\n\n* Searches the “Products Table” in Airtable for items where `{stock_level} &lt;= {reorder_threshold}`.\n* Detects products that need restocking.\n\n#### 2️⃣ **Get supplier details**\n\n* Fetches supplier data for each low-stock product using its `supplier_id`.\n\n#### 3️⃣ **Calculate Dynamic Reorder Quantity**\n\n* JS code calculates an optimal reorder quantity:\n\n  * Uses `average_daily_sales × (lead_time × 1.5) × safety_margin (1.2)`\n  * Adds extra buffer so the new order covers both immediate demand and next cycle.\n\n#### 4️⃣ **Search existing POs**\n\n* Looks in the “Purchase Orders” table for active POs (status `Pending` or `Sent`) matching each product.\n* Prevents duplicate orders.\n\n#### 5️⃣ **Remove duplicate product orders**\n\n* JS node compares current low-stock products with existing POs.\n* Filters out products already covered, so new POs are only created for truly uncovered products.\n\n#### 6️⃣ **Create new purchase orders**\n\n* For filtered products, creates new PO records in Airtable with:\n\n  * `product_name`\n  * `product_id`\n  * calculated `reorder_qty`\n  * supplier info and email\n  * initial status `Pending`\n\n---\n\n### **📧 Process existing pending purchase orders and email suppliers**\n\n#### 7️⃣ **Get Purchase Orders which are pending**\n\n* Searches Airtable for all POs with status `Pending`.\n\n#### 8️⃣ **Group products with suppliers**\n\n* JS code groups these POs by `supplier_id`.\n* Builds a summary (total products, total quantity) and an HTML email with a styled table of items.\n\n#### 9️⃣ **Send PO emails to suppliers**\n\n* Uses Brevo (SendInBlue) to send emails.\n* Subject and content include supplier-specific order details.\n\n#### 🔄 **Update PO statuses to Sent**\n\n* Extracts Airtable record IDs of the sent POs.\n* Updates those POs in Airtable, changing status from `Pending` → `Sent`.\n\n---\n\n### **📌 Summary**\n\n✅ Runs every day\n✅ Dynamically calculates reorder needs\n✅ Avoids duplicate purchase orders\n✅ Automatically creates purchase orders in Airtable\n✅ Groups & emails daily PO summaries to suppliers\n✅ Updates PO status after sending email\n\n---\n\n### **⚙ Tables involved**\n\n* **Products Table:** stores products, stock levels, reorder thresholds, average daily sales, supplier references.\n* **Suppliers Table:** stores supplier emails and metadata.\n* **Purchase Orders Table:** tracks product orders with supplier IDs, status, quantities, etc.\n\n---\n\nThis workflow makes daily procurement fully automated: detects risk of stockouts, creates POs smartly, keeps suppliers in sync by email, and updates order statuses in one closed loop — perfect for any small or mid-sized business using Airtable + N8N.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Products with low stock",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get supplier Details for those low stock products",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Calculate Dynamic Re-order Quantity",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Run Every Mid Night",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Create purchase records in table",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Search records",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Remove Duplicate Product Orders",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Purchase Orders which are pending",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Group products with suppliers",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get the record id's of PO",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update the PO status to sent",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send PO to suppliers via Email",
+      "type": "n8n-nodes-base.sendInBlue",
+      "role": "sendInBlue",
+      "configDescription": "Version 1"
+    }
+  ]
+}

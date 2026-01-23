@@ -1,0 +1,182 @@
+{
+  "id": 7301,
+  "slug": "7301",
+  "title": "Classify emails and send replies with GPT-4o and gotoHuman for supervision",
+  "description": "![wflow preview.JPG](fileId:2054)\nLet AI classify your incoming emails and draft replies.\nUse gotoHuman to approve emails before they are sent out. It also lets you manually edit the draft or even ask for a retry.\n\n## How it works\n1. The workflow is triggered for each new email which gets passed to an **AI classification agent**.\nIt assigns the email to one of the categories defined in the prompt (Customer Support, Sales opportunity, Promo, Personal,...). The agent also determines whether a reply is needed and if it is important.\n2. If a reply is needed, we ask the **AI Email Writer** to draft a response. Even if it is missing context it can help us draft an outline for the response.\n3. The email draft is sent to **gotoHuman** where the reviewer can manually edit it or ask to regenerate it with the option to even edit the prompt (Retries loop back to the _AI Email Writer_ node)\n![gthreview.JPG](fileId:2053)\n![gthchat.JPG](fileId:2052)\n4. Approved email replies are automatically sent from the workflow\n\n## How to set up\n\n1. **Most importantly, install the gotoHuman node before importing this template!**\n(Just add the node to a blank canvas before importing)\n2. Set up your credentials for gotoHuman, OpenAI, and Gmail\n3. In gotoHuman, select and create the pre-built review template \"Email agent\" or import the ID: `v81wzxwYoFYvWpmuIBgX`\n4. Select this template in the gotoHuman node\n\n## Requirements\n\nYou need accounts for\n- gotoHuman (human supervision)\n- OpenAI (classification, drafting)\n- Gmail\n\n## How to customize\n\n- Change the predefined categories in the prompt of the _AI classification agent_\n- Provide the _AI Email Writer_ with more context to create replies. Consider adding tools that allow the agent to fetch more infos about clients, your calendar, FAQs for your product,...",
+  "featuredImage": "/data/workflows/7301/7301.webp",
+  "author": {
+    "id": 101,
+    "slug": "gotohuman",
+    "name": "gotoHuman",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 871,
+  "downloads": 87,
+  "createdAt": "2025-08-12T16:58:54.311Z",
+  "updatedAt": "2026-01-16T08:49:35.585Z",
+  "publishedAt": "2025-08-12T16:58:54.311Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7301",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Classify emails and send replies with GPT-4o and gotoHuman for supervision",
+    "workflowName": "Classify emails and send replies with GPT-4o and gotoHuman for supervision",
+    "description": "![wflow preview.JPG](fileId:2054)\nLet AI classify your incoming emails and draft replies.\nUse gotoHuman to approve emails before they are sent out. It also lets you manually edit the draft or even ask for a retry.\n\n## How it works\n1. The workflow is triggered for each new email which gets passed to an **AI classification agent**.\nIt assigns the email to one of the categories defined in the prompt (Customer Support, Sales opportunity, Promo, Personal,...). The agent also determines whether a reply is needed and if it is important.\n2. If a reply is needed, we ask the **AI Email Writer** to draft a response. Even if it is missing context it can help us draft an outline for the response.\n3. The email draft is sent to **gotoHuman** where the reviewer can manually edit it or ask to regenerate it with the option to even edit the prompt (Retries loop back to the _AI Email Writer_ node)\n![gthreview.JPG](fileId:2053)\n![gthchat.JPG](fileId:2052)\n4. Approved email replies are automatically sent from the workflow\n\n## How to set up\n\n1. **Most importantly, install the gotoHuman node before importing this template!**\n(Just add the node to a blank canvas before importing)\n2. Set up your credentials for gotoHuman, OpenAI, and Gmail\n3. In gotoHuman, select and create the pre-built review template \"Email agent\" or import the ID: `v81wzxwYoFYvWpmuIBgX`\n4. Select this template in the gotoHuman node\n\n## Requirements\n\nYou need accounts for\n- gotoHuman (human supervision)\n- OpenAI (classification, drafting)\n- Gmail\n\n## How to customize\n\n- Change the predefined categories in the prompt of the _AI classification agent_\n- Provide the _AI Email Writer_ with more context to create replies. Consider adding tools that allow the agent to fetch more infos about clients, your calendar, FAQs for your product,...",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "New Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Email Writer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No reply",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set (edited) prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Structured Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Needs Human Attention?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Not important",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "gotoHuman: Human review",
+      "type": "@gotohuman/n8n-nodes-gotohuman.gotoHuman",
+      "role": "gotoHuman",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Human response",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Reply to thread",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

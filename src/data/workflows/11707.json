@@ -1,0 +1,151 @@
+{
+  "id": 11707,
+  "slug": "11707",
+  "title": "Generate B2B leads by industry & location with Google Places API and Google Sheets",
+  "description": "**How it works**\n1. A form trigger accepts an Industry + Location query (e.g. Accountants London).\n2. Text Search Page 1 calls Google Places Text Search to return results and a next_page_token.\n3. Conditional checks + 5s wait nodes fetch page 2 and page 3 when a next page exists.\n4. All pages are merged, split into individual place results, and each place_id is passed to Place Details.\n5. Place Details returns name, formatted_phone_number, website, formatted_address.\n6. Results are formatted and appended to a Google Sheet.\n\n**Setup steps**\n- Enable Google Cloud project billing and Places API (Text Search + Details).\n- Create an API key and add it to the three Text Search and Place Details HTTP request nodes (&lt;YOUR KEY&gt;).\n- Add Google Sheets OAuth credentials to the Google Sheets node.\n- Create a Google Sheet with columns: Company Name, Phone Number, Website, Address\n- Update the Google Sheets node documentId and sheetName to your spreadsheet.\n- Import/paste this workflow into n8n and test with a small query.\n\n**Customization**\n- Edit Place Details fields to retrieve more/less info (address_components, opening_hours, etc.).\n- Adjust the number of pages fetched (workflow currently supports up to 3 pages).\n- Alter output mapping in the code node to add/remove columns or change column order.\n- Add further nodes after the sheet (e.g., email scraper/ sender, CRM integration, enrichment API)\n\n**Use cases**\n- B2B lead generation for targeted industries and locations.\n- Building outreach lists for sales teams and agencies.\n- Enriching CRM with phone, website, and address data from Google Places.\n- Rapid market mapping for local competitors, vendors, or partners.\n\n**Troubleshooting tips**\n- No results / invalid API key: verify API key is correct, not restricted incorrectly, and Places API is enabled.\n- next_page_token not working: the token can take a couple of seconds to activate. Keep the 5s wait nodes; if still failing, increase to ~10s+\n- Quota / billing errors: confirm billing is enabled on the Google Cloud project and check your Places API quota.\n- Missing phone/website: not all places provide all fields; fallback handling is already included (nulls).\n- Duplicates in Sheets: run tests on small queries and inspect the Merge/Split logic; add a dedupe step before appending if needed.\n- Place Details rate limits: if you plan high volume, throttle requests or add longer waits to avoid quota/rate-limit errors.\n- Permissions / OAuth: ensure the Google Sheets OAuth user has edit access to the target spreadsheet.",
+  "featuredImage": "/data/workflows/11707/11707.webp",
+  "author": {
+    "id": 101,
+    "slug": "ayissf",
+    "name": "Ayis Saliaris Fasseas",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 307,
+  "downloads": 30,
+  "createdAt": "2025-12-11T14:38:23.072Z",
+  "updatedAt": "2026-01-16T09:09:47.660Z",
+  "publishedAt": "2025-12-11T14:38:23.072Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11707",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate B2B leads by industry & location with Google Places API and Google Sheets",
+    "workflowName": "Generate B2B leads by industry & location with Google Places API and Google Sheets",
+    "description": "**How it works**\n1. A form trigger accepts an Industry + Location query (e.g. Accountants London).\n2. Text Search Page 1 calls Google Places Text Search to return results and a next_page_token.\n3. Conditional checks + 5s wait nodes fetch page 2 and page 3 when a next page exists.\n4. All pages are merged, split into individual place results, and each place_id is passed to Place Details.\n5. Place Details returns name, formatted_phone_number, website, formatted_address.\n6. Results are formatted and appended to a Google Sheet.\n\n**Setup steps**\n- Enable Google Cloud project billing and Places API (Text Search + Details).\n- Create an API key and add it to the three Text Search and Place Details HTTP request nodes (&lt;YOUR KEY&gt;).\n- Add Google Sheets OAuth credentials to the Google Sheets node.\n- Create a Google Sheet with columns: Company Name, Phone Number, Website, Address\n- Update the Google Sheets node documentId and sheetName to your spreadsheet.\n- Import/paste this workflow into n8n and test with a small query.\n\n**Customization**\n- Edit Place Details fields to retrieve more/less info (address_components, opening_hours, etc.).\n- Adjust the number of pages fetched (workflow currently supports up to 3 pages).\n- Alter output mapping in the code node to add/remove columns or change column order.\n- Add further nodes after the sheet (e.g., email scraper/ sender, CRM integration, enrichment API)\n\n**Use cases**\n- B2B lead generation for targeted industries and locations.\n- Building outreach lists for sales teams and agencies.\n- Enriching CRM with phone, website, and address data from Google Places.\n- Rapid market mapping for local competitors, vendors, or partners.\n\n**Troubleshooting tips**\n- No results / invalid API key: verify API key is correct, not restricted incorrectly, and Places API is enabled.\n- next_page_token not working: the token can take a couple of seconds to activate. Keep the 5s wait nodes; if still failing, increase to ~10s+\n- Quota / billing errors: confirm billing is enabled on the Google Cloud project and check your Places API quota.\n- Missing phone/website: not all places provide all fields; fallback handling is already included (nulls).\n- Duplicates in Sheets: run tests on small queries and inspect the Merge/Split logic; add a dedupe step before appending if needed.\n- Place Details rate limits: if you plan high volume, throttle requests or add longer waits to avoid quota/rate-limit errors.\n- Permissions / OAuth: ensure the Google Sheets OAuth user has edit access to the target spreadsheet.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Text Search Page 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Text Search Page 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Text Search Page 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Place Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait 5s (1)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait 5s (2)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Has Next Page? (Page 3)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Has Next Page? (Page 2)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge All Pages",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Submit Search Query",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Split out the Results",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format the Output for Google Sheets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append rows in the Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

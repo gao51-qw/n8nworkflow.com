@@ -1,0 +1,1 @@
+This workflow allows you to automatically create new members in MailChimp based on entries in an Airtable base.

@@ -1,0 +1,206 @@
+{
+  "id": 4816,
+  "slug": "4816",
+  "title": "Ai-powered local event finder with multi-tool search",
+  "description": "## Summary\nThis n8n workflow implements an AI-powered \"Local Event Finder\" agent. It takes user criteria (like event type, city, date, and interests), uses a suite of search tools (Brave Web Search, Brave Local Search, Google Gemini Search) and a web scraper (Jina AI) to find relevant events, and returns formatted details. The entire agent is exposed as a single, easy-to-use MCP (Multi-Capability Peer) tool, making it simple to integrate into other workflows or applications.\n\nThis template cleverly combines the MCP server endpoint and the AI agent logic into a **single n8n workflow file** for ease of import and management.\n\n## Key Features\n*   **Intelligent Multi-Tool Search:** Dynamically utilizes web search, precise local search, and advanced Gemini semantic search to find events.\n*   **Detailed Information via Web Scraping:** Employs Jina AI to extract comprehensive details directly from event web pages.\n*   **Simplified MCP Tool Exposure:** Makes the complex event-finding logic available as a single, callable tool for other MCP-compatible clients (e.g., Roo Code, Cline, other n8n workflows).\n*   **Customizable AI Behavior:** The core AI agent's behavior, tool usage strategy, and output formatting can be tailored by modifying its System Prompt.\n*   **Modular Design:** Uses distinct nodes for LLM, memory, and each external tool, allowing for easier modification or extension.\n\n## Benefits\n*   **Simplifies Client-Side Integration:** Offloads the complexity of event searching and data extraction from client applications.\n*   **Provides Richer Event Data:** Goes beyond simple search links to extract and format key event details.\n*   **Flexible & Adaptable:** Can be adjusted to various event search needs and can incorporate new tools or data sources.\n*   **Efficient Processing:** Leverages specialized tools for different aspects of the search process.\n\n## Nodes Used\n*   `MCP Trigger`\n*   `Tool Workflow`\n*   `Execute Workflow Trigger`\n*   `AI Agent`\n*   `Google Gemini Chat Model` (ChatGoogleGenerativeAI)\n*   `Simple Memory` (Window Buffer Memory)\n*   `MCP Client` (for Brave Search tools via Smithery)\n*   `Google Gemini Search Tool`\n*   `Jina AI Tool`\n\n## Prerequisites\n*   An active n8n instance.\n*   **Google AI API Key:** For the Gemini LLM (`Google Gemini Chat Model` node) and the `Google Gemini Search Tool`. Ensure your key is enabled for these services.\n*   **Jina AI API Key:** For the `jina_ai_web_page_scraper` node. A free tier is often available.\n*   **Access to a Brave Search MCP Provider (Optional but Recommended):**\n    *   This template uses `MCP Client` nodes configured for Brave Search via a provider like Smithery. You'll need an account/API key for your chosen Brave Search MCP provider to configure the `smithery brave search` credential.\n    *   Alternatively, you could adapt these to call Brave Search API directly if you manage your own access, or replace them with other search tools.\n\n## Setup Instructions\n1.  **Import Workflow:** Download the JSON file for this template and import it into your n8n instance.\n2.  **Configure Credentials:**\n    *   **Google Gemini LLM:**\n        *   Locate the `Google Gemini Chat Model` node.\n        *   Select or create a \"Google Gemini API\" credential (named `Google Gemini Context7` in the template) using your Google AI API Key.\n    *   **Google Gemini Search Tool:**\n        *   Locate the `google_gemini_event_search` node.\n        *   Select or create a \"Gemini API\" credential (named `Gemini Credentials account` in the template) using your Google AI API Key (ensure it's enabled for Search/Vertex AI).\n    *   **Jina AI Web Scraper:**\n        *   Locate the `jina_ai_web_page_scraper` node.\n        *   Select or create a \"Jina AI API\" credential (named `Jina AI account` in the template) using your Jina AI API Key.\n    *   **Brave Search (via MCP):**\n        *   You'll need an MCP Client HTTP API credential to connect to your Brave Search MCP provider (e.g., Smithery).\n        *   Create a new \"MCP Client HTTP API\" credential in n8n. Name it, for example, `smithery brave search`.\n        *   Configure it with the Base URL and any required authentication (e.g., API key in headers) for your Brave Search MCP provider.\n        *   Locate the `brave_web_search` and `brave_local_search` MCP Client nodes in the workflow.\n        *   Assign the `smithery brave search` (or your named credential) to both of these nodes.\n3.  **Activate Workflow:** Ensure the workflow is active.\n4.  **Note MCP Trigger Path:**\n    *   Locate the `local_event_finder` (MCP Trigger) node.\n    *   The `Path` field (e.g., `0ca88864-ec0a-4c27-a7ec-e28c5a900697`) combined with your n8n webhook base URL forms the endpoint for client calls.\n    *   Example Endpoint: `YOUR_N8N_INSTANCE_URL/webhooks/PATH-TO-MCP-SERVER`\n\n\n## Customization\n*   **AI Behavior:** Modify the \"System Message\" parameter within the `event_finder_agent` node to change the AI's persona, its strategy for using tools, or the desired output format.\n*   **LLM Model:** Swap the `Google Gemini Chat Model` node with another compatible LLM node (e.g., OpenAI Chat Model) if desired. You'll need to adjust credentials and potentially the system prompt.\n*   **Tools:** Add, remove, or replace tool nodes (e.g., use a different search provider, add a weather API tool) and update the `event_finder_agent`'s system prompt and tool configuration accordingly.\n*   **Scraping Depth:** Be mindful of the `jina_ai_web_page_scraper`'s usage due to potential timeouts. The system prompt already guides the LLM on this, but you can adjust its usage instructions.",
+  "featuredImage": "/data/workflows/4816/4816.webp",
+  "author": {
+    "id": 101,
+    "slug": "jez",
+    "name": "Jez",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 765,
+  "downloads": 76,
+  "createdAt": "2025-06-09T12:59:58.555Z",
+  "updatedAt": "2026-01-16T08:36:20.854Z",
+  "publishedAt": "2025-06-09T12:59:58.555Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4816",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Ai-powered local event finder with multi-tool search",
+    "workflowName": "Ai-powered local event finder with multi-tool search",
+    "description": "## Summary\nThis n8n workflow implements an AI-powered \"Local Event Finder\" agent. It takes user criteria (like event type, city, date, and interests), uses a suite of search tools (Brave Web Search, Brave Local Search, Google Gemini Search) and a web scraper (Jina AI) to find relevant events, and returns formatted details. The entire agent is exposed as a single, easy-to-use MCP (Multi-Capability Peer) tool, making it simple to integrate into other workflows or applications.\n\nThis template cleverly combines the MCP server endpoint and the AI agent logic into a **single n8n workflow file** for ease of import and management.\n\n## Key Features\n*   **Intelligent Multi-Tool Search:** Dynamically utilizes web search, precise local search, and advanced Gemini semantic search to find events.\n*   **Detailed Information via Web Scraping:** Employs Jina AI to extract comprehensive details directly from event web pages.\n*   **Simplified MCP Tool Exposure:** Makes the complex event-finding logic available as a single, callable tool for other MCP-compatible clients (e.g., Roo Code, Cline, other n8n workflows).\n*   **Customizable AI Behavior:** The core AI agent's behavior, tool usage strategy, and output formatting can be tailored by modifying its System Prompt.\n*   **Modular Design:** Uses distinct nodes for LLM, memory, and each external tool, allowing for easier modification or extension.\n\n## Benefits\n*   **Simplifies Client-Side Integration:** Offloads the complexity of event searching and data extraction from client applications.\n*   **Provides Richer Event Data:** Goes beyond simple search links to extract and format key event details.\n*   **Flexible & Adaptable:** Can be adjusted to various event search needs and can incorporate new tools or data sources.\n*   **Efficient Processing:** Leverages specialized tools for different aspects of the search process.\n\n## Nodes Used\n*   `MCP Trigger`\n*   `Tool Workflow`\n*   `Execute Workflow Trigger`\n*   `AI Agent`\n*   `Google Gemini Chat Model` (ChatGoogleGenerativeAI)\n*   `Simple Memory` (Window Buffer Memory)\n*   `MCP Client` (for Brave Search tools via Smithery)\n*   `Google Gemini Search Tool`\n*   `Jina AI Tool`\n\n## Prerequisites\n*   An active n8n instance.\n*   **Google AI API Key:** For the Gemini LLM (`Google Gemini Chat Model` node) and the `Google Gemini Search Tool`. Ensure your key is enabled for these services.\n*   **Jina AI API Key:** For the `jina_ai_web_page_scraper` node. A free tier is often available.\n*   **Access to a Brave Search MCP Provider (Optional but Recommended):**\n    *   This template uses `MCP Client` nodes configured for Brave Search via a provider like Smithery. You'll need an account/API key for your chosen Brave Search MCP provider to configure the `smithery brave search` credential.\n    *   Alternatively, you could adapt these to call Brave Search API directly if you manage your own access, or replace them with other search tools.\n\n## Setup Instructions\n1.  **Import Workflow:** Download the JSON file for this template and import it into your n8n instance.\n2.  **Configure Credentials:**\n    *   **Google Gemini LLM:**\n        *   Locate the `Google Gemini Chat Model` node.\n        *   Select or create a \"Google Gemini API\" credential (named `Google Gemini Context7` in the template) using your Google AI API Key.\n    *   **Google Gemini Search Tool:**\n        *   Locate the `google_gemini_event_search` node.\n        *   Select or create a \"Gemini API\" credential (named `Gemini Credentials account` in the template) using your Google AI API Key (ensure it's enabled for Search/Vertex AI).\n    *   **Jina AI Web Scraper:**\n        *   Locate the `jina_ai_web_page_scraper` node.\n        *   Select or create a \"Jina AI API\" credential (named `Jina AI account` in the template) using your Jina AI API Key.\n    *   **Brave Search (via MCP):**\n        *   You'll need an MCP Client HTTP API credential to connect to your Brave Search MCP provider (e.g., Smithery).\n        *   Create a new \"MCP Client HTTP API\" credential in n8n. Name it, for example, `smithery brave search`.\n        *   Configure it with the Base URL and any required authentication (e.g., API key in headers) for your Brave Search MCP provider.\n        *   Locate the `brave_web_search` and `brave_local_search` MCP Client nodes in the workflow.\n        *   Assign the `smithery brave search` (or your named credential) to both of these nodes.\n3.  **Activate Workflow:** Ensure the workflow is active.\n4.  **Note MCP Trigger Path:**\n    *   Locate the `local_event_finder` (MCP Trigger) node.\n    *   The `Path` field (e.g., `0ca88864-ec0a-4c27-a7ec-e28c5a900697`) combined with your n8n webhook base URL forms the endpoint for client calls.\n    *   Example Endpoint: `YOUR_N8N_INSTANCE_URL/webhooks/PATH-TO-MCP-SERVER`\n\n\n## Customization\n*   **AI Behavior:** Modify the \"System Message\" parameter within the `event_finder_agent` node to change the AI's persona, its strategy for using tools, or the desired output format.\n*   **LLM Model:** Swap the `Google Gemini Chat Model` node with another compatible LLM node (e.g., OpenAI Chat Model) if desired. You'll need to adjust credentials and potentially the system prompt.\n*   **Tools:** Add, remove, or replace tool nodes (e.g., use a different search provider, add a weather API tool) and update the `event_finder_agent`'s system prompt and tool configuration accordingly.\n*   **Scraping Depth:** Be mindful of the `jina_ai_web_page_scraper`'s usage due to potential timeouts. The system prompt already guides the LLM on this, but you can adjust its usage instructions.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "brave_web_search",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "brave_local_search",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "find_events",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "even_finder_workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "event_finder_agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "local_event_finder",
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "role": "mcpTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "google_gemini_event_search",
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "role": "geminiSearchToolTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "jina_ai_web_page_scraper",
+      "type": "n8n-nodes-base.jinaAiTool",
+      "role": "jinaAiTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

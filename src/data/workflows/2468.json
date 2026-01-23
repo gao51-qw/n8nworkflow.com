@@ -1,0 +1,254 @@
+{
+  "id": 2468,
+  "slug": "2468",
+  "title": "Automate customer support issue resolution using AI text classifier",
+  "description": "This n8n template is designed to assist and improve customer support team member capacity by automating the resolution of long-lived and forgotten JIRA issues.\n\n## How it works\n\n* Schedule Trigger runs daily to check for long-lived unresolved issues and imports them into the workflow.\n* Each Issue is handled as a separate subworkflow by using an execute workflow node. This allows parallel processing.\n* A report is generated from the issue using its comment history allowing the issue to be classified by AI - determining the state and progress of the issue.\n* If determined to be resolved, sentiment analysis is performed to track customer satisfaction. If negative, a slack message is sent to escalate, otherwise the issue is closed automatically.\n* If no response has been initiated, an AI agent will attempt to search and resolve the issue itself using similar resolved issues or from the notion database. If a solution is found, it is posted to the issue and closed.\n* If the issue is blocked and waiting for responses, then a reminder message is added.\n\n## How to use\n\n* This template searches for JIRA issues which are older than 7 days which are not in the \"Done\" status. Ensure there are some issues that meet this criteria otherwise adjust the search query to suit.\n* Works best if you frequently have long-lived issues that need resolving.\n* Ensure the notion tool is configured as to not read documents you didn't intend it to ie. private and/or internal documentation.\n\n## Requirements\n\n* JIRA for issues management\n* OpenAI for LLM\n* Slack for notifications\n\n## Customising this workflow\n\n* Why not try classifying issues as they are created? One use-case may be for quality control such as ensuring reporting criteria is adhered to, summarising and rephrasing issue for easier reading or adjusting priority.",
+  "featuredImage": "/data/workflows/2468/2468.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 27569,
+  "downloads": 2756,
+  "createdAt": "2024-10-17T12:00:39.983Z",
+  "updatedAt": "2026-01-16T08:24:57.021Z",
+  "publishedAt": "2024-10-17T12:00:39.983Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2468",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate customer support issue resolution using AI text classifier",
+    "workflowName": "Automate customer support issue resolution using AI text classifier",
+    "description": "This n8n template is designed to assist and improve customer support team member capacity by automating the resolution of long-lived and forgotten JIRA issues.\n\n## How it works\n\n* Schedule Trigger runs daily to check for long-lived unresolved issues and imports them into the workflow.\n* Each Issue is handled as a separate subworkflow by using an execute workflow node. This allows parallel processing.\n* A report is generated from the issue using its comment history allowing the issue to be classified by AI - determining the state and progress of the issue.\n* If determined to be resolved, sentiment analysis is performed to track customer satisfaction. If negative, a slack message is sent to escalate, otherwise the issue is closed automatically.\n* If no response has been initiated, an AI agent will attempt to search and resolve the issue itself using similar resolved issues or from the notion database. If a solution is found, it is posted to the issue and closed.\n* If the issue is blocked and waiting for responses, then a reminder message is added.\n\n## How to use\n\n* This template searches for JIRA issues which are older than 7 days which are not in the \"Done\" status. Ensure there are some issues that meet this criteria otherwise adjust the search query to suit.\n* Works best if you frequently have long-lived issues that need resolving.\n* Ensure the notion tool is configured as to not read documents you didn't intend it to ie. private and/or internal documentation.\n\n## Requirements\n\n* JIRA for issues management\n* OpenAI for LLM\n* Slack for notifications\n\n## Customising this workflow\n\n* Why not try classifying issues as they are created? One use-case may be for quality control such as ensuring reporting criteria is adhered to, summarising and rephrasing issue for easier reading or adjusting priority.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Issue Comments",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Close Issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Reminder",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Join Comments",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add Autoclose Message",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Ask For Feedback Message",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simplify Thread For AI",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Solution Found?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Reply to Issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Last Message is Not Bot",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Issue Metadata",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Close Issue2",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get List of Unresolved Long Lived Issues",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Customer Satisfaction Agent",
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "role": "sentimentAnalysis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "KnowledgeBase Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Issue Reminder Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Find Simlar Issues",
+      "type": "n8n-nodes-base.jiraTool",
+      "role": "jiraTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Query KnowledgeBase",
+      "type": "n8n-nodes-base.notionTool",
+      "role": "notionTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Report Unhappy Resolution",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Classify Current Issue State",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1"
+    }
+  ]
+}

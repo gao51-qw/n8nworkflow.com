@@ -1,0 +1,94 @@
+# Automated Upwork messages alerts to Slack with Gmail and Google Gemini AI
+
+> ## Upwork Messages Notifications (Gmail to Slack) - Fully Automated Alerts
+
+This n8n workflow streamlines how you receive Upwork client messages, sending instant notifications to Slack. It demonstrates two approaches: a code-based extraction and an AI-powered one with Google Gemini.
+
+---
+
+### Use Cases
+
+* **Instant Communication:** Get real-time alerts for new Upwork client messages in your team's Slack channel.
+* **Improved Responsiveness:** Quickly respond to client inquiries and maintain strong communication.
+* **Centralized Notifications:** Keep all your essential work-related notifications in one place.
+
+### Good to Know
+
+* The workflow is set to poll your Gmail every *3 minutes* for unread Upwork messages, which can be reduced or increased.
+* The **AI Information Extractor** with Google Gemini provides a more refined and robust method for data parsing compared to custom code.
+* Usage of Google Gemini may incur costs. Refer to [Gemini Pricing](https://ai.google.dev/gemini-api/docs/pricing) for updated information.
+* Google Gemini models can be geo-restricted. If you encounter a "model not found" error, it might not be available in your region.
+
+### How it Works
+
+**Method 1: Code-Based Extraction**
+
+1.  **Gmail Trigger:** The workflow starts by monitoring your Gmail for new, unread emails from "via Upwork".
+2.  **Code Node:** A custom JavaScript code block is used to extract the client's name and the message content directly from the email's text.
+3.  **Slack Notification:** The extracted client name and message are then formatted and sent as a new message to a designated Slack channel.
+
+**Method 2: AI-Powered Extraction with Google Gemini (Recommended)**
+
+1.  **Gmail Trigger X:** Similar to Method 1, this part also triggers on new unread Upwork emails.
+2.  **Information Extractor (AI):** This powerful node, powered by Google Gemini, takes the entire email text and intelligently extracts structured information like the "client" name and the "message" content based on a defined schema. This method is more robust and requires less manual parsing logic.
+3.  **Google Gemini Chat Model:** (Implicitly used by the Information Extractor) This node provides the underlying AI capabilities for intelligent information extraction.
+4.  **Send to Slack X:** The refined output from the AI Information Extractor (client name and message) is then sent to a Slack channel.
+
+### How to Use
+
+1.  **Gmail Credentials:** Ensure you have configured your Gmail OAuth2 credentials in n8n for both "Gmail Trigger" nodes.
+2.  **Slack Credentials:** Set up your Slack OAuth2 credentials in n8n for both "Send to Slack" nodes and select the desired Slack channel.
+3.  **Google Gemini Credentials:** For the AI-powered workflow, you'll need to set up your Google Gemini API key as a credential in n8n.
+4.  **Activate Workflows:** Enable both workflows in n8n to start receiving notifications. You can compare the output quality of each method.
+
+### Requirements
+
+* **n8n instance** (self-hosted or cloud)
+* **Gmail Account** connected to Upwork notifications.
+* **Slack Workspace** and a designated channel for notifications.
+* **Google Gemini API key** for the AI-powered extraction workflow.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6600
+- **Complexity:** intermediate
+- **Node Count:** 9
+- **Views:** 108
+- **Downloads:** 10
+- **Created:** 2025/7/29
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6600)
+
+## 👤 Author
+
+- **Name:** Zain Khan
+- **Username:** @zain
+
+## 🏷️ Categories
+
+- Personal Productivity
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **gmailTrigger** (×2)
+- **code** 
+- **@n8n/n8n-nodes-langchain.informationExtractor** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **stickyNote** (×2)
+- **slack** (×2)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 9 nodes with 5 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

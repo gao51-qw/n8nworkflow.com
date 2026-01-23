@@ -1,0 +1,115 @@
+{
+  "id": 7130,
+  "slug": "7130",
+  "title": "Build targeted prospect lists: find & enrich leads with Surfe to HubSpot",
+  "description": "## 🚀 Build Hyper-Targeted Prospecting Lists with Surfe & HubSpot\n\nThis template automatically discovers companies that match your Ideal Customer Profile (ICP), finds the right people inside those companies and enriches them — ready to drop straight into HubSpot. Launch the workflow, sit back, and get a clean list of validated prospects in minutes.\n\n---\n\n## 1. ❓ What Problem Does This Solve?\n\nSourcing prospects that truly fit your ICP is slow and repetitive. You jump between databases, copy domains, hunt down decision-makers, and then still have to enrich emails and phone numbers one by one.\n\nThis workflow replaces all that manual effort:\n\n1. It queries Surfe’s database for companies that match your exact industry, size, revenue and geography filters.\n2. It pulls the best-fit people inside each company and enriches them in bulk.\n3. It keeps only records with both a direct email *and* mobile phone, then syncs them to HubSpot automatically.\n\nNo spreadsheets, no copy-paste — just a fresh, qualified prospect list ready for outreach.\n\n---\n\n## 2. 🧰 Prerequisites\n\nYou’ll need:\n\n- A self-hosted or cloud instance of **n8n**\n- A **Surfe API Key**\n- A **HubSpot** Private App Token with contact read/write scopes\n- A **Gmail** account (OAuth2) for the completion notification\n- The workflow JSON file linked above\n    \n    [N8N_FLOW_2__Building_Prospecting_Lists.json](attachment:1d4ec670-711b-4e96-9cca-7556e53f6ba0:N8N_FLOW_2__Building_Prospecting_Lists.json)\n    \n\n---\n\n## 3. 📌 Search ICP Companies Configuration — Fine-Tune Your Targeting\n\n![Screenshot 20250807 at 12.13.11.png](fileId:1984)\n\n### 3.1 Editing the JSON\n\nEvery targeting rule lives inside the **“🔍 Search ICP Companies”** HTTP node.\n\nOpen the node `Search ICP Companies` → `*Parameters* tab` → `*JSON Body*` to edit the filters.\n\n| Filter | JSON path | What it does | Example |\n| --- | --- | --- | --- |\n| **industries** | `filters.industries` | Narrow to specific verticals (case-sensitive strings) | `[\"Software\",\"Apps\",\"SaaS\"]` |\n| **employeeCount.from / to** | `filters.employeeCount` | from / to  | `1 / 35` |\n| **countries** | `filters.countries` | 2-letter ISO codes | `[\"FR\",\"DE\"]` |\n| **revenues** | `filters.revenues` | Annual revenue brackets | `[\"1-10M\"]` |\n| **limit** | `limit` | Companies per run | `20` |\n\n### 3.2 Where to find allowed values\n\nSurfe exposes an **“🗂 Get Filters”** endpoint that returns every accepted value for:\n\n- `industries`\n- `employeeCounts`\n- `revenues`\n- `countries` (always ISO-2 codes)\n\nYou can hit it with a simple `GET /v1/people/search/filters` request or browse the interactive docs here:\n\nhttps://developers.surfe.com/public-008-people-filters [developers.surfe.com](https://developers.surfe.com/public-008-people-filters)\n\nFor company-level searches, the same enumerations apply.\n\n---\n\n## 4. ⚙️ Setup Instructions\n\n### 4.1 🔐 Create Your Credentials in n8n\n\n---\n\n### 4.1.1 🚀 Surfe API\n\n1. In your [Surfe dashboard](https://www.surfe.com/) → Use Surfe Api → copy your **API key**\n2. Go to **n8n → Credentials → Create Credential**\n    1. Choose **Credential Type**: `Bearer Auth`\n    2. Name it something like `SURFE API Key`\n    3. Paste your API key into the `Bearer Token`\n    4. Save\n    \n![Screenshot 20250807 at 12.13.38.png](fileId:1983)\n    \n\n---\n\n### 4.1.2 📧 Gmail OAuth2 API\n\n1. Go to **n8n → Credentials**\n2. Create new credentials:\n    - Type: `Gmail OAuth2 API`\n3. A pop-up window will appear where you can log in with your **Google account** that is linked to Gmail\n    - Make sure you grant **email send permissions** when prompted\n\n![Screenshot 20250807 at 12.14.26.png](fileId:1982)\n\n---\n\n### 4.1.3 🎯 HubSpot\n\n### 🔓 Private App Token\n\n1. Go to HubSpot → Settings → Integrations → **Private Apps**\n    1. Create an app with scopes:\n        - `crm.objects.contacts.read`\n        - `crm.objects.contacts.write`\n        - `crm.schemas.contacts.read`\n    2. **Save the App token**\n2. Go to **n8n → Credentials → Create Credential → HubSpot App Token**\n    1. Paste your App Token\n\n![Screenshot 20250807 at 12.14.52.png](fileId:1987)\n\n![Screenshot 20250807 at 12.15.12.png](fileId:1988)\n\n![Screenshot 20250807 at 12.15.28.png](fileId:1981)\n\n### ✅ You are now all set for the credentials\n\n---\n\n### 4.2 📥 Import and Configure the N8N Workflow\n\n- Import the provided JSON workflow into N8N\n    - Create a New Blank Workflow\n    - click the `…` on the top left\n    - Import from File\n\n![Screenshot 20250807 at 12.16.02.png](fileId:1986)\n\n![Screenshot 20250807 at 12.16.17.png](fileId:1989)\n\n### 4.2.1 🔗 Link Nodes to Your Credentials\n\nIn the workflow, link your newly created credentials to each node of this list :\n\n- `Surfe HTTP nodes:`\n    - Authentication → Generic Credential Type\n    - Generic Auth Type → Bearer Auth\n    - Bearer Auth → Select the credentials you created before\n- `Gmail Node Credentials to connect with` → `Gmail account`\n- `Hubspot Node` →`Credentials to connect with` → `Gmail account`\n\n![Screenshot 20250807 at 12.16.53.png](fileId:1985)\n\n`Surfe HTTP nodes`\n\n`Surfe HTTP nodes`\n\n- HubSpot node → `Credentials to connect with` → select your HubSpot credentials in the list\n\n---\n\n## 5. 🔄 How This N8N Workflow Works\n\n1. **Manual Trigger** – Click **Execute Workflow** (or schedule it) to start.\n2. **Search ICP Companies** – Surfe returns company domains that match your filter set.\n3. **Prepare JSON Payload with Company Domains** – Formats the domain list for the next call.\n4. **Search People in Companies** – Finds people inside each company.\n5. **Prepare JSON Payload Enrichment Request** – Builds the bulk-enrichment request.\n6. **Surfe Bulk Enrichments API** – Launches one enrichment job for the whole batch.\n7. **Wait + Polling loop** – Checks job status every 3 seconds until it’s `COMPLETED`.\n8. **Extract List of People** – Pulls the enriched contacts from Surfe’s response.\n9. **Filter: phone AND email** – Keeps only fully reachable prospects (email *and* mobile).\n10. **HubSpot: Create or Update** – Inserts/updates each contact in HubSpot.\n11. **Gmail** – Sends you a “Your ICP prospecting enrichment is done” email.\n\n---\n\n## 6. 🧩 Use Cases\n\n- **Weekly prospect list refresh** – Generate 50 perfectly-matched prospects every Monday morning.\n- **Territory expansion** – Spin up a list of SMB software CEOs in a new country in minutes.\n- **ABM prep** – Build multi-stakeholder buying-group lists for target accounts.\n- **Campaign-specific lists** – Quickly assemble contacts for a limited-time product launch.\n\n---\n\n## 7. 🛠 Customization Ideas\n\nprepare \n\n- 🎯 **Refine filters for people** – Add seniorities or other filters in the node `JSON PAYLOAD WITH Company Domains`\n    - use the surfe search people api doc https://developers.surfe.com/public-009-search-people-v2\n- ♻️ **Deduplicate** – Check HubSpot first to skip existing contacts.\n- 🟢 **Slack alert** – Replace Gmail with a Slack notification.\n- 📊 **Reporting** – Append enriched contacts to a Google Sheet for analytics.\n\n---\n\n## 8. ✅ Summary\n\nFire off the workflow, and n8n will find ICP-fit companies, pull key people, enrich direct contact data and drop everything into HubSpot — all on autopilot.\n\nProspecting lists, done for you.",
+  "featuredImage": "/data/workflows/7130/7130.webp",
+  "author": {
+    "id": 101,
+    "slug": "go-surfe",
+    "name": "go-surfe",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 3379,
+  "downloads": 337,
+  "createdAt": "2025-08-07T11:18:02.174Z",
+  "updatedAt": "2026-01-16T08:48:38.390Z",
+  "publishedAt": "2025-08-07T11:18:02.174Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7130",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build targeted prospect lists: find & enrich leads with Surfe to HubSpot",
+    "workflowName": "Build targeted prospect lists: find & enrich leads with Surfe to HubSpot",
+    "description": "## 🚀 Build Hyper-Targeted Prospecting Lists with Surfe & HubSpot\n\nThis template automatically discovers companies that match your Ideal Customer Profile (ICP), finds the right people inside those companies and enriches them — ready to drop straight into HubSpot. Launch the workflow, sit back, and get a clean list of validated prospects in minutes.\n\n---\n\n## 1. ❓ What Problem Does This Solve?\n\nSourcing prospects that truly fit your ICP is slow and repetitive. You jump between databases, copy domains, hunt down decision-makers, and then still have to enrich emails and phone numbers one by one.\n\nThis workflow replaces all that manual effort:\n\n1. It queries Surfe’s database for companies that match your exact industry, size, revenue and geography filters.\n2. It pulls the best-fit people inside each company and enriches them in bulk.\n3. It keeps only records with both a direct email *and* mobile phone, then syncs them to HubSpot automatically.\n\nNo spreadsheets, no copy-paste — just a fresh, qualified prospect list ready for outreach.\n\n---\n\n## 2. 🧰 Prerequisites\n\nYou’ll need:\n\n- A self-hosted or cloud instance of **n8n**\n- A **Surfe API Key**\n- A **HubSpot** Private App Token with contact read/write scopes\n- A **Gmail** account (OAuth2) for the completion notification\n- The workflow JSON file linked above\n    \n    [N8N_FLOW_2__Building_Prospecting_Lists.json](attachment:1d4ec670-711b-4e96-9cca-7556e53f6ba0:N8N_FLOW_2__Building_Prospecting_Lists.json)\n    \n\n---\n\n## 3. 📌 Search ICP Companies Configuration — Fine-Tune Your Targeting\n\n![Screenshot 20250807 at 12.13.11.png](fileId:1984)\n\n### 3.1 Editing the JSON\n\nEvery targeting rule lives inside the **“🔍 Search ICP Companies”** HTTP node.\n\nOpen the node `Search ICP Companies` → `*Parameters* tab` → `*JSON Body*` to edit the filters.\n\n| Filter | JSON path | What it does | Example |\n| --- | --- | --- | --- |\n| **industries** | `filters.industries` | Narrow to specific verticals (case-sensitive strings) | `[\"Software\",\"Apps\",\"SaaS\"]` |\n| **employeeCount.from / to** | `filters.employeeCount` | from / to  | `1 / 35` |\n| **countries** | `filters.countries` | 2-letter ISO codes | `[\"FR\",\"DE\"]` |\n| **revenues** | `filters.revenues` | Annual revenue brackets | `[\"1-10M\"]` |\n| **limit** | `limit` | Companies per run | `20` |\n\n### 3.2 Where to find allowed values\n\nSurfe exposes an **“🗂 Get Filters”** endpoint that returns every accepted value for:\n\n- `industries`\n- `employeeCounts`\n- `revenues`\n- `countries` (always ISO-2 codes)\n\nYou can hit it with a simple `GET /v1/people/search/filters` request or browse the interactive docs here:\n\nhttps://developers.surfe.com/public-008-people-filters [developers.surfe.com](https://developers.surfe.com/public-008-people-filters)\n\nFor company-level searches, the same enumerations apply.\n\n---\n\n## 4. ⚙️ Setup Instructions\n\n### 4.1 🔐 Create Your Credentials in n8n\n\n---\n\n### 4.1.1 🚀 Surfe API\n\n1. In your [Surfe dashboard](https://www.surfe.com/) → Use Surfe Api → copy your **API key**\n2. Go to **n8n → Credentials → Create Credential**\n    1. Choose **Credential Type**: `Bearer Auth`\n    2. Name it something like `SURFE API Key`\n    3. Paste your API key into the `Bearer Token`\n    4. Save\n    \n![Screenshot 20250807 at 12.13.38.png](fileId:1983)\n    \n\n---\n\n### 4.1.2 📧 Gmail OAuth2 API\n\n1. Go to **n8n → Credentials**\n2. Create new credentials:\n    - Type: `Gmail OAuth2 API`\n3. A pop-up window will appear where you can log in with your **Google account** that is linked to Gmail\n    - Make sure you grant **email send permissions** when prompted\n\n![Screenshot 20250807 at 12.14.26.png](fileId:1982)\n\n---\n\n### 4.1.3 🎯 HubSpot\n\n### 🔓 Private App Token\n\n1. Go to HubSpot → Settings → Integrations → **Private Apps**\n    1. Create an app with scopes:\n        - `crm.objects.contacts.read`\n        - `crm.objects.contacts.write`\n        - `crm.schemas.contacts.read`\n    2. **Save the App token**\n2. Go to **n8n → Credentials → Create Credential → HubSpot App Token**\n    1. Paste your App Token\n\n![Screenshot 20250807 at 12.14.52.png](fileId:1987)\n\n![Screenshot 20250807 at 12.15.12.png](fileId:1988)\n\n![Screenshot 20250807 at 12.15.28.png](fileId:1981)\n\n### ✅ You are now all set for the credentials\n\n---\n\n### 4.2 📥 Import and Configure the N8N Workflow\n\n- Import the provided JSON workflow into N8N\n    - Create a New Blank Workflow\n    - click the `…` on the top left\n    - Import from File\n\n![Screenshot 20250807 at 12.16.02.png](fileId:1986)\n\n![Screenshot 20250807 at 12.16.17.png](fileId:1989)\n\n### 4.2.1 🔗 Link Nodes to Your Credentials\n\nIn the workflow, link your newly created credentials to each node of this list :\n\n- `Surfe HTTP nodes:`\n    - Authentication → Generic Credential Type\n    - Generic Auth Type → Bearer Auth\n    - Bearer Auth → Select the credentials you created before\n- `Gmail Node Credentials to connect with` → `Gmail account`\n- `Hubspot Node` →`Credentials to connect with` → `Gmail account`\n\n![Screenshot 20250807 at 12.16.53.png](fileId:1985)\n\n`Surfe HTTP nodes`\n\n`Surfe HTTP nodes`\n\n- HubSpot node → `Credentials to connect with` → select your HubSpot credentials in the list\n\n---\n\n## 5. 🔄 How This N8N Workflow Works\n\n1. **Manual Trigger** – Click **Execute Workflow** (or schedule it) to start.\n2. **Search ICP Companies** – Surfe returns company domains that match your filter set.\n3. **Prepare JSON Payload with Company Domains** – Formats the domain list for the next call.\n4. **Search People in Companies** – Finds people inside each company.\n5. **Prepare JSON Payload Enrichment Request** – Builds the bulk-enrichment request.\n6. **Surfe Bulk Enrichments API** – Launches one enrichment job for the whole batch.\n7. **Wait + Polling loop** – Checks job status every 3 seconds until it’s `COMPLETED`.\n8. **Extract List of People** – Pulls the enriched contacts from Surfe’s response.\n9. **Filter: phone AND email** – Keeps only fully reachable prospects (email *and* mobile).\n10. **HubSpot: Create or Update** – Inserts/updates each contact in HubSpot.\n11. **Gmail** – Sends you a “Your ICP prospecting enrichment is done” email.\n\n---\n\n## 6. 🧩 Use Cases\n\n- **Weekly prospect list refresh** – Generate 50 perfectly-matched prospects every Monday morning.\n- **Territory expansion** – Spin up a list of SMB software CEOs in a new country in minutes.\n- **ABM prep** – Build multi-stakeholder buying-group lists for target accounts.\n- **Campaign-specific lists** – Quickly assemble contacts for a limited-time product launch.\n\n---\n\n## 7. 🛠 Customization Ideas\n\nprepare \n\n- 🎯 **Refine filters for people** – Add seniorities or other filters in the node `JSON PAYLOAD WITH Company Domains`\n    - use the surfe search people api doc https://developers.surfe.com/public-009-search-people-v2\n- ♻️ **Deduplicate** – Check HubSpot first to skip existing contacts.\n- 🟢 **Slack alert** – Replace Gmail with a Slack notification.\n- 📊 **Reporting** – Append enriched contacts to a Google Sheet for analytics.\n\n---\n\n## 8. ✅ Summary\n\nFire off the workflow, and n8n will find ICP-fit companies, pull key people, enrich direct contact data and drop everything into HubSpot — all on autopilot.\n\nProspecting lists, done for you.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Search ICP Companies",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Search People in Companies",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare JSON Payload Enrichment Request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Surfe Bulk Enrichments API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Surfe check enrichement status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Is enrichment complete ?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait 3 secondes",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract list of peoples from Surfe API response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter: phone AND email",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HubSpot: Create or Update",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "prepare JSON PAYLOAD WITH Company Domains",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "id": 10299,
+  "slug": "10299",
+  "title": "Upload files to Dropbox and generate direct download links",
+  "description": "**How It Works**\nThis sub-workflow uploads files to Dropbox and returns a direct download link:\n\nUpload file - Receives file from parent workflow and uploads to Dropbox\nCheck for existing link - Queries Dropbox API to see if a shared link already exists for this file\nCreate or reuse link - If no link exists, creates a new public shared link; otherwise uses existing one\nConvert to direct link - Transforms Dropbox's standard sharing URL (dropbox.com) into a direct download URL (dl.dropboxusercontent.com)\nReturn URL - Outputs the final direct download link for use in other workflows\n\n**Important:** File names must be unique, or you'll get links to old files with the same name.\n\n**Setup Steps\nTime estimate: ~25-30 minutes (first time)**\n\n**Create Dropbox app** - Register at https://www.dropbox.com/developers/apps and get App Key + App Secret. Grant \"Files and folders\" + \"Collaboration\" permissions\nConfigure OAuth2 credentials - Add Dropbox OAuth2 credentials in n8n (2 places: \"Upload a file\" and \"List Shared Links\" nodes). Set redirect URI to your n8n instance\n\nCreate data table - Make a table called \"cred-Dropbox\" with columns: id (value: 1) and token (your access token)\n\nSet up token refresh - Deploy the companion \"Dropbox Token Refresher\" workflow (referenced but not included as its a paid workflow) to auto-refresh tokens\n\nCustomize upload path - Update the path in \"Upload a file\" node (currently /Automate/N8N/host/)\n\nTest with form - Use the included test workflow to verify everything works\n\nPro tip: Generate your first access token manually in the Dropbox app console to test uploads before setting up auto-refresh.",
+  "featuredImage": "/data/workflows/10299/10299.webp",
+  "author": {
+    "id": 101,
+    "slug": "usascholar",
+    "name": "Anthony",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 346,
+  "downloads": 34,
+  "createdAt": "2025-10-29T23:40:48.082Z",
+  "updatedAt": "2026-01-16T09:04:22.073Z",
+  "publishedAt": "2025-10-29T23:40:48.082Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10299",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Upload files to Dropbox and generate direct download links",
+    "workflowName": "Upload files to Dropbox and generate direct download links",
+    "description": "**How It Works**\nThis sub-workflow uploads files to Dropbox and returns a direct download link:\n\nUpload file - Receives file from parent workflow and uploads to Dropbox\nCheck for existing link - Queries Dropbox API to see if a shared link already exists for this file\nCreate or reuse link - If no link exists, creates a new public shared link; otherwise uses existing one\nConvert to direct link - Transforms Dropbox's standard sharing URL (dropbox.com) into a direct download URL (dl.dropboxusercontent.com)\nReturn URL - Outputs the final direct download link for use in other workflows\n\n**Important:** File names must be unique, or you'll get links to old files with the same name.\n\n**Setup Steps\nTime estimate: ~25-30 minutes (first time)**\n\n**Create Dropbox app** - Register at https://www.dropbox.com/developers/apps and get App Key + App Secret. Grant \"Files and folders\" + \"Collaboration\" permissions\nConfigure OAuth2 credentials - Add Dropbox OAuth2 credentials in n8n (2 places: \"Upload a file\" and \"List Shared Links\" nodes). Set redirect URI to your n8n instance\n\nCreate data table - Make a table called \"cred-Dropbox\" with columns: id (value: 1) and token (your access token)\n\nSet up token refresh - Deploy the companion \"Dropbox Token Refresher\" workflow (referenced but not included as its a paid workflow) to auto-refresh tokens\n\nCustomize upload path - Update the path in \"Upload a file\" node (currently /Automate/N8N/host/)\n\nTest with form - Use the included test workflow to verify everything works\n\nPro tip: Generate your first access token manually in the Dropbox app console to test uploads before setting up auto-refresh.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Normalize Path1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Upload & Path Processing1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sharing Link Management1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Direct Link Processing1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Dropbox: Create Shared Link",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "If: Link Exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract Existing Link",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Dropbox: List Shared Links",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Rewrite Dropbox Host",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Build Direct Link",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Final Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload a file",
+      "type": "n8n-nodes-base.dropbox",
+      "role": "dropbox",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get DropBox access token",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload File",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Completed",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Call '[SUB] Dropbox upload links'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

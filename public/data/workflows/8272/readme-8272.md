@@ -1,0 +1,83 @@
+# Dynamic MCP server selection with OpenAI GPT-4.1 and contextual AI reranker
+
+> ## PROBLEM
+Thousands of MCP Servers exist and many are updated daily, making server selection difficult for LLMs.
+- Current approaches require manually downloading and configuring servers, limiting flexibility.
+- When multiple servers are pre-configured, LLMs get overwhelmed and confused about which server to use for specific tasks.
+
+### This template enables dynamic server selection from a live PulseMCP directory of 5000+ servers.
+
+## How it works
+- A user query goes to an LLM that decides whether to use MCP servers to fulfill a given query and provides reasoning for its decision.
+- Next, we fetch MCP Servers from Pulse MCP API and format them as documents for reranking
+- Now, we use Contextual AI's Reranker to score and rank all MCP Servers based on our query and instructions
+
+## How to set up
+- Sign up for a free trial of Contextual AI [here](https://app.contextual.ai/) to find CONTEXTUALAI_API_KEY.
+- Click on variables option in left panel and add a new environment variable CONTEXTUALAI_API_KEY.
+- For the baseline model, we have used GPT 4.1 mini, you can find your OpenAI API key[ here](https://platform.openai.com/api-keys)
+
+## How to customize the workflow
+- We use chat trigger to initate the workflow. Feel free to replace it with a webhook or other trigger as required.
+- We use OpenAI's GPT 4.1 mini as the baseline model and reranker prompt generator. You can swap out this section to use the LLM of your choice.
+- We fetch 5000 MCP Servers from the PulseMCP directory as a baseline number, feel free to adjust this parameter as required.
+- We are using Contextual AI's ctxl-rerank-v2-instruct-multilingual reranker model, which can be swapped with any one of the following rerankers: 
+  1) ctxl-rerank-v2-instruct-multilingual
+  2) ctxl-rerank-v2-instruct-multilingual-mini
+  3)  ctxl-rerank-v1-instruct
+- You can checkout this [blog](https://contextual.ai/blog/context-engineering-for-your-mcp-client/) for more information about rerankers to learn more about them.
+
+## Good to know:
+- Contextual AI Reranker (with full MCP docs): ~$0.035/query
+Includes 0.035 for reranking + ~$0.0001 for OpenAI instruction generation.
+- OpenAI Baseline: ~$0.017/query
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 8272
+- **Complexity:** advanced
+- **Node Count:** 16
+- **Views:** 285
+- **Downloads:** 28
+- **Created:** 2025/9/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/8272)
+
+## 👤 Author
+
+- **Name:** Jinash Rouniyar
+- **Username:** @jinash
+
+## 🏷️ Categories
+
+- Engineering
+- AI RAG
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** 
+- **if** 
+- **merge** (×2)
+- **stickyNote** (×4)
+- **@n8n/n8n-nodes-langchain.chatTrigger** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **httpRequest** 
+- **@n8n/n8n-nodes-langchain.chat** (×2)
+- **code** (×2)
+- **n8n-nodes-contextualai.contextualAi** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 16 nodes with 10 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,1 @@
+Automatically import the name and email in Google Sheet to the mautic contact each time the lead is filled to the sheet.

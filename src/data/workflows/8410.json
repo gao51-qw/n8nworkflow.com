@@ -1,0 +1,368 @@
+{
+  "id": 8410,
+  "slug": "8410",
+  "title": "N8N automated Twitter reply bot workflow",
+  "description": "**N8N Automated Twitter Reply Bot Workflow**\n============================================\n\n**For latest version, check**: [dziura.online/automation](https://dziura.online/automation)\n\nLatest [documentation can be find here](https://docs.google.com/document/d/13okk16lkUOgpbeahMcdmd7BuWkAp_Lx6kQ8BwScbqZk/edit?usp=sharing)\n\n**You must have Apify community node installed before pasting the JSON to your workflow.** \n\n**Overview**\n------------\n\nThis n8n workflow creates an intelligent Twitter/X reply bot that automatically scrapes tweets based on keywords or communities, analyzes them using AI, generates contextually appropriate replies, and posts them while avoiding duplicates. The bot operates on a schedule with intelligent timing and retry mechanisms.\n\n**Key Features**\n----------------\n\n*   **Automated tweet scraping** from Twitter/X using Apify actors\n    \n*   **AI-powered reply generation** using LLM (Large Language Model)\n    \n*   **Duplicate prevention** via MongoDB storage\n    \n*   **Smart scheduling** with timezone awareness and natural posting patterns\n    \n*   **Retry mechanism** with failure tracking\n    \n*   **Telegram notifications** for status updates\n    \n*   **Manual trigger** option via Telegram command\n    \n\n**Required Credentials & Setup**\n--------------------------------\n\n### **1\\. Telegram Bot**\n\n*   Create a bot via [@BotFather](https://t.me/BotFather) on Telegram\n    \n*   Get your Telegram chat ID to receive status messages\n    \n*   **Credential needed**: Telegram account (Bot token)\n    \n\n### **2\\. MongoDB Database**\n\n*   Set up a MongoDB database to store replied tweets and prevent duplicates\n    \n*   Create a collection (default name: collection\\_name)\n    \n*   **Credential needed**: MongoDB account (Connection string)\n    \n*   **Tutorial**: [MongoDB Connection Guide](https://youtu.be/gB76VdlpX7Y?si=bw_LHLTkXEk8LFO0)\n    \n\n### **3\\. Apify Account**\n\n*   Sign up at [Apify.com](https://apify.com/)\n    \n*   **Primary actors used**:\n    \n    *   **Search Actor**: [api-ninja/x-twitter-advanced-search](https://apify.com/api-ninja/x-twitter-advanced-search) - For keyword-based tweet scraping (ID: 0oVSlMlAX47R2EyoP)\n        \n    *   **Community Actor**: [api-ninja/x-twitter-community-search-post-scraper](https://apify.com/api-ninja/x-twitter-community-search-post-scraper) - For community-based tweet scraping (ID: upbwCMnBATzmzcaNu)\n        \n*   **Credential needed**: Apify account (API token)\n    \n\n### **4\\. OpenRouter (LLM Provider)**\n\n*   Sign up at [OpenRouter.ai](https://openrouter.ai/)\n    \n*   Used for AI-powered tweet analysis and reply generation\n    \n*   **Model used**: x-ai/grok-3 (configurable)\n    \n*   **Credential needed**: OpenRouter account (API key)\n    \n\n### **5\\. Twitter/X API**\n\n*   Set up developer account at [developer.x.com](https://developer.x.com/)\n    \n*   **Note**: Free tier limited to ~17 posts per day\n    \n*   **Credential needed**: X account (OAuth2 credentials)\n    \n\n**Workflow Components**\n-----------------------\n\n### **Trigger Nodes**\n\n#### **1\\. Schedule Trigger**\n\n*   **Purpose**: Runs automatically every 20 minutes\n    \n*   **Smart timing**: Only active between 7 AM - 11:59 PM (configurable timezone)\n    \n*   **Randomization**: Built-in probability control (~28% execution chance) to mimic natural posting patterns\n    \n\n#### **2\\. Manual Trigger**\n\n*   **Purpose**: Manual execution for testing\n    \n\n#### **3\\. Telegram Trigger**\n\n*   **Purpose**: Manual execution via /reply command in Telegram\n    \n*   **Usage**: Send /reply to your bot to trigger the workflow manually\n    \n\n### **Data Processing Flow**\n\n#### **1\\. MongoDB Query (Find documents)**\n\n*   **Purpose**: Retrieves previously replied tweet IDs to avoid duplicates\n    \n*   **Collection**: collection\\_name (configure to match your setup)\n    \n*   **Projection**: Only fetches tweet\\_id field for efficiency\n    \n\n#### **2\\. Data Aggregation (Aggregate1)**\n\n*   **Purpose**: Consolidates tweet IDs into a single array for filtering\n    \n\n#### **3\\. Keyword/Community Selection (Keyword/Community List)**\n\n*   **Purpose**: Defines search terms and communities\n    \n*   **Configuration**: Edit the JSON to include your keywords and Twitter community IDs\n    \n\n**Format**:{\n\n  \"keyword\\_community\\_list\": \\[\n\n    \"SaaS\",\n\n    \"Entrepreneur\", \n\n    \"1488663855127535616\"  // Community ID (19-digit number)\n\n  \\],\n\n  \"failure\": 0\n\n}\n\n#### **4\\. Random Selection (Randomized community, keyword)**\n\n*   **Purpose**: Randomly selects one item from the list to ensure variety\n    \n\n#### **5\\. Routing Logic (If4)**\n\n*   **Purpose**: Determines whether to use Community search or Keyword search\n    \n*   **Logic**: Uses regex to detect 19-digit community IDs vs keywords\n    \n\n### **Tweet Scraping (Apify Actors)**\n\n#### **Community Search Actor**\n\n*   **Actor**: api-ninja/x-twitter-community-search-post-scraper\n    \n*   **Purpose**: Scrapes tweets from specific Twitter communities\n    \n\n**Configuration**:{\n\n  \"communityIds\": \\[\"COMMUNITY\\_ID\"\\],\n\n  \"numberOfTweets\": 40\n\n}\n\n#### **Search Actor**\n\n*   **Actor**: api-ninja/x-twitter-advanced-search\n    \n*   **Purpose**: Scrapes tweets based on keywords\n    \n\n**Configuration**:{\n\n  \"contentLanguage\": \"en\",\n\n  \"engagementMinLikes\": 10,\n\n  \"engagementMinReplies\": 5,\n\n  \"numberOfTweets\": 20,\n\n  \"query\": \"KEYWORD\",\n\n  \"timeWithinTime\": \"2d\",\n\n  \"tweetTypes\": \\[\"original\"\\],\n\n  \"usersBlueVerifiedOnly\": true\n\n}\n\n### **Filtering System (Community filter)**\n\nThe workflow applies multiple filters to ensure high-quality replies:\n\n*   **Text length**: &gt;60 characters (substantial content)\n    \n*   **Follower count**: &gt;100 followers (audience reach)\n    \n*   **Engagement**: &gt;10 likes, &gt;3 replies (proven engagement)\n    \n*   **Language**: English only\n    \n*   **Views**: &gt;100 views (visibility)\n    \n*   **Duplicate check**: Not previously replied to\n    \n*   **Recency**: Within 2 days (configurable in actor settings)\n    \n\n### **AI-Powered Reply Generation**\n\n#### **LLM Chain (Basic LLM Chain)**\n\n*   **Purpose**: Analyzes filtered tweets and generates contextually appropriate replies\n    \n*   **Model**: Grok-3 via OpenRouter (configurable)\n    \n*   **Features**:\n    \n    *   Engagement potential scoring\n        \n    *   User authority analysis\n        \n    *   Timing optimization\n        \n    *   Multiple reply styles (witty, informative, supportive, etc.)\n        \n    *   &lt;100 character limit for optimal engagement\n        \n\n#### **Output Parser (Structured Output Parser)**\n\n*   **Purpose**: Ensures consistent JSON output format\n    \n\n**Schema**:{\n\n  \"selected\\_tweet\\_id\": \"tweet\\_id\\_here\",\n\n  \"screen\\_name\": \"author\\_screen\\_name\", \n\n  \"reply\": \"generated\\_reply\\_here\"\n\n}\n\n### **Posting & Notification System**\n\n#### **Twitter Posting (Create Tweet)**\n\n*   **Purpose**: Posts the generated reply as a Twitter response\n    \n*   **Error handling**: Catches API limitations and rate limits\n    \n\n#### **Status Notifications**\n\n*   **Success**: Notifies via Telegram with tweet link and reply text\n    \n*   **Failure**: Notifies about API limitations or errors\n    \n*   **Format**: HTML-formatted messages with clickable links\n    \n\n#### **Database Storage (Insert documents)**\n\n*   **Purpose**: Saves successful replies to prevent future duplicates\n    \n*   **Fields stored**: tweet\\_id, screen\\_name, reply, tweet\\_url, timestamp\n    \n\n### **Retry Mechanism**\n\nThe workflow includes intelligent retry logic:\n\n#### **Failure Counter (If5, Increment Failure Counter1)**\n\n*   **Logic**: If no suitable tweets found, increment failure counter\n    \n*   **Retry limit**: Maximum 3 retries with different random keywords\n    \n*   **Wait time**: 3-second delay between retries\n    \n\n#### **Final Failure Notification**\n\n*   **Trigger**: After 4 failed attempts\n    \n*   **Action**: Sends Telegram notification about unsuccessful search\n    \n*   **Recovery**: Manual retry available via /reply command\n    \n\n**Configuration Guide**\n-----------------------\n\n### **Essential Settings to Modify**\n\n1.  **MongoDB Collection Name**: Update collection\\_name in MongoDB nodes\n    \n2.  **Telegram Chat ID**: Replace 11111111111 with your actual chat ID\n    \n3.  **Keywords/Communities**: Edit the list in Keyword/Community List node\n    \n4.  **Timezone**: Update timezone in Code node (currently set to Europe/Kyiv)\n    \n5.  **Actor Selection**: Enable only one actor (Community OR Search) based on your needs\n    \n\n### **Filter Customization**\n\nAdjust filters in Community filter node based on your requirements:\n\n*   Minimum engagement thresholds\n    \n*   Text length requirements\n    \n*   Time windows\n    \n*   Language preferences\n    \n\n### **LLM Customization**\n\nModify the AI prompt in Basic LLM Chain to:\n\n*   Change reply style and tone\n    \n*   Adjust engagement criteria\n    \n*   Modify scoring algorithms\n    \n*   Set different character limits\n    \n\n**Usage Tips**\n--------------\n\n1.  **Start small**: Begin with a few high-quality keywords/communities\n    \n2.  **Monitor performance**: Use Telegram notifications to track success rates\n    \n3.  **Adjust filters**: Fine-tune based on the quality of generated replies\n    \n4.  **Respect limits**: Twitter's free tier allows ~17 posts/day\n    \n5.  **Test manually**: Use /reply command for testing before scheduling\n    \n\n**Troubleshooting**\n-------------------\n\n### **Common Issues**\n\n1.  **No tweets found**: Adjust filter criteria or check keywords\n    \n2.  **API rate limits**: Reduce posting frequency or upgrade Twitter API plan\n    \n3.  **MongoDB connection**: Verify connection string and collection name\n    \n4.  **Apify quota**: Monitor Apify usage limits\n    \n5.  **LLM failures**: Check OpenRouter credits and model availability\n    \n\n### **Best Practices**\n\n*   Monitor your bot's replies for quality and appropriateness\n    \n*   Regularly update keywords to stay relevant\n    \n*   Keep an eye on engagement metrics\n    \n*   Adjust timing based on your audience's activity patterns\n    \n*   Maintain a balanced posting frequency to avoid appearing spammy\n    \n\n**Documentation Links**\n-----------------------\n\n*   **Full Documentation**: [Google Doc Guide](https://docs.google.com/document/d/13okk16lkUOgpbeahMcdmd7BuWkAp_Lx6kQ8BwScbqZk/edit?usp=sharing)\n    \n*   **Latest Version**: [dziura.online/automation](https://dziura.online/automation)\n    \n*   **MongoDB Setup Tutorial**: [YouTube Guide](https://youtu.be/gB76VdlpX7Y?si=bw_LHLTkXEk8LFO0)\n    \n\nThis workflow provides a comprehensive solution for automated, intelligent Twitter engagement while maintaining quality and avoiding spam-like behavior.",
+  "featuredImage": "/data/workflows/8410/8410.webp",
+  "author": {
+    "id": 101,
+    "slug": "dziura",
+    "name": "Max",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1060,
+  "downloads": 106,
+  "createdAt": "2025-09-09T12:18:57.100Z",
+  "updatedAt": "2026-01-16T08:55:40.610Z",
+  "publishedAt": "2025-09-09T12:18:57.100Z",
+  "nodes": 55,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8410",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "N8N automated Twitter reply bot workflow",
+    "workflowName": "N8N automated Twitter reply bot workflow",
+    "description": "**N8N Automated Twitter Reply Bot Workflow**\n============================================\n\n**For latest version, check**: [dziura.online/automation](https://dziura.online/automation)\n\nLatest [documentation can be find here](https://docs.google.com/document/d/13okk16lkUOgpbeahMcdmd7BuWkAp_Lx6kQ8BwScbqZk/edit?usp=sharing)\n\n**You must have Apify community node installed before pasting the JSON to your workflow.** \n\n**Overview**\n------------\n\nThis n8n workflow creates an intelligent Twitter/X reply bot that automatically scrapes tweets based on keywords or communities, analyzes them using AI, generates contextually appropriate replies, and posts them while avoiding duplicates. The bot operates on a schedule with intelligent timing and retry mechanisms.\n\n**Key Features**\n----------------\n\n*   **Automated tweet scraping** from Twitter/X using Apify actors\n    \n*   **AI-powered reply generation** using LLM (Large Language Model)\n    \n*   **Duplicate prevention** via MongoDB storage\n    \n*   **Smart scheduling** with timezone awareness and natural posting patterns\n    \n*   **Retry mechanism** with failure tracking\n    \n*   **Telegram notifications** for status updates\n    \n*   **Manual trigger** option via Telegram command\n    \n\n**Required Credentials & Setup**\n--------------------------------\n\n### **1\\. Telegram Bot**\n\n*   Create a bot via [@BotFather](https://t.me/BotFather) on Telegram\n    \n*   Get your Telegram chat ID to receive status messages\n    \n*   **Credential needed**: Telegram account (Bot token)\n    \n\n### **2\\. MongoDB Database**\n\n*   Set up a MongoDB database to store replied tweets and prevent duplicates\n    \n*   Create a collection (default name: collection\\_name)\n    \n*   **Credential needed**: MongoDB account (Connection string)\n    \n*   **Tutorial**: [MongoDB Connection Guide](https://youtu.be/gB76VdlpX7Y?si=bw_LHLTkXEk8LFO0)\n    \n\n### **3\\. Apify Account**\n\n*   Sign up at [Apify.com](https://apify.com/)\n    \n*   **Primary actors used**:\n    \n    *   **Search Actor**: [api-ninja/x-twitter-advanced-search](https://apify.com/api-ninja/x-twitter-advanced-search) - For keyword-based tweet scraping (ID: 0oVSlMlAX47R2EyoP)\n        \n    *   **Community Actor**: [api-ninja/x-twitter-community-search-post-scraper](https://apify.com/api-ninja/x-twitter-community-search-post-scraper) - For community-based tweet scraping (ID: upbwCMnBATzmzcaNu)\n        \n*   **Credential needed**: Apify account (API token)\n    \n\n### **4\\. OpenRouter (LLM Provider)**\n\n*   Sign up at [OpenRouter.ai](https://openrouter.ai/)\n    \n*   Used for AI-powered tweet analysis and reply generation\n    \n*   **Model used**: x-ai/grok-3 (configurable)\n    \n*   **Credential needed**: OpenRouter account (API key)\n    \n\n### **5\\. Twitter/X API**\n\n*   Set up developer account at [developer.x.com](https://developer.x.com/)\n    \n*   **Note**: Free tier limited to ~17 posts per day\n    \n*   **Credential needed**: X account (OAuth2 credentials)\n    \n\n**Workflow Components**\n-----------------------\n\n### **Trigger Nodes**\n\n#### **1\\. Schedule Trigger**\n\n*   **Purpose**: Runs automatically every 20 minutes\n    \n*   **Smart timing**: Only active between 7 AM - 11:59 PM (configurable timezone)\n    \n*   **Randomization**: Built-in probability control (~28% execution chance) to mimic natural posting patterns\n    \n\n#### **2\\. Manual Trigger**\n\n*   **Purpose**: Manual execution for testing\n    \n\n#### **3\\. Telegram Trigger**\n\n*   **Purpose**: Manual execution via /reply command in Telegram\n    \n*   **Usage**: Send /reply to your bot to trigger the workflow manually\n    \n\n### **Data Processing Flow**\n\n#### **1\\. MongoDB Query (Find documents)**\n\n*   **Purpose**: Retrieves previously replied tweet IDs to avoid duplicates\n    \n*   **Collection**: collection\\_name (configure to match your setup)\n    \n*   **Projection**: Only fetches tweet\\_id field for efficiency\n    \n\n#### **2\\. Data Aggregation (Aggregate1)**\n\n*   **Purpose**: Consolidates tweet IDs into a single array for filtering\n    \n\n#### **3\\. Keyword/Community Selection (Keyword/Community List)**\n\n*   **Purpose**: Defines search terms and communities\n    \n*   **Configuration**: Edit the JSON to include your keywords and Twitter community IDs\n    \n\n**Format**:{\n\n  \"keyword\\_community\\_list\": \\[\n\n    \"SaaS\",\n\n    \"Entrepreneur\", \n\n    \"1488663855127535616\"  // Community ID (19-digit number)\n\n  \\],\n\n  \"failure\": 0\n\n}\n\n#### **4\\. Random Selection (Randomized community, keyword)**\n\n*   **Purpose**: Randomly selects one item from the list to ensure variety\n    \n\n#### **5\\. Routing Logic (If4)**\n\n*   **Purpose**: Determines whether to use Community search or Keyword search\n    \n*   **Logic**: Uses regex to detect 19-digit community IDs vs keywords\n    \n\n### **Tweet Scraping (Apify Actors)**\n\n#### **Community Search Actor**\n\n*   **Actor**: api-ninja/x-twitter-community-search-post-scraper\n    \n*   **Purpose**: Scrapes tweets from specific Twitter communities\n    \n\n**Configuration**:{\n\n  \"communityIds\": \\[\"COMMUNITY\\_ID\"\\],\n\n  \"numberOfTweets\": 40\n\n}\n\n#### **Search Actor**\n\n*   **Actor**: api-ninja/x-twitter-advanced-search\n    \n*   **Purpose**: Scrapes tweets based on keywords\n    \n\n**Configuration**:{\n\n  \"contentLanguage\": \"en\",\n\n  \"engagementMinLikes\": 10,\n\n  \"engagementMinReplies\": 5,\n\n  \"numberOfTweets\": 20,\n\n  \"query\": \"KEYWORD\",\n\n  \"timeWithinTime\": \"2d\",\n\n  \"tweetTypes\": \\[\"original\"\\],\n\n  \"usersBlueVerifiedOnly\": true\n\n}\n\n### **Filtering System (Community filter)**\n\nThe workflow applies multiple filters to ensure high-quality replies:\n\n*   **Text length**: &gt;60 characters (substantial content)\n    \n*   **Follower count**: &gt;100 followers (audience reach)\n    \n*   **Engagement**: &gt;10 likes, &gt;3 replies (proven engagement)\n    \n*   **Language**: English only\n    \n*   **Views**: &gt;100 views (visibility)\n    \n*   **Duplicate check**: Not previously replied to\n    \n*   **Recency**: Within 2 days (configurable in actor settings)\n    \n\n### **AI-Powered Reply Generation**\n\n#### **LLM Chain (Basic LLM Chain)**\n\n*   **Purpose**: Analyzes filtered tweets and generates contextually appropriate replies\n    \n*   **Model**: Grok-3 via OpenRouter (configurable)\n    \n*   **Features**:\n    \n    *   Engagement potential scoring\n        \n    *   User authority analysis\n        \n    *   Timing optimization\n        \n    *   Multiple reply styles (witty, informative, supportive, etc.)\n        \n    *   &lt;100 character limit for optimal engagement\n        \n\n#### **Output Parser (Structured Output Parser)**\n\n*   **Purpose**: Ensures consistent JSON output format\n    \n\n**Schema**:{\n\n  \"selected\\_tweet\\_id\": \"tweet\\_id\\_here\",\n\n  \"screen\\_name\": \"author\\_screen\\_name\", \n\n  \"reply\": \"generated\\_reply\\_here\"\n\n}\n\n### **Posting & Notification System**\n\n#### **Twitter Posting (Create Tweet)**\n\n*   **Purpose**: Posts the generated reply as a Twitter response\n    \n*   **Error handling**: Catches API limitations and rate limits\n    \n\n#### **Status Notifications**\n\n*   **Success**: Notifies via Telegram with tweet link and reply text\n    \n*   **Failure**: Notifies about API limitations or errors\n    \n*   **Format**: HTML-formatted messages with clickable links\n    \n\n#### **Database Storage (Insert documents)**\n\n*   **Purpose**: Saves successful replies to prevent future duplicates\n    \n*   **Fields stored**: tweet\\_id, screen\\_name, reply, tweet\\_url, timestamp\n    \n\n### **Retry Mechanism**\n\nThe workflow includes intelligent retry logic:\n\n#### **Failure Counter (If5, Increment Failure Counter1)**\n\n*   **Logic**: If no suitable tweets found, increment failure counter\n    \n*   **Retry limit**: Maximum 3 retries with different random keywords\n    \n*   **Wait time**: 3-second delay between retries\n    \n\n#### **Final Failure Notification**\n\n*   **Trigger**: After 4 failed attempts\n    \n*   **Action**: Sends Telegram notification about unsuccessful search\n    \n*   **Recovery**: Manual retry available via /reply command\n    \n\n**Configuration Guide**\n-----------------------\n\n### **Essential Settings to Modify**\n\n1.  **MongoDB Collection Name**: Update collection\\_name in MongoDB nodes\n    \n2.  **Telegram Chat ID**: Replace 11111111111 with your actual chat ID\n    \n3.  **Keywords/Communities**: Edit the list in Keyword/Community List node\n    \n4.  **Timezone**: Update timezone in Code node (currently set to Europe/Kyiv)\n    \n5.  **Actor Selection**: Enable only one actor (Community OR Search) based on your needs\n    \n\n### **Filter Customization**\n\nAdjust filters in Community filter node based on your requirements:\n\n*   Minimum engagement thresholds\n    \n*   Text length requirements\n    \n*   Time windows\n    \n*   Language preferences\n    \n\n### **LLM Customization**\n\nModify the AI prompt in Basic LLM Chain to:\n\n*   Change reply style and tone\n    \n*   Adjust engagement criteria\n    \n*   Modify scoring algorithms\n    \n*   Set different character limits\n    \n\n**Usage Tips**\n--------------\n\n1.  **Start small**: Begin with a few high-quality keywords/communities\n    \n2.  **Monitor performance**: Use Telegram notifications to track success rates\n    \n3.  **Adjust filters**: Fine-tune based on the quality of generated replies\n    \n4.  **Respect limits**: Twitter's free tier allows ~17 posts/day\n    \n5.  **Test manually**: Use /reply command for testing before scheduling\n    \n\n**Troubleshooting**\n-------------------\n\n### **Common Issues**\n\n1.  **No tweets found**: Adjust filter criteria or check keywords\n    \n2.  **API rate limits**: Reduce posting frequency or upgrade Twitter API plan\n    \n3.  **MongoDB connection**: Verify connection string and collection name\n    \n4.  **Apify quota**: Monitor Apify usage limits\n    \n5.  **LLM failures**: Check OpenRouter credits and model availability\n    \n\n### **Best Practices**\n\n*   Monitor your bot's replies for quality and appropriateness\n    \n*   Regularly update keywords to stay relevant\n    \n*   Keep an eye on engagement metrics\n    \n*   Adjust timing based on your audience's activity patterns\n    \n*   Maintain a balanced posting frequency to avoid appearing spammy\n    \n\n**Documentation Links**\n-----------------------\n\n*   **Full Documentation**: [Google Doc Guide](https://docs.google.com/document/d/13okk16lkUOgpbeahMcdmd7BuWkAp_Lx6kQ8BwScbqZk/edit?usp=sharing)\n    \n*   **Latest Version**: [dziura.online/automation](https://dziura.online/automation)\n    \n*   **MongoDB Setup Tutorial**: [YouTube Guide](https://youtu.be/gB76VdlpX7Y?si=bw_LHLTkXEk8LFO0)\n    \n\nThis workflow provides a comprehensive solution for automated, intelligent Twitter engagement while maintaining quality and avoiding spam-like behavior.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Find documents",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If5",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get dataset items",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "role": "apify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenRouter Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create Tweet",
+      "type": "n8n-nodes-base.twitter",
+      "role": "twitter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a success reply",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send a failed reply",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "parse reply",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Insert documents",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "modify tweet data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get tweet data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Community filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Community search actor",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "role": "apify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Keyword/Community List",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Randomized community, keyword",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If4",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a scraping failure message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Increment Failure Counter",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Search keyword actor",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "role": "apify",
+      "configDescription": "Version 1"
+    }
+  ]
+}

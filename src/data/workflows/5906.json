@@ -1,0 +1,182 @@
+{
+  "id": 5906,
+  "slug": "5906",
+  "title": "Automated job applications & status tracking with LinkedIn, Indeed & Google Sheets",
+  "description": "# Apply to jobs automatically from Google Sheets with status tracking\n\n## Who's it for\n\nJob seekers who want to streamline their application process, save time on repetitive tasks, and never miss following up on applications. Perfect for anyone managing multiple job applications across different platforms.\n\n## What it does\n\nThis workflow automatically applies to jobs from a Google Sheet, tracks application status, and keeps you updated with notifications. It handles the entire application lifecycle from submission to status monitoring.\n\n**Key features:**\n- Reads job listings from Google Sheets with filtering by priority and status\n- Automatically applies to jobs on LinkedIn, Indeed, and other platforms\n- Updates application status in real-time\n- Checks application status every 2 days and notifies you of changes\n- Sends email notifications for successful applications and status updates\n- Prevents duplicate applications and manages rate limiting\n\n## How it works\n\nThe workflow runs on two main schedules:\n\n**Daily Application Process (9 AM, weekdays):**\n1. Reads your job list from Google Sheets\n2. Filters for jobs marked as \"Not Applied\" with Medium/High priority\n3. Processes each job individually to prevent rate limiting\n4. Applies to jobs using platform-specific APIs (LinkedIn, Indeed, etc.)\n5. Updates the sheet with application status and reference ID\n6. Sends confirmation email for each application\n\n**Status Monitoring (Every 2 days at 10 AM):**\n1. Checks all jobs with \"Applied\" status\n2. Queries job platforms for application status updates\n3. Updates the sheet if status has changed\n4. Sends notification emails for status changes (interviews, rejections, etc.)\n\n## Requirements\n\n- Google account with Google Sheets access\n- Gmail account for notifications\n- Resume stored online (Google Drive, Dropbox, etc.)\n- API access to job platforms (LinkedIn, Indeed) - optional for basic version\n- n8n instance (self-hosted or cloud)\n\n## How to set up\n\n### Step 1: Create Your Job Tracking Sheet\n\nCreate a Google Sheet with these exact column headers:\n\n| Job_ID | Company | Position | Status | Applied_Date | Last_Checked | Application_ID | Notes | Job_URL | Priority |\n|--------|---------|----------|--------|--------------|--------------|----------------|-------|---------|----------|\n| JOB001 | Google | Software Engineer | Not Applied | | | | | https://careers.google.com/jobs/123 | High |\n| JOB002 | Microsoft | Product Manager | Not Applied | | | | | https://careers.microsoft.com/jobs/456 | Medium |\n\n**Column explanations:**\n- **Job_ID**: Unique identifier (JOB001, JOB002, etc.)\n- **Company**: Company name\n- **Position**: Job title\n- **Status**: Not Applied, Applied, Under Review, Interview Scheduled, Rejected, Offer\n- **Applied_Date**: Auto-filled when application is submitted\n- **Last_Checked**: Auto-updated during status checks\n- **Application_ID**: Platform reference ID (auto-generated)\n- **Notes**: Additional information or application notes\n- **Job_URL**: Direct link to job posting\n- **Priority**: High, Medium, Low (Low priority jobs are skipped)\n\n### Step 2: Configure Google Sheets Access\n\n1. In n8n, go to **Credentials** → **Add Credential**\n2. Select **Google Sheets OAuth2 API**\n3. Follow the OAuth setup process to authorize n8n\n4. Test the connection with your job tracking sheet\n\n### Step 3: Set Up Gmail Notifications\n\n1. Add another credential for **Gmail OAuth2 API**\n2. Authorize n8n to send emails from your Gmail account\n3. Test by sending a sample email\n\n### Step 4: Update Workflow Configuration\n\nIn the **\"Set Configuration\"** node, update these values:\n- **spreadsheetId**: Your Google Sheet ID (found in the URL)\n- **resumeUrl**: Direct link to your resume (make sure it's publicly accessible)\n- **yourEmail**: Your email address for notifications\n- **coverLetterTemplate**: Customize your cover letter template\n\n### Step 5: Customize Application Logic\n\n**For basic version (no API access):**\nThe workflow includes placeholder HTTP requests that you can replace with actual job platform integrations.\n\n**For advanced version (with API access):**\n- Replace LinkedIn/Indeed HTTP nodes with actual API calls\n- Add your API credentials to n8n's credential store\n- Update the platform detection logic for additional job boards\n\n### Step 6: Test and Activate\n\n1. Add 1-2 test jobs to your sheet with \"Not Applied\" status\n2. Run the workflow manually to test\n3. Check that the sheet gets updated and you receive notifications\n4. Activate the workflow to run automatically\n\n## How to customize the workflow\n\n### Adding New Job Platforms\n\n1. **Update Platform Detection**: Modify the \"Check Platform Type\" node to recognize new job board URLs\n2. **Add New Application Node**: Create HTTP request nodes for new platforms\n3. **Update Status Checking**: Add status check logic for the new platform\n\n### Customizing Application Strategy\n\n- **Rate Limiting**: Add \"Wait\" nodes between applications (recommended: 5-10 minutes)\n- **Application Timing**: Modify the cron schedule to apply during optimal hours\n- **Priority Filtering**: Adjust the filter conditions to match your criteria\n- **Multiple Resumes**: Use conditional logic to select different resumes based on job type\n\n### Enhanced Notifications\n\n- **Slack Integration**: Replace Gmail nodes with Slack for team notifications\n- **Discord Webhooks**: Send updates to Discord channels\n- **SMS Notifications**: Use Twilio for urgent status updates\n- **Dashboard Updates**: Connect to Notion, Airtable, or other productivity tools\n\n### Advanced Features\n\n- **AI-Powered Personalization**: Use OpenAI to generate custom cover letters\n- **Job Scoring**: Implement scoring logic based on job requirements vs. your skills\n- **Interview Scheduling**: Auto-schedule interviews when status changes\n- **Follow-up Automation**: Send follow-up emails after specific time periods\n\n## Important Notes\n\n### Platform Compliance\n- Always respect rate limits to avoid being blocked\n- Follow each platform's Terms of Service\n- Use official APIs when available instead of web scraping\n- Don't spam job boards with excessive applications\n\n### Data Privacy\n- Store credentials securely using n8n's credential store\n- Don't hardcode API keys or personal information in nodes\n- Regularly review and clean up old application data\n- Ensure your resume link is secure but accessible\n\n### Quality Control\n- Start with a small number of jobs to test the workflow\n- Review application success rates and adjust strategy\n- Monitor for errors and set up proper error handling\n- Keep your job list updated and remove expired postings\n\nThis workflow transforms job searching from a manual, time-consuming process into an automated system that maximizes your application efficiency while maintaining quality and compliance.",
+  "featuredImage": "/data/workflows/5906/5906.webp",
+  "author": {
+    "id": 101,
+    "slug": "vxi14",
+    "name": "VipinW",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 52723,
+  "downloads": 5272,
+  "createdAt": "2025-07-12T09:05:22.338Z",
+  "updatedAt": "2026-01-16T08:42:03.621Z",
+  "publishedAt": "2025-07-12T09:05:22.338Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5906",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated job applications & status tracking with LinkedIn, Indeed & Google Sheets",
+    "workflowName": "Automated job applications & status tracking with LinkedIn, Indeed & Google Sheets",
+    "description": "# Apply to jobs automatically from Google Sheets with status tracking\n\n## Who's it for\n\nJob seekers who want to streamline their application process, save time on repetitive tasks, and never miss following up on applications. Perfect for anyone managing multiple job applications across different platforms.\n\n## What it does\n\nThis workflow automatically applies to jobs from a Google Sheet, tracks application status, and keeps you updated with notifications. It handles the entire application lifecycle from submission to status monitoring.\n\n**Key features:**\n- Reads job listings from Google Sheets with filtering by priority and status\n- Automatically applies to jobs on LinkedIn, Indeed, and other platforms\n- Updates application status in real-time\n- Checks application status every 2 days and notifies you of changes\n- Sends email notifications for successful applications and status updates\n- Prevents duplicate applications and manages rate limiting\n\n## How it works\n\nThe workflow runs on two main schedules:\n\n**Daily Application Process (9 AM, weekdays):**\n1. Reads your job list from Google Sheets\n2. Filters for jobs marked as \"Not Applied\" with Medium/High priority\n3. Processes each job individually to prevent rate limiting\n4. Applies to jobs using platform-specific APIs (LinkedIn, Indeed, etc.)\n5. Updates the sheet with application status and reference ID\n6. Sends confirmation email for each application\n\n**Status Monitoring (Every 2 days at 10 AM):**\n1. Checks all jobs with \"Applied\" status\n2. Queries job platforms for application status updates\n3. Updates the sheet if status has changed\n4. Sends notification emails for status changes (interviews, rejections, etc.)\n\n## Requirements\n\n- Google account with Google Sheets access\n- Gmail account for notifications\n- Resume stored online (Google Drive, Dropbox, etc.)\n- API access to job platforms (LinkedIn, Indeed) - optional for basic version\n- n8n instance (self-hosted or cloud)\n\n## How to set up\n\n### Step 1: Create Your Job Tracking Sheet\n\nCreate a Google Sheet with these exact column headers:\n\n| Job_ID | Company | Position | Status | Applied_Date | Last_Checked | Application_ID | Notes | Job_URL | Priority |\n|--------|---------|----------|--------|--------------|--------------|----------------|-------|---------|----------|\n| JOB001 | Google | Software Engineer | Not Applied | | | | | https://careers.google.com/jobs/123 | High |\n| JOB002 | Microsoft | Product Manager | Not Applied | | | | | https://careers.microsoft.com/jobs/456 | Medium |\n\n**Column explanations:**\n- **Job_ID**: Unique identifier (JOB001, JOB002, etc.)\n- **Company**: Company name\n- **Position**: Job title\n- **Status**: Not Applied, Applied, Under Review, Interview Scheduled, Rejected, Offer\n- **Applied_Date**: Auto-filled when application is submitted\n- **Last_Checked**: Auto-updated during status checks\n- **Application_ID**: Platform reference ID (auto-generated)\n- **Notes**: Additional information or application notes\n- **Job_URL**: Direct link to job posting\n- **Priority**: High, Medium, Low (Low priority jobs are skipped)\n\n### Step 2: Configure Google Sheets Access\n\n1. In n8n, go to **Credentials** → **Add Credential**\n2. Select **Google Sheets OAuth2 API**\n3. Follow the OAuth setup process to authorize n8n\n4. Test the connection with your job tracking sheet\n\n### Step 3: Set Up Gmail Notifications\n\n1. Add another credential for **Gmail OAuth2 API**\n2. Authorize n8n to send emails from your Gmail account\n3. Test by sending a sample email\n\n### Step 4: Update Workflow Configuration\n\nIn the **\"Set Configuration\"** node, update these values:\n- **spreadsheetId**: Your Google Sheet ID (found in the URL)\n- **resumeUrl**: Direct link to your resume (make sure it's publicly accessible)\n- **yourEmail**: Your email address for notifications\n- **coverLetterTemplate**: Customize your cover letter template\n\n### Step 5: Customize Application Logic\n\n**For basic version (no API access):**\nThe workflow includes placeholder HTTP requests that you can replace with actual job platform integrations.\n\n**For advanced version (with API access):**\n- Replace LinkedIn/Indeed HTTP nodes with actual API calls\n- Add your API credentials to n8n's credential store\n- Update the platform detection logic for additional job boards\n\n### Step 6: Test and Activate\n\n1. Add 1-2 test jobs to your sheet with \"Not Applied\" status\n2. Run the workflow manually to test\n3. Check that the sheet gets updated and you receive notifications\n4. Activate the workflow to run automatically\n\n## How to customize the workflow\n\n### Adding New Job Platforms\n\n1. **Update Platform Detection**: Modify the \"Check Platform Type\" node to recognize new job board URLs\n2. **Add New Application Node**: Create HTTP request nodes for new platforms\n3. **Update Status Checking**: Add status check logic for the new platform\n\n### Customizing Application Strategy\n\n- **Rate Limiting**: Add \"Wait\" nodes between applications (recommended: 5-10 minutes)\n- **Application Timing**: Modify the cron schedule to apply during optimal hours\n- **Priority Filtering**: Adjust the filter conditions to match your criteria\n- **Multiple Resumes**: Use conditional logic to select different resumes based on job type\n\n### Enhanced Notifications\n\n- **Slack Integration**: Replace Gmail nodes with Slack for team notifications\n- **Discord Webhooks**: Send updates to Discord channels\n- **SMS Notifications**: Use Twilio for urgent status updates\n- **Dashboard Updates**: Connect to Notion, Airtable, or other productivity tools\n\n### Advanced Features\n\n- **AI-Powered Personalization**: Use OpenAI to generate custom cover letters\n- **Job Scoring**: Implement scoring logic based on job requirements vs. your skills\n- **Interview Scheduling**: Auto-schedule interviews when status changes\n- **Follow-up Automation**: Send follow-up emails after specific time periods\n\n## Important Notes\n\n### Platform Compliance\n- Always respect rate limits to avoid being blocked\n- Follow each platform's Terms of Service\n- Use official APIs when available instead of web scraping\n- Don't spam job boards with excessive applications\n\n### Data Privacy\n- Store credentials securely using n8n's credential store\n- Don't hardcode API keys or personal information in nodes\n- Regularly review and clean up old application data\n- Ensure your resume link is secure but accessible\n\n### Quality Control\n- Start with a small number of jobs to test the workflow\n- Review application success rates and adjust strategy\n- Monitor for errors and set up proper error handling\n- Keep your job list updated and remove expired postings\n\nThis workflow transforms job searching from a manual, time-consuming process into an automated system that maximizes your application efficiency while maintaining quality and compliance.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "📋 Template Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📊 Sheet Structure",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "⚙️ Setup Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🕘 Daily Application Trigger",
+      "type": "n8n-nodes-base.cron",
+      "role": "cron",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "⚙️ Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "📖 Read Jobs Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "🎯 Filter Pending Applications",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "🔄 Process Jobs One by One",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "📝 Prepare Application Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "🔀 Route by Platform",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "💼 Apply via LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "🔍 Apply via Indeed",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "📊 Process Application Result",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "📝 Update Job Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "📧 Send Application Notification",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "📊 Status Tracking Info",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "🕐 Status Check Trigger",
+      "type": "n8n-nodes-base.cron",
+      "role": "cron",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "📖 Read Applied Jobs",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "🎯 Filter Applied Jobs",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "🔄 Check Status One by One",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "🔍 Mock Status Check",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "🔄 Check if Status Changed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "📝 Update Changed Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "📧 Send Status Update",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    }
+  ]
+}

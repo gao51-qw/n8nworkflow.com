@@ -1,0 +1,1 @@
+Nathan is a proof of concept framework for creating a personal assistant who can handle various day to day functions for you.

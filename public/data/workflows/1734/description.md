@@ -1,0 +1,1 @@
+This workflow imports a JSON file from an email attachment and saves the content into a spreadsheet.

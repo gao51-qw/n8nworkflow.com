@@ -1,0 +1,27 @@
+{
+  "id": 10871,
+  "slug": "10871",
+  "title": "Personal finance tracker with Telegram Bot, Google Gemini Vision, and Sheets",
+  "description": "# Personal Finance AI Agent – Telegram Bot (n8n Workflow)\n\nA fully automated Telegram-based personal finance tracker that:\n- Accepts receipts as **images**, **PDFs**, or plain text  \n- Uses Google Gemini Vision for OCR & intelligent extraction  \n- Logs every expense into **Google Sheets**  \n- Stores receipt images/PDFs in **Google Drive**  \n- Answers natural-language spending questions (\"How much did I spend on food last month?\", \"Compare this month vs last month\", etc.)\n\nBuilt entirely with **n8n** – 100% self-hostable, no-code/low-code.\n\n---\n\n## How It Works (Overview)\n\n1. **You send a message to your Telegram bot**  \n   → Photo of a receipt, PDF, or just text like \"Nov 10 – 2500 NGN – Uber\"\n\n2. **Switch node** detects the message type:\n   - Photo → Branch 0\n   - Document (PDF/other) → Branch 1  \n   - Pure text → Branch 2 (goes straight to query agent)\n\n3. **Receipt Processing Path (Images & PDFs)**\n   - Files downloaded from Telegram → uploaded to Google Drive (\"Monthly receipts\" folder)\n   - Images → OCR with Gemini Vision  \n     PDFs → native PDF text extraction\n   - Extracted text + Drive link → merged → sent to Gemini AI Agent\n   - AI extracts: Date (YYYY-MM-DD) • Amount (NGN) • Description • Category  \n     (food, transportation, subscriptions, takeouts, entertainment, gift, electricity, repairs, other stuffs)\n   - Clean JSON → appended to Google Sheets → friendly confirmation sent back\n\n4. **Spending Query Path (Text questions)**\n   - Second AI Agent with access to the live Google Sheet + calculator + memory\n   - Answers anything: totals, breakdowns, comparisons, trends, percentages…\n\n---\n\n## Live Google Sheet (Template)\nYou can make a copy of the exact sheet the bot uses:  \nhttps://docs.google.com/spreadsheets/d/1kwWJquPpwL9vt9U06a4f4phXq5jZjaGazvh2V69FGoc/edit?usp=sharing\n\nJust click **File → Make a copy** and use your copy’s ID in the workflow.\n\n---\n\n## Setup Steps (Step-by-Step)\n\n### Prerequisites\n- n8n instance (cloud or self-hosted)\n- Telegram bot (created via @BotFather)\n- Google account\n\n### 1. Create Telegram Bot\n1. Message @BotFather → `/newbot`\n2. Copy the bot token\n3. In n8n → Credentials → New **Telegram API** credential → paste token\n\n### 2. Google Setup\n1. **Make a copy** of the sheet above  \n   → Copy the new spreadsheet ID from the URL\n2. Create a Google Drive folder called **\"Monthly receipts\"** (or any name) → copy folder ID\n3. Enable Gemini API in Google Cloud (or use your existing key)\n4. In n8n create these credentials:\n   - Google Sheets OAuth2 API\n   - Google Drive OAuth2 API\n   - Google Gemini (PaLM) API\n\n### 3. Import Workflow\n- Copy the full JSON from the original file\n- n8n → Workflows → Import → paste → Import\n\n### 4. Update IDs & Credentials\nAfter import, configure these nodes:\n\n| Node                              | What to Change                                      |\n|-----------------------------------|-----------------------------------------------------|\n| Telegram Trigger + all Telegram nodes | Your Telegram credential                            |\n| Google Sheets nodes               | Your Google Sheets credential + new Sheet ID        |\n| Google Drive \"Upload file\" nodes  | Paste your \"Monthly receipts\" folder ID             |\n| Gemini nodes                      | Your Gemini credential                              |\n| AI Agent & AI Agent1              | Verify model, memory, tools are connected           |\n\n### 5. Activate & Test\n- Click **Activate**\n- Start chatting with your bot on Telegram\n\n**Test commands**  \n- Send a photo/PDF receipt  \n- Type: `How much did I spend last month?`  \n- Type: `Show me food spending this month vs last month`\n\nYou’ll get instant replies and see new rows appear in your sheet!\n\n---\n\n## Features\n- Zero manual entry ever again\n- Works with handwritten receipts\n- Smart categorization\n- Natural-language spending insights\n- All data stays 100% in your Google account\n- Completely private & self-hostable\n- NGN-native (Naira)\n\nNever track expenses manually again!",
+  "featuredImage": "/data/workflows/10871/10871.webp",
+  "author": {
+    "id": 101,
+    "slug": "anakhuagborsule",
+    "name": "Anakhuagbor Sule",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 686,
+  "downloads": 68,
+  "createdAt": "2025-11-15T21:08:55.417Z",
+  "updatedAt": "2026-01-16T09:06:37.567Z",
+  "publishedAt": "2025-11-15T21:08:55.417Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10871"
+}

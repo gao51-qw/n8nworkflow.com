@@ -1,0 +1,188 @@
+{
+  "id": 4426,
+  "slug": "4426",
+  "title": "Evaluate RAG response accuracy with OpenAI: document groundedness metric",
+  "description": "### This n8n template demonstrates how to calculate the evaluation metric \"RAG document groundedness\" which in this scenario, measures the ability to provide or reference information included only in retrieved vector store documents.\n\nThe scoring approach is adapted from [https://cloud.google.com/vertex-ai/generative-ai/docs/models/metrics-templates#pointwise_groundedness](https://cloud.google.com/vertex-ai/generative-ai/docs/models/metrics-templates#pointwise_groundedness)\n\n### How it works\n* This evaluation works best for an agent that requires document retrieval from a vector store or similar source.\n* For our scoring, we need to collect the agent's response and the documents retrieved and use an LLM to assess if the former is based off the latter.\n* A key factor is to look out information in the response which is not mentioned in the documents.\n* A high score indicates LLM adherence and alignment whereas a low score could signal inadequate prompt or model hallucination.\n\n### Requirements\n* n8n version 1.94+\n* Check out this Google Sheet for a sample data [https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing)\n",
+  "featuredImage": "/data/workflows/4426/4426.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1484,
+  "downloads": 148,
+  "createdAt": "2025-05-27T07:21:41.587Z",
+  "updatedAt": "2026-01-16T08:34:19.788Z",
+  "publishedAt": "2025-05-27T07:21:41.587Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4426",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Evaluate RAG response accuracy with OpenAI: document groundedness metric",
+    "workflowName": "Evaluate RAG response accuracy with OpenAI: document groundedness metric",
+    "description": "### This n8n template demonstrates how to calculate the evaluation metric \"RAG document groundedness\" which in this scenario, measures the ability to provide or reference information included only in retrieved vector store documents.\n\nThe scoring approach is adapted from [https://cloud.google.com/vertex-ai/generative-ai/docs/models/metrics-templates#pointwise_groundedness](https://cloud.google.com/vertex-ai/generative-ai/docs/models/metrics-templates#pointwise_groundedness)\n\n### How it works\n* This evaluation works best for an agent that requires document retrieval from a vector store or similar source.\n* For our scoring, we need to collect the agent's response and the documents retrieved and use an LLM to assess if the former is based off the latter.\n* A key factor is to look out information in the response which is not mentioned in the documents.\n* A high score indicates LLM adherence and alignment whereas a low score could signal inadequate prompt or model hallucination.\n\n### Requirements\n* n8n version 1.94+\n* Check out this Google Sheet for a sample data [https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1YOnu2JJjlxd787AuYcg-wKbkjyjyZFgASYVV0jsij5Y/edit?usp=sharing)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Datasheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Simple Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Evaluation",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Documents",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When fetching a dataset row",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "role": "evaluationTrigger",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Remap Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Document Grounding",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Set Outputs",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Set Metrics",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

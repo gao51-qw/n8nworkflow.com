@@ -1,0 +1,109 @@
+# Create an AI image remix and design bot for Telegram with BrowserAct and Gemini
+
+> # AI Image Remix & Design Bot for Telegram with BrowserAct & Gemini 
+
+This workflow transforms your Telegram bot into an intelligent creative assistant. It can chat conversationally, fetch trending image prompts from PromptHero for inspiration, or perform a deep "remix" of any photo you upload by analyzing its composition and regenerating it with high-fidelity prompt engineering.
+
+## Target Audience
+
+Digital artists, designers, content creators, and hobbyists looking for AI-assisted inspiration and image generation.
+
+## How it works
+
+1. **Traffic Control**: The workflow starts with a **Telegram Trigger** and immediately splits traffic: new messages go one way, while interactive button clicks (like "Regenerate") go another.
+2. **Intent Classification**: An **AI Agent** analyzes text inputs to decide if the user wants to "Chat" (small talk) or "Start" a creative session (fetch inspiration).
+3. **Inspiration Mode**: If "Start" is detected, **BrowserAct** scrapes trending prompts from PromptHero and saves them to a Google Sheet.
+4. **Visual Forensics**: If the user uploads an image, an **AI Vision Agent** (using OpenRouter/Gemini) analyzes it in extreme detail (lighting, composition, subjects) and saves the description.
+5. **Master Prompt Engineering**: Specialized AI Agents expand these inputs (either scraped prompts or image descriptions) into massive, detailed prompts using the "Rule of Multiplication."
+6. **Production**: **Google Gemini** generates the new image, which is sent back to Telegram with interactive buttons to "Regenerate" or move to the "Next" idea.
+
+## ⚠️ Complex Workflow
+
+This workflow is complex.
+
+Please **proceed using the tutorial video**.
+
+## How to set up
+
+1. **Configure Credentials**: Connect your **Telegram**, **Google Sheets**, **BrowserAct**, **Google Gemini**, and **OpenRouter** accounts in n8n.
+2. **Prepare BrowserAct**: Ensure the **Image Remix & Design Bot** template is saved in your BrowserAct account.
+3. **Setup Google Sheet**: Create a Google Sheet with four tabs: `PromptHero`, `Current State`, `UserImage`, and `Current Image`.
+4. **Connect Sheet**: Open all **Google Sheets** nodes in the workflow and paste your spreadsheet ID.
+5. **Configure Telegram**: Ensure your bot is created via BotFather and the API token is added to the Telegram credentials.
+6. **Activate**: Turn on the workflow.
+
+## Requirements
+
+* **BrowserAct** account with the **Image Remix & Design Bot** template.
+* **Telegram** account (Bot Token).
+* **Google Sheets** account.
+* **Google Gemini** account.
+* **OpenRouter** account (or compatible LLM credentials).
+
+## How to customize the workflow
+
+1. **Change Art Style**: Modify the system prompt in the **Generate Image** agents to enforce a specific style (e.g., "Cyberpunk," "Watercolor," or "Photorealistic").
+2. **Add More Sources**: Update the **BrowserAct** template to scrape prompts from other sites like Civitai or Midjourney feed.
+3. **Switch Image Model**: Replace the Gemini image generation node with **Stable Diffusion** or **DALL-E 3** if you prefer different aesthetics.
+
+## Need Help?
+
+* [How to Find Your BrowserAct API Key & Workflow ID](https://www.youtube.com/watch?v=pDjoZWEsZlE)
+* [How to Connect n8n to BrowserAct](https://www.youtube.com/watch?v=RoYMdJaRdcQ)
+* [How to Use & Customize BrowserAct Templates](https://www.youtube.com/watch?v=CPZHFUASncY)
+
+---
+### Workflow Guidance and Showcase Video
+
+* #### [How To create stateful n8n Workflows | AI Image Remix Bot with n8n & BrowserAct & Telegram 🎨](https://youtu.be/GqeKd9aYjW4)
+
+## 📊 Basic Information
+
+- **Workflow ID:** 12354
+- **Complexity:** advanced
+- **Node Count:** 64
+- **Views:** 0
+- **Downloads:** 0
+- **Created:** 2026/1/1
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/12354)
+
+## 👤 Author
+
+- **Name:** Madame AI Team | Kai
+- **Username:** @madame-ai
+
+## 🏷️ Categories
+
+- Content Creation
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **telegramTrigger** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** (×5)
+- **telegram** (×9)
+- **@n8n/n8n-nodes-langchain.agent** (×6)
+- **googleSheets** (×15)
+- **@n8n/n8n-nodes-langchain.lmChatOpenRouter** (×2)
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** (×6)
+- **stickyNote** (×12)
+- **switch** (×5)
+- **n8n-nodes-browseract.browserAct** 
+- **code** 
+- **@n8n/n8n-nodes-langchain.googleGemini** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 64 nodes with 43 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

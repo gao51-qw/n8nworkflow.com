@@ -1,0 +1,182 @@
+{
+  "id": 11121,
+  "slug": "11121",
+  "title": "Auto create & publish X-threads (Twitter) with GPT via Telegram & approval loop",
+  "description": "# AI X (twitter) Threads Bot with Approval Loop\n\nThis n8n workflow transforms your Telegram messenger into a personal assistant for creating and publishing X-Threads. You can simply send an idea as a text or voice message, collaboratively edit the AI’s suggestion in a chat, and then publish the finished thread directly to X just by saying “Okay.”\n\n## What You’ll Need to Get Started\nBefore you can use this workflow, you’ll need a few prerequisites set up. This workflow connects three different services, so you will need API credentials for each:\n\n***Telegram Bot API Key***: You can get this by talking to the  [“BotFather” ](https://telegram.me/BotFathers)on Telegram. It will guide you through creating your new bot and provide you with the API token.\nNew Chat with Telegram BotFather\n\n***OpenAI API Key***: This is required for the “Speech to Text” and “AI Agent” nodes. You’ll need an account with OpenAI to generate this key.\nOpenAI API Platform\n\n***Blotato API Key***: This service is used to publish the final post to X. You’ll need a Blotato account and to connect your X profile there to get the key.\nBlotato platform for social media publishing\n\n\nOnce you have these keys, you can add them to the corresponding credentials in your n8n instance.\n\n## How the Workflow Operates, Step-by-Step\nHere is a detailed breakdown of how the workflow processes your request and handles the publishing.\n\n### 1. Input & Initial Processing\nThis phase captures your idea and converts it into usable text.\n\nNode Name\tRole in Workflow\nStart: Telegram Message\tThis Telegram Trigger node initiates the entire process upon receiving any message from you in the bot.\nPrepare Input\tConsolidates the message content, ensuring the AI receives only one clean text input.\nCheck: ist it a Voice?\tChecks the incoming message for text. If text is empty, it proceeds to voice handling.\nGet Voice File\tIf a voice note is detected, this node downloads the raw audio file from Telegram.\nSpeech to Text\tThis node uses the OpenAI Whisper API to convert the downloaded audio file into a text string.\n### 2. AI Core & Iteration Loop\nThis is the central dialogue system where the AI drafts the content and engages in the feedback loop.\n\n\nAI: Draft & Revise Post\tThe main logic agent. It analyzes your request, applies the “System Prompt” rules, drafts the post, and handles revisions based on your feedback.\nOpenAI Chat Model\tDefines the large language model (LLM) used for generating and revising the post.\nWindow Buffer Memory\tA memory buffer that stores the last turns of the conversation, allowing the AI to maintain context when you request changes (e.g., “Make it shorter”).\nCheck if Approved\tThis crucial node detects the specific JSON structure the AI outputs only when you provide an approval keyword (like “ok” or “approved”).\nPost Suggestion Or Ask For Approval\tSends the AI’s post draft back to your Telegram chat for review and feedback.\nAI Agent System Prompt (Internal Instructions - English)\nThe agent operates under a strict prompt that dictates its behavior and formatting (found within the AI: Draft & Revise Post node.\n\n\n\n### 3. Publishing & Status Check\nOnce approved, the workflow handles the publication and monitors the post’s status in real-time.\n\nNode Name\tRole in Workflow\nApproval: Extract Final Thread Posts\tParses the incoming JSON, extracting only the clean text ready for publishing.\nCreate post with Blotato\tUses the Blotato API to upload the finalized content to your connected X account.\nGive Blotat 5s :)\tA brief pause to allow the publishing service to start processing the request.\nCheck post status\tChecks back with Blotato to determine if the post is published, in progress, or failed.\nPublished?\tChecks if the status is “published” to send the success message.\nIn Progress?\tChecks if the post is still being processed. If so, it loops back to the next wait period.\nGive Blotat other 5s :)\tPauses the workflow before re-checking the post status, preventing unnecessary API calls.\n4. Final Notification\nNode Name\tRole in Workflow\nSend a confirmation message\tSends a confirmation message and the direct link to the published X post.\nSend an error message\tSends a notification if the post failed to upload or encountered an error during processing.\n## 🛠️ Personalizing Your Content Bot\nThe true power of this n8n workflow lies in its flexibility. You can easily modify key components to match your unique brand voice and technical preferences.\n\n### 1. Tweak the Content Creator Prompt\nThe personality, tone, and formatting rules for your X content are all defined in the System Prompt.\n\nWhere to find it: Inside the AI: Draft & Revise Post node, under the System Message setting.\nWhat to personalize: Adjust the tone, change the formatting rules (e.g., number of hashtags, required emojis), or insert specific details about your industry or target audience.\n### 2. Switch the AI Model or Provider\nYou can easily swap the language model used for generation.\n\nWhere to find it: The OpenAI Chat Model node.\nWhat to personalize:\nModel: Swap out the default model for a more powerful or faster alternative (e.g., gpt-4 family, or models from other providers if you change the node).\nProvider: You can replace the entire Langchain block (including the AI Model and Window Buffer Memory nodes) with an equivalent block using a different provider’s Chat/LLM node (e.g., Anthropic, Cohere, or Google Gemini), provided you set up the corresponding credentials and context flow.\n### 3. Modify Publishing Behavior (Schedule vs. Post)\nThe final step is currently set to publish immediately, but you might prefer to schedule posts.\n\nWhere to find it: The Create post with Blotato node.\nWhat to personalize:\nConsult the Blotato documentation for alternative operations. Instead of choosing the “Create Post” operation (which often posts immediately), you can typically select a “Schedule Post” or “Add to Queue” operation within the Blotato node.\nIf scheduling, you will need to add a step (e.g., a Set node or another agent prompt) before publishing to calculate and pass a Scheduled Time parameter to the Blotato node.\n",
+  "featuredImage": "/data/workflows/11121/11121.webp",
+  "author": {
+    "id": 101,
+    "slug": "ferasdabour",
+    "name": "Feras Dabour",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 307,
+  "downloads": 30,
+  "createdAt": "2025-11-21T19:07:44.882Z",
+  "updatedAt": "2026-01-16T09:07:35.521Z",
+  "publishedAt": "2025-11-21T19:07:44.882Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11121",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto create & publish X-threads (Twitter) with GPT via Telegram & approval loop",
+    "workflowName": "Auto create & publish X-threads (Twitter) with GPT via Telegram & approval loop",
+    "description": "# AI X (twitter) Threads Bot with Approval Loop\n\nThis n8n workflow transforms your Telegram messenger into a personal assistant for creating and publishing X-Threads. You can simply send an idea as a text or voice message, collaboratively edit the AI’s suggestion in a chat, and then publish the finished thread directly to X just by saying “Okay.”\n\n## What You’ll Need to Get Started\nBefore you can use this workflow, you’ll need a few prerequisites set up. This workflow connects three different services, so you will need API credentials for each:\n\n***Telegram Bot API Key***: You can get this by talking to the  [“BotFather” ](https://telegram.me/BotFathers)on Telegram. It will guide you through creating your new bot and provide you with the API token.\nNew Chat with Telegram BotFather\n\n***OpenAI API Key***: This is required for the “Speech to Text” and “AI Agent” nodes. You’ll need an account with OpenAI to generate this key.\nOpenAI API Platform\n\n***Blotato API Key***: This service is used to publish the final post to X. You’ll need a Blotato account and to connect your X profile there to get the key.\nBlotato platform for social media publishing\n\n\nOnce you have these keys, you can add them to the corresponding credentials in your n8n instance.\n\n## How the Workflow Operates, Step-by-Step\nHere is a detailed breakdown of how the workflow processes your request and handles the publishing.\n\n### 1. Input & Initial Processing\nThis phase captures your idea and converts it into usable text.\n\nNode Name\tRole in Workflow\nStart: Telegram Message\tThis Telegram Trigger node initiates the entire process upon receiving any message from you in the bot.\nPrepare Input\tConsolidates the message content, ensuring the AI receives only one clean text input.\nCheck: ist it a Voice?\tChecks the incoming message for text. If text is empty, it proceeds to voice handling.\nGet Voice File\tIf a voice note is detected, this node downloads the raw audio file from Telegram.\nSpeech to Text\tThis node uses the OpenAI Whisper API to convert the downloaded audio file into a text string.\n### 2. AI Core & Iteration Loop\nThis is the central dialogue system where the AI drafts the content and engages in the feedback loop.\n\n\nAI: Draft & Revise Post\tThe main logic agent. It analyzes your request, applies the “System Prompt” rules, drafts the post, and handles revisions based on your feedback.\nOpenAI Chat Model\tDefines the large language model (LLM) used for generating and revising the post.\nWindow Buffer Memory\tA memory buffer that stores the last turns of the conversation, allowing the AI to maintain context when you request changes (e.g., “Make it shorter”).\nCheck if Approved\tThis crucial node detects the specific JSON structure the AI outputs only when you provide an approval keyword (like “ok” or “approved”).\nPost Suggestion Or Ask For Approval\tSends the AI’s post draft back to your Telegram chat for review and feedback.\nAI Agent System Prompt (Internal Instructions - English)\nThe agent operates under a strict prompt that dictates its behavior and formatting (found within the AI: Draft & Revise Post node.\n\n\n\n### 3. Publishing & Status Check\nOnce approved, the workflow handles the publication and monitors the post’s status in real-time.\n\nNode Name\tRole in Workflow\nApproval: Extract Final Thread Posts\tParses the incoming JSON, extracting only the clean text ready for publishing.\nCreate post with Blotato\tUses the Blotato API to upload the finalized content to your connected X account.\nGive Blotat 5s :)\tA brief pause to allow the publishing service to start processing the request.\nCheck post status\tChecks back with Blotato to determine if the post is published, in progress, or failed.\nPublished?\tChecks if the status is “published” to send the success message.\nIn Progress?\tChecks if the post is still being processed. If so, it loops back to the next wait period.\nGive Blotat other 5s :)\tPauses the workflow before re-checking the post status, preventing unnecessary API calls.\n4. Final Notification\nNode Name\tRole in Workflow\nSend a confirmation message\tSends a confirmation message and the direct link to the published X post.\nSend an error message\tSends a notification if the post failed to upload or encountered an error during processing.\n## 🛠️ Personalizing Your Content Bot\nThe true power of this n8n workflow lies in its flexibility. You can easily modify key components to match your unique brand voice and technical preferences.\n\n### 1. Tweak the Content Creator Prompt\nThe personality, tone, and formatting rules for your X content are all defined in the System Prompt.\n\nWhere to find it: Inside the AI: Draft & Revise Post node, under the System Message setting.\nWhat to personalize: Adjust the tone, change the formatting rules (e.g., number of hashtags, required emojis), or insert specific details about your industry or target audience.\n### 2. Switch the AI Model or Provider\nYou can easily swap the language model used for generation.\n\nWhere to find it: The OpenAI Chat Model node.\nWhat to personalize:\nModel: Swap out the default model for a more powerful or faster alternative (e.g., gpt-4 family, or models from other providers if you change the node).\nProvider: You can replace the entire Langchain block (including the AI Model and Window Buffer Memory nodes) with an equivalent block using a different provider’s Chat/LLM node (e.g., Anthropic, Cohere, or Google Gemini), provided you set up the corresponding credentials and context flow.\n### 3. Modify Publishing Behavior (Schedule vs. Post)\nThe final step is currently set to publish immediately, but you might prefer to schedule posts.\n\nWhere to find it: The Create post with Blotato node.\nWhat to personalize:\nConsult the Blotato documentation for alternative operations. Instead of choosing the “Create Post” operation (which often posts immediately), you can typically select a “Schedule Post” or “Add to Queue” operation within the Blotato node.\nIf scheduling, you will need to add a step (e.g., a Set node or another agent prompt) before publishing to calculate and pass a Scheduled Time parameter to the Blotato node.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Speech to Text",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get Voice File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check if Approved",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Start: Telegram Message",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Input",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Check: ist it a Voice?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI: Draft & Revise Post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Approval: Extract Final Post Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create post with Blotato",
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "role": "blotato",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Give Blotat 5s :)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check post status",
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "role": "blotato",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Published?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a confirmation message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "In Progress?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Give Blotat other 5s :)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send an error message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Post Suggestion Or Ask For Approval",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

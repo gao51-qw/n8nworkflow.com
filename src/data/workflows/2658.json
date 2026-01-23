@@ -1,0 +1,566 @@
+{
+  "id": 2658,
+  "slug": "2658",
+  "title": "Api schema extractor",
+  "description": "This workflow automates the process of discovering and extracting APIs from various services, followed by generating custom schemas. It works in three distinct stages: research, extraction, and schema generation, with each stage tracking progress in a Google Sheet.\n\n🙏 [Jim Le](https://n8n.io/creators/jimleuk/) deserves major kudos for helping to build this sophisticated three-stage workflow that cleverly automates API documentation processing using a smart combination of web scraping, vector search, and LLM technologies.\n\n## How it works\n### Stage 1 - Research:\n- Fetches pending services from a Google Sheet\n- Uses Google search to find API documentation\n- Employs Apify for web scraping to filter relevant pages\n- Stores webpage contents and metadata in Qdrant (vector database)\n- Updates progress status in Google Sheet (pending, ok, or error)\n\n### Stage 2 - Extraction:\n- Processes services that completed research successfully\n- Queries vector store to identify products and offerings\n- Further queries for relevant API documentation\n- Uses Gemini (LLM) to extract API operations\n- Records extracted operations in Google Sheet\n- Updates progress status (pending, ok, or error)\n\n### Stage 3 - Generation:\n- Takes services with successful extraction\n- Retrieves all API operations from the database\n- Combines and groups operations into a custom schema\n- Uploads final schema to Google Drive\n- Updates final status in sheet with file location\n\n## Ideal for:\n- Development teams needing to catalog multiple APIs\n- API documentation initiatives\n- Creating standardized API schema collections\n- Automating API discovery and documentation\n\n## Accounts required:\n- Google account (for Sheets and Drive access)\n- Apify account (for web scraping)\n- Qdrant database\n- Gemini API access\n\n## Set up instructions:\n- Prepare your Google Sheets document with the services information. [Here's an example of a Google Sheet](https://docs.google.com/spreadsheets/d/1UJtksHQV0NRNhsDdVdkdIoNssuvoTWso/edit?usp=sharing&ouid=108234606433343029350&rtpof=true&sd=true) – you can copy it and change or remove the values under the columns. Also, make sure to update Google Sheets nodes with the correct Google Sheet ID. \n- Configure Google Sheets OAuth2 credentials, required third-party services (Apify, Qdrant) and Gemini.\n- Ensure proper permissions for Google Drive access.\n",
+  "featuredImage": "/data/workflows/2658/2658.webp",
+  "author": {
+    "id": 101,
+    "slug": "polina-n8n",
+    "name": "Polina Medvedieva",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 28472,
+  "downloads": 2847,
+  "createdAt": "2024-12-19T12:39:56.130Z",
+  "updatedAt": "2026-01-16T08:25:53.247Z",
+  "publishedAt": "2024-12-19T12:39:56.130Z",
+  "nodes": 88,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2658",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Api schema extractor",
+    "workflowName": "Api schema extractor",
+    "description": "This workflow automates the process of discovering and extracting APIs from various services, followed by generating custom schemas. It works in three distinct stages: research, extraction, and schema generation, with each stage tracking progress in a Google Sheet.\n\n🙏 [Jim Le](https://n8n.io/creators/jimleuk/) deserves major kudos for helping to build this sophisticated three-stage workflow that cleverly automates API documentation processing using a smart combination of web scraping, vector search, and LLM technologies.\n\n## How it works\n### Stage 1 - Research:\n- Fetches pending services from a Google Sheet\n- Uses Google search to find API documentation\n- Employs Apify for web scraping to filter relevant pages\n- Stores webpage contents and metadata in Qdrant (vector database)\n- Updates progress status in Google Sheet (pending, ok, or error)\n\n### Stage 2 - Extraction:\n- Processes services that completed research successfully\n- Queries vector store to identify products and offerings\n- Further queries for relevant API documentation\n- Uses Gemini (LLM) to extract API operations\n- Records extracted operations in Google Sheet\n- Updates progress status (pending, ok, or error)\n\n### Stage 3 - Generation:\n- Takes services with successful extraction\n- Retrieves all API operations from the database\n- Combines and groups operations into a custom schema\n- Uploads final schema to Google Drive\n- Updates final status in sheet with file location\n\n## Ideal for:\n- Development teams needing to catalog multiple APIs\n- API documentation initiatives\n- Creating standardized API schema collections\n- Automating API discovery and documentation\n\n## Accounts required:\n- Google account (for Sheets and Drive access)\n- Apify account (for web scraping)\n- Qdrant database\n- Gemini API access\n\n## Set up instructions:\n- Prepare your Google Sheets document with the services information. [Here's an example of a Google Sheet](https://docs.google.com/spreadsheets/d/1UJtksHQV0NRNhsDdVdkdIoNssuvoTWso/edit?usp=sharing&ouid=108234606433343029350&rtpof=true&sd=true) – you can copy it and change or remove the values under the columns. Also, make sure to update Google Sheets nodes with the correct Google Sheet ID. \n- Configure Google Sheets OAuth2 credentials, required third-party services (Apify, Qdrant) and Gemini.\n- Ensure proper permissions for Google Drive access.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Web Search For API Schema",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Scrape Webpage Contents",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Results to List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter1",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Content Chunking @ 50k Chars",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Split Out Chunks",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Embedding Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execution Data",
+      "type": "n8n-nodes-base.executionData",
+      "role": "executionData",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "EventRouter",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Successful Runs",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "For Each Document...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Embeddings Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Has API Documentation?",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Document Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings Google Gemini1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract API Operations",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search in Relevant Docs",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Remove Dupes",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter Results",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Research",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Has Results?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Response Empty",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Response OK",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Combine Docs",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Template to List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Query Templates",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "For Each Template...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Query & Docs",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Identify Service Products",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract API Templates",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Embeddings Google Gemini2",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "role": "embeddingsGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search in Relevant Docs1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine Docs1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Query & Docs1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "For Each Template...1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Merge Lists",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Response OK1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Has Operations?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Response Empty1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Research Pending",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Research Result",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Research Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Extract Pending",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Research Event",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Event",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract Result",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Extract Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Get API Operations",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Contruct JSON Schema",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Upload Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Response OK2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Event",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Pending",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Generate",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Generate Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Generate Result",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Get All Extract",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Get All Research",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "For Each Research...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "For Each Extract...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "All Research Done?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "All Extract Done?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get All Generate",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "All Generate Done?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "For Each Generate...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Has Results?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Response Scrape Error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Has Results?3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Response No API Docs",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

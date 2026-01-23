@@ -1,0 +1,1 @@
+This workflow gets data from an API and exports it into Google Sheets and a CSV file.

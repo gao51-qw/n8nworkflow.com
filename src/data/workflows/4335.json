@@ -1,0 +1,67 @@
+{
+  "id": 4335,
+  "slug": "4335",
+  "title": "Automatically update n8n version",
+  "description": "# 🔄 n8n Workflow: Check and Update n8n Version\n\nThis workflow automatically **checks if the local n8n version is outdated** and, if so, **creates a file to signal an update is needed**.\n\n---\n\n## 🖥️ Working Environment\n\n- **Operating System:** Ubuntu 24.04  \n- **n8n Installation:** Docker container\n\n---\n\n## 📁 Project Directory Structure\nn8n/\n├── check_update.txt\n├── check-update.sh\n├── compose.yml\n├── update_n8n.cron\n\n---\n\n## 🧾 File Descriptions\n\n### `check_update.txt`\n\nContains a single word:\n\n- `true`: Update is needed  \n- `false`: No update required\n\n---\n\n### `check-update.sh`\n\n```bash\n#!/bin/bash\nPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\nif grep -q \"true\" /home/sysadmin/n8n/check_update.txt; then\n    # Place your update logic here\n    echo \"Update needed - please insert update logic\"\n    echo true &gt; /home/sysadmin/n8n/check_update.txt\nfi\n```\n**Purpose:**\n\n- Checks the contents of `check_update.txt`\n- If it contains `true`, executes update logic (currently a placeholder)\n- Resets `check_update.txt` to `true`\n---\n### `update_n8n.cron`\n\n```cron\nSHELL=/bin/sh\n10 5 * * * /bin/sh /home/sysadmin/n8n/check-update.sh\n```\n**Purpose:**\n\n- Runs the `check-update.sh` script daily at 5:10 AM\n- Uses `/bin/sh` as the shell environment\n\n## 🧩 n8n Workflow Breakdown\n\n### 1. Schedule Trigger 🕓\n- **Purpose:** Triggers the workflow every day at 5:00 AM  \n- **Node Type:** Schedule Trigger\n\n---\n\n### 2. Get the latest n8n version 🌐\n- **Purpose:** Fetches the latest version of n8n from npm  \n- **Endpoint:** `https://registry.npmjs.org/n8n/latest`  \n- **Node Type:** HTTP Request\n\n---\n\n### 3. Get Local n8n version 🖥️\n- **Purpose:** Retrieves the currently running n8n version  \n- **Endpoint:** `http://192.168.100.18:5678/rest/settings`  \n- **Node Type:** HTTP Request\n\n---\n\n### 4. If 🔍\n- **Purpose:** Compares the local and latest versions  \n- **Condition:** If not equal → update is needed\n\n---\n\n### 5. SSH1 🧾\n- **Purpose:** Writes the result to a file on the host via SSH  \n- **Logic:**\n\n```bash\necho \"{{ $('If').params.conditions ? 'false' : 'true' }}\" &gt; check_update.txt\n```\n**Effect**: Updates `check_update.txt` with `\"true\"` if an update is needed, `\"false\"` otherwise.\n\n## 🛠️ Setting up Crontab on Ubuntu\n### 1.  Register the cron job with:\n```bash\ncrontab update_n8n.cron\n```\n### 2.  Verify that your cron job is registered:\n```bash\ncrontab -l\n```\n## ✅ Result\n\n- **5:00 AM** – n8n workflow checks versions and writes result to `check_update.txt`  \n- **5:10 AM** – Cron runs `check-update.sh` to respond to update flag\n",
+  "featuredImage": "/data/workflows/4335/4335.webp",
+  "author": {
+    "id": 101,
+    "slug": "lun",
+    "name": "Weilun",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1920,
+  "downloads": 192,
+  "createdAt": "2025-05-23T08:39:54.420Z",
+  "updatedAt": "2026-01-16T08:33:51.296Z",
+  "publishedAt": "2025-05-23T08:39:54.420Z",
+  "nodes": 5,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4335",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatically update n8n version",
+    "workflowName": "Automatically update n8n version",
+    "description": "# 🔄 n8n Workflow: Check and Update n8n Version\n\nThis workflow automatically **checks if the local n8n version is outdated** and, if so, **creates a file to signal an update is needed**.\n\n---\n\n## 🖥️ Working Environment\n\n- **Operating System:** Ubuntu 24.04  \n- **n8n Installation:** Docker container\n\n---\n\n## 📁 Project Directory Structure\nn8n/\n├── check_update.txt\n├── check-update.sh\n├── compose.yml\n├── update_n8n.cron\n\n---\n\n## 🧾 File Descriptions\n\n### `check_update.txt`\n\nContains a single word:\n\n- `true`: Update is needed  \n- `false`: No update required\n\n---\n\n### `check-update.sh`\n\n```bash\n#!/bin/bash\nPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\nif grep -q \"true\" /home/sysadmin/n8n/check_update.txt; then\n    # Place your update logic here\n    echo \"Update needed - please insert update logic\"\n    echo true &gt; /home/sysadmin/n8n/check_update.txt\nfi\n```\n**Purpose:**\n\n- Checks the contents of `check_update.txt`\n- If it contains `true`, executes update logic (currently a placeholder)\n- Resets `check_update.txt` to `true`\n---\n### `update_n8n.cron`\n\n```cron\nSHELL=/bin/sh\n10 5 * * * /bin/sh /home/sysadmin/n8n/check-update.sh\n```\n**Purpose:**\n\n- Runs the `check-update.sh` script daily at 5:10 AM\n- Uses `/bin/sh` as the shell environment\n\n## 🧩 n8n Workflow Breakdown\n\n### 1. Schedule Trigger 🕓\n- **Purpose:** Triggers the workflow every day at 5:00 AM  \n- **Node Type:** Schedule Trigger\n\n---\n\n### 2. Get the latest n8n version 🌐\n- **Purpose:** Fetches the latest version of n8n from npm  \n- **Endpoint:** `https://registry.npmjs.org/n8n/latest`  \n- **Node Type:** HTTP Request\n\n---\n\n### 3. Get Local n8n version 🖥️\n- **Purpose:** Retrieves the currently running n8n version  \n- **Endpoint:** `http://192.168.100.18:5678/rest/settings`  \n- **Node Type:** HTTP Request\n\n---\n\n### 4. If 🔍\n- **Purpose:** Compares the local and latest versions  \n- **Condition:** If not equal → update is needed\n\n---\n\n### 5. SSH1 🧾\n- **Purpose:** Writes the result to a file on the host via SSH  \n- **Logic:**\n\n```bash\necho \"{{ $('If').params.conditions ? 'false' : 'true' }}\" &gt; check_update.txt\n```\n**Effect**: Updates `check_update.txt` with `\"true\"` if an update is needed, `\"false\"` otherwise.\n\n## 🛠️ Setting up Crontab on Ubuntu\n### 1.  Register the cron job with:\n```bash\ncrontab update_n8n.cron\n```\n### 2.  Verify that your cron job is registered:\n```bash\ncrontab -l\n```\n## ✅ Result\n\n- **5:00 AM** – n8n workflow checks versions and writes result to `check_update.txt`  \n- **5:10 AM** – Cron runs `check-update.sh` to respond to update flag",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Local n8n version",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "SSH1",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get the latest n8n version",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    }
+  ]
+}

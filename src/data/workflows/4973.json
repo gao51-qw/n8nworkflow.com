@@ -1,0 +1,163 @@
+{
+  "id": 4973,
+  "slug": "4973",
+  "title": "Automated SSL Certificate Monitoring and Renewal with Notion and Telegram",
+  "description": "Automatically fetch existing domains from Notion's Database and verify the validity of SSL certificates through [SSL-Checker](https://ssl-checker.io/). If the validity period is less than 14 days, send a Telegram message notification and trigger SSH remote automatic refresh. Successful refresh notification will be sent through Telegram.\nThis can prevent problems with the server-side automatic refresh program, which may cause unexpected service interruptions.\n\n**Main use cases:**\n- Notion store domain.\n- Telegram receives warning messages.\n- Remotely trigger [Certbot](certbot) to refresh SSL.\n\n**How it works:**\n- Record who triggered this workflow, because if there is a credential that is about to expire, this workflow will be triggered repeatedly.\n- After getting all the domains from Notion, send an http request to SSL-Checker.\n- After getting all the SSL-Checker results, add the validity label. And use the IF node to check if there are any certificates that are about to expire.\n\nThen there are two workflows:\n- If there is a certificate that is about to expire: send an SSH command to the remote control server to refresh the certificate, notify through Telegram, and call this workflow again to re-verify the validity of the SSL certificate.\n- If the validity period of SSL is normal: then refresh the data on Notion, and if a re-called workflow is detected, Telegram will be used to notify that the SSL has been updated.\n\n\n",
+  "featuredImage": "/data/workflows/4973/4973.webp",
+  "author": {
+    "id": 101,
+    "slug": "frankchen",
+    "name": "Frank Chen",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1446,
+  "downloads": 144,
+  "createdAt": "2025-06-16T14:20:52.859Z",
+  "updatedAt": "2026-01-16T08:37:06.769Z",
+  "publishedAt": "2025-06-16T14:20:52.859Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4973",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated SSL Certificate Monitoring and Renewal with Notion and Telegram",
+    "workflowName": "Automated SSL Certificate Monitoring and Renewal with Notion and Telegram",
+    "description": "Automatically fetch existing domains from Notion's Database and verify the validity of SSL certificates through [SSL-Checker](https://ssl-checker.io/). If the validity period is less than 14 days, send a Telegram message notification and trigger SSH remote automatic refresh. Successful refresh notification will be sent through Telegram.\nThis can prevent problems with the server-side automatic refresh program, which may cause unexpected service interruptions.\n\n**Main use cases:**\n- Notion store domain.\n- Telegram receives warning messages.\n- Remotely trigger [Certbot](certbot) to refresh SSL.\n\n**How it works:**\n- Record who triggered this workflow, because if there is a credential that is about to expire, this workflow will be triggered repeatedly.\n- After getting all the domains from Notion, send an http request to SSL-Checker.\n- After getting all the SSL-Checker results, add the validity label. And use the IF node to check if there are any certificates that are about to expire.\n\nThen there are two workflows:\n- If there is a certificate that is about to expire: send an SSH command to the remote control server to refresh the certificate, notify through Telegram, and call this workflow again to re-verify the validity of the SSL certificate.\n- If the validity period of SSL is normal: then refresh the data on Notion, and if a re-called workflow is detected, Telegram will be used to notify that the SSL has been updated.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Check SSL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get SSL Info",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Refresh SSL Status",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update SSL Info",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge Content",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Weekly Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set Click Triggered",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Weekly Triggered",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set anotherWorkflow Triggered",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Select Who Triggered",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Renew Server Cert",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

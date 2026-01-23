@@ -1,0 +1,65 @@
+# Salesforce lead capture with GPT-4 personalized email & SMS follow-up
+
+> ## How It Works
+This workflow transforms n8n into a smart Web Lead Form alternative to Salesforce's traditional Web-to-Lead, capturing leads, creating Salesforce records, and sending AI-personalized responses via email or SMS.
+
+- **Capture Submission**: User submits form data (name, email, phone, description, preference) via n8n's hosted form.
+- **Create Lead**: Maps data to a new Salesforce Lead.
+- **Personalize Message**: Uses OpenAI to generate a tailored welcome based on description and preference (detailed for email, concise for SMS).
+- **Route Outreach**: Branches to send via Twilio SMS or SMTP email depending on preference.
+
+## Set Up Steps
+Setup takes about 15-30 minutes if you have credentials ready. Focus on connecting services; detailed configs are in workflow sticky notes.
+
+- Duplicate this template in n8n.
+- Add your Salesforce, OpenAI, Twilio, and SMTP credentials (no hardcoding—use n8n's credential manager).
+- Customize form fields if needed and test with sample data.
+- Activate and share the form URL on your site.
+
+[n8n Web to Lead Form.json](https://drive.google.com/file/d/1puZgYLD2aKcuyhyTF_C-s_1kCWBwNnLQ/view?usp=sharing)
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6102
+- **Complexity:** intermediate
+- **Node Count:** 7
+- **Views:** 1749
+- **Downloads:** 174
+- **Created:** 2025/7/18
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6102)
+
+## 👤 Author
+
+- **Name:** Le Nguyen
+- **Username:** @leeseifer
+
+## 🏷️ Categories
+
+- Lead Generation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **salesforce** 
+- **formTrigger** 
+- **@n8n/n8n-nodes-langchain.openAi** 
+- **switch** 
+- **twilio** 
+- **emailSend** 
+- **stickyNote** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 7 nodes with 4 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,73 @@
+# Automatic background removal for images in Google Drive
+
+> This n8n workflow simplifies the process of removing backgrounds from images stored in Google Drive. By leveraging the PhotoRoom API, this template enables automatic background removal, padding adjustments, and output formatting, all while storing the updated images back in a designated Google Drive folder.
+
+This workflow is very useful for companies or individuals that are spending a lot of time into removing the background from product images.
+
+## How it Works
+
+    The workflow begins with a Google Drive Trigger node that monitors a specific folder for new image uploads.
+    Upon detecting a new image, the workflow downloads the file and extracts essential metadata, such as the file size.
+    Configurations are set for background color, padding, output size, and more, which are all customizable to match specific requirements.
+    The PhotoRoom API is called to process the image by removing its background and adding padding based on the settings.
+    The processed image is saved back to Google Drive in the specified output folder with an updated name indicating the background has been removed.
+
+## Requirements
+
+    PhotoRoom API Key
+    Google Drive API Access
+
+## Customizing the Workflow
+
+    Easily adjust the background color, padding, and output size using the configuration node.
+    Modify the output folder path in Google Drive or replace Google Drive with another storage service if needed.
+    For advanced use cases, integrate further image processing steps, such as adding captions or analyzing content using AI.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 2529
+- **Complexity:** advanced
+- **Node Count:** 16
+- **Views:** 14302
+- **Downloads:** 1430
+- **Created:** 2024/11/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/2529)
+
+## 👤 Author
+
+- **Name:** Simon
+- **Username:** @simonfes
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **set** 
+- **httpRequest** (×2)
+- **splitOut** 
+- **googleDrive** (×3)
+- **merge** 
+- **editImage** 
+- **stickyNote** (×4)
+- **googleDriveTrigger** 
+- **if** 
+- **splitInBatches** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 16 nodes with 12 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,361 @@
+{
+  "id": 2853,
+  "slug": "2853",
+  "title": "Spotify to YouTube playlist synchronization",
+  "description": "# Spotify to YouTube Playlist Synchronization\n## A workflow that maintains a YouTube playlist in sync with a Spotify playlist, featuring smart video matching and persistent synchronization.\n\n## Key Features\n- **One-way Sync**: Spotify playlist → YouTube playlist (additions and deletions)\n- **Continuous Monitoring**: Automatic synchronization (every hour by default, but you can put any time you want)\n- **Smart Video Matching**: Considers video length and content relevance\n- **Auto-Recovery**: Automatically handles deleted YouTube videos\n- **Database Backup**: Persistent storage using Supabase\n\n## Prerequisites\n\n1. Supabase project with the following table structure:\n```sql\nCREATE TABLE IF NOT EXISTS musics (\n    id TEXT PRIMARY KEY,\n    title TEXT NOT NULL,\n    artist TEXT NOT NULL,\n    duration INT8 NOT NULL,\n    youtube_video_id TEXT,\n    to_delete BOOLEAN DEFAULT FALSE\n);\n```\n2. Empty YouTube playlist (recommended as duplicates are not handled)\n3. Configured credentials for YouTube, Spotify, and Supabase APIs\n4. Properly set variables in all \"variables\" nodes (variables, variables1, variables2, variables3, variables4 (all the same))\n5. Activate the workflow !",
+  "featuredImage": "/data/workflows/2853/2853.webp",
+  "author": {
+    "id": 101,
+    "slug": "lugnicca",
+    "name": "Lugnicca",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3127,
+  "downloads": 312,
+  "createdAt": "2025-02-05T17:50:00.354Z",
+  "updatedAt": "2026-01-16T08:26:53.478Z",
+  "publishedAt": "2025-02-05T17:50:00.354Z",
+  "nodes": 54,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2853",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Spotify to YouTube playlist synchronization",
+    "workflowName": "Spotify to YouTube playlist synchronization",
+    "description": "# Spotify to YouTube Playlist Synchronization\n## A workflow that maintains a YouTube playlist in sync with a Spotify playlist, featuring smart video matching and persistent synchronization.\n\n## Key Features\n- **One-way Sync**: Spotify playlist → YouTube playlist (additions and deletions)\n- **Continuous Monitoring**: Automatic synchronization (every hour by default, but you can put any time you want)\n- **Smart Video Matching**: Considers video length and content relevance\n- **Auto-Recovery**: Automatically handles deleted YouTube videos\n- **Database Backup**: Persistent storage using Supabase\n\n## Prerequisites\n\n1. Supabase project with the following table structure:\n```sql\nCREATE TABLE IF NOT EXISTS musics (\n    id TEXT PRIMARY KEY,\n    title TEXT NOT NULL,\n    artist TEXT NOT NULL,\n    duration INT8 NOT NULL,\n    youtube_video_id TEXT,\n    to_delete BOOLEAN DEFAULT FALSE\n);\n```\n2. Empty YouTube playlist (recommended as duplicates are not handled)\n3. Configured credentials for YouTube, Spotify, and Supabase APIs\n4. Properly set variables in all \"variables\" nodes (variables, variables1, variables2, variables3, variables4 (all the same))\n5. Activate the workflow !",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get playlist snapshot",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get playlist snapshot1",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If different snapshot",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get all musics",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update to_delete to true",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add music",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Compare Datasets",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get all musics not in youtube playlist",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Every day at noon",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Every day at noon + 1mn",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Every hour",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait 1 hour",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Search video",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get video duration",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If video duration ~= music duration",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add music to playlist",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add youtube id to row",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Discord",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Discord1",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set youtube id to NOTFOUND if no matching",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If no result",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "variables2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "variables1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "data1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get playlist items",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Playlist items to be deleted",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Get all musics that should be in playlist",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Remove video from playlist",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check for deleted videos",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Set youtube_video_id to null",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get all musics to be deleted",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete music",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Every day at midnight",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "variables3",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Reset NOTFOUND id to NULL",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "variables4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Every month",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

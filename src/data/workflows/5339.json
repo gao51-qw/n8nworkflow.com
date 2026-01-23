@@ -1,0 +1,326 @@
+{
+  "id": 5339,
+  "slug": "5339",
+  "title": "Tech news_curator - analyze daily news using AI_agents with Mistral",
+  "description": "Using Mistral API, you can use this n8n workflow to automate the process of: collecting, filtering, analyzing, and summarizing news articles from multiple sources. The sources come from pre-built RSS feeds and a custom DuckDuckGo node, which you can change if you need.\nIt will deliver the most relevant news of the day in a concise manner.\n\n\n\n****++How It Works++****\n\n1.     The workflow begins each weekday at noon.\n\n2.     The news are gathered from RSS feeds and a custom DuckDuckGo node, using HTTPS GET when needed.\n\n3.     News not from today or containing unwanted keywords are filtered out.\n\n4.     The first AI Agent will select the top news from their titles alone and generate a general title & summary.\n\n5.     The next AI Agent will summarize the full content of the selected top news articles.\n\n6.     The general summary and title will be combined with the top 10 news summaries into a final output.\n\n\n\n**++Requirements++**\n\n-     An active n8n instance (self-hosted or cloud).\n\n-     Install the custom DuckDuckGo node: **n8n-nodes-duckduckgo-search**\n\n-     A Mistral API key\n\n-     Configure the Sub-Workflow for the content which requires HTTP GET requests. It is provided in the template itself.\n\n\n\n\n++*Fair Notice*++\n\nThis is an older version of the template. There is a superior updated version which isn't restricted to tech news, with enhanced capabilities such as communication through different channels (email, social media) and advanced keyword filtering. It was recently published in n8n. You can find it [here](https://n8n.io/workflows/6157-multi-source-news-curator-with-mistral-ai-analysis-summaries-and-custom-channels/). If you are interested or would like to discuss specific needs, then feel free to contact us.",
+  "featuredImage": "/data/workflows/5339/5339.webp",
+  "author": {
+    "id": 101,
+    "slug": "hybroht",
+    "name": "Hybroht",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1663,
+  "downloads": 166,
+  "createdAt": "2025-06-25T23:28:14.690Z",
+  "updatedAt": "2026-01-16T08:39:05.517Z",
+  "publishedAt": "2025-06-25T23:28:14.690Z",
+  "nodes": 48,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5339",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Tech news_curator - analyze daily news using AI_agents with Mistral",
+    "workflowName": "Tech news_curator - analyze daily news using AI_agents with Mistral",
+    "description": "Using Mistral API, you can use this n8n workflow to automate the process of: collecting, filtering, analyzing, and summarizing news articles from multiple sources. The sources come from pre-built RSS feeds and a custom DuckDuckGo node, which you can change if you need.\nIt will deliver the most relevant news of the day in a concise manner.\n\n\n\n****++How It Works++****\n\n1.     The workflow begins each weekday at noon.\n\n2.     The news are gathered from RSS feeds and a custom DuckDuckGo node, using HTTPS GET when needed.\n\n3.     News not from today or containing unwanted keywords are filtered out.\n\n4.     The first AI Agent will select the top news from their titles alone and generate a general title & summary.\n\n5.     The next AI Agent will summarize the full content of the selected top news articles.\n\n6.     The general summary and title will be combined with the top 10 news summaries into a final output.\n\n\n\n**++Requirements++**\n\n-     An active n8n instance (self-hosted or cloud).\n\n-     Install the custom DuckDuckGo node: **n8n-nodes-duckduckgo-search**\n\n-     A Mistral API key\n\n-     Configure the Sub-Workflow for the content which requires HTTP GET requests. It is provided in the template itself.\n\n\n\n\n++*Fair Notice*++\n\nThis is an older version of the template. There is a superior updated version which isn't restricted to tech news, with enhanced capabilities such as communication through different channels (email, social media) and advanced keyword filtering. It was recently published in n8n. You can find it [here](https://n8n.io/workflows/6157-multi-source-news-curator-with-mistral-ai-analysis-summaries-and-custom-channels/). If you are interested or would like to discuss specific needs, then feel free to contact us.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ScienceDaily Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AlternativeTo Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "MIT Technology Review Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "lobste.rs Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Filter by Datetime",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "role": "lmChatMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "News Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Split Out News Data",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Certain Content",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Silicone Republic Technology Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Silicone Republic Science Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Rejoin Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Join Outputs",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Final Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Website Summarizer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "TheHackersNews* Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Filter Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 3",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 5",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 6",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 7",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields 8",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Markdown Conversion",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "JSON Output Parser 2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "JSON Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "DuckDuckGo",
+      "type": "n8n-nodes-duckduckgo-search.duckDuckGo",
+      "role": "duckDuckGo",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter Fields 9",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Call Get Webpage Content to Data",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Elements with Empty Content",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HTTP Request Example",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Rejoin Data Example",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Markdown Conversion Example",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Final Join Outputs",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Test Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    }
+  ]
+}

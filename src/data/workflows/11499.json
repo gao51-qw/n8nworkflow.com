@@ -1,0 +1,121 @@
+{
+  "id": 11499,
+  "slug": "11499",
+  "title": "Meta ads to Google Sheets: daily & historical campaign performance report",
+  "description": "## Overview\n\nThis template automatically exports **Meta (Facebook) Ads campaign performance** into **Google Sheets** — both **daily** and for **historical backfills**. It’s ideal for performance marketers, agencies, and analytics teams who want a reliable data pipeline from Meta Ads into their reporting stack.\n\n## What this workflow does\n\n- Runs a **daily cron job** to pull *yesterday’s* campaign-level performance from the Meta Ads Insights API.\n- Flattens the API response and calculates key KPIs like **CPL, CPA, ROAS, CTR, CPC, CPM, frequency** and more.\n- Appends one row per **campaign per day** to a Google Sheet (for dashboards and further analysis).\n- Provides a separate **Manual Backfill** section to import historical data using a `time_range` parameter (e.g. last 12–24 months).\n\n## Use cases\n\n- Build Looker Studio / Power BI dashboards on top of a clean, daily Meta Ads dataset.\n- Track ROAS, CPL, CPA, CTR, and frequency trends over time.\n- Combine campaign data with CRM or ecommerce data in the same spreadsheet.\n- Quickly backfill past performance when onboarding a new Meta Ads account.\n\n## How it works\n\n1. **Daily Incremental Flow**\n   - A `Schedule Trigger` runs every day at 05:00.\n   - The `Set config` node defines ad account, date preset (`yesterday`), and Google Sheet details.\n   - The `Meta Insights` node calls the Facebook Graph `insights` edge at `level=campaign`.\n   - The `Code` node flattens the data and derives CPL, CPA, ROAS, and other KPIs.\n   - The `Google Sheets` node appends the rows to your `Meta_Daily_Data` sheet.\n\n2. **Manual Backfill Flow**\n   - A `Manual Trigger` lets you run the flow on demand.\n   - The `Set backfill config` node defines `backfillSince` and `backfillUntil`.\n   - The `Meta Insights (time_range)` node fetches performance for that historical range.\n   - The same transform logic is applied, and rows are appended to the same sheet.\n\n## Prerequisites\n\n- A Meta Business account with:\n  - A **system user** and a **long-lived access token** with `ads_read` / `read_insights`.\n- A **Google Sheet** with a header row that matches the mapped column names.\n- n8n credentials for:\n  - **Facebook Graph API**\n  - **Google Sheets OAuth2**\n\n## Setup steps\n\n1. Import this template into your n8n instance.\n2. Open the `Set config` and `Set backfill config` nodes:\n   - Set your `adAccountId` (e.g. `act_123456789012345`).\n   - Set your `sheetId` (Google Sheet ID) and sheet name (e.g. `Meta_Daily_Data`).\n3. Configure your **Facebook Graph API** and **Google Sheets** credentials in n8n.\n4. (Optional) Run the **Manual Backfill** section for your desired historical ranges (e.g. per quarter).\n5. Enable the workflow so the **Daily Incremental** section runs automatically.\n\n## Customization\n\n- Change `level` from `campaign` to `adset` or `ad` if you need more granular reporting.\n- Add **breakdowns** (e.g. `publisher_platform`, `platform_position`) to split by platform and placement.\n- Extend the transform code with additional KPIs or dimensions that match your reporting needs.\n- Use a separate sheet for raw data and build dashboards on top of a cleaned or pivoted view.\n\n## Consulting & support\n\nIf you need help with:\n\n- **E-Commerce Strategy & Development**\n(Shopify, Shopware 6, Magento 2, SAP Commerce Cloud, etc.)\n- **Growth & Performance Marketing**\n(Google / Meta / Microsoft Ads, etc.)\n- **Data & Analytics Setups**\n(tracking, dashboards, attribution, gdpr, etc.)\n\nplease reach out to **Serendipity Technologies**:\n\n👉 [https://www.serendipity.at](https://www.serendipity.at)\n\nWe can help you turn this workflow into a full analytics stack and reporting system tailored to your business.",
+  "featuredImage": "/data/workflows/11499/11499.webp",
+  "author": {
+    "id": 101,
+    "slug": "rschmidbauer",
+    "name": "Reinhard Schmidbauer",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 328,
+  "downloads": 32,
+  "createdAt": "2025-12-04T17:08:31.495Z",
+  "updatedAt": "2026-01-16T09:08:58.447Z",
+  "publishedAt": "2025-12-04T17:08:31.495Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11499",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Meta ads to Google Sheets: daily & historical campaign performance report",
+    "workflowName": "Meta ads to Google Sheets: daily & historical campaign performance report",
+    "description": "This template automatically exports **Meta (Facebook) Ads campaign performance** into **Google Sheets** — both **daily** and for **historical backfills**. It’s ideal for performance marketers, agencies, and analytics teams who want a reliable data pipeline from Meta Ads into their reporting stack.\n\n## What this workflow does\n\n- Runs a **daily cron job** to pull *yesterday’s* campaign-level performance from the Meta Ads Insights API.\n- Flattens the API response and calculates key KPIs like **CPL, CPA, ROAS, CTR, CPC, CPM, frequency** and more.\n- Appends one row per **campaign per day** to a Google Sheet (for dashboards and further analysis).\n- Provides a separate **Manual Backfill** section to import historical data using a `time_range` parameter (e.g. last 12–24 months).\n\n## Use cases\n\n- Build Looker Studio / Power BI dashboards on top of a clean, daily Meta Ads dataset.\n- Track ROAS, CPL, CPA, CTR, and frequency trends over time.\n- Combine campaign data with CRM or ecommerce data in the same spreadsheet.\n- Quickly backfill past performance when onboarding a new Meta Ads account.\n\n## How it works\n\n1. **Daily Incremental Flow**\n   - A `Schedule Trigger` runs every day at 05:00.\n   - The `Set config` node defines ad account, date preset (`yesterday`), and Google Sheet details.\n   - The `Meta Insights` node calls the Facebook Graph `insights` edge at `level=campaign`.\n   - The `Code` node flattens the data and derives CPL, CPA, ROAS, and other KPIs.\n   - The `Google Sheets` node appends the rows to your `Meta_Daily_Data` sheet.\n\n2. **Manual Backfill Flow**\n   - A `Manual Trigger` lets you run the flow on demand.\n   - The `Set backfill config` node defines `backfillSince` and `backfillUntil`.\n   - The `Meta Insights (time_range)` node fetches performance for that historical range.\n   - The same transform logic is applied, and rows are appended to the same sheet.\n\n## Prerequisites\n\n- A Meta Business account with:\n  - A **system user** and a **long-lived access token** with `ads_read` / `read_insights`.\n- A **Google Sheet** with a header row that matches the mapped column names.\n- n8n credentials for:\n  - **Facebook Graph API**\n  - **Google Sheets OAuth2**\n\n## Setup steps\n\n1. Import this template into your n8n instance.\n2. Open the `Set config` and `Set backfill config` nodes:\n   - Set your `adAccountId` (e.g. `act_123456789012345`).\n   - Set your `sheetId` (Google Sheet ID) and sheet name (e.g. `Meta_Daily_Data`).\n3. Configure your **Facebook Graph API** and **Google Sheets** credentials in n8n.\n4. (Optional) Run the **Manual Backfill** section for your desired historical ranges (e.g. per quarter).\n5. Enable the workflow so the **Daily Incremental** section runs automatically.\n\n## Customization\n\n- Change `level` from `campaign` to `adset` or `ad` if you need more granular reporting.\n- Add **breakdowns** (e.g. `publisher_platform`, `platform_position`) to split by platform and placement.\n- Extend the transform code with additional KPIs or dimensions that match your reporting needs.\n- Use a separate sheet for raw data and build dashboards on top of a cleaned or pivoted view.\n\n## Consulting & support\n\nIf you need help with:\n\n- **E-Commerce Strategy & Development**\n(Shopify, Shopware 6, Magento 2, SAP Commerce Cloud, etc.)\n- **Growth & Performance Marketing**\n(Google / Meta / Microsoft Ads, etc.)\n- **Data & Analytics Setups**\n(tracking, dashboards, attribution, gdpr, etc.)\n\nplease reach out to **Serendipity Technologies**:\n\n👉 [https://www.serendipity.at](https://www.serendipity.at)\n\nWe can help you turn this workflow into a full analytics stack and reporting system tailored to your business.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set config (Meta + Sheets)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fetch Meta Insights (yesterday)",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transform Meta data for Sheets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append daily rows to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Manual backfill trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set backfill config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Fetch Meta Insights (time_range)",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transform backfill data for Sheets",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append backfill rows to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily schedule (06:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

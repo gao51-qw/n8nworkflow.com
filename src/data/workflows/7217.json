@@ -1,0 +1,248 @@
+{
+  "id": 7217,
+  "slug": "7217",
+  "title": "Auto-comment on Reddit posts with AI brand mentions & Baserow tracking",
+  "description": "## This workflow finds fresh Reddit posts that match your keywords, decides if they’re actually relevant to your brand, writes a short human-style reply using AI, posts it, and logs everything to Baserow.\n\n## 💡Perfect for\n\n- Lead gen without spam: drop helpful replies where your audience hangs out.\n\n- Get discovered by AI surfaces (AI Overviews / SGE, AISEO/GSEO) via high-quality brand mentions.\n\n- Customer support in the wild: answer troubleshooting threads fast.\n\n- Community presence: steady, non-salesy contributions in niche subreddits.\n\n\n## 🧠 What it does\n\n- Searches Reddit for your keyword query on a schedule (e.g., every 30 min)\n\n- Checks Baserow first so you don’t reply twice to the same post\n\n- Uses an AI prompt tuned for short, no-fluff, subreddit-friendly comments\n\n- Softly mentions your brand only when it’s clearly relevant\n\n- Posts the comment via Reddit’s API\n\n- Saves post_id, comment_id, reply, permalink, status to Baserow\n\n- Processes posts one-by-one with an optional short wait to be nice to Reddit\n\n\n## ⚡ Requirements\n\n- Reddit developer API\n\n- Baserow account, table, and API token\n\n- AI provider API (OpenAI / Anthropic / Gemini)\n\n\n\n\n## ⚙️ Setup Instructions\n\n1. **Create Baserow table**\n   Fields (user-field names exactly):\n   `post_id` (**unique**), `permalink`, `subreddit`, `title`, `created_utc`, `reply` (long text), `replied` (boolean), `created_on` (datetime).\n\n2. **Add credentials in n8n**\n\n* **Reddit OAuth2** (scopes: `read, submit, identity`) and set a proper **User-Agent** string (Reddit requires it).\n* **LLM**: Google Gemini and/or Anthropic (both can be added; one can be fallback in the AI Agent).\n* **Baserow**: API token.\n\n3. **Set the Schedule Trigger (Cron)**\n   Start hourly (or every 2–3h). Pacing is mainly enforced by the Wait nodes.\n\n4. **Update “Check duplicate row” (HTTP Request)**\n\n* **URL**:\n  `https://api.baserow.io/api/database/rows/table/{TABLE_ID}/?user_field_names=true&filter__post_id__equal={{$json.post_id}}`\n* **Header**: `Authorization: Token YOUR_BASEROW_TOKEN`\n  (Use your own Baserow domain if self-hosted.)\n\n5. **Configure “Filter Replied Posts”**\n   Ensure it skips items where your Baserow record shows `replied === true` (so you don’t comment twice).\n\n6. **Configure “Fetch Posts from Reddit”**\n   Set your **keyword/search query** (and time/sort). Keep **User-Agent** header present.\n\n\n7. **Configure “Write Reddit Comment (AI)”**\n\n* **Update your brand name** (and optional link).\n* **Edit the prompt/tone** to your voice; ensure it outputs a short `reply` field (≤80 words, helpful, non-salesy).\n\n8. **Configure “Post Reddit Comment” (HTTP Request)**\n\n* Endpoint: `POST https://oauth.reddit.com/api/comment`\n* Body: `thing_id: \"t3_{{$json.post_id}}\", text: \"{{$json.reply}}\"`\n* Uses your Reddit OAuth credential and **User-Agent** header. \n* Update `user_agent` value in header by your username `n8n:reddit-autoreply:1.0 (by /u/{reddit-username})`\n\n10. **Store Comment Data on Baserow (HTTP Request)**\n\n* `POST https://api.baserow.io/api/database/rows/table/{TABLE_ID}/?user_field_names=true`\n* Header: `Authorization: Token YOUR_BASEROW_TOKEN`\n* Map: `post_id, permalink, subreddit, title, created_utc, reply, replied, created_on={{$now}}`.\n\n11. **Keep default pacing**\n    Leave **Wait 5m** (cool-off) and **Wait 6h** (global pace) → \\~**4 comments/day**. Reduce waits gradually as account health allows.\n\n12. **Test & enable**\n    Run once manually, verify a Baserow row and one test comment, then enable the schedule.\n\n\n\n\n## 🤝 Need a hand?\n\nI’m happy to help you get this running smoothly—or tailor it to your brand.\n\nReach out to me via email: imarunavadas@gmail.com",
+  "featuredImage": "/data/workflows/7217/7217.webp",
+  "author": {
+    "id": 101,
+    "slug": "arunava",
+    "name": "Arunava",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 836,
+  "downloads": 83,
+  "createdAt": "2025-08-10T12:57:41.947Z",
+  "updatedAt": "2026-01-16T08:49:04.806Z",
+  "publishedAt": "2025-08-10T12:57:41.947Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7217",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-comment on Reddit posts with AI brand mentions & Baserow tracking",
+    "workflowName": "Auto-comment on Reddit posts with AI brand mentions & Baserow tracking",
+    "description": "## This workflow finds fresh Reddit posts that match your keywords, decides if they’re actually relevant to your brand, writes a short human-style reply using AI, posts it, and logs everything to Baserow.\n\n## 💡Perfect for\n\n- Lead gen without spam: drop helpful replies where your audience hangs out.\n\n- Get discovered by AI surfaces (AI Overviews / SGE, AISEO/GSEO) via high-quality brand mentions.\n\n- Customer support in the wild: answer troubleshooting threads fast.\n\n- Community presence: steady, non-salesy contributions in niche subreddits.\n\n\n## 🧠 What it does\n\n- Searches Reddit for your keyword query on a schedule (e.g., every 30 min)\n\n- Checks Baserow first so you don’t reply twice to the same post\n\n- Uses an AI prompt tuned for short, no-fluff, subreddit-friendly comments\n\n- Softly mentions your brand only when it’s clearly relevant\n\n- Posts the comment via Reddit’s API\n\n- Saves post_id, comment_id, reply, permalink, status to Baserow\n\n- Processes posts one-by-one with an optional short wait to be nice to Reddit\n\n\n## ⚡ Requirements\n\n- Reddit developer API\n\n- Baserow account, table, and API token\n\n- AI provider API (OpenAI / Anthropic / Gemini)\n\n\n\n\n## ⚙️ Setup Instructions\n\n1. **Create Baserow table**\n   Fields (user-field names exactly):\n   `post_id` (**unique**), `permalink`, `subreddit`, `title`, `created_utc`, `reply` (long text), `replied` (boolean), `created_on` (datetime).\n\n2. **Add credentials in n8n**\n\n* **Reddit OAuth2** (scopes: `read, submit, identity`) and set a proper **User-Agent** string (Reddit requires it).\n* **LLM**: Google Gemini and/or Anthropic (both can be added; one can be fallback in the AI Agent).\n* **Baserow**: API token.\n\n3. **Set the Schedule Trigger (Cron)**\n   Start hourly (or every 2–3h). Pacing is mainly enforced by the Wait nodes.\n\n4. **Update “Check duplicate row” (HTTP Request)**\n\n* **URL**:\n  `https://api.baserow.io/api/database/rows/table/{TABLE_ID}/?user_field_names=true&filter__post_id__equal={{$json.post_id}}`\n* **Header**: `Authorization: Token YOUR_BASEROW_TOKEN`\n  (Use your own Baserow domain if self-hosted.)\n\n5. **Configure “Filter Replied Posts”**\n   Ensure it skips items where your Baserow record shows `replied === true` (so you don’t comment twice).\n\n6. **Configure “Fetch Posts from Reddit”**\n   Set your **keyword/search query** (and time/sort). Keep **User-Agent** header present.\n\n\n7. **Configure “Write Reddit Comment (AI)”**\n\n* **Update your brand name** (and optional link).\n* **Edit the prompt/tone** to your voice; ensure it outputs a short `reply` field (≤80 words, helpful, non-salesy).\n\n8. **Configure “Post Reddit Comment” (HTTP Request)**\n\n* Endpoint: `POST https://oauth.reddit.com/api/comment`\n* Body: `thing_id: \"t3_{{$json.post_id}}\", text: \"{{$json.reply}}\"`\n* Uses your Reddit OAuth credential and **User-Agent** header. \n* Update `user_agent` value in header by your username `n8n:reddit-autoreply:1.0 (by /u/{reddit-username})`\n\n10. **Store Comment Data on Baserow (HTTP Request)**\n\n* `POST https://api.baserow.io/api/database/rows/table/{TABLE_ID}/?user_field_names=true`\n* Header: `Authorization: Token YOUR_BASEROW_TOKEN`\n* Map: `post_id, permalink, subreddit, title, created_utc, reply, replied, created_on={{$now}}`.\n\n11. **Keep default pacing**\n    Leave **Wait 5m** (cool-off) and **Wait 6h** (global pace) → \\~**4 comments/day**. Reduce waits gradually as account health allows.\n\n12. **Test & enable**\n    Run once manually, verify a Baserow row and one test comment, then enable the schedule.\n\n\n\n\n## 🤝 Need a hand?\n\nI’m happy to help you get this running smoothly—or tailor it to your brand.\n\nReach out to me via email: imarunavadas@gmail.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Search for a post",
+      "type": "n8n-nodes-base.reddit",
+      "role": "reddit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Anthropic Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Baserow for duplicate post",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Filter Replied Posts",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Structure Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Add Post Details on Baserow",
+      "type": "n8n-nodes-base.baserow",
+      "role": "baserow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait to avoid hitting api limit",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Map Output in Structure",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+You can use the Function node to create an array of objects. 

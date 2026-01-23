@@ -1,0 +1,27 @@
+{
+  "id": 6990,
+  "slug": "6990",
+  "title": "Daily ad spend monitoring with Google Sheets and Slack threshold alerts",
+  "description": "This n8n workflow checks daily ad spend totals from a Google Sheet and sends a Slack alert if spend exceeds $100. It can be scheduled to run automatically or manually triggered for testing. This is perfect for marketing teams who want to monitor budget spikes in near real-time.\n\n---\n\n### ✅ Key Features\n\n- **📥 Google Sheets Integration**: Pulls raw spend data from a shared spreadsheet.\n- **📆 Scheduled or Manual Execution**: Can run daily on a schedule or manually for testing.\n- **📈 Aggregates Spend**: Summarizes daily totals from raw data.\n- **🧠 Logic Check**: Alerts only when spend exceeds a certain threshold.\n- **🔔 Slack Alerts**: Sends instant notification to a specified channel.\n\n---\n\n### 🧰 What You'll Need\n\n- **Google Cloud Project** with Sheets API enabled\n- **OAuth2 Credential** for Google Sheets\n- **Slack Bot Token** with permission to post to your workspace\n- **Your Google Sheet link and tab name**\n\n📎 **Copy this Sample Google Sheet to Use:**  \n[Marketing Data Sheet - Copy Me](https://docs.google.com/spreadsheets/d/19aUQYZq02qHsCelO4eeV4sx_MTJJupC5qe0gDLQBtRA/edit?usp=sharing)\n\n---\n\n### 🔧 Step-by-Step Setup\n\n#### 1️⃣ Schedule or Manual Trigger\n- **Node**: `Schedule Workflow` or `Test Workflow`\n- **Purpose**: Either run daily via a cron-like rule or manually trigger the flow.\n\n#### 2️⃣ Get Google Sheet Data\n- **Node**: `Get Data`\n- **What it does**: Fetches all rows from your connected sheet.\n- **Setup**:\n  - Go to [Google Cloud Console](https://console.cloud.google.com/)\n  - Create a new project\n  - Enable **Google Sheets API**\n  - Create OAuth2 credentials for a desktop or web application\n  - Connect your Google account in n8n via OAuth2\n  - Grant access to the sheet you want to read (ensure it's shared with your OAuth email)\n  - Use the copied sheet's link when connecting in n8n\n\n#### 3️⃣ Summarize Spend by Day\n- **Node**: `Sum spend by Day`\n- **What it does**: Groups the dataset by `Date` and sums the `Spend ($)` column\n- **Requirements**:\n  - Your sheet must have a header row with `Date` and `Spend ($)` as columns\n\n#### 4️⃣ Sort by Most Recent Date\n- **Node**: `Sort Dates Descending`\n- **What it does**: Sorts all entries by the `Date` field so that the most recent day is first\n- **Custom JavaScript**:\n```js\nconst items = $input.all();\nitems.sort((a, b) =&gt; new Date(b.json.Date) - new Date(a.json.Date));\nreturn items;\n```\n\n#### 5️⃣ Select Top Result\n- **Node**: `Keep only Last Day`\n- **What it does**: Captures the top row (most recent day) for evaluation\n- **Fields**: Sets only `Date` and `sum_Spend_($)` to keep things clean\n\n#### 6️⃣ Check Spend Threshold\n- **Node**: `Check if Spend over $100`\n- **What it does**: Uses an IF node to compare `sum_Spend_($)` against a 100 threshold\n- **Logic**:\n```json\nsum_Spend_($) &gt; 100\n```\n\n#### 7️⃣ Send Slack Notification\n- **Node**: `Send Slack Message`\n- **What it does**: Sends a message to a Slack channel if the threshold is exceeded\n- **Setup**:\n  - Go to [Slack API](https://api.slack.com/apps)\n  - Create a new app\n  - Enable **chat:write** and **channels:read** scopes under OAuth & Permissions\n  - Install the app to your workspace\n  - Copy the OAuth Token into your Slack credentials in n8n\n  - Select your target channel from the dropdown (must be public or the bot must be invited)\n- **Message**:\n  ```\n  The spend for the most recent day is over $100\n  ```\n\n#### 8️⃣ No Action if Under Budget\n- **Node**: `Do Nothing. Under 100`\n- **Purpose**: This path simply ends the flow with no action if spend is below the threshold\n\n---\n\n### 👤 Created By\n**Robert Breen**  \nAutomation Consultant | AI Workflow Designer | n8n Expert  \n📧 [rbreen@ynteractive.com](mailto:rbreen@ynteractive.com)  \n🌐 [ynteractive.com](https://ynteractive.com)  \n🔗 [LinkedIn](https://www.linkedin.com/in/robert-breen-29429625/)\n\n---\n\n### 🏷️ Tags\n`slack` `marketing automation` `budget alert` `daily schedule` `google sheets` `threshold logic` `n8n` `spend tracking` `data summarization`\n",
+  "featuredImage": "/data/workflows/6990/6990.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 327,
+  "downloads": 32,
+  "createdAt": "2025-08-05T00:44:26.418Z",
+  "updatedAt": "2026-01-16T08:48:01.012Z",
+  "publishedAt": "2025-08-05T00:44:26.418Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6990"
+}

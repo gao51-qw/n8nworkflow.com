@@ -1,0 +1,254 @@
+{
+  "id": 8205,
+  "slug": "8205",
+  "title": "Generate UGC ads from Google Sheets with Fal.ai models (nano-banana, WAN2.2, Veo3)",
+  "description": "⚠️ **Note:** All sensitive credentials should be set via **n8n Credentials** or environment variables. Do **not** hardcode API keys in nodes.\n\n---\n\n## Who’s it for\nMarketers, creators, and automation builders who want to generate **UGC-style ad images and short videos** automatically from a Google Sheet. Ideal for e‑commerce SKUs, agencies, or teams that need many variations quickly.\n\n---\n\n## What it does (Overview)\nThis template turns a spreadsheet row into **ad images** and optionally **5–8s videos**.\n\n- **Zone 0 — Image-only pipeline (Gemini/OpenRouter)**: Creates an ad image from a product link and prompt, uploads it to Drive, and updates the sheet (no video step).\n- **Zone 1 — Create image (Fal nano‑banana) + prepare for video**: Generates an image via Fal.ai, polls status, fetches URL, then analyzes the image with LLM to prepare scene prompts.\n- **Zone 2 — Generate video (WAN2.2 & Veo3)**: Uses the generated image + structured scene prompts to create short clips, uploads them to Drive, and writes the video URL back to the sheet.\n\n---\n\n## Requirements\n- **Fal.ai API key** (env: `FAL_KEY`)\n- **Google Sheets / Google Drive** OAuth2 credentials\n- **OpenAI / Gemini (via OpenRouter)** for image analysis or alternative image generation\n- A Google Sheet with columns, e.g.: `product | presenter | prompt | img_url | video_url`\n- Google Drive files set to **Anyone with link → Viewer** so APIs can fetch them\n\n---\n\n## How to set up\n1. **Credentials**: Add Google Sheets + Google Drive (OAuth2), Fal.ai (Header Auth with `Authorization: Key {{$env.FAL_KEY}}`), and OpenAI/OpenRouter.\n2. **Google Sheet**: Create the columns above. Paste product image Drive links (the workflow converts them to direct links automatically).\n3. **Import the workflow**: Use the provided JSON. Confirm node credentials resolve.\n4. **Run**: Start with Zone 0 to verify image-only flow, then test Zone 1 + Zone 2 for full image→video.\n\n---\n\n## Zone 0 — Create Ad Image (Image-only)\nThis path is for creating **just an image** and stopping. It reads the **Gemini** tab in the Sheet, generates an image via OpenRouter/Gemini, converts base64 to a file, uploads to Drive, and writes back `img_url`.\n\n**Key nodes**\n- **Get Data1 (Google Sheets)** → reads `Gemini` tab\n- **setImgeURL (Set)** → converts Drive URLs to direct (`uc?export=view&id=...`)\n- **CreateImagebyOpernRouter (Gemini)** → calls `google/gemini-2.5-flash-image-preview:free`\n- **wait20sec (Wait)** → small delay\n- **setBase64data (Code)** → splits data URI into `{ data, mimeType, fileName }`\n- **Convert to File** → creates binary\n- **uploadImagetoGdrive (Google Drive)** → uploads image\n- **updateImageURL (Google Sheets)** → writes back `img_url`\n\n---\n\n## Zone 1 — Create Image (Fal nano‑banana) + Prepare for Video\nReads product rows, normalizes Drive links, generates image with **Fal nano‑banana**, polls until complete, fetches the output image URL, then runs an **image analysis** (OpenAI Vision) to prepare structured text for the video step.\n\n**Key nodes**\n- **Get Data (Google Sheets)** → reads `nanoBanana` tab\n- **Edit Fields (Set)** → converts Drive links to direct (`uc?export=view&id=...`)\n- **Call Fal.ai API (nanoBanana)** → `POST https://queue.fal.run/fal-ai/nano-banana/edit`\n- **Get image status / If / Wait / Get the image** → job polling until complete\n- **Analyze image (OpenAI Vision)** → returns structured description (brand text, colors, type, short description)\n\n---\n\n## Zone 2 — Generate Video (WAN2.2 & Veo3)\nCreates a 5–8s UGC clip using the generated image + structured scene prompt.\n\n**Key nodes**\n- **Describe Each Scene for Video (AI Agent)** → expands analysis + user intent into detailed scene sections (Characters, Scene Background, Camera Movement, Movement in Scene, Sound Design)\n- **Structured Output Parser2 (Schema)** → enforces consistent JSON structure\n- **Veo3 (HTTP)** → `POST /fal-ai/veo3/image-to-video` with prompt + `image_url`\n- **Call Fal.ai API (WAN2.2) [Optional]** → `POST /fal-ai/wan/v2.2-a14b/image-to-video`\n- **Wait for the video / Get the video status / Video status / Get the video** → polling loop\n- **HTTP Request (Download File)** → downloads MP4\n- **uploadImagetoGdrive1 (Google Drive)** → uploads video\n- **updateVideoURL (Google Sheets)** → writes back `video_url`\n\n---\n\n## Node settings (high‑level)\n- **Drive Link Parser (Set)**\n  ```js\n  {{ (() =&gt; {\n    const u = $json.product || '';\n    const q = u.match(/[?&]id=([-\\w]{25,})/);\n    const d = u.match(/\\/d\\/([-\\w]{25,})/);\n    const any = u.match(/[-\\w]{25,}/);\n    const id = q?.[1] || d?.[1] || (any ? any[0] : '');\n    return id ? 'https://drive.google.com/uc?export=view&id=' + id : '';\n  })() }}\n---\n\n## How to customize the workflow\n\n* Adjust **AI prompts** to change ad style (funny, luxury, cozy, techy).\n* Change **video aspect ratio** for TikTok/IG/Shorts (`9:16`, `1:1`, `16:9`).\n* Extend Sheet schema for campaign labels, audiences, hashtags.\n* Add distribution (Slack/LINE/Telegram) after Drive upload.\n\n---\n\n## Troubleshooting\n\n* **JSON parameter needs to be valid JSON** → Ensure expressions return objects, not strings.\n* **403 on images** → Make Drive files public (Viewer) and convert links.\n* **Video never completes** → Check `status_url`, retry with `*-fast` models or off‑peak times.\n\n---\n\n## Template metadata\n\n* **Uses:** Google Sheets, Google Drive, HTTP Request, Wait/If/Switch, Code, Convert to File, OpenAI/Gemini (optional), Fal.ai models (nano‑banana, WAN2.2, Veo3)\n* **Source workflow JSON:** Gemini\\_NanoBanana\\_Template.json (node names and connections match)\n\n## Product Image\n![Alt text](https://drive.google.com/thumbnail?id=1ROt8xvXvpcodXzgNBOlrNQVuiwV1qeRT&sz=w600)\n## Product Image - nano Banana\n![Alt text](https://drive.google.com/thumbnail?id=13ZwkKDBfvDw2TXSGFOo7xZL5jd6JTfHK&sz=w600)\n\n## Product Video - Veo3\n![Alt text](https://drive.google.com/thumbnail?id=1RSLfg3e2ZqJsKv5YLmmGOX7zHHUYEJKK&sz=w600)\n\n## Product Video - Wan2.2\n![Alt text](https://drive.google.com/thumbnail?id=1cdV0Q3j15X5zMvEPhwAQM1uHcGiZIJl1&sz=w600)",
+  "featuredImage": "/data/workflows/8205/8205.webp",
+  "author": {
+    "id": 101,
+    "slug": "jaruphatj",
+    "name": "Jaruphat J.",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3972,
+  "downloads": 397,
+  "createdAt": "2025-09-03T07:25:42.272Z",
+  "updatedAt": "2026-01-16T08:54:40.465Z",
+  "publishedAt": "2025-09-03T07:25:42.272Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8205",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate UGC ads from Google Sheets with Fal.ai models (nano-banana, WAN2.2, Veo3)",
+    "workflowName": "Generate UGC ads from Google Sheets with Fal.ai models (nano-banana, WAN2.2, Veo3)",
+    "description": "⚠️ **Note:** All sensitive credentials should be set via **n8n Credentials** or environment variables. Do **not** hardcode API keys in nodes.\n\n---\n\n## Who’s it for\nMarketers, creators, and automation builders who want to generate **UGC-style ad images and short videos** automatically from a Google Sheet. Ideal for e‑commerce SKUs, agencies, or teams that need many variations quickly.\n\n---\n\n## What it does (Overview)\nThis template turns a spreadsheet row into **ad images** and optionally **5–8s videos**.\n\n- **Zone 0 — Image-only pipeline (Gemini/OpenRouter)**: Creates an ad image from a product link and prompt, uploads it to Drive, and updates the sheet (no video step).\n- **Zone 1 — Create image (Fal nano‑banana) + prepare for video**: Generates an image via Fal.ai, polls status, fetches URL, then analyzes the image with LLM to prepare scene prompts.\n- **Zone 2 — Generate video (WAN2.2 & Veo3)**: Uses the generated image + structured scene prompts to create short clips, uploads them to Drive, and writes the video URL back to the sheet.\n\n---\n\n## Requirements\n- **Fal.ai API key** (env: `FAL_KEY`)\n- **Google Sheets / Google Drive** OAuth2 credentials\n- **OpenAI / Gemini (via OpenRouter)** for image analysis or alternative image generation\n- A Google Sheet with columns, e.g.: `product | presenter | prompt | img_url | video_url`\n- Google Drive files set to **Anyone with link → Viewer** so APIs can fetch them\n\n---\n\n## How to set up\n1. **Credentials**: Add Google Sheets + Google Drive (OAuth2), Fal.ai (Header Auth with `Authorization: Key {{$env.FAL_KEY}}`), and OpenAI/OpenRouter.\n2. **Google Sheet**: Create the columns above. Paste product image Drive links (the workflow converts them to direct links automatically).\n3. **Import the workflow**: Use the provided JSON. Confirm node credentials resolve.\n4. **Run**: Start with Zone 0 to verify image-only flow, then test Zone 1 + Zone 2 for full image→video.\n\n---\n\n## Zone 0 — Create Ad Image (Image-only)\nThis path is for creating **just an image** and stopping. It reads the **Gemini** tab in the Sheet, generates an image via OpenRouter/Gemini, converts base64 to a file, uploads to Drive, and writes back `img_url`.\n\n**Key nodes**\n- **Get Data1 (Google Sheets)** → reads `Gemini` tab\n- **setImgeURL (Set)** → converts Drive URLs to direct (`uc?export=view&id=...`)\n- **CreateImagebyOpernRouter (Gemini)** → calls `google/gemini-2.5-flash-image-preview:free`\n- **wait20sec (Wait)** → small delay\n- **setBase64data (Code)** → splits data URI into `{ data, mimeType, fileName }`\n- **Convert to File** → creates binary\n- **uploadImagetoGdrive (Google Drive)** → uploads image\n- **updateImageURL (Google Sheets)** → writes back `img_url`\n\n---\n\n## Zone 1 — Create Image (Fal nano‑banana) + Prepare for Video\nReads product rows, normalizes Drive links, generates image with **Fal nano‑banana**, polls until complete, fetches the output image URL, then runs an **image analysis** (OpenAI Vision) to prepare structured text for the video step.\n\n**Key nodes**\n- **Get Data (Google Sheets)** → reads `nanoBanana` tab\n- **Edit Fields (Set)** → converts Drive links to direct (`uc?export=view&id=...`)\n- **Call Fal.ai API (nanoBanana)** → `POST https://queue.fal.run/fal-ai/nano-banana/edit`\n- **Get image status / If / Wait / Get the image** → job polling until complete\n- **Analyze image (OpenAI Vision)** → returns structured description (brand text, colors, type, short description)\n\n---\n\n## Zone 2 — Generate Video (WAN2.2 & Veo3)\nCreates a 5–8s UGC clip using the generated image + structured scene prompt.\n\n**Key nodes**\n- **Describe Each Scene for Video (AI Agent)** → expands analysis + user intent into detailed scene sections (Characters, Scene Background, Camera Movement, Movement in Scene, Sound Design)\n- **Structured Output Parser2 (Schema)** → enforces consistent JSON structure\n- **Veo3 (HTTP)** → `POST /fal-ai/veo3/image-to-video` with prompt + `image_url`\n- **Call Fal.ai API (WAN2.2) [Optional]** → `POST /fal-ai/wan/v2.2-a14b/image-to-video`\n- **Wait for the video / Get the video status / Video status / Get the video** → polling loop\n- **HTTP Request (Download File)** → downloads MP4\n- **uploadImagetoGdrive1 (Google Drive)** → uploads video\n- **updateVideoURL (Google Sheets)** → writes back `video_url`\n\n---\n\n## Node settings (high‑level)\n- **Drive Link Parser (Set)**\n  ```js\n  {{ (() =&gt; {\n    const u = $json.product || '';\n    const q = u.match(/[?&]id=([-\\w]{25,})/);\n    const d = u.match(/\\/d\\/([-\\w]{25,})/);\n    const any = u.match(/[-\\w]{25,}/);\n    const id = q?.[1] || d?.[1] || (any ? any[0] : '');\n    return id ? 'https://drive.google.com/uc?export=view&id=' + id : '';\n  })() }}\n---\n\n## How to customize the workflow\n\n* Adjust **AI prompts** to change ad style (funny, luxury, cozy, techy).\n* Change **video aspect ratio** for TikTok/IG/Shorts (`9:16`, `1:1`, `16:9`).\n* Extend Sheet schema for campaign labels, audiences, hashtags.\n* Add distribution (Slack/LINE/Telegram) after Drive upload.\n\n---\n\n## Troubleshooting\n\n* **JSON parameter needs to be valid JSON** → Ensure expressions return objects, not strings.\n* **403 on images** → Make Drive files public (Viewer) and convert links.\n* **Video never completes** → Check `status_url`, retry with `*-fast` models or off‑peak times.\n\n---\n\n## Template metadata\n\n* **Uses:** Google Sheets, Google Drive, HTTP Request, Wait/If/Switch, Code, Convert to File, OpenAI/Gemini (optional), Fal.ai models (nano‑banana, WAN2.2, Veo3)\n* **Source workflow JSON:** Gemini\\_NanoBanana\\_Template.json (node names and connections match)\n\n## Product Image\n![Alt text](https://drive.google.com/thumbnail?id=1ROt8xvXvpcodXzgNBOlrNQVuiwV1qeRT&sz=w600)\n## Product Image - nano Banana\n![Alt text](https://drive.google.com/thumbnail?id=13ZwkKDBfvDw2TXSGFOo7xZL5jd6JTfHK&sz=w600)\n\n## Product Video - Veo3\n![Alt text](https://drive.google.com/thumbnail?id=1RSLfg3e2ZqJsKv5YLmmGOX7zHHUYEJKK&sz=w600)\n\n## Product Video - Wan2.2\n![Alt text](https://drive.google.com/thumbnail?id=1cdV0Q3j15X5zMvEPhwAQM1uHcGiZIJl1&sz=w600)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Data1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "setImgeURL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "CreateImagebyOpernRouter (gemini-2.5-flash-image-preview:free)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "wait20sec",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "setBase64data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "uploadImagetoGdrive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "updateImageURL",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "uploadImagetoGdrive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "updateVideoURL",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Call Fal.ai API (WAN2.2)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Get the image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get image status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Call Fal.ai API (nannoBanana)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Describe Each Scene for Video",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get the  video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Video status",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get the video status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait for the video",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Veo3",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

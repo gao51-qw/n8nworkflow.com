@@ -1,0 +1,314 @@
+{
+  "id": 3799,
+  "slug": "3799",
+  "title": "Interactive knowledge base chat with Supabase RAG using AI 📚💬",
+  "description": "# Google Drive File Ingestion to Supabase for Knowledge Base 📂💾\n\n\n\n## Overview 🌟\n\nThis n8n workflow automates the process of ingesting files from **Google Drive** into a **Supabase** database, preparing them for a knowledge base system. It supports **text-based files** (PDF, DOCX, TXT, etc.) and **tabular data** (XLSX, CSV, Google Sheets), extracting content, generating embeddings, and storing data in structured tables. This is a foundational workflow for building a **company knowledge base** that can be queried via a chat interface (e.g., using a RAG workflow). 🚀\n\n### Problem Solved 🎯\nManually managing a knowledge base with files from Google Drive is time-consuming and error-prone. This workflow solves that by:\n- Automatically **ingesting files** from Google Drive as they are created or updated.\n- **Extracting content** from various file types (text and tabular).\n- Generating **embeddings** for text-based files to enable vector search.\n- Storing data in **Supabase** for efficient retrieval.\n- Handling **duplicates** and errors to ensure data consistency.\n\n**Target Audience**:\n- **Knowledge Managers**: Build a centralized knowledge base from company files.\n- **Data Teams**: Automate the ingestion of spreadsheets and documents.\n- **Developers**: Integrate with other workflows (e.g., RAG for querying the knowledge base).\n\n## Workflow Description 🔍\n\nThis workflow listens for new or updated files in Google Drive, processes them based on their type, and stores the extracted data in Supabase tables for later retrieval. Here’s how it works:\n\n1. **File Detection**: Triggers when a file is created or updated in Google Drive.\n2. **File Processing**: Loops through each file, extracts metadata, and validates the file type.\n3. **Duplicate Check**: Ensures the file hasn’t been processed before.\n4. **Content Extraction**:\n   - **Text-based Files**: Downloads the file, extracts text, splits it into chunks, generates embeddings, and stores the chunks in Supabase.\n   - **Tabular Files**: Extracts data from spreadsheets and stores it as rows in Supabase.\n5. **Metadata Storage**: Stores file metadata and basic info in Supabase tables.\n6. **Error Handling**: Logs errors for unsupported formats or duplicates.\n\n## Nodes Breakdown 🛠️\n\n### 1. Detect New File 🔔\n- **Type**: Google Drive Trigger\n- **Purpose**: Triggers the workflow when a new file is created in Google Drive.\n- **Configuration**:\n  - Credential: Google Drive OAuth2\n  - Event: `File Created`\n- **Customization**:\n  - Specify a folder to monitor specific directories.\n\n### 2. Detect Updated File 🔔\n- **Type**: Google Drive Trigger\n- **Purpose**: Triggers the workflow when a file is updated in Google Drive.\n- **Configuration**:\n  - Credential: Google Drive OAuth2\n  - Event: `File Updated`\n- **Customization**:\n  - Currently disconnected; reconnect if updates need to be processed.\n\n### 3. Process Each File 🔄\n- **Type**: Loop Over Items\n- **Purpose**: Processes each file individually from the Google Drive trigger.\n- **Configuration**:\n  - Input: `{{ $json.files }}`\n- **Customization**:\n  - Adjust the batch size if processing multiple files at once.\n\n### 4. Extract File Metadata 🆔\n- **Type**: Set\n- **Purpose**: Extracts metadata like `file_id`, `file_name`, `mime_type`, and `web_view_link`.\n- **Configuration**:\n  - Fields:\n    - `file_id`: `{{ $json.id }}`\n    - `file_name`: `{{ $json.name }}`\n    - `mime_type`: `{{ $json.mimeType }}`\n    - `web_view_link`: `{{ $json.webViewLink }}`\n- **Customization**:\n  - Add more metadata fields if needed (e.g., `size`, `createdTime`).\n\n### 5. Check File Type ✅\n- **Type**: IF\n- **Purpose**: Validates the file type by checking the MIME type.\n- **Configuration**:\n  - Condition: `mime_type` contains supported types (e.g., `application/pdf`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`).\n- **Customization**:\n  - Add more supported MIME types as needed.\n\n### 6. Find Duplicates 🔍\n- **Type**: Supabase\n- **Purpose**: Checks if the file has already been processed by querying `knowledge_base`.\n- **Configuration**:\n  - Operation: Select\n  - Table: `knowledge_base`\n  - Filter: `file_id = {{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add additional duplicate checks (e.g., by file name).\n\n### 7. Handle Duplicates 🔄\n- **Type**: IF\n- **Purpose**: Routes the workflow based on whether a duplicate is found.\n- **Configuration**:\n  - Condition: `{{ $node['Find Duplicates'].json.length &gt; 0 }}`\n- **Customization**:\n  - Add notifications for duplicates if desired.\n\n### 8. Remove Old Text Data 🗑️\n- **Type**: Supabase\n- **Purpose**: Deletes old text data from `documents` if the file is a duplicate.\n- **Configuration**:\n  - Operation: Delete\n  - Table: `documents`\n  - Filter: `metadata-&gt;&gt;'file_id' = {{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add logging before deletion.\n\n### 9. Remove Old Data 🗑️\n- **Type**: Supabase\n- **Purpose**: Deletes old tabular data from `document_rows` if the file is a duplicate.\n- **Configuration**:\n  - Operation: Delete\n  - Table: `document_rows`\n  - Filter: `dataset_id = {{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add logging before deletion.\n\n### 10. Route by File Type 🔀\n- **Type**: Switch\n- **Purpose**: Routes the workflow based on the file’s MIME type (text-based or tabular).\n- **Configuration**:\n  - Rules: Based on `mime_type` (e.g., `application/pdf` for text, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` for tabular).\n- **Customization**:\n  - Add more routes for additional file types.\n\n### 11. Download File Content 📥\n- **Type**: Google Drive\n- **Purpose**: Downloads the file content for text-based files.\n- **Configuration**:\n  - Credential: Google Drive OAuth2\n  - File ID: `{{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add error handling for download failures.\n\n### 12. Extract PDF Text 📜\n- **Type**: Extract from File (PDF)\n- **Purpose**: Extracts text from PDF files.\n- **Configuration**:\n  - File Content: `{{ $node['Download File Content'].binary.data }}`\n- **Customization**:\n  - Adjust extraction settings for better accuracy.\n\n### 13. Extract DOCX Text 📜\n- **Type**: Extract from File (DOCX)\n- **Purpose**: Extracts text from DOCX files.\n- **Configuration**:\n  - File Content: `{{ $node['Download File Content'].binary.data }}`\n- **Customization**:\n  - Add support for other text formats (e.g., TXT, RTF).\n\n### 14. Extract XLSX Data 📊\n- **Type**: Extract from File (XLSX)\n- **Purpose**: Extracts tabular data from XLSX files.\n- **Configuration**:\n  - File ID: `{{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add support for CSV or Google Sheets.\n\n### 15. Split Text into Chunks ✂️\n- **Type**: Text Splitter\n- **Purpose**: Splits extracted text into manageable chunks for embedding.\n- **Configuration**:\n  - Chunk Size: `1000`\n  - Chunk Overlap: `200`\n- **Customization**:\n  - Adjust chunk size and overlap based on document length.\n\n### 16. Generate Text Embeddings 🌐\n- **Type**: OpenAI\n- **Purpose**: Generates embeddings for text chunks using OpenAI.\n- **Configuration**:\n  - Credential: OpenAI API key\n  - Operation: Embedding\n  - Model: `text-embedding-ada-002`\n- **Customization**:\n  - Switch to a different embedding model if needed.\n\n### 17. Store Text in Supabase 💾\n- **Type**: Supabase Vector Store\n- **Purpose**: Stores text chunks and embeddings in the `documents` table.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Insert Documents\n  - Table Name: `documents`\n- **Customization**:\n  - Add metadata fields to store additional context.\n\n### 18. Store Tabular Data 💾\n- **Type**: Supabase\n- **Purpose**: Stores tabular data in the `document_rows` table.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `document_rows`\n  - Columns: `dataset_id`, `row_data`\n- **Customization**:\n  - Add validation for tabular data structure.\n\n### 19. Store File Metadata 📋\n- **Type**: Supabase\n- **Purpose**: Stores file metadata in the `document_metadata` table.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `document_metadata`\n  - Columns: `file_id`, `file_name`, `file_type`, `file_url`\n- **Customization**:\n  - Add more metadata fields as needed.\n\n### 20. Record in Knowledge Base 📚\n- **Type**: Supabase\n- **Purpose**: Stores basic file info in the `knowledge_base` table.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `knowledge_base`\n  - Columns: `file_id`, `file_name`, `file_type`, `file_url`, `upload_date`\n- **Customization**:\n  - Add indexes for faster lookups.\n\n### 21. Log File Errors ⚠️\n- **Type**: Supabase\n- **Purpose**: Logs errors for unsupported file types.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `error_log`\n  - Columns: `error_type`, `error_message`\n- **Customization**:\n  - Add notifications for errors.\n\n### 22. Log Duplicate Errors ⚠️\n- **Type**: Supabase\n- **Purpose**: Logs errors for duplicate files.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `error_log`\n  - Columns: `error_type`, `error_message`\n- **Customization**:\n  - Add notifications for duplicates.\n\n\n\n\n# Interactive Knowledge Base Chat with Supabase RAG using GPT-4o-mini 📚💬\n\n## Introduction 🌟\n\nThis n8n workflow creates an **interactive chat interface** that allows users to query a company knowledge base using **Retrieval-Augmented Generation (RAG)**. It retrieves relevant information from text documents and tabular data stored in **Supabase**, then generates natural language responses using **OpenAI’s GPT-4o-mini** model. Designed for teams managing internal knowledge, this workflow enables users to ask questions like “What’s the remote work policy?” or “Show me the latest budget data” and receive accurate, context-aware responses in a conversational format. 🚀\n\n## Problem Statement 🎯\n\nManaging a company knowledge base can be a daunting task—employees often struggle to find specific information buried in documents or spreadsheets, leading to wasted time and inefficiencies. Traditional search methods may not understand natural language queries or provide contextually relevant results. This workflow solves these issues by:\n- Offering a **chat-based interface** for natural language queries, making it easy for users to ask questions in their own words.\n- Leveraging **RAG** to retrieve relevant text and tabular data from Supabase, ensuring responses are accurate and context-aware.\n- Supporting diverse file types, including **text-based files** (e.g., PDFs, DOCX) and **tabular data** (e.g., XLSX, CSV), for comprehensive knowledge access.\n- Maintaining **conversation history** to provide context during interactions, improving the user experience.\n\n## Target Audience 👥\n\nThis workflow is ideal for:\n- **HR Teams**: Quickly access company policies, employee handbooks, or benefits documents.\n- **Finance Teams**: Retrieve budget data, expense reports, or financial summaries from spreadsheets.\n- **Knowledge Managers**: Build a centralized assistant for internal documentation, streamlining information access.\n- **Developers**: Extend the workflow with additional tools or integrations for custom use cases.\n\n## Workflow Description 🔍\n\nThis workflow consists of a chat interface powered by n8n’s Chat Trigger node, an AI Agent node for RAG, and several tools to retrieve data from Supabase. Here’s how it works step-by-step:\n\n1. **User Initiates a Chat**: The user interacts with a chat interface, sending queries like “Summarize our remote work policy” or “Show budget data for Q1 2025.”\n2. **Query Processing with RAG**: The AI Agent processes the query using RAG, retrieving relevant data from Supabase tables and generating a response with OpenAI’s GPT-4o-mini model.\n3. **Data Retrieval and Response Generation**: The workflow uses multiple tools to fetch data:\n   - Retrieves text chunks from the `documents` table using vector search.\n   - Fetches tabular data from the `document_rows` table based on file IDs.\n   - Extracts full document text or lists available files as needed.\n   - Generates a natural language response combining the retrieved data.\n4. **Conversation History Management**: Stores the conversation history in Supabase to maintain context for follow-up questions.\n5. **Response Delivery**: Formats and sends the response back to the chat interface for the user to view.\n\n## Nodes Breakdown 🛠️\n\n### 1. Start Chat Interface 💬\n- **Type**: Chat Trigger\n- **Purpose**: Provides the interactive chat interface for users to input queries and receive responses.\n- **Configuration**:\n  - Chat Title: `Company Knowledge Base Assistant`\n  - Chat Subtitle: `Ask me anything about company documents!`\n  - Welcome Message: `Hello! I’m your Company Knowledge Base Assistant. How can I help you today?`\n  - Suggestions: `What is the company policy on remote work?`, `Show me the latest budget data.`, `List all policy documents.`\n  - Output Chat Session ID: `true`\n  - Output User Message: `true`\n- **Customization**:\n  - Update the title and welcome message to align with your company branding (e.g., `HR Knowledge Assistant`).\n  - Add more suggestions relevant to your use case (e.g., `What are the company benefits?`).\n\n### 2. Process Query with RAG 🧠\n- **Type**: AI Agent\n- **Purpose**: Orchestrates the RAG process by retrieving relevant data using tools and generating responses with OpenAI’s GPT-4o-mini.\n- **Configuration**:\n  - Credential: OpenAI API key\n  - Model: `gpt-4o-mini`\n  - System Prompt: `You are a helpful assistant for a company knowledge base. Use the provided tools to retrieve relevant information from documents and tabular data. If the query involves tabular data, format it clearly in your response. If no relevant data is found, respond with \"I couldn’t find any relevant information. Can you provide more details?\"`\n  - Input Field: `{{ $node['Start Chat Interface'].json.message }}`\n- **Customization**:\n  - Switch to a different model (e.g., `gpt-3.5-turbo`) to adjust cost or performance.\n  - Modify the system prompt to change the tone (e.g., more formal for HR use cases).\n\n### 3. Retrieve Text Chunks 📄\n- **Type**: Supabase Vector Store (Tool)\n- **Purpose**: Retrieves relevant text chunks from the `documents` table using vector search.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation Mode: Retrieve Documents (As Tool for AI Agent)\n  - Table Name: `documents`\n  - Embedding Field: `embedding`\n  - Content Field: `content_text`\n  - Metadata Field: `metadata`\n  - Embedding Model: OpenAI `text-embedding-ada-002`\n  - Top K: `10`\n- **Customization**:\n  - Adjust `Top K` to retrieve more or fewer results (e.g., `5` for faster responses).\n  - Ensure the `match_documents` function (see prerequisites) is defined in Supabase.\n\n### 4. Fetch Tabular Data 📊\n- **Type**: Supabase (Tool, Execute Query)\n- **Purpose**: Retrieves tabular data from the `document_rows` table based on a file ID.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Execute Query\n  - Query: `SELECT row_data FROM document_rows WHERE dataset_id = $1 LIMIT 10`\n  - Tool Description: `Run a SQL query - use this to query from the document_rows table once you know the file ID you are querying. dataset_id is the file_id and you are always using the row_data for filtering, which is a jsonb field that has all the keys from the file schema given in the document_metadata table.`\n- **Customization**:\n  - Modify the query to filter specific columns or add conditions (e.g., `WHERE dataset_id = $1 AND row_data-&gt;&gt;'year' = '2025'`).\n  - Increase the `LIMIT` for larger datasets.\n\n### 5. Extract Full Document Text 📜\n- **Type**: Supabase (Tool, Execute Query)\n- **Purpose**: Fetches the full text of a document by concatenating all text chunks for a given `file_id`.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Execute Query\n  - Query: `SELECT string_agg(content_text, ' ') as document_text FROM documents WHERE metadata-&gt;&gt;'file_id' = $1 GROUP BY metadata-&gt;&gt;'file_id'`\n  - Tool Description: `Given file id fetch the text from the documents`\n- **Customization**:\n  - Add filters to the query if needed (e.g., limit to specific metadata fields).\n\n### 6. List Available Files 📋\n- **Type**: Supabase (Tool, Select)\n- **Purpose**: Lists all files in the knowledge base from the `document_metadata` table.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Select\n  - Schema: `public`\n  - Table: `document_metadata`\n  - Tool Description: `Use this tool to fetch all documents including the table schema if the file is csv, excel or xlsx`\n- **Customization**:\n  - Add filters to list specific file types (e.g., `WHERE file_type = 'application/pdf'`).\n  - Modify the columns selected to include additional metadata (e.g., `file_size`).\n\n### 7. Manage Chat History 💾\n- **Type**: Postgres Chat Memory (Tool)\n- **Purpose**: Stores and retrieves conversation history to maintain context.\n- **Configuration**:\n  - Credential: Supabase credentials (Postgres-compatible)\n  - Table Name: `n8n_chat_history`\n  - Session ID Field: `session_id`\n  - Session ID Value: `{{ $node['Start Chat Interface'].json.sessionId }}`\n  - Message Field: `message`\n  - Sender Field: `sender`\n  - Timestamp Field: `timestamp`\n  - Context Window Length: `5`\n- **Customization**:\n  - Increase the context window length for longer conversations (e.g., `10` messages).\n  - Add indexes on `session_id` and `timestamp` in Supabase for better performance.\n\n### 8. Format and Send Response 📤\n- **Type**: Set\n- **Purpose**: Formats the AI Agent’s response and sends it back to the chat interface.\n- **Configuration**:\n  - Fields:\n    - `response`: `{{ $node['Process Query with RAG'].json.output }}`\n- **Customization**:\n  - Add additional formatting to the response if needed (e.g., prepend with a timestamp or apply markdown formatting).\n\n## Setup Instructions 🛠️\n\n### Prerequisites 📋\n1. **n8n Setup**:\n   - Ensure you’re using n8n version 1.0 or higher.\n   - Enable the AI features in n8n settings.\n2. **Supabase**:\n   - Create a Supabase project and set up the following tables:\n     - `documents`: `id (uuid)`, `content_text (text)`, `embedding (vector(1536))`, `metadata (jsonb)`\n     - `document_rows`: `id (uuid)`, `dataset_id (varchar)`, `row_data (jsonb)`\n     - `document_metadata`: `file_id (varchar)`, `file_name (varchar)`, `file_type (varchar)`, `file_url (text)`\n     - `knowledge_base`: `id (serial)`, `file_id (varchar)`, `file_name (varchar)`, `file_type (varchar)`, `file_url (text)`, `upload_date (timestamp)`\n     - `n8n_chat_history`: `id (serial)`, `session_id (varchar)`, `message (text)`, `sender (varchar)`, `timestamp (timestamp)`\n   - Add the `match_documents` function to Supabase to enable vector search:\n     ```sql\n     CREATE OR REPLACE FUNCTION match_documents (\n       query_embedding vector(1536),\n       match_count int DEFAULT 5,\n       filter jsonb DEFAULT '{}'\n     ) RETURNS TABLE (\n       id uuid,\n       content_text text,\n       metadata jsonb,\n       similarity float\n     ) LANGUAGE plpgsql AS $$  \n     BEGIN\n       RETURN QUERY\n       SELECT\n         documents.id,\n         documents.content_text,\n         documents.metadata,\n         1 - (documents.embedding &lt;=&gt; query_embedding) as similarity\n       FROM documents\n       WHERE documents.metadata @&gt; filter\n       ORDER BY similarity DESC\n       LIMIT match_count;\n     END;\n       $$;",
+  "featuredImage": "/data/workflows/3799/3799.webp",
+  "author": {
+    "id": 101,
+    "slug": "spectrabit",
+    "name": "Immanuel",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5272,
+  "downloads": 527,
+  "createdAt": "2025-04-30T09:12:57.114Z",
+  "updatedAt": "2026-01-16T08:31:32.797Z",
+  "publishedAt": "2025-04-30T09:12:57.114Z",
+  "nodes": 46,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3799",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Interactive knowledge base chat with Supabase RAG using AI 📚💬",
+    "workflowName": "Interactive knowledge base chat with Supabase RAG using AI 📚💬",
+    "description": "# Google Drive File Ingestion to Supabase for Knowledge Base 📂💾\n\n\n\n## Overview 🌟\n\nThis n8n workflow automates the process of ingesting files from **Google Drive** into a **Supabase** database, preparing them for a knowledge base system. It supports **text-based files** (PDF, DOCX, TXT, etc.) and **tabular data** (XLSX, CSV, Google Sheets), extracting content, generating embeddings, and storing data in structured tables. This is a foundational workflow for building a **company knowledge base** that can be queried via a chat interface (e.g., using a RAG workflow). 🚀\n\n### Problem Solved 🎯\nManually managing a knowledge base with files from Google Drive is time-consuming and error-prone. This workflow solves that by:\n- Automatically **ingesting files** from Google Drive as they are created or updated.\n- **Extracting content** from various file types (text and tabular).\n- Generating **embeddings** for text-based files to enable vector search.\n- Storing data in **Supabase** for efficient retrieval.\n- Handling **duplicates** and errors to ensure data consistency.\n\n**Target Audience**:\n- **Knowledge Managers**: Build a centralized knowledge base from company files.\n- **Data Teams**: Automate the ingestion of spreadsheets and documents.\n- **Developers**: Integrate with other workflows (e.g., RAG for querying the knowledge base).\n\n## Workflow Description 🔍\n\nThis workflow listens for new or updated files in Google Drive, processes them based on their type, and stores the extracted data in Supabase tables for later retrieval. Here’s how it works:\n\n1. **File Detection**: Triggers when a file is created or updated in Google Drive.\n2. **File Processing**: Loops through each file, extracts metadata, and validates the file type.\n3. **Duplicate Check**: Ensures the file hasn’t been processed before.\n4. **Content Extraction**:\n   - **Text-based Files**: Downloads the file, extracts text, splits it into chunks, generates embeddings, and stores the chunks in Supabase.\n   - **Tabular Files**: Extracts data from spreadsheets and stores it as rows in Supabase.\n5. **Metadata Storage**: Stores file metadata and basic info in Supabase tables.\n6. **Error Handling**: Logs errors for unsupported formats or duplicates.\n\n## Nodes Breakdown 🛠️\n\n### 1. Detect New File 🔔\n- **Type**: Google Drive Trigger\n- **Purpose**: Triggers the workflow when a new file is created in Google Drive.\n- **Configuration**:\n  - Credential: Google Drive OAuth2\n  - Event: `File Created`\n- **Customization**:\n  - Specify a folder to monitor specific directories.\n\n### 2. Detect Updated File 🔔\n- **Type**: Google Drive Trigger\n- **Purpose**: Triggers the workflow when a file is updated in Google Drive.\n- **Configuration**:\n  - Credential: Google Drive OAuth2\n  - Event: `File Updated`\n- **Customization**:\n  - Currently disconnected; reconnect if updates need to be processed.\n\n### 3. Process Each File 🔄\n- **Type**: Loop Over Items\n- **Purpose**: Processes each file individually from the Google Drive trigger.\n- **Configuration**:\n  - Input: `{{ $json.files }}`\n- **Customization**:\n  - Adjust the batch size if processing multiple files at once.\n\n### 4. Extract File Metadata 🆔\n- **Type**: Set\n- **Purpose**: Extracts metadata like `file_id`, `file_name`, `mime_type`, and `web_view_link`.\n- **Configuration**:\n  - Fields:\n    - `file_id`: `{{ $json.id }}`\n    - `file_name`: `{{ $json.name }}`\n    - `mime_type`: `{{ $json.mimeType }}`\n    - `web_view_link`: `{{ $json.webViewLink }}`\n- **Customization**:\n  - Add more metadata fields if needed (e.g., `size`, `createdTime`).\n\n### 5. Check File Type ✅\n- **Type**: IF\n- **Purpose**: Validates the file type by checking the MIME type.\n- **Configuration**:\n  - Condition: `mime_type` contains supported types (e.g., `application/pdf`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`).\n- **Customization**:\n  - Add more supported MIME types as needed.\n\n### 6. Find Duplicates 🔍\n- **Type**: Supabase\n- **Purpose**: Checks if the file has already been processed by querying `knowledge_base`.\n- **Configuration**:\n  - Operation: Select\n  - Table: `knowledge_base`\n  - Filter: `file_id = {{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add additional duplicate checks (e.g., by file name).\n\n### 7. Handle Duplicates 🔄\n- **Type**: IF\n- **Purpose**: Routes the workflow based on whether a duplicate is found.\n- **Configuration**:\n  - Condition: `{{ $node['Find Duplicates'].json.length &gt; 0 }}`\n- **Customization**:\n  - Add notifications for duplicates if desired.\n\n### 8. Remove Old Text Data 🗑️\n- **Type**: Supabase\n- **Purpose**: Deletes old text data from `documents` if the file is a duplicate.\n- **Configuration**:\n  - Operation: Delete\n  - Table: `documents`\n  - Filter: `metadata-&gt;&gt;'file_id' = {{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add logging before deletion.\n\n### 9. Remove Old Data 🗑️\n- **Type**: Supabase\n- **Purpose**: Deletes old tabular data from `document_rows` if the file is a duplicate.\n- **Configuration**:\n  - Operation: Delete\n  - Table: `document_rows`\n  - Filter: `dataset_id = {{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add logging before deletion.\n\n### 10. Route by File Type 🔀\n- **Type**: Switch\n- **Purpose**: Routes the workflow based on the file’s MIME type (text-based or tabular).\n- **Configuration**:\n  - Rules: Based on `mime_type` (e.g., `application/pdf` for text, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` for tabular).\n- **Customization**:\n  - Add more routes for additional file types.\n\n### 11. Download File Content 📥\n- **Type**: Google Drive\n- **Purpose**: Downloads the file content for text-based files.\n- **Configuration**:\n  - Credential: Google Drive OAuth2\n  - File ID: `{{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add error handling for download failures.\n\n### 12. Extract PDF Text 📜\n- **Type**: Extract from File (PDF)\n- **Purpose**: Extracts text from PDF files.\n- **Configuration**:\n  - File Content: `{{ $node['Download File Content'].binary.data }}`\n- **Customization**:\n  - Adjust extraction settings for better accuracy.\n\n### 13. Extract DOCX Text 📜\n- **Type**: Extract from File (DOCX)\n- **Purpose**: Extracts text from DOCX files.\n- **Configuration**:\n  - File Content: `{{ $node['Download File Content'].binary.data }}`\n- **Customization**:\n  - Add support for other text formats (e.g., TXT, RTF).\n\n### 14. Extract XLSX Data 📊\n- **Type**: Extract from File (XLSX)\n- **Purpose**: Extracts tabular data from XLSX files.\n- **Configuration**:\n  - File ID: `{{ $node['Extract File Metadata'].json.file_id }}`\n- **Customization**:\n  - Add support for CSV or Google Sheets.\n\n### 15. Split Text into Chunks ✂️\n- **Type**: Text Splitter\n- **Purpose**: Splits extracted text into manageable chunks for embedding.\n- **Configuration**:\n  - Chunk Size: `1000`\n  - Chunk Overlap: `200`\n- **Customization**:\n  - Adjust chunk size and overlap based on document length.\n\n### 16. Generate Text Embeddings 🌐\n- **Type**: OpenAI\n- **Purpose**: Generates embeddings for text chunks using OpenAI.\n- **Configuration**:\n  - Credential: OpenAI API key\n  - Operation: Embedding\n  - Model: `text-embedding-ada-002`\n- **Customization**:\n  - Switch to a different embedding model if needed.\n\n### 17. Store Text in Supabase 💾\n- **Type**: Supabase Vector Store\n- **Purpose**: Stores text chunks and embeddings in the `documents` table.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Insert Documents\n  - Table Name: `documents`\n- **Customization**:\n  - Add metadata fields to store additional context.\n\n### 18. Store Tabular Data 💾\n- **Type**: Supabase\n- **Purpose**: Stores tabular data in the `document_rows` table.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `document_rows`\n  - Columns: `dataset_id`, `row_data`\n- **Customization**:\n  - Add validation for tabular data structure.\n\n### 19. Store File Metadata 📋\n- **Type**: Supabase\n- **Purpose**: Stores file metadata in the `document_metadata` table.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `document_metadata`\n  - Columns: `file_id`, `file_name`, `file_type`, `file_url`\n- **Customization**:\n  - Add more metadata fields as needed.\n\n### 20. Record in Knowledge Base 📚\n- **Type**: Supabase\n- **Purpose**: Stores basic file info in the `knowledge_base` table.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `knowledge_base`\n  - Columns: `file_id`, `file_name`, `file_type`, `file_url`, `upload_date`\n- **Customization**:\n  - Add indexes for faster lookups.\n\n### 21. Log File Errors ⚠️\n- **Type**: Supabase\n- **Purpose**: Logs errors for unsupported file types.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `error_log`\n  - Columns: `error_type`, `error_message`\n- **Customization**:\n  - Add notifications for errors.\n\n### 22. Log Duplicate Errors ⚠️\n- **Type**: Supabase\n- **Purpose**: Logs errors for duplicate files.\n- **Configuration**:\n  - Operation: Insert\n  - Table: `error_log`\n  - Columns: `error_type`, `error_message`\n- **Customization**:\n  - Add notifications for duplicates.\n\n\n\n\n# Interactive Knowledge Base Chat with Supabase RAG using GPT-4o-mini 📚💬\n\n## Introduction 🌟\n\nThis n8n workflow creates an **interactive chat interface** that allows users to query a company knowledge base using **Retrieval-Augmented Generation (RAG)**. It retrieves relevant information from text documents and tabular data stored in **Supabase**, then generates natural language responses using **OpenAI’s GPT-4o-mini** model. Designed for teams managing internal knowledge, this workflow enables users to ask questions like “What’s the remote work policy?” or “Show me the latest budget data” and receive accurate, context-aware responses in a conversational format. 🚀\n\n## Problem Statement 🎯\n\nManaging a company knowledge base can be a daunting task—employees often struggle to find specific information buried in documents or spreadsheets, leading to wasted time and inefficiencies. Traditional search methods may not understand natural language queries or provide contextually relevant results. This workflow solves these issues by:\n- Offering a **chat-based interface** for natural language queries, making it easy for users to ask questions in their own words.\n- Leveraging **RAG** to retrieve relevant text and tabular data from Supabase, ensuring responses are accurate and context-aware.\n- Supporting diverse file types, including **text-based files** (e.g., PDFs, DOCX) and **tabular data** (e.g., XLSX, CSV), for comprehensive knowledge access.\n- Maintaining **conversation history** to provide context during interactions, improving the user experience.\n\n## Target Audience 👥\n\nThis workflow is ideal for:\n- **HR Teams**: Quickly access company policies, employee handbooks, or benefits documents.\n- **Finance Teams**: Retrieve budget data, expense reports, or financial summaries from spreadsheets.\n- **Knowledge Managers**: Build a centralized assistant for internal documentation, streamlining information access.\n- **Developers**: Extend the workflow with additional tools or integrations for custom use cases.\n\n## Workflow Description 🔍\n\nThis workflow consists of a chat interface powered by n8n’s Chat Trigger node, an AI Agent node for RAG, and several tools to retrieve data from Supabase. Here’s how it works step-by-step:\n\n1. **User Initiates a Chat**: The user interacts with a chat interface, sending queries like “Summarize our remote work policy” or “Show budget data for Q1 2025.”\n2. **Query Processing with RAG**: The AI Agent processes the query using RAG, retrieving relevant data from Supabase tables and generating a response with OpenAI’s GPT-4o-mini model.\n3. **Data Retrieval and Response Generation**: The workflow uses multiple tools to fetch data:\n   - Retrieves text chunks from the `documents` table using vector search.\n   - Fetches tabular data from the `document_rows` table based on file IDs.\n   - Extracts full document text or lists available files as needed.\n   - Generates a natural language response combining the retrieved data.\n4. **Conversation History Management**: Stores the conversation history in Supabase to maintain context for follow-up questions.\n5. **Response Delivery**: Formats and sends the response back to the chat interface for the user to view.\n\n## Nodes Breakdown 🛠️\n\n### 1. Start Chat Interface 💬\n- **Type**: Chat Trigger\n- **Purpose**: Provides the interactive chat interface for users to input queries and receive responses.\n- **Configuration**:\n  - Chat Title: `Company Knowledge Base Assistant`\n  - Chat Subtitle: `Ask me anything about company documents!`\n  - Welcome Message: `Hello! I’m your Company Knowledge Base Assistant. How can I help you today?`\n  - Suggestions: `What is the company policy on remote work?`, `Show me the latest budget data.`, `List all policy documents.`\n  - Output Chat Session ID: `true`\n  - Output User Message: `true`\n- **Customization**:\n  - Update the title and welcome message to align with your company branding (e.g., `HR Knowledge Assistant`).\n  - Add more suggestions relevant to your use case (e.g., `What are the company benefits?`).\n\n### 2. Process Query with RAG 🧠\n- **Type**: AI Agent\n- **Purpose**: Orchestrates the RAG process by retrieving relevant data using tools and generating responses with OpenAI’s GPT-4o-mini.\n- **Configuration**:\n  - Credential: OpenAI API key\n  - Model: `gpt-4o-mini`\n  - System Prompt: `You are a helpful assistant for a company knowledge base. Use the provided tools to retrieve relevant information from documents and tabular data. If the query involves tabular data, format it clearly in your response. If no relevant data is found, respond with \"I couldn’t find any relevant information. Can you provide more details?\"`\n  - Input Field: `{{ $node['Start Chat Interface'].json.message }}`\n- **Customization**:\n  - Switch to a different model (e.g., `gpt-3.5-turbo`) to adjust cost or performance.\n  - Modify the system prompt to change the tone (e.g., more formal for HR use cases).\n\n### 3. Retrieve Text Chunks 📄\n- **Type**: Supabase Vector Store (Tool)\n- **Purpose**: Retrieves relevant text chunks from the `documents` table using vector search.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation Mode: Retrieve Documents (As Tool for AI Agent)\n  - Table Name: `documents`\n  - Embedding Field: `embedding`\n  - Content Field: `content_text`\n  - Metadata Field: `metadata`\n  - Embedding Model: OpenAI `text-embedding-ada-002`\n  - Top K: `10`\n- **Customization**:\n  - Adjust `Top K` to retrieve more or fewer results (e.g., `5` for faster responses).\n  - Ensure the `match_documents` function (see prerequisites) is defined in Supabase.\n\n### 4. Fetch Tabular Data 📊\n- **Type**: Supabase (Tool, Execute Query)\n- **Purpose**: Retrieves tabular data from the `document_rows` table based on a file ID.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Execute Query\n  - Query: `SELECT row_data FROM document_rows WHERE dataset_id = $1 LIMIT 10`\n  - Tool Description: `Run a SQL query - use this to query from the document_rows table once you know the file ID you are querying. dataset_id is the file_id and you are always using the row_data for filtering, which is a jsonb field that has all the keys from the file schema given in the document_metadata table.`\n- **Customization**:\n  - Modify the query to filter specific columns or add conditions (e.g., `WHERE dataset_id = $1 AND row_data-&gt;&gt;'year' = '2025'`).\n  - Increase the `LIMIT` for larger datasets.\n\n### 5. Extract Full Document Text 📜\n- **Type**: Supabase (Tool, Execute Query)\n- **Purpose**: Fetches the full text of a document by concatenating all text chunks for a given `file_id`.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Execute Query\n  - Query: `SELECT string_agg(content_text, ' ') as document_text FROM documents WHERE metadata-&gt;&gt;'file_id' = $1 GROUP BY metadata-&gt;&gt;'file_id'`\n  - Tool Description: `Given file id fetch the text from the documents`\n- **Customization**:\n  - Add filters to the query if needed (e.g., limit to specific metadata fields).\n\n### 6. List Available Files 📋\n- **Type**: Supabase (Tool, Select)\n- **Purpose**: Lists all files in the knowledge base from the `document_metadata` table.\n- **Configuration**:\n  - Credential: Supabase credentials\n  - Operation: Select\n  - Schema: `public`\n  - Table: `document_metadata`\n  - Tool Description: `Use this tool to fetch all documents including the table schema if the file is csv, excel or xlsx`\n- **Customization**:\n  - Add filters to list specific file types (e.g., `WHERE file_type = 'application/pdf'`).\n  - Modify the columns selected to include additional metadata (e.g., `file_size`).\n\n### 7. Manage Chat History 💾\n- **Type**: Postgres Chat Memory (Tool)\n- **Purpose**: Stores and retrieves conversation history to maintain context.\n- **Configuration**:\n  - Credential: Supabase credentials (Postgres-compatible)\n  - Table Name: `n8n_chat_history`\n  - Session ID Field: `session_id`\n  - Session ID Value: `{{ $node['Start Chat Interface'].json.sessionId }}`\n  - Message Field: `message`\n  - Sender Field: `sender`\n  - Timestamp Field: `timestamp`\n  - Context Window Length: `5`\n- **Customization**:\n  - Increase the context window length for longer conversations (e.g., `10` messages).\n  - Add indexes on `session_id` and `timestamp` in Supabase for better performance.\n\n### 8. Format and Send Response 📤\n- **Type**: Set\n- **Purpose**: Formats the AI Agent’s response and sends it back to the chat interface.\n- **Configuration**:\n  - Fields:\n    - `response`: `{{ $node['Process Query with RAG'].json.output }}`\n- **Customization**:\n  - Add additional formatting to the response if needed (e.g., prepend with a timestamp or apply markdown formatting).\n\n## Setup Instructions 🛠️\n\n### Prerequisites 📋\n1. **n8n Setup**:\n   - Ensure you’re using n8n version 1.0 or higher.\n   - Enable the AI features in n8n settings.\n2. **Supabase**:\n   - Create a Supabase project and set up the following tables:\n     - `documents`: `id (uuid)`, `content_text (text)`, `embedding (vector(1536))`, `metadata (jsonb)`\n     - `document_rows`: `id (uuid)`, `dataset_id (varchar)`, `row_data (jsonb)`\n     - `document_metadata`: `file_id (varchar)`, `file_name (varchar)`, `file_type (varchar)`, `file_url (text)`\n     - `knowledge_base`: `id (serial)`, `file_id (varchar)`, `file_name (varchar)`, `file_type (varchar)`, `file_url (text)`, `upload_date (timestamp)`\n     - `n8n_chat_history`: `id (serial)`, `session_id (varchar)`, `message (text)`, `sender (varchar)`, `timestamp (timestamp)`\n   - Add the `match_documents` function to Supabase to enable vector search:\n     ```sql\n     CREATE OR REPLACE FUNCTION match_documents (\n       query_embedding vector(1536),\n       match_count int DEFAULT 5,\n       filter jsonb DEFAULT '{}'\n     ) RETURNS TABLE (\n       id uuid,\n       content_text text,\n       metadata jsonb,\n       similarity float\n     ) LANGUAGE plpgsql AS $$  \n     BEGIN\n       RETURN QUERY\n       SELECT\n         documents.id,\n         documents.content_text,\n         documents.metadata,\n         1 - (documents.embedding &lt;=&gt; query_embedding) as similarity\n       FROM documents\n       WHERE documents.metadata @&gt; filter\n       ORDER BY similarity DESC\n       LIMIT match_count;\n     END;\n       $$;",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "File Created",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update to File",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set File ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check for Duplicates",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Insert Metadata",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Extract from File PDF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from CSV",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from XLSX",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract from RTF",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Logger",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Validate File",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IF Duplicate Check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Log Duplicate",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Debug File ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Schema",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schema Document Metadata",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from DOC",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Duplicate Notification",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Error Notification",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Delete old Doc",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from TXT",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RAG AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "List Documents",
+      "type": "n8n-nodes-base.postgresTool",
+      "role": "postgresTool",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Query Document Rows",
+      "type": "n8n-nodes-base.postgresTool",
+      "role": "postgresTool",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Insert Table Rows",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Delete Old Data Rows",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Error Type",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Supabase Vector Store2",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI2",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Full Document Text - Get File Contents",
+      "type": "n8n-nodes-base.postgresTool",
+      "role": "postgresTool",
+      "configDescription": "Version 2.6"
+    }
+  ]
+}

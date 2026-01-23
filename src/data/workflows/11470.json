@@ -1,0 +1,368 @@
+{
+  "id": 11470,
+  "slug": "11470",
+  "title": "Real-time ISS overhead alert with weather check and multi-channel notifications",
+  "description": "Get notified when the International Space Station passes over your location - but only when you can actually see it! This workflow combines real-time ISS tracking with weather condition checks to send you alerts at the perfect moment for observation.\n\n## Who is this for\n\n- Space enthusiasts and astronomy hobbyists who want to spot the ISS\n- Parents looking to share exciting science moments with their kids\n- Remote workers who want a unique break reminder\n- Educators creating engaging science experiences\n\n## What this workflow does\n\n1. Tracks ISS position every 10 minutes using the Open Notify API\n2. Calculates distance and direction from your location using the Haversine formula\n3. Checks weather conditions via OpenWeatherMap to determine if ISS will be visible\n4. Provides observation guidance including compass direction, elevation angle, and viewing tips\n5. Includes crew information showing who is currently aboard the ISS\n6. Sends multi-channel alerts to Discord, Telegram, and Gmail simultaneously\n\n## How to set up\n\n1. Configure your location in the Calculate Distance and Direction node\n2. Add OpenWeatherMap credentials (free tier available)\n3. Set up at least one notification channel (Discord, Telegram, or Gmail)\n4. Activate the workflow\n\n## Requirements\n\n- OpenWeatherMap API key (free)\n- At least one notification channel configured",
+  "featuredImage": "/data/workflows/11470/11470.webp",
+  "author": {
+    "id": 101,
+    "slug": "kaori",
+    "name": "suzuki",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 22,
+  "downloads": 2,
+  "createdAt": "2025-12-04T01:25:58.725Z",
+  "updatedAt": "2026-01-16T09:08:51.956Z",
+  "publishedAt": "2025-12-04T01:25:58.725Z",
+  "nodes": 55,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11470",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Real-time ISS overhead alert with weather check and multi-channel notifications",
+    "workflowName": "Real-time ISS overhead alert with weather check and multi-channel notifications",
+    "description": "Get notified when the International Space Station passes over your location - but only when you can actually see it! This workflow combines real-time ISS tracking with weather condition checks to send you alerts at the perfect moment for observation.\n\n## Who is this for\n\n- Space enthusiasts and astronomy hobbyists who want to spot the ISS\n- Parents looking to share exciting science moments with their kids\n- Remote workers who want a unique break reminder\n- Educators creating engaging science experiences\n\n## What this workflow does\n\n1. Tracks ISS position every 10 minutes using the Open Notify API\n2. Calculates distance and direction from your location using the Haversine formula\n3. Checks weather conditions via OpenWeatherMap to determine if ISS will be visible\n4. Provides observation guidance including compass direction, elevation angle, and viewing tips\n5. Includes crew information showing who is currently aboard the ISS\n6. Sends multi-channel alerts to Discord, Telegram, and Gmail simultaneously\n\n## How to set up\n\n1. Configure your location in the Calculate Distance and Direction node\n2. Add OpenWeatherMap credentials (free tier available)\n3. Set up at least one notification channel (Discord, Telegram, or Gmail)\n4. Activate the workflow\n\n## Requirements\n\n- OpenWeatherMap API key (free)\n- At least one notification channel configured",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Real-time Check (5 min)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Daily Predictions (6 AM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Weekly Report (Sunday 8 PM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get ISS Detailed (N2YO)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Tiangong Position",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Calculate All Satellites",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Any Satellite Nearby?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Weather Conditions",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Astronauts in Space",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Observable Conditions?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Trivia",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate Space Trivia",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Format Rich Notification",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log to History",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Get ISS Pass Predictions",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Tiangong Predictions",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Process All Predictions",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Prediction Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Predictions to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Predictions to Discord",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Calendar Events",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Add to Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get History Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Calculate Weekly Statistics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Report",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate Weekly Report",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Format Weekly Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Weekly to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Weekly to Discord",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Real-time Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prediction Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Weekly Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get ISS Position1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Analyze Observation Conditions1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send to Discord2",
+      "type": "n8n-nodes-base.discord",
+      "role": "discord",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send to Telegram3",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send to Slack1",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Workflow Description1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 1 - Fetch Positions",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 2 - Calculate",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 3 - Filter Nearby",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 4 - Context",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 5 - Score",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 6 - AI Trivia",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 7 - Format",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 8 - Log & Send",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 1 - Fetch Predictions",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 2 - Process",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 3 - Format Report",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 4 - Notify",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 5 - Calendar",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 1 - Load History",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 2 - Stats",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 3 - AI Analysis",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 4 - Send Report",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "id": 12428,
+  "slug": "12428",
+  "title": "Triage tenant complaints with GPT-4.1, Slack, email and Google Sheets",
+  "description": "## Who this is for\n\nProperty management teams handling multiple properties with high tenant complaint volumes who want AI-assisted triage.\n\n## What this workflow does\n\nAutomatically classifies tenant complaints by urgency and type, escalates high-priority complaints, schedules medium-priority follow-ups, acknowledges low-priority complaints, and logs all activity for reporting.\n\n## How it works\n\n1. Tenant submits a complaint through the portal.\n2. AI classifies complaint urgency and type.\n3. High-priority complaints trigger Slack notifications and follow-up tasks.\n4. Tenant receives an AI-personalized acknowledgment email.\n5. Google Sheets logs each complaint with details.\n\n## How to set up\n\nConnect your form, Slack, Email, Google Sheets, and AI credentials. Customize AI prompts for your tenant complaint categories and test routing.\n\n## Requirements\n\n- n8n (cloud or self-hosted)\n- AI node access\n- Slack and Email credentials\n- Google Sheets\n\n## How to customize\n\nAdjust complaint types, escalation rules, notification channels, or AI follow-up prompts.\n\nBuilt by QuarterSmart. Created by Hyrum Hurst.\n",
+  "featuredImage": "/data/workflows/12428/12428.webp",
+  "author": {
+    "id": 101,
+    "slug": "hyrum-hurst",
+    "name": "Hyrum Hurst",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 16,
+  "downloads": 1,
+  "createdAt": "2026-01-03T18:57:41.038Z",
+  "updatedAt": "2026-01-16T09:12:25.680Z",
+  "publishedAt": "2026-01-03T18:57:41.038Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12428",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Triage tenant complaints with GPT-4.1, Slack, email and Google Sheets",
+    "workflowName": "Triage tenant complaints with GPT-4.1, Slack, email and Google Sheets",
+    "description": "## Who this is for\n\nProperty management teams handling multiple properties with high tenant complaint volumes who want AI-assisted triage.\n\n## What this workflow does\n\nAutomatically classifies tenant complaints by urgency and type, escalates high-priority complaints, schedules medium-priority follow-ups, acknowledges low-priority complaints, and logs all activity for reporting.\n\n## How it works\n\n1. Tenant submits a complaint through the portal.\n2. AI classifies complaint urgency and type.\n3. High-priority complaints trigger Slack notifications and follow-up tasks.\n4. Tenant receives an AI-personalized acknowledgment email.\n5. Google Sheets logs each complaint with details.\n\n## How to set up\n\nConnect your form, Slack, Email, Google Sheets, and AI credentials. Customize AI prompts for your tenant complaint categories and test routing.\n\n## Requirements\n\n- n8n (cloud or self-hosted)\n- AI node access\n- Slack and Email credentials\n- Google Sheets\n\n## How to customize\n\nAdjust complaint types, escalation rules, notification channels, or AI follow-up prompts.\n\nBuilt by QuarterSmart. Created by Hyrum Hurst.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Tenant Complaint Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Normalize Complaint Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "AI Complaint Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Route by Urgency",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Notify Property Manager (High Priority)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "AI Email Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model for Email",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Send Acknowledgment Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create Task Data (Medium Priority)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Consolidate All Branches",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "AI Resolution Suggester",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model for Resolutions",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

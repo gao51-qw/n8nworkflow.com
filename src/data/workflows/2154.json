@@ -1,0 +1,110 @@
+{
+  "id": 2154,
+  "slug": "2154",
+  "title": "Classify new bugs in Linear with OpenAI's GPT-4 and move them to the right team",
+  "description": "## Use case\nWhen working with multiple teams, bugs must get in front of the right team as quickly as possible to be resolved. Normally this includes a manual grooming of new bugs that have arrived in your ticketing system (in our case Linear). We found this way too time-consuming. That's why we built this workflow.\n\n## What this workflow does\nThis workflow triggers every time a Linear issue is created or updated within a certain team. For us at n8n, we created one general team called Engineering where all bugs get added in the beginning. The workflow then checks if the issue meets the criteria to be auto-moved to a certain team. In our case, that means that the description is filled, that it has the bug label, and that it's in the `Triage` state. The workflow then classifies the bug using OpenAI's GPT-4 model before updating the team property of the Linear issue. If the AI fails to classify a team, the workflow sends an alert to Slack.\n\n## Setup\n1. Add your Linear and OpenAi credentials\n2. Change the team in the `Linear Trigger` to match your needs\n3. Customize your teams and their areas of responsibility in the `Set me up` node. Please use the format `[Teamname][Description/Areas of responsibility]`. Also, make sure that the team names match the names in Linear exactly.\n4. Change the Slack channel in the `Set me up` node to your Slack channel of choice.\n\n## How to adjust it to your needs\n- Play around with the context that you're giving to OpenAI, to make sure the model has enough knowledge about your teams and their areas of responsibility\n- Adjust the handling of AI failures to your needs\n\n## How to enhance this workflow\nAt n8n we use this workflow in combination with some others. E.g. we have the following things on top:\n- We're using an automation that enables everyone to add new bugs easily with the right data via a `/bug` command in Slack (check out [this template](https://n8n.io/workflows/2153-add-a-bug-to-linear-via-slack-command) if that's interesting to you)\n\nThis workflow was built using n8n version 1.30.0\n",
+  "featuredImage": "/data/workflows/2154/2154.webp",
+  "author": {
+    "id": 101,
+    "slug": "nik8n",
+    "name": "Niklas Hatje",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 2122,
+  "downloads": 212,
+  "createdAt": "2024-02-29T18:27:31.406Z",
+  "updatedAt": "2026-01-16T08:23:18.940Z",
+  "publishedAt": "2024-02-29T18:27:31.406Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2154",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Classify new bugs in Linear with OpenAI's GPT-4 and move them to the right team",
+    "workflowName": "Classify new bugs in Linear with OpenAI's GPT-4 and move them to the right team",
+    "description": "## Use case\nWhen working with multiple teams, bugs must get in front of the right team as quickly as possible to be resolved. Normally this includes a manual grooming of new bugs that have arrived in your ticketing system (in our case Linear). We found this way too time-consuming. That's why we built this workflow.\n\n## What this workflow does\nThis workflow triggers every time a Linear issue is created or updated within a certain team. For us at n8n, we created one general team called Engineering where all bugs get added in the beginning. The workflow then checks if the issue meets the criteria to be auto-moved to a certain team. In our case, that means that the description is filled, that it has the bug label, and that it's in the `Triage` state. The workflow then classifies the bug using OpenAI's GPT-4 model before updating the team property of the Linear issue. If the AI fails to classify a team, the workflow sends an alert to Slack.\n\n## Setup\n1. Add your Linear and OpenAi credentials\n2. Change the team in the `Linear Trigger` to match your needs\n3. Customize your teams and their areas of responsibility in the `Set me up` node. Please use the format `[Teamname][Description/Areas of responsibility]`. Also, make sure that the team names match the names in Linear exactly.\n4. Change the Slack channel in the `Set me up` node to your Slack channel of choice.\n\n## How to adjust it to your needs\n- Play around with the context that you're giving to OpenAI, to make sure the model has enough knowledge about your teams and their areas of responsibility\n- Adjust the handling of AI failures to your needs\n\n## How to enhance this workflow\nAt n8n we use this workflow in combination with some others. E.g. we have the following things on top:\n- We're using an automation that enables everyone to add new bugs easily with the right data via a `/bug` command in Slack (check out [this template](https://n8n.io/workflows/2153-add-a-bug-to-linear-via-slack-command) if that's interesting to you)\n\nThis workflow was built using n8n version 1.30.0",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Linear Trigger",
+      "type": "n8n-nodes-base.linearTrigger",
+      "role": "linearTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only tickets that need to be classified",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update team",
+      "type": "n8n-nodes-base.linear",
+      "role": "linear",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get all linear teams",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set team ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Set me up",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if AI was able to find a team",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notify in Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    }
+  ]
+}

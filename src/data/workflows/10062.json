@@ -1,0 +1,116 @@
+{
+  "id": 10062,
+  "slug": "10062",
+  "title": "Automate monthly Google Ads performance analysis with GPT-4o, Sheets & Slack",
+  "description": "# 📊 Google Ads + OpenAI + Sheets — Monthly AI Performance Analysis\n\n### Automate monthly ad performance insights with AI-powered recommendations\n\n---\n\n## 🧩 Overview\n\nThis workflow automatically **analyzes Google Ads performance every month**, using the **Google Ads API** and **OpenAI (GPT-4o)** to uncover which ad themes, categories, and messages perform best.\nIt then **generates a structured AI report**, saves it to **Google Sheets**, and sends a **Slack summary** to your marketing team.\n\n💡 Perfect for digital marketers, agencies, and growth analysts who want automated campaign insights without manually crunching numbers.\n\n---\n\n## ⚙️ Features\n\n✅ Automatically runs on the 1st of each month\n✅ Fetches last 30 days of ad performance via Google Ads API (GAQL)\n✅ Uses GPT-4o for natural-language insights & improvement ideas\n✅ Groups ads by *category* and *theme* (e.g., “Free Shipping,” “Premium”)\n✅ Generates a clean, formatted markdown report\n✅ Archives reports in Google Sheets for trend tracking\n✅ Notifies your Slack channel with AI-driven recommendations\n\n---\n\n## 🧠 Architecture\n\n| Component           | Purpose                                          |\n| ------------------- | ------------------------------------------------ |\n| **n8n**             | Workflow engine                                  |\n| **Google Ads API**  | Source of ad performance data                    |\n| **OpenAI (GPT-4o)** | Analyzes CTR patterns and writes recommendations |\n| **Google Sheets**   | Report archiving and history tracking            |\n| **Slack**           | Team notifications                               |\n\n---\n\n## 🧭 Workflow Logic (Summary)\n\n**Monthly Trigger (1st of Month)**\n⬇️\n**1️⃣ Get Performance Data (Google Ads API)**\nFetches 30-day CTR, clicks, impressions for all responsive search ads.\n⬇️\n**2️⃣ Prepare Performance Data**\nGroups data by ad group and theme keywords, builds an AI prompt.\n⬇️\n**3️⃣ AI Agent (LangChain) + GPT-4o**\nAnalyzes patterns and generates actionable insights.\n⬇️\n**4️⃣ Generate Report (Code)**\nFormats a Markdown report with AI recommendations and KPIs.\n⬇️\n**5️⃣ Save to Google Sheets**\nArchives results for long-term analytics.\n⬇️\n**6️⃣ Send Report to Slack**\nDelivers the summary directly to your marketing channel.\n\n---\n\n## 🔑 Environment Variables\n\n| Variable                 | Example                       | Description                    |\n| ------------------------ | ----------------------------- | ------------------------------ |\n| `GOOGLE_ADS_CUSTOMER_ID` | `123-456-7890`                | Google Ads customer account ID |\n| `GOOGLE_ADS_API_VERSION` | `v17`                         | Current Ads API version        |\n| `GOOGLE_SHEET_ID`        | `1xA1B2c3D4EFgH...`           | Target spreadsheet ID          |\n| `OPENAI_API_KEY`         | `sk-xxxxx`                    | OpenAI API key for GPT-4o      |\n| `SLACK_WEBHOOK_URL`      | `https://hooks.slack.com/...` | Slack incoming webhook         |\n\n---\n\n## 🔐 Credential Setup\n\n| Service           | Type                          | Required Scopes                                |\n| ----------------- | ----------------------------- | ---------------------------------------------- |\n| **Google Ads**    | OAuth2 (`googleAdsOAuth2Api`) | `https://www.googleapis.com/auth/adwords`      |\n| **OpenAI**        | API key (`openAiApi`)         | Full access                                    |\n| **Google Sheets** | OAuth2                        | `https://www.googleapis.com/auth/spreadsheets` |\n| **Slack**         | Webhook                       | `chat:write`                                   |\n\n---\n\n## 🧱 Node-by-Node Breakdown\n\n| Node                               | Purpose                                   | Key Configuration                                                                                                                        |\n| ---------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |\n| **Monthly Trigger**                | Starts workflow on 1st of every month     | Cron: `0 0 1 * *`                                                                                                                        |\n| **Get Performance Data**           | Queries Ads data                          | Endpoint: `https://googleads.googleapis.com/v17/customers/{id}/googleAds:search`<br>Query: GAQL (CTR, clicks, impressions, last 30 days) |\n| **Prepare Performance Data**       | Aggregates and builds AI prompt           | Groups by ad group and theme, computes CTRs                                                                                              |\n| **AI Agent – Analyze Performance** | Passes formatted data to GPT-4o           | System message: *“You are a Google Ads performance analyst…”*                                                                            |\n| **OpenAI Chat Model (GPT-4o)**     | Analytical reasoning engine               | Model: `gpt-4o`, Temperature 0.2                                                                                                         |\n| **Generate Report**                | Parses AI output, formats Markdown report | Adds recommendations + next steps                                                                                                        |\n| **Save Report to Sheets**          | Archives report                           | Sheet name: *Performance Reports*                                                                                                        |\n| **Send Report (Slack)**            | Sends summary                             | Uses report_markdown variable                                                                                                            |\n\n---\n\n## 🧠 AI Report Example\n\n```\n# 30-Day Performance Analysis Report\n\n## Executive Summary\nAnalyzed: 940 ads\nPeriod: Last 30 days\n\n## Top Performing Categories\n- Running Shoes: 9.4% CTR (120 ads)\n- Fitness Apparel: 8.2% CTR (90 ads)\n\n## Top Performing Themes\n- \"Free Shipping\" messaging: 9.8% CTR (58 ads)\n- \"Premium\" messaging: 8.5% CTR (44 ads)\n\n## AI-Powered Recommendations\n1. [HIGH] Emphasize “Free Shipping” across more ad groups.  \n   Expected Impact: +5 % CTR  \n2. [MEDIUM] Test “Premium Quality” vs. “New Arrivals.”  \n   Expected Impact: +3 % CTR  \n\n## Next Steps\n1. Implement new ad variations  \n2. A/B test messaging  \n3. Re-analyze next month\n```\n\n---\n\n## 🧩 Testing Procedure\n\n1️⃣ Temporarily disable the cron trigger.\n2️⃣ Run the workflow manually.\n3️⃣ Confirm:\n\n* Google Ads node returns JSON with `results`.\n* AI Agent output is valid JSON.\n* Report is written to Sheets.\n* Slack message received.\n\n4️⃣ Re-enable the monthly trigger once verified.\n\n---\n\n## 🧾 Output in Google Sheets\n\n| Date       | Ads Analyzed | Top Category  | Top Theme     | Key Recommendations                | Generated At      |\n| ---------- | ------------ | ------------- | ------------- | ---------------------------------- | ----------------- |\n| 2025-10-01 | 940          | Running Shoes | Free Shipping | “Add Free Shipping copy to 10 ads” | 2025-10-01T00:05Z |\n\n---\n\n## 🪜 Maintenance\n\n| Frequency | Task                                      |\n| --------- | ----------------------------------------- |\n| Monthly   | Review AI accuracy and update themes list |\n| Quarterly | Refresh Google Ads API credentials        |\n| As needed | Update GAQL fields for new metrics        |\n\n---\n\n## ⚙️ API Verification\n\n**Endpoint:**\n`POST https://googleads.googleapis.com/v17/customers/{customer_id}/googleAds:search`\n\n**Scopes:**\n`https://www.googleapis.com/auth/adwords`\n\n**GAQL Query:**\n\n```sql\nSELECT ad_group_ad.ad.id,\n       ad_group_ad.ad.responsive_search_ad.headlines,\n       ad_group.name,\n       metrics.impressions,\n       metrics.clicks,\n       metrics.ctr\nFROM ad_group_ad\nWHERE segments.date DURING LAST_30_DAYS\n  AND metrics.impressions &gt; 100\nORDER BY metrics.clicks DESC\nLIMIT 1000\n```\n\n✅ Fully valid query — verified for GAQL syntax, fields, and resource joins.\n✅ OAuth2 flow handled by n8n’s `googleAdsOAuth2Api`.\n✅ Optional: add `\"timeout\": 60000` for large accounts.\n\n---\n\n## 📈 Metrics of Success\n\n| KPI                        | Target           |\n| -------------------------- | ---------------- |\n| Report accuracy            | ≥ 95 %           |\n| Monthly automation success | ≥ 99 %           |\n| CTR improvement tracking   | +3–5 % over time |\n\n---\n\n## 🔗 References\n\n* [Google Ads API Docs](https://developers.google.com/google-ads/api/docs/start)\n* [LangChain in n8n](https://docs.n8n.io/integrations/langchain/)\n* [OpenAI API Reference](https://platform.openai.com/docs)\n* [Google Sheets API](https://developers.google.com/sheets/api)\n* [Slack Incoming Webhooks](https://api.slack.com/messaging/webhooks)\n\n---\n\n### 🎯 Conclusion\n\nYou now have a **fully automated Google Ads performance analysis workflow** powered by:\n\n* **Google Ads API** for granular metrics\n* **OpenAI GPT-4o** for intelligent recommendations\n* **Google Sheets** for archiving\n* **Slack** for team-wide updates\n\n💡 **Result:** A recurring, data-driven optimization loop that improves ad performance every month — with zero manual effort.\n\n",
+  "featuredImage": "/data/workflows/10062/10062.webp",
+  "author": {
+    "id": 101,
+    "slug": "nikkannoora",
+    "name": "Nikan Noorafkan",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 336,
+  "downloads": 33,
+  "createdAt": "2025-10-22T20:38:46.412Z",
+  "updatedAt": "2026-01-16T09:03:11.863Z",
+  "publishedAt": "2025-10-22T20:38:46.412Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10062",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate monthly Google Ads performance analysis with GPT-4o, Sheets & Slack",
+    "workflowName": "Automate monthly Google Ads performance analysis with GPT-4o, Sheets & Slack",
+    "description": "# 📊 Google Ads + OpenAI + Sheets — Monthly AI Performance Analysis\n\n### Automate monthly ad performance insights with AI-powered recommendations\n\n---\n\n## 🧩 Overview\n\nThis workflow automatically **analyzes Google Ads performance every month**, using the **Google Ads API** and **OpenAI (GPT-4o)** to uncover which ad themes, categories, and messages perform best.\nIt then **generates a structured AI report**, saves it to **Google Sheets**, and sends a **Slack summary** to your marketing team.\n\n💡 Perfect for digital marketers, agencies, and growth analysts who want automated campaign insights without manually crunching numbers.\n\n---\n\n## ⚙️ Features\n\n✅ Automatically runs on the 1st of each month\n✅ Fetches last 30 days of ad performance via Google Ads API (GAQL)\n✅ Uses GPT-4o for natural-language insights & improvement ideas\n✅ Groups ads by *category* and *theme* (e.g., “Free Shipping,” “Premium”)\n✅ Generates a clean, formatted markdown report\n✅ Archives reports in Google Sheets for trend tracking\n✅ Notifies your Slack channel with AI-driven recommendations\n\n---\n\n## 🧠 Architecture\n\n| Component           | Purpose                                          |\n| ------------------- | ------------------------------------------------ |\n| **n8n**             | Workflow engine                                  |\n| **Google Ads API**  | Source of ad performance data                    |\n| **OpenAI (GPT-4o)** | Analyzes CTR patterns and writes recommendations |\n| **Google Sheets**   | Report archiving and history tracking            |\n| **Slack**           | Team notifications                               |\n\n---\n\n## 🧭 Workflow Logic (Summary)\n\n**Monthly Trigger (1st of Month)**\n⬇️\n**1️⃣ Get Performance Data (Google Ads API)**\nFetches 30-day CTR, clicks, impressions for all responsive search ads.\n⬇️\n**2️⃣ Prepare Performance Data**\nGroups data by ad group and theme keywords, builds an AI prompt.\n⬇️\n**3️⃣ AI Agent (LangChain) + GPT-4o**\nAnalyzes patterns and generates actionable insights.\n⬇️\n**4️⃣ Generate Report (Code)**\nFormats a Markdown report with AI recommendations and KPIs.\n⬇️\n**5️⃣ Save to Google Sheets**\nArchives results for long-term analytics.\n⬇️\n**6️⃣ Send Report to Slack**\nDelivers the summary directly to your marketing channel.\n\n---\n\n## 🔑 Environment Variables\n\n| Variable                 | Example                       | Description                    |\n| ------------------------ | ----------------------------- | ------------------------------ |\n| `GOOGLE_ADS_CUSTOMER_ID` | `123-456-7890`                | Google Ads customer account ID |\n| `GOOGLE_ADS_API_VERSION` | `v17`                         | Current Ads API version        |\n| `GOOGLE_SHEET_ID`        | `1xA1B2c3D4EFgH...`           | Target spreadsheet ID          |\n| `OPENAI_API_KEY`         | `sk-xxxxx`                    | OpenAI API key for GPT-4o      |\n| `SLACK_WEBHOOK_URL`      | `https://hooks.slack.com/...` | Slack incoming webhook         |\n\n---\n\n## 🔐 Credential Setup\n\n| Service           | Type                          | Required Scopes                                |\n| ----------------- | ----------------------------- | ---------------------------------------------- |\n| **Google Ads**    | OAuth2 (`googleAdsOAuth2Api`) | `https://www.googleapis.com/auth/adwords`      |\n| **OpenAI**        | API key (`openAiApi`)         | Full access                                    |\n| **Google Sheets** | OAuth2                        | `https://www.googleapis.com/auth/spreadsheets` |\n| **Slack**         | Webhook                       | `chat:write`                                   |\n\n---\n\n## 🧱 Node-by-Node Breakdown\n\n| Node                               | Purpose                                   | Key Configuration                                                                                                                        |\n| ---------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |\n| **Monthly Trigger**                | Starts workflow on 1st of every month     | Cron: `0 0 1 * *`                                                                                                                        |\n| **Get Performance Data**           | Queries Ads data                          | Endpoint: `https://googleads.googleapis.com/v17/customers/{id}/googleAds:search`<br>Query: GAQL (CTR, clicks, impressions, last 30 days) |\n| **Prepare Performance Data**       | Aggregates and builds AI prompt           | Groups by ad group and theme, computes CTRs                                                                                              |\n| **AI Agent – Analyze Performance** | Passes formatted data to GPT-4o           | System message: *“You are a Google Ads performance analyst…”*                                                                            |\n| **OpenAI Chat Model (GPT-4o)**     | Analytical reasoning engine               | Model: `gpt-4o`, Temperature 0.2                                                                                                         |\n| **Generate Report**                | Parses AI output, formats Markdown report | Adds recommendations + next steps                                                                                                        |\n| **Save Report to Sheets**          | Archives report                           | Sheet name: *Performance Reports*                                                                                                        |\n| **Send Report (Slack)**            | Sends summary                             | Uses report_markdown variable                                                                                                            |\n\n---\n\n## 🧠 AI Report Example\n\n```\n# 30-Day Performance Analysis Report\n\n## Executive Summary\nAnalyzed: 940 ads\nPeriod: Last 30 days\n\n## Top Performing Categories\n- Running Shoes: 9.4% CTR (120 ads)\n- Fitness Apparel: 8.2% CTR (90 ads)\n\n## Top Performing Themes\n- \"Free Shipping\" messaging: 9.8% CTR (58 ads)\n- \"Premium\" messaging: 8.5% CTR (44 ads)\n\n## AI-Powered Recommendations\n1. [HIGH] Emphasize “Free Shipping” across more ad groups.  \n   Expected Impact: +5 % CTR  \n2. [MEDIUM] Test “Premium Quality” vs. “New Arrivals.”  \n   Expected Impact: +3 % CTR  \n\n## Next Steps\n1. Implement new ad variations  \n2. A/B test messaging  \n3. Re-analyze next month\n```\n\n---\n\n## 🧩 Testing Procedure\n\n1️⃣ Temporarily disable the cron trigger.\n2️⃣ Run the workflow manually.\n3️⃣ Confirm:\n\n* Google Ads node returns JSON with `results`.\n* AI Agent output is valid JSON.\n* Report is written to Sheets.\n* Slack message received.\n\n4️⃣ Re-enable the monthly trigger once verified.\n\n---\n\n## 🧾 Output in Google Sheets\n\n| Date       | Ads Analyzed | Top Category  | Top Theme     | Key Recommendations                | Generated At      |\n| ---------- | ------------ | ------------- | ------------- | ---------------------------------- | ----------------- |\n| 2025-10-01 | 940          | Running Shoes | Free Shipping | “Add Free Shipping copy to 10 ads” | 2025-10-01T00:05Z |\n\n---\n\n## 🪜 Maintenance\n\n| Frequency | Task                                      |\n| --------- | ----------------------------------------- |\n| Monthly   | Review AI accuracy and update themes list |\n| Quarterly | Refresh Google Ads API credentials        |\n| As needed | Update GAQL fields for new metrics        |\n\n---\n\n## ⚙️ API Verification\n\n**Endpoint:**\n`POST https://googleads.googleapis.com/v17/customers/{customer_id}/googleAds:search`\n\n**Scopes:**\n`https://www.googleapis.com/auth/adwords`\n\n**GAQL Query:**\n\n```sql\nSELECT ad_group_ad.ad.id,\n       ad_group_ad.ad.responsive_search_ad.headlines,\n       ad_group.name,\n       metrics.impressions,\n       metrics.clicks,\n       metrics.ctr\nFROM ad_group_ad\nWHERE segments.date DURING LAST_30_DAYS\n  AND metrics.impressions &gt; 100\nORDER BY metrics.clicks DESC\nLIMIT 1000\n```\n\n✅ Fully valid query — verified for GAQL syntax, fields, and resource joins.\n✅ OAuth2 flow handled by n8n’s `googleAdsOAuth2Api`.\n✅ Optional: add `\"timeout\": 60000` for large accounts.\n\n---\n\n## 📈 Metrics of Success\n\n| KPI                        | Target           |\n| -------------------------- | ---------------- |\n| Report accuracy            | ≥ 95 %           |\n| Monthly automation success | ≥ 99 %           |\n| CTR improvement tracking   | +3–5 % over time |\n\n---\n\n## 🔗 References\n\n* [Google Ads API Docs](https://developers.google.com/google-ads/api/docs/start)\n* [LangChain in n8n](https://docs.n8n.io/integrations/langchain/)\n* [OpenAI API Reference](https://platform.openai.com/docs)\n* [Google Sheets API](https://developers.google.com/sheets/api)\n* [Slack Incoming Webhooks](https://api.slack.com/messaging/webhooks)\n\n---\n\n### 🎯 Conclusion\n\nYou now have a **fully automated Google Ads performance analysis workflow** powered by:\n\n* **Google Ads API** for granular metrics\n* **OpenAI GPT-4o** for intelligent recommendations\n* **Google Sheets** for archiving\n* **Slack** for team-wide updates\n\n💡 **Result:** A recurring, data-driven optimization loop that improves ad performance every month — with zero manual effort.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Monthly Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Performance Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Performance Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Agent - Analyze Performance",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Save Report to Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Send Report",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

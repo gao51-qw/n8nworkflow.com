@@ -1,0 +1,235 @@
+{
+  "id": 8409,
+  "slug": "8409",
+  "title": "Automated LinkedIn lead enrichment pipeline using Apollo.io & Google Sheets",
+  "description": "## LinkedIn to Apollo.io Lead Enrichment System with Google Sheets\n\nAutomatically capture company and store details from LinkedIn posts, enrich them with domain names and key decision-maker (KDM) data from Apollo.io, and store everything neatly in Google Sheets.  \nThis workflow turns LinkedIn post data into a complete, structured lead database — fully automated from detection to enrichment.\n\n---\n\n## 🧾 Summary\n\nThis workflow reads LinkedIn post data (in JSON format) received via a webhook, extracts company and location information using an AI agent, and progressively enriches the data in three stages:  \n1. **Find Company Domain** using Apollo.io  \n2. **Fetch Key Decision Makers (KDMs)** using the company domain  \n3. **Find Corporate Emails** for those KDMs  \n\nAll results are automatically updated in **Google Sheets**, ensuring your lead list remains fresh, structured, and actionable.\n\n---\n\n## ⚙️ Prerequisites\n\nBefore running the workflow, make sure you have:\n- An **Apollo.io API Key** with company and people search access  \n- A connected **Google Sheets** account (OAuth2)  \n- A **Webhook URL or LinkedIn scraper** that feeds JSON-formatted post data  \n- (Optional) An **OpenAI / AI Agent node** to extract company names and store locations from post text\n\n---\n\n## 🧩 Example Input (Webhook JSON)\n\nEach LinkedIn post is received as a JSON object containing key clues:\n\n```json\n{\n  \"index\": 1,\n  \"text\": \"Excited to announce the opening of our new KFC store at Sky City Mall, Borivali East 🎉🍗\\n\\nLooking forward to welcoming you all to experience the Finger Lickin’ Good taste at our newest location!\\n\\n#KFCIndia #NewStoreOpening #Borivali #SkyCityMall #Sapphirefoods\",\n  \"CompanyName\": \"MockCompany\",\n  \"NewStoreLocation\": \"optional\",\n  \"PersonPosted\": \"https://linkedin.com/in/mockperson\",\n  \"PostImage\": null,\n  \"PostLink\": \"https://www.linkedin.com/search/results/all/?keywords=%23kfcindia&origin=HASH_TAG_FROM_FEED\",\n  \"extracted_at\": \"2025-09-08T12:05:40.044101\"\n}\n\n```\n## 🧠 Workflow Overview\n\nThis workflow runs in three main stages, moving from **LinkedIn data → company domain → people → emails**.\n\n---\n\n## **Stage 1: Company Name to Company Domain 🌐**\n\n**Goal:** Convert each company name into its website domain using Apollo.io.\n\n### **Nodes & Flow**\n- **Schedule Trigger** — Runs automatically (e.g., once a week) to check your Google Sheet for companies missing a domain.  \n- **IF Node (Check for Missing Domain)** — Filters only companies without a website.  \n- **Loop Over Items** — Iterates through each company record.  \n- **HTTP Request – Find Domain** — Calls the Apollo.io Company API to find the company’s domain (e.g., `kfc.com`).  \n- **Update Row in Google Sheets** — Writes the found domain back into the corresponding company row.  \n- **Wait Node – Delay Between API Calls** — Adds a small pause to avoid hitting rate limits.\n\n---\n\n## **Stage 2: Domain to Top 10 KDMs 👥**\n\n**Goal:** Fetch key decision-makers (KDMs) from each company using Apollo.io.\n\n### **Nodes & Flow**\n- **Schedule Trigger** — Runs on a weekly cadence to check for companies with a domain but no KDMs.  \n- **Get Rows from Google Sheets** — Pulls company records ready for enrichment.  \n- **IF Node (Check for Missing KDMs)** — Ensures only companies without people data are processed.  \n- **Loop Over Items** — Processes one company at a time.  \n- **HTTP Request – Find KDMs** — Searches Apollo.io People API for top roles such as *Founder, CEO, Head of Retail*, etc.  \n- **Update Row in Google Sheets** — Saves the top 10 names and their LinkedIn profiles into your sheet.  \n- **Wait Node** — Adds a delay to manage rate limits safely.\n\n---\n\n## **Stage 3: KDM Profile to Email Enricher 📧**\n\n**Goal:** Find and store verified corporate email addresses for each KDM.\n\n### **Nodes & Flow**\n- **Schedule Trigger** — Weekly automation trigger.  \n- **Get Rows from Google Sheets** — Pulls KDMs that have LinkedIn profiles but no email yet.  \n- **IF Node (Check for Missing Emails)** — Ensures only valid records are processed.  \n- **Code Node – Prepare Data** — Organizes LinkedIn profile and domain information.  \n- **HTTP Request – Find Email** — Queries Apollo.io’s email enrichment endpoint using the LinkedIn URL and domain.  \n- **Code Node – Format Response** — Cleans and formats the email result.  \n- **Wait Node** — Adds delay to avoid request bursts.  \n- **Update Row in Google Sheets** — Writes the verified email address back to the corresponding KDM entry and marks it as “Updated – email search.” 🎉\n\n---\n\n## 🧰 Setup Instructions\n\n### **1. Connect APIs & Credentials**\n- Add your **Apollo.io API Key** under HTTP Request credentials.  \n- Connect your **Google Sheets** account (OAuth2).  \n\n### **2. Customize Sheet Structure**\nAdd columns for:  \n`CompanyName`, `Domain`, `KDMs`, `LinkedInProfile`, `Email`, `Status`\n\n### **3. Set Schedule Frequency**\nEach **Schedule Trigger** can be configured separately (e.g., Stage 1 every Monday, Stage 2 every Wednesday).\n\n### **4. Optional: AI Extraction Node**\nUse an AI model (like OpenAI or Gemini) to extract **company name and location** from LinkedIn post text before enrichment.\n\n---\n\n## 🧰 Custom Node Names (Recommended for Clarity)\n\n| Node Type | Recommended Name | Description |\n|------------|------------------|-------------|\n| HTTP Request (Company) | **Find Company Domain (Apollo.io)** | Searches for the company’s official domain |\n| HTTP Request (People) | **Find Key Decision Makers (Apollo.io)** | Retrieves top company contacts |\n| HTTP Request (Emails) | **Find Corporate Emails (Apollo.io)** | Gets verified email addresses for each contact |\n| Wait Node | **API Delay (Rate Limit Buffer)** | Adds delay to avoid hitting API rate limits |\n| Code Node | **Prepare KDM Data** | Organizes input data for API calls |\n\n---\n\n## ⚙️ Customization Tips\n\n- **Multiple Campaigns:** Duplicate the workflow for different industries or store categories, updating parameters as needed.  \n- **Batch Size:** Adjust API request limits (e.g., 100 per batch) based on your Apollo.io plan.  \n- **Filtering:** Add IF conditions to skip records already marked as “Completed.”  \n- **Dashboards:** Build visual analytics directly in Google Sheets or connect to **Looker Studio**.  \n- **Enrichment:** Combine with CRM systems (like **HubSpot** or **Close**) using company domain or lead email as the linking key.\n\n---\n\n## 🔐 Security and Publishing Notes\n\n- 🔒 **Never hardcode API keys** in workflow exports. Use **n8n credentials** or environment variables instead.  \n- 🚫 Replace sensitive values (like API keys or Sheet IDs) with placeholders before sharing.  \n- 🔐 Keep your **Google Sheet** private unless intentionally shared.\n\n---\n\n## 🧩 Troubleshooting\n\n- **No Data in Sheets:** Check API response for `data[]` and verify Split Out configuration.  \n- **Duplicate Rows:** Ensure the “Matching Column” in Google Sheets is correctly set (e.g., `CompanyName` or `LinkedInProfile`).  \n- **Rate Limits:** Add **Wait Nodes** or reduce batch size.  \n- **Mapping Errors:** Confirm Google Sheet headers exactly match node field mappings.  \n- **Timezone Adjustments:** Apollo.io timestamps are in UTC — convert to local time if needed.\n\n---\n\n## 🎯 Example Use Case\n\nEvery week, this workflow scans new **LinkedIn store-opening posts**.  \nIt extracts company names (like *KFC India*), finds their domains and top executives through **Apollo.io**, retrieves their emails, and logs everything in a **Google Sheet** — ready for your sales team to reach out.\n\n---\n\n**Tags:**  \n`LinkedIn` `Apollo` `Automation` `LeadGeneration` `GoogleSheets` `MarketingOps` `DataEnrichment`\n",
+  "featuredImage": "/data/workflows/8409/8409.webp",
+  "author": {
+    "id": 101,
+    "slug": "rahiuppal",
+    "name": "Rahi Uppal",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 73,
+  "downloads": 7,
+  "createdAt": "2025-09-09T12:14:38.550Z",
+  "updatedAt": "2026-01-16T08:55:41.411Z",
+  "publishedAt": "2025-09-09T12:14:38.550Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8409",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated LinkedIn lead enrichment pipeline using Apollo.io & Google Sheets",
+    "workflowName": "Automated LinkedIn lead enrichment pipeline using Apollo.io & Google Sheets",
+    "description": "## LinkedIn to Apollo.io Lead Enrichment System with Google Sheets\n\nAutomatically capture company and store details from LinkedIn posts, enrich them with domain names and key decision-maker (KDM) data from Apollo.io, and store everything neatly in Google Sheets.  \nThis workflow turns LinkedIn post data into a complete, structured lead database — fully automated from detection to enrichment.\n\n---\n\n## 🧾 Summary\n\nThis workflow reads LinkedIn post data (in JSON format) received via a webhook, extracts company and location information using an AI agent, and progressively enriches the data in three stages:  \n1. **Find Company Domain** using Apollo.io  \n2. **Fetch Key Decision Makers (KDMs)** using the company domain  \n3. **Find Corporate Emails** for those KDMs  \n\nAll results are automatically updated in **Google Sheets**, ensuring your lead list remains fresh, structured, and actionable.\n\n---\n\n## ⚙️ Prerequisites\n\nBefore running the workflow, make sure you have:\n- An **Apollo.io API Key** with company and people search access  \n- A connected **Google Sheets** account (OAuth2)  \n- A **Webhook URL or LinkedIn scraper** that feeds JSON-formatted post data  \n- (Optional) An **OpenAI / AI Agent node** to extract company names and store locations from post text\n\n---\n\n## 🧩 Example Input (Webhook JSON)\n\nEach LinkedIn post is received as a JSON object containing key clues:\n\n```json\n{\n  \"index\": 1,\n  \"text\": \"Excited to announce the opening of our new KFC store at Sky City Mall, Borivali East 🎉🍗\\n\\nLooking forward to welcoming you all to experience the Finger Lickin’ Good taste at our newest location!\\n\\n#KFCIndia #NewStoreOpening #Borivali #SkyCityMall #Sapphirefoods\",\n  \"CompanyName\": \"MockCompany\",\n  \"NewStoreLocation\": \"optional\",\n  \"PersonPosted\": \"https://linkedin.com/in/mockperson\",\n  \"PostImage\": null,\n  \"PostLink\": \"https://www.linkedin.com/search/results/all/?keywords=%23kfcindia&origin=HASH_TAG_FROM_FEED\",\n  \"extracted_at\": \"2025-09-08T12:05:40.044101\"\n}\n\n```\n## 🧠 Workflow Overview\n\nThis workflow runs in three main stages, moving from **LinkedIn data → company domain → people → emails**.\n\n---\n\n## **Stage 1: Company Name to Company Domain 🌐**\n\n**Goal:** Convert each company name into its website domain using Apollo.io.\n\n### **Nodes & Flow**\n- **Schedule Trigger** — Runs automatically (e.g., once a week) to check your Google Sheet for companies missing a domain.  \n- **IF Node (Check for Missing Domain)** — Filters only companies without a website.  \n- **Loop Over Items** — Iterates through each company record.  \n- **HTTP Request – Find Domain** — Calls the Apollo.io Company API to find the company’s domain (e.g., `kfc.com`).  \n- **Update Row in Google Sheets** — Writes the found domain back into the corresponding company row.  \n- **Wait Node – Delay Between API Calls** — Adds a small pause to avoid hitting rate limits.\n\n---\n\n## **Stage 2: Domain to Top 10 KDMs 👥**\n\n**Goal:** Fetch key decision-makers (KDMs) from each company using Apollo.io.\n\n### **Nodes & Flow**\n- **Schedule Trigger** — Runs on a weekly cadence to check for companies with a domain but no KDMs.  \n- **Get Rows from Google Sheets** — Pulls company records ready for enrichment.  \n- **IF Node (Check for Missing KDMs)** — Ensures only companies without people data are processed.  \n- **Loop Over Items** — Processes one company at a time.  \n- **HTTP Request – Find KDMs** — Searches Apollo.io People API for top roles such as *Founder, CEO, Head of Retail*, etc.  \n- **Update Row in Google Sheets** — Saves the top 10 names and their LinkedIn profiles into your sheet.  \n- **Wait Node** — Adds a delay to manage rate limits safely.\n\n---\n\n## **Stage 3: KDM Profile to Email Enricher 📧**\n\n**Goal:** Find and store verified corporate email addresses for each KDM.\n\n### **Nodes & Flow**\n- **Schedule Trigger** — Weekly automation trigger.  \n- **Get Rows from Google Sheets** — Pulls KDMs that have LinkedIn profiles but no email yet.  \n- **IF Node (Check for Missing Emails)** — Ensures only valid records are processed.  \n- **Code Node – Prepare Data** — Organizes LinkedIn profile and domain information.  \n- **HTTP Request – Find Email** — Queries Apollo.io’s email enrichment endpoint using the LinkedIn URL and domain.  \n- **Code Node – Format Response** — Cleans and formats the email result.  \n- **Wait Node** — Adds delay to avoid request bursts.  \n- **Update Row in Google Sheets** — Writes the verified email address back to the corresponding KDM entry and marks it as “Updated – email search.” 🎉\n\n---\n\n## 🧰 Setup Instructions\n\n### **1. Connect APIs & Credentials**\n- Add your **Apollo.io API Key** under HTTP Request credentials.  \n- Connect your **Google Sheets** account (OAuth2).  \n\n### **2. Customize Sheet Structure**\nAdd columns for:  \n`CompanyName`, `Domain`, `KDMs`, `LinkedInProfile`, `Email`, `Status`\n\n### **3. Set Schedule Frequency**\nEach **Schedule Trigger** can be configured separately (e.g., Stage 1 every Monday, Stage 2 every Wednesday).\n\n### **4. Optional: AI Extraction Node**\nUse an AI model (like OpenAI or Gemini) to extract **company name and location** from LinkedIn post text before enrichment.\n\n---\n\n## 🧰 Custom Node Names (Recommended for Clarity)\n\n| Node Type | Recommended Name | Description |\n|------------|------------------|-------------|\n| HTTP Request (Company) | **Find Company Domain (Apollo.io)** | Searches for the company’s official domain |\n| HTTP Request (People) | **Find Key Decision Makers (Apollo.io)** | Retrieves top company contacts |\n| HTTP Request (Emails) | **Find Corporate Emails (Apollo.io)** | Gets verified email addresses for each contact |\n| Wait Node | **API Delay (Rate Limit Buffer)** | Adds delay to avoid hitting API rate limits |\n| Code Node | **Prepare KDM Data** | Organizes input data for API calls |\n\n---\n\n## ⚙️ Customization Tips\n\n- **Multiple Campaigns:** Duplicate the workflow for different industries or store categories, updating parameters as needed.  \n- **Batch Size:** Adjust API request limits (e.g., 100 per batch) based on your Apollo.io plan.  \n- **Filtering:** Add IF conditions to skip records already marked as “Completed.”  \n- **Dashboards:** Build visual analytics directly in Google Sheets or connect to **Looker Studio**.  \n- **Enrichment:** Combine with CRM systems (like **HubSpot** or **Close**) using company domain or lead email as the linking key.\n\n---\n\n## 🔐 Security and Publishing Notes\n\n- 🔒 **Never hardcode API keys** in workflow exports. Use **n8n credentials** or environment variables instead.  \n- 🚫 Replace sensitive values (like API keys or Sheet IDs) with placeholders before sharing.  \n- 🔐 Keep your **Google Sheet** private unless intentionally shared.\n\n---\n\n## 🧩 Troubleshooting\n\n- **No Data in Sheets:** Check API response for `data[]` and verify Split Out configuration.  \n- **Duplicate Rows:** Ensure the “Matching Column” in Google Sheets is correctly set (e.g., `CompanyName` or `LinkedInProfile`).  \n- **Rate Limits:** Add **Wait Nodes** or reduce batch size.  \n- **Mapping Errors:** Confirm Google Sheet headers exactly match node field mappings.  \n- **Timezone Adjustments:** Apollo.io timestamps are in UTC — convert to local time if needed.\n\n---\n\n## 🎯 Example Use Case\n\nEvery week, this workflow scans new **LinkedIn store-opening posts**.  \nIt extracts company names (like *KFC India*), finds their domains and top executives through **Apollo.io**, retrieves their emails, and logs everything in a **Google Sheet** — ready for your sales team to reach out.\n\n---\n\n**Tags:**  \n`LinkedIn` `Apollo` `Automation` `LeadGeneration` `GoogleSheets` `MarketingOps` `DataEnrichment`",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Items2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get row(s) in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Update row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Schedule Trigger2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Update row in sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Items4",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get row(s) in sheet3",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Linkedin Scraped Formater",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Store values",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Company Name to Domain",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "People Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Email Finder",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "id": 9766,
+  "slug": "9766",
+  "title": "Retweet cleanup with scheduling for X/Twitter",
+  "description": "## Who’s it for\n\nSocial media managers, creators, and brand accounts that rely on retweets for reach but want an automated, hands-off cleanup after campaigns to keep profiles tidy and on-brand.\n\n## What it does / How it works\n\nOn a schedule, the workflow resolves your handle to a user ID, fetches recent tweets, filters **retweets only**, and safely unretweets them using batching and delays to respect rate limits. A dedicated **CONFIG (Set Fields)** node centralizes variables (e.g., `target_username`, `max_results`, `batch_delay_minutes`) so you can adjust behavior without touching logic.\n\n## API endpoints used\n\n* **GET** `/2/users/by/username/{username}` – resolve handle → user ID\n* **GET** `/2/users/{id}/tweets?tweet.fields=created_at,referenced_tweets` – fetch recent tweets (identify retweets via `referenced_tweets.type === \"retweeted\"`)\n* **DELETE** `/2/users/{id}/retweets/{tweet_id}` – unretweet\n\n## Example response payloads\n\n**GET /2/users/by/username/{username}**\n\n```json\n{\n  \"data\": { \"id\": \"2244994945\", \"name\": \"Twitter Dev\", \"username\": \"TwitterDev\" }\n}\n```\n\n**GET /2/users/{id}/tweets** (truncated)\n\n```json\n{\n  \"data\": [\n    {\n      \"id\": \"1760000000000000000\",\n      \"text\": \"RT @someone: …\",\n      \"referenced_tweets\": [{ \"type\": \"retweeted\", \"id\": \"1759999999999999999\" }],\n      \"created_at\": \"2025-01-15T09:10:11.000Z\"\n    }\n  ],\n  \"meta\": { \"result_count\": 20 }\n}\n```\n\n**DELETE /2/users/{id}/retweets/{tweet_id}**\n\n```json\n{ \"data\": { \"retweeted\": false } }\n```\n\n## Use cases\n\n* **Brand hygiene:** Auto-unretweet promos after 48–72h.\n* **Campaign cadence:** Remove event retweets once the event ends.\n* **Feed freshness:** Clear low-priority retweets on a rolling basis.\n\n## How to set up\n\n1. Open **CONFIG (Set Fields)** and replace placeholders:\n\n   * `target_username = \"your_handle\"`\n   * `max_results = 100` (per fetch)\n   * `batch_delay_minutes = 2` (throttle between batches)\n2. Connect X/Twitter credentials in n8n (no keys hard-coded in HTTP nodes).\n3. Run once with small values, verify logs, then enable the schedule.\n\n&gt; Optional enhancements: add a **dead-letter path** (Error Trigger → Set → Sheets/Email/Slack) and a **notification node** (e.g., Slack) for execution feedback.\n",
+  "featuredImage": "/data/workflows/9766/9766.webp",
+  "author": {
+    "id": 101,
+    "slug": "kawabe03",
+    "name": "masaya kawabe",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 69,
+  "downloads": 6,
+  "createdAt": "2025-10-16T08:49:39.488Z",
+  "updatedAt": "2026-01-16T09:01:50.251Z",
+  "publishedAt": "2025-10-16T08:49:39.488Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9766",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Retweet cleanup with scheduling for X/Twitter",
+    "workflowName": "Retweet cleanup with scheduling for X/Twitter",
+    "description": "## Who’s it for\n\nSocial media managers, creators, and brand accounts that rely on retweets for reach but want an automated, hands-off cleanup after campaigns to keep profiles tidy and on-brand.\n\n## What it does / How it works\n\nOn a schedule, the workflow resolves your handle to a user ID, fetches recent tweets, filters **retweets only**, and safely unretweets them using batching and delays to respect rate limits. A dedicated **CONFIG (Set Fields)** node centralizes variables (e.g., `target_username`, `max_results`, `batch_delay_minutes`) so you can adjust behavior without touching logic.\n\n## API endpoints used\n\n* **GET** `/2/users/by/username/{username}` – resolve handle → user ID\n* **GET** `/2/users/{id}/tweets?tweet.fields=created_at,referenced_tweets` – fetch recent tweets (identify retweets via `referenced_tweets.type === \"retweeted\"`)\n* **DELETE** `/2/users/{id}/retweets/{tweet_id}` – unretweet\n\n## Example response payloads\n\n**GET /2/users/by/username/{username}**\n\n```json\n{\n  \"data\": { \"id\": \"2244994945\", \"name\": \"Twitter Dev\", \"username\": \"TwitterDev\" }\n}\n```\n\n**GET /2/users/{id}/tweets** (truncated)\n\n```json\n{\n  \"data\": [\n    {\n      \"id\": \"1760000000000000000\",\n      \"text\": \"RT @someone: …\",\n      \"referenced_tweets\": [{ \"type\": \"retweeted\", \"id\": \"1759999999999999999\" }],\n      \"created_at\": \"2025-01-15T09:10:11.000Z\"\n    }\n  ],\n  \"meta\": { \"result_count\": 20 }\n}\n```\n\n**DELETE /2/users/{id}/retweets/{tweet_id}**\n\n```json\n{ \"data\": { \"retweeted\": false } }\n```\n\n## Use cases\n\n* **Brand hygiene:** Auto-unretweet promos after 48–72h.\n* **Campaign cadence:** Remove event retweets once the event ends.\n* **Feed freshness:** Clear low-priority retweets on a rolling basis.\n\n## How to set up\n\n1. Open **CONFIG (Set Fields)** and replace placeholders:\n\n   * `target_username = \"your_handle\"`\n   * `max_results = 100` (per fetch)\n   * `batch_delay_minutes = 2` (throttle between batches)\n2. Connect X/Twitter credentials in n8n (no keys hard-coded in HTTP nodes).\n3. Run once with small values, verify logs, then enable the schedule.\n\n&gt; Optional enhancements: add a **dead-letter path** (Error Trigger → Set → Sheets/Email/Slack) and a **notification node** (e.g., Slack) for execution feedback.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "TRIGGER | Schedule (09:00 server time)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "CONFIG | User Variables (Set Fields)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "FETCH | Get user ID by username (X API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "FETCH | Latest tweets (X API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "SPLIT | One item per tweet",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IF | Is retweet?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "LOOP | Split in batches (rate-limit friendly)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "SEND | Unretweet (delete retweet)",
+      "type": "n8n-nodes-base.twitter",
+      "role": "twitter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "WAIT | Delay between API calls",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "🟨 Sticky: Description (copy of page)",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Quick setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Rules & customization",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: TRIGGER details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: CONFIG details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: GET USER details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: FETCH TWEETS details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: SPLIT details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: IF RT details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: LOOP details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: UNRETWEET details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: WAIT details",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Data flow map",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "NOTIFY | Slack (optional)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ON ERROR | Capture",
+      "type": "n8n-nodes-base.errorTrigger",
+      "role": "errorTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "DLQ | Format error (Set)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky: DLQ & Notify",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: API endpoints",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+{
+  "id": 6765,
+  "slug": "6765",
+  "title": "Scheduled Instagram auto-liker with Phantombuster, GPT-4o & cookie rotation",
+  "description": "## Who’s it for  \nSocial-media managers and brands that want to keep their Instagram\naccounts active by automatically liking fresh posts under selected\nhashtags—hands-free and rate-limited.\n\n## How it works / What it does  \n1. **Schedule Trigger** runs every 2 hours at a specified minute.  \n2. **Select Cookie** chooses a rotating Instagram session-cookie\n   (time-slice logic).  \n3. **Generate Random Hashtag** (GPT-4o) outputs a realistic AI/BPA\n   hashtag.  \n4. **Instagram Hashtag Agent** (Phantombuster) scrapes up to\n   `ENV_MAX_POSTS_PER_HASHTAG` recent posts.  \n5. **Get Random Post** selects one; **duplicate checker** ensures it\n   hasn’t been liked before (SharePoint CSV).  \n6. Builds `instagram_posts_to_like.csv`, uploads to SharePoint, then\n   launches the **Auto-like Agent** which likes the post.  \n7. Post URL is appended to `instagram_posts_already_liked.csv` to avoid\n   duplicates.  \n8. **Wait** nodes throttle launches to ~12 likes per profile daily.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API\n   key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `instagram_session_cookies.txt` – one cookie per line.  \n   • `instagram_posts_already_liked.csv` with header `postUrl`.  \n3. Adjust **Set ENV Variables** to change max posts per scrape.  \n4. Activate the workflow; it will like one post every 2 hours.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account\n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Target a different niche: edit hashtag prompt in **Generate Random Hashtag**.  \n- Like more posts: raise `ENV_MAX_POSTS_PER_HASHTAG`,\n  `numberOfPostsPerLaunch`, or schedule frequency.  \n- Replace SharePoint with Drive/Dropbox by swapping storage nodes.",
+  "featuredImage": "/data/workflows/6765/6765.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1478,
+  "downloads": 147,
+  "createdAt": "2025-08-01T08:20:52.647Z",
+  "updatedAt": "2026-01-16T08:46:59.829Z",
+  "publishedAt": "2025-08-01T08:20:52.647Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6765",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Scheduled Instagram auto-liker with Phantombuster, GPT-4o & cookie rotation",
+    "workflowName": "Scheduled Instagram auto-liker with Phantombuster, GPT-4o & cookie rotation",
+    "description": "## Who’s it for  \nSocial-media managers and brands that want to keep their Instagram\naccounts active by automatically liking fresh posts under selected\nhashtags—hands-free and rate-limited.\n\n## How it works / What it does  \n1. **Schedule Trigger** runs every 2 hours at a specified minute.  \n2. **Select Cookie** chooses a rotating Instagram session-cookie\n   (time-slice logic).  \n3. **Generate Random Hashtag** (GPT-4o) outputs a realistic AI/BPA\n   hashtag.  \n4. **Instagram Hashtag Agent** (Phantombuster) scrapes up to\n   `ENV_MAX_POSTS_PER_HASHTAG` recent posts.  \n5. **Get Random Post** selects one; **duplicate checker** ensures it\n   hasn’t been liked before (SharePoint CSV).  \n6. Builds `instagram_posts_to_like.csv`, uploads to SharePoint, then\n   launches the **Auto-like Agent** which likes the post.  \n7. Post URL is appended to `instagram_posts_already_liked.csv` to avoid\n   duplicates.  \n8. **Wait** nodes throttle launches to ~12 likes per profile daily.\n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2, OpenAI API\n   key.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `instagram_session_cookies.txt` – one cookie per line.  \n   • `instagram_posts_already_liked.csv` with header `postUrl`.  \n3. Adjust **Set ENV Variables** to change max posts per scrape.  \n4. Activate the workflow; it will like one post every 2 hours.\n\n## Requirements  \n- n8n 1.33 +  \n- Phantombuster Growth plan (API access)  \n- OpenAI account\n- Microsoft 365 SharePoint tenant\n\n## How to customize  \n- Target a different niche: edit hashtag prompt in **Generate Random Hashtag**.  \n- Like more posts: raise `ENV_MAX_POSTS_PER_HASHTAG`,\n  `numberOfPostsPerLaunch`, or schedule frequency.  \n- Replace SharePoint with Drive/Dropbox by swapping storage nodes.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Launch Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Random Post",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create CSV Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload CSV",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Hashtag Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Posts",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Response",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Autoliking Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Launch AL Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set ENV Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Random Hashtag",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if in List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare Updated Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Available Session Cookies",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Cookies",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Cookie",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

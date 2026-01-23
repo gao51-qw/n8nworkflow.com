@@ -1,0 +1,236 @@
+{
+  "id": 12014,
+  "slug": "12014",
+  "title": "Automate job search & resume matching with LinkedIn, Gemini AI & Google Sheets",
+  "description": "## Description\n\nThis workflow helps you find and evaluate job opportunities automatically, without spending hours searching and comparing roles. It uses your resume to look for relevant jobs on LinkedIn, checks how well each role matches your profile, and organises everything neatly in Google Sheets so you can focus on applying to the best opportunities.\n\n## How it works\n\nOn a schedule, the workflow downloads your resume from Google Drive and analyses it to understand your skills and experience. Based on this, it creates LinkedIn job searches and pulls in recent job listings. Each job is then reviewed using AI to compare the job description with your resume, produce a match score, suggest resume improvements, and generate a tailored cover letter. All results are saved to Google Sheets, and you’re notified by email when the run finishes.\n\n## How to use\n\n1. Make a copy of the Google Sheets template and keep it for your own job tracking.  \n2. Upload your resume (PDF) to Google Drive.  \n3. Connect your Google Drive, Google Sheets, Gmail, and AI credentials in n8n.  \n4. Update the **Config** node with your preferences (remote work, Easy Apply, job limit).  \n5. Paste your copied Google Sheet IDs into the workflow.  \n6. Turn on the Schedule Trigger and activate the workflow.\n\n## Requirements\n\n- Google Drive account for storing your resume  \n- Google Sheets account for tracking results  \n- Gmail account for notifications  \n- AI model access (Google Gemini or similar)  \n- n8n (cloud or self-hosted)\n\n## Customising this workflow\n\nYou can easily adapt this workflow to suit your goals. Change the job limits, locations, or remote preferences in the **Config** node. Update the AI prompts to target different roles or industries, or extend the workflow to send results to tools like Notion, a CRM, or your own application tracker.\n\n## Good to know\n\nThis workflow is designed to help you screen and prepare for jobs, not to apply automatically. Match scores are a guide, not a guarantee, so it’s always worth reviewing roles manually. Also, since LinkedIn pages can change over time, you may occasionally need to update HTML selectors to keep things running smoothly.\n",
+  "featuredImage": "/data/workflows/12014/12014.webp",
+  "author": {
+    "id": 101,
+    "slug": "jamesdinakar",
+    "name": "Dinakar Selvakumar",
+    "avatar": ""
+  },
+  "categories": [
+    "HR",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 564,
+  "downloads": 56,
+  "createdAt": "2025-12-22T09:33:17.730Z",
+  "updatedAt": "2026-01-16T09:11:00.639Z",
+  "publishedAt": "2025-12-22T09:33:17.730Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12014",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate job search & resume matching with LinkedIn, Gemini AI & Google Sheets",
+    "workflowName": "Automate job search & resume matching with LinkedIn, Gemini AI & Google Sheets",
+    "description": "## Description\n\nThis workflow helps you find and evaluate job opportunities automatically, without spending hours searching and comparing roles. It uses your resume to look for relevant jobs on LinkedIn, checks how well each role matches your profile, and organises everything neatly in Google Sheets so you can focus on applying to the best opportunities.\n\n## How it works\n\nOn a schedule, the workflow downloads your resume from Google Drive and analyses it to understand your skills and experience. Based on this, it creates LinkedIn job searches and pulls in recent job listings. Each job is then reviewed using AI to compare the job description with your resume, produce a match score, suggest resume improvements, and generate a tailored cover letter. All results are saved to Google Sheets, and you’re notified by email when the run finishes.\n\n## How to use\n\n1. Make a copy of the Google Sheets template and keep it for your own job tracking.  \n2. Upload your resume (PDF) to Google Drive.  \n3. Connect your Google Drive, Google Sheets, Gmail, and AI credentials in n8n.  \n4. Update the **Config** node with your preferences (remote work, Easy Apply, job limit).  \n5. Paste your copied Google Sheet IDs into the workflow.  \n6. Turn on the Schedule Trigger and activate the workflow.\n\n## Requirements\n\n- Google Drive account for storing your resume  \n- Google Sheets account for tracking results  \n- Gmail account for notifications  \n- AI model access (Google Gemini or similar)  \n- n8n (cloud or self-hosted)\n\n## Customising this workflow\n\nYou can easily adapt this workflow to suit your goals. Change the job limits, locations, or remote preferences in the **Config** node. Update the AI prompts to target different roles or industries, or extend the workflow to send results to tools like Notion, a CRM, or your own application tracker.\n\n## Good to know\n\nThis workflow is designed to help you screen and prepare for jobs, not to apply automatically. Match scores are a guide, not a guarantee, so it’s always worth reviewing roles manually. Also, since LinkedIn pages can change over time, you may occasionally need to update HTML selectors to keep things running smoothly.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "LinkedIn Search URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch jobs from LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTML",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Parse Job Links",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract HTML Job Details",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Job Details",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare Values for GSheet",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Update Rows with Job Detials",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Job Matching Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Resume Editor Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Gemini Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Resume Analyzer Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Build Search Rows",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Limit Jobs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

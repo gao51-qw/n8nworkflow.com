@@ -1,0 +1,152 @@
+{
+  "id": 2647,
+  "slug": "2647",
+  "title": "Sentiment analysis tracking on support issues with Linear and Slack",
+  "description": "This n8n template monitors active support issues in Linear.app to track the mood of their ongoing conversation between reporter and assignee using Sentiment Analysis. When sentiment dips into the negative, a notification is sent via Slack to alert the team.\n\n## How it works\n* A scheduled trigger is used to fetch recently updated issues in Linear using the GraphQL node.\n* Each issue's comments thread is passed into a simple Information Extractor node to identify the overall sentiment.\n* The resulting sentiment analysis combined with the some issue details are uploaded to Airtable for review.\n* When the template is re-run at a later date, each issue is re-analysed for sentiment\n* Each issue's new sentiment state is saved to the airtable whilst its previous state is moved to the \"previous sentiment\" column.\n* An Airtable trigger is used to watch for recently updated rows\n* Each matching Airtable row is filtered to check if it has a previous non-negative state but now has a negative state in its current sentiment.\n* The results are sent via notification to a team slack channel for priority.\n\n**Check out the sample Airtable here**: [https://airtable.com/appViDaeaFw4qv9La/shrq6HgeYzpW6uwXL](https://airtable.com/appViDaeaFw4qv9La/shrq6HgeYzpW6uwXL)\n\n## How to use\n* Modify the GraphQL filter to fetch issues to a relevant issue type, team or person.\n* Update the Slack channel to ensure messages are sent to the correct location or persons.\n* The Airtable also serves to give a snapshot of Sentiment across support tickets for a given period. It's possible to use this to assess the daily operations.\n\n## Requirements\n* Linear for issue tracking (but feel free to use another system if preferred)\n* Airtable for Database\n* OpenAI for LLM and Sentiment Analysis\n\n## Customising the workflow\n* Add more granular levels of sentiment to reduce the number of alerts.\n* Explore different types of sentiment based on issue types and customer types. This may help prioritise alerts and response.\n* Run across teams or categories of issues to get an overview of sentiment across the support organisation.",
+  "featuredImage": "/data/workflows/2647/2647.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2430,
+  "downloads": 243,
+  "createdAt": "2024-12-17T10:19:26.716Z",
+  "updatedAt": "2026-01-16T08:25:48.913Z",
+  "publishedAt": "2024-12-17T10:19:26.716Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2647",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sentiment analysis tracking on support issues with Linear and Slack",
+    "workflowName": "Sentiment analysis tracking on support issues with Linear and Slack",
+    "description": "This n8n template monitors active support issues in Linear.app to track the mood of their ongoing conversation between reporter and assignee using Sentiment Analysis. When sentiment dips into the negative, a notification is sent via Slack to alert the team.\n\n## How it works\n* A scheduled trigger is used to fetch recently updated issues in Linear using the GraphQL node.\n* Each issue's comments thread is passed into a simple Information Extractor node to identify the overall sentiment.\n* The resulting sentiment analysis combined with the some issue details are uploaded to Airtable for review.\n* When the template is re-run at a later date, each issue is re-analysed for sentiment\n* Each issue's new sentiment state is saved to the airtable whilst its previous state is moved to the \"previous sentiment\" column.\n* An Airtable trigger is used to watch for recently updated rows\n* Each matching Airtable row is filtered to check if it has a previous non-negative state but now has a negative state in its current sentiment.\n* The results are sent via notification to a team slack channel for priority.\n\n**Check out the sample Airtable here**: [https://airtable.com/appViDaeaFw4qv9La/shrq6HgeYzpW6uwXL](https://airtable.com/appViDaeaFw4qv9La/shrq6HgeYzpW6uwXL)\n\n## How to use\n* Modify the GraphQL filter to fetch issues to a relevant issue type, team or person.\n* Update the Slack channel to ensure messages are sent to the correct location or persons.\n* The Airtable also serves to give a snapshot of Sentiment across support tickets for a given period. It's possible to use this to assess the daily operations.\n\n## Requirements\n* Linear for issue tracking (but feel free to use another system if preferred)\n* Airtable for Database\n* OpenAI for LLM and Sentiment Analysis\n\n## Customising the workflow\n* Add more granular levels of sentiment to reduce the number of alerts.\n* Explore different types of sentiment based on issue types and customer types. This may help prioritise alerts and response.\n* Run across teams or categories of issues to get an overview of sentiment across the support organisation.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Issues to List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Combine Sentiment Analysis",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sentiment over Issue Comments",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Copy of Issue",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "For Each Issue...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Existing Sentiment",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update Row",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Airtable Trigger",
+      "type": "n8n-nodes-base.airtableTrigger",
+      "role": "airtableTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sentiment Transition",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Fetch Active Linear Issues",
+      "type": "n8n-nodes-base.graphql",
+      "role": "graphql",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Deduplicate Notifications",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Report Issue Negative Transition",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

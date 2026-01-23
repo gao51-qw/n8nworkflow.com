@@ -1,0 +1,127 @@
+{
+  "id": 9020,
+  "slug": "9020",
+  "title": "Track Upwork jobs from Vollna RSS with Google Sheets logging and Slack alerts",
+  "description": "## Who’s it for\n\nFreelancers and agencies who track new Upwork leads via Vollna RSS and want clean logging to Google Sheets with instant Slack alerts.\n\n## What it does\n\nPolls a Vollna RSS feed every few minutes, parses each job (title, budget, link, skills, categories), dedupes against your sheet, appends only new jobs, and notifies Slack with a compact alert.\n\n## How it works\n\t1. Schedule Trigger fires on an interval.\n\t2. RSS Read pulls new items from Vollna.\n\t3. Filter (optional) skips non-ASCII titles.\n\t4. Code node normalizes fields (title/budget split, clean Upwork link, “Posted x mins ago”, etc.).\n\t5. Sheets Lookup + Compare prevents duplicates by job URL.\n\t6. Sheets Append writes new rows; Slack posts a job alert.\n\n## Set up\n\t1. In ⚙️ Config, set: VOLLNA_RSS_URL, GOOGLE_SHEETS_DOC_ID, GOOGLE_SHEET_NAME, SLACK_CHANNEL_ID, EMAIL_TO (optional).\n\t2. Add OAuth credentials for Google Sheets, Slack, and Gmail (optional).\n\t3. Create sheet columns: TITLE, BUDGET, UPWORK JOB LINK, CATEGORIES, SKILLS, DATE, JOB DESCRIPTION, POSTED.\n\t4. (Optional) Adjust polling interval on the Schedule Trigger.\n\n## Requirements\n\t• Vollna RSS feed URL (your tokenized link)\n\t• n8n (cloud or self-hosted) with Google Sheets + Slack creds\n\n## Customize\n\t• Remove the ASCII filter for broader coverage.\n\t• Swap Gmail/Slack with your preferred notifier.\n\t• Add keyword filters before appending to Sheets.",
+  "featuredImage": "/data/workflows/9020/9020.webp",
+  "author": {
+    "id": 101,
+    "slug": "jerrywright",
+    "name": "Jeremiah Wright",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 197,
+  "downloads": 19,
+  "createdAt": "2025-09-27T19:14:14.136Z",
+  "updatedAt": "2026-01-16T08:58:43.947Z",
+  "publishedAt": "2025-09-27T19:14:14.136Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9020",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Track Upwork jobs from Vollna RSS with Google Sheets logging and Slack alerts",
+    "workflowName": "Track Upwork jobs from Vollna RSS with Google Sheets logging and Slack alerts",
+    "description": "## Who’s it for\n\nFreelancers and agencies who track new Upwork leads via Vollna RSS and want clean logging to Google Sheets with instant Slack alerts.\n\n## What it does\n\nPolls a Vollna RSS feed every few minutes, parses each job (title, budget, link, skills, categories), dedupes against your sheet, appends only new jobs, and notifies Slack with a compact alert.\n\n## How it works\n\t1. Schedule Trigger fires on an interval.\n\t2. RSS Read pulls new items from Vollna.\n\t3. Filter (optional) skips non-ASCII titles.\n\t4. Code node normalizes fields (title/budget split, clean Upwork link, “Posted x mins ago”, etc.).\n\t5. Sheets Lookup + Compare prevents duplicates by job URL.\n\t6. Sheets Append writes new rows; Slack posts a job alert.\n\n## Set up\n\t1. In ⚙️ Config, set: VOLLNA_RSS_URL, GOOGLE_SHEETS_DOC_ID, GOOGLE_SHEET_NAME, SLACK_CHANNEL_ID, EMAIL_TO (optional).\n\t2. Add OAuth credentials for Google Sheets, Slack, and Gmail (optional).\n\t3. Create sheet columns: TITLE, BUDGET, UPWORK JOB LINK, CATEGORIES, SKILLS, DATE, JOB DESCRIPTION, POSTED.\n\t4. (Optional) Adjust polling interval on the Schedule Trigger.\n\n## Requirements\n\t• Vollna RSS feed URL (your tokenized link)\n\t• n8n (cloud or self-hosted) with Google Sheets + Slack creds\n\n## Customize\n\t• Remove the ASCII filter for broader coverage.\n\t• Swap Gmail/Slack with your preferred notifier.\n\t• Add keyword filters before appending to Sheets.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Check for foreign characters",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Title, Budget, Link, Posted, Date, Job Description, Skills, Categories",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sort",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Compare Datasets",
+      "type": "n8n-nodes-base.compareDatasets",
+      "role": "compareDatasets",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send a message1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

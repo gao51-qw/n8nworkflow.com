@@ -1,0 +1,307 @@
+{
+  "id": 3615,
+  "slug": "3615",
+  "title": "Verify Telegram channel subscriptions with access control using Postgres",
+  "description": "\n### Who is this for?  \nThis workflow is for Telegram bot developers or marketers who want to verify user subscriptions to specific Telegram channels and optionally reward them with downloadable files.\n\n### What problem is this workflow solving?  \nThis workflow ensures users have subscribed to required Telegram channels before they are granted access to resources or rewards, such as Google Drive files. It automates the subscription verification process, saving time and reducing manual effort.\n\n### What this workflow does  \n- Verifies if a user is subscribed to specific Telegram channels.  \n- Allows adding and removing channel IDs for verification.  \n- Sends referral links to users for subscription checks.  \n- Optionally grants access to Google Drive files upon successful verification (currently inactive)\n \n### Setup  \n1. **Add the bot to your Telegram channels as an admin** – this is required for the bot to check subscription status.  \n2. **Add channel IDs via the bot** – these are the channels users will need to subscribe to.  \n3. **Send the referral link** to users you want to verify.  \n4. **Remove channels anytime** from the subscription check list if needed.  \n5. **Create tables in Postgres**:  \n   - Replace `\"n8n\"` in the provided SQL script with your DB schema name.  \n   - Run the script in your Postgres DB.  \n6. **Add credentials**:  \n   - Telegram  \n   - Postgres  \n\n### How to customize this workflow to your needs  \n- Modify the SQL script to suit your existing database structure.  \n- Adjust the logic to enable or disable file delivery from Google Drive.  ",
+  "featuredImage": "/data/workflows/3615/3615.webp",
+  "author": {
+    "id": 101,
+    "slug": "boanse",
+    "name": "Andrew",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 382,
+  "downloads": 38,
+  "createdAt": "2025-04-19T18:20:13.113Z",
+  "updatedAt": "2026-01-16T08:30:37.485Z",
+  "publishedAt": "2025-04-19T18:20:13.113Z",
+  "nodes": 45,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3615",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Verify Telegram channel subscriptions with access control using Postgres",
+    "workflowName": "Verify Telegram channel subscriptions with access control using Postgres",
+    "description": "### Who is this for?  \nThis workflow is for Telegram bot developers or marketers who want to verify user subscriptions to specific Telegram channels and optionally reward them with downloadable files.\n\n### What problem is this workflow solving?  \nThis workflow ensures users have subscribed to required Telegram channels before they are granted access to resources or rewards, such as Google Drive files. It automates the subscription verification process, saving time and reducing manual effort.\n\n### What this workflow does  \n- Verifies if a user is subscribed to specific Telegram channels.  \n- Allows adding and removing channel IDs for verification.  \n- Sends referral links to users for subscription checks.  \n- Optionally grants access to Google Drive files upon successful verification (currently inactive)\n \n### Setup  \n1. **Add the bot to your Telegram channels as an admin** – this is required for the bot to check subscription status.  \n2. **Add channel IDs via the bot** – these are the channels users will need to subscribe to.  \n3. **Send the referral link** to users you want to verify.  \n4. **Remove channels anytime** from the subscription check list if needed.  \n5. **Create tables in Postgres**:  \n   - Replace `\"n8n\"` in the provided SQL script with your DB schema name.  \n   - Run the script in your Postgres DB.  \n6. **Add credentials**:  \n   - Telegram  \n   - Postgres  \n\n### How to customize this workflow to your needs  \n- Modify the SQL script to suit your existing database structure.  \n- Adjust the logic to enable or disable file delivery from Google Drive.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Subscription statuses",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Channels",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Union statuses",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check failed",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get File",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Add Channel",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Variables TG",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Initialization",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Bot Status",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Define flow",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Commands",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Channel Exists",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update bot status on CHECK SUBSCRIPTION REQUEST CHANNEL",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Request Add Channel",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update bot status on CHECK SUBSCRIPTION REQUEST CHANNEL1",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Request Delete Channel",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Request New Delete Channel",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Request New Add Channel",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Channel Not Exists",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Delete Channel",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Get Channels ",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Add Divide Channels",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Channels",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Define Type",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Update bot status on START",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Buttons",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Success",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Channels  ",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Welcome message Referal",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Welcome message Manager",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Upsert bot status on START",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Referal?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update bot status and referal",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Get Referal",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Check success",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check success + File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Is Admin?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "id": 2440,
+  "slug": "2440",
+  "title": "Building RAG chatbot for movie recommendations with Qdrant and Open AI",
+  "description": "*Create a recommendation tool without hallucinations based on RAG with the Qdrant Vector database. This example is based on movie recommendations on the IMDB-top1000 dataset. You can provide your wishes and your \"big no's\" to the chatbot, for example: \"A movie about wizards but not Harry Potter\", and get top-3 recommendations*.\n\n## How it works\n- [a video with the full design process](https://www.youtube.com/watch?v=O5mT8M7rqQQ)\n- Upload IMDB-1000 dataset to Qdrant Vector Store, embedding movie descriptions with OpenAI;\n- Set up an AI agent with a chat. This agent will call a workflow tool to get movie recommendations based on a request written in the chat;\n- Create a workflow which calls [Qdrant's Recommendation API](https://qdrant.tech/articles/new-recommendation-api/) to retrieve top-3 recommendations of movies based on your positive and negative examples. \n\n## Set Up Steps\n- You'll need to create a free tier [Qdrant Cluster](https://cloud.qdrant.io/) (Qdrant can also be used locally; it's open-sourced) and set up API credentials\n- You'll OpenAI credentials \n- You'll need GitHub credentials & to upload the [IMDB Kaggle dataset](https://www.kaggle.com/datasets/omarhanyy/imdb-top-1000) to your GitHub.",
+  "featuredImage": "/data/workflows/2440/2440.webp",
+  "author": {
+    "id": 101,
+    "slug": "mrscoopers",
+    "name": "Jenny ",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 35010,
+  "downloads": 3501,
+  "createdAt": "2024-09-28T14:16:30.110Z",
+  "updatedAt": "2026-01-16T08:24:45.673Z",
+  "publishedAt": "2024-09-28T14:16:30.110Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2440",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Building RAG chatbot for movie recommendations with Qdrant and Open AI",
+    "workflowName": "Building RAG chatbot for movie recommendations with Qdrant and Open AI",
+    "description": "*Create a recommendation tool without hallucinations based on RAG with the Qdrant Vector database. This example is based on movie recommendations on the IMDB-top1000 dataset. You can provide your wishes and your \"big no's\" to the chatbot, for example: \"A movie about wizards but not Harry Potter\", and get top-3 recommendations*.\n\n## How it works\n- [a video with the full design process](https://www.youtube.com/watch?v=O5mT8M7rqQQ)\n- Upload IMDB-1000 dataset to Qdrant Vector Store, embedding movie descriptions with OpenAI;\n- Set up an AI agent with a chat. This agent will call a workflow tool to get movie recommendations based on a request written in the chat;\n- Create a workflow which calls [Qdrant's Recommendation API](https://qdrant.tech/articles/new-recommendation-api/) to retrieve top-3 recommendations of movies based on your positive and negative examples. \n\n## Set Up Steps\n- You'll need to create a free tier [Qdrant Cluster](https://cloud.qdrant.io/) (Qdrant can also be used locally; it's open-sourced) and set up API credentials\n- You'll OpenAI credentials \n- You'll need GitHub credentials & to upload the [IMDB Kaggle dataset](https://www.kaggle.com/datasets/omarhanyy/imdb-top-1000) to your GitHub.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GitHub",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Token Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "role": "textSplitterTokenSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Call n8n Workflow Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out1",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Embedding Recommendation Request with Open AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Embedding Anti-Recommendation Request with Open AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extracting Embedding",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extracting Embedding1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Calling Qdrant Recommendation API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Retrieving Recommended Movies Meta Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Selecting Fields Relevant for Agent",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

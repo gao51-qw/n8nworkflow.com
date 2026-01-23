@@ -1,0 +1,145 @@
+{
+  "id": 9733,
+  "slug": "9733",
+  "title": "Proxmox system monitor - VM status, host resources & temperature alerts via Telegram",
+  "description": "# Setup Instructions\n\n## Overview\n\nThis n8n workflow monitors your Proxmox VE server and sends automated reports to Telegram every 15 minutes. It tracks VM status, host resource usage, temperature sensors, and detects recently stopped VMs.\n\n## Prerequisites\n\n### Required Software\n- n8n instance (self-hosted or cloud)\n- Proxmox VE server with API access\n- Telegram account with bot created via BotFather\n- lm-sensors package installed on Proxmox host\n\n### Required Access\n- Proxmox admin credentials (username and password)\n- SSH access to Proxmox server\n- Telegram Bot API token\n- Telegram Chat ID\n\n## Installation Steps\n\n### Step 1: Install Temperature Sensors on Proxmox\n\nSSH into your Proxmox server and run:\n\n```bash\napt-get update\napt-get install -y lm-sensors\nsensors-detect\n```\n\nPress ENTER to accept default answers during sensors-detect setup.\n\nTest that sensors work:\n```bash\nsensors | grep -E 'Package|Core'\n```\n\n### Step 2: Create Telegram Bot\n\n1. Open Telegram and search for BotFather\n2. Send `/newbot` command\n3. Follow prompts to create your bot\n4. Save the API token provided\n5. Get your Chat ID by sending a message to your bot, then visiting:\n   ```\n   https://api.telegram.org/bot&lt;YOUR_TOKEN&gt;/getUpdates\n   ```\n6. Look for \"chat\":{\"id\": YOUR_CHAT_ID in the response\n\n### Step 3: Configure n8n Credentials\n\n#### SSH Password Credential\n1. In n8n, go to Credentials menu\n2. Create new credential: SSH Password\n3. Enter:\n   - Host: Your Proxmox IP address\n   - Port: 22\n   - Username: root (or your admin user)\n   - Password: Your Proxmox password\n\n#### Telegram API Credential\n1. Create new credential: Telegram API\n2. Enter the Bot Token from BotFather\n\n### Step 4: Import and Configure Workflow\n\n1. Import the JSON workflow into n8n\n2. Open the \"Set Variables\" node\n3. Update the following values:\n   - PROXMOX_IP: Your Proxmox server IP address\n   - PROXMOX_PORT: API port (default: 8006)\n   - PROXMOX_NODE: Node name (default: pve)\n   - TELEGRAM_CHAT_ID: Your Telegram chat ID\n   - PROXMOX_USER: Proxmox username with realm (e.g., root@pam)\n   - PROXMOX_PASSWORD: Proxmox password\n\n4. Connect credentials:\n   - SSH - Get Sensors node: Select your SSH credential\n   - Send Telegram Report node: Select your Telegram credential\n\n5. Save the workflow\n6. Activate the workflow\n\n## Configuration Options\n\n### Adjust Monitoring Interval\n\nEdit the \"Schedule Every 15min\" node:\n- Change `minutesInterval` value to desired interval (in minutes)\n- Recommended: 5-30 minutes\n\n### Adjust Recently Stopped VM Detection Window\n\nEdit the \"Process Data\" node:\n- Find line: `const fifteenMinutesAgo = now - 900;`\n- Change 900 to desired seconds (900 = 15 minutes)\n\n### Modify Temperature Warning Threshold\n\nThe workflow uses the \"high\" threshold defined by sensors.\nTo manually set threshold, edit \"Process Data\" node:\n- Modify the temperature parsing logic\n- Change comparison: `if (current &gt;= high)` to use custom value\n\n## Testing\n\n### Test Individual Components\n\n1. Execute \"Set Variables\" node manually - verify output\n2. Execute \"Proxmox Login\" node - check for valid ticket\n3. Execute \"API - VM List\" - confirm VM data received\n4. Execute complete workflow - check Telegram for message\n\n### Troubleshooting\n\n**Login fails:**\n- Verify PROXMOX_USER format includes realm (e.g., root@pam)\n- Check password is correct\n- Ensure allowUnauthorizedCerts is enabled for self-signed certificates\n\n**No temperature data:**\n- Verify lm-sensors is installed on Proxmox\n- Run `sensors` command manually via SSH\n- Check SSH credentials are correct\n\n**Recently stopped VMs not detected:**\n- Check task log API endpoint returns data\n- Verify VM was stopped within detection window\n- Ensure task types qmstop or qmshutdown are logged\n\n**Telegram not receiving messages:**\n- Verify bot token is correct\n- Confirm chat ID is accurate\n- Check bot was started (send /start to bot)\n- Verify parse_mode is set to HTML in Telegram node\n\n---\n\n# How It Works\n\n## Workflow Architecture\n\nThe workflow executes in a sequential chain of nodes that gather data from multiple sources, process it, and deliver a formatted report.\n\n### Execution Flow\n\n```\nSchedule Trigger (15min)\n  - Set Variables\n  - Proxmox Login (get authentication ticket)\n  - Prepare Auth (prepare credentials for API calls)\n  - API - VM List (get all VMs and their status)\n  - API - Node Tasks (get recent task log)\n  - API - Node Status (get host CPU, memory, uptime)\n  - SSH - Get Sensors (get temperature data)\n  - Process Data (analyze and structure all data)\n  - Generate Formatted Message (create Telegram message)\n  - Send Telegram Report (deliver via Telegram)\n```\n\n## Data Collection\n\n### VM Information (Proxmox API)\n\nEndpoint: `/api2/json/nodes/{node}/qemu`\n\nRetrieves:\n- Total VM count\n- Running VM count\n- Stopped VM count\n- VM names and IDs\n\n### Task Log (Proxmox API)\n\nEndpoint: `/api2/json/nodes/{node}/tasks?limit=100`\n\nRetrieves recent tasks to detect:\n- qmstop operations (VM stop commands)\n- qmshutdown operations (VM shutdown commands)\n- Task timestamps\n- Task status\n\n### Host Status (Proxmox API)\n\nEndpoint: `/api2/json/nodes/{node}/status`\n\nRetrieves:\n- CPU usage percentage\n- Memory total and used (in GB)\n- System uptime (in seconds)\n\n### Temperature Data (SSH)\n\nCommand: `sensors | grep -E 'Package|Core'`\n\nRetrieves:\n- CPU package temperature\n- Individual core temperatures\n- High and critical thresholds\n\n## Data Processing\n\n### VM Status Analysis\n\n1. Counts total, running, and stopped VMs\n2. Queries task log for stop/shutdown operations\n3. Filters tasks within 15-minute window\n4. Extracts VM ID from task UPID string\n5. Matches VM ID to VM name from VM list\n6. Calculates time elapsed since stop operation\n\n### Temperature Intelligence\n\nThe workflow implements smart temperature reporting:\n\n**Normal Operation (all temps below high threshold):**\n- Calculates average temperature across all cores\n- Displays min, max, and average values\n- Example: \"Average: 47.5 C (Min: 44.0 C, Max: 52.0 C)\"\n\n**Warning State (any temp at or above high threshold):**\n- Displays all temperature readings in detail\n- Shows full sensor output with thresholds\n- Changes section title to \"Temperature Warning\"\n- Adds fire emoji indicator\n\n### Resource Calculation\n\n**CPU Usage:**\n- API returns decimal (0.0 to 1.0)\n- Converted to percentage: `cpu * 100`\n\n**Memory:**\n- API returns bytes\n- Converted to GB: `bytes / (1024^3)`\n- Calculates percentage: `(used / total) * 100`\n\n**Uptime:**\n- API returns seconds\n- Converted to days and hours: `days = seconds / 86400`, `hours = (seconds % 86400) / 3600`\n\n## Report Generation\n\n### Message Structure\n\nThe Telegram message uses HTML formatting for structure:\n\n1. **Header Section**\n   - Report title\n   - Generation timestamp\n\n2. **Virtual Machines Section**\n   - Total VM count\n   - Running VMs with checkmark\n   - Stopped VMs with stop sign\n   - Recently stopped count with warning\n   - Detailed list if VMs stopped in last 15 minutes\n\n3. **Host Resources Section**\n   - CPU usage percentage\n   - Memory used/total with percentage\n   - Host uptime in days and hours\n\n4. **Temperature Section**\n   - Smart display (summary or detailed)\n   - Warning indicator if thresholds exceeded\n   - Monospace formatting for sensor output\n\n### HTML Formatting Features\n\n- Bold tags for headers and labels\n- Italic for timestamps\n- Code blocks for temperature data\n- Unicode separators for visual structure\n- Emoji indicators for status (checkmark, stop, warning, fire)\n\n## Security Considerations\n\n### Credential Storage\n\n- Passwords stored in n8n Set node (encrypted in database)\n- Alternative: Use n8n environment variables\n- Recommendation: Use Proxmox API tokens instead of passwords\n\n### API Communication\n\n- HTTPS with self-signed certificate acceptance\n- Authentication via session tickets (15-minute validity)\n- CSRF token validation for API requests\n\n### SSH Access\n\n- Password-based authentication (can use key-based)\n- Commands limited to read-only operations\n- No privilege escalation required\n\n## Performance Impact\n\n### API Load\n\n- 3 API calls per execution (VM list, tasks, status)\n- Lightweight endpoints with minimal data\n- 15-minute interval reduces server load\n\n### Execution Time\n\nTypical workflow execution: 5-10 seconds\n- Login: 1-2 seconds\n- API calls: 2-3 seconds\n- SSH command: 1-2 seconds\n- Processing: less than 1 second\n\n### Resource Usage\n\n- Minimal CPU impact on Proxmox\n- Small memory footprint\n- Negligible network bandwidth\n\n## Extensibility\n\n### Adding Additional Metrics\n\nTo monitor additional data points:\n\n1. Add new API call node after \"Prepare Auth\"\n2. Update \"Process Data\" node to include new data\n3. Modify \"Generate Formatted Message\" for display\n\n### Integration with Other Services\n\nThe workflow can be extended to:\n- Send to Discord, Slack, or email\n- Write to database or log file\n- Trigger alerts based on thresholds\n- Generate charts or graphs\n\n### Multi-Node Monitoring\n\nTo monitor multiple Proxmox nodes:\n1. Duplicate API call nodes\n2. Update node names in URLs\n3. Merge data in processing step\n4. Generate combined report",
+  "featuredImage": "/data/workflows/9733/9733.webp",
+  "author": {
+    "id": 101,
+    "slug": "vighsandor",
+    "name": "Vigh Sandor",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1100,
+  "downloads": 110,
+  "createdAt": "2025-10-15T20:07:53.806Z",
+  "updatedAt": "2026-01-16T09:01:39.688Z",
+  "publishedAt": "2025-10-15T20:07:53.806Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9733",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Proxmox system monitor - VM status, host resources & temperature alerts via Telegram",
+    "workflowName": "Proxmox system monitor - VM status, host resources & temperature alerts via Telegram",
+    "description": "# Setup Instructions\n\n## Overview\n\nThis n8n workflow monitors your Proxmox VE server and sends automated reports to Telegram every 15 minutes. It tracks VM status, host resource usage, temperature sensors, and detects recently stopped VMs.\n\n## Prerequisites\n\n### Required Software\n- n8n instance (self-hosted or cloud)\n- Proxmox VE server with API access\n- Telegram account with bot created via BotFather\n- lm-sensors package installed on Proxmox host\n\n### Required Access\n- Proxmox admin credentials (username and password)\n- SSH access to Proxmox server\n- Telegram Bot API token\n- Telegram Chat ID\n\n## Installation Steps\n\n### Step 1: Install Temperature Sensors on Proxmox\n\nSSH into your Proxmox server and run:\n\n```bash\napt-get update\napt-get install -y lm-sensors\nsensors-detect\n```\n\nPress ENTER to accept default answers during sensors-detect setup.\n\nTest that sensors work:\n```bash\nsensors | grep -E 'Package|Core'\n```\n\n### Step 2: Create Telegram Bot\n\n1. Open Telegram and search for BotFather\n2. Send `/newbot` command\n3. Follow prompts to create your bot\n4. Save the API token provided\n5. Get your Chat ID by sending a message to your bot, then visiting:\n   ```\n   https://api.telegram.org/bot&lt;YOUR_TOKEN&gt;/getUpdates\n   ```\n6. Look for \"chat\":{\"id\": YOUR_CHAT_ID in the response\n\n### Step 3: Configure n8n Credentials\n\n#### SSH Password Credential\n1. In n8n, go to Credentials menu\n2. Create new credential: SSH Password\n3. Enter:\n   - Host: Your Proxmox IP address\n   - Port: 22\n   - Username: root (or your admin user)\n   - Password: Your Proxmox password\n\n#### Telegram API Credential\n1. Create new credential: Telegram API\n2. Enter the Bot Token from BotFather\n\n### Step 4: Import and Configure Workflow\n\n1. Import the JSON workflow into n8n\n2. Open the \"Set Variables\" node\n3. Update the following values:\n   - PROXMOX_IP: Your Proxmox server IP address\n   - PROXMOX_PORT: API port (default: 8006)\n   - PROXMOX_NODE: Node name (default: pve)\n   - TELEGRAM_CHAT_ID: Your Telegram chat ID\n   - PROXMOX_USER: Proxmox username with realm (e.g., root@pam)\n   - PROXMOX_PASSWORD: Proxmox password\n\n4. Connect credentials:\n   - SSH - Get Sensors node: Select your SSH credential\n   - Send Telegram Report node: Select your Telegram credential\n\n5. Save the workflow\n6. Activate the workflow\n\n## Configuration Options\n\n### Adjust Monitoring Interval\n\nEdit the \"Schedule Every 15min\" node:\n- Change `minutesInterval` value to desired interval (in minutes)\n- Recommended: 5-30 minutes\n\n### Adjust Recently Stopped VM Detection Window\n\nEdit the \"Process Data\" node:\n- Find line: `const fifteenMinutesAgo = now - 900;`\n- Change 900 to desired seconds (900 = 15 minutes)\n\n### Modify Temperature Warning Threshold\n\nThe workflow uses the \"high\" threshold defined by sensors.\nTo manually set threshold, edit \"Process Data\" node:\n- Modify the temperature parsing logic\n- Change comparison: `if (current &gt;= high)` to use custom value\n\n## Testing\n\n### Test Individual Components\n\n1. Execute \"Set Variables\" node manually - verify output\n2. Execute \"Proxmox Login\" node - check for valid ticket\n3. Execute \"API - VM List\" - confirm VM data received\n4. Execute complete workflow - check Telegram for message\n\n### Troubleshooting\n\n**Login fails:**\n- Verify PROXMOX_USER format includes realm (e.g., root@pam)\n- Check password is correct\n- Ensure allowUnauthorizedCerts is enabled for self-signed certificates\n\n**No temperature data:**\n- Verify lm-sensors is installed on Proxmox\n- Run `sensors` command manually via SSH\n- Check SSH credentials are correct\n\n**Recently stopped VMs not detected:**\n- Check task log API endpoint returns data\n- Verify VM was stopped within detection window\n- Ensure task types qmstop or qmshutdown are logged\n\n**Telegram not receiving messages:**\n- Verify bot token is correct\n- Confirm chat ID is accurate\n- Check bot was started (send /start to bot)\n- Verify parse_mode is set to HTML in Telegram node\n\n---\n\n# How It Works\n\n## Workflow Architecture\n\nThe workflow executes in a sequential chain of nodes that gather data from multiple sources, process it, and deliver a formatted report.\n\n### Execution Flow\n\n```\nSchedule Trigger (15min)\n  - Set Variables\n  - Proxmox Login (get authentication ticket)\n  - Prepare Auth (prepare credentials for API calls)\n  - API - VM List (get all VMs and their status)\n  - API - Node Tasks (get recent task log)\n  - API - Node Status (get host CPU, memory, uptime)\n  - SSH - Get Sensors (get temperature data)\n  - Process Data (analyze and structure all data)\n  - Generate Formatted Message (create Telegram message)\n  - Send Telegram Report (deliver via Telegram)\n```\n\n## Data Collection\n\n### VM Information (Proxmox API)\n\nEndpoint: `/api2/json/nodes/{node}/qemu`\n\nRetrieves:\n- Total VM count\n- Running VM count\n- Stopped VM count\n- VM names and IDs\n\n### Task Log (Proxmox API)\n\nEndpoint: `/api2/json/nodes/{node}/tasks?limit=100`\n\nRetrieves recent tasks to detect:\n- qmstop operations (VM stop commands)\n- qmshutdown operations (VM shutdown commands)\n- Task timestamps\n- Task status\n\n### Host Status (Proxmox API)\n\nEndpoint: `/api2/json/nodes/{node}/status`\n\nRetrieves:\n- CPU usage percentage\n- Memory total and used (in GB)\n- System uptime (in seconds)\n\n### Temperature Data (SSH)\n\nCommand: `sensors | grep -E 'Package|Core'`\n\nRetrieves:\n- CPU package temperature\n- Individual core temperatures\n- High and critical thresholds\n\n## Data Processing\n\n### VM Status Analysis\n\n1. Counts total, running, and stopped VMs\n2. Queries task log for stop/shutdown operations\n3. Filters tasks within 15-minute window\n4. Extracts VM ID from task UPID string\n5. Matches VM ID to VM name from VM list\n6. Calculates time elapsed since stop operation\n\n### Temperature Intelligence\n\nThe workflow implements smart temperature reporting:\n\n**Normal Operation (all temps below high threshold):**\n- Calculates average temperature across all cores\n- Displays min, max, and average values\n- Example: \"Average: 47.5 C (Min: 44.0 C, Max: 52.0 C)\"\n\n**Warning State (any temp at or above high threshold):**\n- Displays all temperature readings in detail\n- Shows full sensor output with thresholds\n- Changes section title to \"Temperature Warning\"\n- Adds fire emoji indicator\n\n### Resource Calculation\n\n**CPU Usage:**\n- API returns decimal (0.0 to 1.0)\n- Converted to percentage: `cpu * 100`\n\n**Memory:**\n- API returns bytes\n- Converted to GB: `bytes / (1024^3)`\n- Calculates percentage: `(used / total) * 100`\n\n**Uptime:**\n- API returns seconds\n- Converted to days and hours: `days = seconds / 86400`, `hours = (seconds % 86400) / 3600`\n\n## Report Generation\n\n### Message Structure\n\nThe Telegram message uses HTML formatting for structure:\n\n1. **Header Section**\n   - Report title\n   - Generation timestamp\n\n2. **Virtual Machines Section**\n   - Total VM count\n   - Running VMs with checkmark\n   - Stopped VMs with stop sign\n   - Recently stopped count with warning\n   - Detailed list if VMs stopped in last 15 minutes\n\n3. **Host Resources Section**\n   - CPU usage percentage\n   - Memory used/total with percentage\n   - Host uptime in days and hours\n\n4. **Temperature Section**\n   - Smart display (summary or detailed)\n   - Warning indicator if thresholds exceeded\n   - Monospace formatting for sensor output\n\n### HTML Formatting Features\n\n- Bold tags for headers and labels\n- Italic for timestamps\n- Code blocks for temperature data\n- Unicode separators for visual structure\n- Emoji indicators for status (checkmark, stop, warning, fire)\n\n## Security Considerations\n\n### Credential Storage\n\n- Passwords stored in n8n Set node (encrypted in database)\n- Alternative: Use n8n environment variables\n- Recommendation: Use Proxmox API tokens instead of passwords\n\n### API Communication\n\n- HTTPS with self-signed certificate acceptance\n- Authentication via session tickets (15-minute validity)\n- CSRF token validation for API requests\n\n### SSH Access\n\n- Password-based authentication (can use key-based)\n- Commands limited to read-only operations\n- No privilege escalation required\n\n## Performance Impact\n\n### API Load\n\n- 3 API calls per execution (VM list, tasks, status)\n- Lightweight endpoints with minimal data\n- 15-minute interval reduces server load\n\n### Execution Time\n\nTypical workflow execution: 5-10 seconds\n- Login: 1-2 seconds\n- API calls: 2-3 seconds\n- SSH command: 1-2 seconds\n- Processing: less than 1 second\n\n### Resource Usage\n\n- Minimal CPU impact on Proxmox\n- Small memory footprint\n- Negligible network bandwidth\n\n## Extensibility\n\n### Adding Additional Metrics\n\nTo monitor additional data points:\n\n1. Add new API call node after \"Prepare Auth\"\n2. Update \"Process Data\" node to include new data\n3. Modify \"Generate Formatted Message\" for display\n\n### Integration with Other Services\n\nThe workflow can be extended to:\n- Send to Discord, Slack, or email\n- Write to database or log file\n- Trigger alerts based on thresholds\n- Generate charts or graphs\n\n### Multi-Node Monitoring\n\nTo monitor multiple Proxmox nodes:\n1. Duplicate API call nodes\n2. Update node names in URLs\n3. Merge data in processing step\n4. Generate combined report",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Every 15min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Proxmox Login",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Auth",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "API - VM List",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "API - Node Tasks",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "API - Node Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "SSH - Get Sensors",
+      "type": "n8n-nodes-base.ssh",
+      "role": "ssh",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate Formatted Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Telegram Report",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

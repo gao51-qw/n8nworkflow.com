@@ -1,0 +1,26 @@
+{
+  "id": 9158,
+  "slug": "9158",
+  "title": "Generate meeting minutes from videos with Whisper, Ollama LLM and Notion",
+  "description": "# Automated Meeting Minutes from Video Recordings\n\nThis workflow automatically transforms video recordings of meetings into structured, professional meeting minutes in Notion. It uses local AI models (Whisper for transcription and Ollama for summarization) to ensure privacy and cost efficiency, while uploading the original video to Google Drive for safekeeping. Ideal for creative teams, production reviews, or any scenario where visual context is as important as the spoken word.\n\n## 🔄 How It Works\n\n1. **Wait & Detect**: The workflow monitors a local folder. When a new `.mkv` video file is added, it waits until the file has finished copying.\n2. **Prepare Audio**: The video is converted into a `.wav` audio file optimized for transcription (under 25 MB with high clarity).\n3. **Transcribe Locally**: The local Whisper model generates a timestamped text transcript.\n4. **Generate Smart Minutes**: The transcript is sent to a local Ollama LLM, which produces structured, summarized meeting notes.\n5. **Store & Share**: The original video is uploaded to Google Drive, a new page is created in Notion with the notes and a link to the video, and a completion notification is sent via Discord.\n\n## ⏱️ Setup Steps\n\n* **Estimated Time**: 10–15 minutes (for technically experienced users).\n* **Prerequisites**:\n  * Install Python, FFmpeg, and required packages (`openai-whisper`, `ffmpeg-python`).\n  * Run Ollama locally with a compatible model (e.g., `gpt-oss:20b`, `llama3`, `mistral`).\n  * Configure n8n credentials for Google Drive, Notion, and Discord.\n* **Workflow Configuration**:\n  * Update the file paths for the helper scripts (`wait-for-file.ps1`, `create_wav.py`, `transcribe_return.py`) in the respective \"Execute Command\" nodes.\n  * Change the input folder path (`G:\\OBS\\videos`) in the \"File\" node to your own recording directory.\n  * Replace the Google Drive folder ID and Notion database/page ID in their respective nodes.\n\n&gt; 💡 **Note**: Detailed instructions for each step, including error handling and variable setup, are documented in the **Sticky Notes** within the workflow itself.\n\n---\n\n## 📁 Helper Scripts Documentation\n\n### `wait-for-file.ps1`\nA PowerShell script that checks if a file is still being written to (i.e., locked by another process). It returns `0` if the file is free and `1` if it is still locked.\n\n**Usage:**\n```powershell\n.\\wait-for-file.ps1 -FilePath \"C:\\path\\to\\your\\file.mkv\"\n```\n\n### `create_wav.py`\nA Python script that converts a video file into a .wav audio file. It automatically calculates the necessary audio bitrate to keep the output file under 25 MB—a common requirement for many transcription services.\n\n**Usage:**\n```powershell\npython create_wav.py \"C:\\path\\to\\your\\file.mkv\"\n```\n\n### `transcribe_return.py`\nA Python script that uses a local Whisper model to transcribe an audio file. It can auto-detect the language or use a language code specified in the filename (e.g., meeting.en.mkv for English, meeting.es.mkv for Spanish). The transcript is printed directly to stdout with timestamps, which is then captured by the n8n workflow.\n\n**Usage:**\n```powershell\n# Auto-detect language\npython transcribe_return.py \"C:\\path\\to\\your\\file.mkv\"\n\n# Force language via filename\npython transcribe_return.py \"C:\\path\\to\\your\\file.es.mkv\"\n```",
+  "featuredImage": "/data/workflows/9158/9158.webp",
+  "author": {
+    "id": 101,
+    "slug": "fafacabrera",
+    "name": "Facundo Cabrera",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 336,
+  "downloads": 33,
+  "createdAt": "2025-10-01T15:14:54.774Z",
+  "updatedAt": "2026-01-16T08:59:17.377Z",
+  "publishedAt": "2025-10-01T15:14:54.774Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9158"
+}

@@ -1,0 +1,27 @@
+{
+  "id": 7592,
+  "slug": "7592",
+  "title": "Generate weekly energy consumption reports with EnergiDataService, email and Google Drive",
+  "description": "# 📊 Generate Weekly Energy Consumption Reports with API, Email and Google Drive\n\nThis workflow automates the process of retrieving energy consumption data, formatting it into a CSV report, and distributing it every week via **email** and **Google Drive**.\n\n## ⚡ Quick Implementation Steps:\n- Import the workflow into your n8n instance.\n- Configure your API, email details and Google Drive folder.\n- (Optional) Adjust the **CRON schedule** if you need a different time or frequency.\n- Activate workflow—automated weekly reports begin immediately.\n\n## 🎯 Who’s It For\nEnergy providers, sustainability departments, facility managers, renewable energy operators.\n\n## 🛠 Requirements\n- n8n instance\n- Energy Consumption API access\n- Google Drive account\n- Email SMTP access\n\n## ⚙️ How It Works\nWorkflow triggers every Monday at 8 AM, fetches consumption data, emails CSV report and saves a copy to Google Drive.\n\n## 🔄 Workflow Steps\n\n### 1. **Schedule Weekly (Mon 8:00 AM)**\n- Type: **Cron Node**\n- Runs every Monday at 8:00 AM.\n- Triggers the workflow execution automatically.\n\n### 2. **Fetch Energy Data**\n- Type: **HTTP Request Node**\n- Makes a GET request to:\n```\nhttps://api.energidataservice.dk/dataset/ConsumptionDE35Hour\n(sample API)\n```\n- The API returns JSON data with hourly electricity consumption in Denmark.\n\n**Sample Response Structure:**\n```json\n{\n\"records\": [\n{\n\"HourDK\": \"2025-08-25T01:00:00\",\n\"MunicipalityNo\": ___,\n\"MunicipalityName\": \"Copenhagen\",\n\"ConsumptionkWh\": 12345.67\n}\n]\n}\n```\n\n### 3. **Normalize Records**\n- Type: **Code Node**\n- Extracts the `records` array from the API response and maps each entry into separate JSON items for easier handling downstream.\n- Code used:\n```javascript\nconst itemlist = $input.first().json.records;\nreturn itemlist.map(r =&gt; ({ json: r }));\n```\n\n### 4. **Convert to File**\n- Type: **Convert to File Node**\n- Converts the array of JSON records into a **CSV file**.\n- The CSV is stored in a binary field called `data`.\n\n### 5. **Send Email Weekly Report**\n- Type: **Email Send Node**\n- Sends the generated CSV file as an **attachment**.\n- Parameters:\n- `fromEmail`: Sender email address (configure in node).\n- `toEmail`: Recipient email address.\n- `subject`: `\"Weekly Energy Consumption Report\"`.\n- `attachments`: `=data` (binary data from the previous node).\n\n### 6. **Report File Upload to Google Drive**\n- Type: **Google Drive Node**\n- Uploads the CSV file to your Google Drive root folder.\n- Filename pattern:\n```\nenergy_report_{{ $now.format('yyyy_MM_dd_HH_ii_ss') }}\n```\n- Requires valid Google Drive OAuth2 credentials.\n\n## ✨ How To Customize\nChange report frequency, email template, data format (CSV/Excel) or add-ons.\n\n## ➕ Add-ons\n- Integration with analytics tools (Power BI, Tableau)\n- Additional reporting formats (Excel, PDF)\n- Slack notifications\n\n## 🚦 Use Case Examples\n- Automated weekly/monthly reporting for compliance\n- Historical consumption tracking\n- Operational analytics and forecasting\n\n## 🔍 Troubleshooting Guide\n| Issue | Cause | Solution |\n|-------|-------|----------|\n| Data not fetched | API endpoint incorrect | Verify URL |\n| Email delivery issues | SMTP configuration incorrect | Verify SMTP |\n| Drive save fails | Permissions/Drive ID incorrect | Check Drive permissions |\n\n## 📞 Need Assistance?\nContact WeblineIndia for additional customization and support, we're happy to help.",
+  "featuredImage": "/data/workflows/7592/7592.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 285,
+  "downloads": 28,
+  "createdAt": "2025-08-19T14:10:48.963Z",
+  "updatedAt": "2026-01-16T08:51:16.348Z",
+  "publishedAt": "2025-08-19T14:10:48.963Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7592"
+}

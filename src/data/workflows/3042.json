@@ -1,0 +1,164 @@
+{
+  "id": 3042,
+  "slug": "3042",
+  "title": "Automated water consumption tracker - stored in sheet and notify in Slack",
+  "description": "# Water Reminder Workflow\n\nThis workflow demonstrates how to use **n8n** and **Slack** to build an intelligent water drinking reminder system, combined with **Google Sheets** for data recording and **OpenAI** for generating personalized reminder messages.\n\n---\n\n[Google Sheet Template](https://docs.google.com/spreadsheets/d/1cMf03l3Ae3vo-4w8yeaUvSh9dB7CLM7CFUb2y4BmqwY/edit?usp=sharing)\n\nThe iOS shortcut template:\n![IMG_5835_5dcead4a70_1_09d5e26b6c 1.jpg](fileId:989)\n\n**The result in iOS health:**\n![IMG_0378_35d2c74ab3 1.png](fileId:975)\n\n\n[The template demo in Youtube](https://www.youtube.com/watch?v=h2_QO5gxdts)\n\n\n---\n\n## Key Features\n1. **Scheduled Reminders**: Automatically sends water reminders at random times every hour.\n2. **Intelligent Scheduling**: Delays the next reminder if you've recently had water.\n3. **AI-Generated Messages**: Uses OpenAI to generate friendly and non-repetitive reminder messages.\n4. **Data Tracking**: Records daily water intake and calculates percentage of goal achievement.\n5. **Quick Response**: Easily record water intake through Slack buttons.\n6. **iOS Integration**: Provides iOS shortcut links to sync data with the Health app.\n\n---\n\n## Pre-Configuration Requirements\nTo use this workflow, you need to set up the following:\n\n1. **Google Sheets**:\n   - Create a Google spreadsheet with `log` and `setting` sheets\n   - The `log` sheet should include `date`, `time`, and `value` columns\n   - The `setting` sheet is used to store daily water intake goals\n\n2. **Slack**:\n   - Create a Slack app and obtain an API token\n   - Configure permissions for interactive buttons\n\n3. **OpenAI**:\n   - Obtain an OpenAI API key\n\n4. **iOS Shortcut** (optional):\n   - Create an iOS shortcut named `darrell_water` for recording health data\n\n---\n\n## Node Configurations\n\n### 1. Scheduled Triggers and Data Collection\n\n#### 1.1. Schedule Trigger\n- **Purpose**: Triggers water reminders on schedule\n- **Configuration**:\n  - **Cron Expression**: `0 {{ Math.floor(Math.random() * 11) }} 8-23 * * *`\n  - Triggers at a random minute every hour, only between 8 AM and 11 PM\n\n#### 1.2. Google Sheets - Get Target\n- **Purpose**: Retrieves daily water intake goal\n- **Configuration**:\n  - **Document ID**: Your Google spreadsheet ID\n  - **Sheet Name**: `setting`\n\n#### 1.3. Google Sheets - Get Log\n- **Purpose**: Retrieves today's water intake records\n- **Configuration**:\n  - **Document ID**: Your Google spreadsheet ID\n  - **Sheet Name**: `log`\n  - **Filter Condition**: `date` equals today's date `{{ $now.format('yyyy-MM-dd') }}`\n\n#### 1.4. Summarize\n- **Purpose**: Calculates total water intake for today\n- **Configuration**:\n  - **Fields to Summarize**: `value` (sum)\n\n#### 1.5. Limit\n- **Purpose**: Gets the most recent water intake record\n- **Configuration**:\n  - **Keep**: Last items\n\n---\n\n### 2. Intelligent Reminder Logic\n\n#### 2.1. Combine Data\n- **Purpose**: Merges target and actual water intake data\n- **Configuration**:\n  - **Combine By**: Combine by position\n  - **Number of Inputs**: 3\n\n#### 2.2. If\n- **Purpose**: Checks if water was consumed recently\n- **Configuration**:\n  - **Condition**:\n    - `{{ DateTime.fromISO($json.date+\"T\"+$json.time).format('yyyy-MM-dd HH:mm:ss') }}` is after `{{ $now.minus(30, \"minutes\") }}`\n\n#### 2.3. Wait\n- **Purpose**: Randomly delays the reminder if water was consumed recently\n- **Configuration**:\n  - **Wait Time**: `{{ Math.floor(Math.random() * 1) + 1 }}` minutes\n\n---\n\n### 3. AI Message Generation and Sending\n\n#### 3.1. OpenAI\n- **Purpose**: Generates personalized water reminder messages\n- **Configuration**:\n  - **Model**: `gpt-4o-mini`\n  - **Messages**:\n    - System prompt: Requests responses in Traditional Chinese and in JSON format\n    - User prompt: Includes information about last water time, current time, goal, and progress\n  - **Temperature**: 1\n\n#### 3.2. Slack Send Drink Notification\n- **Purpose**: Sends water reminders to Slack channel\n- **Configuration**:\n  - **Channel**: Your Slack channel ID\n  - **Message Type**: Block\n  - **Block UI**: Contains AI-generated reminder message and water amount buttons (100ml, 150ml, 200ml, 250ml, 300ml)\n\n---\n\n### 4. User Interaction and Data Recording\n\n#### 4.1. Slack Drink Webhook\n- **Purpose**: Receives user interactions when water buttons are clicked\n- **Configuration**:\n  - **HTTP Method**: `POST`\n  - **Path**: `slack-water-webhook`\n\n#### 4.2. Slack Action Payload\n- **Purpose**: Parses Slack interaction data\n- **Configuration**:\n  - **Mode**: Raw\n  - **JSON Output**: `{{ $json.body.payload }}`\n\n#### 4.3. Slack Action Drink Data\n- **Purpose**: Extracts water amount and message information\n- **Configuration**:\n  - **Assignments**:\n    - `value`: `{{ $json.actions[0].value }}`\n    - `message_text`: `{{ $json.message.text }}`\n    - `shortcut_url`: `shortcuts://run-shortcut?name=darrell_water&input=`\n    - `shortcut_url_data`: JSON containing water amount and time\n    - `message_ts`: `{{ $json.container.message_ts }}`\n\n#### 4.4. Google Sheets\n- **Purpose**: Records water intake data to spreadsheet\n- **Configuration**:\n  - **Operation**: Append\n  - **Document ID**: Your Google spreadsheet ID\n  - **Sheet Name**: `log`\n  - **Column Mapping**:\n    - `date`: `{{ $now.format('yyyy-MM-dd') }}`\n    - `time`: `{{ $now.format('HH:mm:ss') }}`\n    - `value`: `{{ $json.value }}`\n\n#### 4.5. Send to Slack with Confirm\n- **Purpose**: Sends confirmation message and provides iOS shortcut link\n- **Configuration**:\n  - **Channel**: Your Slack channel ID\n  - **Message Type**: Block\n  - **Block UI**: Contains confirmation message and iOS Health app button\n  - **Reply Settings**: Reply to the thread of the original message\n\n---\n\n## Author Information\nThis workflow was created by **darrell_tw_**, an engineer focused on AI and Automation.\n\nContact:\n- [X](https://x.com/darrell_tw_)\n- [Threads](https://www.threads.net/@darrell_tw_)\n- [Instagram](https://www.instagram.com/darrell_tw_/)\n- [Website](https://www.darrelltw.com/)\n",
+  "featuredImage": "/data/workflows/3042/3042.webp",
+  "author": {
+    "id": 101,
+    "slug": "darrelltw",
+    "name": "darrell_tw",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 829,
+  "downloads": 82,
+  "createdAt": "2025-02-28T15:53:27.335Z",
+  "updatedAt": "2026-01-16T08:27:47.788Z",
+  "publishedAt": "2025-02-28T15:53:27.335Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3042",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated water consumption tracker - stored in sheet and notify in Slack",
+    "workflowName": "Automated water consumption tracker - stored in sheet and notify in Slack",
+    "description": "# Water Reminder Workflow\n\nThis workflow demonstrates how to use **n8n** and **Slack** to build an intelligent water drinking reminder system, combined with **Google Sheets** for data recording and **OpenAI** for generating personalized reminder messages.\n\n---\n\n[Google Sheet Template](https://docs.google.com/spreadsheets/d/1cMf03l3Ae3vo-4w8yeaUvSh9dB7CLM7CFUb2y4BmqwY/edit?usp=sharing)\n\nThe iOS shortcut template:\n![IMG_5835_5dcead4a70_1_09d5e26b6c 1.jpg](fileId:989)\n\n**The result in iOS health:**\n![IMG_0378_35d2c74ab3 1.png](fileId:975)\n\n\n[The template demo in Youtube](https://www.youtube.com/watch?v=h2_QO5gxdts)\n\n\n---\n\n## Key Features\n1. **Scheduled Reminders**: Automatically sends water reminders at random times every hour.\n2. **Intelligent Scheduling**: Delays the next reminder if you've recently had water.\n3. **AI-Generated Messages**: Uses OpenAI to generate friendly and non-repetitive reminder messages.\n4. **Data Tracking**: Records daily water intake and calculates percentage of goal achievement.\n5. **Quick Response**: Easily record water intake through Slack buttons.\n6. **iOS Integration**: Provides iOS shortcut links to sync data with the Health app.\n\n---\n\n## Pre-Configuration Requirements\nTo use this workflow, you need to set up the following:\n\n1. **Google Sheets**:\n   - Create a Google spreadsheet with `log` and `setting` sheets\n   - The `log` sheet should include `date`, `time`, and `value` columns\n   - The `setting` sheet is used to store daily water intake goals\n\n2. **Slack**:\n   - Create a Slack app and obtain an API token\n   - Configure permissions for interactive buttons\n\n3. **OpenAI**:\n   - Obtain an OpenAI API key\n\n4. **iOS Shortcut** (optional):\n   - Create an iOS shortcut named `darrell_water` for recording health data\n\n---\n\n## Node Configurations\n\n### 1. Scheduled Triggers and Data Collection\n\n#### 1.1. Schedule Trigger\n- **Purpose**: Triggers water reminders on schedule\n- **Configuration**:\n  - **Cron Expression**: `0 {{ Math.floor(Math.random() * 11) }} 8-23 * * *`\n  - Triggers at a random minute every hour, only between 8 AM and 11 PM\n\n#### 1.2. Google Sheets - Get Target\n- **Purpose**: Retrieves daily water intake goal\n- **Configuration**:\n  - **Document ID**: Your Google spreadsheet ID\n  - **Sheet Name**: `setting`\n\n#### 1.3. Google Sheets - Get Log\n- **Purpose**: Retrieves today's water intake records\n- **Configuration**:\n  - **Document ID**: Your Google spreadsheet ID\n  - **Sheet Name**: `log`\n  - **Filter Condition**: `date` equals today's date `{{ $now.format('yyyy-MM-dd') }}`\n\n#### 1.4. Summarize\n- **Purpose**: Calculates total water intake for today\n- **Configuration**:\n  - **Fields to Summarize**: `value` (sum)\n\n#### 1.5. Limit\n- **Purpose**: Gets the most recent water intake record\n- **Configuration**:\n  - **Keep**: Last items\n\n---\n\n### 2. Intelligent Reminder Logic\n\n#### 2.1. Combine Data\n- **Purpose**: Merges target and actual water intake data\n- **Configuration**:\n  - **Combine By**: Combine by position\n  - **Number of Inputs**: 3\n\n#### 2.2. If\n- **Purpose**: Checks if water was consumed recently\n- **Configuration**:\n  - **Condition**:\n    - `{{ DateTime.fromISO($json.date+\"T\"+$json.time).format('yyyy-MM-dd HH:mm:ss') }}` is after `{{ $now.minus(30, \"minutes\") }}`\n\n#### 2.3. Wait\n- **Purpose**: Randomly delays the reminder if water was consumed recently\n- **Configuration**:\n  - **Wait Time**: `{{ Math.floor(Math.random() * 1) + 1 }}` minutes\n\n---\n\n### 3. AI Message Generation and Sending\n\n#### 3.1. OpenAI\n- **Purpose**: Generates personalized water reminder messages\n- **Configuration**:\n  - **Model**: `gpt-4o-mini`\n  - **Messages**:\n    - System prompt: Requests responses in Traditional Chinese and in JSON format\n    - User prompt: Includes information about last water time, current time, goal, and progress\n  - **Temperature**: 1\n\n#### 3.2. Slack Send Drink Notification\n- **Purpose**: Sends water reminders to Slack channel\n- **Configuration**:\n  - **Channel**: Your Slack channel ID\n  - **Message Type**: Block\n  - **Block UI**: Contains AI-generated reminder message and water amount buttons (100ml, 150ml, 200ml, 250ml, 300ml)\n\n---\n\n### 4. User Interaction and Data Recording\n\n#### 4.1. Slack Drink Webhook\n- **Purpose**: Receives user interactions when water buttons are clicked\n- **Configuration**:\n  - **HTTP Method**: `POST`\n  - **Path**: `slack-water-webhook`\n\n#### 4.2. Slack Action Payload\n- **Purpose**: Parses Slack interaction data\n- **Configuration**:\n  - **Mode**: Raw\n  - **JSON Output**: `{{ $json.body.payload }}`\n\n#### 4.3. Slack Action Drink Data\n- **Purpose**: Extracts water amount and message information\n- **Configuration**:\n  - **Assignments**:\n    - `value`: `{{ $json.actions[0].value }}`\n    - `message_text`: `{{ $json.message.text }}`\n    - `shortcut_url`: `shortcuts://run-shortcut?name=darrell_water&input=`\n    - `shortcut_url_data`: JSON containing water amount and time\n    - `message_ts`: `{{ $json.container.message_ts }}`\n\n#### 4.4. Google Sheets\n- **Purpose**: Records water intake data to spreadsheet\n- **Configuration**:\n  - **Operation**: Append\n  - **Document ID**: Your Google spreadsheet ID\n  - **Sheet Name**: `log`\n  - **Column Mapping**:\n    - `date`: `{{ $now.format('yyyy-MM-dd') }}`\n    - `time`: `{{ $now.format('HH:mm:ss') }}`\n    - `value`: `{{ $json.value }}`\n\n#### 4.5. Send to Slack with Confirm\n- **Purpose**: Sends confirmation message and provides iOS shortcut link\n- **Configuration**:\n  - **Channel**: Your Slack channel ID\n  - **Message Type**: Block\n  - **Block UI**: Contains confirmation message and iOS Health app button\n  - **Reply Settings**: Reply to the thread of the original message\n\n---\n\n## Author Information\nThis workflow was created by **darrell_tw_**, an engineer focused on AI and Automation.\n\nContact:\n- [X](https://x.com/darrell_tw_)\n- [Threads](https://www.threads.net/@darrell_tw_)\n- [Instagram](https://www.instagram.com/darrell_tw_/)\n- [Website](https://www.darrelltw.com/)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "slack_action_payload",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "slack_action_drink_data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Sheets - Get Target",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "role": "summarize",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "combine data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "slack drink webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack send drink notification",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Send to Slack with confirm",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Edit Fields-Set progress",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Google Sheets - log water value to sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Google Sheets - Get Today Water Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    }
+  ]
+}

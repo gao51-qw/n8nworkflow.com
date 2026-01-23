@@ -1,0 +1,164 @@
+{
+  "id": 9870,
+  "slug": "9870",
+  "title": "Create a voice & text Telegram assistant with Lookio RAG and GPT-4.1",
+  "description": "Create a Telegram bot that answers questions using Retrieval-Augmented Generation (RAG) powered by **Lookio** and an LLM agent (GPT-4.1).\n\nThis template handles both **text** and **voice** messages (voice transcribed via a Mistral model by default), routes queries through an agent that can call a Lookio tool to fetch knowledge from your uploaded documents, and returns concise, Telegram-friendly replies. A security switch lets you restrict use to a single Telegram username for private testing, or remove the filter to make the bot public.\n\n## Who is this for?\n\n* **Internal teams & knowledge workers**: Turn your internal docs into an interactive Telegram assistant for quick knowledge lookups.\n* **Support & ops**: Provide on-demand answers from your internal knowledge base without exposing full documentation.\n* **Developers & automation engineers**: Use this as a reference for integrating agents, transcription, and RAG inside n8n.\n* **No-code builders**: Quickly deploy a chat interface that uses Lookio for accurate, source-backed answers.\n\n## What it does / What problem does this solve?\n\n* **Provides accurate, source-backed answers**: Routes queries to **Lookio** so replies are grounded in your documents instead of generic web knowledge.\n* **Handles voice & text transparently**: Accepts Telegram voice messages, transcribes them (via the **Mistral** API node by default), and treats transcripts the same as typed text.\n* **Simple agent + tool architecture**: Uses a **LangChain AI Agent** with a **Query knowledge base** tool to separate reasoning from retrieval.\n* **Privacy control**: Includes a **Myself?** filter to restrict access to a specific Telegram username for safe testing.\n\n## How it works\n\n1.  **Trigger**: **Telegram Trigger** receives incoming messages (text or voice).\n2.  **Route**: **Message Router** detects voice vs text. Voice files are fetched with **Get Audio File**.\n3.  **Transcribe**: **Mistral transcribe** receives the audio file and returns a transcript; the transcript or text is normalized into **preset\\_user\\_message** and consolidated in **Consolidate user message**.\n4.  **Agent**: **AI Agent** (GPT-4.1-mini configured) runs with a system prompt that instructs it to call the **Query knowledge base** tool when domain knowledge is required.\n5.  **Respond**: The agent output is sent back to the user via **Telegram answer**.\n\n## How to set up\n\n1.  **Create a Lookio assistant**: Sign up at [https://www.lookio.app/](https://www.lookio.app/), upload documents, and create an assistant.\n2.  **Add credentials in n8n**: Configure **Telegram API**, **OpenAI** (or your LLM provider), and **Mistral Cloud** credentials in n8n.\n3.  **Configure Lookio tool**: In the **Query knowledge base** node, replace `&lt;your-lookio-api-key&gt;` and `&lt;your-assistant-id&gt;` placeholders with your Lookio API Key and Assistant ID.\n4.  **Set Telegram privacy (optional)**: Edit the **Myself?** **If** node and replace `&lt;Replace with your Telegram username&gt;` with your username to restrict access. Remove the node to allow public use.\n5.  **Adjust transcription (optional)**: Swap the **Mistral transcribe** HTTP node for another provider (OpenAI, Whisper, etc.) and update its prompt to include your jargon list.\n6.  **Connect LLM**: In **OpenAI Chat Model** node, add your OpenAI API key (or configure another LLM node) and ensure the **AI Agent** node references this model.\n7.  **Activate workflow**: Activate the workflow and test by messaging your bot in Telegram.\n\n## Requirements\n\n* An n8n instance (cloud or self-hosted)\n* A **Telegram Bot** token added in n8n credentials\n* A **Lookio** account, **API Key**, and **Assistant ID**\n* An LLM provider account (OpenAI or equivalent) for the **OpenAI Chat Model** node\n* A **Mistral** API key (or other transcription provider) for voice transcription\n\n## How to take it further\n\n* **Add provenance & sources**: Parse Lookio responses and include short citations or source links in the agent replies.\n* **Rich replies**: Use Telegram media (images, files) or inline keyboards to create follow-up actions (open docs, request feedback, escalate to humans).\n* **Multi-user access control**: Replace the single-username filter with a list or role-based access system (Airtable or Google Sheets lookup) to allow multiple trusted users.\n* **Logging & analytics**: Save queries and agent responses to **Airtable** or **Google Sheets** for monitoring, quality checks, and prompt improvement.",
+  "featuredImage": "/data/workflows/9870/9870.webp",
+  "author": {
+    "id": 101,
+    "slug": "duv",
+    "name": "Guillaume Duvernay",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 219,
+  "downloads": 21,
+  "createdAt": "2025-10-18T20:39:08.038Z",
+  "updatedAt": "2026-01-16T09:02:23.203Z",
+  "publishedAt": "2025-10-18T20:39:08.038Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9870",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create a voice & text Telegram assistant with Lookio RAG and GPT-4.1",
+    "workflowName": "Create a voice & text Telegram assistant with Lookio RAG and GPT-4.1",
+    "description": "Create a Telegram bot that answers questions using Retrieval-Augmented Generation (RAG) powered by **Lookio** and an LLM agent (GPT-4.1).\n\nThis template handles both **text** and **voice** messages (voice transcribed via a Mistral model by default), routes queries through an agent that can call a Lookio tool to fetch knowledge from your uploaded documents, and returns concise, Telegram-friendly replies. A security switch lets you restrict use to a single Telegram username for private testing, or remove the filter to make the bot public.\n\n## Who is this for?\n\n* **Internal teams & knowledge workers**: Turn your internal docs into an interactive Telegram assistant for quick knowledge lookups.\n* **Support & ops**: Provide on-demand answers from your internal knowledge base without exposing full documentation.\n* **Developers & automation engineers**: Use this as a reference for integrating agents, transcription, and RAG inside n8n.\n* **No-code builders**: Quickly deploy a chat interface that uses Lookio for accurate, source-backed answers.\n\n## What it does / What problem does this solve?\n\n* **Provides accurate, source-backed answers**: Routes queries to **Lookio** so replies are grounded in your documents instead of generic web knowledge.\n* **Handles voice & text transparently**: Accepts Telegram voice messages, transcribes them (via the **Mistral** API node by default), and treats transcripts the same as typed text.\n* **Simple agent + tool architecture**: Uses a **LangChain AI Agent** with a **Query knowledge base** tool to separate reasoning from retrieval.\n* **Privacy control**: Includes a **Myself?** filter to restrict access to a specific Telegram username for safe testing.\n\n## How it works\n\n1.  **Trigger**: **Telegram Trigger** receives incoming messages (text or voice).\n2.  **Route**: **Message Router** detects voice vs text. Voice files are fetched with **Get Audio File**.\n3.  **Transcribe**: **Mistral transcribe** receives the audio file and returns a transcript; the transcript or text is normalized into **preset\\_user\\_message** and consolidated in **Consolidate user message**.\n4.  **Agent**: **AI Agent** (GPT-4.1-mini configured) runs with a system prompt that instructs it to call the **Query knowledge base** tool when domain knowledge is required.\n5.  **Respond**: The agent output is sent back to the user via **Telegram answer**.\n\n## How to set up\n\n1.  **Create a Lookio assistant**: Sign up at [https://www.lookio.app/](https://www.lookio.app/), upload documents, and create an assistant.\n2.  **Add credentials in n8n**: Configure **Telegram API**, **OpenAI** (or your LLM provider), and **Mistral Cloud** credentials in n8n.\n3.  **Configure Lookio tool**: In the **Query knowledge base** node, replace `&lt;your-lookio-api-key&gt;` and `&lt;your-assistant-id&gt;` placeholders with your Lookio API Key and Assistant ID.\n4.  **Set Telegram privacy (optional)**: Edit the **Myself?** **If** node and replace `&lt;Replace with your Telegram username&gt;` with your username to restrict access. Remove the node to allow public use.\n5.  **Adjust transcription (optional)**: Swap the **Mistral transcribe** HTTP node for another provider (OpenAI, Whisper, etc.) and update its prompt to include your jargon list.\n6.  **Connect LLM**: In **OpenAI Chat Model** node, add your OpenAI API key (or configure another LLM node) and ensure the **AI Agent** node references this model.\n7.  **Activate workflow**: Activate the workflow and test by messaging your bot in Telegram.\n\n## Requirements\n\n* An n8n instance (cloud or self-hosted)\n* A **Telegram Bot** token added in n8n credentials\n* A **Lookio** account, **API Key**, and **Assistant ID**\n* An LLM provider account (OpenAI or equivalent) for the **OpenAI Chat Model** node\n* A **Mistral** API key (or other transcription provider) for voice transcription\n\n## How to take it further\n\n* **Add provenance & sources**: Parse Lookio responses and include short citations or source links in the agent replies.\n* **Rich replies**: Use Telegram media (images, files) or inline keyboards to create follow-up actions (open docs, request feedback, escalate to humans).\n* **Multi-user access control**: Replace the single-username filter with a list or role-based access system (Airtable or Google Sheets lookup) to allow multiple trusted users.\n* **Logging & analytics**: Save queries and agent responses to **Airtable** or **Google Sheets** for monitoring, quality checks, and prompt improvement.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Myself?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Audio File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Message Router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram answer",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Query knowledge base",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare message from audio",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare message from text",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Consolidate user message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mistral transcribe",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+# Automated ticket triage for HaloPSA with Gemini AI summary generation
+
+> What it is
+
+This workflow listens for new tickets in HaloPSA via webhook, generates a professional AI-powered summary of the issue using Gemini (or another LLM), and posts it back into the ticket as a private note.
+
+It’s designed for MSPs using HaloPSA who want to reduce triage time and give engineers a clear head start on each support case.
+
+⸻
+
+✨ Features
+	•	🔔 Webhook trigger from HaloPSA on new ticket creation
+	•	🚧 Optional team filter (skip Sales or other queues)
+	•	📦 Extracts ticket subject, details, and ID
+	•	🧠 Builds a structured AI prompt with MSP context (NinjaOne, M365, CIPP)
+	•	🤖 Processes via Gemini or other LLM
+	•	📑 Cleans & parses JSON output (summary, next step, troubleshooting)
+	•	🧱 Generates a branded HTML private note (logo + styled sections)
+	•	🌐 Posts the note back into HaloPSA via API
+
+⸻
+
+🔧 Setup
+	1.	Webhook
+	•	Replace WEBHOOK_PATH and paste the generated Production URL into your HaloPSA webhook.
+	2.	Guard filter (optional)
+	•	Change teamName or teamId to skip tickets from specific queues.
+	3.	Branding
+	•	Replace YOUR_LOGO_URL and Your MSP Brand in the HTML note builder.
+	4.	HaloPSA API
+	•	In the HTTP node, replace YOUR_HALO_DOMAIN and add your Halo API token (Bearer auth).
+	5.	LLM credentials
+	•	Set your API key in the Gemini / OpenAI node credentials section.
+	6.	(Optional) Adjust the AI prompt with your own tools or processes.
+
+⸻
+
+✅ Requirements
+	•	HaloPSA account with API enabled
+	•	Gemini / OpenAI (or other LLM) API key
+	•	SMTP (optional) if you want to extend with notifications
+
+⸻
+
+⚡ Workflow overview
+
+``🔔 Webhook → 🚧 Guard → 📦 Extract Ticket → 🧠 Build AI Prompt → 🤖 AI Agent (Gemini) → 📑 Parse JSON → 🧱 Build HTML Note → 🌐 Post to HaloPSA``
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7557
+- **Complexity:** advanced
+- **Node Count:** 20
+- **Views:** 306
+- **Downloads:** 30
+- **Created:** 2025/8/19
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7557)
+
+## 👤 Author
+
+- **Name:** WhySoSerious
+- **Username:** @whysoserious
+
+## 🏷️ Categories
+
+- AI Summarization
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×10)
+- **webhook** 
+- **code** (×6)
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **httpRequest** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 20 nodes with 9 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

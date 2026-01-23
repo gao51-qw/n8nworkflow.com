@@ -1,0 +1,265 @@
+{
+  "id": 8174,
+  "slug": "8174",
+  "title": "Automate document approvals with multi-level workflows using Supabase & Gmail",
+  "description": "## Multi-Level Document Approval & Audit Workflow\n\nThis workflow automates a **document approval process** using Supabase and Gmail.  \n\n---\n\n### Who it’s for\n- Teams that need structured multi-level document approvals.  \n- Companies managing policies, contracts, or proposals. \n- Medical document need multiple lavel of review and approval. \n\n\n---\n\n### How it works\n1. **Form Trigger** – A user submits a document via the form.  \n2. **Supabase Integration** – The document is saved in the `documents` table.  \n3. **Supabase Storage** – The document is saved in the bucket. \n4. **Workflow Levels** – Fetches the correct approval level from `workflow_levels`.  \n5. **Assign Approvers** – Matches approvers by role from the `users` table.  \n6. **Approval Record** – Creates an `approvals` record with a unique token and expiry.  \n7. **Email Notification** – Sends an email with **Approve / Reject links**.  \n8. **Audit Logs** – Records every approval request in `audit_logs`.\n8. **Repeat** - repeat the flow till all the aproval level is comepted  \n\n---\n\n### How to set up\n- Configure your **Supabase credentials**. \n- Create tables as per data model given. \n- Create a storage bucket in **Supabase Storage**.\n- Connect your **Gmail account**.  \n- Adjust approval expiry time (`48h` default).  \n- Deploy and test via the **Form Trigger**.  \n---\n### Customization\n- Add multiple approval levels by chaining `workflow_levels`.  \n- Replace Gmail with Slack, Teams, or another notification channel.  \n- Adjust audit logging for compliance needs.  \n- Update the endpoint http://localhost:5678/webhook-test/ based on instance and env (remove test if you run in prod)\n- Update the bucket name.\n\n---\n\n## Important steps \n\n### 1. **Form Submit**\n- Triggered when by submiting form \n- Captures form parameters:  \n  - `Title` (Document Title)  \n  - `Description` (Document Description)\n  - `file` (Document need for approval) \n\n\n### 2. **Webhook Entry Point**\n- Triggered when an approver clicks the **Approve** or **Reject** link in email.  \n- Captures query parameters:  \n  - `token` (approval token)  \n  - `decision` (approved/rejected)  \n\n---\n\n### 3. **Approval Data Retrieval & Update**\n- Fetch approval record from **Supabase (approvals)** using `token`.  \n- Update approval status:  \n  - `Approved` → moves to next workflow level or final approval.  \n  - `Rejected` → document marked as rejected immediately.  \n- Records `acted_at` timestamp.  \n\n---\n\n### 4. **Decision Check**\n- **IF Node** checks whether the decision is **approved** or **rejected**.  \n- **Reject Path** → Update document status to **Rejected** in `documents`.  \n- **Approve Path** → Continue workflow level progression.  \n\n---\n\n### 5. **Workflow Level Progression**\n- Fetch details of the current workflow level.  \n- Identify the **next level** (`workflow_levels`) based on `level_number`.  \n\n#### ✅ If Next Level Exists:\n- Retrieve approvers by `role_id`.  \n- Generate unique approval tokens.  \n- Create new approval records in `approvals`.  \n- Send **email notifications** with approval/reject links.  \n\n#### ❌ If No Next Level (Last Level):\n- Update document status to **Approved** in `documents`.  \n\n---\n\n### 6. **Audit Logging**\n- Every approval action is logged into `audit_logs` table:  \n  - `document_id`  \n  - `action` (e.g., `approval_sent`, `approved`, `rejected`)  \n  - `actor_email` (system/approver)  \n  - `details` (workflow level, role info, etc.)  \n\n---\n\n## 📨 Email Template\nApproval request email includes **decision links**:  \n\n```html\n<p>Please review the document:</p>\n<p>\n  <a href=\"http://localhost:5678/webhook-test/doc-approval?token={{$json.token}}&decision=approved\">✅ Approve</a> |\n  <a href=\"http://localhost:5678/webhook-test/doc-approval?token={{$json.token}}&decision=rejected\">❌ Reject</a>\n</p> \n```\n\nHappy Automating! 🚀",
+  "featuredImage": "/data/workflows/8174/8174.webp",
+  "author": {
+    "id": 101,
+    "slug": "alokkumar",
+    "name": "Alok Kumar",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 467,
+  "downloads": 46,
+  "createdAt": "2025-09-02T14:02:52.948Z",
+  "updatedAt": "2026-01-16T08:54:29.681Z",
+  "publishedAt": "2025-09-02T14:02:52.948Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8174",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate document approvals with multi-level workflows using Supabase & Gmail",
+    "workflowName": "Automate document approvals with multi-level workflows using Supabase & Gmail",
+    "description": "## Multi-Level Document Approval & Audit Workflow\n\nThis workflow automates a **document approval process** using Supabase and Gmail.  \n\n---\n\n### Who it’s for\n- Teams that need structured multi-level document approvals.  \n- Companies managing policies, contracts, or proposals. \n- Medical document need multiple lavel of review and approval. \n\n\n---\n\n### How it works\n1. **Form Trigger** – A user submits a document via the form.  \n2. **Supabase Integration** – The document is saved in the `documents` table.  \n3. **Supabase Storage** – The document is saved in the bucket. \n4. **Workflow Levels** – Fetches the correct approval level from `workflow_levels`.  \n5. **Assign Approvers** – Matches approvers by role from the `users` table.  \n6. **Approval Record** – Creates an `approvals` record with a unique token and expiry.  \n7. **Email Notification** – Sends an email with **Approve / Reject links**.  \n8. **Audit Logs** – Records every approval request in `audit_logs`.\n8. **Repeat** - repeat the flow till all the aproval level is comepted  \n\n---\n\n### How to set up\n- Configure your **Supabase credentials**. \n- Create tables as per data model given. \n- Create a storage bucket in **Supabase Storage**.\n- Connect your **Gmail account**.  \n- Adjust approval expiry time (`48h` default).  \n- Deploy and test via the **Form Trigger**.  \n---\n### Customization\n- Add multiple approval levels by chaining `workflow_levels`.  \n- Replace Gmail with Slack, Teams, or another notification channel.  \n- Adjust audit logging for compliance needs.  \n- Update the endpoint http://localhost:5678/webhook-test/ based on instance and env (remove test if you run in prod)\n- Update the bucket name.\n\n---\n\n## Important steps \n\n### 1. **Form Submit**\n- Triggered when by submiting form \n- Captures form parameters:  \n  - `Title` (Document Title)  \n  - `Description` (Document Description)\n  - `file` (Document need for approval) \n\n\n### 2. **Webhook Entry Point**\n- Triggered when an approver clicks the **Approve** or **Reject** link in email.  \n- Captures query parameters:  \n  - `token` (approval token)  \n  - `decision` (approved/rejected)  \n\n---\n\n### 3. **Approval Data Retrieval & Update**\n- Fetch approval record from **Supabase (approvals)** using `token`.  \n- Update approval status:  \n  - `Approved` → moves to next workflow level or final approval.  \n  - `Rejected` → document marked as rejected immediately.  \n- Records `acted_at` timestamp.  \n\n---\n\n### 4. **Decision Check**\n- **IF Node** checks whether the decision is **approved** or **rejected**.  \n- **Reject Path** → Update document status to **Rejected** in `documents`.  \n- **Approve Path** → Continue workflow level progression.  \n\n---\n\n### 5. **Workflow Level Progression**\n- Fetch details of the current workflow level.  \n- Identify the **next level** (`workflow_levels`) based on `level_number`.  \n\n#### ✅ If Next Level Exists:\n- Retrieve approvers by `role_id`.  \n- Generate unique approval tokens.  \n- Create new approval records in `approvals`.  \n- Send **email notifications** with approval/reject links.  \n\n#### ❌ If No Next Level (Last Level):\n- Update document status to **Approved** in `documents`.  \n\n---\n\n### 6. **Audit Logging**\n- Every approval action is logged into `audit_logs` table:  \n  - `document_id`  \n  - `action` (e.g., `approval_sent`, `approved`, `rejected`)  \n  - `actor_email` (system/approver)  \n  - `details` (workflow level, role info, etc.)  \n\n---\n\n## 📨 Email Template\nApproval request email includes **decision links**:  \n\n```html\n<p>Please review the document:</p>\n<p>\n  <a href=\"http://localhost:5678/webhook-test/doc-approval?token={{$json.token}}&decision=approved\">✅ Approve</a> |\n  <a href=\"http://localhost:5678/webhook-test/doc-approval?token={{$json.token}}&decision=rejected\">❌ Reject</a>\n</p> \n```\n\nHappy Automating! 🚀",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Audit1",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Final Update Document",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "save_document",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_workflow_level_one",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_user_by_role",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "create_uuid_token",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "create_record_approvals",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "send_email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "audit_invites",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "start_approval_form",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "get_approval_data",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "update_approval_data",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "check_reject_or_approve",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "get_level_details",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_next_level",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "is_last_level",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "get_workflow_by_level",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "get_user_by_role1",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "generate_uuid",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "create_approval_record",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "send_emai_by_level",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Audit",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "upload_to_supabase_storage",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "fetch_file_to_review",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "get_document_details",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "fetch_file_to_review1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "response_message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "response_message1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "response_message2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "end_form",
+      "type": "n8n-nodes-base.form",
+      "role": "form",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

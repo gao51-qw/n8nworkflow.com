@@ -1,0 +1,85 @@
+{
+  "id": 6493,
+  "slug": "6493",
+  "title": "Weekly ETL pipeline: QuickBooks financial data to Google BigQuery",
+  "description": "This template sets up a weekly ETL (Extract, Transform, Load) pipeline that pulls financial data from QuickBooks Online into Google BigQuery. It not only transfers data, but also cleans, classifies, and enriches each transaction using your own business logic.\n\n### Who It's For\n- **Data Analysts & BI Developers**  \n  Need structured financial data in a warehouse to build dashboards (e.g., Looker Studio, Tableau) and run complex queries.\n- **Financial Analysts & Accountants**  \n  Want to run custom SQL queries beyond QuickBooks’ native capabilities.\n- **Business Owners**  \n  Need a permanent, historical archive of transactions for reporting and tracking.\n\n### What the Workflow Does\n#### 1. Extract  \nFetches transactions from the previous week every Monday from your QuickBooks Online account.\n#### 2. Transform  \nApplies custom business logic:\n- Cleans up text fields  \n- Generates stable transaction IDs  \n- Classifies transactions (income, expense, internal transfer)\n#### 3. Format  \nPrepares the cleaned data as a bulk-insert-ready SQL statement.\n#### 4. Load  \nInserts the structured and enriched data into a Google BigQuery table.\n\n### Setup Guide\n#### 1. Prepare BigQuery\n- Create a dataset (e.g., `quickbooks`) and table (e.g., `transactions`)\n- The table schema must match the SQL query in the \"Load Data to BigQuery\" node\n#### 2. Add Credentials\n- Add QuickBooks Online and Google BigQuery credentials to your n8n instance\n#### 3. Configure Business Logic\n- Open the `Clean & Classify Transactions` node\n- Update the JavaScript arrays:\n  - `internalTransferAccounts`\n  - `expenseCategories`\n  - `incomeCategories`\n- Ensure these match your QuickBooks Chart of Accounts exactly\n#### 4. Configure BigQuery Node\n- Open the `Load Data to BigQuery` node\n- Select the correct Google Cloud project\n- Ensure the SQL query references the correct dataset and table\n#### 5. Activate the Workflow\n- Save and activate it  \n- The workflow will now run weekly\n\n### Requirements\n- A running n8n instance (Cloud or Self-Hosted)  \n- A QuickBooks Online account  \n- A Google Cloud Platform project with BigQuery enabled  \n- A BigQuery table with a matching schema\n\n### Customization Options\n- **Change Schedule**: Modify the schedule node to run daily, monthly, or at a different time  \n- **Adjust Date Range**: Change the date macro in the `Get Last Week's Transactions` node  \n- **Refine Classification Rules**: Add custom logic in the `Clean & Classify Transactions` node to handle specific edge cases\n",
+  "featuredImage": "/data/workflows/6493/6493.webp",
+  "author": {
+    "id": 101,
+    "slug": "fahmiiireza",
+    "name": "Fahmi Fahreza",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 476,
+  "downloads": 47,
+  "createdAt": "2025-07-26T15:55:56.551Z",
+  "updatedAt": "2026-01-16T08:45:16.742Z",
+  "publishedAt": "2025-07-26T15:55:56.551Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6493",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Weekly ETL pipeline: QuickBooks financial data to Google BigQuery",
+    "workflowName": "Weekly ETL pipeline: QuickBooks financial data to Google BigQuery",
+    "description": "This template sets up a weekly ETL (Extract, Transform, Load) pipeline that pulls financial data from QuickBooks Online into Google BigQuery. It not only transfers data, but also cleans, classifies, and enriches each transaction using your own business logic.\n\n### Who It's For\n- **Data Analysts & BI Developers**  \n  Need structured financial data in a warehouse to build dashboards (e.g., Looker Studio, Tableau) and run complex queries.\n- **Financial Analysts & Accountants**  \n  Want to run custom SQL queries beyond QuickBooks’ native capabilities.\n- **Business Owners**  \n  Need a permanent, historical archive of transactions for reporting and tracking.\n\n### What the Workflow Does\n#### 1. Extract  \nFetches transactions from the previous week every Monday from your QuickBooks Online account.\n#### 2. Transform  \nApplies custom business logic:\n- Cleans up text fields  \n- Generates stable transaction IDs  \n- Classifies transactions (income, expense, internal transfer)\n#### 3. Format  \nPrepares the cleaned data as a bulk-insert-ready SQL statement.\n#### 4. Load  \nInserts the structured and enriched data into a Google BigQuery table.\n\n### Setup Guide\n#### 1. Prepare BigQuery\n- Create a dataset (e.g., `quickbooks`) and table (e.g., `transactions`)\n- The table schema must match the SQL query in the \"Load Data to BigQuery\" node\n#### 2. Add Credentials\n- Add QuickBooks Online and Google BigQuery credentials to your n8n instance\n#### 3. Configure Business Logic\n- Open the `Clean & Classify Transactions` node\n- Update the JavaScript arrays:\n  - `internalTransferAccounts`\n  - `expenseCategories`\n  - `incomeCategories`\n- Ensure these match your QuickBooks Chart of Accounts exactly\n#### 4. Configure BigQuery Node\n- Open the `Load Data to BigQuery` node\n- Select the correct Google Cloud project\n- Ensure the SQL query references the correct dataset and table\n#### 5. Activate the Workflow\n- Save and activate it  \n- The workflow will now run weekly\n\n### Requirements\n- A running n8n instance (Cloud or Self-Hosted)  \n- A QuickBooks Online account  \n- A Google Cloud Platform project with BigQuery enabled  \n- A BigQuery table with a matching schema\n\n### Customization Options\n- **Change Schedule**: Modify the schedule node to run daily, monthly, or at a different time  \n- **Adjust Date Range**: Change the date macro in the `Get Last Week's Transactions` node  \n- **Refine Classification Rules**: Add custom logic in the `Clean & Classify Transactions` node to handle specific edge cases",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Start: Weekly on Monday",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "1. Get Last Week's Transactions",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "2. Clean & Classify Transactions",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "3. Format Data for SQL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "4. Load Data to BigQuery",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

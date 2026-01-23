@@ -1,0 +1,27 @@
+{
+  "id": 7155,
+  "slug": "7155",
+  "title": "Beginner lead finder using SerpAPI search",
+  "description": "This n8n workflow finds experts on **any topic**, scrapes their websites, and pulls out contact emails automatically.  \nCore services used: **SerpAPI (google search)** · **Apify (website crawler)** · **OpenAI (GPT-4o email extraction)**.\n\n---\n\n## 🛠️ Step-by-Step Setup & Execution\n\n### 1️⃣ Run Workflow (Manual Trigger)\n| Node | Type | Purpose |\n|------|------|---------|\n| `Run Workflow` | Manual Trigger | Start the workflow on demand while you test. |\n\n---\n\n### 2️⃣ Set Your Topic\n| Node | Type | How to configure |\n|------|------|------------------|\n| `Set Topic` | **Set** | Add a string field **Topic** – e.g. `\"n8n\"`. This keyword drives every subsequent step. |\n\n---\n\n### 3️⃣ Search Google (Results 1-10)\n| Node | Type | API Credential |\n|------|------|----------------|\n| `Search Google (top 10)` | **SerpAPI** | **Create SerpAPI credential**<br>1. Sign up → copy API key → n8n → **Credentials → New → SerpAPI** → paste.<br>2. Select the credential in this node. |\n| **Key Params** | |  |\n| `q` |  | `={{ $json.Topic }} Expert` |\n| `location` |  | Region code (ex `585069efee19ad271e9c9b36`) |\n| `additionalFields.start` |  | `\"10\"` (Google position 1-10)|\n\n---\n\n### 4️⃣ Search Google (Results 11-20)\n| Node | Type | Notes |\n|------|------|-------|\n| `Search Google (11-20)` | **SerpAPI** (same credential) | Remove `start` or set to 20+ to fetch next page. |\n\n---\n\n### 5️⃣ Extract URL Lists\n| Node | Type | Script Purpose |\n|------|------|----------------|\n| `Extract Url` & `Extract Url 2` | **Code** | Loop `data.organic_results` → output `{ title, link, displayed_link }` for each result. |\n\n---\n\n### 6️⃣ Combine Both Result Sets\n| Node | Type | Details |\n|------|------|---------|\n| `Append Results` | **Merge (combineAll)** | Merges arrays from steps 3 & 4 into a single list for processing. |\n\n---\n\n### 7️⃣ Loop Over Every URL\n| Node | Type | Configuration |\n|------|------|---------------|\n| `Loop Over Items1` | **Split In Batches** | Default batch = 1 (process one page at a time).<br>`onError = continueRegularOutput` keeps loop alive on failures. |\n\n---\n\n### 8️⃣ Scrape Webpage Content (Apify)\n| Node | Type | API Credential |\n|------|------|----------------|\n| `Scrape URL with apify` | **HTTP Request** | **Create Apify credential**<br>1. Sign up at https://console.apify.com<br>2. Account → **API tokens** → copy.<br>3. n8n → **Credentials → New → HTTP Query Auth** → set query param `token=YOUR_TOKEN`. |\n| **Request Details** |  |  |\n| Method | POST |\n| URL | `https://api.apify.com/v2/acts/6sigmag~fast-website-content-crawler/run-sync-get-dataset-items` |\n| JSON Body | ```json { \"startUrls\": [\"{{ $json.link }}\"] } ``` |\n\n---\n\n### 9️⃣ Extract Email with OpenAI\n| Node | Type | API Credential |\n|------|------|----------------|\n| `Extract Email from webpage` | **LangChain Agent** | **Create OpenAI credential**<br>1. Generate key at https://platform.openai.com/account/api-keys<br>2. n8n → **Credentials → New → OpenAI API** → paste key. |\n| Prompt (system) | ```extract the email address from the text. if there is no email address, output null.``` |\n| **Output Parser** | `Structured Output Parser2` expects → `{ \"email\": \"address OR null\" }` |\n\n---\n\n### 🔟 Loop Continues & Final Data\n- The extracted result returns to **Loop Over Items1** until every URL is processed.  \n- **Typical final item JSON**:\n  ```json\n  {\n    \"title\": \"How to Build n8n Workflows\",\n    \"link\": \"https://example.com\",\n    \"email\": \"info@example.com\"\n  }\n\n💡 Optional Enhancements\nIdea\tHow\nSave Leads\tAdd a Google Sheets or Airtable node after the loop.\nValidate Emails\tChain a ZeroBounce / Hunter.io verification API before saving.\nParallel Crawling\tIncrease SplitInBatches size (watch Apify rate limits).\n\n🙋‍♂️ Need More Help?\nRobert Breen – Automation Consultant & n8n Expert\n📧 robert.j.breen@gmail.com\n🔗 https://www.linkedin.com/in/robert-breen-29429625/\n🌐 https://ynteractive.com",
+  "featuredImage": "/data/workflows/7155/7155.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1331,
+  "downloads": 133,
+  "createdAt": "2025-08-08T00:17:57.516Z",
+  "updatedAt": "2026-01-16T08:48:46.075Z",
+  "publishedAt": "2025-08-08T00:17:57.516Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7155"
+}

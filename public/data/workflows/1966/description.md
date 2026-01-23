@@ -1,0 +1,1 @@
+This workflow provides a simple example of how to use `itemMatching(itemIndex: Number)` in the Code node to retrieve linked items from earlier in the workflow.

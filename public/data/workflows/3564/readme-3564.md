@@ -1,0 +1,102 @@
+# Create daily Israeli economic newsletter using RSS and GPT-4o
+
+> Daily Economic News Brief for Israel (Hebrew, RTL, GPT-4o)
+
+### Overview ###
+Stay ahead of the curve with this AI-powered workflow that delivers a daily economic summary tailored for professionals tracking the Israeli economy.
+At 8:00 PM Israel Time, this workflow:
+
+- Retrieves the latest articles from Calcalist and Mako via RSS
+- Filters duplicates and irrelevant stories
+- Uses OpenAI’s GPT-4o to identify the 5 most important stories of the day
+- Summarizes each article in concise, readable Hebrew
+- Generates a fully styled, responsive HTML email (with proper RTL layout)
+- Sends it to your inbox using your preferred SMTP email provider
+
+**Perfect for economists, analysts, investors, or policymakers who want an actionable and personalized news digest -- no distractions, no fluff.**
+
+### Setup Instructions ###
+**Estimated setup time:**
+- 10 minutes
+
+**Required credentials:**
+
+- OpenAI API Key
+- SMTP credentials (for email delivery)
+
+**Steps:**
+1. Import this template into your n8n instance.
+3. Add your OpenAI API Key under credentials.
+5. Configure the SMTP Email node with:
+	Host (e.g. smtp.gmail.com)
+	Port (465 or 587)
+	Username (your email)
+	Password (app-specific password or login)
+15. Set your target email address in the last node.
+17. (Optional) Customize the GPT prompt to adjust tone or audience (e.g. general public, policy makers).
+19. Activate the workflow and receive daily updates straight to your inbox.
+
+### Customization Tips ###
+- Change the RSS sources to pull from other Hebrew or international news websites
+- Modify the summarization prompt to fit different sectors (e.g. tech, health, politics)
+- Add integrations like Notion, Airtable, or Telegram for logging or distribution
+- Apply your branding to the HTML output (logos, footer, colors)
+
+### Why Use This? ###
+This is more than a news digest. It’s an intelligent economic assistant that filters noise, highlights what matters, and keeps you informed-automatically.
+
+**You can set it up in 10 minutes and benefit every single day.**
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3564
+- **Complexity:** advanced
+- **Node Count:** 23
+- **Views:** 3100
+- **Downloads:** 310
+- **Created:** 2025/4/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3564)
+
+## 👤 Author
+
+- **Name:** Elay Guez
+- **Username:** @elay96
+
+## 🏷️ Categories
+
+- Social Media
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×4)
+- **emailSend** 
+- **function** 
+- **merge** (×2)
+- **html** (×2)
+- **aggregate** 
+- **set** (×3)
+- **httpRequest** 
+- **splitOut** 
+- **@n8n/n8n-nodes-langchain.openAi** 
+- **code** 
+- **sort** 
+- **filter** 
+- **rssFeedRead** (×2)
+- **scheduleTrigger** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 23 nodes with 18 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

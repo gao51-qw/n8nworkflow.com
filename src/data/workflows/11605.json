@@ -1,0 +1,464 @@
+{
+  "id": 11605,
+  "slug": "11605",
+  "title": "Handle clinic WhatsApp support with GPT-4o-mini, Pinecone RAG and Gmail alerts",
+  "description": "# 🏥 Clinic WhatsApp Customer Service Bot\n\nThis workflow automates patient communication for medical clinics using the WhatsApp Business API. It supports appointment booking, rescheduling, service inquiries, follow-ups, and document submissions. The workflow includes AI capabilities, appointment management, human escalation logic, memory storage, and CRM synchronization.\n\n## Good to know\n\n- Supports text, voice notes, images, and document uploads.\n- Uses an AI agent powered by GPT-4o-mini with retrieval-augmented generation for accurate answers.\n- Includes sentiment and frustration detection to trigger human takeover.\n- Conversation history and lead details are stored for context and follow-up.\n- Appointment booking includes slot validation to reduce errors and conflicts.\n\n## How it works\n\n- The workflow receives WhatsApp messages through a webhook connection.\n- The AI agent processes the message and identifies the intent:\n  - 📅 Appointment booking or rescheduling\n  - ❓ Service or doctor inquiry\n  - 📎 Document submission (e.g., lab results, insurance)\n  - 🤝 Human support request\n- If the request is informational, the AI responds using GPT-4o-mini with RAG from Pinecone to ensure clinic-specific accuracy.\n- If the request relates to booking, the workflow:\n  - Checks availability in Data Tables\n  - Validates slot selection\n  - Confirms, updates, or cancels the appointment\n- If the user is confused, frustrated, or explicitly asks for a human, automation is paused and a staff member is notified.\n- Voice messages are transcribed using Whisper API and images are processed using Vision API.\n- All interactions are logged and synced to Google Sheets for CRM tracking.\n\n## Requirements\n\n- WhatsApp Business API access with active credentials\n- OpenAI API key for GPT-4o-mini, Whisper, and Vision models\n- Pinecone account for vector storage\n- Google Sheets and Gmail for logging and notifications\n- n8n instance (Cloud or self-hosted)\n- Data Tables enabled for memory, appointments, and lead management\n\n",
+  "featuredImage": "/data/workflows/11605/11605.webp",
+  "author": {
+    "id": 101,
+    "slug": "melhem",
+    "name": "Mira Melhem",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 31,
+  "downloads": 3,
+  "createdAt": "2025-12-08T12:30:15.044Z",
+  "updatedAt": "2026-01-16T09:09:19.142Z",
+  "publishedAt": "2025-12-08T12:30:15.044Z",
+  "nodes": 71,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11605",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Handle clinic WhatsApp support with GPT-4o-mini, Pinecone RAG and Gmail alerts",
+    "workflowName": "Handle clinic WhatsApp support with GPT-4o-mini, Pinecone RAG and Gmail alerts",
+    "description": "# 🏥 Clinic WhatsApp Customer Service Bot\n\nThis workflow automates patient communication for medical clinics using the WhatsApp Business API. It supports appointment booking, rescheduling, service inquiries, follow-ups, and document submissions. The workflow includes AI capabilities, appointment management, human escalation logic, memory storage, and CRM synchronization.\n\n## Good to know\n\n- Supports text, voice notes, images, and document uploads.\n- Uses an AI agent powered by GPT-4o-mini with retrieval-augmented generation for accurate answers.\n- Includes sentiment and frustration detection to trigger human takeover.\n- Conversation history and lead details are stored for context and follow-up.\n- Appointment booking includes slot validation to reduce errors and conflicts.\n\n## How it works\n\n- The workflow receives WhatsApp messages through a webhook connection.\n- The AI agent processes the message and identifies the intent:\n  - 📅 Appointment booking or rescheduling\n  - ❓ Service or doctor inquiry\n  - 📎 Document submission (e.g., lab results, insurance)\n  - 🤝 Human support request\n- If the request is informational, the AI responds using GPT-4o-mini with RAG from Pinecone to ensure clinic-specific accuracy.\n- If the request relates to booking, the workflow:\n  - Checks availability in Data Tables\n  - Validates slot selection\n  - Confirms, updates, or cancels the appointment\n- If the user is confused, frustrated, or explicitly asks for a human, automation is paused and a staff member is notified.\n- Voice messages are transcribed using Whisper API and images are processed using Vision API.\n- All interactions are logged and synced to Google Sheets for CRM tracking.\n\n## Requirements\n\n- WhatsApp Business API access with active credentials\n- OpenAI API key for GPT-4o-mini, Whisper, and Vision models\n- Pinecone account for vector storage\n- Google Sheets and Gmail for logging and notifications\n- n8n instance (Cloud or self-hosted)\n- Data Tables enabled for memory, appointments, and lead management",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Append or update slot",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get lead",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append or update lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get human call",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append or update human call",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get human appointment",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append or update appointment",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Booked Appointment",
+      "type": "n8n-nodes-base.dataTableTool",
+      "role": "dataTableTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Summarizer1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check Appointment1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Data Extractor",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send via WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get a document",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "role": "toolVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pinecone Vector Store (Retrieval)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Verify • WA (hub.challenge)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "filter text messages",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If Audio",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Transcribe Audio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "If Image",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If Video/PDF",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get file",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Email With Attachment",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email with attachment",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Prepare Text Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Row Memory",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get History",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Context",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Main AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "save appointment - different service",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get only users appointment",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get leads",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Email Notification If Human is called",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Add row for Human Call",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Appointment is ready",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "save appointment - same service",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Human is called",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if Lead",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Insert Lead",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Row",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Output Format Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get slots",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    }
+  ]
+}

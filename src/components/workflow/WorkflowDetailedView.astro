@@ -20,6 +20,7 @@
 
 import type { WorkflowDetailed, Workflow } from '../../lib/types/workflow';
 import { Image } from 'astro:assets';
+import { marked } from 'marked';
 
 interface Props {
   workflow: WorkflowDetailed;
@@ -27,6 +28,11 @@ interface Props {
 }
 
 const { workflow, relatedWorkflows = [] } = Astro.props;
+
+// 渲染 Markdown
+const renderedDescription = workflow.overview?.description 
+  ? await marked.parse(workflow.overview.description) 
+  : '';
 
 // 提取节点类型
 const nodeTypes = workflow.nodeDetails 
@@ -69,23 +75,10 @@ const formatDate = (dateStr?: string) => {
     {
       workflow.overview && (
         <section id="overview" class="prose dark:prose-invert max-w-none">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">1. Workflow Overview</h2>
-          
           <div class="space-y-4">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Title:</h3>
-              <p class="text-gray-700 dark:text-gray-300">{workflow.title}</p>
-            </div>
-            
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Workflow Name (n8n):</h3>
-              <p class="text-gray-700 dark:text-gray-300">{workflow.overview.workflowName || workflow.title}</p>
-            </div>
-            
-            <div>
-              <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                {workflow.overview.description}
-              </p>
+              <div class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed markdown-content" set:html={renderedDescription}>
+              </div>
             </div>
 
             {workflow.overview.features && workflow.overview.features.length > 0 && (
@@ -121,56 +114,6 @@ const formatDate = (dateStr?: string) => {
         </section>
       )
     }
-
-    <!-- 2. Block-by-Block Analysis 部分 -->
-    {
-      workflow.nodeDetails && workflow.nodeDetails.length > 0 && (
-        <section id="block-analysis" class="space-y-8">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">2. Block-by-Block Analysis</h2>
-          
-          <div class="space-y-8">
-            {workflow.nodeDetails.map((node, index) => (
-              <div class="space-y-4">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                  Node: {node.name}
-                </h3>
-                
-                <div class="space-y-4 text-gray-700 dark:text-gray-300">
-                  <ul class="list-none pl-0 space-y-4">
-                    <li>
-                      <strong class="text-gray-900 dark:text-white">Type / Role:</strong> {node.type} — {node.role}
-                    </li>
-                    {node.configDescription && (
-                      <li>
-                        <strong class="text-gray-900 dark:text-white">Config choices:</strong>
-                        <ul class="list-disc pl-8 mt-2">
-                          <li>{node.configDescription}</li>
-                        </ul>
-                      </li>
-                    )}
-                    {node.connections && node.connections.length > 0 && (
-                      <li>
-                        <strong class="text-gray-900 dark:text-white">Connections:</strong> {node.connections.join(' → ')}
-                      </li>
-                    )}
-                    {node.edgeCases && node.edgeCases.length > 0 && (
-                      <li>
-                        <strong class="text-gray-900 dark:text-white">Edge cases / failures:</strong>
-                        <ul class="list-disc pl-8 mt-2">
-                          {node.edgeCases.map((edgeCase) => (
-                            <li>{edgeCase}</li>
-                          ))}
-                        </ul>
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )
-    }
   </div>
 
   <!-- 右侧边栏 (4列) -->
@@ -195,7 +138,7 @@ const formatDate = (dateStr?: string) => {
           <a href={`/authors/${workflow.author.slug || workflow.author.name.toLowerCase()}`} class="text-lg font-bold text-gray-900 dark:text-white hover:text-primary-600 transition-colors">
             {workflow.author.name}
           </a>
-          <p class="text-sm text-gray-500 dark:text-gray-400">30 workflows</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{workflow.author.workflowCount || 0} workflow{workflow.author.workflowCount !== 1 ? 's' : ''}</p>
         </div>
       </div>
       
@@ -217,7 +160,7 @@ const formatDate = (dateStr?: string) => {
           <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3">Categories</h3>
           <div class="flex flex-wrap gap-2">
             {workflow.categories?.map(cat => (
-              <a href={`/categories/${cat.toLowerCase()}`} class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              <a href={`/categories/${cat.toLowerCase().trim().replace(/\s+/g, '-')}`} class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                 {cat}
               </a>
             ))}
@@ -263,10 +206,14 @@ const formatDate = (dateStr?: string) => {
             <span>View on n8n.io</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           </a>
-          <button class="w-full py-3 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          <a 
+            href={`/data/workflows/${workflow.id}/${workflow.id}.json`}
+            download={`${workflow.slug}.json`}
+            class="w-full py-3 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             <span>Download Workflow</span>
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -342,4 +289,22 @@ const formatDate = (dateStr?: string) => {
       display: none;
     }
   }
+
+  .markdown-content :global(h1),
+  .markdown-content :global(h2),
+  .markdown-content :global(h3) {
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    color: inherit;
+  }
+  .markdown-content :global(h1) { font-size: 1.5rem; }
+  .markdown-content :global(h2) { font-size: 1.25rem; }
+  .markdown-content :global(h3) { font-size: 1.125rem; }
+  .markdown-content :global(p) { margin-bottom: 1rem; }
+  .markdown-content :global(ul) { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+  .markdown-content :global(ol) { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+  .markdown-content :global(li) { margin-bottom: 0.5rem; }
+  .markdown-content :global(code) { background-color: rgba(0,0,0,0.05); padding: 0.2rem 0.4rem; rounded: 0.25rem; }
+  .markdown-content :global(pre) { background-color: rgba(0,0,0,0.05); padding: 1rem; rounded: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
 </style>

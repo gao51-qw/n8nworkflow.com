@@ -1,0 +1,206 @@
+{
+  "id": 7644,
+  "slug": "7644",
+  "title": "Automated expense tracking from emails & Telegram with Gemini AI & Google Sheets",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\nThis n8n template automatically parses bank transaction emails (HDFC, Indian Bank, Indian Overseas Bank, UPI apps like Google pay, Paytm, etc.) - The from email(bank name/UPI apps) is changable, classifies them using Gemini AI, and logs them into a structured Google Sheets budget tracker. It helps you consolidate expenses, compare against monthly budgets, and get real-time alerts when limits are exceeded.\n\n## 📝 Problem Statement\n\nTracking expenses manually from different bank emails and UPI apps is frustrating, time-consuming, and error-prone. Small transactions often slip through, making budget control difficult.\n\n## This workflow solves that by:\n\nAutomatically extracting financial data from Gmail.\n\nCategorizing expenses using AI parsing.\n\nSaving all data into Google Sheets in a structured way.\n\nComparing with monthly budgets and raising alerts.\n\n## Target Audience:\n\nIndividuals who want personal budget automation.\n\nFamilies managing shared household spending.\n\nSmall teams looking for a lightweight financial log.\n\n## ⚙️ Setup\nPrerequisites\n\nAn n8n instance (self-hosted or cloud).\n\nA Google account with Gmail + Google Sheets enabled.\n\nPre-created Google Sheets file with 2 tabs:\n\nExpenses\n\nBudgets\n\nA configured Gemini API connection in n8n.\n\n## 📊 Google Sheets Template\nExpenses Tab (columns in order):\n\nTimestamp | Date | Account | From | To | Type | Category | Description | Amount | Currency | Source | MessageId | Status\n\nBudget Tab (columns in order):\n\nMonth | Category | Budget Amount | Notes | UpdatedAt\n\nYearly Summary Tab (auto-calculated):\n\nYear | Month | Category | Total Expense | Budget | Variance | Alert\n\nVariance = Budget - Total Expense\n\nAlert = ⚠️ Over Budget when spending &gt; budget\n\n## 🚀 How It Works\n\nGmail:\n\nGmail Trigger captures new bank/UPI emails.\n\nGemini AI Parser extracts structured details (date, amount, category, etc.).\n\nFilter Node ensures only valid financial transactions are logged.\n\nInformation extractor will extract the information like Date, account, transaction type(Credit/Debit), description, currency, status, messageId, from email, to email, category -&gt; checks if the transaction is 'Credit' or 'Debit' then appends the details to the respective google sheet\n\nBudget Validator checks against monthly allocations.\n\nIf the expense is above the budget is raises an alert and will send a email to the connected account. \n\nFor sending email I wrote a Google Sheet App script:\n\n```function myFunction() {\n  var ss = SpreadsheetApp.getActiveSpreadsheet();\n  var monthly = ss.getSheetByName(\"MonthlySummary\");\n  var yearly = ss.getSheetByName(\"YearlySummary\");\n\n  // Get values from Monthly Summary\n  var totalExpense = monthly.getRange(\"D2\").getValue();\n  var budget = monthly.getRange(\"E2\").getValue();\n\n  // Get current date info\n  var now = new Date();\n  var month = Utilities.formatDate(now, \"GMT+5:30\", \"MM\");\n  var year = Utilities.formatDate(now, \"GMT+5:30\", \"yyyy\");\n\n  var status = (totalExpense &gt; budget) ? \"Alert\" : \"\";\n\n  // Append to Yearly Summary\n  yearly.appendRow([year, month, totalExpense, status]);\n\n  // If budget exceeded, send alert email\n  if (status === \"Alert\") {\n    var emailAddress = \"YOUR EMAIL\";\n    var subject = \"⚠️ Budget Exceeded - \" + month + \"/\" + year;\n    var body = \"Your total expenses this month (\" + totalExpense +\n      \") have exceeded your budget of \" + budget + \".\\n\\n\" +\n      \"Please review your spending.\";\n    MailApp.sendEmail(emailAddress, subject, body);\n  }\n\n  // 🔄 Reset Monthly Summary\n  var lastRow = monthly.getLastRow();\n  if (lastRow &gt; 3) { // assuming headers in first 2-3 rows\n    monthly.getRange(\"A4:C\" + lastRow).clearContent();\n  }\n\n  // Reset total in D2\n  monthly.getRange(\"D2\").setValue(0);\n}\n\n```\nMonthly summary auto-calculates the expense and updates the expense for every month and budgets(sum all budgets if there are more than 1 budgets).\n\nYearly Summary auto-updates and raises over-budget alerts.\n\nTelegram:\n\nTakes input from a telegram bot which is connected to the n8n workflow telegram trigger.\n\nGemini AI Parser extracts structured details (date, amount, category, etc.).\n\nThen it checks, whether the manually specified details is 'budget' or 'expense', then splits the data -&gt; parse the data -&gt; then again check whether it is 'Budget' or 'Expense' then appends the structured data to the respective google sheet.\n\nMonthly summary auto-calculates the expense and updates the expense for every month and budgets(sum all budgets if there are more than 1 budgets).\n\nYearly Summary auto-updates and raises over-budget alerts.\n\n🔧 Customization\n\nAdd support for more banks/UPI apps by extending the parser schema.\n\n```const emailBody = $input.first().json.snippet || \"\";\nconst senderEmail = $input.first().json.From || \"\";\n\n// Account detection\nlet account = \"\"; // you can modify the bank names and UPI names here\n\nif (/alerts@hdfcbank\\.net/i.test(senderEmail)) account = \"HDFC Bank\"; // you can modify the bank names and UPI names here\n\nelse if (/ealerts@iobnet\\.co\\.in/i.test(senderEmail)) account = \"Indian Overseas Bank\";\nelse if (/alerts@indianbank\\.in/i.test(senderEmail)) account = \"Indian Bank\";\nelse if (/@upi|@okhdfcbank|@okaxis|@okicici/i.test(emailBody)) {\n    if (/gpay|google pay/i.test(emailBody)) account = \"Google Pay\";\n    else if (/phonepe/i.test(emailBody)) account = \"PhonePe\";\n    else if (/paytm/i.test(emailBody)) account = \"Paytm\";\n    else account = \"UPI\";\n} else {\n    account = \"Other\";\n}\n\n// If account is \"Other\", skip output\nif (account === \"Other\") {\n    return [];\n}\n\n// Output\nreturn [{\n    account,\n    from: senderEmail, // exact Gmail \"From\" metadata\n    snippet: emailBody,\n    messageId: $input.first().json.id || \"\"\n}];\n\n```\n\nCreate custom categories (e.g., Travel, Groceries, Subscriptions).\n\nSend real-time alerts via Telegram/Slack/Email using n8n nodes.\n\nShare the Google Sheet with family or team for collaborative use.\n\n## 📌 Usage\n\nThe workflow runs automatically on every new Gmail transaction email and financial input on the telegram bot.\n\nAt the end of each month, totals are calculated in the Yearly Summary tab.\n\nUsers only need to maintain the Budget tab with updated monthly allocations.",
+  "featuredImage": "/data/workflows/7644/7644.webp",
+  "author": {
+    "id": 101,
+    "slug": "thorodinson7358",
+    "name": "Alex",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 660,
+  "downloads": 66,
+  "createdAt": "2025-08-20T12:29:52.207Z",
+  "updatedAt": "2026-01-16T08:51:33.121Z",
+  "publishedAt": "2025-08-20T12:29:52.207Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7644",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated expense tracking from emails & Telegram with Gemini AI & Google Sheets",
+    "workflowName": "Automated expense tracking from emails & Telegram with Gemini AI & Google Sheets",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\nThis n8n template automatically parses bank transaction emails (HDFC, Indian Bank, Indian Overseas Bank, UPI apps like Google pay, Paytm, etc.) - The from email(bank name/UPI apps) is changable, classifies them using Gemini AI, and logs them into a structured Google Sheets budget tracker. It helps you consolidate expenses, compare against monthly budgets, and get real-time alerts when limits are exceeded.\n\n## 📝 Problem Statement\n\nTracking expenses manually from different bank emails and UPI apps is frustrating, time-consuming, and error-prone. Small transactions often slip through, making budget control difficult.\n\n## This workflow solves that by:\n\nAutomatically extracting financial data from Gmail.\n\nCategorizing expenses using AI parsing.\n\nSaving all data into Google Sheets in a structured way.\n\nComparing with monthly budgets and raising alerts.\n\n## Target Audience:\n\nIndividuals who want personal budget automation.\n\nFamilies managing shared household spending.\n\nSmall teams looking for a lightweight financial log.\n\n## ⚙️ Setup\nPrerequisites\n\nAn n8n instance (self-hosted or cloud).\n\nA Google account with Gmail + Google Sheets enabled.\n\nPre-created Google Sheets file with 2 tabs:\n\nExpenses\n\nBudgets\n\nA configured Gemini API connection in n8n.\n\n## 📊 Google Sheets Template\nExpenses Tab (columns in order):\n\nTimestamp | Date | Account | From | To | Type | Category | Description | Amount | Currency | Source | MessageId | Status\n\nBudget Tab (columns in order):\n\nMonth | Category | Budget Amount | Notes | UpdatedAt\n\nYearly Summary Tab (auto-calculated):\n\nYear | Month | Category | Total Expense | Budget | Variance | Alert\n\nVariance = Budget - Total Expense\n\nAlert = ⚠️ Over Budget when spending &gt; budget\n\n## 🚀 How It Works\n\nGmail:\n\nGmail Trigger captures new bank/UPI emails.\n\nGemini AI Parser extracts structured details (date, amount, category, etc.).\n\nFilter Node ensures only valid financial transactions are logged.\n\nInformation extractor will extract the information like Date, account, transaction type(Credit/Debit), description, currency, status, messageId, from email, to email, category -&gt; checks if the transaction is 'Credit' or 'Debit' then appends the details to the respective google sheet\n\nBudget Validator checks against monthly allocations.\n\nIf the expense is above the budget is raises an alert and will send a email to the connected account. \n\nFor sending email I wrote a Google Sheet App script:\n\n```function myFunction() {\n  var ss = SpreadsheetApp.getActiveSpreadsheet();\n  var monthly = ss.getSheetByName(\"MonthlySummary\");\n  var yearly = ss.getSheetByName(\"YearlySummary\");\n\n  // Get values from Monthly Summary\n  var totalExpense = monthly.getRange(\"D2\").getValue();\n  var budget = monthly.getRange(\"E2\").getValue();\n\n  // Get current date info\n  var now = new Date();\n  var month = Utilities.formatDate(now, \"GMT+5:30\", \"MM\");\n  var year = Utilities.formatDate(now, \"GMT+5:30\", \"yyyy\");\n\n  var status = (totalExpense &gt; budget) ? \"Alert\" : \"\";\n\n  // Append to Yearly Summary\n  yearly.appendRow([year, month, totalExpense, status]);\n\n  // If budget exceeded, send alert email\n  if (status === \"Alert\") {\n    var emailAddress = \"YOUR EMAIL\";\n    var subject = \"⚠️ Budget Exceeded - \" + month + \"/\" + year;\n    var body = \"Your total expenses this month (\" + totalExpense +\n      \") have exceeded your budget of \" + budget + \".\\n\\n\" +\n      \"Please review your spending.\";\n    MailApp.sendEmail(emailAddress, subject, body);\n  }\n\n  // 🔄 Reset Monthly Summary\n  var lastRow = monthly.getLastRow();\n  if (lastRow &gt; 3) { // assuming headers in first 2-3 rows\n    monthly.getRange(\"A4:C\" + lastRow).clearContent();\n  }\n\n  // Reset total in D2\n  monthly.getRange(\"D2\").setValue(0);\n}\n\n```\nMonthly summary auto-calculates the expense and updates the expense for every month and budgets(sum all budgets if there are more than 1 budgets).\n\nYearly Summary auto-updates and raises over-budget alerts.\n\nTelegram:\n\nTakes input from a telegram bot which is connected to the n8n workflow telegram trigger.\n\nGemini AI Parser extracts structured details (date, amount, category, etc.).\n\nThen it checks, whether the manually specified details is 'budget' or 'expense', then splits the data -&gt; parse the data -&gt; then again check whether it is 'Budget' or 'Expense' then appends the structured data to the respective google sheet.\n\nMonthly summary auto-calculates the expense and updates the expense for every month and budgets(sum all budgets if there are more than 1 budgets).\n\nYearly Summary auto-updates and raises over-budget alerts.\n\n🔧 Customization\n\nAdd support for more banks/UPI apps by extending the parser schema.\n\n```const emailBody = $input.first().json.snippet || \"\";\nconst senderEmail = $input.first().json.From || \"\";\n\n// Account detection\nlet account = \"\"; // you can modify the bank names and UPI names here\n\nif (/alerts@hdfcbank\\.net/i.test(senderEmail)) account = \"HDFC Bank\"; // you can modify the bank names and UPI names here\n\nelse if (/ealerts@iobnet\\.co\\.in/i.test(senderEmail)) account = \"Indian Overseas Bank\";\nelse if (/alerts@indianbank\\.in/i.test(senderEmail)) account = \"Indian Bank\";\nelse if (/@upi|@okhdfcbank|@okaxis|@okicici/i.test(emailBody)) {\n    if (/gpay|google pay/i.test(emailBody)) account = \"Google Pay\";\n    else if (/phonepe/i.test(emailBody)) account = \"PhonePe\";\n    else if (/paytm/i.test(emailBody)) account = \"Paytm\";\n    else account = \"UPI\";\n} else {\n    account = \"Other\";\n}\n\n// If account is \"Other\", skip output\nif (account === \"Other\") {\n    return [];\n}\n\n// Output\nreturn [{\n    account,\n    from: senderEmail, // exact Gmail \"From\" metadata\n    snippet: emailBody,\n    messageId: $input.first().json.id || \"\"\n}];\n\n```\n\nCreate custom categories (e.g., Travel, Groceries, Subscriptions).\n\nSend real-time alerts via Telegram/Slack/Email using n8n nodes.\n\nShare the Google Sheet with family or team for collaborative use.\n\n## 📌 Usage\n\nThe workflow runs automatically on every new Gmail transaction email and financial input on the telegram bot.\n\nAt the end of each month, totals are calculated in the Yearly Summary tab.\n\nUsers only need to maintain the Budget tab with updated monthly allocations.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Budget information extractor",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Expense information extractor",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Information extraction from telegram input",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Raw check if the transaction is 'Budget' or 'Expense'",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check if the transaction is 'Budget' or 'Expense'",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Append transaction data to budget sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Append transaction data to expense sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send a confirmation reply to the user",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Extract the email only from specified bank/UPI apps or the transactions made from them",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate the structured data from the raw emails",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Extract the information and parse it",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check if the transaction is 'Credit' or 'Debit'",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Append transaction data to expense sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Append transaction data to expense sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

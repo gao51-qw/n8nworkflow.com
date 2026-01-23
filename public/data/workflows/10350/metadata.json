@@ -1,0 +1,27 @@
+{
+  "id": 10350,
+  "slug": "10350",
+  "title": "Generate AI videos with OpenAI Sora 2 & Google Veo 3.1 via parallel processing",
+  "description": "# **Automate Video Generation with Sora 2 & Veo 3.1 - For Beginners**\n\nKick-start AI video generation in n8n with two popular paths: OpenAI Sora 2 and Google Veo 3.1 (via Wavespeed). This beginner-friendly template lets you type a prompt in Chat Trigger, then automatically:\n\nCall Sora 2 to generate a short 720p clip and email the MP4.\n\nCall Veo 3.1 through Wavespeed, poll until ready, and email the result link.\n\n🎥 Watch the full step-by-step build: https://www.youtube.com/watch?v=qjFWfYvHxlY\n## \n## What this template does\nChat input → Two video routes run in parallel:\nSora 2 route: HTTP Request (POST /v1/videos) → HTTP Request (GET /videos/{id}/content) → Gmail (attach MP4).\nVeo 3.1 route (Wavespeed): HTTP Request (POST /google/veo3.1/text-to-video) → poll result with HTTP Request (GET /predictions/{id}/result) inside a Wait + IF loop → Gmail (send result URL).\nIncludes pinned sample prompt for a marketing use case.\nUses Sticky Notes to explain each lane and link to the tutorial.\n\n### Why it’s useful (for beginners)\nNo code required: fill credentials, paste your prompt, run.\nSide-by-side comparison: learn how Sora 2 vs Veo 3.1 flows differ (direct file vs polled URL).\nEmail delivery built-in: get outputs in your inbox for quick review.\n\n### Requirements\nOpenAI API key with access to Sora 2 video endpoint.\nWavespeed API key (for Veo 3.1).\nGoogle Gmail OAuth2 (to send yourself the results).\nn8n (self-hosted or Cloud), with internet access.\n\nNote: Replace any placeholder or demo credentials after import. Never commit real keys to public templates.\n\n### Credentials to set in n8n\nHTTP Header Auth – OpenAI Sora 2\nHeader Name: Authorization\nValue: Bearer YOUR_OPENAI_API_KEY\nHTTP Header Auth – Wavespeed\nHeader Name: Authorization\nValue: Bearer YOUR_WAVESPEED_API_KEY\nGmail OAuth2\nConnect your Google account.\nIn the two Gmail nodes, change “sendTo” to your email.\n\n### How it works (nodes overview)\nWhen chat message received (Chat Trigger)\nReceives your chatInput prompt.\nVeo 3.1 lane (top)\nHTTP Request — Post to Wavespeed\nPOST https://api.wavespeed.ai/api/v3/google/veo3.1/text-to-video\nBody params (editable): aspect_ratio, duration, generate_audio, prompt, resolution.\nWait 1 Minute → HTTP Request — Get result\nPolls GET /api/v3/predictions/{id}/result.\nIF (status === \"completed\")\nTrue → Gmail — Send Video Result to Email (sends the output URL).\nFalse → Wait another 60 secs → back to Wait 1 Minute (poll again).\nSora 2 lane (bottom)\nHTTP Request — POST /v1/videos (OpenAI)\nMultipart form: prompt={{$json.chatInput}}, model=\"sora-2-pro\", size=\"1280x720\", seconds=\"8\".\nHTTP Request — GET /v1/videos/{id}/content\nDownloads the MP4 as binary (video.mp4).\nGmail — Send Video to Email\nAttaches video.mp4 and emails it to you.\n\n### Setup (step-by-step)\nImport the template into n8n.\nOpen each HTTP Request node and select the correct HTTP Header Auth credentials.\nOpen both Gmail nodes and:\nSelect your Gmail OAuth2 credential.\nChange “sendTo” to your email.\n\n### (Optional) Tweak defaults:\nSora 2: size (e.g., 1920x1080), seconds (e.g., 5–10).\nVeo 3.1 via Wavespeed: aspect_ratio (9:16, 16:9, 1:1), duration, resolution.\nWait timing and max polling passes (add an extra IF to stop after N attempts).\nExecute Workflow and enter your prompt in the Chat window.\n\n### Customization tips\nDifferent delivery: swap Gmail for Google Drive, Slack, or Telegram nodes.\nApproval loop: after email, branch to a Slack approval step before archiving the file.\nBrand presets: store common prompt fragments (tone, overlays, logo instructions) in an Item Lists/Set node and merge into the main prompt.\nContent length: Sora and Veo costs/latency grow with duration—start short (5–8s), then iterate.\n\n### Troubleshooting\n403/401 errors: re-check API keys and header names (Authorization: Bearer …).\nEmpty Veo output: confirm polling loop runs until status = completed; inspect the GET result JSON path used in email (data.outputs[0]).\nSora content fetch fails: ensure the second GET uses the returned id path and outputs binary video.mp4.\nEmail not received: verify Gmail OAuth2 scope and recipient; check n8n executions for errors.\nNSFW/safety blocks: refine the prompt to avoid restricted content.",
+  "featuredImage": "/data/workflows/10350/10350.webp",
+  "author": {
+    "id": 101,
+    "slug": "marconi",
+    "name": "Automate With Marc",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8570,
+  "downloads": 857,
+  "createdAt": "2025-10-30T14:47:55.818Z",
+  "updatedAt": "2026-01-16T09:04:40.403Z",
+  "publishedAt": "2025-10-30T14:47:55.818Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10350"
+}

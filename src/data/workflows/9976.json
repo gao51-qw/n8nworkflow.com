@@ -1,0 +1,122 @@
+{
+  "id": 9976,
+  "slug": "9976",
+  "title": "Automated customer feedback triage & follow-up with Gemini, Jotform, Gmail, Jira",
+  "description": "## AI-Powered Customer Feedback: Triage and Insight-Driven Chat\n\nThis n8n workflow creates a two-phase system for handling customer feedback received via a **Jotform** submission. The first agent quickly triages the issue, and the second agent engages in a persistent, conversational exchange over email to collect the information necessary for a resolution.\n\n### Phase 1: Triage and Initial Action (AI Agent)\n\nThis phase is triggered by a new submission on the **Jotform**. The goal is to immediately categorize the feedback and take the appropriate initial action.\n\n1.  **Jotform Trigger:** The workflow starts instantly when a user submits your designated feedback form.\n2.  **AI Agent (Triage):** This agent (powered by **Google Gemini**) is tasked with two primary jobs:\n    * **Sentiment Analysis and Response Drafting:** It reads the feedback (`q6_typeA6`) and the user's name (`q3_name.first`).\n        * **If Positive:** It uses the **Send a message in Gmail** tool to send a concise, appreciative thank you note.\n        * **If Negative:** It uses the **Send a message in Gmail** tool to send an initial, empathetic response acknowledging the issue and stating that a team member will follow up with questions. It also uses the **Create an issue in Jira Software** tool to log the bug or issue immediately.\n    * **Data Structuring:** It uses the **Structured Output Parser** to extract key data points, most importantly the `threadId` of the initial email, which is crucial for the follow-up conversation agent.\n\n### Phase 2: Conversational Insight Gathering (AI Agent (Chat))\n\nThis phase takes over for all negative feedback, engaging the customer in a back-and-forth exchange to collect essential details required for the development or support team.\n\n1.  **Gmail Trigger:** This node is set to **poll for new, unread emails** (which are expected to be replies from the customer).\n2.  **Simple Memory:** This node is vital for the conversational aspect. It is configured to use the unique email **`threadId`** as its session key, allowing the AI Agent to remember the entire history of the conversation (previous questions asked and details provided) across multiple emails.\n3.  **AI Agent (Chat):** This is the **2nd agent** and the core of the conversational process.\n    * **Role:** It acts as a dedicated feedback assistant.\n    * **Goal:** Its instruction is to **reply and ask for specific, missing information** needed for the ticket, such as: *what device they were using*, *if they know the steps to reproduce the issue*, and to confirm that the team will send a **free coupon for credits** as a thank you for their help.\n    * **Tool:** It uses the **Reply to a message in Gmail** tool to continue the conversation directly within the original email thread.\n    * **Resolution:** The agent is trained to look for confirmation that all necessary information has been provided. Once it determines the issue details are complete, it will send a final thank you email and automatically use the **Jira tool** to **summarize and update the existing Jira issue** with the new insights, closing the loop on the data collection process.\n\n\n---\n\n## Requirements\n\nTo implement and run this automated customer feedback workflow, the following accounts and credentials are required:\n\n### 1. Automation Platform\n\n* **n8n Instance:** A running instance of n8n (Cloud or self-hosted) to host and execute the workflow.\n**Sign up for n8n using:** [https://n8n.partnerlinks.io/pe6gzwqi3rqw](https://n8n.partnerlinks.io/pe6gzwqi3rqw)\n\n### 2. Service Credentials\n\nYou must set up and connect the following credentials within your n8n instance:\n\n* **Google Gemini API Key:** Required to power both **AI Agent** nodes for sentiment analysis and conversational follow-up.\n* **Gmail OAuth2/API Key:** Required for:\n    * The **Send a message in Gmail** tool (for initial replies).\n    * The **Gmail Trigger** (to detect new replies).\n    * The **Reply to a message in Gmail** tool (for the ongoing conversation).\n* **Jotform API Key:** Required for the **Jotform Trigger** node to instantly receive and process new form submissions.\n**Sign up for Jotform using:** [https://www.jotform.com/?partner=zainurrehman](https://www.jotform.com/?partner=zainurrehman)\n* **Jira Software Credentials:** Required for the **Create an issue in Jira Software** tool (for the first agent) and the **Jira Tool** (for the second agent to update the ticket).\n\n### 3. External Configurations\n\n* **Jotform Setup:** A live Jotform must be configured with specific fields to capture the user's name, email, and the feedback text.\n* **Jira Setup:** You need a designated **Jira Project** and a defined **Issue Type** for the workflow to create and update tickets.\n",
+  "featuredImage": "/data/workflows/9976/9976.webp",
+  "author": {
+    "id": 101,
+    "slug": "zain",
+    "name": "Zain Khan",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 96,
+  "downloads": 9,
+  "createdAt": "2025-10-21T12:03:22.394Z",
+  "updatedAt": "2026-01-16T09:02:50.111Z",
+  "publishedAt": "2025-10-21T12:03:22.394Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9976",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated customer feedback triage & follow-up with Gemini, Jotform, Gmail, Jira",
+    "workflowName": "Automated customer feedback triage & follow-up with Gemini, Jotform, Gmail, Jira",
+    "description": "## AI-Powered Customer Feedback: Triage and Insight-Driven Chat\n\nThis n8n workflow creates a two-phase system for handling customer feedback received via a **Jotform** submission. The first agent quickly triages the issue, and the second agent engages in a persistent, conversational exchange over email to collect the information necessary for a resolution.\n\n### Phase 1: Triage and Initial Action (AI Agent)\n\nThis phase is triggered by a new submission on the **Jotform**. The goal is to immediately categorize the feedback and take the appropriate initial action.\n\n1.  **Jotform Trigger:** The workflow starts instantly when a user submits your designated feedback form.\n2.  **AI Agent (Triage):** This agent (powered by **Google Gemini**) is tasked with two primary jobs:\n    * **Sentiment Analysis and Response Drafting:** It reads the feedback (`q6_typeA6`) and the user's name (`q3_name.first`).\n        * **If Positive:** It uses the **Send a message in Gmail** tool to send a concise, appreciative thank you note.\n        * **If Negative:** It uses the **Send a message in Gmail** tool to send an initial, empathetic response acknowledging the issue and stating that a team member will follow up with questions. It also uses the **Create an issue in Jira Software** tool to log the bug or issue immediately.\n    * **Data Structuring:** It uses the **Structured Output Parser** to extract key data points, most importantly the `threadId` of the initial email, which is crucial for the follow-up conversation agent.\n\n### Phase 2: Conversational Insight Gathering (AI Agent (Chat))\n\nThis phase takes over for all negative feedback, engaging the customer in a back-and-forth exchange to collect essential details required for the development or support team.\n\n1.  **Gmail Trigger:** This node is set to **poll for new, unread emails** (which are expected to be replies from the customer).\n2.  **Simple Memory:** This node is vital for the conversational aspect. It is configured to use the unique email **`threadId`** as its session key, allowing the AI Agent to remember the entire history of the conversation (previous questions asked and details provided) across multiple emails.\n3.  **AI Agent (Chat):** This is the **2nd agent** and the core of the conversational process.\n    * **Role:** It acts as a dedicated feedback assistant.\n    * **Goal:** Its instruction is to **reply and ask for specific, missing information** needed for the ticket, such as: *what device they were using*, *if they know the steps to reproduce the issue*, and to confirm that the team will send a **free coupon for credits** as a thank you for their help.\n    * **Tool:** It uses the **Reply to a message in Gmail** tool to continue the conversation directly within the original email thread.\n    * **Resolution:** The agent is trained to look for confirmation that all necessary information has been provided. Once it determines the issue details are complete, it will send a final thank you email and automatically use the **Jira tool** to **summarize and update the existing Jira issue** with the new insights, closing the loop on the data collection process.\n\n\n---\n\n## Requirements\n\nTo implement and run this automated customer feedback workflow, the following accounts and credentials are required:\n\n### 1. Automation Platform\n\n* **n8n Instance:** A running instance of n8n (Cloud or self-hosted) to host and execute the workflow.\n**Sign up for n8n using:** [https://n8n.partnerlinks.io/pe6gzwqi3rqw](https://n8n.partnerlinks.io/pe6gzwqi3rqw)\n\n### 2. Service Credentials\n\nYou must set up and connect the following credentials within your n8n instance:\n\n* **Google Gemini API Key:** Required to power both **AI Agent** nodes for sentiment analysis and conversational follow-up.\n* **Gmail OAuth2/API Key:** Required for:\n    * The **Send a message in Gmail** tool (for initial replies).\n    * The **Gmail Trigger** (to detect new replies).\n    * The **Reply to a message in Gmail** tool (for the ongoing conversation).\n* **Jotform API Key:** Required for the **Jotform Trigger** node to instantly receive and process new form submissions.\n**Sign up for Jotform using:** [https://www.jotform.com/?partner=zainurrehman](https://www.jotform.com/?partner=zainurrehman)\n* **Jira Software Credentials:** Required for the **Create an issue in Jira Software** tool (for the first agent) and the **Jira Tool** (for the second agent to update the ticket).\n\n### 3. External Configurations\n\n* **Jotform Setup:** A live Jotform must be configured with specific fields to capture the user's name, email, and the feedback text.\n* **Jira Setup:** You need a designated **Jira Project** and a defined **Issue Type** for the workflow to create and update tickets.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "JotForm Trigger",
+      "type": "n8n-nodes-base.jotFormTrigger",
+      "role": "jotFormTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Reply to a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "AI Agent (Chat)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create an issue in Jira Software",
+      "type": "n8n-nodes-base.jiraTool",
+      "role": "jiraTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

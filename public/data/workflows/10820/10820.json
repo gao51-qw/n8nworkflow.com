@@ -1,0 +1,884 @@
+{
+  "workflow": {
+    "id": 10820,
+    "name": "Automate meeting transcription & minutes distribution with OpenAI and Google Drive",
+    "views": 204,
+    "recentViews": 1,
+    "totalViews": 204,
+    "createdAt": "2025-11-14T11:29:55.223Z",
+    "description": "## Automated Meeting Recording Transcription & Minutes Distribution Workflow\n\nManaging meeting recordings manually—downloading audio, transcribing it, summarizing key points, saving documents, and notifying the team—quickly becomes repetitive and inefficient. This workflow eliminates all of those manual steps by automatically detecting new audio files uploaded to a designated Google Drive folder, converting them into high-quality transcripts using OpenAI, summarizing them into structured meeting minutes, transforming the content into a text file, uploading it back to Google Drive, and finally notifying a Chatwork room with the completed summary.\nWhat used to take hours can now be completed automatically within minutes, ensuring consistency, accuracy, and faster information sharing.\n\n## Who’s it for\n\nThis workflow is ideal for:\n\n- Teams that need high-quality, client-ready meeting minutes generated automatically  \n- Project managers who require accurate summaries, decision tracking, and action items without manual effort  \n- Cross-functional teams handling multiple meetings and requiring structured, searchable documentation  \n- Organizations using Google Meet, Zoom, or Teams where recordings must be turned into polished minutes  \n- Anyone who wants a consistent, AI-assisted system that analyzes discussions, extracts insights, and formats them professionally  \n\nBy leveraging an advanced Meeting Minutes Generation System—capable of key-point extraction, noise reduction, speaker/topic organization, and review support—this workflow ensures that every meeting is transformed into a clean, structured, and highly usable document.\n\n---\n\n## How it works\n\n### 1. Audio file upload triggers the workflow  \nWhen a new recording is uploaded to the designated Google Drive folder, the Google Drive Trigger immediately activates and begins processing.\n\n### 2. The audio file is downloaded  \nThe file is retrieved from Google Drive and prepared in binary format for accurate transcription.\n\n### 3. AI-powered transcription  \nThe audio is sent to OpenAI’s transcription engine, producing a complete and highly accurate transcript of the meeting.\n\n### 4. Generate structured, client-ready meeting minutes  \nThe transcript is processed by a specialized Meeting Minutes Generation System powered by a multi-step prompt.  \nInstead of using a fixed template, the system intelligently analyzes the transcription and automatically generates a professionally structured document using the following capabilities:\n\n- Extraction of key points while removing irrelevant conversation  \n- Organization of content by speaker, topic, and logical flow  \n- Automatic construction of headings and document structure  \n- Draft generation based on client-facing writing standards  \n- Review-support logic that allows refinement and improved readability  \n- Task-based orchestration (ingestion → key-point extraction → draft generation → review → final approval)\n\nBecause the system dynamically determines the optimal structure, the resulting minutes adapt to the content of each meeting rather than following a rigid set of categories.  \nIf certain information cannot be derived from the transcript, the system will appropriately leave it out rather than forcing placeholder sections.\n\n\n### 5. Convert the minutes into a file  \nThe structured minutes are converted into a `.txt` or `.docx` document, ready for submission or archival.\n\n### 6. Upload the finalized document  \nThe completed meeting minutes are uploaded to a specific Google Drive folder and saved using a timestamped filename.\n\n### 7. Notify Chatwork  \nA formatted notification—including the summarized content—is automatically posted to a Chatwork room, ensuring immediate team visibility.\n\n---\n\n## How to set up\n\n1. Import the workflow into your n8n environment.  \n2. Authenticate Google Drive and select the folder to monitor for new recordings.  \n3. Connect your OpenAI API keys for both transcription and structured minutes generation.  \n4. Specify the Google Drive folder where the finished documents should be stored.  \n5. Add your Chatwork API token and room ID for automated notifications.  \n6. Upload a sample audio file to confirm the full end-to-end pipeline works correctly.\n\n---\n\n## Requirements\n\n- n8n instance (cloud or self-hosted)  \n- Google Drive account with appropriate folder permissions  \n- OpenAI API credentials  \n- Chatwork API token  \n- Supported audio formats like mp3, wav, m4a, etc.\n\n---\n\n## How to customize the workflow\n\n- Modify the minutes-generation prompt to reflect your organization’s preferred format  \n- Add Slack, Teams, or Discord notifications in addition to Chatwork  \n- Route different types of meetings to different folders or templates  \n- Save transcript and structured minutes separately for compliance or analysis  \n- Log metadata or decisions into Google Sheets or project management tools  \n- Store minutes in a vector database to enable semantic search across past meetings  \n- Attach the final document directly as a file in Chatwork  \n- Extend the system to support revision cycles, reviewer comments, or approval workflows  \n\n",
+    "workflow": {
+      "id": "55z6K2RROkmMufYu",
+      "meta": {
+        "instanceId": "d766a8ee81e6e9c4a6f6072b794508c301e839c43fcd16e1ba1e24f731944509",
+        "templateCredsSetupCompleted": true
+      },
+      "name": "Automated Meeting Recording Transcription & Minutes Distribution Workflow",
+      "tags": [
+        {
+          "id": "9lQxmdXusUqB0ADJ",
+          "name": "議事録系",
+          "createdAt": "2025-11-01T15:04:17.465Z",
+          "updatedAt": "2025-11-01T15:04:17.465Z"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "c47970ae-4de8-49f0-91c7-d1b92dcf8236",
+          "name": "Google Drive Trigger",
+          "type": "n8n-nodes-base.googleDriveTrigger",
+          "position": [
+            -400,
+            32
+          ],
+          "parameters": {
+            "event": "fileCreated",
+            "options": {},
+            "pollTimes": {
+              "item": [
+                {
+                  "mode": "everyHour",
+                  "minute": 59
+                }
+              ]
+            },
+            "triggerOn": "specificFolder",
+            "folderToWatch": {
+              "__rl": true,
+              "mode": "list",
+              "value": "103izO2_it3aeyuqF6lo7lfIZhvOp7mbY",
+              "cachedResultUrl": "https://drive.google.com/drive/folders/103izO2_it3aeyuqF6lo7lfIZhvOp7mbY",
+              "cachedResultName": "Recordings-test"
+            }
+          },
+          "credentials": {
+            "googleDriveOAuth2Api": {
+              "id": "credential-id",
+              "name": "googleDriveOAuth2Api Credential"
+            }
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "85222786-3e08-4b34-ae57-252fa5e72dd9",
+          "name": "Google Drive",
+          "type": "n8n-nodes-base.googleDrive",
+          "position": [
+            -160,
+            32
+          ],
+          "parameters": {
+            "fileId": {
+              "__rl": true,
+              "mode": "id",
+              "value": "={{ $json.id }}"
+            },
+            "options": {
+              "fileName": "={{ $json.originalFilename }}",
+              "binaryPropertyName": "data"
+            },
+            "operation": "download"
+          },
+          "credentials": {
+            "googleDriveOAuth2Api": {
+              "id": "credential-id",
+              "name": "googleDriveOAuth2Api Credential"
+            }
+          },
+          "typeVersion": 3
+        },
+        {
+          "id": "daa338d6-3be9-410d-8f7d-910e8a875b59",
+          "name": "OpenAI",
+          "type": "@n8n/n8n-nodes-langchain.openAi",
+          "position": [
+            112,
+            32
+          ],
+          "parameters": {
+            "options": {},
+            "resource": "audio",
+            "operation": "transcribe"
+          },
+          "credentials": {
+            "openAiApi": {
+              "id": "credential-id",
+              "name": "openAiApi Credential"
+            }
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "ed1f6913-94e2-428f-89a9-6994e5037dcb",
+          "name": "Sticky Note",
+          "type": "n8n-nodes-base.stickyNote",
+          "position": [
+            -464,
+            -176
+          ],
+          "parameters": {
+            "width": 459.0695038476583,
+            "height": 425.9351190986499,
+            "content": "## Triggering and Downloading the Audio File\n\nThis workflow uses Google Drive as the source.\n\nWhen an audio file is uploaded, the trigger activates immediately and downloads the file for processing."
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "2c82e15f-f4ad-4500-80a5-54ce726c7691",
+          "name": "Sticky Note1",
+          "type": "n8n-nodes-base.stickyNote",
+          "position": [
+            64,
+            -176
+          ],
+          "parameters": {
+            "color": 6,
+            "width": 537,
+            "height": 420,
+            "content": "## Transcription and Summarization with OpenAI\n\nOnce the file data is retrieved, it is sent to OpenAI for transcription.\nThe transcribed text is then processed again by OpenAI to generate a summary and extract additional information.\nAlthough this workflow uses OpenAI, you can replace it with any other LLM as well.\n"
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "768b5b61-0afb-4ec1-a34f-bff4b07e4676",
+          "name": "Sticky Note2",
+          "type": "n8n-nodes-base.stickyNote",
+          "position": [
+            1408,
+            -176
+          ],
+          "parameters": {
+            "width": 231.28081576725737,
+            "height": 411.7664447204431,
+            "content": "## Chatwork Notification\nSends an automatic notification to Chatwork to inform that the meeting notes are ready."
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "2bae20fa-21c0-4bee-a40e-2a4fc1747d09",
+          "name": "OpenAI 2",
+          "type": "@n8n/n8n-nodes-langchain.openAi",
+          "position": [
+            320,
+            32
+          ],
+          "parameters": {
+            "modelId": {
+              "__rl": true,
+              "mode": "list",
+              "value": "gpt-5",
+              "cachedResultName": "GPT-5"
+            },
+            "options": {},
+            "messages": {
+              "values": [
+                {
+                  "content": "=\"Today is \" {{ $now }}  \"Transcript: \" {{  $('OpenAI').item.json.text }}"
+                },
+                {
+                  "role": "system",
+                  "content": "<!--\n最終的な「議事録作成支援システム」のシステムプロンプト構造サンプル\n必ず日本語で出力が返ってくるようにするための指定を追加\n-->\n\n<SystemSetup>\n    <Role>議事録作成支援システム</Role>\n    <Objective>\n        会議の文字起こしデータを元に、クライアント向けの正式な議事録を自動生成する\n    </Objective>\n    <CoreSkills>\n        <Skill>要点の抽出・雑談の除去</Skill>\n        <Skill>発言者やトピックごとの整理</Skill>\n        <Skill>クライアント向けの文書構成・文言調整</Skill>\n        <Skill>議事録提出前のレビューサポート</Skill>\n    </CoreSkills>\n    <LanguageSettings>\n        <!-- 日本語での入出力を常に行うよう強制する設定 -->\n        <PreferredLanguage>ja-JP</PreferredLanguage>\n        <AlwaysRespondInJapanese>true</AlwaysRespondInJapanese>\n    </LanguageSettings>\n    <WorkflowSteps>\n        <Step1>文字起こしデータの入力と初期解析</Step1>\n        <Step2>要点抽出と文書構成の自動生成</Step2>\n        <Step3>議事録ドラフト生成</Step3>\n        <Step4>レビュー・修正・最終承認</Step4>\n    </WorkflowSteps>\n</SystemSetup>\n\n<DynamicTaskExecutionOrchestration>\n    <TaskList>\n        <Task id=\"data_ingestion\" priority=\"high\">\n            <Description>\n                文字起こしデータを読み込み、基本的な情報（発言者、発言時間など）を解析する\n            </Description>\n            <Dependencies></Dependencies>\n        </Task>\n        <Task id=\"summary_generation\" priority=\"high\">\n            <Description>\n                要点抽出アルゴリズムを実行し、重要なトピックや決定事項を抽出。\n                その結果をもとに議事録の見出し構成を生成する\n            </Description>\n            <Dependencies>data_ingestion</Dependencies>\n        </Task>\n        <Task id=\"draft_generation\" priority=\"medium\">\n            <Description>\n                要点抽出結果とクライアント向けフォーマット情報をもとに、\n                議事録ドラフトを作成する\n            </Description>\n            <Dependencies>summary_generation</Dependencies>\n        </Task>\n        <Task id=\"review_process\" priority=\"medium\">\n            <Description>\n                ドラフトをユーザー（またはレビュアー）が確認・修正できるフローを提供する。\n                修正内容を学習して精度向上に活用\n            </Description>\n            <Dependencies>draft_generation</Dependencies>\n        </Task>\n        <Task id=\"final_approval\" priority=\"high\">\n            <Description>\n                修正後の議事録を最終承認し、クライアントに提出できる形式で出力する\n            </Description>\n            <Dependencies>review_process</Dependencies>\n        </Task>\n    </TaskList>\n    \n    <ExecutionLogic>\n        <PriorityRules>\n            <Rule>優先度 (priority=\"high\") が高いタスクを先に実行</Rule>\n            <Rule>Dependencies がすべて完了したタスクから実行</Rule>\n        </PriorityRules>\n        <RuntimeAdjustments>\n            <Rule>ユーザーから再抽出要望があれば summary_generation タスクへリダイレクト</Rule>\n            <Rule>修正量が多い場合、draft_generation ～ review_process を繰り返す</Rule>\n        </RuntimeAdjustments>\n    </ExecutionLogic>\n    \n    <ErrorHandling>\n        <ErrorCase>\n            <Condition>文字起こしデータのフォーマットが不正</Condition>\n            <Action>ユーザーにエラーメッセージを提示し、正しい形式での再入力を促す</Action>\n        </ErrorCase>\n        <ErrorCase>\n            <Condition>要点抽出アルゴリズムが無効なデータを受信</Condition>\n            <Action>ログを記録し、タスク実行を中断。ユーザーによる手動修正を求める</Action>\n        </ErrorCase>\n    </ErrorHandling>\n</DynamicTaskExecutionOrchestration>\n\n<FeedbackLoop>\n    <CollectionMechanism>\n        <Method>レビュー画面でのコメント入力</Method>\n        <Method>修正履歴の追跡</Method>\n        <Method>アプリ内満足度評価ボタン（例：☆1～5）</Method>\n    </CollectionMechanism>\n    <AnalysisAndLearning>\n        <Rule>修正されたフレーズや文書構成を学習し、次回以降の自動生成に反映</Rule>\n        <Rule>要点抽出時に誤認識・不要抽出があった場合、その事例をアルゴリズムにフィードバック</Rule>\n    </AnalysisAndLearning>\n    <ImprovementActions>\n        <Action>抽出アルゴリズムの重み付け再調整</Action>\n        <Action>テキスト整形/言い回しのテンプレートアップデート</Action>\n        <Action>UI/UX面でレビュー・修正プロセスを最適化</Action>\n    </ImprovementActions>\n</FeedbackLoop>\n\n<PerformanceMetrics>\n    <Metrics>\n        <Metric>\n            <Name>要点抽出精度</Name>\n            <Description>雑談や不要部分の省略がどれだけ正確に行われているか</Description>\n        </Metric>\n        <Metric>\n            <Name>文書校正精度</Name>\n            <Description>クライアントにとって読みやすく、誤字脱字が少ないか</Description>\n        </Metric>\n        <Metric>\n            <Name>レビュー修正率</Name>\n            <Description>生成されたドラフトに対して、どの程度の修正が行われるか</Description>\n        </Metric>\n        <Metric>\n            <Name>ユーザー満足度</Name>\n            <Description>星評価やコメントなどのフィードバックを集計し、改善度を把握</Description>\n        </Metric>\n    </Metrics>\n    <AnalysisCycle>\n        <Frequency>週次または月次でメトリクスを集計</Frequency>\n        <Action>改善アイデアの優先度付けと対応計画の作成</Action>\n    </AnalysisCycle>\n</PerformanceMetrics>\n\n<CreativityEnhancement>\n    <CrossDomainIdeas>\n        <Method>\n            発言内容に関連する外部の情報ソースを照会し、類似ケース・成功事例などを提示して議事録に添える\n        </Method>\n        <Benefit>\n            会議内容を発展させるヒントを提供し、付加価値の高い議事録を作成\n        </Benefit>\n    </CrossDomainIdeas>\n    <CreativityTechniques>\n        <Technique>\n            <Name>SCAMPER法</Name>\n            <Implementation>\n                会議内容に対し、S (Substitute), C (Combine), A (Adapt) ... などの\n                観点で提案や考察を行う\n            </Implementation>\n        </Technique>\n        <Technique>\n            <Name>ブレーンライティング</Name>\n            <Implementation>\n                テキストベースでアイデアを連鎖的に追加し合うプロセスをサポート\n            </Implementation>\n        </Technique>\n    </CreativityTechniques>\n    <CoCreationModel>\n        <InteractionFlow>\n            <Step>システムが複数の要約パターンや視点を提案</Step>\n            <Step>ユーザーが提案を比較検討し、追加アイデアを入力</Step>\n            <Step>システムが最終的にユーザーの意図を反映した「議事録＋アルファ案」を生成</Step>\n        </InteractionFlow>\n        <Benefit>\n            新たな視点や発想を盛り込んだ議事録を作成できる\n        </Benefit>\n    </CoCreationModel>\n    <IdeaEvaluation>\n        <Criteria>\n            <Criterion>\n                <Name>新規性</Name>\n                <Description>既存の議事録にはないユニークな切り口か</Description>\n            </Criterion>\n            <Criterion>\n                <Name>有用性</Name>\n                <Description>クライアントや会議参加者にとって実行可能で価値があるか</Description>\n            </Criterion>\n        </Criteria>\n    </IdeaEvaluation>\n</CreativityEnhancement>\n\n<EthicalConsiderations>\n    <Principles>\n        <Principle>\n            <Name>機密保持</Name>\n            <Description>\n                会議内容や個人情報は厳格に管理し、外部に流出しないよう徹底する\n            </Description>\n        </Principle>\n        <Principle>\n            <Name>プライバシー保護</Name>\n            <Description>\n                会議参加者の個人情報は必要最小限にとどめる\n            </Description>\n        </Principle>\n        <Principle>\n            <Name>透明性と説明可能性</Name>\n            <Description>\n                要約・抽出ロジックを概念的に説明できるようにし、\n                ユーザーが編集過程を追跡できるようにする\n            </Description>\n        </Principle>\n    </Principles>\n    <PossibleDilemmas>\n        <Dilemma>\n            <Name>誤った要約や偏り</Name>\n            <Description>\n                主観的なバイアスにより、特定の意見や人物に不利となる要約が生成されるリスク\n            </Description>\n            <Mitigation>\n                システムの要約結果をユーザー（または複数人）がレビューできる体制を整備\n            </Mitigation>\n        </Dilemma>\n        <Dilemma>\n            <Name>情報の二次利用</Name>\n            <Description>\n                学習データとして過去の会議内容を利用する際、機密情報を扱うリスク\n            </Description>\n            <Mitigation>\n                機密情報を匿名化やマスキング処理し、同意を得た範囲でのみ再利用\n            </Mitigation>\n        </Dilemma>\n    </PossibleDilemmas>\n    <DecisionProcess>\n        <Step>\n            生成テキストに機密情報が含まれそうな場合、システムがアラートを提示\n        </Step>\n        <Step>\n            ユーザーが伏字・削除・匿名化の方法を選択し、システムが実行\n        </Step>\n        <Step>\n            最終チェックで問題があれば再度要約・修正プロセスへ\n        </Step>\n    </DecisionProcess>\n    <Transparency>\n        <Method>\n            どの発言がどのように要約・編集されたかをユーザーが追跡可能にする\n        </Method>\n        <Method>\n            恣意的な改変が疑われる場合、元の文字起こしとの比較を容易に行える\n        </Method>\n    </Transparency>\n</EthicalConsiderations>"
+                }
+              ]
+            }
+          },
+          "credentials": {
+            "openAiApi": {
+              "id": "credential-id",
+              "name": "openAiApi Credential"
+            }
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "a4e8924c-72fe-4a67-87f7-3cb2865e318b",
+          "name": "Upload file",
+          "type": "n8n-nodes-base.googleDrive",
+          "position": [
+            1088,
+            16
+          ],
+          "parameters": {
+            "name": "={{ $now.format('yyyy-MM-dd _hhmmss') }}. docx",
+            "driveId": {
+              "__rl": true,
+              "mode": "list",
+              "value": "My Drive"
+            },
+            "options": {},
+            "folderId": {
+              "__rl": true,
+              "mode": "list",
+              "value": "1u9Q0BevrGONjaiBKIhnW69rx5iMK27o8",
+              "cachedResultUrl": "https://drive.google.com/drive/folders/1u9Q0BevrGONjaiBKIhnW69rx5iMK27o8",
+              "cachedResultName": "議事録(meet以外)"
+            }
+          },
+          "credentials": {
+            "googleDriveOAuth2Api": {
+              "id": "credential-id",
+              "name": "googleDriveOAuth2Api Credential"
+            }
+          },
+          "typeVersion": 3
+        },
+        {
+          "id": "c547724e-009f-4bf7-a8b2-0418364fdb0b",
+          "name": "Convert to File",
+          "type": "n8n-nodes-base.convertToFile",
+          "position": [
+            784,
+            16
+          ],
+          "parameters": {
+            "options": {},
+            "operation": "toText",
+            "sourceProperty": "message.content"
+          },
+          "typeVersion": 1.1
+        },
+        {
+          "id": "17ab2f44-4bdf-41f1-9b86-a1d23b488b7d",
+          "name": "Sticky Note3",
+          "type": "n8n-nodes-base.stickyNote",
+          "position": [
+            720,
+            -176
+          ],
+          "parameters": {
+            "color": 5,
+            "width": 231.28081576725737,
+            "height": 411.7664447204431,
+            "content": "## Convert to File\nConverts the summarized meeting notes into a text or docx file."
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "c58fa179-7f38-41c7-ac92-b210e8d90aba",
+          "name": "Sticky Note4",
+          "type": "n8n-nodes-base.stickyNote",
+          "position": [
+            1024,
+            -176
+          ],
+          "parameters": {
+            "color": 3,
+            "width": 231.28081576725737,
+            "height": 411.7664447204431,
+            "content": "## Google Drive Upload\nUploads the generated meeting notes file to the specified Google Drive folder."
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "bff86f5a-3685-45c0-9ea8-db1ab04fa188",
+          "name": "Sticky Note5",
+          "type": "n8n-nodes-base.stickyNote",
+          "position": [
+            -1408,
+            -576
+          ],
+          "parameters": {
+            "width": 880,
+            "height": 2016,
+            "content": "## Automated Meeting Recording Transcription & Minutes Distribution Workflow\n\nManaging meeting recordings manually—downloading audio, transcribing it, summarizing key points, saving documents, and notifying the team—quickly becomes repetitive and inefficient. This workflow eliminates all of those manual steps by automatically detecting new audio files uploaded to a designated Google Drive folder, converting them into high-quality transcripts using OpenAI, summarizing them into structured meeting minutes, transforming the content into a text file, uploading it back to Google Drive, and finally notifying a Chatwork room with the completed summary.\nWhat used to take hours can now be completed automatically within minutes, ensuring consistency, accuracy, and faster information sharing.\n\n## Who’s it for\n\nThis workflow is ideal for:\n\n- Teams that need high-quality, client-ready meeting minutes generated automatically  \n- Project managers who require accurate summaries, decision tracking, and action items without manual effort  \n- Cross-functional teams handling multiple meetings and requiring structured, searchable documentation  \n- Organizations using Google Meet, Zoom, or Teams where recordings must be turned into polished minutes  \n- Anyone who wants a consistent, AI-assisted system that analyzes discussions, extracts insights, and formats them professionally  \n\nBy leveraging an advanced Meeting Minutes Generation System—capable of key-point extraction, noise reduction, speaker/topic organization, and review support—this workflow ensures that every meeting is transformed into a clean, structured, and highly usable document.\n\n---\n\n## How it works\n\n### 1. Audio file upload triggers the workflow  \nWhen a new recording is uploaded to the designated Google Drive folder, the Google Drive Trigger immediately activates and begins processing.\n\n### 2. The audio file is downloaded  \nThe file is retrieved from Google Drive and prepared in binary format for accurate transcription.\n\n### 3. AI-powered transcription  \nThe audio is sent to OpenAI’s transcription engine, producing a complete and highly accurate transcript of the meeting.\n\n### 4. Generate structured, client-ready meeting minutes  \nThe transcript is processed by a specialized Meeting Minutes Generation System powered by a multi-step prompt.  \nInstead of using a fixed template, the system intelligently analyzes the transcription and automatically generates a professionally structured document using the following capabilities:\n\n- Extraction of key points while removing irrelevant conversation  \n- Organization of content by speaker, topic, and logical flow  \n- Automatic construction of headings and document structure  \n- Draft generation based on client-facing writing standards  \n- Review-support logic that allows refinement and improved readability  \n- Task-YOUR_OPENAI_KEY_HERE orchestration (ingestion → key-point extraction → draft generation → review → final approval)\n\nBecause the system dynamically determines the optimal structure, the resulting minutes adapt to the content of each meeting rather than following a rigid set of categories.  \nIf certain information cannot be derived from the transcript, the system will appropriately leave it out rather than forcing placeholder sections.\n\n\n### 5. Convert the minutes into a file  \nThe structured minutes are converted into a `.txt` or `.docx` document, ready for submission or archival.\n\n### 6. Upload the finalized document  \nThe completed meeting minutes are uploaded to a specific Google Drive folder and saved using a timestamped filename.\n\n### 7. Notify Chatwork  \nA formatted notification—including the summarized content—is automatically posted to a Chatwork room, ensuring immediate team visibility.\n\n---\n\n## How to set up\n\n1. Import the workflow into your n8n environment.  \n2. Authenticate Google Drive and select the folder to monitor for new recordings.  \n3. Connect your OpenAI API keys for both transcription and structured minutes generation.  \n4. Specify the Google Drive folder where the finished documents should be stored.  \n5. Add your Chatwork API token and room ID for automated notifications.  \n6. Upload a sample audio file to confirm the full end-to-end pipeline works correctly.\n\n---\n\n## Requirements\n\n- n8n instance (cloud or self-hosted)  \n- Google Drive account with appropriate folder permissions  \n- OpenAI API credentials  \n- Chatwork API token  \n- Supported audio formats like mp3, wav, m4a, etc.\n\n---\n\n## How to customize the workflow\n\n- Modify the minutes-generation prompt to reflect your organization’s preferred format  \n- Add Slack, Teams, or Discord notifications in addition to Chatwork  \n- Route different types of meetings to different folders or templates  \n- Save transcript and structured minutes separately for compliance or analysis  \n- Log metadata or decisions into Google Sheets or project management tools  \n- Store minutes in a vector database to enable semantic search across past meetings  \n- Attach the final document directly as a file in Chatwork  \n- Extend the system to support revision cycles, reviewer comments, or approval workflows  \n\n"
+          },
+          "typeVersion": 1
+        },
+        {
+          "id": "501cad16-ca1c-4ac8-9ff0-0d9fe05b4f5a",
+          "name": "Chatwork Notification",
+          "type": "n8n-nodes-base.httpRequest",
+          "position": [
+            1472,
+            0
+          ],
+          "parameters": {
+            "method": "POST",
+            "options": {},
+            "sendBody": true,
+            "contentType": "form-urlencoded",
+            "authentication": "genericCredentialType",
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "body",
+                  "value": "=[info][title]自動通知[/title]議事録の作成が完了しました。[/info]\n\n{{ $('OpenAI 2').item.json.message.content }}"
+                }
+              ]
+            },
+            "genericAuthType": "httpHeaderAuth"
+          },
+          "credentials": {
+            "httpHeaderAuth": {
+              "id": "credential-id",
+              "name": "httpHeaderAuth Credential"
+            }
+          },
+          "typeVersion": 4.2
+        }
+      ],
+      "active": false,
+      "pinData": {},
+      "settings": {
+        "executionOrder": "v1"
+      },
+      "versionId": "f7879139-33c9-4f3d-b499-d6f185cf09da",
+      "connections": {
+        "OpenAI": {
+          "main": [
+            [
+              {
+                "node": "OpenAI 2",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "OpenAI 2": {
+          "main": [
+            [
+              {
+                "node": "Convert to File",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Upload file": {
+          "main": [
+            [
+              {
+                "node": "Chatwork Notification",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Google Drive": {
+          "main": [
+            [
+              {
+                "node": "OpenAI",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Convert to File": {
+          "main": [
+            [
+              {
+                "node": "Upload file",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        },
+        "Google Drive Trigger": {
+          "main": [
+            [
+              {
+                "node": "Google Drive",
+                "type": "main",
+                "index": 0
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "lastUpdatedBy": 1,
+    "workflowInfo": {
+      "nodeCount": 13,
+      "nodeTypes": {
+        "n8n-nodes-base.stickyNote": {
+          "count": 6
+        },
+        "n8n-nodes-base.googleDrive": {
+          "count": 2
+        },
+        "n8n-nodes-base.httpRequest": {
+          "count": 1
+        },
+        "n8n-nodes-base.convertToFile": {
+          "count": 1
+        },
+        "@n8n/n8n-nodes-langchain.openAi": {
+          "count": 2
+        },
+        "n8n-nodes-base.googleDriveTrigger": {
+          "count": 1
+        }
+      }
+    },
+    "status": "published",
+    "user": {
+      "name": "Yuki Hirota",
+      "username": "yukihirota",
+      "bio": "TMD Co., Ltd., CEO / AI Engineer & AI Consultant\ndTosh Inc., Assistant to the CEO",
+      "verified": false,
+      "links": [
+        ""
+      ],
+      "avatar": "https://gravatar.com/avatar/cbe5a905829cdf2163946c477c7c025be757e80a61236faa1d884eaec86c0958?r=pg&d=retro&size=200"
+    },
+    "nodes": [
+      {
+        "id": 19,
+        "icon": "file:httprequest.svg",
+        "name": "n8n-nodes-base.httpRequest",
+        "codex": {
+          "data": {
+            "alias": [
+              "API",
+              "Request",
+              "URL",
+              "Build",
+              "cURL"
+            ],
+            "resources": {
+              "generic": [
+                {
+                  "url": "https://n8n.io/blog/2021-the-year-to-automate-the-new-you-with-n8n/",
+                  "icon": "☀️",
+                  "label": "2021: The Year to Automate the New You with n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/why-business-process-automation-with-n8n-can-change-your-daily-life/",
+                  "icon": "🧬",
+                  "label": "Why business process automation with n8n can change your daily life"
+                },
+                {
+                  "url": "https://n8n.io/blog/automatically-pulling-and-visualizing-data-with-n8n/",
+                  "icon": "📈",
+                  "label": "Automatically pulling and visualizing data with n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/learn-how-to-automatically-cross-post-your-content-with-n8n/",
+                  "icon": "✍️",
+                  "label": "Learn how to automatically cross-post your content with n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/automatically-adding-expense-receipts-to-google-sheets-with-telegram-mindee-twilio-and-n8n/",
+                  "icon": "🧾",
+                  "label": "Automatically Adding Expense Receipts to Google Sheets with Telegram, Mindee, Twilio, and n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/running-n8n-on-ships-an-interview-with-maranics/",
+                  "icon": "🛳",
+                  "label": "Running n8n on ships: An interview with Maranics"
+                },
+                {
+                  "url": "https://n8n.io/blog/what-are-apis-how-to-use-them-with-no-code/",
+                  "icon": " 🪢",
+                  "label": "What are APIs and how to use them with no code"
+                },
+                {
+                  "url": "https://n8n.io/blog/5-tasks-you-can-automate-with-notion-api/",
+                  "icon": "⚡️",
+                  "label": "5 tasks you can automate with the new Notion API "
+                },
+                {
+                  "url": "https://n8n.io/blog/world-poetry-day-workflow/",
+                  "icon": "📜",
+                  "label": "Celebrating World Poetry Day with a daily poem in Telegram"
+                },
+                {
+                  "url": "https://n8n.io/blog/automate-google-apps-for-productivity/",
+                  "icon": "💡",
+                  "label": "15 Google apps you can combine and automate to increase productivity"
+                },
+                {
+                  "url": "https://n8n.io/blog/automate-designs-with-bannerbear-and-n8n/",
+                  "icon": "🎨",
+                  "label": "Automate Designs with Bannerbear and n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/how-uproc-scraped-a-multi-page-website-with-a-low-code-workflow/",
+                  "icon": " 🕸️",
+                  "label": "How uProc scraped a multi-page website with a low-code workflow"
+                },
+                {
+                  "url": "https://n8n.io/blog/building-an-expense-tracking-app-in-10-minutes/",
+                  "icon": "📱",
+                  "label": "Building an expense tracking app in 10 minutes"
+                },
+                {
+                  "url": "https://n8n.io/blog/5-workflow-automations-for-mattermost-that-we-love-at-n8n/",
+                  "icon": "🤖",
+                  "label": "5 workflow automations for Mattermost that we love at n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/how-to-use-the-http-request-node-the-swiss-army-knife-for-workflow-automation/",
+                  "icon": "🧰",
+                  "label": "How to use the HTTP Request Node - The Swiss Army Knife for Workflow Automation"
+                },
+                {
+                  "url": "https://n8n.io/blog/learn-how-to-use-webhooks-with-mattermost-slash-commands/",
+                  "icon": "🦄",
+                  "label": "Learn how to use webhooks with Mattermost slash commands"
+                },
+                {
+                  "url": "https://n8n.io/blog/how-a-membership-development-manager-automates-his-work-and-investments/",
+                  "icon": "📈",
+                  "label": "How a Membership Development Manager automates his work and investments"
+                },
+                {
+                  "url": "https://n8n.io/blog/a-low-code-bitcoin-ticker-built-with-questdb-and-n8n-io/",
+                  "icon": "📈",
+                  "label": "A low-code bitcoin ticker built with QuestDB and n8n.io"
+                },
+                {
+                  "url": "https://n8n.io/blog/how-to-set-up-a-ci-cd-pipeline-with-no-code/",
+                  "icon": "🎡",
+                  "label": "How to set up a no-code CI/CD pipeline with GitHub and TravisCI"
+                },
+                {
+                  "url": "https://n8n.io/blog/automations-for-activists/",
+                  "icon": "✨",
+                  "label": "How Common Knowledge use workflow automation for activism"
+                },
+                {
+                  "url": "https://n8n.io/blog/creating-scheduled-text-affirmations-with-n8n/",
+                  "icon": "🤟",
+                  "label": "Creating scheduled text affirmations with n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/how-goomer-automated-their-operations-with-over-200-n8n-workflows/",
+                  "icon": "🛵",
+                  "label": "How Goomer automated their operations with over 200 n8n workflows"
+                },
+                {
+                  "url": "https://n8n.io/blog/aws-workflow-automation/",
+                  "label": "7 no-code workflow automations for Amazon Web Services"
+                }
+              ],
+              "primaryDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest/"
+                }
+              ]
+            },
+            "categories": [
+              "Development",
+              "Core Nodes"
+            ],
+            "nodeVersion": "1.0",
+            "codexVersion": "1.0",
+            "subcategories": {
+              "Core Nodes": [
+                "Helpers"
+              ]
+            }
+          }
+        },
+        "group": "[\"output\"]",
+        "defaults": {
+          "name": "HTTP Request",
+          "color": "#0004F5"
+        },
+        "iconData": {
+          "type": "file",
+          "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik00MCAyMEM0MCA4Ljk1MzE0IDMxLjA0NjkgMCAyMCAwQzguOTUzMTQgMCAwIDguOTUzMTQgMCAyMEMwIDMxLjA0NjkgOC45NTMxNCA0MCAyMCA0MEMzMS4wNDY5IDQwIDQwIDMxLjA0NjkgNDAgMjBaTTIwIDM2Ljk0NThDMTguODg1MiAzNi45NDU4IDE3LjEzNzggMzUuOTY3IDE1LjQ5OTggMzIuNjk4NUMxNC43OTY0IDMxLjI5MTggMTQuMTk2MSAyOS41NDMxIDEzLjc1MjYgMjcuNjg0N0gyNi4xODk4QzI1LjgwNDUgMjkuNTQwMyAyNS4yMDQ0IDMxLjI5MDEgMjQuNTAwMiAzMi42OTg1QzIyLjg2MjIgMzUuOTY3IDIxLjExNDggMzYuOTQ1OCAyMCAzNi45NDU4Wk0xMi45MDY0IDIwQzEyLjkwNjQgMjEuNjA5NyAxMy4wMDg3IDIzLjE2NCAxMy4yMDAzIDI0LjYzMDVIMjYuNzk5N0MyNi45OTEzIDIzLjE2NCAyNy4wOTM2IDIxLjYwOTcgMjcuMDkzNiAyMEMyNy4wOTM2IDE4LjM5MDMgMjYuOTkxMyAxNi44MzYgMjYuNzk5NyAxNS4zNjk1SDEzLjIwMDNDMTMuMDA4NyAxNi44MzYgMTIuOTA2NCAxOC4zOTAzIDEyLjkwNjQgMjBaTTIwIDMuMDU0MTlDMjEuMTE0OSAzLjA1NDE5IDIyLjg2MjIgNC4wMzA3OCAyNC41MDAxIDcuMzAwMzlDMjUuMjA2NiA4LjcxNDA4IDI1LjgwNzIgMTAuNDA2NyAyNi4xOTIgMTIuMzE1M0gxMy43NTAxQzE0LjE5MzMgMTAuNDA0NyAxNC43OTQyIDguNzEyNTQgMTUuNDk5OCA3LjMwMDY0QzE3LjEzNzcgNC4wMzA4MyAxOC44ODUxIDMuMDU0MTkgMjAgMy4wNTQxOVpNMzAuMTQ3OCAyMEMzMC4xNDc4IDE4LjQwOTkgMzAuMDU0MyAxNi44NjE3IDI5LjgyMjcgMTUuMzY5NUgzNi4zMDQyQzM2LjcyNTIgMTYuODQyIDM2Ljk0NTggMTguMzk2NCAzNi45NDU4IDIwQzM2Ljk0NTggMjEuNjAzNiAzNi43MjUyIDIzLjE1OCAzNi4zMDQyIDI0LjYzMDVIMjkuODIyN0MzMC4wNTQzIDIzLjEzODMgMzAuMTQ3OCAyMS41OTAxIDMwLjE0NzggMjBaTTI2LjI3NjcgNC4yNTUxMkMyNy42MzY1IDYuMzYwMTkgMjguNzExIDkuMTMyIDI5LjM3NzQgMTIuMzE1M0gzNS4xMDQ2QzMzLjI1MTEgOC42NjggMzAuMTA3IDUuNzgzNDYgMjYuMjc2NyA0LjI1NTEyWk0xMC42MjI2IDEyLjMxNTNINC44OTI5M0M2Ljc1MTQ3IDguNjY3ODQgOS44OTM1MSA1Ljc4MzQxIDEzLjcyMzIgNC4yNTUxM0MxMi4zNjM1IDYuMzYwMjEgMTEuMjg5IDkuMTMyMDEgMTAuNjIyNiAxMi4zMTUzWk0zLjA1NDE5IDIwQzMuMDU0MTkgMjEuNjAzIDMuMjc3NDMgMjMuMTU3NSAzLjY5NDg0IDI0LjYzMDVIMTAuMTIxN0M5Ljk0NjE5IDIzLjE0MiA5Ljg1MjIyIDIxLjU5NDMgOS44NTIyMiAyMEM5Ljg1MjIyIDE4LjQwNTcgOS45NDYxOSAxNi44NTggMTAuMTIxNyAxNS4zNjk1SDMuNjk0ODRDMy4yNzc0MyAxNi44NDI1IDMuMDU0MTkgMTguMzk3IDMuMDU0MTkgMjBaTTI2LjI3NjYgMzUuNzQyN0MyNy42MzY1IDMzLjYzOTMgMjguNzExIDMwLjg2OCAyOS4zNzc0IDI3LjY4NDdIMzUuMTA0NkMzMy4yNTEgMzEuMzMyMiAzMC4xMDY4IDM0LjIxNzkgMjYuMjc2NiAzNS43NDI3Wk0xMy43MjM0IDM1Ljc0MjdDOS44OTM2OSAzNC4yMTc5IDYuNzUxNTUgMzEuMzMyNCA0Ljg5MjkzIDI3LjY4NDdIMTAuNjIyNkMxMS4yODkgMzAuODY4IDEyLjM2MzUgMzMuNjM5MyAxMy43MjM0IDM1Ljc0MjdaIiBmaWxsPSIjM0E0MkU5Ii8+Cjwvc3ZnPgo="
+        },
+        "displayName": "HTTP Request",
+        "typeVersion": 4,
+        "nodeCategories": [
+          {
+            "id": 5,
+            "name": "Development"
+          },
+          {
+            "id": 9,
+            "name": "Core Nodes"
+          }
+        ]
+      },
+      {
+        "id": 58,
+        "icon": "file:googleDrive.svg",
+        "name": "n8n-nodes-base.googleDrive",
+        "codex": {
+          "data": {
+            "resources": {
+              "generic": [
+                {
+                  "url": "https://n8n.io/blog/your-business-doesnt-need-you-to-operate/",
+                  "icon": " 🖥️",
+                  "label": "Hey founders! Your business doesn't need you to operate"
+                },
+                {
+                  "url": "https://n8n.io/blog/why-this-product-manager-loves-workflow-automation-with-n8n/",
+                  "icon": "🧠",
+                  "label": "Why this Product Manager loves workflow automation with n8n"
+                },
+                {
+                  "url": "https://n8n.io/blog/aws-workflow-automation/",
+                  "label": "7 no-code workflow automations for Amazon Web Services"
+                }
+              ],
+              "primaryDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledrive/"
+                }
+              ],
+              "credentialDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/credentials/google/oauth-single-service/"
+                }
+              ]
+            },
+            "categories": [
+              "Data & Storage"
+            ],
+            "nodeVersion": "1.0",
+            "codexVersion": "1.0"
+          }
+        },
+        "group": "[\"input\"]",
+        "defaults": {
+          "name": "Google Drive"
+        },
+        "iconData": {
+          "type": "file",
+          "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiB2aWV3Qm94PSIwIDAgODEgNzMiPjx1c2UgeGxpbms6aHJlZj0iI2EiIHg9Ii41IiB5PSIuNSIvPjxzeW1ib2wgaWQ9ImEiIG92ZXJmbG93PSJ2aXNpYmxlIj48ZyBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZT0ibm9uZSI+PHBhdGggZmlsbD0iIzAwNjZkYSIgZD0ibTYuMDQ4IDYxLjI2IDMuNTI4IDYuMDk0Yy43MzMgMS4yODMgMS43ODcgMi4yOTEgMy4wMjQgMy4wMjRsMTIuNi0yMS44MUgwYTguMyA4LjMgMCAwIDAgMS4xIDQuMTI0eiIvPjxwYXRoIGZpbGw9IiMwMGFjNDciIGQ9Ik00MCAyMi45MSAyNy40IDEuMWMtMS4yMzcuNzMzLTIuMjkxIDEuNzQxLTMuMDI0IDMuMDI0TDEuMSA0NC40NDVBOC4zIDguMyAwIDAgMCAwIDQ4LjU2OGgyNS4yeiIvPjxwYXRoIGZpbGw9IiNlYTQzMzUiIGQ9Ik02Ny40IDcwLjM3OGMxLjIzNy0uNzMzIDIuMjkxLTEuNzQxIDMuMDI0LTMuMDI0bDEuNDY2LTIuNTIgNy4wMS0xMi4xNDJhOC4zIDguMyAwIDAgMCAxLjEtNC4xMjRINTQuNzk4bDUuMzYzIDEwLjUzOHoiLz48cGF0aCBmaWxsPSIjMDA4MzJkIiBkPSJNNDAgMjIuOTEgNTIuNiAxLjFDNTEuMzYzLjM2NyA0OS45NDMgMCA0OC40NzcgMEgzMS41MjRjLTEuNDY2IDAtMi44ODcuNDEyLTQuMTI0IDEuMXoiLz48cGF0aCBmaWxsPSIjMjY4NGZjIiBkPSJNNTQuNzk5IDQ4LjU2OEgyNS4ybC0xMi42IDIxLjgxYzEuMjM3LjczMyAyLjY1NyAxLjEgNC4xMjQgMS4xaDQ2LjU1MmMxLjQ2NiAwIDIuODg3LS40MTIgNC4xMjQtMS4xeiIvPjxwYXRoIGZpbGw9IiNmZmJhMDAiIGQ9Ik02Ny4yNjIgMjQuMjg0IDU1LjYyNCA0LjEyNEM1NC44OTEgMi44NDEgNTMuODM3IDEuODMzIDUyLjYgMS4xTDQwIDIyLjkxbDE0LjggMjUuNjU5aDI1LjE1NWE4LjMgOC4zIDAgMCAwLTEuMS00LjEyNHoiLz48L2c+PC9zeW1ib2w+PC9zdmc+"
+        },
+        "displayName": "Google Drive",
+        "typeVersion": 3,
+        "nodeCategories": [
+          {
+            "id": 3,
+            "name": "Data & Storage"
+          }
+        ]
+      },
+      {
+        "id": 531,
+        "icon": "file:googleDrive.svg",
+        "name": "n8n-nodes-base.googleDriveTrigger",
+        "codex": {
+          "data": {
+            "resources": {
+              "generic": [
+                {
+                  "url": "https://n8n.io/blog/aws-workflow-automation/",
+                  "label": "7 no-code workflow automations for Amazon Web Services"
+                }
+              ],
+              "primaryDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.googledrivetrigger/"
+                }
+              ],
+              "credentialDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/credentials/google/oauth-single-service/"
+                }
+              ]
+            },
+            "categories": [
+              "Data & Storage"
+            ],
+            "nodeVersion": "1.0",
+            "codexVersion": "1.0"
+          }
+        },
+        "group": "[\"trigger\"]",
+        "defaults": {
+          "name": "Google Drive Trigger"
+        },
+        "iconData": {
+          "type": "file",
+          "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiB2aWV3Qm94PSIwIDAgODEgNzMiPjx1c2UgeGxpbms6aHJlZj0iI2EiIHg9Ii41IiB5PSIuNSIvPjxzeW1ib2wgaWQ9ImEiIG92ZXJmbG93PSJ2aXNpYmxlIj48ZyBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZT0ibm9uZSI+PHBhdGggZmlsbD0iIzAwNjZkYSIgZD0ibTYuMDQ4IDYxLjI2IDMuNTI4IDYuMDk0Yy43MzMgMS4yODMgMS43ODcgMi4yOTEgMy4wMjQgMy4wMjRsMTIuNi0yMS44MUgwYTguMyA4LjMgMCAwIDAgMS4xIDQuMTI0eiIvPjxwYXRoIGZpbGw9IiMwMGFjNDciIGQ9Ik00MCAyMi45MSAyNy40IDEuMWMtMS4yMzcuNzMzLTIuMjkxIDEuNzQxLTMuMDI0IDMuMDI0TDEuMSA0NC40NDVBOC4zIDguMyAwIDAgMCAwIDQ4LjU2OGgyNS4yeiIvPjxwYXRoIGZpbGw9IiNlYTQzMzUiIGQ9Ik02Ny40IDcwLjM3OGMxLjIzNy0uNzMzIDIuMjkxLTEuNzQxIDMuMDI0LTMuMDI0bDEuNDY2LTIuNTIgNy4wMS0xMi4xNDJhOC4zIDguMyAwIDAgMCAxLjEtNC4xMjRINTQuNzk4bDUuMzYzIDEwLjUzOHoiLz48cGF0aCBmaWxsPSIjMDA4MzJkIiBkPSJNNDAgMjIuOTEgNTIuNiAxLjFDNTEuMzYzLjM2NyA0OS45NDMgMCA0OC40NzcgMEgzMS41MjRjLTEuNDY2IDAtMi44ODcuNDEyLTQuMTI0IDEuMXoiLz48cGF0aCBmaWxsPSIjMjY4NGZjIiBkPSJNNTQuNzk5IDQ4LjU2OEgyNS4ybC0xMi42IDIxLjgxYzEuMjM3LjczMyAyLjY1NyAxLjEgNC4xMjQgMS4xaDQ2LjU1MmMxLjQ2NiAwIDIuODg3LS40MTIgNC4xMjQtMS4xeiIvPjxwYXRoIGZpbGw9IiNmZmJhMDAiIGQ9Ik02Ny4yNjIgMjQuMjg0IDU1LjYyNCA0LjEyNEM1NC44OTEgMi44NDEgNTMuODM3IDEuODMzIDUyLjYgMS4xTDQwIDIyLjkxbDE0LjggMjUuNjU5aDI1LjE1NWE4LjMgOC4zIDAgMCAwLTEuMS00LjEyNHoiLz48L2c+PC9zeW1ib2w+PC9zdmc+"
+        },
+        "displayName": "Google Drive Trigger",
+        "typeVersion": 1,
+        "nodeCategories": [
+          {
+            "id": 3,
+            "name": "Data & Storage"
+          }
+        ]
+      },
+      {
+        "id": 565,
+        "icon": "fa:sticky-note",
+        "name": "n8n-nodes-base.stickyNote",
+        "codex": {
+          "data": {
+            "alias": [
+              "Comments",
+              "Notes",
+              "Sticky"
+            ],
+            "categories": [
+              "Core Nodes"
+            ],
+            "nodeVersion": "1.0",
+            "codexVersion": "1.0",
+            "subcategories": {
+              "Core Nodes": [
+                "Helpers"
+              ]
+            }
+          }
+        },
+        "group": "[\"input\"]",
+        "defaults": {
+          "name": "Sticky Note",
+          "color": "#FFD233"
+        },
+        "iconData": {
+          "icon": "sticky-note",
+          "type": "icon"
+        },
+        "displayName": "Sticky Note",
+        "typeVersion": 1,
+        "nodeCategories": [
+          {
+            "id": 9,
+            "name": "Core Nodes"
+          }
+        ]
+      },
+      {
+        "id": 1234,
+        "icon": "file:convertToFile.svg",
+        "name": "n8n-nodes-base.convertToFile",
+        "codex": {
+          "data": {
+            "alias": [
+              "CSV",
+              "Spreadsheet",
+              "Excel",
+              "xls",
+              "xlsx",
+              "ods",
+              "tabular",
+              "encode",
+              "encoding",
+              "Move Binary Data",
+              "Binary",
+              "File",
+              "JSON",
+              "HTML",
+              "ICS",
+              "iCal",
+              "RTF",
+              "64",
+              "Base64"
+            ],
+            "resources": {
+              "primaryDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.converttofile/"
+                }
+              ]
+            },
+            "categories": [
+              "Core Nodes"
+            ],
+            "nodeVersion": "1.0",
+            "codexVersion": "1.0",
+            "subcategories": {
+              "Core Nodes": [
+                "Files",
+                "Data Transformation"
+              ]
+            }
+          }
+        },
+        "group": "[\"input\"]",
+        "defaults": {
+          "name": "Convert to File"
+        },
+        "iconData": {
+          "type": "file",
+          "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjc2MTkgMkMxMy4yNDM3IDIgMTIuODIzNiAyLjQyMDA5IDEyLjgyMzYgMi45MzgzMVYxNS4yNTI2QzEzLjMxOTkgMTUuNDY0MyAxMy43ODUxIDE1Ljc3MiAxNC4xOTEgMTYuMTc1N0wyMS4yMjgzIDIzLjE3MzlDMjIuMDU0OCAyMy45OTU4IDIyLjUxOTUgMjUuMTEzMiAyMi41MTk1IDI2LjI3ODhDMjIuNTE5NSAyNy40NDQzIDIyLjA1NDggMjguNTYxOCAyMS4yMjgzIDI5LjM4MzdMMTQuMTkxIDM2LjM4MTlDMTMuNzg1IDM2Ljc4NTYgMTMuMzE5OSAzNy4wOTMyIDEyLjgyMzYgMzcuMzA1VjM3LjM1MjdDMTIuODIzNiAzNy44NzA5IDEzLjI0MzcgMzguMjkxIDEzLjc2MTkgMzguMjkxSDM5LjA2MTdDMzkuNTc5OSAzOC4yOTEgNDAgMzcuODcwOSA0MCAzNy4zNTI3TDQwIDE1Ljc5NEgyNy4xNDQzQzI2LjYyNjEgMTUuNzk0IDI2LjIwNiAxNS4zNzM5IDI2LjIwNiAxNC44NTU3VjJIMTMuNzYxOVoiIGZpbGw9IiMzQTQyRTkiLz4KPHBhdGggZD0iTTI4Ljg2NDUgMkMyOC43NzgxIDIgMjguNzA4MSAyLjA3MDAyIDI4LjcwODEgMi4xNTYzOVYxMi44MjI3QzI4LjcwODEgMTMuMDgxOCAyOC45MTgyIDEzLjI5MTkgMjkuMTc3MyAxMy4yOTE5SDM5Ljg0MzZDMzkuOTMgMTMuMjkxOSA0MCAxMy4yMjE5IDQwIDEzLjEzNTVMNDAgMTIuNjI2M0M0MCAxMi4zNzc4IDM5LjkwMTQgMTIuMTM5NSAzOS43MjYgMTEuOTYzNkwzMC4wNjEgMi4yNzU2MUMyOS44ODUgMi4wOTkxNiAyOS42NDYgMiAyOS4zOTY3IDJIMjguODY0NVoiIGZpbGw9IiMzQTQyRTkiLz4KPHBhdGggZD0iTTkuNzcyNjggMzQuNjAwM0M5LjA0MTg2IDMzLjg2NTQgOS4wNDUxNyAzMi42NzcyIDkuNzgwMDcgMzEuOTQ2NEwxMy42MzE1IDI4LjExNjNMMC45MzgzMTEgMjguMTE2M0MwLjQyMDA5NiAyOC4xMTYzIC0yLjI2NTE5ZS0wOCAyNy42OTYyIDAgMjcuMTc4TDguMjAyOTdlLTA4IDI1LjMwMTRDMS4wNDY4MmUtMDcgMjQuNzgzMiAwLjQyMDA5NSAyNC4zNjMxIDAuOTM4MzExIDI0LjM2MzFIMTMuNTUyOUw5Ljc4MDA3IDIwLjYxMTJDOS4wNDUxNyAxOS44ODA0IDkuMDQxODYgMTguNjkyMiA5Ljc3MjY4IDE3Ljk1NzNDMTAuNTAzNSAxNy4yMjI0IDExLjY5MTcgMTcuMjE5MSAxMi40MjY2IDE3Ljk0OTlMMTkuNDYzOSAyNC45NDgxQzE5LjgxODEgMjUuMzAwNCAyMC4wMTczIDI1Ljc3OTMgMjAuMDE3MyAyNi4yNzg4QzIwLjAxNzMgMjYuNzc4MyAxOS44MTgxIDI3LjI1NzIgMTkuNDYzOSAyNy42MDk1TDEyLjQyNjYgMzQuNjA3N0MxMS42OTE3IDM1LjMzODUgMTAuNTAzNSAzNS4zMzUyIDkuNzcyNjggMzQuNjAwM1oiIGZpbGw9IiMzQTQyRTkiLz4KPC9zdmc+Cg=="
+        },
+        "displayName": "Convert to File",
+        "typeVersion": 1,
+        "nodeCategories": [
+          {
+            "id": 9,
+            "name": "Core Nodes"
+          }
+        ]
+      },
+      {
+        "id": 1250,
+        "icon": "file:openAi.svg",
+        "name": "@n8n/n8n-nodes-langchain.openAi",
+        "codex": {
+          "data": {
+            "alias": [
+              "LangChain",
+              "ChatGPT",
+              "Sora",
+              "DallE",
+              "whisper",
+              "audio",
+              "transcribe",
+              "tts",
+              "assistant"
+            ],
+            "resources": {
+              "primaryDocumentation": [
+                {
+                  "url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-langchain.openai/"
+                }
+              ]
+            },
+            "categories": [
+              "AI",
+              "Langchain"
+            ],
+            "subcategories": {
+              "AI": [
+                "Agents",
+                "Miscellaneous",
+                "Root Nodes"
+              ]
+            }
+          }
+        },
+        "group": "[\"transform\"]",
+        "defaults": {
+          "name": "OpenAI"
+        },
+        "iconData": {
+          "type": "file",
+          "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTM2Ljg2NzEgMTYuMzcxOEMzNy43NzQ2IDEzLjY0OCAzNy40NjIxIDEwLjY2NDIgMzYuMDEwOCA4LjE4NjYxQzMzLjgyODIgNC4zODY1MyAyOS40NDA3IDIuNDMxNDkgMjUuMTU1NiAzLjM1MTUxQzIzLjI0OTMgMS4yMDM5NiAyMC41MTA1IC0wLjAxNzMxNDggMTcuNjM5MiAwLjAwMDE4NTUzM0MxMy4yNTkxIC0wLjAwOTgxNDY4IDkuMzcyNzMgMi44MTAyNSA4LjAyNTIgNi45Nzc4M0M1LjIxMTM5IDcuNTU0MSAyLjc4MjU4IDkuMzE1MzggMS4zNjEzIDExLjgxMTdDLTAuODM3NDkzIDE1LjYwMTggLTAuMzM2MjMyIDIwLjM3OTQgMi42MDEzMyAyMy42Mjk0QzEuNjkzODEgMjYuMzUzMiAyLjAwNjMyIDI5LjMzNzEgMy40NTc2IDMxLjgxNDZDNS42NDAxNSAzNS42MTQ3IDEwLjAyNzcgMzcuNTY5NyAxNC4zMTI4IDM2LjY0OTdDMTYuMjE3OSAzOC43OTczIDE4Ljk1NzkgNDAuMDE4NSAyMS44MjkyIDM5Ljk5OThDMjYuMjExOCA0MC4wMTEgMzAuMDk5NCAzNy4xODg1IDMxLjQ0NjkgMzMuMDE3MUMzNC4yNjA4IDMyLjQ0MDkgMzYuNjg5NiAzMC42Nzk2IDM4LjExMDggMjguMTgzM0M0MC4zMDcxIDI0LjM5MzIgMzkuODA0NiAxOS42MTk0IDM2Ljg2ODMgMTYuMzY5M0wzNi44NjcxIDE2LjM3MThaTTIxLjgzMTcgMzcuMzg2QzIwLjA3OCAzNy4zODg1IDE4LjM3OTIgMzYuNzc0NyAxNy4wMzI5IDM1LjY1MDlDMTcuMDk0MSAzNS42MTg1IDE3LjIwMDQgMzUuNTU5NyAxNy4yNjkxIDM1LjUxNzJMMjUuMjM0MyAzMC45MTcxQzI1LjY0MTggMzAuNjg1OCAyNS44OTE4IDMwLjI1MjEgMjUuODg5MyAyOS43ODMzVjE4LjU1NDNMMjkuMjU1NiAyMC40OTgxQzI5LjI5MTkgMjAuNTE1NiAyOS4zMTU3IDIwLjU1MDYgMjkuMzIwNyAyMC41OTA2VjI5Ljg4OTZDMjkuMzE1NyAzNC4wMjQ3IDI1Ljk2NjggMzcuMzc3MiAyMS44MzE3IDM3LjM4NlpNNS43MjY0IDMwLjUwNzFDNC44NDc2MyAyOC45ODk2IDQuNTMxMzcgMjcuMjEwOCA0LjgzMjYzIDI1LjQ4NDVDNC44OTEzOCAyNS41MTk1IDQuOTk1MTMgMjUuNTgzMiA1LjA2ODg4IDI1LjYyNTdMMTMuMDM0MSAzMC4yMjU4QzEzLjQzNzggMzAuNDYyMSAxMy45Mzc4IDMwLjQ2MjEgMTQuMzQyOCAzMC4yMjU4TDI0LjA2NjggMjQuNjEwN1YyOC40OTgzQzI0LjA2OTMgMjguNTM4MyAyNC4wNTA1IDI4LjU3NyAyNC4wMTkzIDI4LjYwMkwxNS45Njc5IDMzLjI1MDlDMTIuMzgxNSAzNS4zMTU5IDcuODAxNDQgMzQuMDg4NCA1LjcyNzY1IDMwLjUwNzFINS43MjY0Wk0zLjYzMDEgMTMuMTIwNUM0LjUwNTEyIDExLjYwMDQgNS44ODY0IDEwLjQzNzkgNy41MzE0NCA5LjgzNDE1QzcuNTMxNDQgOS45MDI5IDcuNTI3NjkgMTAuMDI0MSA3LjUyNzY5IDEwLjEwOTJWMTkuMzEwNkM3LjUyNTE5IDE5Ljc3ODEgNy43NzUxOSAyMC4yMTE5IDguMTgxNDUgMjAuNDQzMUwxNy45MDU0IDI2LjA1N0wxNC41MzkxIDI4LjAwMDhDMTQuNTA1MyAyOC4wMjMzIDE0LjQ2MjggMjguMDI3IDE0LjQyNTMgMjguMDEwOEw2LjM3MjY2IDIzLjM1ODJDMi43OTM4MyAyMS4yODU2IDEuNTY2MzEgMTYuNzA2OCAzLjYyODg1IDEzLjEyMTdMMy42MzAxIDEzLjEyMDVaTTMxLjI4ODIgMTkuNTU2OUwyMS41NjQyIDEzLjk0MTdMMjQuOTMwNiAxMS45OTkyQzI0Ljk2NDMgMTEuOTc2NyAyNS4wMDY4IDExLjk3MjkgMjUuMDQ0MyAxMS45ODkyTDMzLjA5NyAxNi42MzhDMzYuNjgyMSAxOC43MDkzIDM3LjkxMDggMjMuMjk1NyAzNS44Mzk1IDI2Ljg4MDhDMzQuOTYzMyAyOC4zOTgzIDMzLjU4MzIgMjkuNTYwOCAzMS45Mzk1IDMwLjE2NThWMjAuNjg5NEMzMS45NDMyIDIwLjIyMTkgMzEuNjk0NSAxOS43ODk0IDMxLjI4OTQgMTkuNTU2OUgzMS4yODgyWk0zNC42MzgzIDE0LjUxNDJDMzQuNTc5NSAxNC40NzggMzQuNDc1OCAxNC40MTU1IDM0LjQwMiAxNC4zNzNMMjYuNDM2OCA5Ljc3Mjg5QzI2LjAzMzEgOS41MzY2NCAyNS41MzMxIDkuNTM2NjQgMjUuMTI4MSA5Ljc3Mjg5TDE1LjQwNDEgMTUuMzg4VjExLjUwMDRDMTUuNDAxNiAxMS40NjA0IDE1LjQyMDQgMTEuNDIxNyAxNS40NTE2IDExLjM5NjdMMjMuNTAzIDYuNzUxNThDMjcuMDg5NCA0LjY4Mjc5IDMxLjY3NDUgNS45MTQwNiAzMy43NDIgOS41MDE2NEMzNC42MTU4IDExLjAxNjcgMzQuOTMyIDEyLjc5MDUgMzQuNjM1OCAxNC41MTQySDM0LjYzODNaTTEzLjU3NDEgMjEuNDQzMUwxMC4yMDY1IDE5LjQ5OTRDMTAuMTcwMiAxOS40ODE5IDEwLjE0NjUgMTkuNDQ2OCAxMC4xNDE1IDE5LjQwNjhWMTAuMTA3OUMxMC4xNDQgNS45Njc4MSAxMy41MDI4IDIuNjEyNzQgMTcuNjQyOSAyLjYxNTI0QzE5LjM5NDIgMi42MTUyNCAyMS4wODkyIDMuMjMwMjUgMjIuNDM1NSA0LjM1MDI4QzIyLjM3NDMgNC4zODI3OCAyMi4yNjkzIDQuNDQxNTMgMjIuMTk5MiA0LjQ4NDAzTDE0LjIzNDEgOS4wODQxM0MxMy44MjY2IDkuMzE1MzggMTMuNTc2NiA5Ljc0Nzg5IDEzLjU3OTEgMTAuMjE2N0wxMy41NzQxIDIxLjQ0MDZWMjEuNDQzMVpNMTUuNDAyOSAxNy41MDA2TDE5LjczNDIgMTQuOTk5M0wyNC4wNjU1IDE3LjQ5OTNWMjIuNTAwN0wxOS43MzQyIDI1LjAwMDdMMTUuNDAyOSAyMi41MDA3VjE3LjUwMDZaIiBmaWxsPSJibGFjayIvPgo8L3N2Zz4K"
+        },
+        "displayName": "OpenAI",
+        "typeVersion": 2,
+        "nodeCategories": [
+          {
+            "id": 25,
+            "name": "AI"
+          },
+          {
+            "id": 26,
+            "name": "Langchain"
+          }
+        ]
+      }
+    ],
+    "categories": [
+      {
+        "id": 35,
+        "name": "Document Extraction"
+      },
+      {
+        "id": 51,
+        "name": "Multimodal AI"
+      }
+    ],
+    "image": []
+  }
+}

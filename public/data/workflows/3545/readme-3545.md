@@ -1,0 +1,79 @@
+# Automate purchase order form submissions from Outlook Excel attachments with AI
+
+> ### This n8n template imports purchase order submissions from Outlook and converts attached purchase order forms in XLSX format into structured output.
+
+Data entry jobs with user-submitted XLSX forms are time consuming, incredibly mundane but necessary tasks which in likelihood are inherited and critical to business operation.
+
+While we could dream of system overhauls and modernisation, the fact is that change is hard. There is another way however -  using n8n and AI! N8N offers an end-to-end solution to parse XLSX form attachments using LLM-powered OCR and send the extracted output to your ERP or otherwise.
+
+### How it works
+* An Outlook trigger is used to watch for incoming purchase order forms submitted via a shared inbox.
+* The email attachment for the submission is a form in xlsx format - like this one [Purchase Order Example](https://1drv.ms/x/c/8f1f7dda12b7a145/ETWH8dKwgZ1OiVz7ISUWYf8BwiyihBjXPXEbCYkVi8XDyw?e=WWU2eR) - which is imported into the workflow.
+* The 'Extract from File' node is used with the 'code' node to convert the xlsx file to markdown. This is so our LLM can understand it.
+* The Information Extractor node is used to read and extract the relevant purchase order details and line items from the form.
+* A simple validation step is used to check for common errors such as missing PO number or the amounts not matching up. A notification is automated to reply to the buyer if so.
+* Once validation passes, a confirmation is sent to the buyer and the purchase order structured output can be sent along to internal systems.
+
+### How to use
+* This template only works if you're expecting and receiving forms in XLSX format. These can be invoices, request forms as well as purchase order forms.
+* Update the Outlook nodes with your email or other emails as required.
+* What's next? I've omitted the last steps to send to an ERP or accounting system as this is dependent on your org.
+
+### Requirements
+* Outlook for Emails
+  * Check out how to setup credentials here: [https://docs.n8n.io/integrations/builtin/credentials/microsoft](https://docs.n8n.io/integrations/builtin/credentials/microsoft/)
+* OpenAI for LLM document understanding and extraction.
+
+### Customising the workflow
+* This template should work for other Excel files. Some will be more complicated than others so experiment with different parsers and extraction tools and strategies.
+* Customise the Information Extractor Schema to pull out the specific data you need. For example, capture any notes or comments given by the buyer.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3545
+- **Complexity:** advanced
+- **Node Count:** 22
+- **Views:** 3614
+- **Downloads:** 361
+- **Created:** 2025/4/14
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3545)
+
+## 👤 Author
+
+- **Name:** Jimleuk
+- **Username:** @jimleuk
+
+## 🏷️ Categories
+
+- Invoice Processing
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×6)
+- **@n8n/n8n-nodes-langchain.informationExtractor** 
+- **if** (×2)
+- **set** (×2)
+- **extractFromFile** 
+- **code** 
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** (×2)
+- **microsoftOutlook** (×3)
+- **microsoftOutlookTrigger** 
+- **noOp** (×2)
+- **@n8n/n8n-nodes-langchain.textClassifier** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 22 nodes with 12 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

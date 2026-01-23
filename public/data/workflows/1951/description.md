@@ -1,0 +1,3 @@
+This workflow integrates both web scraping and NLP functionalities. It uses HTML parsing to extract links, HTTP requests to fetch essay content, and AI-based summarization using GPT-4o. It's an excellent example of an end-to-end automated task that is not only efficient but also provides real value by summarizing valuable content.
+
+Note that to use this template, you need to be on n8n version 1.50.0 or later.

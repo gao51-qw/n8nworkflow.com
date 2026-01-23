@@ -1,0 +1,182 @@
+{
+  "id": 7957,
+  "slug": "7957",
+  "title": "Conversational Meta ads reporting & management with GPT-5",
+  "description": "Currently Work-In-Progress\n\nThis n8n template creates an intelligent AI assistant that responds to chat messages, providing conversational access to your Meta Ads data. Powered by an OpenAI GPT-5 model and equipped with memory to maintain context, this agent can interact with your Meta Ads accounts via the Facebook Graph API.\n\nUsers can ask it to:\n* **List all connected ad accounts.**\n* **Retrieve detailed information** for a specific ad account, including active campaigns, ad sets, and individual ads.\n* **Fetch performance insights** (e.g., spend, impressions, conversions, CPC, CPM, CTR, ROAS) for a given account and time range.\n \nIdeal for **marketers, advertisers**, or anyone needing quick, conversational access to their Meta Ads performance data and campaign structure without logging into the Ad Manager directly.\n\nRequires: OpenAI and Facebook Graph API credentials.",
+  "featuredImage": "/data/workflows/7957/7957.webp",
+  "author": {
+    "id": 101,
+    "slug": "kroziewski",
+    "name": "Konrad Roziewski",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3551,
+  "downloads": 355,
+  "createdAt": "2025-08-27T16:01:05.882Z",
+  "updatedAt": "2026-01-16T08:53:15.719Z",
+  "publishedAt": "2025-08-27T16:01:05.882Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7957",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Conversational Meta ads reporting & management with GPT-5",
+    "workflowName": "Conversational Meta ads reporting & management with GPT-5",
+    "description": "Currently Work-In-Progress\n\nThis n8n template creates an intelligent AI assistant that responds to chat messages, providing conversational access to your Meta Ads data. Powered by an OpenAI GPT-5 model and equipped with memory to maintain context, this agent can interact with your Meta Ads accounts via the Facebook Graph API.\n\nUsers can ask it to:\n* **List all connected ad accounts.**\n* **Retrieve detailed information** for a specific ad account, including active campaigns, ad sets, and individual ads.\n* **Fetch performance insights** (e.g., spend, impressions, conversions, CPC, CPM, CTR, ROAS) for a given account and time range.\n \nIdeal for **marketers, advertisers**, or anyone needing quick, conversational access to their Meta Ads performance data and campaign structure without logging into the Ad Manager directly.\n\nRequires: OpenAI and Facebook Graph API credentials.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "list accounts",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "account details",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "graph: adaccounts",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "account: campaigns",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "account: adsets",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "account: ads",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "since, until",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "fix missing act_",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "account insights",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ads: insights",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ad details",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

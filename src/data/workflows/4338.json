@@ -1,0 +1,115 @@
+{
+  "id": 4338,
+  "slug": "4338",
+  "title": "N8N backup flow to Nextcloud (7-day retention)",
+  "description": "This workflow automates the daily backup of all your n8n workflows to a designated folder in Nextcloud. It ensures that you always have the last 7 days of backups available while automatically deleting older ones to save space.\n\n\n🔧 Features\n\n    Scheduled Trigger: Runs automatically once per day (can be executed manually as well).\n\n    Directory Management: Creates the /N8N-Backup directory in Nextcloud if it doesn't already exist.\n\n    Backup Collection: Retrieves all workflows from the n8n instance.\n\n    JSON Conversion: Converts each workflow into a JSON file.\n\n    Upload to Nextcloud: Saves each backup file into the specified backup directory.\n\n    Retention Control: Keeps only the latest 7 backups and deletes the rest from Nextcloud.\n\n📌 Notes\n\n    Make sure to manually create the /N8N-Backup directory in your Nextcloud account before using this flow.\n\n    Update the Backup Path node if you wish to change the upload directory.\n\n    Ideal for teams using n8n with self-hosted instances and requiring offsite backup via Nextcloud.\n\n🔒 Requirements\n\n    n8n instance with access to the Nextcloud node.\n\n    Valid credentials for your Nextcloud account with API access.\n\n\nUpdate: 08/11/2025 “Backup Flows to Nextcloud” – Import format fixed\n\nSummary:\nThe workflow now exports one clean JSON object per workflow (no arrays, no backup/meta fields), so files can be imported 1:1 via the n8n UI.\n\nWhat changed:\n\n    Switched from “Convert to File” to a Set node that builds the JSON in binary data.\n\n    Enabled filters.include = \"all\" on Get many workflows to include nodes, connections, settings, pinData, and tags.\n\n    Sanitized filenames and removed IDs/metadata that can break UI imports.\n\n    Fixed Nextcloud path and binary property mapping (data).\n\nVerification:\n\n    Generated multiple backups and imported each via UI (“Import from file”) without errors.\n\n    Each file begins with { (single object) and loads with full workflow structure.\n\nNotes:\n\n    Keep “Binary Property” set to data in the Nextcloud node.\n\n    Filenames are sanitized to avoid special-character issues.",
+  "featuredImage": "/data/workflows/4338/4338.webp",
+  "author": {
+    "id": 101,
+    "slug": "jhummel",
+    "name": "Joachim Hummel",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1086,
+  "downloads": 108,
+  "createdAt": "2025-05-23T09:21:20.581Z",
+  "updatedAt": "2026-01-16T08:33:53.802Z",
+  "publishedAt": "2025-05-23T09:21:20.581Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4338",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "N8N backup flow to Nextcloud (7-day retention)",
+    "workflowName": "N8N backup flow to Nextcloud (7-day retention)",
+    "description": "This workflow automates the daily backup of all your n8n workflows to a designated folder in Nextcloud. It ensures that you always have the last 7 days of backups available while automatically deleting older ones to save space.\n\n\n🔧 Features\n\n    Scheduled Trigger: Runs automatically once per day (can be executed manually as well).\n\n    Directory Management: Creates the /N8N-Backup directory in Nextcloud if it doesn't already exist.\n\n    Backup Collection: Retrieves all workflows from the n8n instance.\n\n    JSON Conversion: Converts each workflow into a JSON file.\n\n    Upload to Nextcloud: Saves each backup file into the specified backup directory.\n\n    Retention Control: Keeps only the latest 7 backups and deletes the rest from Nextcloud.\n\n📌 Notes\n\n    Make sure to manually create the /N8N-Backup directory in your Nextcloud account before using this flow.\n\n    Update the Backup Path node if you wish to change the upload directory.\n\n    Ideal for teams using n8n with self-hosted instances and requiring offsite backup via Nextcloud.\n\n🔒 Requirements\n\n    n8n instance with access to the Nextcloud node.\n\n    Valid credentials for your Nextcloud account with API access.\n\n\nUpdate: 08/11/2025 “Backup Flows to Nextcloud” – Import format fixed\n\nSummary:\nThe workflow now exports one clean JSON object per workflow (no arrays, no backup/meta fields), so files can be imported 1:1 via the n8n UI.\n\nWhat changed:\n\n    Switched from “Convert to File” to a Set node that builds the JSON in binary data.\n\n    Enabled filters.include = \"all\" on Get many workflows to include nodes, connections, settings, pinData, and tags.\n\n    Sanitized filenames and removed IDs/metadata that can break UI imports.\n\n    Fixed Nextcloud path and binary property mapping (data).\n\nVerification:\n\n    Generated multiple backups and imported each via UI (“Import from file”) without errors.\n\n    Each file begins with { (single object) and loads with full workflow structure.\n\nNotes:\n\n    Keep “Binary Property” set to data in the Nextcloud node.\n\n    Filenames are sanitized to avoid special-character issues.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "n8n",
+      "type": "n8n-nodes-base.n8n",
+      "role": "n8n",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Backups",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Backup Path",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Nextcloud Directory",
+      "type": "n8n-nodes-base.nextCloud",
+      "role": "nextCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Nextcloud Upload",
+      "type": "n8n-nodes-base.nextCloud",
+      "role": "nextCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Nextcloud List Dir",
+      "type": "n8n-nodes-base.nextCloud",
+      "role": "nextCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limits Backups",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Nextcloud - Delete old backups",
+      "type": "n8n-nodes-base.nextCloud",
+      "role": "nextCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+# Qualify webhook leads with GPT-4o-mini and create Asana tasks automatically
+
+> ## 📊 Description
+Automate your inbound lead qualification pipeline by enriching raw lead data, scoring it with AI, and instantly creating follow-up tasks for your sales team. 🎯🤖 This workflow receives new leads via webhook, enriches them using RocketReach to fetch verified emails and contact details, applies confidence-based filtering, and uses GPT-4o-mini to score each lead based on seniority, company fit, and data quality. High-quality leads automatically generate Asana tasks and Slack notifications, while low-quality leads are safely filtered out — ensuring your team focuses only on the best opportunities. 🚀📋
+## 🔁 What This Template Does
+1️⃣ Receives inbound lead data via webhook (name, company, job title, LinkedIn URL). 🌐
+ 2️⃣ Normalizes incoming data into a clean, structured format. 🧾
+ 3️⃣ Enriches lead profiles using RocketReach to fetch emails and phone numbers. 📇
+ 4️⃣ Calculates email confidence scores based on quality grades (A–D). 📊
+ 5️⃣ Filters out low-confidence leads automatically. 🚫
+ 6️⃣ Uses AI (GPT-4o-mini) to score qualified leads from 1–10. 🤖
+ 7️⃣ Assigns priority levels (High / Medium / Low) with reasoning. 🧠
+ 8️⃣ Creates an Asana task for leads scoring above the threshold. ✅
+ 9️⃣ Sends Slack notifications for both qualified and disqualified leads. 💬
+ 🔟 Returns a structured webhook response with scoring results. 🔁
+ 1️⃣1️⃣ Sends Gmail alerts automatically if any workflow error occurs. 🚨
+## ⭐ Key Benefits
+✅ Eliminates manual lead enrichment and qualification
+ ✅ Uses verified contact data from RocketReach
+ ✅ AI scoring ensures consistent, unbiased lead evaluation
+ ✅ Automatically routes high-quality leads to sales via Asana
+ ✅ Keeps teams informed with real-time Slack notifications
+ ✅ Prevents sales effort from being wasted on low-quality leads
+## 🧩 Features
+- Webhook-based inbound lead intake
+- RocketReach profile enrichment
+- Email confidence scoring logic
+- AI lead scoring with strict JSON output
+- Configurable quality and score thresholds
+- Automatic Asana task creation
+- Slack alerts for qualified and disqualified leads
+- Gmail-based error handling
+Frontend-ready webhook responses
+## 🔐 Requirements
+- RocketReach API key
+- OpenAI API key (GPT-4o-mini recommended)
+- Asana OAuth2 credentials
+- Slack API credentials
+- Gmail OAuth2 credentials (for error alerts)
+- Webhook client sending lead details (first_name, last_name, company, job_title, linkedin_url)
+## 🎯 Target Audience
+- B2B sales teams handling inbound leads
+- Revenue operations (RevOps) teams
+- SaaS companies optimizing lead qualification
+- Lead generation agencies
+- Automation teams building AI-driven sales pipelines
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 12480
+- **Complexity:** advanced
+- **Node Count:** 23
+- **Views:** 10
+- **Downloads:** 1
+- **Created:** 2026/1/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/12480)
+
+## 👤 Author
+
+- **Name:** Rahul Joshi
+- **Username:** @rahul08
+
+## 🏷️ Categories
+
+- Lead Generation
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×7)
+- **webhook** 
+- **set** (×2)
+- **if** (×2)
+- **@n8n/n8n-nodes-langchain.openAi** 
+- **respondToWebhook** (×3)
+- **httpRequest** 
+- **code** 
+- **asana** 
+- **slack** (×2)
+- **errorTrigger** 
+- **gmail** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 23 nodes with 12 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

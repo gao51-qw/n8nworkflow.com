@@ -1,0 +1,230 @@
+{
+  "id": 10142,
+  "slug": "10142",
+  "title": "Website chatbot with Google Drive knowledge base using GPT-4 and Mistral AI",
+  "description": "#  AI-Powered Website Chatbot with Google Drive Knowledge Base\n\n\n##  Overview\nThis workflow combines **website chatbot intelligence** with **automated document ingestion and vectorization** — enabling live Q&A from both **chat input** and **processed Google Drive files**.  \nIt uses **Mistral AI** for OCR + embeddings, and **Qdrant** for vector search.\n\n---\n\n##  Chatbot Flow\n- **Trigger:** `When chat message received` or `webhook` based upon deployed chatbot\n- **Model:** `OpenAI gpt-4.1-mini`\n- **Memory:** `Simple Memory (Buffer Window)`\n- **Vector Search Tool:** `Qdrant Vector Store `\n- **Embeddings:** `Mistral Cloud`\n- **Agent:** `website chat agent`\n  - Responds based on `chatdbtai` Supabase content\n  - Enforces brand tone and informative documents.\n  - Integratration  with both:\n    - **Embedded chat** UI\n    - **Webhook** \n\n---\n\n##  Document → Knowledge Base Pipeline\nTriggered manually to keep vector store up-to-date.\n\n### Steps\n1. **Google Drive (brand folder)**  \n   → Fetch files from folder `Website kb (ID: 1o3DK9Ceka5Lqb8irvFSfEeB8SVGG_OL7)`\n2. **Loop Over Items**  \n   → For each file:\n   - `Set metadata`\n   - `Download file`\n   - `Upload to Mistral` for OCR\n   - `Get Signed URL`\n   - `Run OCR extraction` (`mistral-ocr-latest`)\n3. **If OCR success**  \n   → Pass to chunking pipeline  \n   Else → skip and continue\n4. **Chunking Logic (`Code` node)**  \n   - Splits document into 1,000-character JSON chunks  \n   - Adds metadata (source, char positions, file ID)\n5. **Default Data Loader + Text Splitter**  \n   → Prepares chunks for embedding\n6. **Embeddings (Mistral Cloud)**  \n   → Generates embeddings for text chunks\n7. **Qdrant Vector Store (Insert mode)**  \n   → Saves embeddings into `docragtestkb` collection\n8. **Wait**  \n   → Optional delay between batches\n\n---\n\n##  Integrations Used\n| Service | Purpose | Credential |\n|----------|----------|------------|\n| **Google Drive** | File source | `Google Drive account 6 rn dbt` |\n| **Mistral Cloud** | OCR + embeddings | `Mistral Cloud account 2 dbt rn` |\n| **Qdrant** | Vector storage | `QdrantApi account` |\n| **OpenAI** | Chat model | `OpenAi account 8 dbt digi` |\n\n---\n\n##  Agent System Prompt Summary\n&gt; “You are the official AI assistant for this website.  \nUse `chatdbtai` only as your knowledge source.  \nRespond conversationally, list offerings clearly, link blogs, and say  \n‘I couldn’t find that on this site’ if no match.”\n\n---\n\n##  Key Features\n- ✅ Automated OCR + chunking → vectorization  \n- ✅ Persistent memory for chat sessions  \n- ✅ Multi-channel (Webhook + Embedded Chat)  \n- ✅ Fully brand-guided, structured responses  \n- ✅ Live data retrieval from Qdrant vector store  \n\n\n---\n\n##  Summary\n&gt; A unified workflow that turns brand files + web content into a **knowledge base** that powers a intelligent chatbot — capable of responding to visitors in real time, powered by **Mistral**, **OpenAI**, and **Qdrant**.\n\n---\n\n###  **Need Help or More Workflows?**\nWant to customize this workflow for your business or integrate it with your existing tools?  \nOur team at **Digital Biz Tech** can tailor it precisely to your use case  from automation logic to AI-powered enhancements.  \n\n💡 We can help you set it up for free — from connecting credentials to deploying it live.\n\nContact: [shilpa.raju@digitalbiz.tech](mailto:shilpa.raju@digitalbiz.tech)  \nWebsite: [https://www.digitalbiz.tech](https://www.digitalbiz.tech)  \nLinkedIn: [https://www.linkedin.com/company/digital-biz-tech/](https://www.linkedin.com/company/digital-biz-tech/)  \nYou can also DM us on LinkedIn for any help.\n\n---",
+  "featuredImage": "/data/workflows/10142/10142.webp",
+  "author": {
+    "id": 101,
+    "slug": "dbt",
+    "name": "DIGITAL BIZ TECH",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1221,
+  "downloads": 122,
+  "createdAt": "2025-10-25T05:51:33.317Z",
+  "updatedAt": "2026-01-16T09:03:38.619Z",
+  "publishedAt": "2025-10-25T05:51:33.317Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10142",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Website chatbot with Google Drive knowledge base using GPT-4 and Mistral AI",
+    "workflowName": "Website chatbot with Google Drive knowledge base using GPT-4 and Mistral AI",
+    "description": "#  AI-Powered Website Chatbot with Google Drive Knowledge Base\n\n\n##  Overview\nThis workflow combines **website chatbot intelligence** with **automated document ingestion and vectorization** — enabling live Q&A from both **chat input** and **processed Google Drive files**.  \nIt uses **Mistral AI** for OCR + embeddings, and **Qdrant** for vector search.\n\n---\n\n##  Chatbot Flow\n- **Trigger:** `When chat message received` or `webhook` based upon deployed chatbot\n- **Model:** `OpenAI gpt-4.1-mini`\n- **Memory:** `Simple Memory (Buffer Window)`\n- **Vector Search Tool:** `Qdrant Vector Store `\n- **Embeddings:** `Mistral Cloud`\n- **Agent:** `website chat agent`\n  - Responds based on `chatdbtai` Supabase content\n  - Enforces brand tone and informative documents.\n  - Integratration  with both:\n    - **Embedded chat** UI\n    - **Webhook** \n\n---\n\n##  Document → Knowledge Base Pipeline\nTriggered manually to keep vector store up-to-date.\n\n### Steps\n1. **Google Drive (brand folder)**  \n   → Fetch files from folder `Website kb (ID: 1o3DK9Ceka5Lqb8irvFSfEeB8SVGG_OL7)`\n2. **Loop Over Items**  \n   → For each file:\n   - `Set metadata`\n   - `Download file`\n   - `Upload to Mistral` for OCR\n   - `Get Signed URL`\n   - `Run OCR extraction` (`mistral-ocr-latest`)\n3. **If OCR success**  \n   → Pass to chunking pipeline  \n   Else → skip and continue\n4. **Chunking Logic (`Code` node)**  \n   - Splits document into 1,000-character JSON chunks  \n   - Adds metadata (source, char positions, file ID)\n5. **Default Data Loader + Text Splitter**  \n   → Prepares chunks for embedding\n6. **Embeddings (Mistral Cloud)**  \n   → Generates embeddings for text chunks\n7. **Qdrant Vector Store (Insert mode)**  \n   → Saves embeddings into `docragtestkb` collection\n8. **Wait**  \n   → Optional delay between batches\n\n---\n\n##  Integrations Used\n| Service | Purpose | Credential |\n|----------|----------|------------|\n| **Google Drive** | File source | `Google Drive account 6 rn dbt` |\n| **Mistral Cloud** | OCR + embeddings | `Mistral Cloud account 2 dbt rn` |\n| **Qdrant** | Vector storage | `QdrantApi account` |\n| **OpenAI** | Chat model | `OpenAi account 8 dbt digi` |\n\n---\n\n##  Agent System Prompt Summary\n&gt; “You are the official AI assistant for this website.  \nUse `chatdbtai` only as your knowledge source.  \nRespond conversationally, list offerings clearly, link blogs, and say  \n‘I couldn’t find that on this site’ if no match.”\n\n---\n\n##  Key Features\n- ✅ Automated OCR + chunking → vectorization  \n- ✅ Persistent memory for chat sessions  \n- ✅ Multi-channel (Webhook + Embedded Chat)  \n- ✅ Fully brand-guided, structured responses  \n- ✅ Live data retrieval from Qdrant vector store  \n\n\n---\n\n##  Summary\n&gt; A unified workflow that turns brand files + web content into a **knowledge base** that powers a intelligent chatbot — capable of responding to visitors in real time, powered by **Mistral**, **OpenAI**, and **Qdrant**.\n\n---\n\n###  **Need Help or More Workflows?**\nWant to customize this workflow for your business or integrate it with your existing tools?  \nOur team at **Digital Biz Tech** can tailor it precisely to your use case  from automation logic to AI-powered enhancements.  \n\n💡 We can help you set it up for free — from connecting credentials to deploying it live.\n\nContact: [shilpa.raju@digitalbiz.tech](mailto:shilpa.raju@digitalbiz.tech)  \nWebsite: [https://www.digitalbiz.tech](https://www.digitalbiz.tech)  \nLinkedIn: [https://www.linkedin.com/company/digital-biz-tech/](https://www.linkedin.com/company/digital-biz-tech/)  \nYou can also DM us on LinkedIn for any help.\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings Mistral Cloud",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings Mistral Cloud1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set metadata",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Mistral Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Mistral Signed URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Mistral DOC OCR",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Drive(brand related data for chatbot)",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Drive(load file)",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code(convert to chunks for loading into vector db)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "prepare for chunking",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "website chat agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

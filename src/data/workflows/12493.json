@@ -1,0 +1,218 @@
+{
+  "id": 12493,
+  "slug": "12493",
+  "title": "Reconcile Stripe, bank, and e-commerce data with GPT-4.1 and Google Sheets",
+  "description": "## How It Works\nThis workflow automates financial reconciliation by orchestrating multiple AI agents to detect mismatches, analyze root causes, and apply corrections across bank statements, invoices, and e-commerce platforms. Designed for finance teams, accountants, and business owners managing high transaction volumes, it eliminates manual reconciliation tedious work that typically consumes hours weekly. The system retrieves financial data from Stripe, banking APIs, and e-commerce platforms, then feeds it to specialized AI agents: one detects discrepancies using pattern recognition, another performs root cause analysis, and a third generates ledger corrections. An orchestrator agent coordinates these specialists, ensuring systematic processing. Results are logged to Google Sheets and trigger email notifications for critical issues, creating an audit trail while reducing reconciliation time from hours to minutes with 95%+ accuracy.\n\n## Setup Steps\n1. Configure Stripe API credentials in \"Get Stripe Transactions\" node\n2. Add banking API authentication for \"Get Bank Feed Data\" node\n3. Connect e-commerce platform (Shopify/WooCommerce) credentials  \n4. Input NVIDIA API key for all OpenAI Model nodes\n5. Set OpenAI API key in Orchestrator Agent\n6. Configure Gmail credentials for notification node\n\n## Prerequisites\nNVIDIA API access, OpenAI API key, Stripe account\n## Use Cases\nMonthly financial close automation, daily transaction reconciliation\n## Customization\nModify detection thresholds, add custom financial data sources\n## Benefits\nReduces reconciliation time by 90%, eliminates manual data entry errors",
+  "featuredImage": "/data/workflows/12493/12493.webp",
+  "author": {
+    "id": 101,
+    "slug": "cschin",
+    "name": "Cheng Siong Chin",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 19,
+  "downloads": 1,
+  "createdAt": "2026-01-05T17:02:21.144Z",
+  "updatedAt": "2026-01-16T09:12:31.636Z",
+  "publishedAt": "2026-01-05T17:02:21.144Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12493",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Reconcile Stripe, bank, and e-commerce data with GPT-4.1 and Google Sheets",
+    "workflowName": "Reconcile Stripe, bank, and e-commerce data with GPT-4.1 and Google Sheets",
+    "description": "## How It Works\nThis workflow automates financial reconciliation by orchestrating multiple AI agents to detect mismatches, analyze root causes, and apply corrections across bank statements, invoices, and e-commerce platforms. Designed for finance teams, accountants, and business owners managing high transaction volumes, it eliminates manual reconciliation tedious work that typically consumes hours weekly. The system retrieves financial data from Stripe, banking APIs, and e-commerce platforms, then feeds it to specialized AI agents: one detects discrepancies using pattern recognition, another performs root cause analysis, and a third generates ledger corrections. An orchestrator agent coordinates these specialists, ensuring systematic processing. Results are logged to Google Sheets and trigger email notifications for critical issues, creating an audit trail while reducing reconciliation time from hours to minutes with 95%+ accuracy.\n\n## Setup Steps\n1. Configure Stripe API credentials in \"Get Stripe Transactions\" node\n2. Add banking API authentication for \"Get Bank Feed Data\" node\n3. Connect e-commerce platform (Shopify/WooCommerce) credentials  \n4. Input NVIDIA API key for all OpenAI Model nodes\n5. Set OpenAI API key in Orchestrator Agent\n6. Configure Gmail credentials for notification node\n\n## Prerequisites\nNVIDIA API access, OpenAI API key, Stripe account\n## Use Cases\nMonthly financial close automation, daily transaction reconciliation\n## Customization\nModify detection thresholds, add custom financial data sources\n## Benefits\nReduces reconciliation time by 90%, eliminates manual data entry errors",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get Stripe Transactions",
+      "type": "n8n-nodes-base.stripe",
+      "role": "stripe",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Bank Feed Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Get Invoice Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Get Ecommerce Platform Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Combine All Financial Data",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Orchestrator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Mismatch Detection Agent Tool",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Root Cause Analysis Agent Tool",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Ledger Correction Agent Tool",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Model - Orchestrator",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Model - Mismatch Detection",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Model - Root Cause",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "OpenAI Model - Ledger Correction",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Orchestrator Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Mismatch Detection Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Root Cause Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Ledger Correction Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Calculator Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Apply Ledger Corrections",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Log Fixes to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

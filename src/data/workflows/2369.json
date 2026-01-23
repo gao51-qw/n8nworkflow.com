@@ -1,0 +1,157 @@
+{
+  "id": 2369,
+  "slug": "2369",
+  "title": "Parse DMARC reports, save them in database and notify on DKIM or SPF error",
+  "description": "## Who is it for\nIf you are a postmaster or you manage email server, you can set up DKIM and SPF records to ensure that spoofing your email address is hard. On your domain you can also set up DMARC record to receive XML reports from email providers (rua tag). Those reports contain data if email they received passed DKIM and SPF verifications. \n\nSince DMARC email is public, you will receive a lot of emails from email providers, not only if DKIM/SPF fail. There is no need for it - you probably only need to know if SPF/DKIM failed. \n\nSo this script is intended to automatically parse all DMARC reports that come from email providers, but ONLY send you notification if SPF or DKIM failed - meaning that either someone tries to spoof your email or your DKIM/SPF is improperly set up.\n\n## How it works\n- script monitors postmaster email for DMARC reprots (rua)\n- unpacks report and parses XML into JSON\n- maps JSON and formats fields for MySQL/MariaDB input\n\t- inputs into database\n\t- sends notification on DKIM or SPF failure\n\n## Remember to set up\n- email input mailbox\n- notification channels\n\t- for slack\n\t- for email\n",
+  "featuredImage": "/data/workflows/2369/2369.webp",
+  "author": {
+    "id": 101,
+    "slug": "lukaszpp",
+    "name": "Łukasz",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3281,
+  "downloads": 328,
+  "createdAt": "2024-07-29T08:57:53.096Z",
+  "updatedAt": "2026-01-16T08:24:14.960Z",
+  "publishedAt": "2024-07-29T08:57:53.096Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2369",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Parse DMARC reports, save them in database and notify on DKIM or SPF error",
+    "workflowName": "Parse DMARC reports, save them in database and notify on DKIM or SPF error",
+    "description": "## Who is it for\nIf you are a postmaster or you manage email server, you can set up DKIM and SPF records to ensure that spoofing your email address is hard. On your domain you can also set up DMARC record to receive XML reports from email providers (rua tag). Those reports contain data if email they received passed DKIM and SPF verifications. \n\nSince DMARC email is public, you will receive a lot of emails from email providers, not only if DKIM/SPF fail. There is no need for it - you probably only need to know if SPF/DKIM failed. \n\nSo this script is intended to automatically parse all DMARC reports that come from email providers, but ONLY send you notification if SPF or DKIM failed - meaning that either someone tries to spoof your email or your DKIM/SPF is improperly set up.\n\n## How it works\n- script monitors postmaster email for DMARC reprots (rua)\n- unpacks report and parses XML into JSON\n- maps JSON and formats fields for MySQL/MariaDB input\n\t- inputs into database\n\t- sends notification on DKIM or SPF failure\n\n## Remember to set up\n- email input mailbox\n- notification channels\n\t- for slack\n\t- for email",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "role": "emailReadImap",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "End date format",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If multiple records to parse",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map fields for DB input and parse",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Begin format date",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Input into database",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "If issue with DKIM or SPF",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Rename Keys",
+      "type": "n8n-nodes-base.renameKeys",
+      "role": "renameKeys",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rename column for consistency",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Unzip File",
+      "type": "n8n-nodes-base.compression",
+      "role": "compression",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract XML data",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse XML data to JSON",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out For Separate Entries",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack Post Message On Channel",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Error Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

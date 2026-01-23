@@ -1,0 +1,662 @@
+{
+  "id": 9363,
+  "slug": "9363",
+  "title": "One telegram chat to edit, thumbnail & auto-post your videos everywhere",
+  "description": "This workflow turns any **Telegram bot** into an AI-powered **social media command center** for photos, videos and voice notes.\n\n[video demo](https://www.youtube.com/watch?v=a5WndRCD63I)\n\nFrom one Telegram chat you can:\n\n- Send a **photo** and auto-post it to **Instagram, TikTok and Pinterest** with AI captions.\n- Send a **video** and:\n  - Let AI generate **titles + descriptions** and upload it to **TikTok, Instagram and YouTube**.\n  - Use `/thumb` to generate **4 custom thumbnails** with **Nano Banana Pro**.\n  - Use `/edit ...` to run **FFmpeg edits** (cut, mute, resize, speed, etc.) via **Upload-Post FFmpeg jobs** and get the edited video back in Telegram.\n- Send a **voice note** and turn it into posts for **LinkedIn, X (Twitter) and Threads**, then auto-publish.\n- Keep **human approval** in the loop: every caption or text post is shown in Telegram for you to accept before publishing.\n\nOut of the box, the captions and long descriptions are optimized for **Spanish (es-ES)**, but you can easily change the prompts to any language or brand voice.\n\n---\n\n## What You Can Do From Telegram\n\n### 1. Photo → Instagram, TikTok & Pinterest\n\nJust send a **photo** (or image as document) to your Telegram bot:\n\n- The workflow downloads the photo from Telegram.\n- **Gemini 2.5 Flash** analyzes the image plus your caption/text (if any).\n- An AI Agent generates **platform-specific descriptions** for:\n  - TikTok (short hook, 90 chars)\n  - Instagram\n  - Pinterest (title + description)\n- You receive a message in Telegram with all the proposed descriptions.\n- You approve or reject with inline buttons.\n- On approval, **Upload-Post** publishes the photo to:\n  - Instagram\n  - TikTok\n  - Pinterest (to the board you configured)  \n  and sends back a status message with success flags, post URLs and error messages.\n\n---\n\n### 2. Video → TikTok, Instagram & YouTube (no commands)\n\nIf you send a **video with no special caption**:\n\n- The workflow treats it as a standard **video post**.\n- It fetches the file from Telegram.\n- **Gemini 2.5 Flash** analyzes the video and describes its content.\n- An AI Agent turns that description + your caption into:\n  - TikTok description\n  - Instagram description\n  - YouTube **title + description**\n- You get a Telegram message with the three platform descriptions to review.\n- Once you approve:\n  - It shows “Uploading…” in Telegram.\n  - The video is sent to **Upload-Post**, which uploads to **TikTok, Instagram and YouTube** with the generated text.\n  - Finally, you receive an upload report for each platform (success, URL, error message).\n\n---\n\n### 3. `/thumb` → AI Thumbnails for Your Video (Nano Banana Pro)\n\nIf you send a **video with caption exactly `/thumb`**:\n\n- The workflow downloads the video.\n- **Gemini 2.5 Flash** generates a **long, SEO-rich description in Spanish** of everything that happens in the video.\n- A second AI Agent uses that detailed description to create **3 concepts**:\n  - Each concept has: `title`, `description`, and a full `prompt_thumbnail` (Spanish, single line) specially crafted for **Nano Banana Pro**.\n- In Telegram you see the 3 concepts (titles) and select:\n  - `0`, `1`, `2` or “create new”.\n- Once you choose a concept:\n  - The prompt is sent to **Nano Banana Pro** (`fal-ai/nano-banana-pro/edit`) with your reference face image (configurable).\n  - Nano Banana Pro generates **4 thumbnails** (16:9).\n  - The workflow downloads the 4 images and sends them back to you in Telegram as photos so you can pick and use your favorite in your YouTube/Upload-Post pipeline.\n\nUse `/thumb` whenever you already have the video and just want **killer thumbnails** generated with AI.\n\n---\n\n### 4. `/edit …` → Natural-Language FFmpeg Video Editor\n\nIf you send a **video with a caption starting with `/edit`**, for example:\n\n- `/edit cut the first 3 seconds and remove the audio`\n- `/edit crop to vertical 9:16 and speed up x1.5`\n- `/edit blur the background and keep the subject centered`\n\nThe workflow behaves as a **text-to-FFmpeg command generator**:\n\n- An AI Agent (powered by **Gemini**) reads your `/edit` instructions.\n- It generates a **safe FFmpeg command** in JSON format:\n  - Always uses `ffmpeg -y`\n  - Uses `{input}` and `{output}` placeholders\n  - No semicolons and no dangerous shell characters\n- The workflow then:\n  - Downloads the original video from Telegram.\n  - Calls **Upload-Post FFmpeg jobs API** with the video and the generated `full_command`.\n  - Polls the job status until it’s finished.\n  - Downloads the processed (edited) video.\n  - Sends the edited video back to you in Telegram with a simple `sendVideo` node.\n\nThis makes Telegram a **front-end for a remote FFmpeg engine**: you describe the edit in natural language, and the workflow handles all the FFmpeg complexity.\n\n&gt; Note: The edited video is returned to Telegram; if you want to auto-post it, simply send the new video again **without `/edit`** so it goes through the normal multi-platform publishing path.\n\n---\n\n### 5. Voice Notes → LinkedIn, X & Threads (Text Posts)\n\nFor **voice messages**:\n\n- The Telegram Trigger detects `message.voice`.\n- The workflow downloads the audio file.\n- **OpenAI Whisper** transcribes the recording.\n- An AI Agent turns the transcription into:\n  - A **LinkedIn post** (Spanish, long-form dev/creator style, based on your examples).\n  - A **Threads post** (Spanish, up to ~500 chars).\n  - A **Tweet / X post or thread** (English, using hooks + hashtags like `#n8n`, `#automation`, `#dev`).\n- In Telegram you see a preview message with the suggested copy for Threads, LinkedIn and X.\n- After you approve:\n  - You get an “Uploading…” message.\n  - **Upload-Post** publishes:\n    - To your LinkedIn organization page (configured by ID).\n    - To X (Twitter).\n    - To Threads.\n  - The workflow sends a status message with success flags and URLs for each platform.\n\nThis is perfect for **“talk to your phone, ship content to all your text platforms”**.\n\n---\n\n## How the Workflow Is Structured\n\n- **Telegram Trigger**  \n  Listens to every incoming message and routes by type:\n  - `/start` → No-Op\n  - `voice` → Audio pipeline\n  - `document/photo` → Photo pipeline\n  - `video` → Video/thumbnail/editor pipelines (`/thumb`, `/edit` or normal)\n\n- **AI Blocks (Gemini + OpenAI)**  \n  - Gemini 2.5 Flash for:\n    - Photo understanding.\n    - Short video descriptions (for auto-posting).\n    - Long, detailed video summaries (for thumbnail generator).\n  - OpenAI Whisper for voice transcription.\n  - Multiple AI Agents (Gemini chat) with **structured JSON output parsers** for:\n    - Per-platform social captions.\n    - Threads/LinkedIn/X posts.\n    - Thumbnail prompts and title concepts.\n    - FFmpeg command generation.\n\n- **Upload-Post Integration**\n  - **Photos** → Instagram, TikTok, Pinterest.\n  - **Videos** → TikTok, Instagram, YouTube.\n  - **Text** → LinkedIn page, X, Threads.\n  - FFmpeg job endpoint for server-side video editing.\n  - All uploads return **status, URL and error messages** back into Telegram.\n\n- **Human-in-the-Loop**\n  - All critical AI outputs go through `sendAndWait` nodes in Telegram:\n    - You review and choose whether to publish or not.\n    - You choose which thumbnail concept to use.\n\n---\n\n## Requirements & Setup\n\n- **Accounts & APIs**\n  - Telegram bot (via @BotFather).\n  - **Upload-Post.com** account with your social profiles connected.\n  - **OpenAI API key** (Whisper).\n  - **Google Gemini API key** (AI Studio).\n  - **Nano Banana Pro / fal.ai** key (for thumbnails).\n\n- **Runtime**\n  - n8n instance (cloud or self-hosted).\n  - FFmpeg available where n8n runs (Docker image, VM, etc.) for local checks if needed (the heavy lifting is delegated to Upload-Post FFmpeg jobs).\n\n- **Configuration**\n  - Create Telegram credentials with your bot token.\n  - Create Upload-Post credentials with your API token.\n  - Set `upload_post_user` and `pinterest_board_id` in the `Edit Fields` node.\n  - Optionally replace:\n    - Example face image URL used for Nano Banana Pro.\n    - LinkedIn organization ID.\n    - Any language / tone in the AI agent system prompts.\n\n---\n\n## Ideal Use Cases\n\n- **Creators & influencers** who want to post to every platform from **one Telegram chat**.\n- **Agencies** who want a “content butler” clients can use without touching n8n.\n- **Solo devs & makers** who publish workflows, devlogs and product updates and want:\n  - Multi-platform video posts.\n  - Voice → LinkedIn/X/Threads posts.\n  - Easy text-based video editing and thumbnail generation.\n\nInstall this template, plug in your keys, talk to your bot in Telegram, and turn it into your **all-in-one AI social media machine**.\n",
+  "featuredImage": "/data/workflows/9363/9363.webp",
+  "author": {
+    "id": 101,
+    "slug": "carlosgracia",
+    "name": "Juan Carlos Cavero Gracia",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1532,
+  "downloads": 153,
+  "createdAt": "2025-10-07T21:18:20.726Z",
+  "updatedAt": "2026-01-16T09:00:10.601Z",
+  "publishedAt": "2025-10-07T21:18:20.726Z",
+  "nodes": 104,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9363",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "One telegram chat to edit, thumbnail & auto-post your videos everywhere",
+    "workflowName": "One telegram chat to edit, thumbnail & auto-post your videos everywhere",
+    "description": "This workflow turns any **Telegram bot** into an AI-powered **social media command center** for photos, videos and voice notes.\n\n[video demo](https://www.youtube.com/watch?v=a5WndRCD63I)\n\nFrom one Telegram chat you can:\n\n- Send a **photo** and auto-post it to **Instagram, TikTok and Pinterest** with AI captions.\n- Send a **video** and:\n  - Let AI generate **titles + descriptions** and upload it to **TikTok, Instagram and YouTube**.\n  - Use `/thumb` to generate **4 custom thumbnails** with **Nano Banana Pro**.\n  - Use `/edit ...` to run **FFmpeg edits** (cut, mute, resize, speed, etc.) via **Upload-Post FFmpeg jobs** and get the edited video back in Telegram.\n- Send a **voice note** and turn it into posts for **LinkedIn, X (Twitter) and Threads**, then auto-publish.\n- Keep **human approval** in the loop: every caption or text post is shown in Telegram for you to accept before publishing.\n\nOut of the box, the captions and long descriptions are optimized for **Spanish (es-ES)**, but you can easily change the prompts to any language or brand voice.\n\n---\n\n## What You Can Do From Telegram\n\n### 1. Photo → Instagram, TikTok & Pinterest\n\nJust send a **photo** (or image as document) to your Telegram bot:\n\n- The workflow downloads the photo from Telegram.\n- **Gemini 2.5 Flash** analyzes the image plus your caption/text (if any).\n- An AI Agent generates **platform-specific descriptions** for:\n  - TikTok (short hook, 90 chars)\n  - Instagram\n  - Pinterest (title + description)\n- You receive a message in Telegram with all the proposed descriptions.\n- You approve or reject with inline buttons.\n- On approval, **Upload-Post** publishes the photo to:\n  - Instagram\n  - TikTok\n  - Pinterest (to the board you configured)  \n  and sends back a status message with success flags, post URLs and error messages.\n\n---\n\n### 2. Video → TikTok, Instagram & YouTube (no commands)\n\nIf you send a **video with no special caption**:\n\n- The workflow treats it as a standard **video post**.\n- It fetches the file from Telegram.\n- **Gemini 2.5 Flash** analyzes the video and describes its content.\n- An AI Agent turns that description + your caption into:\n  - TikTok description\n  - Instagram description\n  - YouTube **title + description**\n- You get a Telegram message with the three platform descriptions to review.\n- Once you approve:\n  - It shows “Uploading…” in Telegram.\n  - The video is sent to **Upload-Post**, which uploads to **TikTok, Instagram and YouTube** with the generated text.\n  - Finally, you receive an upload report for each platform (success, URL, error message).\n\n---\n\n### 3. `/thumb` → AI Thumbnails for Your Video (Nano Banana Pro)\n\nIf you send a **video with caption exactly `/thumb`**:\n\n- The workflow downloads the video.\n- **Gemini 2.5 Flash** generates a **long, SEO-rich description in Spanish** of everything that happens in the video.\n- A second AI Agent uses that detailed description to create **3 concepts**:\n  - Each concept has: `title`, `description`, and a full `prompt_thumbnail` (Spanish, single line) specially crafted for **Nano Banana Pro**.\n- In Telegram you see the 3 concepts (titles) and select:\n  - `0`, `1`, `2` or “create new”.\n- Once you choose a concept:\n  - The prompt is sent to **Nano Banana Pro** (`fal-ai/nano-banana-pro/edit`) with your reference face image (configurable).\n  - Nano Banana Pro generates **4 thumbnails** (16:9).\n  - The workflow downloads the 4 images and sends them back to you in Telegram as photos so you can pick and use your favorite in your YouTube/Upload-Post pipeline.\n\nUse `/thumb` whenever you already have the video and just want **killer thumbnails** generated with AI.\n\n---\n\n### 4. `/edit …` → Natural-Language FFmpeg Video Editor\n\nIf you send a **video with a caption starting with `/edit`**, for example:\n\n- `/edit cut the first 3 seconds and remove the audio`\n- `/edit crop to vertical 9:16 and speed up x1.5`\n- `/edit blur the background and keep the subject centered`\n\nThe workflow behaves as a **text-to-FFmpeg command generator**:\n\n- An AI Agent (powered by **Gemini**) reads your `/edit` instructions.\n- It generates a **safe FFmpeg command** in JSON format:\n  - Always uses `ffmpeg -y`\n  - Uses `{input}` and `{output}` placeholders\n  - No semicolons and no dangerous shell characters\n- The workflow then:\n  - Downloads the original video from Telegram.\n  - Calls **Upload-Post FFmpeg jobs API** with the video and the generated `full_command`.\n  - Polls the job status until it’s finished.\n  - Downloads the processed (edited) video.\n  - Sends the edited video back to you in Telegram with a simple `sendVideo` node.\n\nThis makes Telegram a **front-end for a remote FFmpeg engine**: you describe the edit in natural language, and the workflow handles all the FFmpeg complexity.\n\n&gt; Note: The edited video is returned to Telegram; if you want to auto-post it, simply send the new video again **without `/edit`** so it goes through the normal multi-platform publishing path.\n\n---\n\n### 5. Voice Notes → LinkedIn, X & Threads (Text Posts)\n\nFor **voice messages**:\n\n- The Telegram Trigger detects `message.voice`.\n- The workflow downloads the audio file.\n- **OpenAI Whisper** transcribes the recording.\n- An AI Agent turns the transcription into:\n  - A **LinkedIn post** (Spanish, long-form dev/creator style, based on your examples).\n  - A **Threads post** (Spanish, up to ~500 chars).\n  - A **Tweet / X post or thread** (English, using hooks + hashtags like `#n8n`, `#automation`, `#dev`).\n- In Telegram you see a preview message with the suggested copy for Threads, LinkedIn and X.\n- After you approve:\n  - You get an “Uploading…” message.\n  - **Upload-Post** publishes:\n    - To your LinkedIn organization page (configured by ID).\n    - To X (Twitter).\n    - To Threads.\n  - The workflow sends a status message with success flags and URLs for each platform.\n\nThis is perfect for **“talk to your phone, ship content to all your text platforms”**.\n\n---\n\n## How the Workflow Is Structured\n\n- **Telegram Trigger**  \n  Listens to every incoming message and routes by type:\n  - `/start` → No-Op\n  - `voice` → Audio pipeline\n  - `document/photo` → Photo pipeline\n  - `video` → Video/thumbnail/editor pipelines (`/thumb`, `/edit` or normal)\n\n- **AI Blocks (Gemini + OpenAI)**  \n  - Gemini 2.5 Flash for:\n    - Photo understanding.\n    - Short video descriptions (for auto-posting).\n    - Long, detailed video summaries (for thumbnail generator).\n  - OpenAI Whisper for voice transcription.\n  - Multiple AI Agents (Gemini chat) with **structured JSON output parsers** for:\n    - Per-platform social captions.\n    - Threads/LinkedIn/X posts.\n    - Thumbnail prompts and title concepts.\n    - FFmpeg command generation.\n\n- **Upload-Post Integration**\n  - **Photos** → Instagram, TikTok, Pinterest.\n  - **Videos** → TikTok, Instagram, YouTube.\n  - **Text** → LinkedIn page, X, Threads.\n  - FFmpeg job endpoint for server-side video editing.\n  - All uploads return **status, URL and error messages** back into Telegram.\n\n- **Human-in-the-Loop**\n  - All critical AI outputs go through `sendAndWait` nodes in Telegram:\n    - You review and choose whether to publish or not.\n    - You choose which thumbnail concept to use.\n\n---\n\n## Requirements & Setup\n\n- **Accounts & APIs**\n  - Telegram bot (via @BotFather).\n  - **Upload-Post.com** account with your social profiles connected.\n  - **OpenAI API key** (Whisper).\n  - **Google Gemini API key** (AI Studio).\n  - **Nano Banana Pro / fal.ai** key (for thumbnails).\n\n- **Runtime**\n  - n8n instance (cloud or self-hosted).\n  - FFmpeg available where n8n runs (Docker image, VM, etc.) for local checks if needed (the heavy lifting is delegated to Upload-Post FFmpeg jobs).\n\n- **Configuration**\n  - Create Telegram credentials with your bot token.\n  - Create Upload-Post credentials with your API token.\n  - Set `upload_post_user` and `pinterest_board_id` in the `Edit Fields` node.\n  - Optionally replace:\n    - Example face image URL used for Nano Banana Pro.\n    - LinkedIn organization ID.\n    - Any language / tone in the AI agent system prompts.\n\n---\n\n## Ideal Use Cases\n\n- **Creators & influencers** who want to post to every platform from **one Telegram chat**.\n- **Agencies** who want a “content butler” clients can use without touching n8n.\n- **Solo devs & makers** who publish workflows, devlogs and product updates and want:\n  - Multi-platform video posts.\n  - Voice → LinkedIn/X/Threads posts.\n  - Easy text-based video editing and thumbnail generation.\n\nInstall this template, plug in your keys, talk to your bot in Telegram, and turn it into your **all-in-one AI social media machine**.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transcribe a recording",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get a Audio File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get a Photo",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze video",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze an image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Send Regular Message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get a Photo File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "AI Agent Photos",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent Videos",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get a Video File2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send message and wait for response",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send message and wait for response1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send message and wait for response2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent Text",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Confirmation upload",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send processing upload",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send processing upload1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Confirmation upload1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send processing upload2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Confirmation upload2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Upload video to Tiktok Instagram Youtube",
+      "type": "n8n-nodes-upload-post.uploadPost",
+      "role": "uploadPost",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload photos",
+      "type": "n8n-nodes-upload-post.uploadPost",
+      "role": "uploadPost",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload a text post",
+      "type": "n8n-nodes-upload-post.uploadPost",
+      "role": "uploadPost",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "ffmpeg: Extract Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait 5s & Retry1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Is Completed?1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Job Status1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download VIdeo",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get a Video File3",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Need edit the video?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send a video",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note26",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "DebugHelper",
+      "type": "n8n-nodes-base.debugHelper",
+      "role": "debugHelper",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send message and wait for response3",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Need a thumnail for this video?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Gemini Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser4",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note27",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get a Video File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note29",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze video2",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get a Video File5",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send message and wait for response4",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send processing upload3",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Wait for Final Video",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Generate thumnails",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Final photo",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Photo 0",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Photo 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Photo 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download Photo 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note30",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note31",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note32",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note34",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note35",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note36",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note37",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

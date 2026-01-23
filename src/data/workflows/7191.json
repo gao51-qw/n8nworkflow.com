@@ -1,0 +1,224 @@
+{
+  "id": 7191,
+  "slug": "7191",
+  "title": "Automating WhatsApp replies using Go High Level with Redis and Anthropic",
+  "description": "# Automating WhatsApp replies in Go High Level with Redis and Anthropic\n## Description\n* Integrates GHL + Wazzap with Redis and an AI Agent using ClientInfo to process messages, generate accurate replies, and send them via a custom field trigger.\n---\n## Who’s it for\n* This workflow is for businesses using **GoHighLevel (GHL)**, including the **Wazzap** plugin for WhatsApp, who want to automate inbound SMS/WhatsApp replies with AI. It’s ideal for teams that need accurate, data-driven responses from a predefined **ClientInfo** source and want to send them back to customers without paying for extra inbound automations.\n---\n## How it works / What it does\n1. **Receive message** in n8n via Webhook from GHL (**Customer Replied (SMS)** automation). WhatsApp messages arrive the same way using the **Wazzap** plugin.\n2. **Filter message type**:\n   * If audio → skip processing and send fallback asking for text.\n   * If text → sanitize by fixing escaped quotes, escaping line breaks/carriage returns/tabs, and removing invalid fields.\n3. **Buffer messages** in Redis to group multiple messages sent in a short window.\n4. **Run AI Agent** using the **ClientInfo** tool to answer only with accurate service/branch data.\n5. **Sanitize AI output** before sending back.\n6. **Update GHL contact** custom field (**IA_answer**) with the AI’s response.\n7. **Send SMS reply** automatically via GHL’s outbound automation triggered by the updated custom field.\n---\n## How to set up\n1. In **GHL**, create:\n   * **Inbound automation**: Trigger on *Customer Replied (SMS)* → Send to your n8n Webhook.\n   * **Outbound automation**: Trigger when **IA_answer** is updated → Send SMS to the contact.\n   * Create a custom field named **IA_answer**.\n2. Connect **Wazzap** in GHL to handle WhatsApp messages.\n3. Configure **Redis** in n8n (host, port, DB index, password).\n4. Add your **AI model** credentials (Anthropic, OpenAI, etc.) in n8n.\n5. (Optional) Set up the **Google Drive Excel Merge** sub-workflow to enrich ClientInfo with external data.\n---\n## Requirements\n* **GoHighLevel sub-account API key**.\n* **Anthropic (Claude)** API key or another supported LLM provider.\n* **Redis database** for temporary message storage.\n* **GHL automations**: one for inbound messages to n8n, one for outbound replies when **IA\\_answer** is updated.\n* **GHL custom field**: **IA\\_answer** to store and trigger replies.\n* **Wazzap plugin** in GHL for WhatsApp message handling.\n---\n## How to customize the workflow\n* Add more context or business-specific data to the **AI Agent prompt** so replies match your brand tone and policies.\n* Expand the **ClientInfo** dataset with additional services, branches, or product details.\n* Adjust the **Redis wait time** to control how long the workflow buffers messages before replying.",
+  "featuredImage": "/data/workflows/7191/7191.webp",
+  "author": {
+    "id": 101,
+    "slug": "jorgemartinezjam",
+    "name": "Jorge Martínez",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 578,
+  "downloads": 57,
+  "createdAt": "2025-08-09T03:59:19.111Z",
+  "updatedAt": "2026-01-16T08:48:56.600Z",
+  "publishedAt": "2025-08-09T03:59:19.111Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7191",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automating WhatsApp replies using Go High Level with Redis and Anthropic",
+    "workflowName": "Automating WhatsApp replies using Go High Level with Redis and Anthropic",
+    "description": "# Automating WhatsApp replies in Go High Level with Redis and Anthropic\n## Description\n* Integrates GHL + Wazzap with Redis and an AI Agent using ClientInfo to process messages, generate accurate replies, and send them via a custom field trigger.\n---\n## Who’s it for\n* This workflow is for businesses using **GoHighLevel (GHL)**, including the **Wazzap** plugin for WhatsApp, who want to automate inbound SMS/WhatsApp replies with AI. It’s ideal for teams that need accurate, data-driven responses from a predefined **ClientInfo** source and want to send them back to customers without paying for extra inbound automations.\n---\n## How it works / What it does\n1. **Receive message** in n8n via Webhook from GHL (**Customer Replied (SMS)** automation). WhatsApp messages arrive the same way using the **Wazzap** plugin.\n2. **Filter message type**:\n   * If audio → skip processing and send fallback asking for text.\n   * If text → sanitize by fixing escaped quotes, escaping line breaks/carriage returns/tabs, and removing invalid fields.\n3. **Buffer messages** in Redis to group multiple messages sent in a short window.\n4. **Run AI Agent** using the **ClientInfo** tool to answer only with accurate service/branch data.\n5. **Sanitize AI output** before sending back.\n6. **Update GHL contact** custom field (**IA_answer**) with the AI’s response.\n7. **Send SMS reply** automatically via GHL’s outbound automation triggered by the updated custom field.\n---\n## How to set up\n1. In **GHL**, create:\n   * **Inbound automation**: Trigger on *Customer Replied (SMS)* → Send to your n8n Webhook.\n   * **Outbound automation**: Trigger when **IA_answer** is updated → Send SMS to the contact.\n   * Create a custom field named **IA_answer**.\n2. Connect **Wazzap** in GHL to handle WhatsApp messages.\n3. Configure **Redis** in n8n (host, port, DB index, password).\n4. Add your **AI model** credentials (Anthropic, OpenAI, etc.) in n8n.\n5. (Optional) Set up the **Google Drive Excel Merge** sub-workflow to enrich ClientInfo with external data.\n---\n## Requirements\n* **GoHighLevel sub-account API key**.\n* **Anthropic (Claude)** API key or another supported LLM provider.\n* **Redis database** for temporary message storage.\n* **GHL automations**: one for inbound messages to n8n, one for outbound replies when **IA\\_answer** is updated.\n* **GHL custom field**: **IA\\_answer** to store and trigger replies.\n* **Wazzap plugin** in GHL for WhatsApp message handling.\n---\n## How to customize the workflow\n* Add more context or business-specific data to the **AI Agent prompt** so replies match your brand tone and policies.\n* Expand the **ClientInfo** dataset with additional services, branches, or product details.\n* Adjust the **Redis wait time** to control how long the workflow buffers messages before replying.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Update Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "GHL Custom fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Save message",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get messages",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sanitize and Format Message Body",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Delete messages",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "messages",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Call n8n Workflow Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract Tests",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Sites",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Contact No audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get GHL Custom fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sanitize and Format Message Output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

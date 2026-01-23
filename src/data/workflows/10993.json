@@ -1,0 +1,170 @@
+{
+  "id": 10993,
+  "slug": "10993",
+  "title": "Expense Logging with Telegram to Google Sheets using AI Voice & Text Parsing",
+  "description": "## Use Cases\n-Personal or family budget tracking.\n\n-Small business expense logging via Telegram\n\n-Hands-free logging (using voice messages)\n\n---\n\n## How it works:\n\n-Trigger receives text or voice.\n\n-Optional branch transcribes audio to text.\n\n-AI parses into a structured array (SOP enforces schema).\n\n-Split Out produces 1 item per expense.\n\n-Loop Over Items appends rows sequentially with a Wait, preventing missed writes.\n\n-In parallel, Item Lists (Aggregate) builds a single summary string; Merge (Wait for Both) releases one final Telegram confirmation.\n\n----\n\n## Setup Instructions \n\n1. Connect credentials: Telegram, Google, OpenAI.\n2. Sheets: Create a sheet with headers Date, Category, Merchant, Amount, Note. Copy Spreadsheet ID + sheet name.\n3. Map columns in Append to Google Sheet.\n4. Pick models: set Chat model (e.g., gpt-4o-mini) and Whisper for transcription if using audio.\n5. Wait time: keep 500–1000 ms to avoid API race conditions.\n6. Run: Send a Telegram message like:\nGas 34.67, Groceries 82.45, Coffee 6.25, Lunch 14.90.\n\n----\n## Customization ideas:\n\n-Add categories map (Memory/Set) for consistent labeling.\n\n-Add currency detection/formatting.\n\n-Add error-to-Telegram path for invalid schema.",
+  "featuredImage": "/data/workflows/10993/10993.webp",
+  "author": {
+    "id": 101,
+    "slug": "calvinc4",
+    "name": "Calvin Cunningham",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 392,
+  "downloads": 39,
+  "createdAt": "2025-11-18T21:41:10.425Z",
+  "updatedAt": "2026-01-16T09:07:03.657Z",
+  "publishedAt": "2025-11-18T21:41:10.425Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10993",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Expense Logging with Telegram to Google Sheets using AI Voice & Text Parsing",
+    "workflowName": "Expense Logging with Telegram to Google Sheets using AI Voice & Text Parsing",
+    "description": "## Use Cases\n-Personal or family budget tracking.\n\n-Small business expense logging via Telegram\n\n-Hands-free logging (using voice messages)\n\n---\n\n## How it works:\n\n-Trigger receives text or voice.\n\n-Optional branch transcribes audio to text.\n\n-AI parses into a structured array (SOP enforces schema).\n\n-Split Out produces 1 item per expense.\n\n-Loop Over Items appends rows sequentially with a Wait, preventing missed writes.\n\n-In parallel, Item Lists (Aggregate) builds a single summary string; Merge (Wait for Both) releases one final Telegram confirmation.\n\n----\n\n## Setup Instructions \n\n1. Connect credentials: Telegram, Google, OpenAI.\n2. Sheets: Create a sheet with headers Date, Category, Merchant, Amount, Note. Copy Spreadsheet ID + sheet name.\n3. Map columns in Append to Google Sheet.\n4. Pick models: set Chat model (e.g., gpt-4o-mini) and Whisper for transcription if using audio.\n5. Wait time: keep 500–1000 ms to avoid API race conditions.\n6. Run: Send a Telegram message like:\nGas 34.67, Groceries 82.45, Coffee 6.25, Lunch 14.90.\n\n----\n## Customization ideas:\n\n-Add categories map (Memory/Set) for consistent labeling.\n\n-Add currency detection/formatting.\n\n-Add error-to-Telegram path for invalid schema.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Parse Expenses with AI",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Wait 0.5 seconds",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send Telegram Confirmation",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Telegram Message Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Check if Audio file",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Transcribe audio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Set field",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Build Expense Summary Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Build Confirmation Text",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

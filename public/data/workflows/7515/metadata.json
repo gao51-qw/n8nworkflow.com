@@ -1,0 +1,27 @@
+{
+  "id": 7515,
+  "slug": "7515",
+  "title": "AI-powered ServiceNow chat triage with GPT-4 — Incident & request router",
+  "description": "\n# Short description\n\nAutomatically triage incoming chat messages into **Incidents**, **Service Requests**, or **Other** using an LLM-powered classifier; create Incidents in ServiceNow, submit Service Catalog requests (HTTP), and route everything else to an AI Agent with web search + memory. Includes an optional summarization step for ticket context.\n\n# Full description\n\nThis n8n template wires a chat trigger to an LLM-based **Text Classifier** and then routes messages to the appropriate downstream action:\n\n1. **Trigger**: `When chat message received` — incoming messages from your chat channel.\n2. **Text Classifier**: small LLM prompt/classifier that returns one of three labels: `Incident`, `Request`, or `Everything Else`.\n3. **Create Incident** (ServiceNow connector): when labeled **Incident**, the workflow creates a Servicenow Incident record (short fields: short\\_description, description, priority, caller).\n4. **Submit General Request** (HTTP Request): when labeled **Request**, the workflow calls your Service Catalog API (POST) to place a catalog item / submit a request.\n5. **AI Agent**: when labeled **Everything Else**, route to an AI Agent node that:\n\n   * uses an OpenAI chat model for contextual replies,\n   * can consult **SerpAPI** (web search) as a tool,\n   * saves relevant context to **Simple Memory** for future conversations.\n6. **Summarization Chain**: optional chain to summarize long chat threads into concise ticket descriptions before creating incidents/requests.\n\nThis template is ideal for support desks that want automated triage with human-quality context and searchable memory.\n\n# Key highlights (what to call out)\n\n* **Three-way LLM triage**: ensures messages are routed automatically to the correct backend action (Incident vs Service Request vs AI handling).\n* **ServiceNow native connector**: uses the ServiceNow node to create Incidents (safer than raw HTTP for incidents).\n* **Service Catalog via HTTP**: flexible — supports organizations using RESTful catalog endpoints.\n* **Summarization before ticket creation**: produces concise, high-quality `short_description` and `description` fields.\n* **AI Agent + Memory + Web Search**: handles non-ticket queries with web-augmented answers and stores context for follow-ups.\n* **Failover & logging**: include a catch node (optional) that logs failures and notifies admins.\n\n# Required credentials & inputs (must configure)\n\n* **ServiceNow**: Instance URL + API user (must have rights to create incidents).\n* **Service Catalog HTTP endpoint**: URL + API key / auth header (for POST).\n* **OpenAI API key** (or other LLM provider): for Text Classifier, Summarization Chain, and AI Agent.\n* **SerpAPI key** (optional): for web search tools inside the AI Agent.\n* **Memory store**: Simple Memory node (or external DB) for conversation history.\n\n# Nodes included (quick map)\n\n* Trigger: `When chat message received`\n* Processor: `Text Classifier` (OpenAI/LLM)\n* Branch A: `ServiceNow (Create Incident)`\n* Branch B: `HTTP Request` (Service Catalog POST)\n* Branch C: `AI Agent` (OpenAI + SerpAPI + Simple Memory)\n* Shared: `Summarization Chain` (used before A or B where enabled)\n* Optional: `Error / Audit logging` node, `Slack/email` notifications\n\n# Recommended n8n settings & tips\n\n* **Use structured outputs** from classifier (`{ label: \"Incident\", confidence: 0.92 }`) so you can implement confidence thresholds.\n* **If confidence &lt; 0.7**, route to a human review queue instead of auto-creating a ticket.\n* **Sanitize user PII** before storing in memory or sending to external APIs.\n* **Rate-limit** OpenAI/SerpAPI calls to avoid unexpected bills.\n* **Test the Service Catalog POST body** in Postman first — include sample `variables` JSON.\n\n# Short sample variables JSON (Service Catalog POST)\n\n```json\n{\n  \"sysparm_quantity\": 1,\n  \"variables\": {\n    \n    \"description\": \"User reports VPN timeout on Windows machine; error code 1234\"\n  }\n}\n```\n\n",
+  "featuredImage": "/data/workflows/7515/7515.webp",
+  "author": {
+    "id": 101,
+    "slug": "yajna",
+    "name": "Tushar Mishra",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 567,
+  "downloads": 56,
+  "createdAt": "2025-08-17T12:37:11.523Z",
+  "updatedAt": "2026-01-16T08:50:44.661Z",
+  "publishedAt": "2025-08-17T12:37:11.523Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7515"
+}

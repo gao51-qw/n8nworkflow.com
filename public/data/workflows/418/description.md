@@ -1,0 +1,1 @@
+This workflow uses [Strapi](https://strapi.io/) as a CMS and then cross posts new blog posts to [Medium](https://medium.com/) and [Dev.to](https://dev.to/).

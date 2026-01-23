@@ -1,0 +1,367 @@
+{
+  "id": 9315,
+  "slug": "9315",
+  "title": "Monitor & filter French procurement tenders with BOAMP API and Google Sheets",
+  "description": "# French Public Procurement Tender Monitoring Workflow\n\n## Overview\n\nThis n8n workflow automates the monitoring and filtering of French public procurement tenders (BOAMP - Bulletin Officiel des Annonces des Marchés Publics). It retrieves tenders based on your preferences, filters them by market type, and identifies relevant opportunities using keyword matching.\n\n## Who is this for?\n\n- Companies seeking French public procurement opportunities\n- Consultants monitoring specific market sectors\n- Organizations tracking government contracts in France\n\n## What it does\n\nThe workflow operates in two main phases:\n\n**Phase 1: Automated Tender Collection**\n- Retrieves all tenders from the BOAMP API based on your configuration\n- Filters by market type (Works, Services, Supplies)\n- Stores complete tender data in Google Sheets\n- Handles pagination automatically for large datasets\n\n**Phase 2: Intelligent Keyword Filtering**\n- Downloads and extracts text from tender PDF documents\n- Searches for your specified keywords within tender content\n- Saves matching tenders to a separate \"Target\" sheet for easy review\n- Tracks processing status to avoid duplicates\n\n## Requirements\n\n- n8n instance (self-hosted or cloud)\n- Google account with Google Sheets access\n- Google Sheets API credentials configured in n8n\n\n## Setup Instructions\n\n### Step 1: Duplicate the Configuration Spreadsheet\n\n1. Access the template spreadsheet: [Configuration Template](https://docs.google.com/spreadsheets/d/1wapLLWjwzo7SfG_YEsUlFaPRs1MmjxPRhRc6BlwBUAY/edit?gid=966659321#gid=966659321)\n2. Click **File → Make a copy**\n3. Save to your Google Drive\n4. Note the URL of your new spreadsheet\n\n### Step 2: Configure Your Preferences\n\nOpen your copied spreadsheet and configure the **Config** tab:\n\n**Market Types** - Check the categories you want to monitor:\n- Travaux (Works/Construction)\n- Services\n- Fournitures (Supplies)\n\n**Search Period** - Enter the number of days to look back (e.g., \"30\" for the last 30 days)\n\n**Keywords** - Enter your search terms as a comma-separated list (e.g., \"informatique, cloud, cybersécurité\")\n\n### Step 3: Import the Workflow\n\n1. Copy the workflow JSON from this template\n2. In n8n, click **Workflows → Import from File/URL**\n3. Paste the JSON and import\n\n### Step 4: Update Google Sheets Connections\n\nReplace all Google Sheets node URLs with your spreadsheet URL:\n\n**Nodes to update:**\n- Get config (2 instances)\n- Get keyword\n- Get Offset\n- Get All\n- Append row in sheet\n- Update offset\n- Reset Offset\n- Ok\n- Target offre\n\n**For each node:**\n1. Open the node settings\n2. Update the **Document ID** field with your spreadsheet URL\n3. Verify the **Sheet Name** matches your spreadsheet tabs\n\n### Step 5: Configure Schedule Triggers\n\nThe workflow has two schedule triggers:\n\n**Schedule Trigger1** (Phase 1 - Tender Collection)\n- Default: `0 8 1 * *` (1st day of month at 8:00 AM)\n- Adjust based on how frequently you want to collect tenders\n\n**Schedule Trigger** (Phase 2 - Keyword Filtering)\n- Default: `0 10 1 * *` (1st day of month at 10:00 AM)\n- Should run after Phase 1 completes\n\n**To modify:**\n1. Open the Schedule Trigger node\n2. Click **Cron Expression**\n3. Adjust timing as needed\n\n### Step 6: Test the Workflow\n\n1. Manually execute **Phase 1** by clicking the **Schedule Trigger1** node and selecting **Execute Node**\n2. Verify tenders appear in your \"All\" sheet\n3. Execute **Phase 2** by triggering the **Schedule Trigger** node\n4. Check the \"Target\" sheet for matching tenders\n\n## How the Workflow Works\n\n### Phase 1: Tender Collection Process\n\n1. **Configuration Loading** - Reads your preferences from Google Sheets\n2. **Offset Management** - Tracks pagination position for API calls\n3. **API Request** - Fetches up to 100 tenders per batch from BOAMP\n4. **Market Type Filtering** - Keeps only selected market categories\n5. **Data Storage** - Formats and saves tenders to the \"All\" sheet\n6. **Pagination Loop** - Continues until all tenders are retrieved\n7. **Offset Reset** - Prepares for next execution\n\n### Phase 2: Keyword Matching Process\n\n1. **Keyword Loading** - Retrieves search terms from configuration\n2. **Tender Retrieval** - Gets unprocessed tenders from \"All\" sheet\n3. **Sequential Processing** - Loops through each tender individually\n4. **PDF Extraction** - Downloads and extracts text from tender documents\n5. **Keyword Analysis** - Searches for matches with accent/case normalization\n6. **Status Update** - Marks tender as processed\n7. **Match Evaluation** - Determines if keywords were found\n8. **Target Storage** - Saves relevant tenders with match details\n\n## Customization Options\n\n### Adjust API Parameters\n\nIn the **HTTP Request** node, you can modify:\n- `limit`: Number of records per batch (default: 100)\n- Additional filters in the `where` parameter\n\n### Modify Keyword Matching Logic\n\nEdit the **Get query** node to adjust:\n- Text normalization (accent removal, case sensitivity)\n- Match proximity requirements\n- Context length around matches\n\n### Change Data Format\n\nUpdate the **Format Results** node to modify:\n- Date formatting\n- PDF URL generation\n- Field mappings\n\n## Spreadsheet Structure\n\nYour Google Sheets should contain these tabs:\n\n- **Config** - Your configuration settings\n- **Offset** - Pagination tracking (managed automatically)\n- **All** - Complete tender database\n- **Target** - Filtered tenders matching your keywords\n\n## Troubleshooting\n\n**No tenders appearing in \"All\" sheet:**\n- Verify your configuration period isn't too restrictive\n- Check that at least one market type is selected\n- Ensure API is accessible (test the HTTP Request node)\n\n**PDF extraction errors:**\n- Some PDFs may be malformed or protected\n- Check the URL generation in Format Results node\n- Verify PDF URLs are accessible in a browser\n\n**Duplicate tenders in Target sheet:**\n- Ensure the \"Ok\" status is being written correctly\n- Check the Filter node is excluding processed tenders\n- Verify row_number matching in update operations\n\n**Keywords not matching:**\n- Keywords are case-insensitive and accent-insensitive\n- Verify your keywords are spelled correctly\n- Check the extracted text contains your terms\n\n## Performance Considerations\n\n- Phase 1 processes 100 tenders per iteration with a 10-second wait between batches\n- Phase 2 processes tenders sequentially to avoid overloading PDF extraction\n- Large datasets (1000+ tenders) may take significant time to process\n- Consider running Phase 1 less frequently if tender volume is manageable\n\n## Data Privacy\n\n- All data is stored in your Google Sheets\n- No external databases or third-party storage\n- BOAMP API is publicly accessible (no authentication required)\n- Ensure your Google Sheets permissions are properly configured\n\n## Support and Updates\n\nThis workflow retrieves data from the BOAMP public API. If API structure changes, nodes may require updates. Monitor the workflow execution logs for errors and adjust accordingly.",
+  "featuredImage": "/data/workflows/9315/9315.webp",
+  "author": {
+    "id": 101,
+    "slug": "growthai",
+    "name": "Growth AI",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 378,
+  "downloads": 37,
+  "createdAt": "2025-10-06T15:11:49.910Z",
+  "updatedAt": "2026-01-16T08:59:58.901Z",
+  "publishedAt": "2025-10-06T15:11:49.910Z",
+  "nodes": 55,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9315",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor & filter French procurement tenders with BOAMP API and Google Sheets",
+    "workflowName": "Monitor & filter French procurement tenders with BOAMP API and Google Sheets",
+    "description": "# French Public Procurement Tender Monitoring Workflow\n\n## Overview\n\nThis n8n workflow automates the monitoring and filtering of French public procurement tenders (BOAMP - Bulletin Officiel des Annonces des Marchés Publics). It retrieves tenders based on your preferences, filters them by market type, and identifies relevant opportunities using keyword matching.\n\n## Who is this for?\n\n- Companies seeking French public procurement opportunities\n- Consultants monitoring specific market sectors\n- Organizations tracking government contracts in France\n\n## What it does\n\nThe workflow operates in two main phases:\n\n**Phase 1: Automated Tender Collection**\n- Retrieves all tenders from the BOAMP API based on your configuration\n- Filters by market type (Works, Services, Supplies)\n- Stores complete tender data in Google Sheets\n- Handles pagination automatically for large datasets\n\n**Phase 2: Intelligent Keyword Filtering**\n- Downloads and extracts text from tender PDF documents\n- Searches for your specified keywords within tender content\n- Saves matching tenders to a separate \"Target\" sheet for easy review\n- Tracks processing status to avoid duplicates\n\n## Requirements\n\n- n8n instance (self-hosted or cloud)\n- Google account with Google Sheets access\n- Google Sheets API credentials configured in n8n\n\n## Setup Instructions\n\n### Step 1: Duplicate the Configuration Spreadsheet\n\n1. Access the template spreadsheet: [Configuration Template](https://docs.google.com/spreadsheets/d/1wapLLWjwzo7SfG_YEsUlFaPRs1MmjxPRhRc6BlwBUAY/edit?gid=966659321#gid=966659321)\n2. Click **File → Make a copy**\n3. Save to your Google Drive\n4. Note the URL of your new spreadsheet\n\n### Step 2: Configure Your Preferences\n\nOpen your copied spreadsheet and configure the **Config** tab:\n\n**Market Types** - Check the categories you want to monitor:\n- Travaux (Works/Construction)\n- Services\n- Fournitures (Supplies)\n\n**Search Period** - Enter the number of days to look back (e.g., \"30\" for the last 30 days)\n\n**Keywords** - Enter your search terms as a comma-separated list (e.g., \"informatique, cloud, cybersécurité\")\n\n### Step 3: Import the Workflow\n\n1. Copy the workflow JSON from this template\n2. In n8n, click **Workflows → Import from File/URL**\n3. Paste the JSON and import\n\n### Step 4: Update Google Sheets Connections\n\nReplace all Google Sheets node URLs with your spreadsheet URL:\n\n**Nodes to update:**\n- Get config (2 instances)\n- Get keyword\n- Get Offset\n- Get All\n- Append row in sheet\n- Update offset\n- Reset Offset\n- Ok\n- Target offre\n\n**For each node:**\n1. Open the node settings\n2. Update the **Document ID** field with your spreadsheet URL\n3. Verify the **Sheet Name** matches your spreadsheet tabs\n\n### Step 5: Configure Schedule Triggers\n\nThe workflow has two schedule triggers:\n\n**Schedule Trigger1** (Phase 1 - Tender Collection)\n- Default: `0 8 1 * *` (1st day of month at 8:00 AM)\n- Adjust based on how frequently you want to collect tenders\n\n**Schedule Trigger** (Phase 2 - Keyword Filtering)\n- Default: `0 10 1 * *` (1st day of month at 10:00 AM)\n- Should run after Phase 1 completes\n\n**To modify:**\n1. Open the Schedule Trigger node\n2. Click **Cron Expression**\n3. Adjust timing as needed\n\n### Step 6: Test the Workflow\n\n1. Manually execute **Phase 1** by clicking the **Schedule Trigger1** node and selecting **Execute Node**\n2. Verify tenders appear in your \"All\" sheet\n3. Execute **Phase 2** by triggering the **Schedule Trigger** node\n4. Check the \"Target\" sheet for matching tenders\n\n## How the Workflow Works\n\n### Phase 1: Tender Collection Process\n\n1. **Configuration Loading** - Reads your preferences from Google Sheets\n2. **Offset Management** - Tracks pagination position for API calls\n3. **API Request** - Fetches up to 100 tenders per batch from BOAMP\n4. **Market Type Filtering** - Keeps only selected market categories\n5. **Data Storage** - Formats and saves tenders to the \"All\" sheet\n6. **Pagination Loop** - Continues until all tenders are retrieved\n7. **Offset Reset** - Prepares for next execution\n\n### Phase 2: Keyword Matching Process\n\n1. **Keyword Loading** - Retrieves search terms from configuration\n2. **Tender Retrieval** - Gets unprocessed tenders from \"All\" sheet\n3. **Sequential Processing** - Loops through each tender individually\n4. **PDF Extraction** - Downloads and extracts text from tender documents\n5. **Keyword Analysis** - Searches for matches with accent/case normalization\n6. **Status Update** - Marks tender as processed\n7. **Match Evaluation** - Determines if keywords were found\n8. **Target Storage** - Saves relevant tenders with match details\n\n## Customization Options\n\n### Adjust API Parameters\n\nIn the **HTTP Request** node, you can modify:\n- `limit`: Number of records per batch (default: 100)\n- Additional filters in the `where` parameter\n\n### Modify Keyword Matching Logic\n\nEdit the **Get query** node to adjust:\n- Text normalization (accent removal, case sensitivity)\n- Match proximity requirements\n- Context length around matches\n\n### Change Data Format\n\nUpdate the **Format Results** node to modify:\n- Date formatting\n- PDF URL generation\n- Field mappings\n\n## Spreadsheet Structure\n\nYour Google Sheets should contain these tabs:\n\n- **Config** - Your configuration settings\n- **Offset** - Pagination tracking (managed automatically)\n- **All** - Complete tender database\n- **Target** - Filtered tenders matching your keywords\n\n## Troubleshooting\n\n**No tenders appearing in \"All\" sheet:**\n- Verify your configuration period isn't too restrictive\n- Check that at least one market type is selected\n- Ensure API is accessible (test the HTTP Request node)\n\n**PDF extraction errors:**\n- Some PDFs may be malformed or protected\n- Check the URL generation in Format Results node\n- Verify PDF URLs are accessible in a browser\n\n**Duplicate tenders in Target sheet:**\n- Ensure the \"Ok\" status is being written correctly\n- Check the Filter node is excluding processed tenders\n- Verify row_number matching in update operations\n\n**Keywords not matching:**\n- Keywords are case-insensitive and accent-insensitive\n- Verify your keywords are spelled correctly\n- Check the extracted text contains your terms\n\n## Performance Considerations\n\n- Phase 1 processes 100 tenders per iteration with a 10-second wait between batches\n- Phase 2 processes tenders sequentially to avoid overloading PDF extraction\n- Large datasets (1000+ tenders) may take significant time to process\n- Consider running Phase 1 less frequently if tender volume is manageable\n\n## Data Privacy\n\n- All data is stored in your Google Sheets\n- No external databases or third-party storage\n- BOAMP API is publicly accessible (no authentication required)\n- Ensure your Google Sheets permissions are properly configured\n\n## Support and Updates\n\nThis workflow retrieves data from the BOAMP public API. If API structure changes, nodes may require updates. Monitor the workflow execution logs for errors and adjust accordingly.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Process Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check Continue Loop",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Format Results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Offset",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get All",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Query match ?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Loop Over offres",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get query",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Target offre",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Reset Offset",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "HTTP Request4",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Ok",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Update offset",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get config",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get keyword",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Tenders sorting",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note26",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note27",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note29",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note30",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": 10747,
+  "slug": "10747",
+  "title": "Automate Zoom 🎦 user onboarding with OAuth token management and data tables",
+  "description": "This workflow automates the management of **Zoom OAuth tokens** and the **creation of new Zoom users** through the Zoom API.\n\nThis workflow automates the process of creating a new Zoom user by first ensuring a valid OAuth access token is available. It is designed to handle the fact that Zoom access tokens are short-lived (1 hour) by using a longer-lived refresh token (90 days) stored in an n8n Data Table.\n\nIt includes two main phases:\n\n1. **Token Generation & Management**\n\n   * The workflow initially requests a **Zoom access token** using the OAuth 2.0 “authorization code” method.\n   * The resulting **access token** (valid for 1 hour) and **refresh token** (valid for 90 days) are stored in an n8n **Data Table**.\n   * When executed again, the workflow checks for the most recent token, refreshes it using the refresh token, and updates the Data Table automatically.\n\n2. **User Creation in Zoom**\n\n   * Once a valid token is retrieved, the workflow collects the user’s first name, last name, and email (set in the “Data” node).\n   * It then generates a **secure random password** for the new user.\n   * Using the Zoom API, it sends a POST request to create the new user, automatically triggering an invitation email from Zoom.\n\n---\n\n### **Key Features**\n\n1. ✅ **Full Automation of Zoom Authentication**\n\n   * Eliminates manual token handling by automatically refreshing and updating OAuth credentials.\n\n2. ✅ **Centralized Token Storage**\n\n   * Securely stores access and refresh tokens in an n8n Data Table, simplifying reuse across workflows.\n\n3. ✅ **Error Prevention**\n\n   * Ensures that expired tokens are replaced before API requests, avoiding failed Zoom operations.\n\n4.✅  **Automatic User Provisioning**\n\n   * Creates Zoom users automatically with prefilled credentials and triggers Zoom’s built-in invitation process.\n\n5. ✅ **Scalability**\n\n   * Can be easily extended to handle bulk user creation, role assignments, or integration with other systems (e.g., HR, CRM).\n\n6. ✅ **Transparency & Modularity**\n\n   * Each node is clearly labeled with “Sticky Notes” explaining every step, making maintenance and handover simple.\n\n---\n\n### How it works\n\n\n1.  **Trigger and Data Retrieval:** The workflow starts manually. It first retrieves user data (first name, last name, email) from the \"Data\" node. In parallel, it fetches all stored token records from a Data Table.\n2.  **Token Management:** The retrieved tokens are sorted and limited to get only the most recent one. This latest token (which contains the `refresh_token`) is then used in an HTTP Request to Zoom's OAuth endpoint to generate a fresh, valid `access_token`.\n3.  **User Creation:** The new `access_token` and `refresh_token` are saved back to the Data Table for future use. The workflow then generates a random password for the new user, merges this password with the initial user data, and finally sends a POST request to the Zoom API to create the new user. If the creation is successful, Zoom automatically sends an invitation email to the new user.\n\n---\n\n### Set up steps\n\n1.  **Prepare the Data Table:**\n    *   Create a new Data Table in your n8n project.\n    *   Add two columns to it: `accessToken` and `refreshToken`.\n\n2.  **Configure Zoom OAuth App:**\n    *   Create a standard OAuth app in the Zoom Marketplace (not a Server-to-Server app).\n    *   Note your Zoom `account_id`.\n    *   Encode your Zoom app's `client_id` and `client_secret` in Base64 format (as `client_id:client_secret`).\n    *   In both the \"Get new token\" and \"Zoom First Access Token\" nodes, replace the `\"XXX\"` in the `Authorization` header with this Base64-encoded string.\n\n3.  **Generate Initial Tokens (First Run Only):**\n    *   Manually execute the \"Zoom First Access Token\" node once. This node uses an authorization code to fetch the first-ever access and refresh tokens and saves them to your Data Table. The main workflow will use these stored tokens from this point forward.\n\n4.  **Configure User Data:**\n    *   In the \"Data\" node, set the default values for the new Zoom user by replacing the `\"XXX\"` placeholders for `first_name`, `last_name`, and `email`.\n\nAfter these setup steps, the main workflow (triggered via \"When clicking 'Execute workflow'\") can be run whenever you need to create a new Zoom user. It will automatically refresh the token and use the provided user data to create the account.\n\n\n---\n\n### **Need help customizing?**  \n[Contact me](mailto:info@n3w.it) for consulting and support or add me on [Linkedin](https://www.linkedin.com/in/davideboizza/). ",
+  "featuredImage": "/data/workflows/10747/10747.webp",
+  "author": {
+    "id": 101,
+    "slug": "n3witalia",
+    "name": "Davide",
+    "avatar": ""
+  },
+  "categories": [
+    "HR"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 108,
+  "downloads": 10,
+  "createdAt": "2025-11-12T07:34:42.134Z",
+  "updatedAt": "2026-01-16T09:06:07.131Z",
+  "publishedAt": "2025-11-12T07:34:42.134Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10747"
+}

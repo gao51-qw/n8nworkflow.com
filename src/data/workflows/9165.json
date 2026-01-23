@@ -1,0 +1,181 @@
+{
+  "id": 9165,
+  "slug": "9165",
+  "title": "Create dynamic API Gateway with HTTP Router and workflow orchestration",
+  "description": "## Overview  \nThis workflow provides a **universal webhook endpoint** that dynamically routes incoming requests to different subflows. It allows you to manage multiple API-like endpoints from a single entry point, while ensuring proper error handling and consistent responses.\n\n## How it works  \n1. **Webhook Receiver** – A single URL accepts requests.  \n2. **Method Detection** – Branches capture the request method.  \n3. **Route Resolver** – Matches the `action` parameter and method against your route configuration.\n4. **Execute Subflow** – If valid, the matching workflow is executed.  \n5. **Error Handling** – If invalid, the workflow responds with a clear status code and JSON error.\n\n### About the `action` parameter  \nThe `action` query parameter is the **key** that controls routing:  \n\n- In your **Routes Config**, every route is defined with an `action` name, a list of allowed HTTP methods, and the target subflow ID.  \n- When a request comes in, the workflow looks up the provided `action` in this config.  \n- If the action is valid and the method is allowed, the corresponding subflow is executed.  \n- If not, the workflow returns a structured error.\n\nIn other words:  \n- **Config side** → map `action` → subflow ID  \n- **Request side** → send `?action=...` → determines which subflow runs  \n\nThis makes `action` both the **mapping key** in the configuration and the **control key** for triggering the correct logic.  \n\n\n\n\n## Setup steps  \n1. Import the workflow into n8n.  \n2. Define your routes in the **Routes Config** node. Each route contains:  \n   - `action` name  \n   - allowed HTTP methods  \n   - target subflow ID   \n\n---  \n\nThis workflow is useful if you want to:  \n- Expose **multiple clean API endpoints** without creating many Webhook nodes  \n- Ensure consistent error handling across all endpoints  \n- Keep your n8n setup more structured and maintainable  \n\n---  \n\n👉 A practical solution to turn n8n into a **flexible and maintainable API gateway**.  \n",
+  "featuredImage": "/data/workflows/9165/9165.webp",
+  "author": {
+    "id": 101,
+    "slug": "sven",
+    "name": "Sven Rösser",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 313,
+  "downloads": 31,
+  "createdAt": "2025-10-01T19:07:38.019Z",
+  "updatedAt": "2026-01-16T08:59:18.710Z",
+  "publishedAt": "2025-10-01T19:07:38.019Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9165",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create dynamic API Gateway with HTTP Router and workflow orchestration",
+    "workflowName": "Create dynamic API Gateway with HTTP Router and workflow orchestration",
+    "description": "This workflow provides a **universal webhook endpoint** that dynamically routes incoming requests to different subflows. It allows you to manage multiple API-like endpoints from a single entry point, while ensuring proper error handling and consistent responses.\n\n## How it works  \n1. **Webhook Receiver** – A single URL accepts requests.  \n2. **Method Detection** – Branches capture the request method.  \n3. **Route Resolver** – Matches the `action` parameter and method against your route configuration.\n4. **Execute Subflow** – If valid, the matching workflow is executed.  \n5. **Error Handling** – If invalid, the workflow responds with a clear status code and JSON error.\n\n### About the `action` parameter  \nThe `action` query parameter is the **key** that controls routing:  \n\n- In your **Routes Config**, every route is defined with an `action` name, a list of allowed HTTP methods, and the target subflow ID.  \n- When a request comes in, the workflow looks up the provided `action` in this config.  \n- If the action is valid and the method is allowed, the corresponding subflow is executed.  \n- If not, the workflow returns a structured error.\n\nIn other words:  \n- **Config side** → map `action` → subflow ID  \n- **Request side** → send `?action=...` → determines which subflow runs  \n\nThis makes `action` both the **mapping key** in the configuration and the **control key** for triggering the correct logic.  \n\n\n\n\n## Setup steps  \n1. Import the workflow into n8n.  \n2. Define your routes in the **Routes Config** node. Each route contains:  \n   - `action` name  \n   - allowed HTTP methods  \n   - target subflow ID   \n\n---  \n\nThis workflow is useful if you want to:  \n- Expose **multiple clean API endpoints** without creating many Webhook nodes  \n- Ensure consistent error handling across all endpoints  \n- Keep your n8n setup more structured and maintainable  \n\n---  \n\n👉 A practical solution to turn n8n into a **flexible and maintainable API gateway**.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "HEAD",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Aggregate Method Branches",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "PUT",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "PATCH",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "DELETE",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "POST",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "GET",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Routes Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Query param exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Universal Receiver",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky: Method detection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Routes config",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Resolver",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Execute & respond",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "[Error] Required query param missing",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Resolve",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Route is OK?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Status = 405?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "[Error] Method Not Allowed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error - Not OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error - Subflow",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky: Method detection1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

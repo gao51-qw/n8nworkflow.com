@@ -1,0 +1,122 @@
+{
+  "id": 11669,
+  "slug": "11669",
+  "title": "Breaking news aggregator with SendGrid and PostgreSQL",
+  "description": "# Breaking News Aggregator with SendGrid and PostgreSQL\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes multiple government and regulatory websites, extracts the latest policy or compliance-related news, stores the data in PostgreSQL, and instantly emails daily summaries to your team through SendGrid. It is ideal for compliance professionals and industry analysts who need near real-time awareness of regulatory changes impacting their sector.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n.cloud)\n- ScrapeGraphAI community node installed\n- Operational SendGrid account\n- PostgreSQL database accessible from n8n\n- Basic knowledge of SQL for table creation\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping and parsing\n- **SendGrid API Key** – Sends email notifications\n- **PostgreSQL Credentials** – Host, port, database, user, and password\n\n### Specific Setup Requirements\n| Resource       | Requirement                                                      | Example Value                |\n|----------------|------------------------------------------------------------------|------------------------------|\n| PostgreSQL     | Table with columns: `id`, `title`, `url`, `source`, `published_at`| `news_updates`               |\n| Allowed Hosts  | Outbound HTTPS access from n8n to target sites & SendGrid endpoint| `https://*.gov`, `https://api.sendgrid.com` |\n| Keywords List  | Comma-separated compliance terms to filter results               | `GDPR, AML, cybersecurity`   |\n\n## How it works\n\nThis workflow automatically scrapes multiple government and regulatory websites, extracts the latest policy or compliance-related news, stores the data in PostgreSQL, and instantly emails daily summaries to your team through SendGrid. It is ideal for compliance professionals and industry analysts who need near real-time awareness of regulatory changes impacting their sector.\n\n## Key Steps:\n- **Schedule Trigger**: Runs once daily (or at any chosen interval).\n- **ScrapeGraphAI**: Crawls predefined regulatory URLs and returns structured article data.\n- **Code (JS)**: Filters results by keywords and formats them.\n- **SplitInBatches**: Processes articles in manageable chunks to avoid timeouts.\n- **If Node**: Checks whether each article already exists in the database.\n- **PostgreSQL**: Inserts only new articles into the `news_updates` table.\n- **Set Node**: Generates an email-friendly HTML summary.\n- **SendGrid**: Dispatches the compiled summary to compliance stakeholders.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install ScrapeGraphAI Node**:  \n   - From n8n, go to “Settings → Community Nodes → Install”, search “ScrapeGraphAI”, and install.\n2. **Create PostgreSQL Table**:  \n   ```sql\n   CREATE TABLE news_updates (\n     id SERIAL PRIMARY KEY,\n     title TEXT,\n     url TEXT UNIQUE,\n     source TEXT,\n     published_at TIMESTAMP\n   );\n   ```\n3. **Add Credentials**:  \n   - Navigate to “Credentials”, add ScrapeGraphAI, SendGrid, and PostgreSQL credentials.\n4. **Import Workflow**:  \n   - Copy the JSON workflow, paste into “Import from Clipboard”.\n5. **Configure Environment Variables** (optional):  \n   - `REG_NEWS_KEYWORDS`, `SEND_TO_EMAILS`, `DB_TABLE_NAME`.\n6. **Set Schedule**:  \n   - Open the Schedule Trigger node and define your preferred cron expression.\n7. **Activate Workflow**:  \n   - Toggle “Active”, then click “Execute Workflow” once to validate all connections.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Schedule Trigger** – Initiates the workflow at the defined interval.\n- **ScrapeGraphAI** – Scrapes and parses news listings into JSON.\n- **Code** – Filters articles by keywords and normalizes timestamps.\n- **SplitInBatches** – Prevents database overload by batching inserts.\n- **If** – Determines whether an article is already stored.\n- **PostgreSQL** – Executes parameterized INSERT statements.\n- **Set** – Builds the HTML email body.\n- **SendGrid** – Sends the daily digest email.\n\n### Data Flow:\n1. **Schedule Trigger** → **ScrapeGraphAI** → **Code** → **SplitInBatches** → **If** → **PostgreSQL** → **Set** → **SendGrid**\n\n## Customization Examples\n\n### Change Keyword Filtering\n```javascript\n// Code Node snippet\nconst keywords = ['GDPR','AML','SOX']; // Add or remove terms\nitem.filtered = keywords.some(k =&gt; item.title.includes(k));\nreturn item;\n```\n\n### Switch to Weekly Digest\n```json\n{\n  \"trigger\": {\n    \"cronExpression\": \"0 9 * * 1\" // Every Monday at 09:00\n  }\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"title\": \"Data Privacy Act Amendment Passed\",\n  \"url\": \"https://regulator.gov/news/1234\",\n  \"source\": \"regulator.gov\",\n  \"published_at\": \"2024-06-12T14:30:00Z\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI node not found** – Install the community node and restart n8n.\n2. **Duplicate key error in PostgreSQL** – Ensure the `url` column is marked `UNIQUE` to prevent duplicates.\n3. **Emails not sending** – Verify SendGrid API key and check account’s daily limit.\n\n### Performance Tips\n- Limit initial scrape URLs to fewer than 20 to reduce run time.\n- Increase SplitInBatches size only if your database can handle larger inserts.\n\n**Pro Tips:**\n- Use environment variables to manage sensitive credentials securely.\n- Add an Error Trigger node to catch and log failures for auditing purposes.\n- Combine with Slack or Microsoft Teams nodes to push instant alerts alongside email digests.",
+  "featuredImage": "/data/workflows/11669/11669.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 121,
+  "downloads": 12,
+  "createdAt": "2025-12-10T20:49:05.934Z",
+  "updatedAt": "2026-01-16T09:09:36.802Z",
+  "publishedAt": "2025-12-10T20:49:05.934Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11669",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Breaking news aggregator with SendGrid and PostgreSQL",
+    "workflowName": "Breaking news aggregator with SendGrid and PostgreSQL",
+    "description": "# Breaking News Aggregator with SendGrid and PostgreSQL\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes multiple government and regulatory websites, extracts the latest policy or compliance-related news, stores the data in PostgreSQL, and instantly emails daily summaries to your team through SendGrid. It is ideal for compliance professionals and industry analysts who need near real-time awareness of regulatory changes impacting their sector.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- n8n instance (self-hosted or n8n.cloud)\n- ScrapeGraphAI community node installed\n- Operational SendGrid account\n- PostgreSQL database accessible from n8n\n- Basic knowledge of SQL for table creation\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping and parsing\n- **SendGrid API Key** – Sends email notifications\n- **PostgreSQL Credentials** – Host, port, database, user, and password\n\n### Specific Setup Requirements\n| Resource       | Requirement                                                      | Example Value                |\n|----------------|------------------------------------------------------------------|------------------------------|\n| PostgreSQL     | Table with columns: `id`, `title`, `url`, `source`, `published_at`| `news_updates`               |\n| Allowed Hosts  | Outbound HTTPS access from n8n to target sites & SendGrid endpoint| `https://*.gov`, `https://api.sendgrid.com` |\n| Keywords List  | Comma-separated compliance terms to filter results               | `GDPR, AML, cybersecurity`   |\n\n## How it works\n\nThis workflow automatically scrapes multiple government and regulatory websites, extracts the latest policy or compliance-related news, stores the data in PostgreSQL, and instantly emails daily summaries to your team through SendGrid. It is ideal for compliance professionals and industry analysts who need near real-time awareness of regulatory changes impacting their sector.\n\n## Key Steps:\n- **Schedule Trigger**: Runs once daily (or at any chosen interval).\n- **ScrapeGraphAI**: Crawls predefined regulatory URLs and returns structured article data.\n- **Code (JS)**: Filters results by keywords and formats them.\n- **SplitInBatches**: Processes articles in manageable chunks to avoid timeouts.\n- **If Node**: Checks whether each article already exists in the database.\n- **PostgreSQL**: Inserts only new articles into the `news_updates` table.\n- **Set Node**: Generates an email-friendly HTML summary.\n- **SendGrid**: Dispatches the compiled summary to compliance stakeholders.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install ScrapeGraphAI Node**:  \n   - From n8n, go to “Settings → Community Nodes → Install”, search “ScrapeGraphAI”, and install.\n2. **Create PostgreSQL Table**:  \n   ```sql\n   CREATE TABLE news_updates (\n     id SERIAL PRIMARY KEY,\n     title TEXT,\n     url TEXT UNIQUE,\n     source TEXT,\n     published_at TIMESTAMP\n   );\n   ```\n3. **Add Credentials**:  \n   - Navigate to “Credentials”, add ScrapeGraphAI, SendGrid, and PostgreSQL credentials.\n4. **Import Workflow**:  \n   - Copy the JSON workflow, paste into “Import from Clipboard”.\n5. **Configure Environment Variables** (optional):  \n   - `REG_NEWS_KEYWORDS`, `SEND_TO_EMAILS`, `DB_TABLE_NAME`.\n6. **Set Schedule**:  \n   - Open the Schedule Trigger node and define your preferred cron expression.\n7. **Activate Workflow**:  \n   - Toggle “Active”, then click “Execute Workflow” once to validate all connections.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **Schedule Trigger** – Initiates the workflow at the defined interval.\n- **ScrapeGraphAI** – Scrapes and parses news listings into JSON.\n- **Code** – Filters articles by keywords and normalizes timestamps.\n- **SplitInBatches** – Prevents database overload by batching inserts.\n- **If** – Determines whether an article is already stored.\n- **PostgreSQL** – Executes parameterized INSERT statements.\n- **Set** – Builds the HTML email body.\n- **SendGrid** – Sends the daily digest email.\n\n### Data Flow:\n1. **Schedule Trigger** → **ScrapeGraphAI** → **Code** → **SplitInBatches** → **If** → **PostgreSQL** → **Set** → **SendGrid**\n\n## Customization Examples\n\n### Change Keyword Filtering\n```javascript\n// Code Node snippet\nconst keywords = ['GDPR','AML','SOX']; // Add or remove terms\nitem.filtered = keywords.some(k =&gt; item.title.includes(k));\nreturn item;\n```\n\n### Switch to Weekly Digest\n```json\n{\n  \"trigger\": {\n    \"cronExpression\": \"0 9 * * 1\" // Every Monday at 09:00\n  }\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"title\": \"Data Privacy Act Amendment Passed\",\n  \"url\": \"https://regulator.gov/news/1234\",\n  \"source\": \"regulator.gov\",\n  \"published_at\": \"2024-06-12T14:30:00Z\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI node not found** – Install the community node and restart n8n.\n2. **Duplicate key error in PostgreSQL** – Ensure the `url` column is marked `UNIQUE` to prevent duplicates.\n3. **Emails not sending** – Verify SendGrid API key and check account’s daily limit.\n\n### Performance Tips\n- Limit initial scrape URLs to fewer than 20 to reduce run time.\n- Increase SplitInBatches size only if your database can handle larger inserts.\n\n**Pro Tips:**\n- Use environment variables to manage sensitive credentials securely.\n- Add an Error Trigger node to catch and log failures for auditing purposes.\n- Combine with Slack or Microsoft Teams nodes to push instant alerts alongside email digests.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Daily Regulatory Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Define Regulatory Sources",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Through Sources",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Regulatory Page",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Normalize & Score Impact",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add Timestamp & Metadata",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "High Impact?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Email Content",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "SendGrid Alert",
+      "type": "n8n-nodes-base.sendGrid",
+      "role": "sendGrid",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Regulation Record",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section - Data Collection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section - Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section - Alerts & Storage",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

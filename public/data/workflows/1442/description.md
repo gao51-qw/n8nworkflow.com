@@ -1,0 +1,1 @@
+This workflow assigns a user to an issue if they include "assign me" when opening or commenting. To use this workflow you will need to update the credentials used for the Github nodes.

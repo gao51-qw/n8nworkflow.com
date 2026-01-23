@@ -1,0 +1,27 @@
+{
+  "id": 4931,
+  "slug": "4931",
+  "title": "Flexible currency rate uploads for SAP B1 with AI validation & multiple sources",
+  "description": "This workflow automates currency rate uploads into SAP Business One via Service Layer, using flexible input sources such as JSON (API), SQL Server, Google Sheets, or manual values. It leverages logic branching, AI validation, and logging for complete control and traceability.\n\n++**⚙️ HOW IT WORKS:**++\n**🔹 1. Receive Data via Webhook**\n\nThe workflow listens on the endpoint /formulario-datos via HTTP POST.\n\nThe request body should include:\n\norigen: one of JSON, SQL, GoogleSheets, or Manual\n\nDepending on the value, the flow branches accordingly.\n\n**🔹 2. Authenticate with SAP Business One**\n\nA POST request is sent to SAP B1’s Login endpoint.\n\nA session cookie (B1SESSION) is retrieved and used in all subsequent API calls.\n\n**🔹 3. Switch by Origin**\nThe flow branches into four processing paths based on origen:\n\n- JSON:\n\nThe payload is normalized using OpenAI to extract an array of rates.\n\nEach rate is sent to SAP individually after parsing.\n\n- SQL:\n\nThe SQL query provided in the payload is executed on a connected Microsoft SQL Server.\n\nThe results are checked by AI to validate the date format.\n\nIf valid, rates are sent to SAP.\n\n- GoogleSheets:\n\nRates are pulled from a connected spreadsheet.\n\nEach entry is sent to SAP in sequence.\n\n- Manual:\n\nUses currency, rate, and rateDate directly from the webhook payload.\n\nSends the result directly to SAP.\n\n**🔹 4. AI-Powered Enhancements (Optional but enabled)**\n\n- Normalize JSON:\nUses OpenAI (LangChain node) to convert any messy structure into a uniform array under the key rate.\n\n- Date Formatting:\nAnother OpenAI call ensures RateDate is in yyyyMMdd format (required by SAP), converting from ISO, timestamp, or other formats.\n\n**🔹 5. Send to SAP Business One (Service Layer)**\nAll paths send a POST request to:\n\n/SBOBobService_SetCurrencyRate\nWith a payload such as:\n\n{\n  \"Currency\": \"USD\",\n  \"Rate\": \"0.92\",\n  \"RateDate\": \"20250612\"\n}\n\n**🔹 6. Log Results**\n\nAll success/failure results are appended to a Google Sheets log (LOGS_N8N)\n\nThe log includes method, URL, sent payload, status code, and message.\n\n**++🛠 SETUP STEPS:++**\n\n**1️⃣ Create Required Credentials:**\nGo to Credentials &gt; + New Credential and configure:\n\n- SAP Business One (Service Layer)\n\nType: HTTP Request Auth or Token\n\nBase URL: https://&lt;your-host&gt;:50000/b1s/v1/\n\nProvide Username, Password, and CompanyDB via variables or fields\n\n- Google Sheets\n\nOAuth2 connection to a Google account with access\n\n- Microsoft SQL Server\n\nSQL login credentials and host\n\n- OpenAI\n\nAPI key with access to models like GPT-4o\n\n**2️⃣ Environment Variables (Recommended)**\nSet these variables in n8n → Settings → Variables:\n\n\nSAP_URL=https://&lt;host&gt;:50000/b1s/v1/\nSAP_USER=your_username\nSAP_PASSWORD=your_password\nSAP_COMPANY_DB=your_companyDB\n\n\n**3️⃣ Prepare Google Sheets**\n- Sheet 1: RATE (for charging the data)\n\nColumns: Currency, Rate, RateDate\n\n- Sheet 2: LOGS_N8N (to save the logs, success or failed)\n\nColumns: workflow, method, url, json, status_code, message\n\n**4️⃣ Activate and Test**\nDeploy the webhook and grab the URL.\n\n**++✅ BONUS++**\n- Built-in AI assistance for input validation and structure\n\n- Logs all results for compliance and audit\n\n- Flexible integration paths: perfect for hybrid or transitional systems",
+  "featuredImage": "/data/workflows/4931/4931.webp",
+  "author": {
+    "id": 101,
+    "slug": "raquelgiugliano",
+    "name": "Raquel Giugliano",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1619,
+  "downloads": 161,
+  "createdAt": "2025-06-14T13:53:54.678Z",
+  "updatedAt": "2026-01-16T08:36:59.456Z",
+  "publishedAt": "2025-06-14T13:53:54.678Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4931"
+}

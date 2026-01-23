@@ -1,0 +1,254 @@
+{
+  "id": 2374,
+  "slug": "2374",
+  "title": "Community insights using Qdrant, Python and Information Extractor",
+  "description": "This n8n template is one of a 3-part series exploring use-cases for clustering vector embeddings:\n* Survey Insights\n* Customer Insights\n* Community Insights\n\nThis template demonstrates the Community Insights scenario where HN commments can be quickly grouped by similarity and an AI agent can generate insights on those groupings.\n\nWith this workflow, Researchers or HN users can quickly breakdown community consensus on a particular topic and identify frequently mentioned positives and negatives.\n\nSample Output: https://docs.google.com/spreadsheets/d/e/2PACX-1vQXaQU9XxsxnUIIeqmmf1PuYRuYtwviVXTv6Mz9Vo6_a4ty-XaJHSeZsptjWXS3wGGDG8Z4u16rvE7l/pubhtml\n\n### How it works\n* HN comments are imported via the Hacknews API node.\n* Comments are then inserted into a Qdrant collection carefully tagged with the Hackernews API metadata.\n* Comments are then fetched and are put through a clustering algorithm using the Python Code node. The Qdrant points are returned in clustered groups.\n* Each group is looped to fetch the payloads of the points and feed them to the AI agent to summarise and generate insights for.\n* The resulting insights and raw responses are then saved to the Google Spreadsheet for further analysis by the researcher or the HN user.\n\n### Requirements\n* Works best with lots of comments!\n* Qdrant Vectorstore for storing embeddings.\n* OpenAI account for embeddings and LLM.\n\n### Customising the Template\n* Adjust clustering parameters which make sense for your data.\n* Adjust sentimentality setting if comments are overwhelmingly negative at times.",
+  "featuredImage": "/data/workflows/2374/2374.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 47111,
+  "downloads": 4711,
+  "createdAt": "2024-08-05T10:05:06.448Z",
+  "updatedAt": "2026-01-16T08:24:18.097Z",
+  "publishedAt": "2024-08-05T10:05:06.448Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2374",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Community insights using Qdrant, Python and Information Extractor",
+    "workflowName": "Community insights using Qdrant, Python and Information Extractor",
+    "description": "This n8n template is one of a 3-part series exploring use-cases for clustering vector embeddings:\n* Survey Insights\n* Customer Insights\n* Community Insights\n\nThis template demonstrates the Community Insights scenario where HN commments can be quickly grouped by similarity and an AI agent can generate insights on those groupings.\n\nWith this workflow, Researchers or HN users can quickly breakdown community consensus on a particular topic and identify frequently mentioned positives and negatives.\n\nSample Output: https://docs.google.com/spreadsheets/d/e/2PACX-1vQXaQU9XxsxnUIIeqmmf1PuYRuYtwviVXTv6Mz9Vo6_a4ty-XaJHSeZsptjWXS3wGGDG8Z4u16rvE7l/pubhtml\n\n### How it works\n* HN comments are imported via the Hacknews API node.\n* Comments are then inserted into a Qdrant collection carefully tagged with the Hackernews API metadata.\n* Comments are then fetched and are put through a clustering algorithm using the Python Code node. The Qdrant points are returned in clustered groups.\n* Each group is looped to fetch the payloads of the points and feed them to the AI agent to summarise and generate insights for.\n* The resulting insights and raw responses are then saved to the Google Spreadsheet for further analysis by the researcher or the HN user.\n\n### Requirements\n* Works best with lots of comments!\n* Qdrant Vectorstore for storing embeddings.\n* OpenAI account for embeddings and LLM.\n\n### Customising the Template\n* Adjust clustering parameters which make sense for your data.\n* Adjust sentimentality setting if comments are overwhelmingly negative at times.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Hacker News",
+      "type": "n8n-nodes-base.hackerNews",
+      "role": "hackerNews",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Comments",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Clear Existing Comments",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Payload of Points",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Clusters To List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Only Clusters With 3+ points",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Variables1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prep Output For Export",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Export To Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.4"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Trigger Insights",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prep Values For Trigger",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Find Comments",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Apply K-means Clustering Algorithm",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "role": "informationExtractor",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": 2839,
+  "slug": "2839",
+  "title": "Calculate the centroid of a set of vectors",
+  "description": "# n8n Workflow: Calculate the Centroid of a Set of Vectors\n\n## Overview\nThis workflow receives an array of vectors in JSON format, validates that all vectors have the same dimensions, and computes the centroid. It is designed to be reusable across different projects.\n\n## Workflow Structure\n### Nodes and Their Functions:\n1. **Receive Vectors (Webhook)**: Accepts a GET request containing an array of vectors in the `vectors` parameter.\n   - **Expected Input:** `vectors` parameter in JSON format.\n   - **Example Request:** `/webhook/centroid?vectors=[[2,3,4],[4,5,6],[6,7,8]]`\n   - **Output:** Passes the received data to the next node.\n\n2. **Extract & Parse Vectors (Set Node)**: Converts the input string into a proper JSON array for processing.\n   - **Ensures `vectors` is a valid array.**\n   - **If the parameter is missing, it may generate an error.**\n   - **Expected Output Example:**\n   ```json\n   {\n     \"vectors\": [[2,3,4],[4,5,6],[6,7,8]]\n   }\n   ```\n\n3. **Validate & Compute Centroid (Code Node)**: Validates vector dimensions and calculates the centroid.\n   - **Validation:** Ensures all vectors have the same number of dimensions.\n   - **Computation:** Averages each dimension to determine the centroid.\n   - **If validation fails:** Returns an error message indicating inconsistent dimensions.\n   - **Successful Output Example:**\n   ```json\n   {\n     \"centroid\": [4,5,6]\n   }\n   ```\n   - **Error Output Example:**\n   ```json\n   {\n     \"error\": \"Vectors have inconsistent dimensions.\"\n   }\n   ```\n\n4. **Return Centroid Response (Respond to Webhook Node)**: Sends the final response back to the client.\n   - **If the computation is successful**, it returns the centroid.\n   - **If an error occurs**, it returns a descriptive error message.\n   - **Example Response:**\n   ```json\n   {\n     \"centroid\": [4, 5, 6]\n   }\n   ```\n\n## Inputs\n- JSON array of vectors, where each vector is an array of numerical values.\n\n### Example Input\n```json\n{\n  \"vectors\": [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n  ]\n}\n```\n\n## Setup Guide\n1. **Create a new workflow in n8n**.\n2. **Add a Webhook node** (`Receive Vectors`) to receive JSON input.\n3. **Add a Set node** (`Extract & Parse Vectors`) to extract and convert the data.\n4. **Add a Code node** (`Validate & Compute Centroid`) to:\n   - Validate dimensions.\n   - Compute the centroid.\n5. **Add a Respond to Webhook node** (`Return Centroid Response`) to return the result.\n\n### Function Node Script Example\n```javascript\nconst input = items[0].json;\nconst vectors = input.vectors;\n\nif (!Array.isArray(vectors) || vectors.length === 0) {\n  return [{ json: { error: \"Invalid input: Expected an array of vectors.\" } }];\n}\n\nconst dimension = vectors[0].length;\nif (!vectors.every(v =&gt; v.length === dimension)) {\n  return [{ json: { error: \"Vectors have inconsistent dimensions.\" } }];\n}\n\nconst centroid = new Array(dimension).fill(0);\nvectors.forEach(vector =&gt; {\n  vector.forEach((val, index) =&gt; {\n    centroid[index] += val;\n  });\n});\n\nfor (let i = 0; i &lt; dimension; i++) {\n  centroid[i] /= vectors.length;\n}\n\nreturn [{ json: { centroid } }];\n```\n\n## Testing\n- Use a tool like Postman or the n8n UI to send sample inputs and verify the responses.\n- Modify the input vectors to test different scenarios.\n\nThis workflow provides a simple yet flexible solution for vector centroid computation, ensuring validation and reliability.\n",
+  "featuredImage": "/data/workflows/2839/2839.webp",
+  "author": {
+    "id": 101,
+    "slug": "rckflr",
+    "name": "Mauricio Perera",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 620,
+  "downloads": 62,
+  "createdAt": "2025-02-03T02:28:31.005Z",
+  "updatedAt": "2026-01-16T08:26:45.804Z",
+  "publishedAt": "2025-02-03T02:28:31.005Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2839"
+}

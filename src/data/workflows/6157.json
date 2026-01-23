@@ -1,0 +1,758 @@
+{
+  "id": 6157,
+  "slug": "6157",
+  "title": "Multi-source news curator with Mistral AI analysis, summaries & custom channels",
+  "description": "## Flexible News Curator - Multi-Sources, AI Analysis, Summaries, Translation, and Settable Channels\n\n## 🎬 Overview\n\nThe Flexible News Curator workflow can automate the collection, filtering, AI-driven analysis, and summarization of news from diverse sources of your interest. Using customizable search themes, RSS feeds, and (optional) video descriptions, it delivers concise, quality news summaries via configurable channels. This workflow is designed to help reduce information overload and keep you updated effortlessly.\n\nClick the image below to watch the video guide:\n[![Watch the video guide](https://img.youtube.com/vi/ajtmTstc6Lo/0.jpg)](https://www.youtube.com/watch?v=ajtmTstc6Lo)\n\n## ✨ Features\n\n- **Multi-Source News Aggregation**: Collect news from customizable RSS feeds, SerpAPI, and Video Channel Feeds (if enabled).\n- **AI-Powered News Selection \\& Summarization**: Uses advanced AI agents (Mistral Cloud Chat Model by default) to select, analyze, and summarize top news.\n- **Quality Assurance Step**: Optional AI-powered filtering to improve news selection quality before analysis.\n- **Multi-Language Translation \\& Tone Customization**: Translate summaries and customize tone for localized or tailored consumption.\n- **Multi-Channel Delivery**: Send outputs via Email, Telegram, WhatsApp, Webhook, or save to disk.\n- **Advanced Filtering**: Regex-based filtering on URLs, titles, and content to exclude unwanted articles.\n- **Sub-Workflow Architecture**: Modular handling of video transcripts, content retrieval, multi-theme searching, and more.\n- **Flexible Scheduling \\& Trigger Options**: Supports schedule-based triggering, email (IMAP) triggers, and webhook-based activation.\n- **(Optional) Video Search**: Video content descriptions via Video Channel Feeds.\n\n## 👤 Who is this for?\n\nThis workflow benefits professionals, researchers, marketers, and anyone who needs to stay informed about specific news themes without wasting time on irrelevant information or reading too many news to select the most interesting ones.\n\n## 💡 What problem does this solve?\n\nThe workflow tackles the challenge of information overload by automatically filtering, summarizing, and delivering the essential news tailored to your interests and preferences. It integrates various data sources and channels for comprehensive yet efficient news consumption. Ideal use-cases include:\n\n- Monitoring breakthroughs in research fields\n- Receiving daily business opportunity updates (e.g., real estate)\n- Lower the cognitive load required to follow your favorite news\n- Translating news summaries to your chosen language\n\n## 🔍 What this workflow does\n\nThe workflow gathers news from RSS feeds, search engines, and social media, then:\n\n- Filters duplicates and irrelevant content via custom regex filters and date ranges.\n- Applies optional AI-powered Quality Assurance for headline evaluation.\n- Selects top news articles with AI analysis focused on user-defined criteria and audience.\n- Summarizes individual articles using AI summarization agents, ensuring structured, consistent outputs.\n- Optionally translates and adjusts the tone of summaries.\n- Distributes summaries through configured channels such as email, social media, messaging apps, or webhook calls.\n\n## 🔄 Workflow Steps\n\n### 1. News Gathering\n\n- Fetch news using RSS feeds, SerpAPI search, and optionally video channel feeds.\n- Standardize output structures for seamless merging.\n- Employ sub-workflows for video transcript retrieval and looping over custom RSS feed lists.\n\n### 2. Filtering\n\n- Remove duplicates and news outside the specified date range.\n- Exclude articles matching user-defined keywords via regex filters in URLs, titles, and content.\n- Limit the number of news articles for AI analysis.\n\n### 3. News Selection\n\n- Optionally invoke an AI Quality Assurance agent to pre-filter headlines.\n- Aggregate news for AI analysis.\n- Select and summarize top news articles with AI agents using customizable criteria.\n- Parse AI responses into defined JSON structures to ensure consistent data.\n\n### 4. News Summarization\n\n- Prepare individual article content.\n- Summarize content with AI agents and validate structured output.\n\n### 5. Sender Preparation\n\n- Combine general summaries with selected top news summaries.\n- Format final summaries as text and HTML suitable for delivery.\n- Optionally apply translation and tone adjustment.\n\n### 6. Sending\n\n- Deliver summaries through selected channels (Email, Telegram, WhatsApp, Webhook).\n- Optionally save the output to disk as JSON.\n\n## 📌 Expected Input / Configuration\n\nThe workflow is primarily configured via the **Configure Workflow Args** node or the **Global Variables** custom node, with these key parameters:\n\n| Parameter | Description | Type |\n| :-- | :-- | :-- |\n| `search_themes` | List of keywords/themes to search in SerpAPI | List of strings |\n| `datetime_delta` | Number of days back to include news from; e.g., 0 = today | Integer |\n| `link_censor` | Regex to exclude unwanted URLs | Regex string |\n| `title_censor` | Regex to exclude unwanted titles | Regex string |\n| `content_censor` | Regex to exclude unwanted content | Regex string |\n| `use_qa` | Flag to enable AI Quality Assurance for headline filtering | Boolean |\n| `max_news_analysis` | Max number of articles sent to News Analyzer | Integer |\n| `qa_max_news` | Number of headlines the QA Agent analyzes | Integer |\n| `qa_max_top_news` | Number of headlines selected by QA Agent | Integer |\n| `qa_check_criteria` | Criteria used by QA Agent to discard low-quality headlines | List of strings |\n| `qa_select_criteria` | Criteria used by QA Agent to rank/select the best headlines | List of strings |\n| `news_focus` | What the News Analyzer should focus on while selecting news | String |\n| `news_target_audience` | Target audience description for the News Analyzer | String |\n| `news_criteria` | Instructions for the News Analyzer to identify relevant news | List of strings |\n| `language` | Language for news summaries; triggers translation if not English | String |\n| `translator_tone` | Tone for translation (e.g., casual, professional) | String |\n| `translator_notes` | Additional instructions for the translator | String |\n| `email_sender` | Email address used for sending (via SMTP) | String |\n| `email_recipients` | Recipient email addresses (comma-separated) | String |\n| `email_subject` | Email subject line | String |\n| `telegram_chat_id` | Telegram chat ID for sending notifications | String |\n| `phone_number` | Phone number for WhatsApp messages | String |\n| `rss_feeds` | Custom list of RSS feeds (objects with `link` and `needs_content_search` properties) | JSON array of objects |\n| `video_rss_feeds` | Custom list of video RSS feeds | JSON array of objects |\n| `enable_video_search` | Enable/disable video search functionality | Boolean |\n| `enabled_senders` | List of enabled delivery channels (email, telegram, whatsapp, webhook, save-to-disk) | List of strings |\n\n*Hint:* To add or combine keywords in censors, use the pattern `\"keyword1|keyword2|keyword3\"`.\n\n## 📦 Expected Output\n\nStructured JSON containing a general news summary, top news with summaries, and metadata, suitable for your preferred channel delivery.\n\n## 📌 Example\n\n![example.png](fileId:1798)\n\nAn example that includes workflow parameters is provided in a note within the workflow.\n\n## ⚙️ n8n Setup Used\n\n- **n8n version:** 1.100.1\n- **n8n-nodes-serpapi:** 0.1.6\n- **n8n-nodes-globals:** 1.1.0\n- **LLM Model:** mistral-small-latest (API)\n- **IMAP:** imap.gmail.com (Port 993)\n- **Platform:** Podman 4.3.1 on Linux\n- **Date:** 2025-07-15\n\n## ⚡ Requirements to Use / Setup\n\n- Self-hosted n8n instance.\n(This workflow contains community nodes that are only compatible with the self-hosted version of n8n.)\n- Install necessary custom nodes:\n    - [n8n-nodes-serpapi](https://github.com/serpapi/n8n-nodes-serpapi)\n    - [n8n-nodes-globals](https://github.com/umanamente/n8n-nodes-globals#readme) (or use Edit Field (Set) node instead)\n- Configure all sub-workflows bundled within this template (see [Sub-Workflows Guide](https://docs.n8n.io/flow-logic/subworkflows/)).\n- Provide valid credentials to nodes for SerpAPI, Telegram, WhatsApp, Mistral Cloud Chat API, and SMTP (for email).\n- Custom RSS feed list must be set by you in the workflow args.\n- You must either install the SerpAPI custom node or deactivate it.\n\n## ⚠️ Notes, Assumptions \\& Warnings\n\n- The workflow timeout is set to 30 minutes by default; adjust depending on your setup and workload.\n- Duplicate removal is applied, but occasional overlaps might still appear depending on feed sources.\n- This workflow assumes familiarity with n8n, RSS feeds, API key management and regex expressions.\n- Video search only works for configured video channels; remember to respect the rights of these channels.\n- Using AI agents (Mistral or substitute LLMs) requires access to their API services and keys.\n- Out-of-the-box customization is done via the Global Variables node or direct workflow argument edits.\n\n## ℹ️ About Us\n\nThis workflow was developed by the Hybroht team of AI enthusiasts and developers dedicated to enhancing the capabilities of AI through collaborative processes. Our goal is to create tools that harness the possibilities of AI technology and more. For questions, support, or feature requests, reach out via [contact@hybroht.com](mailto:contact@hybroht.com).\n\n---\n\n### ❓ Questions & Issues\n\nWe will answer any questions, provided they are related to this workflow.\n\nPlease contact us if there is any bug/issue with this workflow. We will assist you.\n\n### ⚖️ Warranty & Legal Notice\n\nYou can view the full license terms [here](https://hybroht.com/docs/policies/licenses/n8n_workflows/news_curator/WORKFLOW-LEGAL_NOTICE_v3.0.md). Please review them before making your purchase.\n\n**By purchasing this product, you agree to these terms.**\n\n---\n",
+  "featuredImage": "/data/workflows/6157/6157.webp",
+  "author": {
+    "id": 101,
+    "slug": "hybroht",
+    "name": "Hybroht",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 253,
+  "downloads": 25,
+  "createdAt": "2025-07-18T22:44:28.618Z",
+  "updatedAt": "2026-01-16T08:43:28.957Z",
+  "publishedAt": "2025-07-18T22:44:28.618Z",
+  "nodes": 120,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6157",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Multi-source news curator with Mistral AI analysis, summaries & custom channels",
+    "workflowName": "Multi-source news curator with Mistral AI analysis, summaries & custom channels",
+    "description": "## Flexible News Curator - Multi-Sources, AI Analysis, Summaries, Translation, and Settable Channels\n\n## 🎬 Overview\n\nThe Flexible News Curator workflow can automate the collection, filtering, AI-driven analysis, and summarization of news from diverse sources of your interest. Using customizable search themes, RSS feeds, and (optional) video descriptions, it delivers concise, quality news summaries via configurable channels. This workflow is designed to help reduce information overload and keep you updated effortlessly.\n\nClick the image below to watch the video guide:\n[![Watch the video guide](https://img.youtube.com/vi/ajtmTstc6Lo/0.jpg)](https://www.youtube.com/watch?v=ajtmTstc6Lo)\n\n## ✨ Features\n\n- **Multi-Source News Aggregation**: Collect news from customizable RSS feeds, SerpAPI, and Video Channel Feeds (if enabled).\n- **AI-Powered News Selection \\& Summarization**: Uses advanced AI agents (Mistral Cloud Chat Model by default) to select, analyze, and summarize top news.\n- **Quality Assurance Step**: Optional AI-powered filtering to improve news selection quality before analysis.\n- **Multi-Language Translation \\& Tone Customization**: Translate summaries and customize tone for localized or tailored consumption.\n- **Multi-Channel Delivery**: Send outputs via Email, Telegram, WhatsApp, Webhook, or save to disk.\n- **Advanced Filtering**: Regex-based filtering on URLs, titles, and content to exclude unwanted articles.\n- **Sub-Workflow Architecture**: Modular handling of video transcripts, content retrieval, multi-theme searching, and more.\n- **Flexible Scheduling \\& Trigger Options**: Supports schedule-based triggering, email (IMAP) triggers, and webhook-based activation.\n- **(Optional) Video Search**: Video content descriptions via Video Channel Feeds.\n\n## 👤 Who is this for?\n\nThis workflow benefits professionals, researchers, marketers, and anyone who needs to stay informed about specific news themes without wasting time on irrelevant information or reading too many news to select the most interesting ones.\n\n## 💡 What problem does this solve?\n\nThe workflow tackles the challenge of information overload by automatically filtering, summarizing, and delivering the essential news tailored to your interests and preferences. It integrates various data sources and channels for comprehensive yet efficient news consumption. Ideal use-cases include:\n\n- Monitoring breakthroughs in research fields\n- Receiving daily business opportunity updates (e.g., real estate)\n- Lower the cognitive load required to follow your favorite news\n- Translating news summaries to your chosen language\n\n## 🔍 What this workflow does\n\nThe workflow gathers news from RSS feeds, search engines, and social media, then:\n\n- Filters duplicates and irrelevant content via custom regex filters and date ranges.\n- Applies optional AI-powered Quality Assurance for headline evaluation.\n- Selects top news articles with AI analysis focused on user-defined criteria and audience.\n- Summarizes individual articles using AI summarization agents, ensuring structured, consistent outputs.\n- Optionally translates and adjusts the tone of summaries.\n- Distributes summaries through configured channels such as email, social media, messaging apps, or webhook calls.\n\n## 🔄 Workflow Steps\n\n### 1. News Gathering\n\n- Fetch news using RSS feeds, SerpAPI search, and optionally video channel feeds.\n- Standardize output structures for seamless merging.\n- Employ sub-workflows for video transcript retrieval and looping over custom RSS feed lists.\n\n### 2. Filtering\n\n- Remove duplicates and news outside the specified date range.\n- Exclude articles matching user-defined keywords via regex filters in URLs, titles, and content.\n- Limit the number of news articles for AI analysis.\n\n### 3. News Selection\n\n- Optionally invoke an AI Quality Assurance agent to pre-filter headlines.\n- Aggregate news for AI analysis.\n- Select and summarize top news articles with AI agents using customizable criteria.\n- Parse AI responses into defined JSON structures to ensure consistent data.\n\n### 4. News Summarization\n\n- Prepare individual article content.\n- Summarize content with AI agents and validate structured output.\n\n### 5. Sender Preparation\n\n- Combine general summaries with selected top news summaries.\n- Format final summaries as text and HTML suitable for delivery.\n- Optionally apply translation and tone adjustment.\n\n### 6. Sending\n\n- Deliver summaries through selected channels (Email, Telegram, WhatsApp, Webhook).\n- Optionally save the output to disk as JSON.\n\n## 📌 Expected Input / Configuration\n\nThe workflow is primarily configured via the **Configure Workflow Args** node or the **Global Variables** custom node, with these key parameters:\n\n| Parameter | Description | Type |\n| :-- | :-- | :-- |\n| `search_themes` | List of keywords/themes to search in SerpAPI | List of strings |\n| `datetime_delta` | Number of days back to include news from; e.g., 0 = today | Integer |\n| `link_censor` | Regex to exclude unwanted URLs | Regex string |\n| `title_censor` | Regex to exclude unwanted titles | Regex string |\n| `content_censor` | Regex to exclude unwanted content | Regex string |\n| `use_qa` | Flag to enable AI Quality Assurance for headline filtering | Boolean |\n| `max_news_analysis` | Max number of articles sent to News Analyzer | Integer |\n| `qa_max_news` | Number of headlines the QA Agent analyzes | Integer |\n| `qa_max_top_news` | Number of headlines selected by QA Agent | Integer |\n| `qa_check_criteria` | Criteria used by QA Agent to discard low-quality headlines | List of strings |\n| `qa_select_criteria` | Criteria used by QA Agent to rank/select the best headlines | List of strings |\n| `news_focus` | What the News Analyzer should focus on while selecting news | String |\n| `news_target_audience` | Target audience description for the News Analyzer | String |\n| `news_criteria` | Instructions for the News Analyzer to identify relevant news | List of strings |\n| `language` | Language for news summaries; triggers translation if not English | String |\n| `translator_tone` | Tone for translation (e.g., casual, professional) | String |\n| `translator_notes` | Additional instructions for the translator | String |\n| `email_sender` | Email address used for sending (via SMTP) | String |\n| `email_recipients` | Recipient email addresses (comma-separated) | String |\n| `email_subject` | Email subject line | String |\n| `telegram_chat_id` | Telegram chat ID for sending notifications | String |\n| `phone_number` | Phone number for WhatsApp messages | String |\n| `rss_feeds` | Custom list of RSS feeds (objects with `link` and `needs_content_search` properties) | JSON array of objects |\n| `video_rss_feeds` | Custom list of video RSS feeds | JSON array of objects |\n| `enable_video_search` | Enable/disable video search functionality | Boolean |\n| `enabled_senders` | List of enabled delivery channels (email, telegram, whatsapp, webhook, save-to-disk) | List of strings |\n\n*Hint:* To add or combine keywords in censors, use the pattern `\"keyword1|keyword2|keyword3\"`.\n\n## 📦 Expected Output\n\nStructured JSON containing a general news summary, top news with summaries, and metadata, suitable for your preferred channel delivery.\n\n## 📌 Example\n\n![example.png](fileId:1798)\n\nAn example that includes workflow parameters is provided in a note within the workflow.\n\n## ⚙️ n8n Setup Used\n\n- **n8n version:** 1.100.1\n- **n8n-nodes-serpapi:** 0.1.6\n- **n8n-nodes-globals:** 1.1.0\n- **LLM Model:** mistral-small-latest (API)\n- **IMAP:** imap.gmail.com (Port 993)\n- **Platform:** Podman 4.3.1 on Linux\n- **Date:** 2025-07-15\n\n## ⚡ Requirements to Use / Setup\n\n- Self-hosted n8n instance.\n(This workflow contains community nodes that are only compatible with the self-hosted version of n8n.)\n- Install necessary custom nodes:\n    - [n8n-nodes-serpapi](https://github.com/serpapi/n8n-nodes-serpapi)\n    - [n8n-nodes-globals](https://github.com/umanamente/n8n-nodes-globals#readme) (or use Edit Field (Set) node instead)\n- Configure all sub-workflows bundled within this template (see [Sub-Workflows Guide](https://docs.n8n.io/flow-logic/subworkflows/)).\n- Provide valid credentials to nodes for SerpAPI, Telegram, WhatsApp, Mistral Cloud Chat API, and SMTP (for email).\n- Custom RSS feed list must be set by you in the workflow args.\n- You must either install the SerpAPI custom node or deactivate it.\n\n## ⚠️ Notes, Assumptions \\& Warnings\n\n- The workflow timeout is set to 30 minutes by default; adjust depending on your setup and workload.\n- Duplicate removal is applied, but occasional overlaps might still appear depending on feed sources.\n- This workflow assumes familiarity with n8n, RSS feeds, API key management and regex expressions.\n- Video search only works for configured video channels; remember to respect the rights of these channels.\n- Using AI agents (Mistral or substitute LLMs) requires access to their API services and keys.\n- Out-of-the-box customization is done via the Global Variables node or direct workflow argument edits.\n\n## ℹ️ About Us\n\nThis workflow was developed by the Hybroht team of AI enthusiasts and developers dedicated to enhancing the capabilities of AI through collaborative processes. Our goal is to create tools that harness the possibilities of AI technology and more. For questions, support, or feature requests, reach out via [contact@hybroht.com](mailto:contact@hybroht.com).\n\n---\n\n### ❓ Questions & Issues\n\nWe will answer any questions, provided they are related to this workflow.\n\nPlease contact us if there is any bug/issue with this workflow. We will assist you.\n\n### ⚖️ Warranty & Legal Notice\n\nYou can view the full license terms [here](https://hybroht.com/docs/policies/licenses/n8n_workflows/news_curator/WORKFLOW-LEGAL_NOTICE_v3.0.md). Please review them before making your purchase.\n\n**By purchasing this product, you agree to these terms.**\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter by Datetime",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Limit Number of Articles",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mistral Cloud Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "role": "lmChatMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "News Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Split Out News Data",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Certain Content",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Join Outputs",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Final Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Website Summarizer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Results to Text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "JSON Output Parser 2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "JSON Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Final Markdown Conversion",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Call Get Webpage Content to Data",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Elements with Empty Content",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Custom RSS Feed List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Call Loop Over Custom RSS Feed News List",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Remove Elements with Empty Content  (Custom Feed)",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Call Get Webpage Content to Data (Custom Feed)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Custom Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Final Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configure Workflow Args",
+      "type": "n8n-nodes-globals.globalConstants",
+      "role": "globalConstants",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configure Workflow Args (Alternative)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Markdown Conversion",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rejoin Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Fields for Custom Feed",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Combine General Summary with Specific Summaries",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Final Join Outputs",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If Not Empty",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items (Search)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sending Step Prep",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Custom Feed Test",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Quality Assurance",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "If QA isn't Needed",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Aggregate for QA",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop for QA",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "JSON Output Parser (QA)",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Out QA Results",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prep QA Results",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Clean Content",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configure Workflow Args (Custom Credentials)",
+      "type": "n8n-nodes-globals.globalConstants",
+      "role": "globalConstants",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Custom Credentials",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "role": "emailReadImap",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook: Call Workflow Activation",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook: JSON with Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Write contents to disk",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create a binary data for the Latest News",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setting Email Body",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Content Translator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Determine Language & Tone",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If Tone isn't Empty",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If Not English",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If Video Search is Enabled",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp message",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note31",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note30",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note32",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note33",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note34",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note35",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note37",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note38",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Shuffle News",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Confirmation",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Remove Empty",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Remove Video Info with Empty Content",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Custom Video Feed List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Video Filter by Datetime",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note29",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "XML",
+      "type": "n8n-nodes-base.xml",
+      "role": "xml",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Video Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "HTTP Request to XML Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out Videos",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Video Feed Searches",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Google_news search",
+      "type": "n8n-nodes-serpapi.serpApi",
+      "role": "serpApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove Elements with Empty Links",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Filter Fields for Loop",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split Out News Results",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Call Search Queries with SerpAPI",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Call Video News - Get the Descriptions of Video Found through Feeds and Theme Search",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

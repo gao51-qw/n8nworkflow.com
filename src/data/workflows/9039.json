@@ -1,0 +1,193 @@
+{
+  "id": 9039,
+  "slug": "9039",
+  "title": "Create secure human-in-the-loop approval flows with Postgres and Telegram",
+  "description": "## 🔐 Human-in-the-Loop Approval Flow (n8n + Postgres + Telegram)\n\n### 👥 Who’s it for  \nTeams that need a **manager approval step** before a ticket or request can change status. Great for internal ops, IT requests, or any workflow where “a human must sign off.”\n\n### ⚡ What it does  \n- 📨 Manager receives approval/reject link  \n- 🔑 Link is signed with HMAC + expiry (secure & tamper-proof)  \n- 🗄️ Postgres updates the ticket status  \n- 📝 Audit trail records every decision  \n- 📲 Telegram notifies both manager and requester  \n- ⏰ Expired or invalid links trigger alerts and logs  \n\n### 🛠 Requirements  \n- n8n instance (self-hosted)  \n- Postgres database (with `tickets`, `ticket_audit`, `workflow_errors`)  \n- Telegram bot token  \n- One environment variable set: `SECRET_KEY`  \n\n### ⚙️ How to set up  \n1. Set `SECRET_KEY` in `.env`  \n2. Create Postgres tables (SQL provided)  \n3. Add Telegram + Postgres credentials in n8n  \n4. Import the workflow JSON  \n5. Test by opening an approval/reject link in your browser  \n\n### 🎨 How to customize  \n- Change who the “manager” is (currently hardcoded in the Code node).  \n- Swap Telegram for Slack or email notifications.  \n- Extend the audit schema to include more metadata (IP, username).  \n",
+  "featuredImage": "/data/workflows/9039/9039.webp",
+  "author": {
+    "id": 101,
+    "slug": "mohammad-1378",
+    "name": "Mohammad",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 278,
+  "downloads": 27,
+  "createdAt": "2025-09-28T11:02:52.243Z",
+  "updatedAt": "2026-01-16T08:58:48.566Z",
+  "publishedAt": "2025-09-28T11:02:52.243Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9039",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create secure human-in-the-loop approval flows with Postgres and Telegram",
+    "workflowName": "Create secure human-in-the-loop approval flows with Postgres and Telegram",
+    "description": "## 🔐 Human-in-the-Loop Approval Flow (n8n + Postgres + Telegram)\n\n### 👥 Who’s it for  \nTeams that need a **manager approval step** before a ticket or request can change status. Great for internal ops, IT requests, or any workflow where “a human must sign off.”\n\n### ⚡ What it does  \n- 📨 Manager receives approval/reject link  \n- 🔑 Link is signed with HMAC + expiry (secure & tamper-proof)  \n- 🗄️ Postgres updates the ticket status  \n- 📝 Audit trail records every decision  \n- 📲 Telegram notifies both manager and requester  \n- ⏰ Expired or invalid links trigger alerts and logs  \n\n### 🛠 Requirements  \n- n8n instance (self-hosted)  \n- Postgres database (with `tickets`, `ticket_audit`, `workflow_errors`)  \n- Telegram bot token  \n- One environment variable set: `SECRET_KEY`  \n\n### ⚙️ How to set up  \n1. Set `SECRET_KEY` in `.env`  \n2. Create Postgres tables (SQL provided)  \n3. Add Telegram + Postgres credentials in n8n  \n4. Import the workflow JSON  \n5. Test by opening an approval/reject link in your browser  \n\n### 🎨 How to customize  \n- Change who the “manager” is (currently hardcoded in the Code node).  \n- Swap Telegram for Slack or email notifications.  \n- Extend the audit schema to include more metadata (IP, username).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "01 Webhook Trigger: Approval Decision",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "02 FN: Verify Signature + TTL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "04c DB: Update Ticket Status",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "04c1 DB: Get Ticket Owner",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "04c1a IF: Resolved or In Progress",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "05c1a Telegram: Notify Resolved",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "05c1b Telegram: Notify In Progress",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "05c Telegram: Update Confirmation",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Notify Failed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Execute a SQL query",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "04c2 DB: Insert Audit Row",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Text (reject)",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "04r0 DB: Get Ticket ID",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Execute a SQL query1",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "If Resolved",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "If in_progress",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Actions",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "04e DB: Insert Audit Expired",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "04i DB: Insert Audit Invalid",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "05e Telegram: Notify Expired",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "05i Telegram: Alert Invalid",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+---
+/**
+ * 文章列表页面
+ * 展示所有手写的文章
+ */
+
+import MainLayout from '../layouts/MainLayout.astro';
+import ArticleCard from '../components/ui/ArticleCard.astro';
+import Pagination from '../components/ui/Pagination.astro';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export const prerender = false;
+
+// 获取分页参数
+const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const pageSize = 12;
+
+// 获取所有手写文章
+let articles: CollectionEntry<'articles'>[] = [];
+try {
+  articles = await getCollection('articles');
+  // 按日期降序排序
+  articles.sort((a, b) => {
+    const dateA = new Date(a.data.pubDate).getTime();
+    const dateB = new Date(b.data.pubDate).getTime();
+    return dateB - dateA;
+  });
+} catch (error) {
+  console.error('Error fetching articles:', error);
+}
+
+const totalCount = articles.length;
+const totalPages = Math.ceil(totalCount / pageSize);
+const paginatedArticles = articles.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+// SEO 配置
+const seoConfig = {
+  title: 'Workflow Articles & Tutorials - N8N Workflows',
+  description: 'Browse our collection of hand-written articles and tutorials about n8n automation. Learn from comprehensive guides and expert tips.',
+  canonical: '/articles',
+};
+
+// 面包屑导航
+const breadcrumbItems = [
+  { label: 'Articles' }
+];
+---
+
+<MainLayout {...seoConfig}>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <Breadcrumb items={breadcrumbItems} />
+
+    <!-- Page Header -->
+    <div class="mb-12">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div class="max-w-2xl">
+          <h1 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
+            Workflow Articles & Tutorials
+          </h1>
+          <p class="text-xl text-gray-600 dark:text-gray-400">
+            In-depth guides, tips, and best practices to help you master n8n automation.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 px-4 py-2 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800/30">
+          <span class="text-2xl font-black text-primary-700 dark:text-primary-400">{totalCount}</span>
+          <span class="text-sm font-bold text-primary-600 dark:text-primary-500 uppercase tracking-wider">Articles</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles Grid -->
+    {paginatedArticles.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {paginatedArticles.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-24 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+        <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v4a2 2 0 002 2h4" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 13H8" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17H8" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9H8" />
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          No articles yet
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+          We're currently working on some amazing content. Please check back soon!
+        </p>
+      </div>
+    )}
+
+    <!-- Pagination -->
+    {totalPages > 1 && (
+      <div class="mt-16">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          baseUrl="/articles"
+        />
+      </div>
+    )}
+
+    <!-- Newsletter CTA -->
+    <div class="mt-24 bg-gray-900 dark:bg-primary-900/20 rounded-3xl p-8 md:p-12 overflow-hidden relative">
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="text-center md:text-left">
+          <h2 class="text-3xl font-black text-white mb-4">Stay Updated</h2>
+          <p class="text-gray-400 text-lg max-w-md">
+            Get the latest n8n tutorials and workflow tips delivered straight to your inbox.
+          </p>
+        </div>
+        <div class="w-full md:w-auto">
+          <form class="flex flex-col sm:flex-row gap-3">
+            <input 
+              type="email" 
+              placeholder="your@email.com" 
+              class="px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 min-w-[300px]"
+            />
+            <button class="px-8 py-4 bg-white text-gray-900 rounded-xl font-black hover:bg-gray-100 transition-colors">
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- Decorative elements -->
+      <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-primary-500/20 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
+    </div>
+  </div>
+</MainLayout>

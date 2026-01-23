@@ -1,0 +1,397 @@
+{
+  "id": 12056,
+  "slug": "12056",
+  "title": "Automate Odoo-triggered Redmine & GitLab account creation with Slack notifications",
+  "description": "## 📌Who is this for?\nHR teams, IT Operations, and System Administrators managing employee onboarding at scale.\nIt’s perfect if you use Odoo 18 to trigger account requests and need Redmine + GitLab accounts created instantly and consistently.\n\n## 📌The Problem\nManual account creation creates bottlenecks:\n- IT waits for HR notifications that often get missed or delayed.\n- Duplicate accounts pile up when no one checks existing data first.\n- Account creation timelines are inconsistent (sometimes correct, sometimes wrong).\n- Zero visibility into what succeeded or failed.\n\n## 📌What It Does\n Catches an employee account creation request from Odoo 18 → queries employee data → checks for existing accounts → creates only the accounts that are missing → notifies your team via Slack with the full status.\nHere's the flow in detail:\n1. **Webhook trigger from Odoo 18** - automatically fires when your HR team marks an employee as needing Redmine, GitLab, or both.\n2. **Fetch employee data from Odoo 18** - pulls email and account type requirements.\n3. **Deduplicate requests** - separates \"needs both,\" \"GitLab only,\" and \"Redmine only\" cases.\n4. **Check for existing accounts** - queries Redmine and GitLab to avoid duplicate creation attempts.\n5. **Create accounts** - uses Redmine and GitLab APIs to spin up accounts (only if they don't exist).\n6. **Slack notification** - sends a summary showing what was created, skipped, or failed- including error details if something went wrong.\n\n## 📌Quick Setup\n- Generate a Webhook URL in n8n and configure Odoo 18 to call it during onboarding.\n- Add Redmine admin API key and GitLab admin access token.\n- Enable /users.json (Redmine) and /users (GitLab) endpoints.\n- Configure Slack webhook for notifications.\n- Test with sample data, then activate.\n\n## 📌Results\n- Zero duplicates - the system checks before creating.\n- Full visibility - Slack reports every single attempt.\n- Instant delivery - new hires get accounts on day one.\n- Dramatically reduced IT workload.\n\n## 📌Take It Further\n- Auto-assign projects in Redmine/GitLab post-creation.\n- Generate passwords or TOTP setup and email them to new hires.\n- Log everything to Google Sheets, Notion, or a database.\n- Handle multi-tenant setups if your Odoo manages multiple organizations.\n- Add provisioning for Slack, Google Workspace, VPN, or other systems.\n\n## 📌Need help customizing?\nContact me for consulting and support:\n[Linkedin](https://www.linkedin.com/company/bac-ha-software/posts/?feedView=all) / [Website](https://bachasoftware.com/bhsoft-contacts)",
+  "featuredImage": "/data/workflows/12056/12056.webp",
+  "author": {
+    "id": 101,
+    "slug": "bhsoft",
+    "name": "BHSoft",
+    "avatar": ""
+  },
+  "categories": [
+    "HR"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 22,
+  "downloads": 2,
+  "createdAt": "2025-12-23T08:11:47.937Z",
+  "updatedAt": "2026-01-16T09:11:11.758Z",
+  "publishedAt": "2025-12-23T08:11:47.937Z",
+  "nodes": 60,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12056",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate Odoo-triggered Redmine & GitLab account creation with Slack notifications",
+    "workflowName": "Automate Odoo-triggered Redmine & GitLab account creation with Slack notifications",
+    "description": "## 📌Who is this for?\nHR teams, IT Operations, and System Administrators managing employee onboarding at scale.\nIt’s perfect if you use Odoo 18 to trigger account requests and need Redmine + GitLab accounts created instantly and consistently.\n\n## 📌The Problem\nManual account creation creates bottlenecks:\n- IT waits for HR notifications that often get missed or delayed.\n- Duplicate accounts pile up when no one checks existing data first.\n- Account creation timelines are inconsistent (sometimes correct, sometimes wrong).\n- Zero visibility into what succeeded or failed.\n\n## 📌What It Does\n Catches an employee account creation request from Odoo 18 → queries employee data → checks for existing accounts → creates only the accounts that are missing → notifies your team via Slack with the full status.\nHere's the flow in detail:\n1. **Webhook trigger from Odoo 18** - automatically fires when your HR team marks an employee as needing Redmine, GitLab, or both.\n2. **Fetch employee data from Odoo 18** - pulls email and account type requirements.\n3. **Deduplicate requests** - separates \"needs both,\" \"GitLab only,\" and \"Redmine only\" cases.\n4. **Check for existing accounts** - queries Redmine and GitLab to avoid duplicate creation attempts.\n5. **Create accounts** - uses Redmine and GitLab APIs to spin up accounts (only if they don't exist).\n6. **Slack notification** - sends a summary showing what was created, skipped, or failed- including error details if something went wrong.\n\n## 📌Quick Setup\n- Generate a Webhook URL in n8n and configure Odoo 18 to call it during onboarding.\n- Add Redmine admin API key and GitLab admin access token.\n- Enable /users.json (Redmine) and /users (GitLab) endpoints.\n- Configure Slack webhook for notifications.\n- Test with sample data, then activate.\n\n## 📌Results\n- Zero duplicates - the system checks before creating.\n- Full visibility - Slack reports every single attempt.\n- Instant delivery - new hires get accounts on day one.\n- Dramatically reduced IT workload.\n\n## 📌Take It Further\n- Auto-assign projects in Redmine/GitLab post-creation.\n- Generate passwords or TOTP setup and email them to new hires.\n- Log everything to Google Sheets, Notion, or a database.\n- Handle multi-tenant setups if your Odoo manages multiple organizations.\n- Add provisioning for Slack, Google Workspace, VPN, or other systems.\n\n## 📌Need help customizing?\nContact me for consulting and support:\n[Linkedin](https://www.linkedin.com/company/bac-ha-software/posts/?feedView=all) / [Website](https://bachasoftware.com/bhsoft-contacts)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Step1: Odoo 18 called a webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step2: Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Step 3: Wait 5s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Step5: Handle get today",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 6: Check if there's a requirement to create a Redmine or GitLab account on Odoo 18.",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step7: If total_count is not equal to 0 = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step8: Get many users",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 9: Find the record requesting both Redmine and Gitlab accounts on Odoo 18.",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step10: If total_count is not equal to 0 = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step 11.1: Find and extract the email from the request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step12.1: Get user info in RM6",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step13.1: If total_count is not equal to 0 = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step14.1: Get user information in Gitlab",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step15.1:  Check if there is a record = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step16.1: Send a message to channel",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step 16.2: Create a new user in Gitlab",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 17.1: Send reset password",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 19.1: Send a message to the member via Slack once their Gitlab account has been created.",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step18.1: Convert to text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step20.1: Send a message to channel REPORT",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step 14.2: Create a new user in Redmine",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 15.2: Assign the user to a group in Redmine",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 16.3: Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 17.2: Create a new user in Gitlab",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 18.2: Send reset password",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step19.2: Convert to text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 20.2: Send a message to the member via Slack once their Gitlab and Redmine account has been created.",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step21.1: Send a message to channel REPORT",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step 11.2: Find the Redmine account request record on Odoo 18",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step12.2: If total_count is not equal to 0 = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step13.2: Find and extract the email from the request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 14.3: Get user info in RM6",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 15.3: If total_count is not equal to 0 = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step 16.3: Create a new user in Redmine",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 17.3: Assign the user to a group in Redmine",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step18.3: Convert to text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step20.3: Send a message to channel REPORT",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step 19.3: Send a message to the member via Slack once their Redmine account has been created.",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step 13.3: Find the Gitlab account request record on Odoo 18",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 14.4: If total_count is not equal to 0 = true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step15.4: Find and extract the email from the request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 16.4: Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 17.4: Create a new user in Gitlab",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step 18.4: Send reset password",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step19.4: Convert to text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step 20.4: Send a message to the member via Gitlab once their Redmine account has been created.",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step21.2: Send a message to channel REPORT",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step4: Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

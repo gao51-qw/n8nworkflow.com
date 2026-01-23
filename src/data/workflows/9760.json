@@ -1,0 +1,325 @@
+{
+  "id": 9760,
+  "slug": "9760",
+  "title": "Automated invoice generation & payment reminders with QuickBooks, Jotform & GPT-4o",
+  "description": "## Generate Invoices and Send Reminders for Customers with Jotform, QuickBooks and Gmail\nThis workflow automates the entire process of receiving a product/service order, checking or creating a customer in **QuickBooks Online (QBO)**, generating an invoice, emailing it — all triggered by a form submission (via **Jotform**), and sending invoice reminders.\n\n## How It Works\n1. **Receive Submission**\n* Triggered when a user submits a form.\n* Collects data like customer details, selected product/service, etc.\n\n2. **Check If Customer Exists**\n* Searches QBO to determine if the customer already exists.\n* **If Customer Exists:** **Update** customer details (e.g., billing address).\n* **If Customer Doesn’t Exist:** **Create** a new customer in QBO.\n\n3. **Get The Item**\n* Retrieves the selected product or service from QBO.\n\n4. **Create The Invoice**\n* Generates a new invoice for the customer using the item selected.\n\n5. **Send The Invoice**\n* Automatically sends the invoice via email to the customer.\n\n6. **Store The Invoice In DB**\n* Stores the needed invoice details in the DB.\n\n7. **Send Reminders**\n* Every day at 8 AM, the automation checks each invoice to decide whether to:\n    * send a reminder email,\n    * skip and send it later, or\n    * delete the invoice from the DB (if it's paid or all reminders have been sent).\n\n## Who Can Benefit from This Workflow?\n* **Freelancers**\n* **Service Providers**\n* **Consultants & Coaches**\n* **Small Businesses**\n* **E-commerce or Custom Product Sellers**\n\n## Requirements\n- Jotform webhook setup, more info [here](https://www.jotform.com/help/245-how-to-setup-a-webhook-with-jotform/)\n- QuickBooks Online credentials, more info [here](https://developer.intuit.com/app/developer/qbo/docs/get-started/get-client-id-and-client-secret)\n- Email setup, update email nodes (`Send reminder email` & `Send reminders sent summary`), more info about Gmail setup [here](https://docs.n8n.io/integrations/builtin/credentials/google)\n- Create data table with the following columns:\n    * invoiceId (string)\n    * remainingAmount (number)\n    * currency (string)\n    * remindersSent (number)\n    * lastSentAt (date time)\n- Update `Add reminders config` node so update the data table id and intervals in days (default is after 2 days, then after 3 days and finally after 5 days )\n- LLM model credentials",
+  "featuredImage": "/data/workflows/9760/9760.webp",
+  "author": {
+    "id": 101,
+    "slug": "appunitsai",
+    "name": "AppUnits AI",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 163,
+  "downloads": 16,
+  "createdAt": "2025-10-16T07:02:44.796Z",
+  "updatedAt": "2026-01-16T09:01:46.639Z",
+  "publishedAt": "2025-10-16T07:02:44.796Z",
+  "nodes": 48,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9760",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated invoice generation & payment reminders with QuickBooks, Jotform & GPT-4o",
+    "workflowName": "Automated invoice generation & payment reminders with QuickBooks, Jotform & GPT-4o",
+    "description": "## Generate Invoices and Send Reminders for Customers with Jotform, QuickBooks and Gmail\nThis workflow automates the entire process of receiving a product/service order, checking or creating a customer in **QuickBooks Online (QBO)**, generating an invoice, emailing it — all triggered by a form submission (via **Jotform**), and sending invoice reminders.\n\n## How It Works\n1. **Receive Submission**\n* Triggered when a user submits a form.\n* Collects data like customer details, selected product/service, etc.\n\n2. **Check If Customer Exists**\n* Searches QBO to determine if the customer already exists.\n* **If Customer Exists:** **Update** customer details (e.g., billing address).\n* **If Customer Doesn’t Exist:** **Create** a new customer in QBO.\n\n3. **Get The Item**\n* Retrieves the selected product or service from QBO.\n\n4. **Create The Invoice**\n* Generates a new invoice for the customer using the item selected.\n\n5. **Send The Invoice**\n* Automatically sends the invoice via email to the customer.\n\n6. **Store The Invoice In DB**\n* Stores the needed invoice details in the DB.\n\n7. **Send Reminders**\n* Every day at 8 AM, the automation checks each invoice to decide whether to:\n    * send a reminder email,\n    * skip and send it later, or\n    * delete the invoice from the DB (if it's paid or all reminders have been sent).\n\n## Who Can Benefit from This Workflow?\n* **Freelancers**\n* **Service Providers**\n* **Consultants & Coaches**\n* **Small Businesses**\n* **E-commerce or Custom Product Sellers**\n\n## Requirements\n- Jotform webhook setup, more info [here](https://www.jotform.com/help/245-how-to-setup-a-webhook-with-jotform/)\n- QuickBooks Online credentials, more info [here](https://developer.intuit.com/app/developer/qbo/docs/get-started/get-client-id-and-client-secret)\n- Email setup, update email nodes (`Send reminder email` & `Send reminders sent summary`), more info about Gmail setup [here](https://docs.n8n.io/integrations/builtin/credentials/google)\n- Create data table with the following columns:\n    * invoiceId (string)\n    * remainingAmount (number)\n    * currency (string)\n    * remindersSent (number)\n    * lastSentAt (date time)\n- Update `Add reminders config` node so update the data table id and intervals in days (default is after 2 days, then after 3 days and finally after 5 days )\n- LLM model credentials",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Receive form submission",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get the product",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create the invoice",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send the invoice",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if the customer exists",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create the customer",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update the customer",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add customer id",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add item id",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add reminders config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Insert invoice id to DB",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Invoices",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get the invoice",
+      "type": "n8n-nodes-base.quickbooks",
+      "role": "quickbooks",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If2",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Schedule reminders trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop over invoices",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get today's sent reminders",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Increase sent reminders",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete invoice",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send reminder email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send reminders sent summary",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

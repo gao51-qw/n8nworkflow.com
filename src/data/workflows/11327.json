@@ -1,0 +1,374 @@
+{
+  "id": 11327,
+  "slug": "11327",
+  "title": "Automate timesheet to invoice conversion with OpenAI, Gmail & Google Workspace",
+  "description": "\nThis workflow converts emailed timesheets into structured invoice rows in Google Sheets and stores them in the correct Google Drive folder structure.\n\nIt:\n\n- Listens to Gmail for timesheet attachments  \n- Runs OCR and AI parsing  \n- Looks up Customer and PO data from a Google Sheet  \n- Organizes files in Client → Employee → Year folders  \n- Reuses an existing invoice sheet or creates a new one and writes the invoice row  \n\n---\n\n## Quick Implementation Steps\n\n1. Import the workflow JSON into your n8n instance.  \n2. Set up credentials for:\n   - Gmail  \n   - Google Drive  \n   - Google Sheets  \n   - OpenAI  \n3. Check the OCR HTTP node:  \n   - Default URL: `https://universal-file-to-text-extractor.vercel.app/extract`  \n4. Configure \"Get Customer Info From PO Sheet\" with:\n   - Spreadsheet ID  \n   - Correct sheet and column names  \n5. Confirm Gmail Trigger filter:  \n   - `has:attachment (filename:timesheet OR subject:timesheet)` and unread only  \n6. Ensure your Client Invoices root folder exists in Google Drive.  \n7. Test once with a sample timesheet email.  \n8. Activate the workflow.\n\n---\n\n## What It Does\n\n- Reads unread Gmail messages with timesheet attachments.  \n- Splits and processes each attachment separately.  \n- Sends files to OCR and converts them to text.  \n- Uses OpenAI to extract:\n  - Employee Name  \n  - Client Name  \n  - Week Start and End Dates  \n  - Total Billable Hours  \n  - Current Year  \n- Looks up Customer and PO data from a Google Sheet:\n  - Account Number  \n  - PO Number  \n  - Item Name  \n  - Folder Name  \n  - Invoice range  \n  - Due Date offset  \n- Builds or finds:\n  - Client folder  \n  - Employee folder  \n  - Year folder  \n- Either:\n  - Appends to an existing sheet for that employee and period, or  \n  - Creates a new sheet, sets timezone, moves it into the right folder, and adds the invoice row  \n\n---\n\n## Who Is It For\n\n- Agencies and consultancies billing from emailed timesheets  \n- Finance or ops teams managing many clients and employees in Google Workspace  \n- Service providers that keep one sheet per employee per period  \n- Anyone who wants to stop manually reading timesheets and filling invoice sheets\n\n---\n\n## Requirements\n\n- n8n instance  \n- Gmail account with timesheet emails  \n- Google Drive and Google Sheets  \n- OpenAI API key  \n- OCR API endpoint (or the default one)  \n- Customer POs Google Sheet with:\n  - Email  \n  - Customer Account Number  \n  - PO Number  \n  - Item  \n  - Folder Name  \n  - Invoice range  \n  - Due Date Calculation  \n\n---\n\n## How It Works\n\n### 1. Email Intake and Loop\n\n- Gmail Trigger  \n  - Polls every minute  \n  - Filter: unread + has attachment + timesheet in file name or subject  \n- Split Binary Attachments  \n  - Creates one item per attachment  \n- Loop: Process Each Attachment  \n  - Handles each timesheet file in sequence  \n\n### 2. OCR and AI Parsing\n\n- Extract Text from Attachment  \n  - Sends binary file to OCR endpoint  \n  - Returns plain text  \n- Extract Timesheet Data (OpenAI)  \n  - Reads the text and outputs strict JSON with:\n    - Employee Name  \n    - Client Name  \n    - Week Starting Date  \n    - Week Ending Date  \n    - Total Working Hours  \n- Set Timesheet JSON Fields  \n  - Normalizes and stores:\n    - Employee Name  \n    - Total Billable hours  \n    - Week Start Date and Week End Date  \n    - Client Name  \n    - Current Year  \n\n### 3. Customer and PO Lookup\n\n- Get Customer Info From PO Sheet  \n  - Looks up sender email  \n  - Pulls:\n    - Customer Account Number  \n    - PO Number  \n    - Item  \n    - Folder Name  \n    - Invoice range  \n    - Due Date Calculation  \n\n### 4. Drive Folder Discovery\n\n- Search: Client Invoices Folder  \n  - Finds the main invoices root folder  \n- Search or create:\n  - Client folder using Client Name  \n  - Employee folder using Folder Name from PO sheet  \n- Search: Year Folder  \n  - Looks for folder matching Current Year  \n- If Year Folder does not exist:\n  - Create Year Folder or Create Current Year Folder  \n- Set: Invoice Range  \n  - Stores invoice range and Year Folder id  \n\n### 5. File Naming and Sheet Search\n\n- Set: File Name from Start and End Based Date Range  \n  - Builds:\n    - File Name (Start Date Based)  \n    - File Name (End Date Based)  \n  - Handles weekly and 15 days invoice logic  \n- Search: File By Start Date Name  \n- Search: File By End Date Name  \n- Merge: Combine Folder Search Results  \n  - Merges both search results  \n- If: Invoice Range is 15 Days  \n  - Uses custom 2 week window for file naming  \n- Set Invoice Date and Due Date Days  \n  - Invoice Date from week end  \n  - Due Date from week end plus offset  \n\n### 6. Reuse vs Create Sheet\n\n- If: File Already Exists  \n  - If found  \n    - Go to Append: Final Row to Existing Sheet  \n  - If not found  \n    - Go to Sheets: Create Sheet  \n\n#### New Sheet Path\n\n- Sheets: Create Sheet  \n  - Creates new spreadsheet with generated name  \n- HTTP Request (create sheet)  \n  - Sets spreadsheet timezone to America/New_York  \n- Drive: Move Sheet To Final Folder  \n  - Moves spreadsheet into the Year Folder  \n- Set: Empty Row Structure  \n  - Prepares JSON structure for invoice row  \n- Sheets: Append Row1  \n  - Writes the first invoice row  \n- Set: Spreadsheet (ID and Name)  \n  - Stores id and name  \n- Append: Final Row to Existing Sheet  \n  - Ensures row is appended with full mapping  \n\n#### Existing Sheet Path\n\n- Set: Spreadsheet (ID and Name)  \n  - Uses found spreadsheet  \n- Append: Final Row to Existing Sheet  \n  - Appends new row with:\n    - Customer Account Number  \n    - Invoice Date  \n    - Due Date  \n    - PO Number  \n    - Item and columns  \n    - Total billable hours as Quantity  \n    - Description with week period  \n\n---\n\n## How To Set Up\n\n### 1. Import and Credentials\n\n- Import JSON in n8n  \n- Set credentials for:\n  - Gmail Trigger  \n  - Google Drive nodes  \n  - Google Sheets nodes  \n  - OpenAI node  \n  - OCR HTTP node if needed  \n\n### 2. Customer POs Sheet\n\n- In Get Customer Info From PO Sheet:\n  - Set Spreadsheet ID  \n  - Confirm column names  \n- Make sure each employee email row has:\n  - Customer Account Number  \n  - PO Number  \n  - Item  \n  - Folder Name  \n  - Invoice range  \n  - Due Date Calculation  \n\n### 3. Drive and Gmail\n\n- Confirm Client Invoices root folder exists  \n- Confirm Gmail Trigger:\n  - Query string  \n  - Poll schedule  \n\n### 4. Test\n\n- Send a sample timesheet email  \n- Run the workflow once manually  \n- Check:\n  - Folder structure  \n  - Created or reused sheet  \n  - Invoice row content  \n\n### 5. Activate\n\n- Turn workflow ON once tests are successful.\n\n---\n\n## How To Customize\n\n- Swap the OpenAI model in Extract Timesheet Data.  \n- Change prompt to extract extra fields such as project, cost center, or approval status.  \n- Replace OCR endpoint with another service if needed.  \n- Change folder naming rules in Set and Create folder nodes.  \n- Adjust file naming rules for different billing periods.  \n- Add validation steps to handle:\n  - Missing name  \n  - Zero hours  \n  - Invalid dates  \n- Extend the PO sheet and invoice sheet with:\n  - Hourly rate  \n  - Currency  \n  - Tax codes  \n\n---\n\n## Use Case Examples\n\n- Weekly consulting invoices from signed timesheets.  \n- Contractor billing for staffing agencies.  \n- Internal cross charging between departments using timesheet reports.  \n- Creating a clean, auditable history of timesheets and related invoice lines.\n\n---\n\n## Troubleshooting Guide\n\n| Issue | Possible Solution |\n|-------|-------------------|\n| No rows are created | Check Gmail Trigger is active and the filter matches the email. Confirm email is unread and has attachments. |\n| OCR returns empty or error | Check OCR URL, status code, and supported file types. Log the response body. |\n| Wrong or missing dates or hours | Review OpenAI prompt and a sample output. Ensure JSON keys in Set Timesheet JSON Fields match the AI output. |\n| Folders not found or created | Confirm the Client Invoices root exists and that Client Name and Folder Name text matches what the workflow expects. |\n| Files in wrong year folder | Check Current Year extraction and Year Folder search logic. |\n| Duplicate sheets for same period | Check file naming code and Drive search nodes for exact match on names. |\n| Due Date incorrect | Confirm Due Date Calculation in PO sheet and date math formats in Set and append nodes. |\n\n---\n\n###  **Need Help or More Workflows?**\nWant to customize this workflow for your business or integrate it with your existing tools?  \nOur team at **Digital Biz Tech** can tailor it precisely to your use case  from automation logic to AI-powered enhancements.  \n\n We can help you set it up for free — from connecting credentials to deploying it live.\n\nContact: [shilpa.raju@digitalbiz.tech](mailto:shilpa.raju@digitalbiz.tech)  \nWebsite: [https://www.digitalbiz.tech](https://www.digitalbiz.tech)  \nLinkedIn: [https://www.linkedin.com/company/digital-biz-tech/](https://www.linkedin.com/company/digital-biz-tech/)  \nYou can also DM us on LinkedIn for any help.\n\n---\n",
+  "featuredImage": "/data/workflows/11327/11327.webp",
+  "author": {
+    "id": 101,
+    "slug": "dbt",
+    "name": "DIGITAL BIZ TECH",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 49,
+  "downloads": 4,
+  "createdAt": "2025-11-28T09:52:51.448Z",
+  "updatedAt": "2026-01-16T09:08:23.388Z",
+  "publishedAt": "2025-11-28T09:52:51.448Z",
+  "nodes": 56,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11327",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate timesheet to invoice conversion with OpenAI, Gmail & Google Workspace",
+    "workflowName": "Automate timesheet to invoice conversion with OpenAI, Gmail & Google Workspace",
+    "description": "This workflow converts emailed timesheets into structured invoice rows in Google Sheets and stores them in the correct Google Drive folder structure.\n\nIt:\n\n- Listens to Gmail for timesheet attachments  \n- Runs OCR and AI parsing  \n- Looks up Customer and PO data from a Google Sheet  \n- Organizes files in Client → Employee → Year folders  \n- Reuses an existing invoice sheet or creates a new one and writes the invoice row  \n\n---\n\n## Quick Implementation Steps\n\n1. Import the workflow JSON into your n8n instance.  \n2. Set up credentials for:\n   - Gmail  \n   - Google Drive  \n   - Google Sheets  \n   - OpenAI  \n3. Check the OCR HTTP node:  \n   - Default URL: `https://universal-file-to-text-extractor.vercel.app/extract`  \n4. Configure \"Get Customer Info From PO Sheet\" with:\n   - Spreadsheet ID  \n   - Correct sheet and column names  \n5. Confirm Gmail Trigger filter:  \n   - `has:attachment (filename:timesheet OR subject:timesheet)` and unread only  \n6. Ensure your Client Invoices root folder exists in Google Drive.  \n7. Test once with a sample timesheet email.  \n8. Activate the workflow.\n\n---\n\n## What It Does\n\n- Reads unread Gmail messages with timesheet attachments.  \n- Splits and processes each attachment separately.  \n- Sends files to OCR and converts them to text.  \n- Uses OpenAI to extract:\n  - Employee Name  \n  - Client Name  \n  - Week Start and End Dates  \n  - Total Billable Hours  \n  - Current Year  \n- Looks up Customer and PO data from a Google Sheet:\n  - Account Number  \n  - PO Number  \n  - Item Name  \n  - Folder Name  \n  - Invoice range  \n  - Due Date offset  \n- Builds or finds:\n  - Client folder  \n  - Employee folder  \n  - Year folder  \n- Either:\n  - Appends to an existing sheet for that employee and period, or  \n  - Creates a new sheet, sets timezone, moves it into the right folder, and adds the invoice row  \n\n---\n\n## Who Is It For\n\n- Agencies and consultancies billing from emailed timesheets  \n- Finance or ops teams managing many clients and employees in Google Workspace  \n- Service providers that keep one sheet per employee per period  \n- Anyone who wants to stop manually reading timesheets and filling invoice sheets\n\n---\n\n## Requirements\n\n- n8n instance  \n- Gmail account with timesheet emails  \n- Google Drive and Google Sheets  \n- OpenAI API key  \n- OCR API endpoint (or the default one)  \n- Customer POs Google Sheet with:\n  - Email  \n  - Customer Account Number  \n  - PO Number  \n  - Item  \n  - Folder Name  \n  - Invoice range  \n  - Due Date Calculation  \n\n---\n\n## How It Works\n\n### 1. Email Intake and Loop\n\n- Gmail Trigger  \n  - Polls every minute  \n  - Filter: unread + has attachment + timesheet in file name or subject  \n- Split Binary Attachments  \n  - Creates one item per attachment  \n- Loop: Process Each Attachment  \n  - Handles each timesheet file in sequence  \n\n### 2. OCR and AI Parsing\n\n- Extract Text from Attachment  \n  - Sends binary file to OCR endpoint  \n  - Returns plain text  \n- Extract Timesheet Data (OpenAI)  \n  - Reads the text and outputs strict JSON with:\n    - Employee Name  \n    - Client Name  \n    - Week Starting Date  \n    - Week Ending Date  \n    - Total Working Hours  \n- Set Timesheet JSON Fields  \n  - Normalizes and stores:\n    - Employee Name  \n    - Total Billable hours  \n    - Week Start Date and Week End Date  \n    - Client Name  \n    - Current Year  \n\n### 3. Customer and PO Lookup\n\n- Get Customer Info From PO Sheet  \n  - Looks up sender email  \n  - Pulls:\n    - Customer Account Number  \n    - PO Number  \n    - Item  \n    - Folder Name  \n    - Invoice range  \n    - Due Date Calculation  \n\n### 4. Drive Folder Discovery\n\n- Search: Client Invoices Folder  \n  - Finds the main invoices root folder  \n- Search or create:\n  - Client folder using Client Name  \n  - Employee folder using Folder Name from PO sheet  \n- Search: Year Folder  \n  - Looks for folder matching Current Year  \n- If Year Folder does not exist:\n  - Create Year Folder or Create Current Year Folder  \n- Set: Invoice Range  \n  - Stores invoice range and Year Folder id  \n\n### 5. File Naming and Sheet Search\n\n- Set: File Name from Start and End Based Date Range  \n  - Builds:\n    - File Name (Start Date Based)  \n    - File Name (End Date Based)  \n  - Handles weekly and 15 days invoice logic  \n- Search: File By Start Date Name  \n- Search: File By End Date Name  \n- Merge: Combine Folder Search Results  \n  - Merges both search results  \n- If: Invoice Range is 15 Days  \n  - Uses custom 2 week window for file naming  \n- Set Invoice Date and Due Date Days  \n  - Invoice Date from week end  \n  - Due Date from week end plus offset  \n\n### 6. Reuse vs Create Sheet\n\n- If: File Already Exists  \n  - If found  \n    - Go to Append: Final Row to Existing Sheet  \n  - If not found  \n    - Go to Sheets: Create Sheet  \n\n#### New Sheet Path\n\n- Sheets: Create Sheet  \n  - Creates new spreadsheet with generated name  \n- HTTP Request (create sheet)  \n  - Sets spreadsheet timezone to America/New_York  \n- Drive: Move Sheet To Final Folder  \n  - Moves spreadsheet into the Year Folder  \n- Set: Empty Row Structure  \n  - Prepares JSON structure for invoice row  \n- Sheets: Append Row1  \n  - Writes the first invoice row  \n- Set: Spreadsheet (ID and Name)  \n  - Stores id and name  \n- Append: Final Row to Existing Sheet  \n  - Ensures row is appended with full mapping  \n\n#### Existing Sheet Path\n\n- Set: Spreadsheet (ID and Name)  \n  - Uses found spreadsheet  \n- Append: Final Row to Existing Sheet  \n  - Appends new row with:\n    - Customer Account Number  \n    - Invoice Date  \n    - Due Date  \n    - PO Number  \n    - Item and columns  \n    - Total billable hours as Quantity  \n    - Description with week period  \n\n---\n\n## How To Set Up\n\n### 1. Import and Credentials\n\n- Import JSON in n8n  \n- Set credentials for:\n  - Gmail Trigger  \n  - Google Drive nodes  \n  - Google Sheets nodes  \n  - OpenAI node  \n  - OCR HTTP node if needed  \n\n### 2. Customer POs Sheet\n\n- In Get Customer Info From PO Sheet:\n  - Set Spreadsheet ID  \n  - Confirm column names  \n- Make sure each employee email row has:\n  - Customer Account Number  \n  - PO Number  \n  - Item  \n  - Folder Name  \n  - Invoice range  \n  - Due Date Calculation  \n\n### 3. Drive and Gmail\n\n- Confirm Client Invoices root folder exists  \n- Confirm Gmail Trigger:\n  - Query string  \n  - Poll schedule  \n\n### 4. Test\n\n- Send a sample timesheet email  \n- Run the workflow once manually  \n- Check:\n  - Folder structure  \n  - Created or reused sheet  \n  - Invoice row content  \n\n### 5. Activate\n\n- Turn workflow ON once tests are successful.\n\n---\n\n## How To Customize\n\n- Swap the OpenAI model in Extract Timesheet Data.  \n- Change prompt to extract extra fields such as project, cost center, or approval status.  \n- Replace OCR endpoint with another service if needed.  \n- Change folder naming rules in Set and Create folder nodes.  \n- Adjust file naming rules for different billing periods.  \n- Add validation steps to handle:\n  - Missing name  \n  - Zero hours  \n  - Invalid dates  \n- Extend the PO sheet and invoice sheet with:\n  - Hourly rate  \n  - Currency  \n  - Tax codes  \n\n---\n\n## Use Case Examples\n\n- Weekly consulting invoices from signed timesheets.  \n- Contractor billing for staffing agencies.  \n- Internal cross charging between departments using timesheet reports.  \n- Creating a clean, auditable history of timesheets and related invoice lines.\n\n---\n\n## Troubleshooting Guide\n\n| Issue | Possible Solution |\n|-------|-------------------|\n| No rows are created | Check Gmail Trigger is active and the filter matches the email. Confirm email is unread and has attachments. |\n| OCR returns empty or error | Check OCR URL, status code, and supported file types. Log the response body. |\n| Wrong or missing dates or hours | Review OpenAI prompt and a sample output. Ensure JSON keys in Set Timesheet JSON Fields match the AI output. |\n| Folders not found or created | Confirm the Client Invoices root exists and that Client Name and Folder Name text matches what the workflow expects. |\n| Files in wrong year folder | Check Current Year extraction and Year Folder search logic. |\n| Duplicate sheets for same period | Check file naming code and Drive search nodes for exact match on names. |\n| Due Date incorrect | Confirm Due Date Calculation in PO sheet and date math formats in Set and append nodes. |\n\n---\n\n###  **Need Help or More Workflows?**\nWant to customize this workflow for your business or integrate it with your existing tools?  \nOur team at **Digital Biz Tech** can tailor it precisely to your use case  from automation logic to AI-powered enhancements.  \n\n We can help you set it up for free — from connecting credentials to deploying it live.\n\nContact: [shilpa.raju@digitalbiz.tech](mailto:shilpa.raju@digitalbiz.tech)  \nWebsite: [https://www.digitalbiz.tech](https://www.digitalbiz.tech)  \nLinkedIn: [https://www.linkedin.com/company/digital-biz-tech/](https://www.linkedin.com/company/digital-biz-tech/)  \nYou can also DM us on LinkedIn for any help.\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Binary Attachments",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop: Process Each Attachment",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract Timesheet Data (OpenAI)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Get Customer Info From PO Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Set Invoice Date & Due Date Days",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Sheet Name (Employee + Week Start to End Dates)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set: Invoice Range",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If: File Already Exists?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": " If: Invoice Range is 15 Days?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Set: File Name from Start & End Based Date Range",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": " Merge: Combine Folder Search Results",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Create New Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Move Created Sheet to Final Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": " Set: Row Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": " Sheets: Append Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": " Sheets: Final Append",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": " Sheets: Create Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": " Sheets: Append Row1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Extract Text from Attachment",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Search: Client Invoices Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Search: Client Folder by Name",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Search: File By Start Date Name",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Search: File By End Date Name",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Drive: Move Sheet To Final Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set: Empty Row Structure",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set: Spreadsheet  (ID & Name)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Append: Final Row to Existing Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Check if Year Folder Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Client Name Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check Client Name Folder",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Search: Employee Name Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check Employee Name Folder",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Employee Name Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Search: Year Folder ",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Create Year Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Create Current Year Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Set Timesheet JSON Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request(new sheet)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request1(create sheet)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

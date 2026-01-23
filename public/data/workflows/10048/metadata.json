@@ -1,0 +1,26 @@
+{
+  "id": 10048,
+  "slug": "10048",
+  "title": "Distribute workflow execution with round-robin logic using data tables",
+  "description": "## Key Features\n\nImplements a simple round-robin distribution mechanism using a Data Table to track the last route used.\n\nSupports multiple downstream workflows or resources, balancing workload across them sequentially.\n\nUses Switch and Code nodes for flexible routing logic.\n\nDesigned for easy customization — replace placeholder “Route” nodes with sub-workflow calls or API triggers.\n\nWorks with any trigger type, and includes merge logic to preserve input data.\n\n## Nodes in Use\n| Node Name                                       | Type         | Purpose                                                                 |\n|-------------------------------------------------|---------------|--------------------------------------------------------------------------|\n| When clicking ‘Execute workflow’                | Manual Trigger | Test entry point for manual execution.                                   |\n| Calculate the next route to use                 | Data Table     | Retrieves the last used route number.                                   |\n| Code in JavaScript                              | Code           | Increments the route counter (0–3 cycle).                               |\n| Update last_used in the datatable               | Data Table     | Updates the “Last_Used” field to track next route.                      |\n| Round Robin Router                              | Switch         | Routes workflow execution to the correct path based on Last_Used value. |\n| Route 1 / Route 2 / Route 3                     | NoOp           | Placeholder routes — replace with your own workflows.                   |\n| Merge trigger data to pass to subworkflow if needed | Merge        | Combines trigger data with routing data for sub-workflows.              |\n| Sticky Notes                                    | Annotations    | Explain workflow logic and intended replacements.                       |\n\n\n\n## How It Works\n\nThe workflow starts when triggered manually (or by another workflow).\n\nThe Data Table node fetches the current value of Last_Used, which identifies which route was last used.\n\nThe Code node increments that value, resetting to 0 after 3, creating a round-robin cycle.\n\nThe Data Table update node stores the new Last_Used value.\n\nThe Switch node reads Last_Used and routes execution to the correct downstream branch.\n\nEach route can represent a duplicated workflow, resource, or API endpoint.\n\nOptionally, the Merge node reattaches trigger data before sending it to sub-workflows.\n\n## Step-by-Step\n\nTrigger the workflow manually or via webhook/cron/etc.\n\nRetrieve current route index using the Data Table node.\n\nIncrement route counter with the JavaScript Code node:\n\nIf Last_Used = 3, it resets to 0.\n\nOtherwise, increments by 1.\n\nUpdate Data Table with the new Last_Used value.\n\nRoute execution using the Switch node based on that value.\n\nSend data to corresponding subworkflow (Route 1, Route 2, Route 3).\n\nReplace the NoOp nodes with your target workflow or HTTP call nodes for real routing.\n\n## Use Cases\n\nDistribute load across multiple API endpoints to prevent throttling.\n\nRun identical sub-workflows on different worker instances for parallel processing.\n\nSimulate load balancing during testing of N8N workflows.\n\nSequentially alternate between external systems or servers handling similar tasks.\n\nAct as a proof-of-concept for balancing strategies before scaling up.",
+  "featuredImage": "/data/workflows/10048/10048.webp",
+  "author": {
+    "id": 101,
+    "slug": "akendall1966",
+    "name": "Adrian Kendall",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 151,
+  "downloads": 15,
+  "createdAt": "2025-10-22T13:33:57.466Z",
+  "updatedAt": "2026-01-16T09:03:06.924Z",
+  "publishedAt": "2025-10-22T13:33:57.466Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10048"
+}

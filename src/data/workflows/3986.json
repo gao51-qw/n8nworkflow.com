@@ -1,0 +1,182 @@
+{
+  "id": 3986,
+  "slug": "3986",
+  "title": "Personalized AI tech newsletter using RSS, OpenAI and Gmail",
+  "description": "## Combine Tech News in a Personalized Weekly Newsletter\n\nThis n8n template automates the collection, storage, and summarization of technology news from top sites, turning it into a concise, personalized weekly newsletter.\n\nIf you like staying informed but want to reduce daily distractions, this workflow is perfect for you. It leverages RSS feeds, vector databases, and LLMs to read and curate tech content on your behalf—so you only receive what truly matters.\n\n---\n\n## How it works\n\n* A **daily scheduled trigger** fetches articles from multiple popular tech RSS feeds like Wired, TechCrunch, and The Verge.\n* Fetched articles are:\n\n  * **Normalized** to extract titles, summaries, and publish dates.\n  * **Converted to vector embeddings** via OpenAI and stored in memory for fast semantic querying.\n* A **weekly scheduled trigger** activates the AI summarization flow:\n\n  * The AI is provided with your interests (e.g., *AI, games, gadgets*) and the desired number of items (e.g., 15).\n  * It queries the vector store to retrieve relevant articles and summarizes the most newsworthy stories.\n  * The summary is converted into a clean, email-friendly format and sent to your inbox.\n\n---\n\n## How to use\n\n1. Connect your **OpenAI** and **Gmail** accounts to n8n.\n2. Customize the list of RSS feeds in the “Set Tech News RSS Feeds” node.\n3. Update your interests and number of desired news items in the “Your Topics of Interest” node.\n4. Activate the workflow and let the automation run on schedule.\n\n---\n\n## Requirements\n\n* **OpenAI** credentials for embeddings and summarization\n* **Gmail** (or another email service) for sending the newsletter\n\n---\n\n## Customizing this workflow\n\n* Want to use different sources? Swap in your own RSS feeds, or use an API-based news aggregator.\n* Replace the in-memory vector store with **Pinecone**, **Weaviate**, or another persistent vector DB for longer-term storage.\n* Adjust the agent's summarization style to suit internal updates, industry-specific briefings, or even entertainment recaps.\n* Prefer chat over email? Replace the email node with a **Telegram bot** to receive your personalized tech newsletter directly in a Telegram chat.\n",
+  "featuredImage": "/data/workflows/3986/3986.webp",
+  "author": {
+    "id": 101,
+    "slug": "miha",
+    "name": "Miha",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 64622,
+  "downloads": 6462,
+  "createdAt": "2025-05-11T19:47:23.634Z",
+  "updatedAt": "2026-01-16T08:32:30.404Z",
+  "publishedAt": "2025-05-11T19:47:23.634Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3986",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Personalized AI tech newsletter using RSS, OpenAI and Gmail",
+    "workflowName": "Personalized AI tech newsletter using RSS, OpenAI and Gmail",
+    "description": "## Combine Tech News in a Personalized Weekly Newsletter\n\nThis n8n template automates the collection, storage, and summarization of technology news from top sites, turning it into a concise, personalized weekly newsletter.\n\nIf you like staying informed but want to reduce daily distractions, this workflow is perfect for you. It leverages RSS feeds, vector databases, and LLMs to read and curate tech content on your behalf—so you only receive what truly matters.\n\n---\n\n## How it works\n\n* A **daily scheduled trigger** fetches articles from multiple popular tech RSS feeds like Wired, TechCrunch, and The Verge.\n* Fetched articles are:\n\n  * **Normalized** to extract titles, summaries, and publish dates.\n  * **Converted to vector embeddings** via OpenAI and stored in memory for fast semantic querying.\n* A **weekly scheduled trigger** activates the AI summarization flow:\n\n  * The AI is provided with your interests (e.g., *AI, games, gadgets*) and the desired number of items (e.g., 15).\n  * It queries the vector store to retrieve relevant articles and summarizes the most newsworthy stories.\n  * The summary is converted into a clean, email-friendly format and sent to your inbox.\n\n---\n\n## How to use\n\n1. Connect your **OpenAI** and **Gmail** accounts to n8n.\n2. Customize the list of RSS feeds in the “Set Tech News RSS Feeds” node.\n3. Update your interests and number of desired news items in the “Your Topics of Interest” node.\n4. Activate the workflow and let the automation run on schedule.\n\n---\n\n## Requirements\n\n* **OpenAI** credentials for embeddings and summarization\n* **Gmail** (or another email service) for sending the newsletter\n\n---\n\n## Customizing this workflow\n\n* Want to use different sources? Swap in your own RSS feeds, or use an API-based news aggregator.\n* Replace the in-memory vector store with **Pinecone**, **Weaviate**, or another persistent vector DB for longer-term storage.\n* Adjust the agent's summarization style to suit internal updates, industry-specific briefings, or even entertainment recaps.\n* Prefer chat over email? Replace the email node with a **Telegram bot** to receive your personalized tech newsletter directly in a Telegram chat.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Articles Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Weekly Summary",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "News reader AI",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Send Newsletter",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Convert Response to an Email-Friendly Format",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Your topics of interest",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Store News Articles",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set Tech News RSS Feeds",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Read RSS News Feeds",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get News Articles",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "role": "vectorStoreInMemory",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI2",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set and Normalize Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

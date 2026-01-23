@@ -1,0 +1,548 @@
+{
+  "id": 8582,
+  "slug": "8582",
+  "title": "Personal assistant bot with multi-agent system using Telegram & Google Gemini",
+  "description": "# How It Works \n\n- **Telegram Trigger** receives incoming messages (text, voice, photo, document).  \n- **Switch** routes by message type to appropriate processors:  \n  - **Text** → forwarded as-is.  \n  - **Voice** → downloaded and sent to *Transcribe a recording*.  \n  - **Photo** → downloaded, converted to base64, then sent to *Analyze image*.  \n  - **Document** → routed to document handler.  \n- **Merge** collects the processed input and passes a unified prompt to **Manager Agent**.  \n- **Manager Agent (LM: Google Gemini)** orchestrates specialized agents/tools:  \n  - `memory_base` (Airtable) → saving & retrieving personal/company memory  \n  - `todo_and_task_manager` (Todoist / Google Sheets) → tasks  \n  - `email_agent` (Gmail) → composing/sending emails  \n  - `calendar_agent` (Google Calendar) → scheduling  \n  - `research_agent` (SerpAPI / Wikipedia / Wolfram) → web research  \n  - `project_management` (Google Sheets) → project updates  \n- **Manager Agent** updates memory windows and sends the final reply back to Telegram.  \n\n---\n\n# Setup Steps\n\n1. Create and configure **Telegram bot**; set bot token/webhook in Telegram Trigger and Telegram nodes. Update `chatId` placeholders.  \n2. Add **Google Gemini (PaLM)** credentials in the Gemini model nodes.  \n3. Configure **Airtable knowledge-base**: set base ID & table IDs used by `memory_base` nodes.  \n4. Connect **Google APIs**: Sheets, Calendar, Gmail credentials and set document/sheet IDs.  \n5. Configure **Todoist, SerpAPI, WolframAlpha** credentials and any other tool API keys.  \n6. Verify **Window Buffer Memory** `sessionKey` values (match user sessions).  \n7. Check **schedule triggers** (cron expressions) and adjust times/timezone.  \n8. Run quick tests: send text, voice, image, and confirm replies and memory writes.  \n\n---\n\n# Estimated Setup Time\n\n- **30–60 minutes** → if credentials & IDs are ready.  \n- **2–4 hours** → full setup (API keys, spreadsheets, Airtable, detailed permissions).  \n- **4–8 hours** → complex deployment (team permissions, multiple calendars, advanced tool tuning, production testing).  \n",
+  "featuredImage": "/data/workflows/8582/8582.webp",
+  "author": {
+    "id": 101,
+    "slug": "akillabs",
+    "name": "Akil A",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 2206,
+  "downloads": 220,
+  "createdAt": "2025-09-14T19:36:31.524Z",
+  "updatedAt": "2026-01-16T08:56:39.983Z",
+  "publishedAt": "2025-09-14T19:36:31.524Z",
+  "nodes": 85,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8582",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Personal assistant bot with multi-agent system using Telegram & Google Gemini",
+    "workflowName": "Personal assistant bot with multi-agent system using Telegram & Google Gemini",
+    "description": "# How It Works \n\n- **Telegram Trigger** receives incoming messages (text, voice, photo, document).  \n- **Switch** routes by message type to appropriate processors:  \n  - **Text** → forwarded as-is.  \n  - **Voice** → downloaded and sent to *Transcribe a recording*.  \n  - **Photo** → downloaded, converted to base64, then sent to *Analyze image*.  \n  - **Document** → routed to document handler.  \n- **Merge** collects the processed input and passes a unified prompt to **Manager Agent**.  \n- **Manager Agent (LM: Google Gemini)** orchestrates specialized agents/tools:  \n  - `memory_base` (Airtable) → saving & retrieving personal/company memory  \n  - `todo_and_task_manager` (Todoist / Google Sheets) → tasks  \n  - `email_agent` (Gmail) → composing/sending emails  \n  - `calendar_agent` (Google Calendar) → scheduling  \n  - `research_agent` (SerpAPI / Wikipedia / Wolfram) → web research  \n  - `project_management` (Google Sheets) → project updates  \n- **Manager Agent** updates memory windows and sends the final reply back to Telegram.  \n\n---\n\n# Setup Steps\n\n1. Create and configure **Telegram bot**; set bot token/webhook in Telegram Trigger and Telegram nodes. Update `chatId` placeholders.  \n2. Add **Google Gemini (PaLM)** credentials in the Gemini model nodes.  \n3. Configure **Airtable knowledge-base**: set base ID & table IDs used by `memory_base` nodes.  \n4. Connect **Google APIs**: Sheets, Calendar, Gmail credentials and set document/sheet IDs.  \n5. Configure **Todoist, SerpAPI, WolframAlpha** credentials and any other tool API keys.  \n6. Verify **Window Buffer Memory** `sessionKey` values (match user sessions).  \n7. Check **schedule triggers** (cron expressions) and adjust times/timezone.  \n8. Run quick tests: send text, voice, image, and confirm replies and memory writes.  \n\n---\n\n# Estimated Setup Time\n\n- **30–60 minutes** → if credentials & IDs are ready.  \n- **2–4 hours** → full setup (API keys, spreadsheets, Airtable, detailed permissions).  \n- **4–8 hours** → complex deployment (team permissions, multiple calendars, advanced tool tuning, production testing).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Manager Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Edit Fields3",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields4",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram2",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields5",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transcribe a recording",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "memory_base",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "get many records",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create a record - personal",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Search - personal",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create or Update Existing - personal",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "delete record - personal",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "get record - personal",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update record - personal",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Search notifications",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "get record - notifications",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "get record - contacts",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Search contacts",
+      "type": "n8n-nodes-base.airtableTool",
+      "role": "airtableTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "close task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "delete task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get a single task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get many tasks",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "move a task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "reopen task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "update task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "create task",
+      "type": "n8n-nodes-base.todoistTool",
+      "role": "todoistTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "todo_and_task_manager",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "SerpAPI",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "role": "toolSerpApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "role": "toolWikipedia",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wolfram Alpha",
+      "type": "@n8n/n8n-nodes-langchain.toolWolframAlpha",
+      "role": "toolWolframAlpha",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "research_Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "email_agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Create Draft",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Email Reply",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Labels",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Label Emails",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Mark Unread",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Window Buffer Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "project_management",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Clients task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Company task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "update notes in company task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "update notes in client task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Create company task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "create clients task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "delete company task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "delete client task",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Window Buffer Memory4",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "calendar_agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get all event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Delete event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get a single event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Update event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Availablity operation agent",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create Event with attendee",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create Event without attendee",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

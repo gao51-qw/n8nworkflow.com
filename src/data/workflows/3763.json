@@ -1,0 +1,158 @@
+{
+  "id": 3763,
+  "slug": "3763",
+  "title": "Chat with your email history using Telegram, Mistral and Pgvector for RAG",
+  "description": "# Who is this for?\n\n**Everyone!** Did you dream of asking an AI \"*what hotel did I stay in for holidays last summer?*\" or \"*what were my marks last semester like?*\".\n\nDream no more, as [vector similarity searches](https://www.pinecone.io/learn/vector-embeddings/) and **this workflow** are the foundations to make it possible (as long as the information appears in your e-mails 😅).\n\n## 100% Local and Open Source!\n\nThis workflow is designed to use locally-hosted open source. **Ollama** as LLM provider, `nomic-embed-text` as the embeddings model, and **pgvector** as the vector database engine, on top of **Postgres**.\n\n## Structured AND Vectorized\n\nThis workflow combines *structured* **and** *semantic* search on your e-mail.\n\nNo need for enterprise setups!\nLeverage the convenience of n8n and open source to get a **bleeding edge** solution.\n\n## Setup\n\n1. You will need a **PGVector database** with embeddings for all your email. Use my other template [Gmail to Vector Embeddings with PGVector and Ollama](https://n8n.io/workflows/3762-gmail-to-vector-embeddings-with-pgvector-and-ollama/) to set it up in a breeze!\n2. Make a copy of my [Email Assistant: Convert Natural Language to SQL Queries with Phi4-mini and PostgreSQL](https://n8n.io/workflows/3761-email-assistant-convert-natural-language-to-sql-queries-with-phi4-mini-and-postgresql/), you will need it for structured searches.\n3. Install this template and modify the *Call the SQL composer Workflow* step, to point at your copy of the SQL workflow.\n4. Adjust the rest of necessary steps: *Telegram Trigger*, *AI Chat model*, *AI Embeddings*...\n\n**Activate the workflow** and chat around!\n\n",
+  "featuredImage": "/data/workflows/3763/3763.webp",
+  "author": {
+    "id": 101,
+    "slug": "acorretti",
+    "name": "Alfonso Corretti",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 4102,
+  "downloads": 410,
+  "createdAt": "2025-04-27T15:45:32.302Z",
+  "updatedAt": "2026-01-16T08:31:21.523Z",
+  "publishedAt": "2025-04-27T15:45:32.302Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3763",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Chat with your email history using Telegram, Mistral and Pgvector for RAG",
+    "workflowName": "Chat with your email history using Telegram, Mistral and Pgvector for RAG",
+    "description": "# Who is this for?\n\n**Everyone!** Did you dream of asking an AI \"*what hotel did I stay in for holidays last summer?*\" or \"*what were my marks last semester like?*\".\n\nDream no more, as [vector similarity searches](https://www.pinecone.io/learn/vector-embeddings/) and **this workflow** are the foundations to make it possible (as long as the information appears in your e-mails 😅).\n\n## 100% Local and Open Source!\n\nThis workflow is designed to use locally-hosted open source. **Ollama** as LLM provider, `nomic-embed-text` as the embeddings model, and **pgvector** as the vector database engine, on top of **Postgres**.\n\n## Structured AND Vectorized\n\nThis workflow combines *structured* **and** *semantic* search on your e-mail.\n\nNo need for enterprise setups!\nLeverage the convenience of n8n and open source to get a **bleeding edge** solution.\n\n## Setup\n\n1. You will need a **PGVector database** with embeddings for all your email. Use my other template [Gmail to Vector Embeddings with PGVector and Ollama](https://n8n.io/workflows/3762-gmail-to-vector-embeddings-with-pgvector-and-ollama/) to set it up in a breeze!\n2. Make a copy of my [Email Assistant: Convert Natural Language to SQL Queries with Phi4-mini and PostgreSQL](https://n8n.io/workflows/3761-email-assistant-convert-natural-language-to-sql-queries-with-phi4-mini-and-postgresql/), you will need it for structured searches.\n3. Install this template and modify the *Call the SQL composer Workflow* step, to point at your copy of the SQL workflow.\n4. Adjust the rest of necessary steps: *Telegram Trigger*, *AI Chat model*, *AI Embeddings*...\n\n**Activate the workflow** and chat around!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Came from Telegram?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Postgres PGVector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "role": "vectorStorePGVector",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Call the SQL composer Workflow",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Embeddings Ollama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "role": "embeddingsOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Beautify chat response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split text into chunks",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond on Telegram in batches",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Escape Markdown",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate session id",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

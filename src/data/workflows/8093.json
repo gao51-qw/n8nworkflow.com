@@ -1,0 +1,98 @@
+{
+  "id": 8093,
+  "slug": "8093",
+  "title": "Ai-powered degree audit system with Google Sheets and GPT-5",
+  "description": "Run an **AI-powered degree audit** for each senior student. This template reads student rows from Google Sheets, evaluates completed courses against **hard-coded program requirements**, and writes back an **AI Degree Summary** of what's still missing (major core, Gen Eds, major electives, and upper-division credits). It's designed for quick advisor/registrar review and SIS prototypes.\n\n**Trigger:** Manual — *When clicking \"Execute workflow\"*  \n**Core nodes:** Google Sheets, OpenAI Chat Model, (optional) Structured Output Parser  \n**Programs included:** Computer Science BS, Business Administration BBA, Psychology BA, Mechanical Engineering BS, Biology BS (Pre-Med), English Literature BA, Data Science BS, Nursing BSN, Economics BA, Graphic Design BFA\n\n## Who's it for\n- **Registrars & advisors** who need fast, consistent degree checks  \n- **Student success teams** building prototype dashboards  \n- **SIS/EdTech builders** exploring AI-assisted auditing\n\n## How it works\n1. **Read seniors** from Google Sheets (`Senior_data`) with: `StudentID`, `Name`, `Program`, `Year`, `CompletedCourses`.  \n2. **AI Agent** compares `CompletedCourses` to built-in requirements (per program) and computes **Missing** items + a short **Summary**.  \n3. **Write back** to the same sheet using \"Append or update\" by `StudentID` (updates **AI Degree Summary**; you can also map the raw **Missing** array to a column if desired).\n\n**Example JSON (for one student):**\n{\n \"StudentID\": \"S001\",\n \"Program\": \"Computer Science BS\",\n \"Missing\": [\n   \"GEN-REMAIN | General Education credits remaining | 6\",\n   \"CS-EL-REM | CS Major Electives (200+ level) | 6\",\n   \"UPPER-DIV | Additional Upper-Division (200+ level) credits needed | 18\",\n   \"FREE-EL | Free Electives to reach 120 total credits | 54\"\n ],\n \"Summary\": \"All core CS courses are complete. Still need 6 Gen Ed credits, 6 CS electives, and 66 total credits overall, including 18 upper-division credits — prioritize 200/300-level CS electives.\"\n}\n\n## Setup (2 steps)\n\n### 1) Connect Google Sheets (OAuth2)\nIn n8n → Credentials → New → Google Sheets (OAuth2) and sign in.\n\nIn the Google Sheets nodes, select your spreadsheet and the Senior_data tab.\n\nEnsure your input sheet has at least: StudentID, Name, Program, Year, CompletedCourses.\n\n### 2) Connect OpenAI (API Key)\nIn n8n → Credentials → New → OpenAI API, paste your key.\n\nIn the OpenAI Chat Model node, select that credential and a model (e.g., gpt-4o or gpt-5).\n\n## Requirements\n- **Sheet columns:** StudentID, Name, Program, Year, CompletedCourses\n- **CompletedCourses format:** pipe-separated IDs (e.g., GEN-101|GEN-103|CS-101).\n- **Program labels:** should match the built-in list (e.g., Computer Science BS).\n- **Credits/levels:** Template assumes upper-division ≥ 200-level (adjust the prompt if your policy differs).\n\n## Customization\n- **Change requirements:** Edit the Agent's system message to update totals, core lists, elective credit rules, or level thresholds.\n- **Store more output:** Map Missing to a new column (e.g., AI Missing List) or write rows to a separate sheet for dashboards.\n- **Distribute results:** Email summaries to advisors/students (Gmail/Outlook), or generate PDFs for advising folders.\n- **Add guardrails:** Extend the prompt to enforce residency, capstone, minor/cognate constraints, or per-college Gen Ed variations.\n\n## Best practices (per n8n guidelines)\n- **Sticky notes are mandatory:** Include a yellow sticky note that contains this description and quick setup steps; add neutral sticky notes for per-step tips.\n- **Rename nodes clearly:** e.g., \"Get Seniors,\" \"Degree Audit Agent,\" \"Update Summary.\"\n- **No hardcoded secrets:** Use credentials—not inline keys in HTTP or Code nodes.\n- **Sanitize identifiers:** Don't ship personal spreadsheet IDs or private links in the published version.\n- **Use a Set node for config:** Centralize user-tunable values (e.g., column names, tab names).\n\n## Troubleshooting\n- **OpenAI 401/429:** Verify API key/billing; slow concurrency if rate-limited.\n- **Empty summaries:** Check column names and that CompletedCourses uses |.\n- **Program mismatch:** Align Program labels to those in the prompt (exact naming recommended).\n- **Sheets auth errors:** Reconnect Google Sheets OAuth2 and re-select spreadsheet/tab.\n\n## Limitations\n- **Not an official audit:** It infers gaps from the listed completions; registrar rules can be more nuanced.\n- **Catalog drift:** Requirements are hard-coded in the prompt—update them each term/year.\n- **Upper-division heuristic:** Adjust the level threshold if your institution defines it differently.\n\n## Tags & category\n**Category:** Education / Student Information Systems  \n**Tags:** degree-audit, registrar, google-sheets, openai, electives, upper-division, graduation-readiness\n\n## Changelog\n**v1.0.0** — Initial release: Senior_data in/out, 10 programs, AI Degree Summary output, append/update by StudentID.\n\n## Contact\nNeed help tailoring this to your catalog (e.g., per-college Gen Eds, capstones, minors, PDFs/email)?\n\n📧 rbreen@ynteractive.com  \n📧 robert@ynteractive.com  \n🔗 Robert Breen — https://www.linkedin.com/in/robert-breen-29429625/  \n🌐 ynteractive.com — https://ynteractive.com",
+  "featuredImage": "/data/workflows/8093/8093.webp",
+  "author": {
+    "id": 101,
+    "slug": "rbreen",
+    "name": "Robert Breen",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 483,
+  "downloads": 48,
+  "createdAt": "2025-08-31T20:38:34.540Z",
+  "updatedAt": "2026-01-16T08:54:05.948Z",
+  "publishedAt": "2025-08-31T20:38:34.540Z",
+  "nodes": 10,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8093",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Ai-powered degree audit system with Google Sheets and GPT-5",
+    "workflowName": "Ai-powered degree audit system with Google Sheets and GPT-5",
+    "description": "Run an **AI-powered degree audit** for each senior student. This template reads student rows from Google Sheets, evaluates completed courses against **hard-coded program requirements**, and writes back an **AI Degree Summary** of what's still missing (major core, Gen Eds, major electives, and upper-division credits). It's designed for quick advisor/registrar review and SIS prototypes.\n\n**Trigger:** Manual — *When clicking \"Execute workflow\"*  \n**Core nodes:** Google Sheets, OpenAI Chat Model, (optional) Structured Output Parser  \n**Programs included:** Computer Science BS, Business Administration BBA, Psychology BA, Mechanical Engineering BS, Biology BS (Pre-Med), English Literature BA, Data Science BS, Nursing BSN, Economics BA, Graphic Design BFA\n\n## Who's it for\n- **Registrars & advisors** who need fast, consistent degree checks  \n- **Student success teams** building prototype dashboards  \n- **SIS/EdTech builders** exploring AI-assisted auditing\n\n## How it works\n1. **Read seniors** from Google Sheets (`Senior_data`) with: `StudentID`, `Name`, `Program`, `Year`, `CompletedCourses`.  \n2. **AI Agent** compares `CompletedCourses` to built-in requirements (per program) and computes **Missing** items + a short **Summary**.  \n3. **Write back** to the same sheet using \"Append or update\" by `StudentID` (updates **AI Degree Summary**; you can also map the raw **Missing** array to a column if desired).\n\n**Example JSON (for one student):**\n{\n \"StudentID\": \"S001\",\n \"Program\": \"Computer Science BS\",\n \"Missing\": [\n   \"GEN-REMAIN | General Education credits remaining | 6\",\n   \"CS-EL-REM | CS Major Electives (200+ level) | 6\",\n   \"UPPER-DIV | Additional Upper-Division (200+ level) credits needed | 18\",\n   \"FREE-EL | Free Electives to reach 120 total credits | 54\"\n ],\n \"Summary\": \"All core CS courses are complete. Still need 6 Gen Ed credits, 6 CS electives, and 66 total credits overall, including 18 upper-division credits — prioritize 200/300-level CS electives.\"\n}\n\n## Setup (2 steps)\n\n### 1) Connect Google Sheets (OAuth2)\nIn n8n → Credentials → New → Google Sheets (OAuth2) and sign in.\n\nIn the Google Sheets nodes, select your spreadsheet and the Senior_data tab.\n\nEnsure your input sheet has at least: StudentID, Name, Program, Year, CompletedCourses.\n\n### 2) Connect OpenAI (API Key)\nIn n8n → Credentials → New → OpenAI API, paste your key.\n\nIn the OpenAI Chat Model node, select that credential and a model (e.g., gpt-4o or gpt-5).\n\n## Requirements\n- **Sheet columns:** StudentID, Name, Program, Year, CompletedCourses\n- **CompletedCourses format:** pipe-separated IDs (e.g., GEN-101|GEN-103|CS-101).\n- **Program labels:** should match the built-in list (e.g., Computer Science BS).\n- **Credits/levels:** Template assumes upper-division ≥ 200-level (adjust the prompt if your policy differs).\n\n## Customization\n- **Change requirements:** Edit the Agent's system message to update totals, core lists, elective credit rules, or level thresholds.\n- **Store more output:** Map Missing to a new column (e.g., AI Missing List) or write rows to a separate sheet for dashboards.\n- **Distribute results:** Email summaries to advisors/students (Gmail/Outlook), or generate PDFs for advising folders.\n- **Add guardrails:** Extend the prompt to enforce residency, capstone, minor/cognate constraints, or per-college Gen Ed variations.\n\n## Best practices (per n8n guidelines)\n- **Sticky notes are mandatory:** Include a yellow sticky note that contains this description and quick setup steps; add neutral sticky notes for per-step tips.\n- **Rename nodes clearly:** e.g., \"Get Seniors,\" \"Degree Audit Agent,\" \"Update Summary.\"\n- **No hardcoded secrets:** Use credentials—not inline keys in HTTP or Code nodes.\n- **Sanitize identifiers:** Don't ship personal spreadsheet IDs or private links in the published version.\n- **Use a Set node for config:** Centralize user-tunable values (e.g., column names, tab names).\n\n## Troubleshooting\n- **OpenAI 401/429:** Verify API key/billing; slow concurrency if rate-limited.\n- **Empty summaries:** Check column names and that CompletedCourses uses |.\n- **Program mismatch:** Align Program labels to those in the prompt (exact naming recommended).\n- **Sheets auth errors:** Reconnect Google Sheets OAuth2 and re-select spreadsheet/tab.\n\n## Limitations\n- **Not an official audit:** It infers gaps from the listed completions; registrar rules can be more nuanced.\n- **Catalog drift:** Requirements are hard-coded in the prompt—update them each term/year.\n- **Upper-division heuristic:** Adjust the level threshold if your institution defines it differently.\n\n## Tags & category\n**Category:** Education / Student Information Systems  \n**Tags:** degree-audit, registrar, google-sheets, openai, electives, upper-division, graduation-readiness\n\n## Changelog\n**v1.0.0** — Initial release: Senior_data in/out, 10 programs, AI Degree Summary output, append/update by StudentID.\n\n## Contact\nNeed help tailoring this to your catalog (e.g., per-college Gen Eds, capstones, minors, PDFs/email)?\n\n📧 rbreen@ynteractive.com  \n📧 robert@ynteractive.com  \n🔗 Robert Breen — https://www.linkedin.com/in/robert-breen-29429625/  \n🌐 ynteractive.com — https://ynteractive.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note68",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note69",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note57",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Degree Audit Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Add Student Degree Summary",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get Student Data1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    }
+  ]
+}

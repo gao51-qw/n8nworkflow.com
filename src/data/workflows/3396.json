@@ -1,0 +1,182 @@
+{
+  "id": 3396,
+  "slug": "3396",
+  "title": "Parse incoming invoices from Outlook using AI Document Understanding",
+  "description": "### This n8n template monitors an Outlook mailbox for invoices, automatically parses/extracts data from them and then uploads the output to an Excel Workbook.\n\nOne of my top workflow requests, this template can save many hours of manual labour for you or your finance/accounts team.\n\n### How it works\n* A scheduled trigger is set to fetch recent Outlook messages to the Accounts receivable mailbox.\n* Each message is analysed to determine whether or not it from a supplier and is issuing/contains an invoice.\n* For each valid message, the attachments are downloaded and non-invoice documents are filtered out via AI Vision classification.\n* Invoices are then processed through a AI vision model again to extract the details.\n* The extracted data can then be used for reconciliation or otherwise. For this demonstration, we'll just append the row to an Excel sheet for now.\n\n### How to use\n* Ensure your Microsoft365 credential points to the correct mailbox. If a shared folder is used, toggle \"shared folder\" option to \"on\" and for the principal ID, use the email address.\n* If you receive lots of other types of messages such as replies and forwards, you may want to implement additional checks to prevent processing invoices twice. The \"remove duplicates\" node can help with this.\n\n### Requirements\n* Outlook for Mailbox\n* Google Gemini for Document Understanding and Invoice Extraction\n* Excel for Data Storage\n\n### Customising this workflow\n* Note the assumption for this template is that all invoices will come as a PDF attachment. In real life, this is rarely the case! Adding in document conversion to cover all invoice formats.\n* Human feedback is also an important factor in AI workflows. Try tagging emails as a way to notify team members that the invoice was processed.",
+  "featuredImage": "/data/workflows/3396/3396.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 16444,
+  "downloads": 1644,
+  "createdAt": "2025-04-01T09:17:11.659Z",
+  "updatedAt": "2026-01-16T08:29:35.489Z",
+  "publishedAt": "2025-04-01T09:17:11.659Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3396",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Parse incoming invoices from Outlook using AI Document Understanding",
+    "workflowName": "Parse incoming invoices from Outlook using AI Document Understanding",
+    "description": "### This n8n template monitors an Outlook mailbox for invoices, automatically parses/extracts data from them and then uploads the output to an Excel Workbook.\n\nOne of my top workflow requests, this template can save many hours of manual labour for you or your finance/accounts team.\n\n### How it works\n* A scheduled trigger is set to fetch recent Outlook messages to the Accounts receivable mailbox.\n* Each message is analysed to determine whether or not it from a supplier and is issuing/contains an invoice.\n* For each valid message, the attachments are downloaded and non-invoice documents are filtered out via AI Vision classification.\n* Invoices are then processed through a AI vision model again to extract the details.\n* The extracted data can then be used for reconciliation or otherwise. For this demonstration, we'll just append the row to an Excel sheet for now.\n\n### How to use\n* Ensure your Microsoft365 credential points to the correct mailbox. If a shared folder is used, toggle \"shared folder\" option to \"on\" and for the principal ID, use the email address.\n* If you receive lots of other types of messages such as replies and forwards, you may want to implement additional checks to prevent processing invoices twice. The \"remove duplicates\" node can help with this.\n\n### Requirements\n* Outlook for Mailbox\n* Google Gemini for Document Understanding and Invoice Extraction\n* Excel for Data Storage\n\n### Customising this workflow\n* Note the assumption for this template is that all invoices will come as a PDF attachment. In real life, this is rarely the case! Adding in document conversion to cover all invoice formats.\n* Human feedback is also an important factor in AI workflows. Try tagging emails as a way to notify team members that the invoice was processed.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Split Attachments",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Download Attachments",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "For Each Message",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Message Ref",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Empty Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Filter Invoices",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Has Invoice?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Recent Messages",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "role": "microsoftOutlook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Microsoft Excel 365",
+      "type": "n8n-nodes-base.microsoftExcel",
+      "role": "microsoftExcel",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Invoice Classifier With Gemini 2.0",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "File-Based OCR with Gemini 2.0",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

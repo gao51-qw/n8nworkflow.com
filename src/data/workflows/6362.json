@@ -1,0 +1,133 @@
+{
+  "id": 6362,
+  "slug": "6362",
+  "title": "Automate e-commerce orders, inventory & feedback with Slack, Sheets & Gmail",
+  "description": "### How It Works ⚙️\n\nThis workflow acts as a central nervous system for your e-commerce operations, automating three critical areas:\n\n### A. Order Fulfillment Notification\n1.  **Webhook: New Order:** 🚀 The workflow is instantly triggered when a new order is placed on your e-commerce platform (e.g., Shopify, WooCommerce) via a webhook. This provides real-time data to initiate fulfillment.\n2.  **Extract Order Data (Function):** 🧹 This node parses the incoming JSON data from the new order, extracting crucial details such as Order ID, customer name, email, total amount, products purchased, and shipping address.\n3.  **Send Fulfillment Notification (Slack/Email):** 📢 A detailed, formatted notification containing all necessary order information is immediately sent to your designated fulfillment team's Slack channel or email inbox, ensuring prompt order processing.\n\n### B. Low Stock Alert\n1.  **Schedule Trigger (Daily Inventory Check):** ⏰ The workflow runs automatically once every 24 hours (or at your configured interval) to regularly monitor your product inventory levels.\n2.  **Read Inventory Data (Google Sheets/API):** 📊 It connects to your chosen inventory data source (e.g., a Google Sheet configured with product IDs, names, and stock levels, or an e-commerce platform API) to retrieve current stock data for all products.\n3.  **Filter Low Stock (Function):** 🧹 This node processes the retrieved inventory data. It uses a defined threshold (e.g., 10 units) to identify and filter out any products whose current stock level falls below this critical limit.\n4.  **If Low Stock Items?:** 🚦 This conditional node checks if the previous step found any products that are low on stock. If yes, it proceeds to send an alert.\n5.  **Send Low Stock Alert (Slack/Email):** 🚨 A warning notification is sent to your purchasing or inventory management team via Slack or email, providing details on the low-stock items and prompting them to reorder before stock runs out, preventing lost sales.\n\n### C. Post-Purchase Feedback Request\n1.  **Webhook: Order Fulfilled (Delayed):** 📦 This branch is triggered when an order is marked as fulfilled or delivered in your e-commerce system. **Crucially, this webhook should be sent by your e-commerce platform or a separate automation *after a specific delay* (e.g., 3-7 days post-delivery) to ensure the customer has received and experienced the product.**\n2.  **Extract Customer Data (Feedback) (Function):** 🧹 This node extracts the customer's name and email address from the fulfilled order data, preparing it for the feedback request.\n3.  **Send Feedback Request (Gmail/Email Service):** 📧 A personalized email is sent to the customer. This email thanks them for their purchase and includes a direct link to your chosen customer feedback form (e.g., Google Form, Typeform). This systematic approach encourages valuable insights for continuous business improvement.\n\n---\n\n### How to Set Up 🛠️\n\nFollow these steps carefully to get your \"E-commerce Operations Hub\" workflow up and running in n8n:\n\n1.  **Import Workflow JSON:**\n    * Open your n8n instance.\n    * Click on 'Workflows' in the left sidebar.\n    * Click the '+' button or 'New' to create a new workflow.\n    * Click the '...' (More Options) icon in the top right.\n    * Select 'Import from JSON' and paste the entire JSON code for this workflow.\n\n2.  **Configure Webhook: New Order (Branch A):**\n    * Locate the 'Webhook: New Order' node (1. Webhook: New Order).\n    * Activate the workflow. n8n will provide a unique 'Webhook URL'.\n    * **Crucial Step:** Go to your e-commerce platform (Shopify, WooCommerce, etc.) and configure a new webhook. Set it to trigger on 'Order Created' or 'New Order' events, and paste the n8n Webhook URL there. Ensure the data format sent by your platform is JSON (most do by default).\n\n3.  **Configure Extract Order Data (Function - Branch A):**\n    * Locate the 'Extract Order Data' node (2. Extract Order Data).\n    * **Adjust Field Names:** Review the `functionCode` inside this node. **You MUST adjust the variable assignments (e.g., `orderData.id`, `orderData.customer?.first_name`)** to accurately match the exact field names sent by your e-commerce platform's new order webhook. Use the 'Test Workflow' feature in n8n (after sending a test order webhook from your platform) to inspect the incoming `items[0].json.body` data structure and make precise adjustments.\n\n4.  **Configure Send Fulfillment Notification (Slack - Branch A):**\n    * Locate the 'Send Fulfillment Notification (Slack)' node (3. Send Fulfillment Notification (Slack)).\n    * **Credentials:** Select your existing Slack API credential or click 'Create New' to set one up. Replace `YOUR_SLACK_CREDENTIAL_ID` with the actual ID or name of your credential from your n8n credentials.\n    * **Channel:** Replace `YOUR_FULFILLMENT_SLACK_CHANNEL_ID_OR_NAME` with the exact ID or name of the Slack channel where your fulfillment team receives notifications (e.g., `#order-fulfillment`).\n    * **(Optional: Switch to Email for Fulfillment):** Delete this Slack node and add a Gmail or SendGrid node. Configure its credentials, 'To Email', 'Subject' (e.g., `New Order #{{ $json.orderId }}`), and 'HTML' body (e.g., `={{ $json.fulfillmentMessage }}`).\n\n5.  **Configure Schedule Trigger (Daily Inventory Check - Branch B):**\n    * Locate the 'Schedule Trigger (Daily Inventory Check)' node (4. Schedule Trigger (Daily Inventory Check)).\n    * **Adjust 'interval', 'value', and 'timezone'** to your preferred daily check time (e.g., every 24 hours at 3 AM in your local timezone).\n\n6.  **Configure Read Inventory Data (Google Sheets - Branch B):**\n    * Locate the 'Read Inventory Data (Google Sheets)' node (5. Read Inventory Data (Google Sheets)).\n    * **Credentials:** Select your existing Google Sheets OAuth2 credential or click 'Create New'. Replace `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID` with the actual ID or name of your credential.\n    * **Sheet ID:** Replace `YOUR_INVENTORY_GOOGLE_SHEET_ID` with the actual ID of your Google Sheet where your inventory data is stored.\n    * **Range:** Ensure the 'range' (e.g., `Inventory!A:C`) correctly covers your product ID, name, and stock level columns. **Crucially, ensure your Google Sheet has columns with exact names: `ProductID`, `ProductName`, and `StockLevel` (as numbers).**\n\n7.  **Configure Filter Low Stock (Function - Branch B):**\n    * Locate the 'Filter Low Stock' node (6. Filter Low Stock).\n    * **Set Threshold:** Inside the `functionCode`, adjust `const lowStockThreshold = 10;` to your desired low stock alert level.\n    * **Adjust Field Names:** Review the `functionCode` and **adjust the variable assignments (e.g., `product.ProductID`, `product.StockLevel`)** if your Google Sheet uses different column headers.\n\n8.  **Configure Send Low Stock Alert (Slack - Branch B):**\n    * Locate the 'Send Low Stock Alert (Slack)' node (8. Send Low Stock Alert (Slack)).\n    * **Credentials:** Ensure your Slack API credential is selected (same as in step 4).\n    * **Channel:** Replace `YOUR_INVENTORY_SLACK_CHANNEL_ID_OR_NAME` with the exact ID or name of the Slack channel for inventory alerts (e.g., `#inventory-alerts`).\n    * **(Optional: Switch to Email for Low Stock):** Delete this Slack node and add a Gmail or SendGrid node. Configure its credentials, 'To Email', 'Subject' (e.g., `Low Stock Alert!`), and 'HTML' body (e.g., `={{ $json.alertMessage }}`).\n\n9.  **Configure Webhook: Order Fulfilled (Delayed) (Branch C):**\n    * Locate the 'Webhook: Order Fulfilled (Delayed)' node (10. Webhook: Order Fulfilled (Delayed)).\n    * Activate the workflow. n8n will provide a unique 'Webhook URL'.\n    * **Crucial Step:** This webhook should be triggered when an order is *fulfilled* or *delivered*. You will need to set up a mechanism in your e-commerce platform or a separate automation tool to send a webhook to this n8n URL **after a specific delay** (e.g., 3-7 days after the order is marked as delivered). This allows customers time to receive their product before being asked for feedback.\n\n10. **Configure Extract Customer Data (Feedback) (Function - Branch C):**\n    * Locate the 'Extract Customer Data (Feedback)' node (11. Extract Customer Data (Feedback)).\n    * **Adjust Field Names:** Review the `functionCode` and **adjust the variable assignments (e.g., `fulfilledOrderData.customer?.email`)** to accurately match the exact field names sent by your 'Order Fulfilled' webhook.\n    * **Set Feedback Form URL:** **Replace `YOUR_GOOGLE_FORM_OR_SURVEY_LINK`** with the actual public URL of your customer feedback survey (e.g., Google Form, Typeform, SurveyMonkey).\n    * **Set Store Name:** Replace `[Your Store Name]` in the `emailBody` with your actual store name.\n\n11. **Configure Send Feedback Request (Gmail - Branch C):**\n    * Locate the 'Send Feedback Request (Gmail)' node (12. Send Feedback Request (Gmail)).\n    * **Credentials:** Select your existing Gmail OAuth2 credential or click 'Create New'. Replace `YOUR_GMAIL_CREDENTIAL_ID` with the actual ID or name of your credential.\n    * **From Email:** Replace `YOUR_STORE_EMAIL@example.com` with the email address you want feedback requests to be sent from.\n    * The 'To Email', 'Subject', and 'HTML' body fields are dynamically generated by the previous 'Function' node.\n    * **(Optional: Switch to another Email Service):** Delete this Gmail node and add a SendGrid or Mailgun node, configuring it similarly.\n\n12. **Review and Activate:**\n    * Thoroughly review all node configurations. Ensure all placeholder values (like `YOUR_...`) are replaced and settings are correct.\n    * Click the 'Save' button in the top right corner.\n    * Finally, toggle the 'Inactive' switch to 'Active' to enable your workflow. 🟢 Your \"E-commerce Operations Hub\" is now live, ready to automate and optimize your store!",
+  "featuredImage": "/data/workflows/6362/6362.webp",
+  "author": {
+    "id": 101,
+    "slug": "marth",
+    "name": "Marth",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 354,
+  "downloads": 35,
+  "createdAt": "2025-07-24T05:08:32.560Z",
+  "updatedAt": "2026-01-16T08:44:36.347Z",
+  "publishedAt": "2025-07-24T05:08:32.560Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6362",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate e-commerce orders, inventory & feedback with Slack, Sheets & Gmail",
+    "workflowName": "Automate e-commerce orders, inventory & feedback with Slack, Sheets & Gmail",
+    "description": "### How It Works ⚙️\n\nThis workflow acts as a central nervous system for your e-commerce operations, automating three critical areas:\n\n### A. Order Fulfillment Notification\n1.  **Webhook: New Order:** 🚀 The workflow is instantly triggered when a new order is placed on your e-commerce platform (e.g., Shopify, WooCommerce) via a webhook. This provides real-time data to initiate fulfillment.\n2.  **Extract Order Data (Function):** 🧹 This node parses the incoming JSON data from the new order, extracting crucial details such as Order ID, customer name, email, total amount, products purchased, and shipping address.\n3.  **Send Fulfillment Notification (Slack/Email):** 📢 A detailed, formatted notification containing all necessary order information is immediately sent to your designated fulfillment team's Slack channel or email inbox, ensuring prompt order processing.\n\n### B. Low Stock Alert\n1.  **Schedule Trigger (Daily Inventory Check):** ⏰ The workflow runs automatically once every 24 hours (or at your configured interval) to regularly monitor your product inventory levels.\n2.  **Read Inventory Data (Google Sheets/API):** 📊 It connects to your chosen inventory data source (e.g., a Google Sheet configured with product IDs, names, and stock levels, or an e-commerce platform API) to retrieve current stock data for all products.\n3.  **Filter Low Stock (Function):** 🧹 This node processes the retrieved inventory data. It uses a defined threshold (e.g., 10 units) to identify and filter out any products whose current stock level falls below this critical limit.\n4.  **If Low Stock Items?:** 🚦 This conditional node checks if the previous step found any products that are low on stock. If yes, it proceeds to send an alert.\n5.  **Send Low Stock Alert (Slack/Email):** 🚨 A warning notification is sent to your purchasing or inventory management team via Slack or email, providing details on the low-stock items and prompting them to reorder before stock runs out, preventing lost sales.\n\n### C. Post-Purchase Feedback Request\n1.  **Webhook: Order Fulfilled (Delayed):** 📦 This branch is triggered when an order is marked as fulfilled or delivered in your e-commerce system. **Crucially, this webhook should be sent by your e-commerce platform or a separate automation *after a specific delay* (e.g., 3-7 days post-delivery) to ensure the customer has received and experienced the product.**\n2.  **Extract Customer Data (Feedback) (Function):** 🧹 This node extracts the customer's name and email address from the fulfilled order data, preparing it for the feedback request.\n3.  **Send Feedback Request (Gmail/Email Service):** 📧 A personalized email is sent to the customer. This email thanks them for their purchase and includes a direct link to your chosen customer feedback form (e.g., Google Form, Typeform). This systematic approach encourages valuable insights for continuous business improvement.\n\n---\n\n### How to Set Up 🛠️\n\nFollow these steps carefully to get your \"E-commerce Operations Hub\" workflow up and running in n8n:\n\n1.  **Import Workflow JSON:**\n    * Open your n8n instance.\n    * Click on 'Workflows' in the left sidebar.\n    * Click the '+' button or 'New' to create a new workflow.\n    * Click the '...' (More Options) icon in the top right.\n    * Select 'Import from JSON' and paste the entire JSON code for this workflow.\n\n2.  **Configure Webhook: New Order (Branch A):**\n    * Locate the 'Webhook: New Order' node (1. Webhook: New Order).\n    * Activate the workflow. n8n will provide a unique 'Webhook URL'.\n    * **Crucial Step:** Go to your e-commerce platform (Shopify, WooCommerce, etc.) and configure a new webhook. Set it to trigger on 'Order Created' or 'New Order' events, and paste the n8n Webhook URL there. Ensure the data format sent by your platform is JSON (most do by default).\n\n3.  **Configure Extract Order Data (Function - Branch A):**\n    * Locate the 'Extract Order Data' node (2. Extract Order Data).\n    * **Adjust Field Names:** Review the `functionCode` inside this node. **You MUST adjust the variable assignments (e.g., `orderData.id`, `orderData.customer?.first_name`)** to accurately match the exact field names sent by your e-commerce platform's new order webhook. Use the 'Test Workflow' feature in n8n (after sending a test order webhook from your platform) to inspect the incoming `items[0].json.body` data structure and make precise adjustments.\n\n4.  **Configure Send Fulfillment Notification (Slack - Branch A):**\n    * Locate the 'Send Fulfillment Notification (Slack)' node (3. Send Fulfillment Notification (Slack)).\n    * **Credentials:** Select your existing Slack API credential or click 'Create New' to set one up. Replace `YOUR_SLACK_CREDENTIAL_ID` with the actual ID or name of your credential from your n8n credentials.\n    * **Channel:** Replace `YOUR_FULFILLMENT_SLACK_CHANNEL_ID_OR_NAME` with the exact ID or name of the Slack channel where your fulfillment team receives notifications (e.g., `#order-fulfillment`).\n    * **(Optional: Switch to Email for Fulfillment):** Delete this Slack node and add a Gmail or SendGrid node. Configure its credentials, 'To Email', 'Subject' (e.g., `New Order #{{ $json.orderId }}`), and 'HTML' body (e.g., `={{ $json.fulfillmentMessage }}`).\n\n5.  **Configure Schedule Trigger (Daily Inventory Check - Branch B):**\n    * Locate the 'Schedule Trigger (Daily Inventory Check)' node (4. Schedule Trigger (Daily Inventory Check)).\n    * **Adjust 'interval', 'value', and 'timezone'** to your preferred daily check time (e.g., every 24 hours at 3 AM in your local timezone).\n\n6.  **Configure Read Inventory Data (Google Sheets - Branch B):**\n    * Locate the 'Read Inventory Data (Google Sheets)' node (5. Read Inventory Data (Google Sheets)).\n    * **Credentials:** Select your existing Google Sheets OAuth2 credential or click 'Create New'. Replace `YOUR_GOOGLE_SHEETS_CREDENTIAL_ID` with the actual ID or name of your credential.\n    * **Sheet ID:** Replace `YOUR_INVENTORY_GOOGLE_SHEET_ID` with the actual ID of your Google Sheet where your inventory data is stored.\n    * **Range:** Ensure the 'range' (e.g., `Inventory!A:C`) correctly covers your product ID, name, and stock level columns. **Crucially, ensure your Google Sheet has columns with exact names: `ProductID`, `ProductName`, and `StockLevel` (as numbers).**\n\n7.  **Configure Filter Low Stock (Function - Branch B):**\n    * Locate the 'Filter Low Stock' node (6. Filter Low Stock).\n    * **Set Threshold:** Inside the `functionCode`, adjust `const lowStockThreshold = 10;` to your desired low stock alert level.\n    * **Adjust Field Names:** Review the `functionCode` and **adjust the variable assignments (e.g., `product.ProductID`, `product.StockLevel`)** if your Google Sheet uses different column headers.\n\n8.  **Configure Send Low Stock Alert (Slack - Branch B):**\n    * Locate the 'Send Low Stock Alert (Slack)' node (8. Send Low Stock Alert (Slack)).\n    * **Credentials:** Ensure your Slack API credential is selected (same as in step 4).\n    * **Channel:** Replace `YOUR_INVENTORY_SLACK_CHANNEL_ID_OR_NAME` with the exact ID or name of the Slack channel for inventory alerts (e.g., `#inventory-alerts`).\n    * **(Optional: Switch to Email for Low Stock):** Delete this Slack node and add a Gmail or SendGrid node. Configure its credentials, 'To Email', 'Subject' (e.g., `Low Stock Alert!`), and 'HTML' body (e.g., `={{ $json.alertMessage }}`).\n\n9.  **Configure Webhook: Order Fulfilled (Delayed) (Branch C):**\n    * Locate the 'Webhook: Order Fulfilled (Delayed)' node (10. Webhook: Order Fulfilled (Delayed)).\n    * Activate the workflow. n8n will provide a unique 'Webhook URL'.\n    * **Crucial Step:** This webhook should be triggered when an order is *fulfilled* or *delivered*. You will need to set up a mechanism in your e-commerce platform or a separate automation tool to send a webhook to this n8n URL **after a specific delay** (e.g., 3-7 days after the order is marked as delivered). This allows customers time to receive their product before being asked for feedback.\n\n10. **Configure Extract Customer Data (Feedback) (Function - Branch C):**\n    * Locate the 'Extract Customer Data (Feedback)' node (11. Extract Customer Data (Feedback)).\n    * **Adjust Field Names:** Review the `functionCode` and **adjust the variable assignments (e.g., `fulfilledOrderData.customer?.email`)** to accurately match the exact field names sent by your 'Order Fulfilled' webhook.\n    * **Set Feedback Form URL:** **Replace `YOUR_GOOGLE_FORM_OR_SURVEY_LINK`** with the actual public URL of your customer feedback survey (e.g., Google Form, Typeform, SurveyMonkey).\n    * **Set Store Name:** Replace `[Your Store Name]` in the `emailBody` with your actual store name.\n\n11. **Configure Send Feedback Request (Gmail - Branch C):**\n    * Locate the 'Send Feedback Request (Gmail)' node (12. Send Feedback Request (Gmail)).\n    * **Credentials:** Select your existing Gmail OAuth2 credential or click 'Create New'. Replace `YOUR_GMAIL_CREDENTIAL_ID` with the actual ID or name of your credential.\n    * **From Email:** Replace `YOUR_STORE_EMAIL@example.com` with the email address you want feedback requests to be sent from.\n    * The 'To Email', 'Subject', and 'HTML' body fields are dynamically generated by the previous 'Function' node.\n    * **(Optional: Switch to another Email Service):** Delete this Gmail node and add a SendGrid or Mailgun node, configuring it similarly.\n\n12. **Review and Activate:**\n    * Thoroughly review all node configurations. Ensure all placeholder values (like `YOUR_...`) are replaced and settings are correct.\n    * Click the 'Save' button in the top right corner.\n    * Finally, toggle the 'Inactive' switch to 'Active' to enable your workflow. 🟢 Your \"E-commerce Operations Hub\" is now live, ready to automate and optimize your store!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "1. Webhook: New Order",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "2. Extract Order Data",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "3. Send Fulfillment Notification (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "4. Schedule Trigger (Daily Inventory Check)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "5. Read Inventory Data (Google Sheets)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "6. Filter Low Stock",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "7. If Low Stock Items?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "8. Send Low Stock Alert (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "9. No Low Stock",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "10. Webhook: Order Fulfilled (Delayed)",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "11. Extract Customer Data (Feedback)",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "12. Send Feedback Request (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

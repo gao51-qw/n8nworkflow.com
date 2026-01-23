@@ -1,0 +1,248 @@
+{
+  "id": 6497,
+  "slug": "6497",
+  "title": "Enhance & expand Telegram images to 3:2 with CodeFormer & LightX AI",
+  "description": "## 🚀 Automatically enhance and expand Telegram images with AI\n\nThis n8n workflow turns your Telegram bot into a powerful AI photo enhancer!  \nWhether users send a **photo or a link**, it processes the image by:\n\n1. 📥 Receiving the input (photo or link)\n2. 🧠 Upscaling quality using **Replicate's CodeFormer**\n3. 📐 Analyzing image dimensions and calculating paddings to fit the 3:2 ratio\n4. 🖼️ Expanding the image contextually with **LightX AI**\n5. ☁️ Uploading the result to S3\n6. 🔗 Sending back a public URL to the user in Telegram\n\n---\n\n## 👥 Who is it for?\n- Telegram bot creators\n- Content creators & photographers\n- SMM pros looking to quickly polish user images\n- AI enthusiasts who want plug-and-play image workflows\n\n---\n\n## 🛠️ Setup Requirements\n- A Telegram bot (via @BotFather)\n- AWS S3 Bucket (public)\n- Replicate API key\n- LightX API key\n\n---\n\n## 🔧 How to customize\n- Add custom prompts or ratio in JavaScript node\n- Connect to other AI tools for filters or style transfer\n- Switch storage destination (e.g. Google Drive or Dropbox)\n\n---\n\n## 💡 Tips\n- Works great in photo-related communities\n- Can be used for virtual try-ons, image recovery or thumbnail generation\n\n---\n\n## 🌍 Languages\nThe main sticky note can be localized — feel free to swap it for your audience!\n\n---",
+  "featuredImage": "/data/workflows/6497/6497.webp",
+  "author": {
+    "id": 101,
+    "slug": "vadym-nahornyi",
+    "name": "Vadym Nahornyi",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 40,
+  "downloads": 4,
+  "createdAt": "2025-07-26T21:34:39.335Z",
+  "updatedAt": "2026-01-16T08:45:17.660Z",
+  "publishedAt": "2025-07-26T21:34:39.335Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6497",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Enhance & expand Telegram images to 3:2 with CodeFormer & LightX AI",
+    "workflowName": "Enhance & expand Telegram images to 3:2 with CodeFormer & LightX AI",
+    "description": "## 🚀 Automatically enhance and expand Telegram images with AI\n\nThis n8n workflow turns your Telegram bot into a powerful AI photo enhancer!  \nWhether users send a **photo or a link**, it processes the image by:\n\n1. 📥 Receiving the input (photo or link)\n2. 🧠 Upscaling quality using **Replicate's CodeFormer**\n3. 📐 Analyzing image dimensions and calculating paddings to fit the 3:2 ratio\n4. 🖼️ Expanding the image contextually with **LightX AI**\n5. ☁️ Uploading the result to S3\n6. 🔗 Sending back a public URL to the user in Telegram\n\n---\n\n## 👥 Who is it for?\n- Telegram bot creators\n- Content creators & photographers\n- SMM pros looking to quickly polish user images\n- AI enthusiasts who want plug-and-play image workflows\n\n---\n\n## 🛠️ Setup Requirements\n- A Telegram bot (via @BotFather)\n- AWS S3 Bucket (public)\n- Replicate API key\n- LightX API key\n\n---\n\n## 🔧 How to customize\n- Add custom prompts or ratio in JavaScript node\n- Connect to other AI tools for filters or style transfer\n- Switch storage destination (e.g. Google Drive or Dropbox)\n\n---\n\n## 💡 Tips\n- Works great in photo-related communities\n- Can be used for virtual try-ons, image recovery or thumbnail generation\n\n---\n\n## 🌍 Languages\nThe main sticky note can be localized — feel free to swap it for your audience!\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Send Final URL to User via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Generate Public URL for Final Image",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Upload Final Photo to S1",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Download Final Photo from LightX",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Generate Output Filename (.jpeg) Final",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check If Expansion Is Complete",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check LightX Expansion Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait Before Checking Status Again",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Iterate Until Expansion is Ready",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Request AI Expansion from LightX",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Upload File to LightX via PUT",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge Data for Upload",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Extract Upload Link from LightX Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Request Upload Link from LightX",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get File Size (in Bytes)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Calculate Padding for 3:2 Ratio",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Download Upscaled Image from Replicate1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait After Upscale",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Upscale Image via Replicate",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Generate Output File Name (.png)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set Input URL for AI Model",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Public URL for Original Image",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Upload Original Photo to S1",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate Input File Name (.jpeg)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check If Photo Exists1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note Links1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Result1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Loop1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Expand Process1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Upscale1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Photo Upload1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note If1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Trigger1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note Main1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Trigger1",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "id": 1855,
+  "slug": "1855",
+  "title": "Sync Stripe charges to HubSpot contacts",
+  "description": "This workflow pushes Stripe charges to HubSpot contacts. It uses the Stripe API to get all charges and the HubSpot API to update the contacts. The workflow will create a new HubSpot property to store the total amount charged. If the property already exists, it will update the property.\n\n## Prerequisites\n\n- [Stripe credentials](https://docs.n8n.io/integrations/builtin/credentials/stripe/).\n- [HubSpot credentials](https://docs.n8n.io/integrations/builtin/credentials/hubspot/).\n\n## How it works\n\n1. On a schedule, check if the property exists in HubSpot. If it doesn't exist, create it. The default schedule is once a day at midnight.\n2. Once property is acertained, the first Stripe node gets all charges.\n3. Once the charges are returned, the second Stripe node gets extra customer information.\n4. Once the customer information is returned, `Merge data` node will merge the customer information with the charges so that the next node `Aggregate totals` can calculate the total amount charged per contact.\n5. Once we have the total amount charged per contact, the `Create or update customer` node will create a new HubSpot contact if it doesn't exist or update the contact if it does exist with the total amount charged.",
+  "featuredImage": "/data/workflows/1855/1855.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8n-team",
+    "name": "n8n Team",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1845,
+  "downloads": 184,
+  "createdAt": "2023-01-05T14:08:51.094Z",
+  "updatedAt": "2026-01-16T08:22:08.972Z",
+  "publishedAt": "2023-01-05T14:08:51.094Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/1855",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sync Stripe charges to HubSpot contacts",
+    "workflowName": "Sync Stripe charges to HubSpot contacts",
+    "description": "This workflow pushes Stripe charges to HubSpot contacts. It uses the Stripe API to get all charges and the HubSpot API to update the contacts. The workflow will create a new HubSpot property to store the total amount charged. If the property already exists, it will update the property.\n\n## Prerequisites\n\n- [Stripe credentials](https://docs.n8n.io/integrations/builtin/credentials/stripe/).\n- [HubSpot credentials](https://docs.n8n.io/integrations/builtin/credentials/hubspot/).\n\n## How it works\n\n1. On a schedule, check if the property exists in HubSpot. If it doesn't exist, create it. The default schedule is once a day at midnight.\n2. Once property is acertained, the first Stripe node gets all charges.\n3. Once the charges are returned, the second Stripe node gets extra customer information.\n4. Once the customer information is returned, `Merge data` node will merge the customer information with the charges so that the next node `Aggregate totals` can calculate the total amount charged per contact.\n5. Once we have the total amount charged per contact, the `Create or update customer` node will create a new HubSpot contact if it doesn't exist or update the contact if it does exist with the total amount charged.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "If charge has customer",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get customer",
+      "type": "n8n-nodes-base.stripe",
+      "role": "stripe",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove duplicate customers",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate `amount_captured`",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate totals",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create or update customer",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get all charges",
+      "type": "n8n-nodes-base.stripe",
+      "role": "stripe",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get HubSpot field",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Create field in HubSpot",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Configure",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Skip field checking",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If field exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    }
+  ]
+}

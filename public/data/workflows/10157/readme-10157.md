@@ -1,0 +1,100 @@
+# Local document question answering with Ollama AI, Agentic RAG & PGVector
+
+> ## 🚀 n8n Local AI Agentic RAG Template
+
+**Author:** [Jadai kongolo](https://www.instagram.com/jadai_ai_automation/)
+
+## What is this?
+This template provides an entirely local implementation of an **Agentic RAG (Retrieval Augmented Generation)** system in n8n that can be extended easily for your specific use case and knowledge base. Unlike standard RAG which only performs simple lookups, this agent can reason about your knowledge base, self-improve retrieval, and dynamically switch between different tools based on the specific question. 
+
+## Why Agentic RAG?
+Standard RAG has significant limitations:
+- Poor analysis of numerical/tabular data
+- Missing context due to document chunking
+- Inability to connect information across documents
+- No dynamic tool selection based on question type
+
+## What makes this template powerful:
+- **Intelligent tool selection**: Switches between RAG lookups, SQL queries, or full document retrieval based on the question
+- **Complete document context**: Accesses entire documents when needed instead of just chunks
+- **Accurate numerical analysis**: Uses SQL for precise calculations on spreadsheet/tabular data
+- **Cross-document insights**: Connects information across your entire knowledge base
+- **Multi-file processing**: Handles multiple documents in a single workflow loop
+- **Efficient storage**: Uses JSONB in Supabase to store tabular data without creating new tables for each CSV
+
+## Getting Started
+1. Run the table creation nodes first to set up your database tables in Supabase
+2. Upload your documents to the folder on your computer that is mounted to /data/shared in the n8n container. This folder by default is the "shared" folder in the local AI package.
+3. The agent will process them automatically (chunking text, storing tabular data in Supabase)
+4. Start asking questions that leverage the agent's multiple reasoning approaches
+
+## Customization
+This template provides a solid foundation that you can extend by:
+- Tuning the system prompt for your specific use case
+- Adding document metadata like summaries
+- Implementing more advanced RAG techniques
+- Optimizing for larger knowledge bases
+
+---
+
+The non-local ("cloud") version of this Agentic RAG agent can be [found here](https://kongolo.gumroad.com/l/anxwv).
+
+## 📊 Basic Information
+
+- **Workflow ID:** 10157
+- **Complexity:** advanced
+- **Node Count:** 41
+- **Views:** 4149
+- **Downloads:** 414
+- **Created:** 2025/10/25
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/10157)
+
+## 👤 Author
+
+- **Name:** Jadai kongolo
+- **Username:** @jadai-ai-automation
+
+## 🏷️ Categories
+
+- Internal Wiki
+- AI RAG
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.documentDefaultDataLoader** 
+- **stickyNote** (×6)
+- **extractFromFile** (×4)
+- **@n8n/n8n-nodes-langchain.memoryPostgresChat** 
+- **set** (×3)
+- **respondToWebhook** 
+- **@n8n/n8n-nodes-langchain.chatTrigger** 
+- **webhook** 
+- **aggregate** 
+- **summarize** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **switch** 
+- **postgres** (×7)
+- **postgresTool** (×3)
+- **splitInBatches** 
+- **localFileTrigger** 
+- **readWriteFile** 
+- **@n8n/n8n-nodes-langchain.embeddingsOllama** (×2)
+- **@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter** 
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** 
+- **@n8n/n8n-nodes-langchain.vectorStorePGVector** (×2)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 41 nodes with 30 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

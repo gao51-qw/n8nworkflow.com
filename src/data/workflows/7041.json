@@ -1,0 +1,116 @@
+{
+  "id": 7041,
+  "slug": "7041",
+  "title": "Send a voice note on Telegram to generate a professional email with ChatGPT",
+  "description": "## Telegram Voice Message → Automatic Email\n\n![baptistefortn8nautomationtelegramaudio.png](fileId:1951)\n\n**Imagine:** What if you could turn a simple Telegram voice message into a professional email—without typing, copying, pasting, or even opening Gmail?\n\nThis workflow does it all for you: just record a voice note, and it will transcribe, format, and write a clean HTML email, **then send it to the right person—all by itself.**\n\n## Prerequisites\n\n- **Create a Telegram bot** (via [BotFather](https://t.me/botfather)) and get the token.\n- **Have an OpenAI account** (API key for Whisper and GPT-4).\n- **Set up a Gmail account with OAuth2.**\n- **Import the JSON template** into your automation platform.\n\n## 🧩 Detailed Flow Architecture\n\n### 1. Telegram Trigger\n\n![workflown8ntelegramvoicebaptistefort.png](fileId:1953)\n\n**Node:** Telegram Trigger  \nThis node listens to all **Message** events received by the specified bot (e.g., “BOT OFFICIEL BAPTISTE”).  \nWhenever a user sends a voice message, the trigger fires automatically.\n\n&gt; ⚠️ Only one Telegram trigger per bot is possible (API limitation).\n\n**Key parameter:**  \n- `Trigger On`: Message\n\n### 2. Wait\n\n**Node:** Wait  \nUsed to buffer or smooth out calls to avoid collisions if you receive several voice messages in a row.\n\n### 3. Retrieve the Audio File\n\n![workflowbaptistefortemailtelegramaudio.png](fileId:1952)\n\n**Node:** Get a file  \n- **Type:** Telegram (resource: `file`)\n- **Parameter:**  \n  - `fileId = {{$json[\"message\"][\"voice\"][\"file_id\"]}}`  \nThis node fetches the voice file from Telegram received in step 1\n\n### 4. Automatic Transcription (Whisper)\n\n![baptistefortn8ntranscriptiontelegramvoice.png](fileId:1950)\n\n**Node:** Transcribe a recording  \n- **Resource:** audio  \n- **Operation:** transcribe  \n- **API Key:** Your OpenAI account  \nThe audio file is sent to OpenAI Whisper: the output is clean, accurate text ready to be processed.\n\n### 5. Optional Wait (Wait1)\n\n**Node:** Wait1  \nSame purpose as step 2: useful if you want to buffer or add a delay to absorb processing time.\n\n### 6. Structured Email Generation (GPT-4 + Output Parser)\n\n**Node:** AI Agent  \nThis is the core of the flow:\n\n- The transcribed text is sent to GPT-4 (or GPT-4.1-mini here, via OpenAI Chat Model)\n- **Prompt used:**\n\n    ```markdown\n    You are an assistant specialized in writing professional emails.\n\n    Based on the text below, you must: {{ $json.text }}\n\n    1. Detect if there is a recipient's email address in the text (or something similar like \"send to fort.baptiste.pro\")\n       - If it’s not a complete address, complete it by assuming it ends with `@gmail.com`.\n    2. Understand the user's intent (resignation, refusal, application, excuse, request, etc.)\n    3. Generate a relevant and concise email subject, faithful to the content\n    4. Write a professional message, structured in HTML:\n       - With a polite tone, adapted to the situation\n       - Formatted with HTML tags (`<p>`, `<br>`, etc.)\n       - No spelling mistakes in French\n       - My first name is jeremy and if the text says he is not happy, specify the wish to resign\n\n⚠️ You must always return your answer in the following strict JSON format, with no extra text:\n    ```\n\n    ```json\n    {\n      \"email\": \"adresse@gmail.com\",\n      \"subject\": \"Objet de l’email\",\n      \"body\": \"<p>Contenu HTML de l’email</p>\"\n    }\n    ```\n\nEverything is strictly validated and formatted with the **Structured Output Parser** node.\n\n### 7. Automatic Email Sending (Gmail)\n\n**Node:** Send a message  \n- **To:** `{{$json.output.email}}`\n- **Subject:** `{{$json.output.subject}}`\n- **HTML Body:** `{{$json.output.body}}`  \nThis node takes the JSON structure returned by the AI and sends the email via Gmail, to the right recipient, with the correct subject and full HTML formatting.\n\nIf you want to automate manual tasks, visit our French [Agence automatisation 0vni](https://www.0vni.fr/).",
+  "featuredImage": "/data/workflows/7041/7041.webp",
+  "author": {
+    "id": 101,
+    "slug": "baptistefort",
+    "name": "Baptiste Fort",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1142,
+  "downloads": 114,
+  "createdAt": "2025-08-06T08:30:25.992Z",
+  "updatedAt": "2026-01-16T08:48:19.077Z",
+  "publishedAt": "2025-08-06T08:30:25.992Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7041",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Send a voice note on Telegram to generate a professional email with ChatGPT",
+    "workflowName": "Send a voice note on Telegram to generate a professional email with ChatGPT",
+    "description": "## Telegram Voice Message → Automatic Email\n\n![baptistefortn8nautomationtelegramaudio.png](fileId:1951)\n\n**Imagine:** What if you could turn a simple Telegram voice message into a professional email—without typing, copying, pasting, or even opening Gmail?\n\nThis workflow does it all for you: just record a voice note, and it will transcribe, format, and write a clean HTML email, **then send it to the right person—all by itself.**\n\n## Prerequisites\n\n- **Create a Telegram bot** (via [BotFather](https://t.me/botfather)) and get the token.\n- **Have an OpenAI account** (API key for Whisper and GPT-4).\n- **Set up a Gmail account with OAuth2.**\n- **Import the JSON template** into your automation platform.\n\n## 🧩 Detailed Flow Architecture\n\n### 1. Telegram Trigger\n\n![workflown8ntelegramvoicebaptistefort.png](fileId:1953)\n\n**Node:** Telegram Trigger  \nThis node listens to all **Message** events received by the specified bot (e.g., “BOT OFFICIEL BAPTISTE”).  \nWhenever a user sends a voice message, the trigger fires automatically.\n\n&gt; ⚠️ Only one Telegram trigger per bot is possible (API limitation).\n\n**Key parameter:**  \n- `Trigger On`: Message\n\n### 2. Wait\n\n**Node:** Wait  \nUsed to buffer or smooth out calls to avoid collisions if you receive several voice messages in a row.\n\n### 3. Retrieve the Audio File\n\n![workflowbaptistefortemailtelegramaudio.png](fileId:1952)\n\n**Node:** Get a file  \n- **Type:** Telegram (resource: `file`)\n- **Parameter:**  \n  - `fileId = {{$json[\"message\"][\"voice\"][\"file_id\"]}}`  \nThis node fetches the voice file from Telegram received in step 1\n\n### 4. Automatic Transcription (Whisper)\n\n![baptistefortn8ntranscriptiontelegramvoice.png](fileId:1950)\n\n**Node:** Transcribe a recording  \n- **Resource:** audio  \n- **Operation:** transcribe  \n- **API Key:** Your OpenAI account  \nThe audio file is sent to OpenAI Whisper: the output is clean, accurate text ready to be processed.\n\n### 5. Optional Wait (Wait1)\n\n**Node:** Wait1  \nSame purpose as step 2: useful if you want to buffer or add a delay to absorb processing time.\n\n### 6. Structured Email Generation (GPT-4 + Output Parser)\n\n**Node:** AI Agent  \nThis is the core of the flow:\n\n- The transcribed text is sent to GPT-4 (or GPT-4.1-mini here, via OpenAI Chat Model)\n- **Prompt used:**\n\n    ```markdown\n    You are an assistant specialized in writing professional emails.\n\n    Based on the text below, you must: {{ $json.text }}\n\n    1. Detect if there is a recipient's email address in the text (or something similar like \"send to fort.baptiste.pro\")\n       - If it’s not a complete address, complete it by assuming it ends with `@gmail.com`.\n    2. Understand the user's intent (resignation, refusal, application, excuse, request, etc.)\n    3. Generate a relevant and concise email subject, faithful to the content\n    4. Write a professional message, structured in HTML:\n       - With a polite tone, adapted to the situation\n       - Formatted with HTML tags (`<p>`, `<br>`, etc.)\n       - No spelling mistakes in French\n       - My first name is jeremy and if the text says he is not happy, specify the wish to resign\n\n⚠️ You must always return your answer in the following strict JSON format, with no extra text:\n    ```\n\n    ```json\n    {\n      \"email\": \"adresse@gmail.com\",\n      \"subject\": \"Objet de l’email\",\n      \"body\": \"<p>Contenu HTML de l’email</p>\"\n    }\n    ```\n\nEverything is strictly validated and formatted with the **Structured Output Parser** node.\n\n### 7. Automatic Email Sending (Gmail)\n\n**Node:** Send a message  \n- **To:** `{{$json.output.email}}`\n- **Subject:** `{{$json.output.subject}}`\n- **HTML Body:** `{{$json.output.body}}`  \nThis node takes the JSON structure returned by the AI and sends the email via Gmail, to the right recipient, with the correct subject and full HTML formatting.\n\nIf you want to automate manual tasks, visit our French [Agence automatisation 0vni](https://www.0vni.fr/).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Buffer Delay (Pre-Processing)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Download Telegram Voice File",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Transcribe Audio to Text (OpenAI Whisper)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Buffer Delay (Pre-AI Processing)",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Generate Email Content AI AGENT",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "GPT-4 Email Generator Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Enforce Email JSON Schema",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Voice note",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

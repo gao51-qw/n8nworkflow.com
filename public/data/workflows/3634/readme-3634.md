@@ -1,0 +1,75 @@
+# Build your own Google Drive MCP server
+
+> ### This n8n demonstrates how to build a simple Google Drive MCP server to search and get contents of files from Google Drive.
+
+This MCP example is based off an official MCP reference implementation which can be found here -[https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive](https://github.com/modelcontextprotocol/servers/tree/main/src/gdrive)
+
+### How it works
+* A MCP server trigger is used and connected to 1x Google Drive tool and 1x Custom Workflow tool.
+* The Google Drive tool is set to perform a search on files within our Google Drive folder.
+* The Custom Workflow tool downloads target files found in our drive and converts the binaries to their text representation. Eg. PDFs have only their text contents extracted and returned to the MCP client.
+
+### How to use
+* This Google Drive MCP server allows any compatible MCP client to manage a person or shared Google Drive. Simple select a drive or for better control, specify a folder within the drive to scope the operations to.
+* Connect your MCP client by following the n8n guidelines here - https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.mcptrigger/#integrating-with-claude-desktop
+* Try the following queries in your MCP client:
+  * "Please help me search for last month's expense reports."
+ * "What does the company policy document say about cancellations and refunds?"
+
+### Requirements
+* Google Drive for documents.
+* OpenAI for image and audio understanding.
+* MCP Client or Agent for usage such as Claude Desktop - https://claude.ai/download
+
+### Customising this workflow
+* Add additional capabilities such as renaming, moving and/or deleting files.
+* Remember to set the MCP server to require credentials before going to production and sharing this MCP server with others!
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3634
+- **Complexity:** advanced
+- **Node Count:** 17
+- **Views:** 7100
+- **Downloads:** 710
+- **Created:** 2025/4/21
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3634)
+
+## 👤 Author
+
+- **Name:** Jimleuk
+- **Username:** @jimleuk
+
+## 🏷️ Categories
+
+- Document Extraction
+- AI RAG
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×4)
+- **executeWorkflowTrigger** 
+- **@n8n/n8n-nodes-langchain.mcpTrigger** 
+- **googleDrive** 
+- **switch** (×2)
+- **extractFromFile** (×2)
+- **set** (×2)
+- **@n8n/n8n-nodes-langchain.toolWorkflow** 
+- **googleDriveTool** 
+- **@n8n/n8n-nodes-langchain.openAi** (×2)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 17 nodes with 8 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,224 @@
+{
+  "id": 2862,
+  "slug": "2862",
+  "title": "Effortless email management with AI-powered summarization & review",
+  "description": "### How it Works\n\nThis workflow automates the handling of incoming emails, summarizes their content, generates appropriate responses using a retrieval-augmented generation (RAG) approach, and obtains approval or suggestions before sending replies. Below is an explanation of its functionality divided into two main sections:\n\n1. **Email Handling and Summarization**:\n   - The process begins with the `Email Trigger (IMAP)` node which listens for new emails in a specified inbox.\n   - Once an email is received, the `Markdown` node converts its HTML content into plain text if necessary, followed by the `Email Summarization Chain` that uses AI to create a concise summary of up to 100 words.\n\n2. **Response Generation and Approval**:\n   - A `Write email` node generates a professional response based on the summarized content, ensuring brevity and professionalism while keeping within the word limit.\n   - Before sending out any automated replies, the system sends these drafts via Gmail for human review and approval through the `Gmail` node configured with free-text response options. If approved, the finalized email is sent back to the original sender using the `Send Email` node; otherwise, it loops back for further edits or manual intervention.\n   - Additionally, there's a `Text Classifier` node designed to categorize feedback from humans as either \"Approved\" or \"Declined\", guiding whether the email should proceed directly to being sent or require additional editing.\n\n### Set Up Steps\n\nTo replicate this workflow within your own n8n environment, follow these essential configuration steps:\n\n1. **Configuration**:\n   - Begin by setting up an n8n instance either locally or via cloud services offered directly from their official site.\n   - Import the provided JSON configuration file into your workspace, making sure all required credentials such as IMAP, SMTP, OpenAI API keys, etc., are properly set up under Credentials since multiple nodes rely heavily on external integrations for functionalities like reading emails, generating summaries, crafting replies, and managing approvals.\n\n2. **Customization**:\n   - Adjust parameters according to specific business needs, including but not limited to adjusting the conditions used during conditional checks performed by nodes like `Approve?`.\n   - Modify the template messages given to AI models so they align closely with organizational tone & style preferences while maintaining professionalism expected in business communications.\n   - Ensure correct mappings between fields when appending data to external systems where records might need tracking post-interaction completion, such as Google Sheets or similar platforms.",
+  "featuredImage": "/data/workflows/2862/2862.webp",
+  "author": {
+    "id": 101,
+    "slug": "n3witalia",
+    "name": "Davide",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 31059,
+  "downloads": 3105,
+  "createdAt": "2025-02-07T15:34:24.029Z",
+  "updatedAt": "2026-01-16T08:26:54.812Z",
+  "publishedAt": "2025-02-07T15:34:24.029Z",
+  "nodes": 31,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2862",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Effortless email management with AI-powered summarization & review",
+    "workflowName": "Effortless email management with AI-powered summarization & review",
+    "description": "### How it Works\n\nThis workflow automates the handling of incoming emails, summarizes their content, generates appropriate responses using a retrieval-augmented generation (RAG) approach, and obtains approval or suggestions before sending replies. Below is an explanation of its functionality divided into two main sections:\n\n1. **Email Handling and Summarization**:\n   - The process begins with the `Email Trigger (IMAP)` node which listens for new emails in a specified inbox.\n   - Once an email is received, the `Markdown` node converts its HTML content into plain text if necessary, followed by the `Email Summarization Chain` that uses AI to create a concise summary of up to 100 words.\n\n2. **Response Generation and Approval**:\n   - A `Write email` node generates a professional response based on the summarized content, ensuring brevity and professionalism while keeping within the word limit.\n   - Before sending out any automated replies, the system sends these drafts via Gmail for human review and approval through the `Gmail` node configured with free-text response options. If approved, the finalized email is sent back to the original sender using the `Send Email` node; otherwise, it loops back for further edits or manual intervention.\n   - Additionally, there's a `Text Classifier` node designed to categorize feedback from humans as either \"Approved\" or \"Declined\", guiding whether the email should proceed directly to being sent or require additional editing.\n\n### Set Up Steps\n\nTo replicate this workflow within your own n8n environment, follow these essential configuration steps:\n\n1. **Configuration**:\n   - Begin by setting up an n8n instance either locally or via cloud services offered directly from their official site.\n   - Import the provided JSON configuration file into your workspace, making sure all required credentials such as IMAP, SMTP, OpenAI API keys, etc., are properly set up under Credentials since multiple nodes rely heavily on external integrations for functionalities like reading emails, generating summaries, crafting replies, and managing approvals.\n\n2. **Customization**:\n   - Adjust parameters according to specific business needs, including but not limited to adjusting the conditions used during conditional checks performed by nodes like `Approve?`.\n   - Modify the template messages given to AI models so they align closely with organizational tone & style preferences while maintaining professionalism expected in business communications.\n   - Ensure correct mappings between fields when appending data to external systems where records might need tracking post-interaction completion, such as Google Sheets or similar platforms.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "role": "emailReadImap",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Email Summarization Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "role": "chainSummarization",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Write email",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Text Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "role": "textClassifier",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Refresh collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Download Files",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Token Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "role": "textSplitterTokenSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "DeepSeek Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "role": "lmChatDeepSeek",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email Reviewer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

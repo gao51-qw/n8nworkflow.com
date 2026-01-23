@@ -1,0 +1,122 @@
+{
+  "id": 7667,
+  "slug": "7667",
+  "title": "PDF proposal knowledge base with S3, OpenAI GPT-4o & Qdrant RAG agent",
+  "description": "## This template has a two part setup:\n1. Ingest PDF files from S3, extract text, chunk, embed with OpenAI embeddings, and index into a Qdrant collection with metadata.\n2. Provide a chat entry point that uses an Agent with OpenAI to retrieve from the same Qdrant collection as a tool and answer proposal knowledge questions.\n\n## What it does\n- Lists objects in an S3 bucket, loops through keys, downloads each file, and extracts text from PDFs.\n- Chunks text and loads it into Qdrant with metadata for retrieval.\n- Exposes a chat trigger wired to an Agent using an OpenAI chat model.\n- Adds a retrieve as tool Qdrant node so the Agent can ground answers in the indexed corpus.\n\n## Why it is useful\n- Simple pattern for building a proposal or knowledge base from PDFs stored in S3.\n- End to end path from ingestion to retrieval augmented answers.\n- Easy to swap models or collections, and to extend with more tools.\n\n## Setup notes\n- Attach your own AWS credentials to the two S3 nodes and set your bucket name.\n- Attach your Qdrant credentials to both Qdrant nodes and set your collection.\n- Attach your OpenAI credentials to the embedding and chat nodes.\n- The sanitized template uses placeholders for bucket and collection names.",
+  "featuredImage": "/data/workflows/7667/7667.webp",
+  "author": {
+    "id": 101,
+    "slug": "dhawk",
+    "name": "Joe Swink",
+    "avatar": ""
+  },
+  "categories": [
+    "AI RAG",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 904,
+  "downloads": 90,
+  "createdAt": "2025-08-20T19:47:41.503Z",
+  "updatedAt": "2026-01-16T08:51:41.610Z",
+  "publishedAt": "2025-08-20T19:47:41.503Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7667",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "PDF proposal knowledge base with S3, OpenAI GPT-4o & Qdrant RAG agent",
+    "workflowName": "PDF proposal knowledge base with S3, OpenAI GPT-4o & Qdrant RAG agent",
+    "description": "## This template has a two part setup:\n1. Ingest PDF files from S3, extract text, chunk, embed with OpenAI embeddings, and index into a Qdrant collection with metadata.\n2. Provide a chat entry point that uses an Agent with OpenAI to retrieve from the same Qdrant collection as a tool and answer proposal knowledge questions.\n\n## What it does\n- Lists objects in an S3 bucket, loops through keys, downloads each file, and extracts text from PDFs.\n- Chunks text and loads it into Qdrant with metadata for retrieval.\n- Exposes a chat trigger wired to an Agent using an OpenAI chat model.\n- Adds a retrieve as tool Qdrant node so the Agent can ground answers in the indexed corpus.\n\n## Why it is useful\n- Simple pattern for building a proposal or knowledge base from PDFs stored in S3.\n- End to end path from ingestion to retrieval augmented answers.\n- Easy to swap models or collections, and to extend with more tools.\n\n## Setup notes\n- Attach your own AWS credentials to the two S3 nodes and set your bucket name.\n- Attach your Qdrant credentials to both Qdrant nodes and set your collection.\n- Attach your OpenAI credentials to the embedding and chat nodes.\n- The sanitized template uses placeholders for bucket and collection names.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Download Files from AWS",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get Files from S3",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

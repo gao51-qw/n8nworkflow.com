@@ -1,0 +1,200 @@
+{
+  "id": 10211,
+  "slug": "10211",
+  "title": "Food Photo Analysis to Restaurant & Book Recommendations with GPT Vision and Google APIs",
+  "description": "## AI Recommender: From Food Photo to Restaurant and Book (Google Books Integrated)\n## What it does\n\nAnalyzes a food photo with an AI vision model to extract dish name + category\n\nSearches nearby restaurants with Google Places and selects the single best (rating → reviews tie-break)\n\nFinds a matching book via Google Books and posts a tidy summary to Slack\n\n## Who it’s for\n\nFoodies, bloggers, and teams who want a plug-and-play flow that turns a single food photo into a dining pick + themed reading.\n\n## How it works\n\nGoogle Drive Trigger detects a new photo\n\nDish Classifier (Vision LLM) → JSON (dish_name, category, basic macros)\n\nSearch Google Places near your origin; Select Best Place (AI)\n\nRecommend Book (AI) → Search Google Books → format details\n\nPost to Slack (JP/EN both possible)\n\n## Requirements\n\nGoogle Drive / Google Places / Google Books credentials, LLM access (OpenRouter/OpenAI), Slack OAuth.\n\n## Customize\n\nEdit origin/radius in Set Origin & Radius, tweak category→keyword mapping in Normalize Classification, adjust Slack channel & message in Post to Slack.",
+  "featuredImage": "/data/workflows/10211/10211.webp",
+  "author": {
+    "id": 101,
+    "slug": "shusaku",
+    "name": "noda",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 112,
+  "downloads": 11,
+  "createdAt": "2025-10-27T07:26:56.865Z",
+  "updatedAt": "2026-01-16T09:03:57.704Z",
+  "publishedAt": "2025-10-27T07:26:56.865Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10211",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Food Photo Analysis to Restaurant & Book Recommendations with GPT Vision and Google APIs",
+    "workflowName": "Food Photo Analysis to Restaurant & Book Recommendations with GPT Vision and Google APIs",
+    "description": "## AI Recommender: From Food Photo to Restaurant and Book (Google Books Integrated)\n## What it does\n\nAnalyzes a food photo with an AI vision model to extract dish name + category\n\nSearches nearby restaurants with Google Places and selects the single best (rating → reviews tie-break)\n\nFinds a matching book via Google Books and posts a tidy summary to Slack\n\n## Who it’s for\n\nFoodies, bloggers, and teams who want a plug-and-play flow that turns a single food photo into a dining pick + themed reading.\n\n## How it works\n\nGoogle Drive Trigger detects a new photo\n\nDish Classifier (Vision LLM) → JSON (dish_name, category, basic macros)\n\nSearch Google Places near your origin; Select Best Place (AI)\n\nRecommend Book (AI) → Search Google Books → format details\n\nPost to Slack (JP/EN both possible)\n\n## Requirements\n\nGoogle Drive / Google Places / Google Books credentials, LLM access (OpenRouter/OpenAI), Slack OAuth.\n\n## Customize\n\nEdit origin/radius in Set Origin & Radius, tweak category→keyword mapping in Normalize Classification, adjust Slack channel & message in Post to Slack.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Dish Classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Fetch Image (Drive)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "LLM (Vision/JSON)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Normalize Classification",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Origin & Radius",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Search Google Places",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Summarize Place List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "LLM (Selection)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Best Place (AI)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Format Best Place JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "LLM (Books)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recommend Book (AI)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Normalize Book JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Search Google Books",
+      "type": "n8n-nodes-base.googleBooks",
+      "role": "googleBooks",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Book Details",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pass the API",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

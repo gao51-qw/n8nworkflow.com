@@ -1,0 +1,146 @@
+{
+  "id": 12154,
+  "slug": "12154",
+  "title": "Automatically track certification changes with ScrapeGraphAI, GitLab and Rocket.Chat",
+  "description": "# Certification Requirement Tracker with Rocket.Chat and GitLab\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes certification-issuing bodies once a year, detects any changes in certification or renewal requirements, creates a GitLab issue for the responsible team, and notifies the relevant channel in Rocket.Chat. It helps professionals and compliance teams stay ahead of changing industry requirements and never miss a renewal.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- An n8n instance (self-hosted or n8n.cloud)\n- ScrapeGraphAI community node installed and activated\n- Rocket.Chat workspace with Incoming Webhook or user credentials\n- GitLab account with at least one repository and a Personal Access Token (PAT)\n- Access URLs for all certification bodies or industry associations you want to monitor\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping services  \n- **Rocket.Chat Credentials** – Either:\n  - Webhook URL, or  \n  - Username & Password / Personal Access Token  \n- **GitLab Personal Access Token** – To create issues and comments via API\n\n### Specific Setup Requirements\n| Service       | Requirement                                    | Example/Notes                                        |\n| ------------- | ---------------------------------------------- | ---------------------------------------------------- |\n| Rocket.Chat   | Incoming Webhook URL OR user credentials       | `https://chat.example.com/hooks/abc123…`             |\n| GitLab        | Personal Access Token with `api` scope         | Generate at **Settings → Access Tokens**             |\n| ScrapeGraphAI | Domain whitelist (if running behind firewall)  | Allow outbound HTTPS traffic to target sites         |\n| Cron Schedule | Annual (default) or custom interval            | `0 0 1 1 *` for 1-Jan every year                     |\n\n## How it works\n\nThis workflow automatically scrapes certification-issuing bodies once a year, detects any changes in certification or renewal requirements, creates a GitLab issue for the responsible team, and notifies the relevant channel in Rocket.Chat. It helps professionals and compliance teams stay ahead of changing industry requirements and never miss a renewal.\n\n## Key Steps:\n- **Scheduled Trigger**: Fires annually (or any chosen interval) to start the check.\n- **Set Node – URL List**: Stores an array of certification-body URLs to scrape.\n- **Split in Batches**: Iterates over each URL for parallel scraping.\n- **ScrapeGraphAI**: Extracts requirement text, effective dates, and renewal info.\n- **Code Node – Diff Checker**: Compares the newly scraped data with last year’s GitLab issue (if any) to detect changes.\n- **IF Node – Requirements Changed?**: Routes the flow based on change detection.\n- **GitLab – Create/Update Issue**: Opens a new issue or comments on an existing one with details of the change.\n- **Rocket.Chat – Notify Channel**: Sends a message summarizing any changes and linking to the GitLab issue.\n- **Merge Node**: Collects all branch results for a final summary report.\n\n## Set up steps\n\n**Setup Time: 15-25 minutes**\n\n1. **Install Community Node**: In n8n, navigate to **Settings → Community Nodes** and install “ScrapeGraphAI”.\n2. **Add Credentials**:  \n   a. In **Credentials**, create “ScrapeGraphAI API”.  \n   b. Add your Rocket.Chat Webhook or PAT.  \n   c. Add your GitLab PAT with `api` scope.  \n3. **Import Workflow**: Copy the JSON template into n8n (**Workflows → Import**).  \n4. **Configure URL List**: Open the **Set – URL List** node and replace the sample array with real certification URLs.  \n5. **Adjust Cron Expression**: Double-click the **Schedule Trigger** node and set your desired frequency.  \n6. **Customize Rocket.Chat Channel**: In the **Rocket.Chat – Notify** node, set the `channel` or use an incoming webhook.  \n7. **Run Once for Testing**: Execute the workflow manually to ensure issues and notifications are created as expected.  \n8. **Activate Workflow**: Toggle **Activate** so the schedule starts running automatically.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **stickyNote – Workflow Notes**: Contains a high-level diagram and documentation inside the editor.\n- **Schedule Trigger** – Initiates the yearly check.\n- **Set (URL List)** – Holds certification body URLs and meta info.\n- **SplitInBatches** – Iterates through each URL in manageable chunks.\n- **ScrapeGraphAI** – Scrapes each certification page and returns structured JSON.\n- **Code (Diff Checker)** – Compares the current scrape with historical data.\n- **If – Requirements Changed?** – Switches path based on diff result.\n- **GitLab** – Creates or updates issues, attaches JSON diff, sets labels (`certification`, `renewal`).\n- **Rocket.Chat** – Posts a summary message with links to the GitLab issue(s).\n- **Merge** – Consolidates batch results for final logging.\n- **Set (Success)** – Formats a concise success payload.\n\n### Data Flow:\n1. **Schedule Trigger** → **Set (URL List)** → **SplitInBatches** → **ScrapeGraphAI** → **Code (Diff Checker)** → **If** → **GitLab / Rocket.Chat** → **Merge**\n\n## Customization Examples\n\n### Add Additional Metadata to GitLab Issue\n```javascript\n// Inside the GitLab \"Create Issue\" node ↗️\n{\n  \"title\": `Certification Update: ${$json.domain}`,\n  \"description\": `**What's Changed?**\\n${$json.diff}\\n\\n_Last checked: {{$now}}_`,\n  \"labels\": \"certification,compliance,\" + $json.industry\n}\n```\n\n### Customize Rocket.Chat Message Formatting\n```javascript\n// Rocket.Chat node → JSON parameters\n{\n  \"text\": `:bell: *Certification Update Detected*\\n&gt;*${$json.domain}*\\n&gt;See the GitLab issue: ${$json.issueUrl}`\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"domain\": \"example-cert-body.org\",\n  \"scrapeDate\": \"2024-01-01T00:00:00Z\",\n  \"oldRequirements\": \"Original text …\",\n  \"newRequirements\": \"Updated text …\",\n  \"diff\": \"- Continuous education hours increased from 20 to 24\\n- Fee changed to $200\",\n  \"issueUrl\": \"https://gitlab.com/org/compliance/-/issues/42\",\n  \"notification\": \"sent\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **No data returned from ScrapeGraphAI** – Confirm the target site is publicly accessible and not blocking bots. Whitelist the domain or add proper headers via ScrapeGraphAI options.  \n2. **GitLab issue not created** – Check that the PAT has `api` scope and the project ID is correct in the GitLab node.  \n3. **Rocket.Chat message fails** – Verify webhook URL or credentials and ensure the channel exists.\n\n### Performance Tips\n- Limit the batch size in **SplitInBatches** to avoid API rate limits.\n- Schedule the workflow during off-peak hours to minimize load.\n\n**Pro Tips:**\n- Store last-year scrapes in a dedicated GitLab repository to create a complete change log history.\n- Use n8n’s built-in **Execution History Pruning** to keep the database slim.\n- Add an **Error Trigger** workflow to notify you if any step fails.",
+  "featuredImage": "/data/workflows/12154/12154.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1,
+  "downloads": 0,
+  "createdAt": "2025-12-26T08:46:48.089Z",
+  "updatedAt": "2026-01-16T09:11:33.600Z",
+  "publishedAt": "2025-12-26T08:46:48.089Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12154",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatically track certification changes with ScrapeGraphAI, GitLab and Rocket.Chat",
+    "workflowName": "Automatically track certification changes with ScrapeGraphAI, GitLab and Rocket.Chat",
+    "description": "# Certification Requirement Tracker with Rocket.Chat and GitLab\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically scrapes certification-issuing bodies once a year, detects any changes in certification or renewal requirements, creates a GitLab issue for the responsible team, and notifies the relevant channel in Rocket.Chat. It helps professionals and compliance teams stay ahead of changing industry requirements and never miss a renewal.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- An n8n instance (self-hosted or n8n.cloud)\n- ScrapeGraphAI community node installed and activated\n- Rocket.Chat workspace with Incoming Webhook or user credentials\n- GitLab account with at least one repository and a Personal Access Token (PAT)\n- Access URLs for all certification bodies or industry associations you want to monitor\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables web scraping services  \n- **Rocket.Chat Credentials** – Either:\n  - Webhook URL, or  \n  - Username & Password / Personal Access Token  \n- **GitLab Personal Access Token** – To create issues and comments via API\n\n### Specific Setup Requirements\n| Service       | Requirement                                    | Example/Notes                                        |\n| ------------- | ---------------------------------------------- | ---------------------------------------------------- |\n| Rocket.Chat   | Incoming Webhook URL OR user credentials       | `https://chat.example.com/hooks/abc123…`             |\n| GitLab        | Personal Access Token with `api` scope         | Generate at **Settings → Access Tokens**             |\n| ScrapeGraphAI | Domain whitelist (if running behind firewall)  | Allow outbound HTTPS traffic to target sites         |\n| Cron Schedule | Annual (default) or custom interval            | `0 0 1 1 *` for 1-Jan every year                     |\n\n## How it works\n\nThis workflow automatically scrapes certification-issuing bodies once a year, detects any changes in certification or renewal requirements, creates a GitLab issue for the responsible team, and notifies the relevant channel in Rocket.Chat. It helps professionals and compliance teams stay ahead of changing industry requirements and never miss a renewal.\n\n## Key Steps:\n- **Scheduled Trigger**: Fires annually (or any chosen interval) to start the check.\n- **Set Node – URL List**: Stores an array of certification-body URLs to scrape.\n- **Split in Batches**: Iterates over each URL for parallel scraping.\n- **ScrapeGraphAI**: Extracts requirement text, effective dates, and renewal info.\n- **Code Node – Diff Checker**: Compares the newly scraped data with last year’s GitLab issue (if any) to detect changes.\n- **IF Node – Requirements Changed?**: Routes the flow based on change detection.\n- **GitLab – Create/Update Issue**: Opens a new issue or comments on an existing one with details of the change.\n- **Rocket.Chat – Notify Channel**: Sends a message summarizing any changes and linking to the GitLab issue.\n- **Merge Node**: Collects all branch results for a final summary report.\n\n## Set up steps\n\n**Setup Time: 15-25 minutes**\n\n1. **Install Community Node**: In n8n, navigate to **Settings → Community Nodes** and install “ScrapeGraphAI”.\n2. **Add Credentials**:  \n   a. In **Credentials**, create “ScrapeGraphAI API”.  \n   b. Add your Rocket.Chat Webhook or PAT.  \n   c. Add your GitLab PAT with `api` scope.  \n3. **Import Workflow**: Copy the JSON template into n8n (**Workflows → Import**).  \n4. **Configure URL List**: Open the **Set – URL List** node and replace the sample array with real certification URLs.  \n5. **Adjust Cron Expression**: Double-click the **Schedule Trigger** node and set your desired frequency.  \n6. **Customize Rocket.Chat Channel**: In the **Rocket.Chat – Notify** node, set the `channel` or use an incoming webhook.  \n7. **Run Once for Testing**: Execute the workflow manually to ensure issues and notifications are created as expected.  \n8. **Activate Workflow**: Toggle **Activate** so the schedule starts running automatically.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **stickyNote – Workflow Notes**: Contains a high-level diagram and documentation inside the editor.\n- **Schedule Trigger** – Initiates the yearly check.\n- **Set (URL List)** – Holds certification body URLs and meta info.\n- **SplitInBatches** – Iterates through each URL in manageable chunks.\n- **ScrapeGraphAI** – Scrapes each certification page and returns structured JSON.\n- **Code (Diff Checker)** – Compares the current scrape with historical data.\n- **If – Requirements Changed?** – Switches path based on diff result.\n- **GitLab** – Creates or updates issues, attaches JSON diff, sets labels (`certification`, `renewal`).\n- **Rocket.Chat** – Posts a summary message with links to the GitLab issue(s).\n- **Merge** – Consolidates batch results for final logging.\n- **Set (Success)** – Formats a concise success payload.\n\n### Data Flow:\n1. **Schedule Trigger** → **Set (URL List)** → **SplitInBatches** → **ScrapeGraphAI** → **Code (Diff Checker)** → **If** → **GitLab / Rocket.Chat** → **Merge**\n\n## Customization Examples\n\n### Add Additional Metadata to GitLab Issue\n```javascript\n// Inside the GitLab \"Create Issue\" node ↗️\n{\n  \"title\": `Certification Update: ${$json.domain}`,\n  \"description\": `**What's Changed?**\\n${$json.diff}\\n\\n_Last checked: {{$now}}_`,\n  \"labels\": \"certification,compliance,\" + $json.industry\n}\n```\n\n### Customize Rocket.Chat Message Formatting\n```javascript\n// Rocket.Chat node → JSON parameters\n{\n  \"text\": `:bell: *Certification Update Detected*\\n&gt;*${$json.domain}*\\n&gt;See the GitLab issue: ${$json.issueUrl}`\n}\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"domain\": \"example-cert-body.org\",\n  \"scrapeDate\": \"2024-01-01T00:00:00Z\",\n  \"oldRequirements\": \"Original text …\",\n  \"newRequirements\": \"Updated text …\",\n  \"diff\": \"- Continuous education hours increased from 20 to 24\\n- Fee changed to $200\",\n  \"issueUrl\": \"https://gitlab.com/org/compliance/-/issues/42\",\n  \"notification\": \"sent\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **No data returned from ScrapeGraphAI** – Confirm the target site is publicly accessible and not blocking bots. Whitelist the domain or add proper headers via ScrapeGraphAI options.  \n2. **GitLab issue not created** – Check that the PAT has `api` scope and the project ID is correct in the GitLab node.  \n3. **Rocket.Chat message fails** – Verify webhook URL or credentials and ensure the channel exists.\n\n### Performance Tips\n- Limit the batch size in **SplitInBatches** to avoid API rate limits.\n- Schedule the workflow during off-peak hours to minimize load.\n\n**Pro Tips:**\n- Store last-year scrapes in a dedicated GitLab repository to create a complete change log history.\n- Use n8n’s built-in **Execution History Pruning** to keep the database slim.\n- Add an **Error Trigger** workflow to notify you if any step fails.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Data Collection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Change Detection",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Actions",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Certification URL Config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Requirement Data",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scrape Error?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Fetch Previous Data",
+      "type": "n8n-nodes-base.gitlab",
+      "role": "gitlab",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Current & Previous",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Detect Changes",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Requirement Changed?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare GitLab File",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Save Updated Requirement",
+      "type": "n8n-nodes-base.gitlab",
+      "role": "gitlab",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Craft Alert Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Log No-Change Issue",
+      "type": "n8n-nodes-base.gitlab",
+      "role": "gitlab",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    }
+  ]
+}

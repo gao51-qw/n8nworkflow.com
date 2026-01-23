@@ -1,0 +1,211 @@
+{
+  "id": 5709,
+  "slug": "5709",
+  "title": "Create and manage short URLs with Telegram bot, MongoDB and Nginx redirects",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\nThis workflow allows you to create and manage custom short URLs directly via Telegram, with all data stored in MongoDB, and redirects handled efficiently via Nginx.\n\n## How it works\nThis flow provides a seamless URL shortening experience:\n\n- Create via Telegram: Send a long URL to your bot. It will ask if you want a custom short code.\n\n- Store in MongoDB: All long URLs and their corresponding short codes are securely stored in your MongoDB instance.\n\n- Fast Redirects: When a user accesses a short URL, Nginx forwards the request to a dedicated n8n webhook, which then quickly redirects them to the original long URL.\n\n## Set up steps\nThis setup is straightforward, especially if you already have a running n8n instance and a VPS.\n\n- Difficulty: Medium (Basic n8n/VPS knowledge required)\n\n- Estimated Time: 15-30 minutes\n\n- n8n Instance & VPS: Ensure you have n8n running on your VPS (e.g., 2 core 2GB, as you have).\n\n- Telegram Bot: Create a new bot via @BotFather and get your Bot Token. Add this as a Telegram credential in n8n.\n\n- MongoDB Database: Set up a MongoDB instance (either on your VPS or a cloud service like MongoDB Atlas). Create a database and a collection (e.g., url or short_urls). Add your MongoDB credentials in n8n.\n\nHere's MongoDB data structure JSON:\n\n&gt;[\n    {\"_id\": \"686a11946a48b580d72d0397\",\n    \"longUrl\": \"https://longurl.com/abcdefghijklm/\",\n    \"shortUrl\": \"short-code\"}\n]\n\n\n- Domain/Subdomain: Point a domain or subdomain (e.g., s.yourdomain.com) to your VPS IP address. This will be your short URL base.\n\n- Nginx/Caddy Configuration: Configure your web server (Nginx or Caddy) on the VPS to proxy requests from your short URL domain to the n8n webhook for redirects. (Detailed Nginx config is provided as sticky notes in the redirect workflow)\n\n## Workflow Setup:\n\n- Import both provided n8n workflows (Telegram URL Shortener Creator and URL Redirect Handler).\n\n- Activate both workflows.\n\nCrucial: Set an environment variable in your n8n instance (or .env file) named SHORTENER_DOMAIN with the value of your short URL domain (e.g., https://s.yourdomain.com).\n\nRefer to sticky notes inside the workflows for detailed node configurations and expressions.",
+  "featuredImage": "/data/workflows/5709/5709.webp",
+  "author": {
+    "id": 101,
+    "slug": "fanfanra",
+    "name": "Rudi Afandi",
+    "avatar": ""
+  },
+  "categories": [
+    "Miscellaneous"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 242,
+  "downloads": 24,
+  "createdAt": "2025-07-06T06:50:29.748Z",
+  "updatedAt": "2026-01-16T08:41:02.325Z",
+  "publishedAt": "2025-07-06T06:50:29.748Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5709",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create and manage short URLs with Telegram bot, MongoDB and Nginx redirects",
+    "workflowName": "Create and manage short URLs with Telegram bot, MongoDB and Nginx redirects",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\nThis workflow allows you to create and manage custom short URLs directly via Telegram, with all data stored in MongoDB, and redirects handled efficiently via Nginx.\n\n## How it works\nThis flow provides a seamless URL shortening experience:\n\n- Create via Telegram: Send a long URL to your bot. It will ask if you want a custom short code.\n\n- Store in MongoDB: All long URLs and their corresponding short codes are securely stored in your MongoDB instance.\n\n- Fast Redirects: When a user accesses a short URL, Nginx forwards the request to a dedicated n8n webhook, which then quickly redirects them to the original long URL.\n\n## Set up steps\nThis setup is straightforward, especially if you already have a running n8n instance and a VPS.\n\n- Difficulty: Medium (Basic n8n/VPS knowledge required)\n\n- Estimated Time: 15-30 minutes\n\n- n8n Instance & VPS: Ensure you have n8n running on your VPS (e.g., 2 core 2GB, as you have).\n\n- Telegram Bot: Create a new bot via @BotFather and get your Bot Token. Add this as a Telegram credential in n8n.\n\n- MongoDB Database: Set up a MongoDB instance (either on your VPS or a cloud service like MongoDB Atlas). Create a database and a collection (e.g., url or short_urls). Add your MongoDB credentials in n8n.\n\nHere's MongoDB data structure JSON:\n\n&gt;[\n    {\"_id\": \"686a11946a48b580d72d0397\",\n    \"longUrl\": \"https://longurl.com/abcdefghijklm/\",\n    \"shortUrl\": \"short-code\"}\n]\n\n\n- Domain/Subdomain: Point a domain or subdomain (e.g., s.yourdomain.com) to your VPS IP address. This will be your short URL base.\n\n- Nginx/Caddy Configuration: Configure your web server (Nginx or Caddy) on the VPS to proxy requests from your short URL domain to the n8n webhook for redirects. (Detailed Nginx config is provided as sticky notes in the redirect workflow)\n\n## Workflow Setup:\n\n- Import both provided n8n workflows (Telegram URL Shortener Creator and URL Redirect Handler).\n\n- Activate both workflows.\n\nCrucial: Set an environment variable in your n8n instance (or .env file) named SHORTENER_DOMAIN with the value of your short URL domain (e.g., https://s.yourdomain.com).\n\nRefer to sticky notes inside the workflows for detailed node configurations and expressions.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Insert shortCode",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "New link",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Exist?",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "no exist?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "exist?",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is it reply?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Reply Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "askShortCode",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Clean Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "askShortCode1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Valid URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "take URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Not Valid URL?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Not Valid URL1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "take short code",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "short code exist?",
+      "type": "n8n-nodes-base.mongoDb",
+      "role": "mongoDb",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "short code exist?1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If short code exist",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "404 page",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "shortCode Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

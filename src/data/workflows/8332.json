@@ -1,0 +1,110 @@
+{
+  "id": 8332,
+  "slug": "8332",
+  "title": "Auto-generate & schedule LinkedIn posts from Google Sheets with GPT-4o",
+  "description": "## Target audience\n\nSolo creators, PMs, and content teams who queue LinkedIn ideas in Google Sheets and want them posted on a fixed schedule with AI-generated copy.\n\n## How it works\n\nThe workflow runs on a schedule (Mon/Wed/Fri at 09:30). It pulls the first Google Sheet row with **Status = Pending**, generates a LinkedIn-ready post from **Post title** using an OpenAI prompt, publishes to your LinkedIn profile, then updates the same row to **Done** and writes the final post back to the sheet.\n\n## Prerequisites (use your own credentials)\n\n* **Google Sheets (OAuth2)** with access to the target sheet\n* **LinkedIn OAuth2** tied to the account that should post — set the **person** field to your profile’s URN in the LinkedIn node\n* **OpenAI API key** for the Chat Model node\n* Store secrets in n8n **Credentials**. Never hard-code keys in nodes.\n\n## Google Sheet structure (exact columns)\n\n**Minimum required columns**\n\n* `id` — unique integer/string used to update the same row later\n* `Status` — allowed values: `Pending` or `Done`\n* `Post title` — short prompt/topic for the AI model\n\n**Recommended columns**\n\n* `Output post` — where the workflow writes the final text (use this header, or keep your existing `Column 5`)\n* `Hashtags` *(optional)* — comma-separated list (the prompt can append these)\n* `Image URL` *(optional)* — public URL; add an extra LinkedIn “Create Post” input if you post with media later\n* `Notes` *(optional)* — extra hints for tone, audience, or CTA\n\n**Example header row**\n\n```\nid | Status | Post title | Hashtags | Image URL | Output post | Notes\n```\n\n**Example rows (inputs → outputs)**\n\n```\n1  | Pending | Why I moved from Zapier to n8n | #automation,#nocode |  |  | Focus on cost + flexibility\n2  | Done    | 5 lessons from building a rules engine | #product,#backend |  | This is the final posted text... |\n```\n\n**Resulting `Output post` (for row 1 after publish)**\n\n```\nI switched from Zapier to n8n for three reasons: control, flexibility, and cost.\nHere’s what changed in my stack and what I’d repeat if I had to do it again.\n\n#automation #nocode\n```\n\n&gt; If your sheet already has a column named **Column 5**, either rename it to **Output post** and update the mapping in the final Google Sheets **Update** node, or keep **Column 5** as is and leave the node mapping untouched.\n\n## Step-by-step\n\n1. **Schedule Trigger**\n   Runs on **Mon/Wed/Fri at 09:30**.\n2. **Fetch pending rows (Google Sheets → Get Rows)**\n   Reads the sheet and filters rows where **Status = Pending**.\n3. **Limit**\n   Keeps only the first pending row so one post goes out per run.\n4. **Writing the post (Agent + OpenAI Chat Model + Structured Output Parser)**\n   Uses **Post title** (and optional `Notes`/`Hashtags`) as input. The agent returns JSON with a `post` field. Model set to **gpt-4o-mini** by default.\n5. **Create a post (LinkedIn)**\n   Publishes `{{$json.output.post}}` to the configured **person** (your profile URN).\n6. **Update the sheet (Google Sheets → Update)**\n   Matches by `id`, sets **Status = Done**, and writes the generated text into **Output post** (or your existing output column).\n\n## Customization\n\n* **Schedule** — change days/time in the Schedule node. Consider your n8n server timezone.\n* **Posts per run** — remove or raise the **Limit** to post more than one item.\n* **Style and tone** — edit the Agent’s system prompt. Add rules for line breaks, hashtags, or a closing CTA.\n* **Hashtags handling** — parse the `Hashtags` column in the prompt so the model appends them cleanly.\n* **Media posts** — add a branch that attaches `Image URL` (requires LinkedIn media upload endpoints).\n* **Company Page** — switch the **person** field to an **organization** URN tied to your LinkedIn app scope.\n\n## Troubleshooting\n\n* **No post created**\n\n  * Check the **If/Limit** path: is there any row with `Status = Pending`?\n  * Confirm the sheet **ID** and **tab name** in the Google Sheets nodes.\n* **Sheet not updating**\n\n  * The **Update** node must receive the original `id`. If you changed field names, remap them.\n  * Make sure `id` values are unique.\n* **LinkedIn errors (403/401/404)**\n\n  * Refresh **LinkedIn OAuth2** in Credentials.\n  * The **person/organization URN** is wrong or missing. Copy the exact URN from the LinkedIn node helper.\n  * App lacks required permissions for posting.\n* **Rate limit (429) or model errors**\n\n  * Add a short **Wait** before retries.\n  * Switch to a lighter model or simplify the prompt.\n* **Post too long or broken formatting**\n\n  * LinkedIn hard limit is \\~3,000 characters. Add a truncation step in Code or instruct the prompt to cap length.\n  * Replace double line breaks in the LinkedIn node if you see odd spacing.\n* **Timezone mismatch**\n\n  * The Schedule node uses the n8n instance timezone. Adjust or move to a Cron with explicit TZ if needed.\n\nNeed to post at a different cadence, or push two posts per day? Tweak the **Schedule** and **Limit** nodes and you’re set.\n",
+  "featuredImage": "/data/workflows/8332/8332.webp",
+  "author": {
+    "id": 101,
+    "slug": "snehasish",
+    "name": "Snehasish Konger",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 542,
+  "downloads": 54,
+  "createdAt": "2025-09-06T18:03:50.626Z",
+  "updatedAt": "2026-01-16T08:55:18.103Z",
+  "publishedAt": "2025-09-06T18:03:50.626Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8332",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-generate & schedule LinkedIn posts from Google Sheets with GPT-4o",
+    "workflowName": "Auto-generate & schedule LinkedIn posts from Google Sheets with GPT-4o",
+    "description": "## Target audience\n\nSolo creators, PMs, and content teams who queue LinkedIn ideas in Google Sheets and want them posted on a fixed schedule with AI-generated copy.\n\n## How it works\n\nThe workflow runs on a schedule (Mon/Wed/Fri at 09:30). It pulls the first Google Sheet row with **Status = Pending**, generates a LinkedIn-ready post from **Post title** using an OpenAI prompt, publishes to your LinkedIn profile, then updates the same row to **Done** and writes the final post back to the sheet.\n\n## Prerequisites (use your own credentials)\n\n* **Google Sheets (OAuth2)** with access to the target sheet\n* **LinkedIn OAuth2** tied to the account that should post — set the **person** field to your profile’s URN in the LinkedIn node\n* **OpenAI API key** for the Chat Model node\n* Store secrets in n8n **Credentials**. Never hard-code keys in nodes.\n\n## Google Sheet structure (exact columns)\n\n**Minimum required columns**\n\n* `id` — unique integer/string used to update the same row later\n* `Status` — allowed values: `Pending` or `Done`\n* `Post title` — short prompt/topic for the AI model\n\n**Recommended columns**\n\n* `Output post` — where the workflow writes the final text (use this header, or keep your existing `Column 5`)\n* `Hashtags` *(optional)* — comma-separated list (the prompt can append these)\n* `Image URL` *(optional)* — public URL; add an extra LinkedIn “Create Post” input if you post with media later\n* `Notes` *(optional)* — extra hints for tone, audience, or CTA\n\n**Example header row**\n\n```\nid | Status | Post title | Hashtags | Image URL | Output post | Notes\n```\n\n**Example rows (inputs → outputs)**\n\n```\n1  | Pending | Why I moved from Zapier to n8n | #automation,#nocode |  |  | Focus on cost + flexibility\n2  | Done    | 5 lessons from building a rules engine | #product,#backend |  | This is the final posted text... |\n```\n\n**Resulting `Output post` (for row 1 after publish)**\n\n```\nI switched from Zapier to n8n for three reasons: control, flexibility, and cost.\nHere’s what changed in my stack and what I’d repeat if I had to do it again.\n\n#automation #nocode\n```\n\n&gt; If your sheet already has a column named **Column 5**, either rename it to **Output post** and update the mapping in the final Google Sheets **Update** node, or keep **Column 5** as is and leave the node mapping untouched.\n\n## Step-by-step\n\n1. **Schedule Trigger**\n   Runs on **Mon/Wed/Fri at 09:30**.\n2. **Fetch pending rows (Google Sheets → Get Rows)**\n   Reads the sheet and filters rows where **Status = Pending**.\n3. **Limit**\n   Keeps only the first pending row so one post goes out per run.\n4. **Writing the post (Agent + OpenAI Chat Model + Structured Output Parser)**\n   Uses **Post title** (and optional `Notes`/`Hashtags`) as input. The agent returns JSON with a `post` field. Model set to **gpt-4o-mini** by default.\n5. **Create a post (LinkedIn)**\n   Publishes `{{$json.output.post}}` to the configured **person** (your profile URN).\n6. **Update the sheet (Google Sheets → Update)**\n   Matches by `id`, sets **Status = Done**, and writes the generated text into **Output post** (or your existing output column).\n\n## Customization\n\n* **Schedule** — change days/time in the Schedule node. Consider your n8n server timezone.\n* **Posts per run** — remove or raise the **Limit** to post more than one item.\n* **Style and tone** — edit the Agent’s system prompt. Add rules for line breaks, hashtags, or a closing CTA.\n* **Hashtags handling** — parse the `Hashtags` column in the prompt so the model appends them cleanly.\n* **Media posts** — add a branch that attaches `Image URL` (requires LinkedIn media upload endpoints).\n* **Company Page** — switch the **person** field to an **organization** URN tied to your LinkedIn app scope.\n\n## Troubleshooting\n\n* **No post created**\n\n  * Check the **If/Limit** path: is there any row with `Status = Pending`?\n  * Confirm the sheet **ID** and **tab name** in the Google Sheets nodes.\n* **Sheet not updating**\n\n  * The **Update** node must receive the original `id`. If you changed field names, remap them.\n  * Make sure `id` values are unique.\n* **LinkedIn errors (403/401/404)**\n\n  * Refresh **LinkedIn OAuth2** in Credentials.\n  * The **person/organization URN** is wrong or missing. Copy the exact URN from the LinkedIn node helper.\n  * App lacks required permissions for posting.\n* **Rate limit (429) or model errors**\n\n  * Add a short **Wait** before retries.\n  * Switch to a lighter model or simplify the prompt.\n* **Post too long or broken formatting**\n\n  * LinkedIn hard limit is \\~3,000 characters. Add a truncation step in Code or instruct the prompt to cap length.\n  * Replace double line breaks in the LinkedIn node if you see odd spacing.\n* **Timezone mismatch**\n\n  * The Schedule node uses the n8n instance timezone. Adjust or move to a Cron with explicit TZ if needed.\n\nNeed to post at a different cadence, or push two posts per day? Tweak the **Schedule** and **Limit** nodes and you’re set.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "writing the post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Create a post",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch the pending contents from the sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Selecting the first one only",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update row to Done in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "id": 7514,
+  "slug": "7514",
+  "title": "Automated lead-to-client pipeline with Google Sheets email notifications & time tracking",
+  "description": "## Google Sheets CRM Automations: Lead Stages → Emails, Client Tracking & Delivery Duration\n\n*Turn a simple Google Sheet into a lightweight CRM powered by n8n.*\n\n---\n\n## Overview\nThis template monitors edits in your **Leads** and **Clients** tabs and reacts automatically:\n- **Qualified?** → sends a Cal.com booking email  \n- **Stage → Awaiting Proposal** → sends a “proposal coming soon” email  \n- **Stage → Won** → appends the client to **Clients** with a **Start Date & Time**  \n- **Clients: Project Status → Delivered** → stamps **End Date & Time** and computes **Time to Deliver** (e.g., `2d 5h 30m`)\n\n---\n\n## What This Template Does\n- **Lead Qualification → Email**: When you mark **Qualified?** in **Leads**, a booking email is sent automatically.  \n- **Awaiting Proposal → Email**: Sends a heads-up email that a proposal is coming soon.  \n- **Won → Client Append**: Adds the client to **Clients** and records the start timestamp.  \n- **Delivered → Completion Metrics**: Looks up the client, stamps the end timestamp, and calculates the delivery duration.\n\n---\n\n## How It Works\n1. **Google Apps Script → Webhooks (onEdit)**\n   - A small Apps Script (provided in the workflow’s Sticky Note) watches the sheet and posts JSON to these n8n webhooks:\n     - `/webhook/lead-stage-changed`\n     - `/webhook/lead-qualified`\n     - `/webhook/client-status-changed`\n\n2. **n8n Flow & Branching**\n   - **lead-stage-changed**\n     - If **Awaiting Proposal** → send proposal heads-up email\n     - If **Won** → format timestamp → append to **Clients**\n   - **lead-qualified**\n     - If `qualified = true` → send **Cal.com** booking email\n   - **client-status-changed**\n     - If **Delivered** → lookup client row → stamp **End Date & Time** → compute **Time to Deliver** → update row\n\n---\n\n## Prerequisites\n- Google Sheet with two tabs: **Leads** and **Clients**\n- Gmail account (or use your preferred email/notification node)\n- n8n instance with:\n  - **Google Sheets OAuth2** credentials\n  - **Gmail OAuth2** credentials (if using the Gmail node)\n\n**Suggested columns**\n- **Leads**: `Name (A)`, `Client Email (C)`, `Lead Source (D)`, `Stage (E)`, `Qualified? (H)`\n- **Clients**: `Name (A)`, `Client Email (C)`, `Project Status (D)`, `Start Date & Time (F)`, `End Date & Time (G)`, `Time to Deliver (H)`\n\n---\n\n## Setup Steps\n1. **Copy/prepare the Google Sheet**\n   - Ensure both **Leads** and **Clients** tabs exist with the columns above.\n\n2. **Install the Apps Script**\n   - In Google Sheets: **Extensions → Apps Script** → paste the script from the workflow’s Sticky Note.\n   - Replace webhook URLs with your n8n endpoints:\n     - `https://{{YOUR_N8N_DOMAIN}}/webhook/lead-stage-changed`\n     - `https://{{YOUR_N8N_DOMAIN}}/webhook/lead-qualified`\n     - `https://{{YOUR_N8N_DOMAIN}}/webhook/client-status-changed`\n   - Run `createInstallableTrigger()` once to enable `onEdit`.\n\n3. **Open the workflow in n8n & replace placeholders**\n   - `{{GOOGLE_SHEETS_DOC_ID}}`\n   - `{{LEADS_GID}}`\n   - `{{CLIENTS_GID}}`\n   - `{{CAL_COM_BOOKING_URL}}`\n   - `{{SENDER_NAME}}`\n   - `{{GMAIL_CREDENTIAL_ID}}`, `{{GMAIL_CREDENTIAL_NAME}}`\n   - `{{GSHEETS_CREDENTIAL_ID}}`, `{{GSHEETS_CREDENTIAL_NAME}}`\n\n4. **Connect credentials**\n   - Authorize **Google Sheets OAuth2** and **Gmail OAuth2** (or switch to SMTP/another email node).\n\n5. **Activate & test**\n   - Toggle **Qualified?** on a test row or change **Stage** to **Awaiting Proposal/Won**.\n   - Verify the email, client append, and duration updates flow end-to-end.\n\n---\n\n## Customization Ideas\n- Swap **Gmail** with **SMTP**, **Outlook**, or **Slack** messages.\n- Add a **Stage = Lost** branch to trigger a re-engagement sequence.\n- Add guards to prevent duplicate appends to **Clients**.\n- Localize email copy and date formats.\n\n---\n\n## Troubleshooting\n- **Nothing triggers**: Confirm Apps Script URLs and that `createInstallableTrigger()` was run.  \n- **Wrong tab/GID**: Open each tab and copy its `gid` from the URL; update placeholders.  \n- **Credential errors**: Re-authorize Google Sheets/Gmail OAuth2 in n8n.  \n- **Wrong first name**: Ensure `Name` in **Leads** follows `First Last`; the workflow splits the first token.\n\n---\n## Video Walkthrough Demo\n\n[Screen Studio Template Demo Video](https://screen.studio/share/f3sNqd9N?private-access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaGFyZWFibGVMaW5rSWQiOiJjMTMyZjY0Ny1hODg3LTQzNzctYWUwMi1kMzgyM2E5ZmI2OTkiLCJpYXQiOjE3NTU0MzEyNzB9.6PquB48GkV8T6Ytsg9kVEK1eDaBge9yqxS4jKyTbVXg)",
+  "featuredImage": "/data/workflows/7514/7514.webp",
+  "author": {
+    "id": 101,
+    "slug": "ziadadel",
+    "name": "Ziad Adel",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 634,
+  "downloads": 63,
+  "createdAt": "2025-08-17T11:51:34.078Z",
+  "updatedAt": "2026-01-16T08:50:43.338Z",
+  "publishedAt": "2025-08-17T11:51:34.078Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7514",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated lead-to-client pipeline with Google Sheets email notifications & time tracking",
+    "workflowName": "Automated lead-to-client pipeline with Google Sheets email notifications & time tracking",
+    "description": "## Google Sheets CRM Automations: Lead Stages → Emails, Client Tracking & Delivery Duration\n\n*Turn a simple Google Sheet into a lightweight CRM powered by n8n.*\n\n---\n\n## Overview\nThis template monitors edits in your **Leads** and **Clients** tabs and reacts automatically:\n- **Qualified?** → sends a Cal.com booking email  \n- **Stage → Awaiting Proposal** → sends a “proposal coming soon” email  \n- **Stage → Won** → appends the client to **Clients** with a **Start Date & Time**  \n- **Clients: Project Status → Delivered** → stamps **End Date & Time** and computes **Time to Deliver** (e.g., `2d 5h 30m`)\n\n---\n\n## What This Template Does\n- **Lead Qualification → Email**: When you mark **Qualified?** in **Leads**, a booking email is sent automatically.  \n- **Awaiting Proposal → Email**: Sends a heads-up email that a proposal is coming soon.  \n- **Won → Client Append**: Adds the client to **Clients** and records the start timestamp.  \n- **Delivered → Completion Metrics**: Looks up the client, stamps the end timestamp, and calculates the delivery duration.\n\n---\n\n## How It Works\n1. **Google Apps Script → Webhooks (onEdit)**\n   - A small Apps Script (provided in the workflow’s Sticky Note) watches the sheet and posts JSON to these n8n webhooks:\n     - `/webhook/lead-stage-changed`\n     - `/webhook/lead-qualified`\n     - `/webhook/client-status-changed`\n\n2. **n8n Flow & Branching**\n   - **lead-stage-changed**\n     - If **Awaiting Proposal** → send proposal heads-up email\n     - If **Won** → format timestamp → append to **Clients**\n   - **lead-qualified**\n     - If `qualified = true` → send **Cal.com** booking email\n   - **client-status-changed**\n     - If **Delivered** → lookup client row → stamp **End Date & Time** → compute **Time to Deliver** → update row\n\n---\n\n## Prerequisites\n- Google Sheet with two tabs: **Leads** and **Clients**\n- Gmail account (or use your preferred email/notification node)\n- n8n instance with:\n  - **Google Sheets OAuth2** credentials\n  - **Gmail OAuth2** credentials (if using the Gmail node)\n\n**Suggested columns**\n- **Leads**: `Name (A)`, `Client Email (C)`, `Lead Source (D)`, `Stage (E)`, `Qualified? (H)`\n- **Clients**: `Name (A)`, `Client Email (C)`, `Project Status (D)`, `Start Date & Time (F)`, `End Date & Time (G)`, `Time to Deliver (H)`\n\n---\n\n## Setup Steps\n1. **Copy/prepare the Google Sheet**\n   - Ensure both **Leads** and **Clients** tabs exist with the columns above.\n\n2. **Install the Apps Script**\n   - In Google Sheets: **Extensions → Apps Script** → paste the script from the workflow’s Sticky Note.\n   - Replace webhook URLs with your n8n endpoints:\n     - `https://{{YOUR_N8N_DOMAIN}}/webhook/lead-stage-changed`\n     - `https://{{YOUR_N8N_DOMAIN}}/webhook/lead-qualified`\n     - `https://{{YOUR_N8N_DOMAIN}}/webhook/client-status-changed`\n   - Run `createInstallableTrigger()` once to enable `onEdit`.\n\n3. **Open the workflow in n8n & replace placeholders**\n   - `{{GOOGLE_SHEETS_DOC_ID}}`\n   - `{{LEADS_GID}}`\n   - `{{CLIENTS_GID}}`\n   - `{{CAL_COM_BOOKING_URL}}`\n   - `{{SENDER_NAME}}`\n   - `{{GMAIL_CREDENTIAL_ID}}`, `{{GMAIL_CREDENTIAL_NAME}}`\n   - `{{GSHEETS_CREDENTIAL_ID}}`, `{{GSHEETS_CREDENTIAL_NAME}}`\n\n4. **Connect credentials**\n   - Authorize **Google Sheets OAuth2** and **Gmail OAuth2** (or switch to SMTP/another email node).\n\n5. **Activate & test**\n   - Toggle **Qualified?** on a test row or change **Stage** to **Awaiting Proposal/Won**.\n   - Verify the email, client append, and duration updates flow end-to-end.\n\n---\n\n## Customization Ideas\n- Swap **Gmail** with **SMTP**, **Outlook**, or **Slack** messages.\n- Add a **Stage = Lost** branch to trigger a re-engagement sequence.\n- Add guards to prevent duplicate appends to **Clients**.\n- Localize email copy and date formats.\n\n---\n\n## Troubleshooting\n- **Nothing triggers**: Confirm Apps Script URLs and that `createInstallableTrigger()` was run.  \n- **Wrong tab/GID**: Open each tab and copy its `gid` from the URL; update placeholders.  \n- **Credential errors**: Re-authorize Google Sheets/Gmail OAuth2 in n8n.  \n- **Wrong first name**: Ensure `Name` in **Leads** follows `First Last`; the workflow splits the first token.\n\n---\n## Video Walkthrough Demo\n\n[Screen Studio Template Demo Video](https://screen.studio/share/f3sNqd9N?private-access=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaGFyZWFibGVMaW5rSWQiOiJjMTMyZjY0Ny1hODg3LTQzNzctYWUwMi1kMzgyM2E5ZmI2OTkiLCJpYXQiOjE3NTU0MzEyNzB9.6PquB48GkV8T6Ytsg9kVEK1eDaBge9yqxS4jKyTbVXg)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook: Lead Stage Changed",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Email Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Gmail: Send Stage-Change Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IF: Stage == Won",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Start Timestamp",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GS: Clients Append (On Won)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Webhook: Lead Qualified?",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IF: Is Qualified",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Gmail: Send Cal.com Invite",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GS: Leads Update Stage to Meeting Booked",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Webhook: Client Status Changed",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IF: Delivered?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "GS: Clients Lookup by Email",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Format End Timestamp",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GS: Clients Update End & Duration",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Webhook: Meeting Booked",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

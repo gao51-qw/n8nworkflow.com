@@ -1,0 +1,314 @@
+{
+  "id": 7529,
+  "slug": "7529",
+  "title": "Transform cloud documentation into security baselines with OpenAI and GDrive",
+  "description": "## What this template does\n\nTransforms provider documentation (URLs) into an **auditable, enforceable multicloud security control baseline**. It:\n\n* Fetches and sanitizes HTML\n* Uses AI to **extract security requirements** (strict 3-line TXT blocks)\n* **Composes enforceable controls** (strict 7-line TXT blocks with true-equivalence consolidation)\n* **Builds the final baseline** (TXT or JSON, see *Outputs*) with a `Technology:` header\n* Returns a downloadable artifact via webhook and can **append/create** the file in Google Drive\n\n## Why it’s useful\n\nEliminates manual copy-paste and produces a consistent, portable baseline ready for review, audit, or enforcement tooling—ideal for rapidly generating or refreshing baselines across cloud providers and services.\n\n## Multicloud support\n\nThe workflow is **multicloud by design**. Provide the target cloud in the request and run the same pipeline for:\n\n* **AWS**, **Azure**, **GCP** (out of the box)\n* Extensible to other providers/services by adjusting prompts and routing logic\n\n## How it works (high level)\n\n1. `POST /create` (Basic Auth) with `{ cloudProvider, technology, urls[] }`\n2. Input validation → generate `uuid` → resolve Google Drive folder (search-or-create)\n3. Download & sanitize each URL\n4. AI pipeline: **Extractor → Composer → Baseline Builder → (optional) Baseline Auditor**\n5. Append/create file in Drive and return a **downloadable artifact** (TXT/JSON) via webhook\n\n## Request (webhook)\n\n**Method:** `POST`\n**URL:** `https://&lt;your-n8n&gt;/webhook/create`\n**Auth:** Basic Auth\n**Headers:** `Content-Type: application/json`\n\n### Example input (Postman/CLI)\n\n```json\n{\n  \"cloudProvider\": \"aws\",\n  \"technology\": \"Amazon S3\",\n  \"urls\": [\n    \"https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html\",\n    \"https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/S3/\",\n    \"https://repost.aws/knowledge-center/secure-s3-resources\"\n  ]\n}\n```\n\n## Field reference\n\n* `cloudProvider` *(string, required)* — case-insensitive. Supported: `aws`, `azure`, `gcp`.\n* `technology` *(string, required)* — e.g., `\"Amazon S3\"`, `\"Azure Storage\"`, `\"Google Cloud Storage\"`.\n* `urls` *(string\\[], required)* — 1–20 `http(s)` URLs (official/reputable docs).\n\n**Optional (Google Drive destination):**\n\n* `gdriveTargetId` *(string)* — Google Drive **folderId** used for append/create.\n* `gdrivePath` *(string)* — Path like `\"DefySec/Baselines\"` (folders are created if missing).\n* `gdriveTargetName` *(string)* — Folder name to find/create under `root`.\n\n**Optional (Assistant overrides):**\n\n* `assistantExtractorId`, `assistantComposerId`, `assistantBaselineId`, `assistantAuditorId` *(strings)*\n\n**Resolution precedence**\n\n1. Drive: `gdriveTargetId` → `gdrivePath` → `gdriveTargetName` → default folder.\n2. Assistants: explicit IDs above → dynamic resolution by name (expects `1_DefySec_Extractor`, `2_DefySec_Control_Composer`, `3_DefySec Baseline Builder`, `4_DefySec_Baseline_Auditor`).\n\n## Validation\n\n* Rejects empty `urls` or non-`http(s)` schemes; normalizes `cloudProvider` to `aws|azure|gcp`.\n* Sanitizes fetched HTML (removes scripts/styles/headers) before AI steps.\n\n## Outputs\n\n* **Primary:** downloadable **TXT** file `controls_&lt;technology&gt;_&lt;timestamp&gt;.txt` (via webhook).\n* **Composer outcomes:** if no groups to consolidate → `NO_CONTROLS_TO_BE_CONSOLIDATED`; if nothing valid remains → `NO_CONTROLS_FOUND`.&#x20;\n* **JSON path:** when the Builder stage is configured for **JSON-only** output (strict schema), the workflow returns a `.json` artifact and the Auditor validates it (see next section).&#x20;\n\n## Techniques used (from the built-in assistants)\n\n* **Provider-aware extraction with strict TXT contract (3 lines):** Extractor limits itself to the declared provider/technology, outputs only `Description/Reference/SecurityObjective`, and applies a **reflexive quality check** before emitting.&#x20;\n* **Normalization & strict header parsing:** Composer normalizes whitespace/fences, requires the `CloudProvider/Technology` header, and ignores anything outside the exact 3-line block shape.&#x20;\n* **True-equivalence grouping & consolidation:** Composer groups **only** when intent, enforcement locus/mechanism, scope, and mode/setting all match—otherwise items remain distinct.&#x20;\n* **7-line enforceable control format:** Composer renders each (consolidated or unique) control in **exactly seven labeled lines** to keep results auditable and automatable.&#x20;\n* **Builder with JSON-only schema & technology inference:** Builder parses 7-line blocks, infers `technology`, consolidates true equivalents again if needed, and returns **pure JSON** matching a canonical schema (with counters in `meta`).&#x20;\n* **Self-evaluation loop (Auditor):** Auditor **unwraps transport**, validates **schema & content**, checks provider terminology/scope/automation, and returns either `GOOD_ENOUGH` or a **JSON instruction set** for the Builder to fix and re-emit—enabling reflective improvement.&#x20;\n* **Reference prioritization:** Across stages, official provider documentation is preferred in `References` (AWS/Azure/GCP).&#x20;\n\n## Customization & extensions\n\n* **Prompt-reflective techniques:** keep (or extend) the Auditor loop to add more review passes and quality gates.&#x20;\n* **Compliance assistants:** add assistants to analyze/label controls for **HIPAA, PCI DSS, SOX** (and others), emitting mappings, gaps, and remediation notes.\n* **Implementation context:** feed internal implementation docs, runbooks, or **Architecture Decision Records (ADRs)**; use these as **grounding** to generate or refine controls (works with local/self-hosted LLMs, too).\n* **Local/self-hosted LLMs:** swap OpenAI nodes for your on-prem LLM endpoint while keeping the pipeline.\n* **Provider-specific outputs:** extend the final stage to export Policy-as-Code or IaC snippets (Rego/Sentinel, CloudFormation Guard, Bicep/ARM, Terraform validations).\n\n## Assistant configuration & prompts\n\n* Full assistant configurations and prompts (Extractor, Composer, Baseline Builder, **Baseline Auditor**) are available here:\n  **[https://github.com/followdrabbit/n8nlabs/tree/main/Lab03%20-%20Multicloud%20AI%20Security%20Control%20Baseline%20Builder/Assistants](https://github.com/followdrabbit/n8nlabs/tree/main/Lab03%20-%20Multicloud%20AI%20Security%20Control%20Baseline%20Builder/Assistants)**\n\n## Security & privacy\n\n* No hardcoded secrets in HTTP nodes; use n8n’s Credential Manager.\n* Drive operations are optional and folder-scoped.\n* For sensitive environments, switch to a local LLM and provide only sanitized/approved inputs.\n\n## Quick test (curl)\n\n```bash\ncurl -X POST \"https://&lt;your-n8n&gt;/webhook/create\" \\\n  -u \"&lt;user&gt;:&lt;pass&gt;\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n        \"cloudProvider\":\"aws\",\n        \"technology\":\"Amazon S3\",\n        \"urls\":[\n          \"https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html\"\n        ]\n      }' \\\n  -OJ\n```\n",
+  "featuredImage": "/data/workflows/7529/7529.webp",
+  "author": {
+    "id": 101,
+    "slug": "followdrabbit",
+    "name": "Raphael De Carvalho Florencio",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 414,
+  "downloads": 41,
+  "createdAt": "2025-08-18T02:08:44.545Z",
+  "updatedAt": "2026-01-16T08:50:55.121Z",
+  "publishedAt": "2025-08-18T02:08:44.545Z",
+  "nodes": 46,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7529",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Transform cloud documentation into security baselines with OpenAI and GDrive",
+    "workflowName": "Transform cloud documentation into security baselines with OpenAI and GDrive",
+    "description": "## What this template does\n\nTransforms provider documentation (URLs) into an **auditable, enforceable multicloud security control baseline**. It:\n\n* Fetches and sanitizes HTML\n* Uses AI to **extract security requirements** (strict 3-line TXT blocks)\n* **Composes enforceable controls** (strict 7-line TXT blocks with true-equivalence consolidation)\n* **Builds the final baseline** (TXT or JSON, see *Outputs*) with a `Technology:` header\n* Returns a downloadable artifact via webhook and can **append/create** the file in Google Drive\n\n## Why it’s useful\n\nEliminates manual copy-paste and produces a consistent, portable baseline ready for review, audit, or enforcement tooling—ideal for rapidly generating or refreshing baselines across cloud providers and services.\n\n## Multicloud support\n\nThe workflow is **multicloud by design**. Provide the target cloud in the request and run the same pipeline for:\n\n* **AWS**, **Azure**, **GCP** (out of the box)\n* Extensible to other providers/services by adjusting prompts and routing logic\n\n## How it works (high level)\n\n1. `POST /create` (Basic Auth) with `{ cloudProvider, technology, urls[] }`\n2. Input validation → generate `uuid` → resolve Google Drive folder (search-or-create)\n3. Download & sanitize each URL\n4. AI pipeline: **Extractor → Composer → Baseline Builder → (optional) Baseline Auditor**\n5. Append/create file in Drive and return a **downloadable artifact** (TXT/JSON) via webhook\n\n## Request (webhook)\n\n**Method:** `POST`\n**URL:** `https://&lt;your-n8n&gt;/webhook/create`\n**Auth:** Basic Auth\n**Headers:** `Content-Type: application/json`\n\n### Example input (Postman/CLI)\n\n```json\n{\n  \"cloudProvider\": \"aws\",\n  \"technology\": \"Amazon S3\",\n  \"urls\": [\n    \"https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html\",\n    \"https://www.trendmicro.com/cloudoneconformity/knowledge-base/aws/S3/\",\n    \"https://repost.aws/knowledge-center/secure-s3-resources\"\n  ]\n}\n```\n\n## Field reference\n\n* `cloudProvider` *(string, required)* — case-insensitive. Supported: `aws`, `azure`, `gcp`.\n* `technology` *(string, required)* — e.g., `\"Amazon S3\"`, `\"Azure Storage\"`, `\"Google Cloud Storage\"`.\n* `urls` *(string\\[], required)* — 1–20 `http(s)` URLs (official/reputable docs).\n\n**Optional (Google Drive destination):**\n\n* `gdriveTargetId` *(string)* — Google Drive **folderId** used for append/create.\n* `gdrivePath` *(string)* — Path like `\"DefySec/Baselines\"` (folders are created if missing).\n* `gdriveTargetName` *(string)* — Folder name to find/create under `root`.\n\n**Optional (Assistant overrides):**\n\n* `assistantExtractorId`, `assistantComposerId`, `assistantBaselineId`, `assistantAuditorId` *(strings)*\n\n**Resolution precedence**\n\n1. Drive: `gdriveTargetId` → `gdrivePath` → `gdriveTargetName` → default folder.\n2. Assistants: explicit IDs above → dynamic resolution by name (expects `1_DefySec_Extractor`, `2_DefySec_Control_Composer`, `3_DefySec Baseline Builder`, `4_DefySec_Baseline_Auditor`).\n\n## Validation\n\n* Rejects empty `urls` or non-`http(s)` schemes; normalizes `cloudProvider` to `aws|azure|gcp`.\n* Sanitizes fetched HTML (removes scripts/styles/headers) before AI steps.\n\n## Outputs\n\n* **Primary:** downloadable **TXT** file `controls_&lt;technology&gt;_&lt;timestamp&gt;.txt` (via webhook).\n* **Composer outcomes:** if no groups to consolidate → `NO_CONTROLS_TO_BE_CONSOLIDATED`; if nothing valid remains → `NO_CONTROLS_FOUND`.&#x20;\n* **JSON path:** when the Builder stage is configured for **JSON-only** output (strict schema), the workflow returns a `.json` artifact and the Auditor validates it (see next section).&#x20;\n\n## Techniques used (from the built-in assistants)\n\n* **Provider-aware extraction with strict TXT contract (3 lines):** Extractor limits itself to the declared provider/technology, outputs only `Description/Reference/SecurityObjective`, and applies a **reflexive quality check** before emitting.&#x20;\n* **Normalization & strict header parsing:** Composer normalizes whitespace/fences, requires the `CloudProvider/Technology` header, and ignores anything outside the exact 3-line block shape.&#x20;\n* **True-equivalence grouping & consolidation:** Composer groups **only** when intent, enforcement locus/mechanism, scope, and mode/setting all match—otherwise items remain distinct.&#x20;\n* **7-line enforceable control format:** Composer renders each (consolidated or unique) control in **exactly seven labeled lines** to keep results auditable and automatable.&#x20;\n* **Builder with JSON-only schema & technology inference:** Builder parses 7-line blocks, infers `technology`, consolidates true equivalents again if needed, and returns **pure JSON** matching a canonical schema (with counters in `meta`).&#x20;\n* **Self-evaluation loop (Auditor):** Auditor **unwraps transport**, validates **schema & content**, checks provider terminology/scope/automation, and returns either `GOOD_ENOUGH` or a **JSON instruction set** for the Builder to fix and re-emit—enabling reflective improvement.&#x20;\n* **Reference prioritization:** Across stages, official provider documentation is preferred in `References` (AWS/Azure/GCP).&#x20;\n\n## Customization & extensions\n\n* **Prompt-reflective techniques:** keep (or extend) the Auditor loop to add more review passes and quality gates.&#x20;\n* **Compliance assistants:** add assistants to analyze/label controls for **HIPAA, PCI DSS, SOX** (and others), emitting mappings, gaps, and remediation notes.\n* **Implementation context:** feed internal implementation docs, runbooks, or **Architecture Decision Records (ADRs)**; use these as **grounding** to generate or refine controls (works with local/self-hosted LLMs, too).\n* **Local/self-hosted LLMs:** swap OpenAI nodes for your on-prem LLM endpoint while keeping the pipeline.\n* **Provider-specific outputs:** extend the final stage to export Policy-as-Code or IaC snippets (Rego/Sentinel, CloudFormation Guard, Bicep/ARM, Terraform validations).\n\n## Assistant configuration & prompts\n\n* Full assistant configurations and prompts (Extractor, Composer, Baseline Builder, **Baseline Auditor**) are available here:\n  **[https://github.com/followdrabbit/n8nlabs/tree/main/Lab03%20-%20Multicloud%20AI%20Security%20Control%20Baseline%20Builder/Assistants](https://github.com/followdrabbit/n8nlabs/tree/main/Lab03%20-%20Multicloud%20AI%20Security%20Control%20Baseline%20Builder/Assistants)**\n\n## Security & privacy\n\n* No hardcoded secrets in HTTP nodes; use n8n’s Credential Manager.\n* Drive operations are optional and folder-scoped.\n* For sensitive environments, switch to a local LLM and provide only sanitized/approved inputs.\n\n## Quick test (curl)\n\n```bash\ncurl -X POST \"https://&lt;your-n8n&gt;/webhook/create\" \\\n  -u \"&lt;user&gt;:&lt;pass&gt;\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n        \"cloudProvider\":\"aws\",\n        \"technology\":\"Amazon S3\",\n        \"urls\":[\n          \"https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html\"\n        ]\n      }' \\\n  -OJ\n```",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "check_mandatory_fields",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "generate_uuid",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "create",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "http_get_url",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "html_sanitizer",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "1_DefySec_Extractor",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "explode_urls",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "process_url",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "ec_search_files",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "ec_append_create_filter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "ec_upload_new_file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "ec_update_existing_file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "ec_download_existing_file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "ec_merge_data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "ec_extract_file_info",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "cc_search_files",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "cc_extract_file_info",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "2_DefySec_Control_Composer",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "ec_controls_check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "cc_controls_router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "cc_no_controls_answer",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "3_DefySec Baseline Builder",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "cc_controls_check",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "bb_data_prep",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "get_gdrive_id",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "resolve_assistants",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI_Assistants_List",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "bb_data_respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "input_validation_error",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "validation_failed_answer",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "4_DefySec_Baseline_Auditor",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "ba_controls_check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "ba_prep_feedback",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "5_DefySec Baseline Revisor",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "controls_transfer_area",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

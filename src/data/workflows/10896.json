@@ -1,0 +1,212 @@
+{
+  "id": 10896,
+  "slug": "10896",
+  "title": "Multi-channel feedback to Jira pipeline with AI analysis & Notion reporting",
+  "description": "## Description\n\nThis workflow turns scattered user feedback into a structured product backlog pipeline.\n\n- It collects feedback from three channels (Telegram bot, Google Form/Sheets, and Gmail), normalizes it, and sends it to an AI model that:\n\n- Classifies the feedback (bug, feature request, question, etc.)\n\n- Extracts sentiment and pain level\n\n- Estimates business impact and implementation effort\n\n- Generates a short summary\n\n- Then a custom RICE-style priority score is computed, a Jira ticket is created automatically, a Notion page is generated for documentation, and a monthly product report is sent by email to stakeholders.\n\nIt helps product & support teams move from “random feedback in multiple tools” to a repeatable, data-driven product intake process with zero manual triage.\n\n## Context\n\nIn most teams, feedback is:\n\n- spread across emails, forms, and chat messages\n\n- manually copy–pasted into Jira (when someone remembers)\n\n- hard to prioritize objectively\n\n- nearly impossible to review at the end of the month\n\nThis workflow solves that by:\n\n- Centralizing feedback from Telegram, Google Forms/Sheets, and Gmail\n\n- Automatically normalizing all inputs into the same JSON structure\n\n- Using AI to categorize, tag, summarize, and score each request\n\n- Calculating a RICE-based priority adapted to your tiers (free / pro / enterprise)\n\n- Creating a Jira issue with all the context and acceptance criteria\n\n- Generating a Notion page for each feedback+ticket pair\n\n- Sending a monthly “Product Intelligence Report” by email with insights & recommendations\n\nThe result: less manual work, better prioritization, and a clear story of what users are asking for.\n\n## Target Users\n\nThis template is designed for:\n\n- Product Managers and Product Owners\n\n- SaaS teams with multiple feedback channels\n\n- Support / CS teams that need a structured escalation path\n\n- Project Managers who want objective, data-driven prioritization\n\n- Any team that wants “feedback → backlog” automation without building a custom platform\n\n## Technical Requirements\n\nYou’ll need:\n\n- Google Sheets credential\n\n- Gmail credential\n\n- Telegram Bot + Chat ID\n\n- Google Form connected to a Google Sheet \n\n![image.png](fileId:3320)\n![image.png](fileId:3319)\n\n- Jira credential (Jira Cloud)\n\n- Notion credential\n\n- OpenAI/ Anthropic credential for the AI analysis node\n\n- An existing Jira project where tickets will be created\n\n- A Notion database or parent page where feedback pages will be stored\n\n## Workflow Steps\n\nThe workflow is organized into four main sections:\n![image.png](fileId:3339)\n\n1) Triggers (Multi-channel Intake)\n\n- Telegram Trigger – Listens for new messages sent to your bot\n\n- Google Form / Sheet Trigger – Listens for new form responses / rows\n\n- Gmail Trigger – Listens for new emails matching your filter (e.g. [Feedback] in subject)\n\n- All three paths send their payloads into a “Data Normalizer” node that outputs a unified structure:\n\n2) Request Treated and Enriched (AI Analysis)\n\n- Instant Reply (Telegram only) – Sends a quick “Thanks, we’re analysing your feedback” message\n\n- User Enrichment – Enriches user tier based on mapping\n\n- Message a Model (AI) \n\n\t- classifies the feedback\n\n\t- extracts tags\n\n\t- scores sentiment, pain, business impact, effort\n\n\t- generates a short summary & acceptance criteria\n\n- JSON Parse / Merge – Merges AI output back into the original feedback object\n\n3) Priority Calculation & Jira Ticket Creation\n\n- Priority Calculator applies a RICE-style formula using:\n\n\t- pain level\n\n\t- business impact\n\n\t- implementation effort\n\n\t- user tier weight\n\n\t- assigns internal priority: P0 / P1 / P2 / P3\n\n\t- maps to Jira priority: Highest / High / Medium / Low\n\n- Create Jira Issue – Creates a ticket with:\n\n\t- summary from AI\n\n\t- description including raw feedback, AI analysis, and RICE breakdown\n\n\t- labels based on tags\n\n\t- priority based on the calculator\n\n- Post-processing  – Prepares a clean payload for notifications & logging\n\n- IF (Source = Telegram) – Sends a rich Telegram message back to the user with:\n\n\t- Jira key + URL\n\n\t- category, priority, RICE score, tags, and estimated handling time\n\n\t- Append to Google Sheet (Analytics Log) – Logs each feedback with:\n\n\t- source, user, category, sentiment, RICE score, priority, Jira key, Jira URL\n\n- Create Notion Page – Creates a documentation page linking:\n\n\t- the feedback\n\n\t- the Jira ticket\n\n\t- AI analysis\n\n\t- acceptance criteria\n\n4) Monthly Reporting (Product Intelligence Report)\n\n- Monthly Trigger – Runs once a month\n\n- Query Google Sheet – Fetches all feedback logs for the previous month\n\n- Aggregate Monthly Stats – Computes:\n\n\t- feedback volume\n\n\t- breakdown by category / sentiment / source / tier / priority\n\n\t- average RICE, pain, and impact\n\n\t- top P0/P1 issues and top feature requests\n\n\t- Message a Model (AI) – Generates a written “Product Intelligence Report” with:\n\n\t- executive summary\n\n\t- key insights & trends\n\n\t- top pain points\n\n\t- strategic recommendations\n\n- Parse Response: Extracts structured insights + short summary\n\n- Create Notion Report Page with:\n\n\t- metrics, charts-ready tables, insights, and recommendations\n\n\t- Append Monthly Log to Google Sheet – Stores high-level stats for historical tracking\n\n- Send Email with a formatted HTML report to stakeholders with:\n\n\t- key metrics\n\n\t- top issues\n\n\t- recommendations\n\n\t- link to the full Notion report\n\n## Key Features\n\n- Multi-channel intake: Telegram + Google Forms/Sheets + Gmail\n\n- AI-powered triage: automatic category, sentiment, tags, and summary\n\n- RICE-style priority scoring with tier weighting\n\n- Automatic Jira ticket creation with full context\n\n- Notion documentation for each feedback and for monthly reports\n\n- Google Sheets analytics log for exploration and dashboards\n\n- Monthly “Product Intelligence Report” sent automatically by email\n\n- Designed to be adaptable: you can plug in your own labels, tiers, and scoring rules\n\n## Expected Output\n\nWhen the workflow is running, you can expect:\n\n- A Jira issue created automatically for each relevant feedback\n![image.png](fileId:3323)\n- A confirmation email\n![image.png](fileId:3314)\n- A Telegram confirmation message when the feedback comes from Telegram\n![image.png](fileId:3316)\n![image.png](fileId:3317)\n- A Google Sheet filled with normalized feedback and scoring data\n![image.png](fileId:3315)\n- A Notion page per feedback/ticket with AI analysis and acceptance criteria\n![image.png](fileId:3325)\nEvery month:\n\n- a Notion “Monthly Product Intelligence Report” page\n![image.png](fileId:3324)\n![image.png](fileId:3322)\n- a summary email with key metrics and insights for your stakeholders\n\n![image.png](fileId:3318)\n\n## How it works\n\n- Trigger – Listens to Telegram / Google Forms / Gmail\n\n- Normalize – Converts all inputs to a unified feedback format\n\n- Enrich with AI – Category, sentiment, pain, impact, effort, tags, summary\n\n- Score – Computes RICE-style priority and maps to Jira priority\n\n- Create Ticket – Opens a Jira issue + Notion page + logs to Google Sheets\n\n- Notify – Sends Telegram confirmation (if source is Telegram)\n\n- Report – Once a month, aggregates everything and sends a Product Intelligence Report\n\n## Tutorial Video\n\nTutorial video:\n[Watch the Youtube Tutorial video](https://www.youtube.com/watch?v=q0Is11oU18Y)\n\n## About me\n\nI’m Yassin a Project & Product Manager  Scaling tech products with data-driven project management.\n📬 Feel free to connect with me on [Linkedin](https://www.linkedin.com/in/yassin-zehar)",
+  "featuredImage": "/data/workflows/10896/10896.webp",
+  "author": {
+    "id": 101,
+    "slug": "yassinzehar",
+    "name": "Yassin Zehar",
+    "avatar": ""
+  },
+  "categories": [
+    "Project Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 65,
+  "downloads": 6,
+  "createdAt": "2025-11-17T00:09:15.180Z",
+  "updatedAt": "2026-01-16T09:06:43.520Z",
+  "publishedAt": "2025-11-17T00:09:15.180Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10896",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Multi-channel feedback to Jira pipeline with AI analysis & Notion reporting",
+    "workflowName": "Multi-channel feedback to Jira pipeline with AI analysis & Notion reporting",
+    "description": "## Description\n\nThis workflow turns scattered user feedback into a structured product backlog pipeline.\n\n- It collects feedback from three channels (Telegram bot, Google Form/Sheets, and Gmail), normalizes it, and sends it to an AI model that:\n\n- Classifies the feedback (bug, feature request, question, etc.)\n\n- Extracts sentiment and pain level\n\n- Estimates business impact and implementation effort\n\n- Generates a short summary\n\n- Then a custom RICE-style priority score is computed, a Jira ticket is created automatically, a Notion page is generated for documentation, and a monthly product report is sent by email to stakeholders.\n\nIt helps product & support teams move from “random feedback in multiple tools” to a repeatable, data-driven product intake process with zero manual triage.\n\n## Context\n\nIn most teams, feedback is:\n\n- spread across emails, forms, and chat messages\n\n- manually copy–pasted into Jira (when someone remembers)\n\n- hard to prioritize objectively\n\n- nearly impossible to review at the end of the month\n\nThis workflow solves that by:\n\n- Centralizing feedback from Telegram, Google Forms/Sheets, and Gmail\n\n- Automatically normalizing all inputs into the same JSON structure\n\n- Using AI to categorize, tag, summarize, and score each request\n\n- Calculating a RICE-based priority adapted to your tiers (free / pro / enterprise)\n\n- Creating a Jira issue with all the context and acceptance criteria\n\n- Generating a Notion page for each feedback+ticket pair\n\n- Sending a monthly “Product Intelligence Report” by email with insights & recommendations\n\nThe result: less manual work, better prioritization, and a clear story of what users are asking for.\n\n## Target Users\n\nThis template is designed for:\n\n- Product Managers and Product Owners\n\n- SaaS teams with multiple feedback channels\n\n- Support / CS teams that need a structured escalation path\n\n- Project Managers who want objective, data-driven prioritization\n\n- Any team that wants “feedback → backlog” automation without building a custom platform\n\n## Technical Requirements\n\nYou’ll need:\n\n- Google Sheets credential\n\n- Gmail credential\n\n- Telegram Bot + Chat ID\n\n- Google Form connected to a Google Sheet \n\n![image.png](fileId:3320)\n![image.png](fileId:3319)\n\n- Jira credential (Jira Cloud)\n\n- Notion credential\n\n- OpenAI/ Anthropic credential for the AI analysis node\n\n- An existing Jira project where tickets will be created\n\n- A Notion database or parent page where feedback pages will be stored\n\n## Workflow Steps\n\nThe workflow is organized into four main sections:\n![image.png](fileId:3339)\n\n1) Triggers (Multi-channel Intake)\n\n- Telegram Trigger – Listens for new messages sent to your bot\n\n- Google Form / Sheet Trigger – Listens for new form responses / rows\n\n- Gmail Trigger – Listens for new emails matching your filter (e.g. [Feedback] in subject)\n\n- All three paths send their payloads into a “Data Normalizer” node that outputs a unified structure:\n\n2) Request Treated and Enriched (AI Analysis)\n\n- Instant Reply (Telegram only) – Sends a quick “Thanks, we’re analysing your feedback” message\n\n- User Enrichment – Enriches user tier based on mapping\n\n- Message a Model (AI) \n\n\t- classifies the feedback\n\n\t- extracts tags\n\n\t- scores sentiment, pain, business impact, effort\n\n\t- generates a short summary & acceptance criteria\n\n- JSON Parse / Merge – Merges AI output back into the original feedback object\n\n3) Priority Calculation & Jira Ticket Creation\n\n- Priority Calculator applies a RICE-style formula using:\n\n\t- pain level\n\n\t- business impact\n\n\t- implementation effort\n\n\t- user tier weight\n\n\t- assigns internal priority: P0 / P1 / P2 / P3\n\n\t- maps to Jira priority: Highest / High / Medium / Low\n\n- Create Jira Issue – Creates a ticket with:\n\n\t- summary from AI\n\n\t- description including raw feedback, AI analysis, and RICE breakdown\n\n\t- labels based on tags\n\n\t- priority based on the calculator\n\n- Post-processing  – Prepares a clean payload for notifications & logging\n\n- IF (Source = Telegram) – Sends a rich Telegram message back to the user with:\n\n\t- Jira key + URL\n\n\t- category, priority, RICE score, tags, and estimated handling time\n\n\t- Append to Google Sheet (Analytics Log) – Logs each feedback with:\n\n\t- source, user, category, sentiment, RICE score, priority, Jira key, Jira URL\n\n- Create Notion Page – Creates a documentation page linking:\n\n\t- the feedback\n\n\t- the Jira ticket\n\n\t- AI analysis\n\n\t- acceptance criteria\n\n4) Monthly Reporting (Product Intelligence Report)\n\n- Monthly Trigger – Runs once a month\n\n- Query Google Sheet – Fetches all feedback logs for the previous month\n\n- Aggregate Monthly Stats – Computes:\n\n\t- feedback volume\n\n\t- breakdown by category / sentiment / source / tier / priority\n\n\t- average RICE, pain, and impact\n\n\t- top P0/P1 issues and top feature requests\n\n\t- Message a Model (AI) – Generates a written “Product Intelligence Report” with:\n\n\t- executive summary\n\n\t- key insights & trends\n\n\t- top pain points\n\n\t- strategic recommendations\n\n- Parse Response: Extracts structured insights + short summary\n\n- Create Notion Report Page with:\n\n\t- metrics, charts-ready tables, insights, and recommendations\n\n\t- Append Monthly Log to Google Sheet – Stores high-level stats for historical tracking\n\n- Send Email with a formatted HTML report to stakeholders with:\n\n\t- key metrics\n\n\t- top issues\n\n\t- recommendations\n\n\t- link to the full Notion report\n\n## Key Features\n\n- Multi-channel intake: Telegram + Google Forms/Sheets + Gmail\n\n- AI-powered triage: automatic category, sentiment, tags, and summary\n\n- RICE-style priority scoring with tier weighting\n\n- Automatic Jira ticket creation with full context\n\n- Notion documentation for each feedback and for monthly reports\n\n- Google Sheets analytics log for exploration and dashboards\n\n- Monthly “Product Intelligence Report” sent automatically by email\n\n- Designed to be adaptable: you can plug in your own labels, tiers, and scoring rules\n\n## Expected Output\n\nWhen the workflow is running, you can expect:\n\n- A Jira issue created automatically for each relevant feedback\n![image.png](fileId:3323)\n- A confirmation email\n![image.png](fileId:3314)\n- A Telegram confirmation message when the feedback comes from Telegram\n![image.png](fileId:3316)\n![image.png](fileId:3317)\n- A Google Sheet filled with normalized feedback and scoring data\n![image.png](fileId:3315)\n- A Notion page per feedback/ticket with AI analysis and acceptance criteria\n![image.png](fileId:3325)\nEvery month:\n\n- a Notion “Monthly Product Intelligence Report” page\n![image.png](fileId:3324)\n![image.png](fileId:3322)\n- a summary email with key metrics and insights for your stakeholders\n\n![image.png](fileId:3318)\n\n## How it works\n\n- Trigger – Listens to Telegram / Google Forms / Gmail\n\n- Normalize – Converts all inputs to a unified feedback format\n\n- Enrich with AI – Category, sentiment, pain, impact, effort, tags, summary\n\n- Score – Computes RICE-style priority and maps to Jira priority\n\n- Create Ticket – Opens a Jira issue + Notion page + logs to Google Sheets\n\n- Notify – Sends Telegram confirmation (if source is Telegram)\n\n- Report – Once a month, aggregates everything and sends a Product Intelligence Report\n\n## Tutorial Video\n\nTutorial video:\n[Watch the Youtube Tutorial video](https://www.youtube.com/watch?v=q0Is11oU18Y)\n\n## About me\n\nI’m Yassin a Project & Product Manager  Scaling tech products with data-driven project management.\n📬 Feel free to connect with me on [Linkedin](https://www.linkedin.com/in/yassin-zehar)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "google form trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "data normalizer",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "instant reply",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "user enrichment",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "priority calculator",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create an issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "send result to user",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "log to analytics",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "end notification",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "parse json",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create a page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Message a model1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "monthly report",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "post processing",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "query google sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "1 month Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "aggregate monthly stats",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "parse response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "montly report log",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email reporting",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

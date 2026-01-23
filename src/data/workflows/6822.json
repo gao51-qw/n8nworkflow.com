@@ -1,0 +1,290 @@
+{
+  "id": 6822,
+  "slug": "6822",
+  "title": "Automate web research with GPT-4, Claude & Apify for content analysis and insights",
+  "description": "This n8n template demonstrates how to automate comprehensive web research using multiple AI models to find, analyze, and extract insights from authoritative sources.\n\nUse cases are many: Try automating competitive analysis research, finding latest regulatory guidance from official sources, gathering authoritative content for reports, or conducting market research on industry developments!\n\n## Good to know\n\nEach research query typically costs $0.08-$0.34 depending on the number of sources found and processed. The workflow includes smart filtering to minimize unnecessary API calls.\n\nThe workflow requires multiple AI services and may need additional setup time compared to simpler templates.\n\nQdrant storage is optional and can be removed without affecting performance.\n\n## How it works\n\nYour research question gets transformed into optimized Google search queries that target authoritative sources while filtering out low-quality sites.\n\nApify's RAG Web Browser scrapes the content and converts pages to clean markdown format.\n\nClaude Sonnet 4 evaluates each article for relevance and quality before full processing.\n\nArticles that pass the filter get analyzed in parallel - one pipeline creates focused summaries while another extracts specific claims and evidence.\n\nGPT-4.1 Mini ranks all findings and presents the top 3 most valuable insights and summaries.\n\nAll processed content gets stored in your Qdrant vector database to prevent duplicate processing and enable future reference.\n\n## How to use\n\nThe manual trigger node is used as an example but feel free to replace this with other triggers such as webhook, form submissions, or scheduled research.\n\nYou can modify the configuration variables in the Set Node to customize Qdrant URLs, collection names, and quality thresholds for your specific needs.\n\n## Requirements\n\nOpenAI API account for GPT-4.1 Mini (query optimization, summarization, ranking)\nAnthropic API account for Claude Sonnet 4 (content filtering)\nApify account for web scraping capabilities\nQdrant vector database instance (local or cloud)\nOllama with nomic-embed-text model for embeddings\n\n## Customizing this workflow\n\nWeb research automation can be adapted for many specialized use cases. Try focusing on specific domains like legal research (targeting .gov and .edu sites), medical research (PubMed and health authorities), or financial analysis (SEC filings and analyst reports).",
+  "featuredImage": "/data/workflows/6822/6822.webp",
+  "author": {
+    "id": 101,
+    "slug": "zendzipr",
+    "name": "Peter Zendzian",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1038,
+  "downloads": 103,
+  "createdAt": "2025-08-01T19:55:13.142Z",
+  "updatedAt": "2026-01-16T08:47:12.493Z",
+  "publishedAt": "2025-08-01T19:55:13.142Z",
+  "nodes": 42,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6822",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate web research with GPT-4, Claude & Apify for content analysis and insights",
+    "workflowName": "Automate web research with GPT-4, Claude & Apify for content analysis and insights",
+    "description": "This n8n template demonstrates how to automate comprehensive web research using multiple AI models to find, analyze, and extract insights from authoritative sources.\n\nUse cases are many: Try automating competitive analysis research, finding latest regulatory guidance from official sources, gathering authoritative content for reports, or conducting market research on industry developments!\n\n## Good to know\n\nEach research query typically costs $0.08-$0.34 depending on the number of sources found and processed. The workflow includes smart filtering to minimize unnecessary API calls.\n\nThe workflow requires multiple AI services and may need additional setup time compared to simpler templates.\n\nQdrant storage is optional and can be removed without affecting performance.\n\n## How it works\n\nYour research question gets transformed into optimized Google search queries that target authoritative sources while filtering out low-quality sites.\n\nApify's RAG Web Browser scrapes the content and converts pages to clean markdown format.\n\nClaude Sonnet 4 evaluates each article for relevance and quality before full processing.\n\nArticles that pass the filter get analyzed in parallel - one pipeline creates focused summaries while another extracts specific claims and evidence.\n\nGPT-4.1 Mini ranks all findings and presents the top 3 most valuable insights and summaries.\n\nAll processed content gets stored in your Qdrant vector database to prevent duplicate processing and enable future reference.\n\n## How to use\n\nThe manual trigger node is used as an example but feel free to replace this with other triggers such as webhook, form submissions, or scheduled research.\n\nYou can modify the configuration variables in the Set Node to customize Qdrant URLs, collection names, and quality thresholds for your specific needs.\n\n## Requirements\n\nOpenAI API account for GPT-4.1 Mini (query optimization, summarization, ranking)\nAnthropic API account for Claude Sonnet 4 (content filtering)\nApify account for web scraping capabilities\nQdrant vector database instance (local or cloud)\nOllama with nomic-embed-text model for embeddings\n\n## Customizing this workflow\n\nWeb research automation can be adapted for many specialized use cases. Try focusing on specific domains like legal research (targeting .gov and .edu sites), medical research (PubMed and health authorities), or financial analysis (SEC filings and analyst reports).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "RAG Web Browser",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set Node",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Early Content Filter",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Duplicate Check",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Normalize text",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields5",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser7",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Insight Extraction",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Summarization",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser9",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser10",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "aggregation and ranking of extracted claims",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "aggregation and ranking of extracted summaries",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Save",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Embeddings Ollama1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "role": "embeddingsOllama",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Character Text Splitter2",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "role": "textSplitterCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader2",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Smart Query Builder",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Continue of No Error",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Markdown Cleaner",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Values",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Processing",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Continue Processing",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Aggregate Summaries",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Aggregate Output",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    }
+  ]
+}

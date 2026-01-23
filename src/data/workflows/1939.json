@@ -1,0 +1,121 @@
+{
+  "id": 1939,
+  "slug": "1939",
+  "title": "Send labeled email to a Notion database",
+  "description": "This workflow sends the contents of an email to a Notion database. The email must be labeled with a specific label for the workflow to trigger. The email subject will be the title of the Notion page, and a snippet of the email body will be the content of the Notion page. The email link will be added to the Notion page as a property.\n\n## Prerequisites\n\nNotion account and [Notion credentials](https://docs.n8n.io/integrations/builtin/credentials/notion/).\nGoogle account and [Google credentials](https://docs.n8n.io/integrations/builtin/credentials/google/).\n\n## How it works\n\nOn scheduled intervals, find all emails with a specific label. For each email, check if the email already exists in the Notion database. If it does not exist, create a new page in the Notion database, otherwise do nothing. When the task in the Notion database is checked off, the label will be removed from the email.\n\n### Setup\n\nThis workflow requires that you set up a Notion database or use an existing one with at least the following fields:\n\n- Title (title)\n- Thread ID (text)\n- Email thread (URL)\n\nAdditionally, create a label that will be used to trigger the workflow in Gmail. In this workflow, the label is called \"Notion\".",
+  "featuredImage": "/data/workflows/1939/1939.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8n-team",
+    "name": "n8n Team",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "beginner",
+  "price": 0,
+  "visitors": 7456,
+  "downloads": 745,
+  "createdAt": "2023-08-02T15:08:18.307Z",
+  "updatedAt": "2026-01-16T08:22:17.071Z",
+  "publishedAt": "2023-08-02T15:08:18.307Z",
+  "nodes": 0,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/1939",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Send labeled email to a Notion database",
+    "workflowName": "Send labeled email to a Notion database",
+    "description": "This workflow sends the contents of an email to a Notion database. The email must be labeled with a specific label for the workflow to trigger. The email subject will be the title of the Notion page, and a snippet of the email body will be the content of the Notion page. The email link will be added to the Notion page as a property.\n\n## Prerequisites\n\nNotion account and [Notion credentials](https://docs.n8n.io/integrations/builtin/credentials/notion/).\nGoogle account and [Google credentials](https://docs.n8n.io/integrations/builtin/credentials/google/).\n\n## How it works\n\nOn scheduled intervals, find all emails with a specific label. For each email, check if the email already exists in the Notion database. If it does not exist, create a new page in the Notion database, otherwise do nothing. When the task in the Notion database is checked off, the label will be removed from the email.\n\n### Setup\n\nThis workflow requires that you set up a Notion database or use an existing one with at least the following fields:\n\n- Title (title)\n- Thread ID (text)\n- Email thread (URL)\n\nAdditionally, create a label that will be used to trigger the workflow in Gmail. In this workflow, the label is called \"Notion\".",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "On schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Derive last request time",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get emails from label and last request time",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create database page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Try get database page",
+      "type": "n8n-nodes-base.notion",
+      "role": "notion",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If checked off",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On updated database page",
+      "type": "n8n-nodes-base.notionTrigger",
+      "role": "notionTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Remove label from target email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Not yet checked off, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "If found, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If database page not found",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Find my email address",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

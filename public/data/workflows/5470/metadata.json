@@ -1,0 +1,26 @@
+{
+  "id": 5470,
+  "slug": "5470",
+  "title": "Discord daily digest for multiple Google Analytics accounts",
+  "description": "# Overview\nFetch Multiple Google Analytics GA4 metrics daily, post to Discord, update previous day’s entry as GA data finalizes over seven days.\n![Discord Daily Digest for Multiple Google Analytics Accounts](https://articles.emp0.com/wp-content/uploads/2025/06/Discord-Daily-Digest-for-Multiple-Google-Analytics-Accounts.png)\n\n## Benefits\n- Automates daily traffic reporting\n- Maintains single message per day, avoids channel clutter\n- Provides near–real-time updates by editing prior messages\n\n## Use Case\n- Teams tracking website performance via Discord (or any chat tool) without manual copy–paste. Marketing managers, community moderators, growth hackers.\n- If your manager asks you for daily marketing report every morning, you can now automate it\n\n## Notes\n- google analytics node in n8n does not provide real time data. The node updates previous values for the next 7 days\n- discord node on n8n does not have features to update an exisiting message by message id. So we have used the discord api for this\n- most businesses use multiple google analytics properties across their digital platforms\n\n\n# Core Logic\n\n1. Schedule trigger fires once a day.\n2. Google Analytics node retrieves metrics for date ranges (past 7 days)\n3. Aggregate node collates all records.\n4. Discord node fetches the last 10 messages in the broadcast channel\n5. Code node maps existing Discord messages by to the google analytics data using the date fields\n5. For each GA record:\n\t1. If no message exists → send new POST to the discord channel\n\t2. If message exists and metrics changed, send an update patch to the existing discord message\n8. Batch loops + wait nodes prevent rate-limit.\n\n# Setup Instructions\n\n1. Import workflow JSON into n8n.\n2. [Follow the n8n guide to Create Google Analytics OAuth2 credential](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googleanalytics) with access to all required GA accounts. \n3. [Follow the n8n guide to Create Discord OAuth2 credential](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.discord) for “Get Messages” operations.\n4. [Follow the Discord guide to Create HTTP Header Auth credential](https://discord.com/developers/docs/reference) named “Discord-Bot” with header\n\n```\nKey: Authorization\n\nValue: Bot &lt;your-bot-token&gt;\n```\n\n\n5. In the two Set nodes in the beginning of the flow, assign discord_channel_id and google_analytics_id.\n![Edit discord and google analytics id](https://articles.emp0.com/wp-content/uploads/2025/06/edit-discord-and-google-analytics-id-1.png)\n\t1. Get your discord channel id by sending a text on your discord channel and then copy message link\n\t2. Paste the text below and you will see your message link in the form of https://discord.com/channels/server_id/channel_id/message_id , you will want to get the channel_id which is the number in the middle\n![get discord channel id](https://articles.emp0.com/wp-content/uploads/2025/06/12345678-1.png)\n\t3. Find your google analytics id by going to google analytics dashboard, seeing the properties in the top right and copy paste that number to the flow\n![get google analytics id ](https://articles.emp0.com/wp-content/uploads/2025/06/12345678.png)\n\n\n8. Adjust schedule trigger times to your preferred report hour.\n\n9. Activate workflow.\n\n# Customization\n\nReplace Discord HTTP Request nodes with Slack, ClickUp, WhatsApp, Telegram integrations by swapping POST/PATCH endpoints and authentication.",
+  "featuredImage": "/data/workflows/5470/5470.webp",
+  "author": {
+    "id": 101,
+    "slug": "jay-emp0",
+    "name": "Jay Emp0",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 485,
+  "downloads": 48,
+  "createdAt": "2025-06-30T09:34:33.394Z",
+  "updatedAt": "2026-01-16T08:39:52.355Z",
+  "publishedAt": "2025-06-30T09:34:33.394Z",
+  "nodes": 34,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5470"
+}

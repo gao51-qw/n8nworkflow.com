@@ -1,0 +1,103 @@
+{
+  "id": 3998,
+  "slug": "3998",
+  "title": "Automate medical billing with Google Sheets and Gmail",
+  "description": "# Automate Medical Billing with Google Sheets and Gmail\n\n**Note**: This template is designed for self-hosted n8n instances. The workflow image above shows the complete automation flow.\n\nThis n8n workflow automates the patient billing process—from form submission to invoice generation, email delivery, and Google Sheets logging.\n\n---\n\n## 🏥 Who is this for?\n\nThis workflow is ideal for:\n\n* Private medical clinics\n* Health service providers\n* Medical office administrators\n* Telehealth services\n* Billing departments\n\n---\n\n## 💡 What problem does this workflow solve?\n\nMedical billing often involves repetitive data entry, invoice calculation, and communication. This workflow:\n\n* Eliminates manual invoice generation\n* Ensures accurate and consistent pricing for treatments\n* Sends automated, personalized invoices to patients\n* Logs all billing details in a Google Sheet for recordkeeping\n* Alerts staff when patient data is missing\n\n---\n\n## ⚙️ What this workflow does\n\nThis automation builds a streamlined billing system that:\n\n1. **Captures patient info via an embedded n8n form**\n2. **Formats visit dates** for professional presentation\n3. **Calculates invoice totals** based on treatment selection\n4. **Sends email invoices** to patients using Gmail\n5. **Logs billing data** into Google Sheets\n6. **Notifies admin** via Slack if submission is incomplete\n\n---\n\n## ✅ Setup Instructions\n\n### 🔑 Prerequisites\n\nBefore starting, ensure you have:\n\n* A self-hosted **n8n** instance\n* A **Google account** with access to:\n\n  * Gmail\n  * Google Sheets\n* A **Slack Webhook URL** (optional but included)\n* A designated **Google Sheet** to store invoices\n\n---\n\n### 📋 Step 1: Google Sheet Setup\n\nCreate a new Google Sheet and add the following columns in the first row (**must match exactly**):\n\n```\nInvoice No | Patient Name | Email | Date | Total Cost | Line Items | Payment Status\n```\n\n&gt; ✅ **Customizable**: You can add columns like “Insurance Provider” or “Payment Status” if needed—just update the mapping in the Google Sheets node.\n\n---\n\n### 🗂️ Step 2: Configure Google Credentials in n8n\n\nIn n8n:\n\n* Go to **Settings → Credentials**\n* Add:\n\n  * **Google Sheets OAuth2**\n  * **Gmail OAuth2**\n* Ensure proper scopes are granted:\n\n  * `.../auth/spreadsheets`\n  * `.../auth/gmail.send`\n\n---\n\n### 🧾 Step 3: Configure Treatment Pricing\n\nIn the `Calculate prices` code node:\n\n```js\nconst treatmentPrices = {\n  \"General Consultation\": 60,\n  \"Blood Test - Basic Panel\": 45,\n  \"Blood Test - Comprehensive\": 120,\n  \"X-Ray - Single\": 80,\n  \"Physical Therapy Session\": 75,\n  \"Vaccination - Standard\": 40,\n  \"Specialist Consultation\": 120,\n  \"Minor Procedure\": 150\n};\n```\n\n&gt; ✏️ **Customizable**: Add, remove, or change treatment names and prices.\n\n---\n\n### 🌐 Step 4: Embed the Patient Billing Form\n\nIn the `On form submission` node:\n\n* The form collects:\n\n  * Patient Name\n  * Email Address\n  * Visit Date\n  * Selected Treatments (multi-select dropdown)\n\n&gt; ✏️ **Customizable**: Modify the form fields to include phone number, insurance info, etc.\n\n---\n\n### 📬 Step 5: Customize the Email Template\n\nOpen the `Send Patient Invoice Email` node:\n\nExample message:\n\n```\nHi {{ $json.patientName }},\n\nThank you for visiting MediSure Clinic on {{ $json.formattedDate }}.\nHere is a summary of your treatments:\n{{ $json.lineItems }}\n\nTotal Due: **${{ $json.totalCost }}**\n\nBest regards,  \nMediSure Billing Department\n```\n\n&gt; ✏️ **Customizable**: Adjust the message, branding, and subject line to match your practice.\n\n---\n\n### 🧠 Step 6: Handle Errors\n\nThe `Error Check` and `Generate Error Message` nodes ensure:\n\n* No invoice is sent without an email\n* Admins are alerted via Slack if critical info is missing\n\n&gt; ✏️ **Customizable**: Replace Slack with email, webhook, or CRM notification if preferred.\n\n---\n\n### 🧾 Step 7: Log to Google Sheets\n\nThe `Log Invoice to Googlesheets` node appends each record:\n\n* Invoice number\n* Patient name\n* Email\n* Date\n* Total cost\n* Line items\n\n&gt; ✏️ **Customizable**: You can change the target spreadsheet or sheet name.\n\n---\n\n## 🔄 Testing\n\nOnce configured:\n\n1. Toggle the workflow **Active**\n2. Submit a test form\n3. Check:\n\n   * Email receipt is accurate\n   * Data is correctly appended in Google Sheets\n   * No errors are logged\n\n---\n\n## ✨ How to Customize This Workflow\n\n| Component               | How to Customize                               |\n| ----------------------- | ---------------------------------------------- |\n| **Treatment Prices**    | Edit `Calculate prices` node code              |\n| **Form Fields**         | Modify the `On form submission` node           |\n| **Email Body**          | Change message in `Send Patient Invoice Email` |\n| **Slack Alerts**        | Replace Slack node with email or CRM action    |\n| **Google Sheet Fields** | Add/remove columns and update mappings         |\n\n---\n\n## 🧩 Integrate with Your Stack\n\nAdd downstream automations easily:\n\n* Push to **QuickBooks** or **Stripe** for payment processing\n* Create a **calendar invite** for follow-ups\n* Sync with a **CRM** like HubSpot\n\n---\n\n## 🛠️ Troubleshooting\n\n| Issue                    | Fix                               |\n| ------------------------ | --------------------------------- |\n| Email not sent           | Check Gmail credentials & quotas  |\n| Spreadsheet not updating | Confirm sheet ID and column names |\n| Pricing not accurate     | Review `Calculate prices` logic   |\n| Slack alert not sent     | Check webhook URL format          |\n\n---\n\n## 🤝 Need Help?\n\n* Review [n8n documentation](https://docs.n8n.io/)\n* Ask questions in the [n8n community forum](https://community.n8n.io)\n* Contact the template creator: **David Olusola**\n* Support Email : Dimejicole21@gmail.com\n\n\n\n",
+  "featuredImage": "/data/workflows/3998/3998.webp",
+  "author": {
+    "id": 101,
+    "slug": "dae221",
+    "name": "David Olusola",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 740,
+  "downloads": 74,
+  "createdAt": "2025-05-12T14:37:10.030Z",
+  "updatedAt": "2026-01-16T08:32:32.263Z",
+  "publishedAt": "2025-05-12T14:37:10.030Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3998",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate medical billing with Google Sheets and Gmail",
+    "workflowName": "Automate medical billing with Google Sheets and Gmail",
+    "description": "# Automate Medical Billing with Google Sheets and Gmail\n\n**Note**: This template is designed for self-hosted n8n instances. The workflow image above shows the complete automation flow.\n\nThis n8n workflow automates the patient billing process—from form submission to invoice generation, email delivery, and Google Sheets logging.\n\n---\n\n## 🏥 Who is this for?\n\nThis workflow is ideal for:\n\n* Private medical clinics\n* Health service providers\n* Medical office administrators\n* Telehealth services\n* Billing departments\n\n---\n\n## 💡 What problem does this workflow solve?\n\nMedical billing often involves repetitive data entry, invoice calculation, and communication. This workflow:\n\n* Eliminates manual invoice generation\n* Ensures accurate and consistent pricing for treatments\n* Sends automated, personalized invoices to patients\n* Logs all billing details in a Google Sheet for recordkeeping\n* Alerts staff when patient data is missing\n\n---\n\n## ⚙️ What this workflow does\n\nThis automation builds a streamlined billing system that:\n\n1. **Captures patient info via an embedded n8n form**\n2. **Formats visit dates** for professional presentation\n3. **Calculates invoice totals** based on treatment selection\n4. **Sends email invoices** to patients using Gmail\n5. **Logs billing data** into Google Sheets\n6. **Notifies admin** via Slack if submission is incomplete\n\n---\n\n## ✅ Setup Instructions\n\n### 🔑 Prerequisites\n\nBefore starting, ensure you have:\n\n* A self-hosted **n8n** instance\n* A **Google account** with access to:\n\n  * Gmail\n  * Google Sheets\n* A **Slack Webhook URL** (optional but included)\n* A designated **Google Sheet** to store invoices\n\n---\n\n### 📋 Step 1: Google Sheet Setup\n\nCreate a new Google Sheet and add the following columns in the first row (**must match exactly**):\n\n```\nInvoice No | Patient Name | Email | Date | Total Cost | Line Items | Payment Status\n```\n\n&gt; ✅ **Customizable**: You can add columns like “Insurance Provider” or “Payment Status” if needed—just update the mapping in the Google Sheets node.\n\n---\n\n### 🗂️ Step 2: Configure Google Credentials in n8n\n\nIn n8n:\n\n* Go to **Settings → Credentials**\n* Add:\n\n  * **Google Sheets OAuth2**\n  * **Gmail OAuth2**\n* Ensure proper scopes are granted:\n\n  * `.../auth/spreadsheets`\n  * `.../auth/gmail.send`\n\n---\n\n### 🧾 Step 3: Configure Treatment Pricing\n\nIn the `Calculate prices` code node:\n\n```js\nconst treatmentPrices = {\n  \"General Consultation\": 60,\n  \"Blood Test - Basic Panel\": 45,\n  \"Blood Test - Comprehensive\": 120,\n  \"X-Ray - Single\": 80,\n  \"Physical Therapy Session\": 75,\n  \"Vaccination - Standard\": 40,\n  \"Specialist Consultation\": 120,\n  \"Minor Procedure\": 150\n};\n```\n\n&gt; ✏️ **Customizable**: Add, remove, or change treatment names and prices.\n\n---\n\n### 🌐 Step 4: Embed the Patient Billing Form\n\nIn the `On form submission` node:\n\n* The form collects:\n\n  * Patient Name\n  * Email Address\n  * Visit Date\n  * Selected Treatments (multi-select dropdown)\n\n&gt; ✏️ **Customizable**: Modify the form fields to include phone number, insurance info, etc.\n\n---\n\n### 📬 Step 5: Customize the Email Template\n\nOpen the `Send Patient Invoice Email` node:\n\nExample message:\n\n```\nHi {{ $json.patientName }},\n\nThank you for visiting MediSure Clinic on {{ $json.formattedDate }}.\nHere is a summary of your treatments:\n{{ $json.lineItems }}\n\nTotal Due: **${{ $json.totalCost }}**\n\nBest regards,  \nMediSure Billing Department\n```\n\n&gt; ✏️ **Customizable**: Adjust the message, branding, and subject line to match your practice.\n\n---\n\n### 🧠 Step 6: Handle Errors\n\nThe `Error Check` and `Generate Error Message` nodes ensure:\n\n* No invoice is sent without an email\n* Admins are alerted via Slack if critical info is missing\n\n&gt; ✏️ **Customizable**: Replace Slack with email, webhook, or CRM notification if preferred.\n\n---\n\n### 🧾 Step 7: Log to Google Sheets\n\nThe `Log Invoice to Googlesheets` node appends each record:\n\n* Invoice number\n* Patient name\n* Email\n* Date\n* Total cost\n* Line items\n\n&gt; ✏️ **Customizable**: You can change the target spreadsheet or sheet name.\n\n---\n\n## 🔄 Testing\n\nOnce configured:\n\n1. Toggle the workflow **Active**\n2. Submit a test form\n3. Check:\n\n   * Email receipt is accurate\n   * Data is correctly appended in Google Sheets\n   * No errors are logged\n\n---\n\n## ✨ How to Customize This Workflow\n\n| Component               | How to Customize                               |\n| ----------------------- | ---------------------------------------------- |\n| **Treatment Prices**    | Edit `Calculate prices` node code              |\n| **Form Fields**         | Modify the `On form submission` node           |\n| **Email Body**          | Change message in `Send Patient Invoice Email` |\n| **Slack Alerts**        | Replace Slack node with email or CRM action    |\n| **Google Sheet Fields** | Add/remove columns and update mappings         |\n\n---\n\n## 🧩 Integrate with Your Stack\n\nAdd downstream automations easily:\n\n* Push to **QuickBooks** or **Stripe** for payment processing\n* Create a **calendar invite** for follow-ups\n* Sync with a **CRM** like HubSpot\n\n---\n\n## 🛠️ Troubleshooting\n\n| Issue                    | Fix                               |\n| ------------------------ | --------------------------------- |\n| Email not sent           | Check Gmail credentials & quotas  |\n| Spreadsheet not updating | Confirm sheet ID and column names |\n| Pricing not accurate     | Review `Calculate prices` logic   |\n| Slack alert not sent     | Check webhook URL format          |\n\n---\n\n## 🤝 Need Help?\n\n* Review [n8n documentation](https://docs.n8n.io/)\n* Ask questions in the [n8n community forum](https://community.n8n.io)\n* Contact the template creator: **David Olusola**\n* Support Email : Dimejicole21@gmail.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Data Structure1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Error Check1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Admin Notification1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Calculate prices",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate Error Message1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Patient Invoice Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Log Invoice to Googlesheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": 8852,
+  "slug": "8852",
+  "title": "Domain-specific web content crawler with depth control & text extraction",
+  "description": "This template implements a recursive web crawler inside n8n. Starting from a given URL, it crawls linked pages up to a maximum depth (default: 3), extracts text and links, and returns the collected content via webhook.\n\n---\n\n## 🚀 How It Works\n\n1) **Webhook Trigger**  \n   Accepts a JSON body with a `url` field.  \n   Example payload:\n    \n    { \"url\": \"https://example.com\" }\n\n2) **Initialization**  \n   - Sets crawl parameters: `url`, `domain`, `maxDepth = 3`, and `depth = 0`.  \n   - Initializes global static data (`pending`, `visited`, `queued`, `pages`).\n\n3) **Recursive Crawling**  \n   - Fetches each page (HTTP Request).  \n   - Extracts body text and links (HTML node).  \n   - Cleans and deduplicates links.  \n   - Filters out:\n     - External domains (only same-site is followed)  \n     - Anchors (#), mailto/tel/javascript links  \n     - Non-HTML files (.pdf, .docx, .xlsx, .pptx)\n\n4) **Depth Control & Queue**  \n   - Tracks visited URLs  \n   - Stops at `maxDepth` to prevent infinite loops  \n   - Uses SplitInBatches to loop the queue\n\n5) **Data Collection**  \n   - Saves each crawled page (`url`, `depth`, `content`) into `pages[]`  \n   - When `pending = 0`, combines results\n\n6) **Output**  \n   - Responds via the Webhook node with:\n     - `combinedContent` (all pages concatenated)\n     - `pages[]` (array of individual results)\n   - Large results are chunked when exceeding ~12,000 characters\n\n---\n\n## 🛠️ Setup Instructions\n\n1) **Import Template**  \n   Load from n8n Community Templates.\n\n2) **Configure Webhook**  \n   - Open the **Webhook** node  \n   - Copy the Test URL (development) or Production URL (after deploy)  \n   - You’ll POST crawl requests to this endpoint\n\n3) **Run a Test**  \n   Send a POST with JSON:\n\n    curl -X POST https://&lt;your-n8n&gt;/webhook/&lt;id&gt; \\\n      -H \"Content-Type: application/json\" \\\n      -d '{\"url\": \"https://example.com\"}'\n\n4) **View Response**  \n   The crawler returns a JSON object containing `combinedContent` and `pages[]`.\n\n---\n\n## ⚙️ Configuration\n\n- **maxDepth**  \n  Default: 3. Adjust in the **Init Crawl Params** (Set) node.\n\n- **Timeouts**  \n  HTTP Request node timeout is 5 seconds per request; increase if needed.\n\n- **Filtering Rules**  \n  - Only same-domain links are followed (apex and `www` treated as same-site)  \n  - Skips anchors, `mailto:`, `tel:`, `javascript:`  \n  - Skips document links (.pdf, .docx, .xlsx, .pptx)  \n  - You can tweak the regex and logic in **Queue & Dedup Links** (Code) node\n\n---\n\n## 📌 Limitations\n\n- No JavaScript rendering (static HTML only)  \n- No authentication/cookies/session handling  \n- Large sites can be slow or hit timeouts; chunking mitigates response size\n\n---\n\n## ✅ Example Use Cases\n\n- Extract text across your site for AI ingestion / embeddings  \n- SEO/content audit and internal link checks  \n- Build a lightweight page corpus for downstream processing in n8n\n\n---\n\n## ⏱️ Estimated Setup Time\n\n~10 minutes (import → set webhook → test request)\n\n",
+  "featuredImage": "/data/workflows/8852/8852.webp",
+  "author": {
+    "id": 101,
+    "slug": "leeseifer",
+    "name": "Le Nguyen",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1428,
+  "downloads": 142,
+  "createdAt": "2025-09-23T07:34:54.369Z",
+  "updatedAt": "2026-01-16T08:57:57.288Z",
+  "publishedAt": "2025-09-23T07:34:54.369Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8852"
+}

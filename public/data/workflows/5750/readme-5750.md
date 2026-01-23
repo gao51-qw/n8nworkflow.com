@@ -1,0 +1,123 @@
+# Fetch hierarchical data records from Airtable with multi-level relationships
+
+> # Airtable Hierarchical Record Fetcher
+
+## Description
+
+This n8n workflow retrieves an Airtable record along with its related child records in a hierarchical structure. It can fetch up to 3 levels of linked records and assembles them into a comprehensive JSON object, making it ideal for complex data relationships and nested record structures.
+
+## Features
+
+- **Multi-level Record Fetching**: Retrieves parent record, linked child records (level 2), and optionally grandchild records (level 3)
+- **API Call Optimization**: Uses Airtable's `filterByFormula` to minimize API calls by fetching multiple related records in single requests
+- **Selective Level 3 Fetching**: Only fetches level 3 records for specified linked fields to optimize performance
+- **Rich Text Processing**: Converts Airtable's pseudo-markdown rich text fields to HTML format
+- **Hierarchical JSON Output**: Organizes all data in a structured, nested JSON format
+- **Flexible Configuration**: Customizable depth and field selection per execution
+
+## Input Parameters
+
+The workflow accepts a JSON array with the following structure:
+
+```json
+[
+  {
+    "base_id": "appN8nPMGoLNuzUbY",
+    "table_id": "tblLVOwpYIe0fGQ52", 
+    "record_id": "reczMh1Pp5l94HdYf",
+    "level_3": [
+      "fldRaFra1rLta66cD",
+      "fld3FxCaYk8AVaEHt"
+    ],
+    "to_html": true
+  }
+]
+```
+
+### Parameter Details
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `base_id` | string | Yes | Airtable base identifier |
+| `table_id` | string | Yes | Airtable table identifier for the main record |
+| `record_id` | string | Yes | Airtable record identifier to fetch |
+| `level_3` | array | No | Array of field IDs from level 2 records for which to fetch level 3 children |
+| `to_html` | boolean | No | Convert rich text fields from pseudo-markdown to HTML (default: false). This requires `marked` npm package. |
+
+## Output Structure
+
+The workflow returns a hierarchical JSON object with the following structure:
+
+```json
+{
+   "id": "recXXXXXXX",
+   "field_1": ...,
+   "field_2": ...,
+   "level2_child": [
+      {
+         "id": "recXXXXXXX",
+         "field_a": ...,
+         "field_b": ...,
+         "level3_child": [
+            {
+               "id": "recXXXXXXX",
+               "field_y": ...,
+               "field_z": ...,
+            },
+            ...
+         ]
+      },
+      ...
+   ]
+}
+```
+
+## 📊 Basic Information
+
+- **Workflow ID:** 5750
+- **Complexity:** advanced
+- **Node Count:** 38
+- **Views:** 196
+- **Downloads:** 19
+- **Created:** 2025/7/7
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/5750)
+
+## 👤 Author
+
+- **Name:** digi-stud.io
+- **Username:** @valerian
+
+## 🏷️ Categories
+
+- Engineering
+
+## 🔗 Nodes Used
+
+- **executeWorkflowTrigger** 
+- **set** (×9)
+- **splitOut** (×3)
+- **filter** (×2)
+- **airtable** (×2)
+- **code** (×3)
+- **httpRequest** (×3)
+- **if** (×2)
+- **merge** (×3)
+- **aggregate** (×2)
+- **stickyNote** (×6)
+- **splitInBatches** (×2)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 38 nodes with 31 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

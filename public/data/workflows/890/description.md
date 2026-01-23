@@ -1,0 +1,1 @@
+How to take the path of a local Excel file and read its contents into n8n.

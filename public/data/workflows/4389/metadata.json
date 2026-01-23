@@ -1,0 +1,26 @@
+{
+  "id": 4389,
+  "slug": "4389",
+  "title": "Collect conference feedback with Forms and log to Excel OneDrive with Outlook notifications",
+  "description": "# Conference Feedback Collection and OneDrive Logging Workflow\n\nThis n8n workflow is designed to collect feedback through a web form, log the responses into an Excel file stored in Microsoft OneDrive, and notify the support team via email.\n\n---\n\n## 🧭 Overall Goal\n\nTo collect user feedback from a web form, structure the data, log it into a OneDrive Excel file, and notify support via Outlook email.\n\n---\n\n## 🔄 Workflow Breakdown\n\n### 1. **Form Submission** (`On form submission`)\n- **Node Type**: `formTrigger`\n- **Purpose**: Captures user feedback via a web form.\n- **Form Fields**:\n  - Full Name (Required)\n  - Email (Required)\n  - Company Name\n  - Job Title\n  - How did you hear about the conference? (Required)\n  - Overall experience rating (Required)\n  - Favorite sessions/speakers\n  - Relevance to interests/work (Required)\n  - Networking opportunities (Required)\n  - Suggestions for improvement\n  - Future topics/speakers\n  - Willingness to attend again (Required)\n  - Additional comments\n  - Contact permission (Required)\n- **Access URL**: `/webhook/feedback` (or `/webhook-test/feedback` during testing)\n\n---\n\n### 2. **Parse Data** (`Set`)\n- **Purpose**: Renames form fields to `snake_case`.\n- **Output**: Structured JSON with renamed fields.\n\n---\n\n### 3. **Sample File** (`Convert to File`)\n- **Purpose**: Generates a file name reference for search.\n- **Filename**: `test-n8n-feedback-form-data.xlsx`\n\n---\n\n### 4. **Search Document** (`Microsoft OneDrive`)\n- **Purpose**: Searches OneDrive for the specified Excel file.\n- **Query**: `test-n8n-feedback-form-data.xlsx`\n\n---\n\n### 5. **Extract File ID** (`Code`)\n- **Purpose**: Extracts the ID of the file from the search result.\n- **Output**: `{ \"id\": \"someFileId\" }` or `{ \"id\": null }`\n\n---\n\n### 6. **Check File Existence** (`If`)\n- **Purpose**: Branch logic based on file existence.\n- **Condition**: If `id` exists.\n\n---\n\n### 7. **Build Sheet Data** (`Set`)\n- **Purpose**: Prepares the data to match the Excel column headers.\n- **Only Runs If**: File was found.\n\n---\n\n### 8. **Append Data to Excel** (`Microsoft Excel`)\n- **Purpose**: Appends the new feedback as a row.\n- **Workbook ID**: `{{ $('Code').item.json.id }}`\n- **Worksheet Name**: `Sheet1`\n- **Mode**: Auto-map from input fields\n\n---\n\n### 9. **Notify Support** (`Microsoft Outlook`)\n- **Purpose**: Sends a notification email with key feedback details.\n- **To**: `test@gmail.com`\n- **Subject**: `\"New Feedback Submission Received\"`\n- **Body**: Includes key details from submission\n\n---\n\n### 10. **End Workflow** (`NoOp`)\n- **Purpose**: Marks logical end of the workflow.\n\n---\n\n## 📝 Sticky Notes\n\n- ✅ **Upload Target Excel File First**: Ensure the Excel file exists in OneDrive.\n- 📝 **Filename Consistency**: Filename should match in \"Sample File\" and \"Search Document\" nodes.\n- 📧 **Customize Email Content**: Update \"Notify Support\" node with your desired message and recipient.\n\n---\n\n## 🔧 Customization Guide\n\n### 🧾 Form Customization\n- Change form title, description, fields, or path.\n\n### 🧪 Parsing Logic\n- Update field mappings if form labels change.\n\n### 📁 Excel File Settings\n- Filename must match your actual OneDrive file.\n- Worksheet name and column headers must match in \"Build Sheet Data\".\n\n### 📬 Email Settings\n- Update subject and body using variables like `{{ $('Parse Data').item.json.full_name }}`.\n\n---\n\n## ❗ Error Handling Tips\n- Adjust email content based on file presence.\n- Add an \"Error Trigger\" for advanced error management.\n\n---\n\n## 🔁 Alternatives and Extensions\n- Use Google Sheets, Airtable, or databases instead of OneDrive/Excel.\n- Add Slack or SMS notifications.\n\n---\n\n## 📌 Use Cases\n- Post-event Feedback\n- CSAT Surveys\n- Employee Feedback\n- Bug Reporting\n- Lead Capture\n- Contact Forms\n- Webinar Registration\n\n---\n\n## 🔐 Required Credentials\n\n### 1. **Microsoft OneDrive (OAuth2)**\n- **Used by**: \"Search Document\"\n- **Credential Name**: Microsoft Drive account\n\n### 2. **Microsoft Excel (OAuth2)**\n- **Used by**: \"Append Data\"\n- **Credential Name**: Microsoft Excel account\n\n### 3. **Microsoft Outlook (OAuth2)**\n- **Used by**: \"Notify Support\"\n- **Credential Name**: Outlook 0Auth2\n\n---\n\n## ❤️ Made with n8n by Akhil\n",
+  "featuredImage": "/data/workflows/4389/4389.webp",
+  "author": {
+    "id": 101,
+    "slug": "akhilv7",
+    "name": "Akhil Varma Gadiraju",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 1953,
+  "downloads": 195,
+  "createdAt": "2025-05-26T03:43:21.953Z",
+  "updatedAt": "2026-01-16T08:34:08.275Z",
+  "publishedAt": "2025-05-26T03:43:21.953Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4389"
+}

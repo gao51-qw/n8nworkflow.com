@@ -1,0 +1,109 @@
+{
+  "id": 8676,
+  "slug": "8676",
+  "title": "Automatically reply to customer emails with Airtable, Gmail, and GPT-4.1 Mini",
+  "description": "# Automatically Reply to Customer Emails with Airtable, Gmail, and OpenAI\n![repondreautomatiquementemailsn8nairtablegmailopenai.png](fileId:2643)\n## Introduction\n\nThis guide walks you step by step through setting up an automated agent that:\n- Receives emails sent by your customers.  \n- Analyzes the content of the email.  \n- Generates an appropriate response using an AI model (OpenAI GPT).  \n- Stores all information (received email, AI response, date, customer email) in Airtable.  \n- Automatically replies to the customer in the same Gmail thread.  \n\n---\n\n## Prerequisites\n\nBefore you start, you’ll need:  \n- A [Gmail](https://mail.google.com) account connected to n8n.  \n- An [Airtable](https://airtable.com) account.  \n- An [n8n](https://n8n.io) instance (cloud or self-hosted).  \n- An [OpenAI](https://platform.openai.com) API key.  \n\n---\n\n## Prepare the Airtable Base\n\n![Baseairtable.png](fileId:2645)\n\nNo need to build everything from scratch — here’s a ready-to-use base you can copy:  \n👉 [Open the Airtable base](https://airtable.com/invite/l?inviteId=invnYug7i1yK7gqd4&inviteToken=9cd007631d148208bf689d2af7fd95039839ca775a18ad434918652ea370b86e&utm_medium=email&utm_source=product_team&utm_content=transactional-alerts)\n\nIt already contains the following structure:  \n- **Subject** (text) → email subject.  \n- **Date** (date/time) → date of reception.  \n- **Customer Email** (text) → customer’s email address.  \n- **Message** (long text) → body of the received email.  \n- **AI Response** (long text) → AI-generated reply.  \n\nYou can reuse it as it is or duplicate it into your Airtable account.  \n\n## 1. Set Up Gmail Trigger in n8n\n\n![automatisationsupportclientn8nairtablegmail.png](fileId:2644)\n\nAlright, now that we have our Airtable base ready, we need to capture customer emails.  \nThat’s the job of the **Gmail Trigger**. Basically, this node lies in wait inside your inbox, and as soon as a new message arrives… *bam*, your workflow fires up.\n\n### Connect Your Gmail Account\n- In n8n, add a **Gmail Trigger** node.  \n- Click **Credential to connect with** and select your Gmail account.  \n- If you haven’t done it yet, click **Add new**, connect your Google account, and allow access.  \nPro tip: don’t worry, it won’t read your personal emails to gossip — everything stays inside your workflow.  \n\n### Basic Settings\n- **Poll Times**: select `Every Minute`.  \n   → This way, n8n checks your inbox every minute.  \n- **Mode**: `Message Received`.  \n   → You want the flow to trigger whenever a customer writes to you.  \n- **Event**: `Message Received`.  \n   → Same logic, keep it simple.  \n- **Simplify**: turn it off (`OFF`).  \n   → Why? Because if you enable \"Simplify,\" you only get a stripped-down version of the email. And you want it all: subject, sender, raw message… the full package.  \n\n### Expected Output\nWhen you execute the node, you should see:  \n- **id**: unique identifier of the email.  \n- **threadId**: conversation identifier (super useful to reply in the same thread).  \n- **snippet**: a short preview of the email (first lines).  \n- **From**: your customer’s email address.  \n- **To**: your email address.  \n- **Subject**: the subject of the email.  \n- **payload**: the full body of the email (yep, in base64 — but we’ll handle that later).  \n\nAnd that’s it — your Gmail Trigger is set up. In short, the moment a customer writes “Hey, I have an issue with my account,” your workflow kicks in instantly (well, almost — it checks every minute).  \n\n## 2. Set Up the AI Agent in n8n\n\n![sauvegarderemailsreponsesairtablen8n.png](fileId:2646)\n\nAfter configuring your **Gmail Trigger** (which captures incoming customer emails), you now need a **brain** to take over, analyze the email, and draft a reply.  \nThat’s where the **AI Agent node** comes in.\n\n### Its Role\nThe **AI Agent** node is used to:  \n- Read the email content (via the Gmail Trigger).  \n- Understand the context and tone of the customer.  \n- Generate a clear, concise, and human-like response.  \n- Prepare a personalized reply that will later be sent back via Gmail and stored in Airtable.  \n\nIn short, it’s your **24/7 support colleague**, but coded as a bot.  \n\n---\n\n### How to Configure It\n- **Source for Prompt (User Message)** → choose `Define below`.  \n- **Prompt (User Message)** → describe your business and role as if you were training an intern.  \n  Example: *“You are an AI support agent for a company that sells solar panels. You respond to technical requests, quotes, and customer questions. Your replies must be short, clear, friendly, and precise.”*  \n- **Chat Model** → connect your AI model (e.g. OpenAI GPT-4.1 Mini).  \n- **Memory (optional but recommended)** → connect a **Conversation Memory** node.  \n  → This allows the AI to retain conversation history and better understand follow-ups.  \n\n---\n\n### Expected Output\nWhen you run this node, you should see in the output:  \n- A field `output` containing the automatically generated AI reply.  \n- The text should be short, natural, and adapted to the customer’s tone (casual or formal).  \n\n👉 With the Gmail Trigger you capture emails, and with the AI Agent you get a reply ready to send — as if you had written it yourself.  \n\n## 3. Save Emails and Responses in Airtable\n\nNow that your **AI Agent** generates replies, you need to store them somewhere to keep a clear record of all interactions.  \nThat’s where **Airtable** comes in.\n\n### Quick Reminder\nYou’ve already copied my ready-to-use Airtable base:  \n👉 [Access the base](https://airtable.com/invite/l?inviteId=invnYug7i1yK7gqd4&inviteToken=9cd007631d148208bf689d2af7fd95039839ca775a18ad434918652ea370b86e&utm_medium=email&utm_source=product_team&utm_content=transactional-alerts)\n\nThis base contains a table **Email Support Logs** with the following columns:  \n- **Subject**  \n- **Date**  \n- **Customer Email**  \n- **Message**  \n- **AI Response**  \n\n---\n\n### How to Connect Airtable in n8n\n1. Add an **Airtable** node right after your **AI Agent**.  \n2. Under **Operation**, select `Create`.  \n3. In **Base** → choose **BASE AGENT IA EMAIL**.  \n4. In **Table** → select **Email Support Logs**.  \n\n---\n\n### Map the Correct Values\nThen, link the fields as follows:  \n- **Subject** → `{{ $('Email Received').item.json.Subject }}`  \n- **Customer Email** → `{{ $('Email Received').item.json.From }}`  \n- **Message** → `{{ $('Email Received').item.json.snippet }}`  \n- **AI Response** → `{{ $('AI Agent').item.json.output }}`  \n- **Date** → `{{ $now }}`  \n\n---\n\n### Expected Output\nFor each new email received:  \n- Gmail captures the email.  \n- Your AI drafts the reply.  \n- All details (email, sender, subject, reply) are automatically stored in your Airtable base.  \n\n👉 You now have a fully automated **customer support log**.  \n\n## 4. Automatically Reply to the Customer in Gmail\n\nNow that you’re storing each interaction in Airtable, it’s time to **send your AI’s reply directly back to the customer**.  \nThis closes the loop: customer writes → AI replies → everything gets logged in Airtable.\n\n### Add the Gmail Reply Node\n1. Add a **Gmail** node right after your **AI Agent** (or after Airtable if you prefer logging before replying).  \n2. Under **Operation**, select `Reply`.  \n3. Connect your Gmail account (same credential as your Gmail Trigger).  \n\n### Configure the Reply\n- **Thread ID** → `{{ $('Email Received').item.json.threadId }}`  \n   → Ensures the reply is sent in the same conversation thread.  \n- **To** → `{{ $('Email Received').item.json.From }}`  \n   → Customer’s email address.  \n- **Subject** → `Re: {{ $('Email Received').item.json.Subject }}`  \n   → The \"Re:\" keeps the continuity of the conversation.  \n- **Message Body** → `{{ $('AI Agent').item.json.output }}`  \n   → This is the text automatically generated by your AI.  \n\n---\n\n### Expected Output\nWhen a customer sends an email:  \n- Gmail Trigger captures the message.  \n- The AI Agent generates a tailored reply.  \n- Airtable logs the full interaction.  \n- Gmail automatically sends the response in the same conversation thread.  \n\nYour customer receives a **quick, personalized, and natural reply** without you typing a single word.  \n\n👉 You now have a **complete support agent**: listen, analyze, log, reply.  \n\nWant to save hours each week? Visit [Agence automatisation 0vni](https://www.0vni.fr/).",
+  "featuredImage": "/data/workflows/8676/8676.webp",
+  "author": {
+    "id": 101,
+    "slug": "baptistefort",
+    "name": "Baptiste Fort",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 541,
+  "downloads": 54,
+  "createdAt": "2025-09-17T11:57:27.423Z",
+  "updatedAt": "2026-01-16T08:57:09.296Z",
+  "publishedAt": "2025-09-17T11:57:27.423Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8676",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatically reply to customer emails with Airtable, Gmail, and GPT-4.1 Mini",
+    "workflowName": "Automatically reply to customer emails with Airtable, Gmail, and GPT-4.1 Mini",
+    "description": "# Automatically Reply to Customer Emails with Airtable, Gmail, and OpenAI\n![repondreautomatiquementemailsn8nairtablegmailopenai.png](fileId:2643)\n## Introduction\n\nThis guide walks you step by step through setting up an automated agent that:\n- Receives emails sent by your customers.  \n- Analyzes the content of the email.  \n- Generates an appropriate response using an AI model (OpenAI GPT).  \n- Stores all information (received email, AI response, date, customer email) in Airtable.  \n- Automatically replies to the customer in the same Gmail thread.  \n\n---\n\n## Prerequisites\n\nBefore you start, you’ll need:  \n- A [Gmail](https://mail.google.com) account connected to n8n.  \n- An [Airtable](https://airtable.com) account.  \n- An [n8n](https://n8n.io) instance (cloud or self-hosted).  \n- An [OpenAI](https://platform.openai.com) API key.  \n\n---\n\n## Prepare the Airtable Base\n\n![Baseairtable.png](fileId:2645)\n\nNo need to build everything from scratch — here’s a ready-to-use base you can copy:  \n👉 [Open the Airtable base](https://airtable.com/invite/l?inviteId=invnYug7i1yK7gqd4&inviteToken=9cd007631d148208bf689d2af7fd95039839ca775a18ad434918652ea370b86e&utm_medium=email&utm_source=product_team&utm_content=transactional-alerts)\n\nIt already contains the following structure:  \n- **Subject** (text) → email subject.  \n- **Date** (date/time) → date of reception.  \n- **Customer Email** (text) → customer’s email address.  \n- **Message** (long text) → body of the received email.  \n- **AI Response** (long text) → AI-generated reply.  \n\nYou can reuse it as it is or duplicate it into your Airtable account.  \n\n## 1. Set Up Gmail Trigger in n8n\n\n![automatisationsupportclientn8nairtablegmail.png](fileId:2644)\n\nAlright, now that we have our Airtable base ready, we need to capture customer emails.  \nThat’s the job of the **Gmail Trigger**. Basically, this node lies in wait inside your inbox, and as soon as a new message arrives… *bam*, your workflow fires up.\n\n### Connect Your Gmail Account\n- In n8n, add a **Gmail Trigger** node.  \n- Click **Credential to connect with** and select your Gmail account.  \n- If you haven’t done it yet, click **Add new**, connect your Google account, and allow access.  \nPro tip: don’t worry, it won’t read your personal emails to gossip — everything stays inside your workflow.  \n\n### Basic Settings\n- **Poll Times**: select `Every Minute`.  \n   → This way, n8n checks your inbox every minute.  \n- **Mode**: `Message Received`.  \n   → You want the flow to trigger whenever a customer writes to you.  \n- **Event**: `Message Received`.  \n   → Same logic, keep it simple.  \n- **Simplify**: turn it off (`OFF`).  \n   → Why? Because if you enable \"Simplify,\" you only get a stripped-down version of the email. And you want it all: subject, sender, raw message… the full package.  \n\n### Expected Output\nWhen you execute the node, you should see:  \n- **id**: unique identifier of the email.  \n- **threadId**: conversation identifier (super useful to reply in the same thread).  \n- **snippet**: a short preview of the email (first lines).  \n- **From**: your customer’s email address.  \n- **To**: your email address.  \n- **Subject**: the subject of the email.  \n- **payload**: the full body of the email (yep, in base64 — but we’ll handle that later).  \n\nAnd that’s it — your Gmail Trigger is set up. In short, the moment a customer writes “Hey, I have an issue with my account,” your workflow kicks in instantly (well, almost — it checks every minute).  \n\n## 2. Set Up the AI Agent in n8n\n\n![sauvegarderemailsreponsesairtablen8n.png](fileId:2646)\n\nAfter configuring your **Gmail Trigger** (which captures incoming customer emails), you now need a **brain** to take over, analyze the email, and draft a reply.  \nThat’s where the **AI Agent node** comes in.\n\n### Its Role\nThe **AI Agent** node is used to:  \n- Read the email content (via the Gmail Trigger).  \n- Understand the context and tone of the customer.  \n- Generate a clear, concise, and human-like response.  \n- Prepare a personalized reply that will later be sent back via Gmail and stored in Airtable.  \n\nIn short, it’s your **24/7 support colleague**, but coded as a bot.  \n\n---\n\n### How to Configure It\n- **Source for Prompt (User Message)** → choose `Define below`.  \n- **Prompt (User Message)** → describe your business and role as if you were training an intern.  \n  Example: *“You are an AI support agent for a company that sells solar panels. You respond to technical requests, quotes, and customer questions. Your replies must be short, clear, friendly, and precise.”*  \n- **Chat Model** → connect your AI model (e.g. OpenAI GPT-4.1 Mini).  \n- **Memory (optional but recommended)** → connect a **Conversation Memory** node.  \n  → This allows the AI to retain conversation history and better understand follow-ups.  \n\n---\n\n### Expected Output\nWhen you run this node, you should see in the output:  \n- A field `output` containing the automatically generated AI reply.  \n- The text should be short, natural, and adapted to the customer’s tone (casual or formal).  \n\n👉 With the Gmail Trigger you capture emails, and with the AI Agent you get a reply ready to send — as if you had written it yourself.  \n\n## 3. Save Emails and Responses in Airtable\n\nNow that your **AI Agent** generates replies, you need to store them somewhere to keep a clear record of all interactions.  \nThat’s where **Airtable** comes in.\n\n### Quick Reminder\nYou’ve already copied my ready-to-use Airtable base:  \n👉 [Access the base](https://airtable.com/invite/l?inviteId=invnYug7i1yK7gqd4&inviteToken=9cd007631d148208bf689d2af7fd95039839ca775a18ad434918652ea370b86e&utm_medium=email&utm_source=product_team&utm_content=transactional-alerts)\n\nThis base contains a table **Email Support Logs** with the following columns:  \n- **Subject**  \n- **Date**  \n- **Customer Email**  \n- **Message**  \n- **AI Response**  \n\n---\n\n### How to Connect Airtable in n8n\n1. Add an **Airtable** node right after your **AI Agent**.  \n2. Under **Operation**, select `Create`.  \n3. In **Base** → choose **BASE AGENT IA EMAIL**.  \n4. In **Table** → select **Email Support Logs**.  \n\n---\n\n### Map the Correct Values\nThen, link the fields as follows:  \n- **Subject** → `{{ $('Email Received').item.json.Subject }}`  \n- **Customer Email** → `{{ $('Email Received').item.json.From }}`  \n- **Message** → `{{ $('Email Received').item.json.snippet }}`  \n- **AI Response** → `{{ $('AI Agent').item.json.output }}`  \n- **Date** → `{{ $now }}`  \n\n---\n\n### Expected Output\nFor each new email received:  \n- Gmail captures the email.  \n- Your AI drafts the reply.  \n- All details (email, sender, subject, reply) are automatically stored in your Airtable base.  \n\n👉 You now have a fully automated **customer support log**.  \n\n## 4. Automatically Reply to the Customer in Gmail\n\nNow that you’re storing each interaction in Airtable, it’s time to **send your AI’s reply directly back to the customer**.  \nThis closes the loop: customer writes → AI replies → everything gets logged in Airtable.\n\n### Add the Gmail Reply Node\n1. Add a **Gmail** node right after your **AI Agent** (or after Airtable if you prefer logging before replying).  \n2. Under **Operation**, select `Reply`.  \n3. Connect your Gmail account (same credential as your Gmail Trigger).  \n\n### Configure the Reply\n- **Thread ID** → `{{ $('Email Received').item.json.threadId }}`  \n   → Ensures the reply is sent in the same conversation thread.  \n- **To** → `{{ $('Email Received').item.json.From }}`  \n   → Customer’s email address.  \n- **Subject** → `Re: {{ $('Email Received').item.json.Subject }}`  \n   → The \"Re:\" keeps the continuity of the conversation.  \n- **Message Body** → `{{ $('AI Agent').item.json.output }}`  \n   → This is the text automatically generated by your AI.  \n\n---\n\n### Expected Output\nWhen a customer sends an email:  \n- Gmail Trigger captures the message.  \n- The AI Agent generates a tailored reply.  \n- Airtable logs the full interaction.  \n- Gmail automatically sends the response in the same conversation thread.  \n\nYour customer receives a **quick, personalized, and natural reply** without you typing a single word.  \n\n👉 You now have a **complete support agent**: listen, analyze, log, reply.  \n\nWant to save hours each week? Visit [Agence automatisation 0vni](https://www.0vni.fr/).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Email Reçu",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Réponse envoyée au client GPT4.1 MINI",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sauvegarde dans Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Répondre au Client",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Mémoire des Conversations",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "id": 8523,
+  "slug": "8523",
+  "title": "Personalized sales outreach with Apollo, GPT, and Gmail automation",
+  "description": "This n8n template shows you how to turn outbound sales into a fully automated machine: scrape verified leads, research them with AI, and fire off personalized cold emails while you sleep.\n\nUse cases are simple: scale B2B lead gen without hiring more SDRs, run targeted outreach campaigns that don’t feel generic, and give founders or agencies a repeatable system that books more calls with less effort.\n\n**Good to know**\n- At time of writing, each AI call may incur costs depending on your OpenAI plan.\n- This workflow uses Apollo/Apify for lead scraping, which requires an active token.\n- Telegram approval flow is optional but recommended for quality control.\n\n**How it works**\n- Define your ICP (role, location, industry) in the workflow.\n- Generate Apollo search URLs and scrape verified contacts.\n- AI enriches leads with personal + company research.\n- Hormozi-style cold emails are generated and queued for approval.\n- Approve drafts in Telegram, then Gmail automatically sends them out.\n\n**How to use**\n- Start with the included Schedule Trigger or replace with a Webhook/Form trigger.\n- Adjust ICP settings in the Set node to fit your target audience.\n- Test with a small batch of leads before scaling to larger runs.\n\n**Requirements**\n- Google Sheets, Docs, Drive, and Gmail connected to n8n\n- Apollo/Apify account and token\n- OpenAI API key\n- Telegram bot for approvals\n\n**Customising this workflow**\n- Swap Apollo scraping with another data source if needed.\n- Adapt the AI prompt for a different email tone (formal, friendly, etc.).\n- Extend with a CRM integration to sync approved leads and outreach results.",
+  "featuredImage": "/data/workflows/8523/8523.webp",
+  "author": {
+    "id": 101,
+    "slug": "tamasdemeter",
+    "name": "Tamas Demeter",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 381,
+  "downloads": 38,
+  "createdAt": "2025-09-12T13:03:00.995Z",
+  "updatedAt": "2026-01-16T08:56:19.128Z",
+  "publishedAt": "2025-09-12T13:03:00.995Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8523",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Personalized sales outreach with Apollo, GPT, and Gmail automation",
+    "workflowName": "Personalized sales outreach with Apollo, GPT, and Gmail automation",
+    "description": "This n8n template shows you how to turn outbound sales into a fully automated machine: scrape verified leads, research them with AI, and fire off personalized cold emails while you sleep.\n\nUse cases are simple: scale B2B lead gen without hiring more SDRs, run targeted outreach campaigns that don’t feel generic, and give founders or agencies a repeatable system that books more calls with less effort.\n\n**Good to know**\n- At time of writing, each AI call may incur costs depending on your OpenAI plan.\n- This workflow uses Apollo/Apify for lead scraping, which requires an active token.\n- Telegram approval flow is optional but recommended for quality control.\n\n**How it works**\n- Define your ICP (role, location, industry) in the workflow.\n- Generate Apollo search URLs and scrape verified contacts.\n- AI enriches leads with personal + company research.\n- Hormozi-style cold emails are generated and queued for approval.\n- Approve drafts in Telegram, then Gmail automatically sends them out.\n\n**How to use**\n- Start with the included Schedule Trigger or replace with a Webhook/Form trigger.\n- Adjust ICP settings in the Set node to fit your target audience.\n- Test with a small batch of leads before scaling to larger runs.\n\n**Requirements**\n- Google Sheets, Docs, Drive, and Gmail connected to n8n\n- Apollo/Apify account and token\n- OpenAI API key\n- Telegram bot for approvals\n\n**Customising this workflow**\n- Swap Apollo scraping with another data source if needed.\n- Adapt the AI prompt for a different email tone (formal, friendly, etc.).\n- Extend with a CRM integration to sync approved leads and outreach results.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "scrapeLeads",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "getLeads",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "cleanHTML",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "getCompany",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "copyTable",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "urlGenerator",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "addLeads",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "setICP",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "setEmail",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "personal Research",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "company Research",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "personal Message",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "sendEmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "subjectLine",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Limit leads to 10",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Approved Emails",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Loop Leads",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Trigger: Daily Lead Scraping",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Trigger: Daily Research Run",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Trigger: Approved Email Send",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update Lead Record",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Pull Service Document",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get approved leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Limit leads to research",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scraping setup",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Lead setup",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Email setup",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

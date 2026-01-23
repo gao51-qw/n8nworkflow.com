@@ -154,10 +154,10 @@ export interface LoadMoreParams {
   type?: 'all' | 'popular' | 'recent';
   category?: string;
   author?: string;
-  complexity?: ComplexityLevel;
+  complexity?: string;
   sort?: 'date-desc' | 'date-asc' | 'visitors-desc' | 'downloads-desc';
-  price?: 'all' | 'free' | 'paid';
-  time?: 'all' | 'today' | 'week' | 'month';
+  price?: string;
+  time?: string;
   offset: number;
   limit: number;
 }
@@ -192,6 +192,7 @@ export interface Stats {
   totalCategories: number;
   totalDownloads: number;
   recentWorkflows: number; // 最近 30 天
+  lastUpdatedAt?: string; // 最后更新时间
 }
 
 /**

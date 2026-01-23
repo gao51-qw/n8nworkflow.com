@@ -1,0 +1,163 @@
+{
+  "id": 4923,
+  "slug": "4923",
+  "title": "Automatic backup of workflows to GitHub with email/telegram notifications",
+  "description": "# Why?\n\nHave you ever updated your n8n instance, or moved from one instance to the other and lost all your workflows? I suggest NOT DOING THAT! Especially if you have very complex workflows that would take days to recreate.\n\nMake sure you have a backup process in place!\n\n# How it works\n\n1. Get all workflows from an n8n instance using your n8n API\n2. Formats the workflows cleanly\n3. Creates a backup package\n4. Checks if target GitHub repository exists, if not creates it\n5. Uploads a manifest\n6. Uploads a readme\n7. Uploads your workflows as separate JSON files\n8. Sends a summary to your choice (Telegram or GMAIL)\n\n# What it does\n- Backs up all your workflows\n- Splits them out into separate JSON files for each workflow\n- Sends a notification\n\n# What it doesn't do\n\n- Does not back up credentials (not smart for security reasons)\n- Does not delete old backups\n\n# Requirements\n- n8n\n- n8n API setup with credentials stored in instance you are running this from\n- GitHub user & API (with repository rights) setup (API key in Github, Credentials in n8n)\n# Future Updates\n\nIf I get requests for these features I would build them:\n\n- Rolling backups (delete further back than 3 days)\n- Logic to skip the backup if nothing changed",
+  "featuredImage": "/data/workflows/4923/4923.webp",
+  "author": {
+    "id": 101,
+    "slug": "buildscool",
+    "name": "Builds.Cool",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 272,
+  "downloads": 27,
+  "createdAt": "2025-06-13T13:41:15.736Z",
+  "updatedAt": "2026-01-16T08:36:56.173Z",
+  "publishedAt": "2025-06-13T13:41:15.736Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4923",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatic backup of workflows to GitHub with email/telegram notifications",
+    "workflowName": "Automatic backup of workflows to GitHub with email/telegram notifications",
+    "description": "# Why?\n\nHave you ever updated your n8n instance, or moved from one instance to the other and lost all your workflows? I suggest NOT DOING THAT! Especially if you have very complex workflows that would take days to recreate.\n\nMake sure you have a backup process in place!\n\n# How it works\n\n1. Get all workflows from an n8n instance using your n8n API\n2. Formats the workflows cleanly\n3. Creates a backup package\n4. Checks if target GitHub repository exists, if not creates it\n5. Uploads a manifest\n6. Uploads a readme\n7. Uploads your workflows as separate JSON files\n8. Sends a summary to your choice (Telegram or GMAIL)\n\n# What it does\n- Backs up all your workflows\n- Splits them out into separate JSON files for each workflow\n- Sends a notification\n\n# What it doesn't do\n\n- Does not back up credentials (not smart for security reasons)\n- Does not delete old backups\n\n# Requirements\n- n8n\n- n8n API setup with credentials stored in instance you are running this from\n- GitHub user & API (with repository rights) setup (API key in Github, Credentials in n8n)\n# Future Updates\n\nIf I get requests for these features I would build them:\n\n- Rolling backups (delete further back than 3 days)\n- Logic to skip the backup if nothing changed",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create_Backup_Package",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get_Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Check_Repository_Exists",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "If_Repo_Not_Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Clean_Workflows",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create_Repository",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split_Workflow_Files",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Backup_Complete_Summary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload_Workflow_Files",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Upload_README",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Upload_Manifest",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Loop_Workflow_Uploads",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Send_Backup_Notification",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Backup_Config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail - Notification",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

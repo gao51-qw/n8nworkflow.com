@@ -1,0 +1,241 @@
+{
+  "id": 10179,
+  "slug": "10179",
+  "title": "Build a complete email CRM with Google Sheets & MailerSend",
+  "description": "## ✉️ Automate MailerSend Email (Google Sheets)\n\n---\n\n### 🌐 Overview\nThis workflow converts **Google Sheets into a full Email CRM** — no HubSpot or Customer.io needed!  \nIt automates segmentation, sending, validation, and delivery tracking using:\n\n✅ Google Sheets → CDP + Email Performance DB  \n✅ MailerSend → Email Template Delivery  \n✅ n8n → Automation + Logic + Scheduling\n\nIt automatically:\n• Reads subscribers from a selected segment sheet  \n• Validates email + checks for disposable domains  \n• Sends a MailerSend email template  \n• Updates send status + delivery result in Sheets\n\nPerfect for onboarding emails, promo campaigns, retention flows, newsletters & more!\n\n---\n\n### ✅ Key Features\n• 🎯 Unlimited audience segments  \n• 🚫 Deduplication system per execution  \n• 🛡️ Disposable email filtering  \n• 🔄 Automatic recurring runs (every 30 minutes)  \n• 🧩 Template-based personalization (name, codes, journey)  \n• 📊 Real-time delivery tracking + analytics-ready data  \n• 🔐 Zero CRM vendor lock-in  \n\n---\n\n### 📊 Database Sheets (Google Sheets Required)\n\nUse this database template:  \n🔗 https://docs.google.com/spreadsheets/d/17KqltP-NqchPhZV7gk6QToqCZX6IiA5EBkDCBNsIX_0/edit?usp=sharing\n\n| Sheet Name | Purpose | Required Fields |\n|-----------|---------|----------------|\n| `template` | Campaign configuration | Id, template_name, journey, type, type_template_id, discount_code |\n| `segment1` / `segment2` | Audience lists | user_id, email, first_name, number |\n| `transaction` | Status + results history | user_id, status, sent_result, sent_at, template_name |\n\n### transaction\n| CreatedAt                        | UpdatedAt                        | user_id         | email                   | number      | first_name | status     | database_id | type  | template_id | type_template_id   | template_name   | journey | discount_code | gift_code |\n|----------------------------------|----------------------------------|-----------------|------------------------|-------------|------------|------------|-------------|------|-------------|-------------------|-----------------|---------|---------------|-----------|\n| 2025-10-25T13:11:41.567-04:00    | 2025-10-25T13:11:41.567-04:00    | uid_0000000001  | nimasalimi42@gmail.com | 9362000000  | Liam       | 1-sending  | segment1    | email | 1           | v28xxl2sq8dg785k  | SMS-TEST        | Test    | disxxx        |           |\n| 2025-10-25T13:11:41.567-04:00    | 2025-10-25T13:11:41.567-04:00    | uid_0000000002  | user2@gmail.com        | 9362000001  | Noah       | 1-sending  | segment1    | email | 1           | v28xxl2sq8dg785k  | SMS-TEST        | Test    | disxxx        |           |\n| 2025-10-25T13:11:41.567-04:00    | 2025-10-25T13:11:41.567-04:00    | uid_0000000003  | user3@gmail.com        | 9362000002  | Oliver     | 1-sending  | segment1    | email | 1           | v28xxl2sq8dg785k  | SMS-TEST        | Test    | disxxx        |           |\n\n## template\n| Id | template_name              | journey        | database_id | type  | type_template_id   | discount_code | gift_code |\n|----|---------------------------|----------------|-------------|------|-------------------|---------------|-----------|\n| 3  | Order-Confirmation        | Order          | segment3    | email | v28xxl2sq8dg785k  | discount2     |           |\n| 4  | Shipping-Notification     | Notification   | segment4    | email | v28xxl2sq8dg785c  | discount3     |           |\n| 5  | Add-to-Cart-day1          | Add-to-Car     | segment5    | email | v28xxl2sq8dg785d  | discount4     |           |\n| 6  | Welcome-New-Customer      | Welcome        | segment6    | email | v28xxl2sq8dg785s  | discount5     |           |\n| 7  | Churn-Pro-Plan            | Churn          | segment7    | email | v28xxl2sq8dg785g  | proxc         |           |\n| 8  | Churn-Pro-Plan-1day-ago   | Churn          | segment8    | email | v28xxl2sq8dg785h  |               | shipx     |\n\n## segment1\n| user_id         | email                   | number        | first_name | database_id |\n|-----------------|-------------------------|--------------|------------|-------------|\n| uid_0000000001  | nimasalimi42@gmail.com  | 09362000000  | Liam       | segment1    |\n| uid_0000000002  | user2@gmail.com         | 09362000001  | Noah       | segment1    |\n| uid_0000000003  | user3@gmail.com         | 09362000002  | Oliver     | segment1    |\n| uid_0000000004  | user4@gmail.com         | 09362000003  | Elijah     | segment1    |\n| uid_0000000005  | user5@gmail.com         | 09362000004  | James      | segment1    |\n\n\n📌 Add more segments simply by creating new sheets (segment3, segment4...)  \n📌 Change campaign by updating `template_id` in Setup Flow node  \n\n---\n\n### 👤 Who’s it for?\n• Ecommerce email retention teams  \n• SaaS CRM automation operators  \n• Digital marketing & lifecycle pros  \n• Agencies running multi-brand campaigns  \n• No-code builders who want scalable CRM logic\n\n---\n\n### ⚙️ Automations Included\n\n#### Flow 1 — Insert Users (Triggered on schedule)\n• Pull users from selected segment tab  \n• Insert into transaction sheet  \n• Status: `0-processing` → `1-sending`  \n• Prevent duplicate sending ✅\n\n#### Flow 2 — Send Emails (Runs every 30 min)\n• Selects “ready” users (`1-sending`)  \n• Checks:\n  - Missing email → `3-no-email`\n  - Disposable → `4-disposal-email`\n• Sends via MailerSend template ID in sheet  \n• Updates status → `2-sent` + message result\n\n🎯 Your entire CRM sending logic runs automatically every day\n\n---\n\n### 🧠 Personalization Support\nAvailable merge-fields:\n• `first_name`  \n• `discount_code`  \n• `gift_code`  \n(Modify jsonBody to add more!)\n\n---\n\n### 🔐 MailerSend Setup Required\nInside MailerSend node:\n- Replace “info@example.com” with your verified sender email ✅\n\nYou must:\n✔ Verify domain  \n✔ Approve sender email  \n✔ Copy correct template ID → Google Sheet  \n\n---\n\n### 💡 Optional Enhancements\n• Slack alerts for failed sends  \n• Connect Looker Studio for dashboards  \n• Add SMS / WhatsApp parallel flows  \n• A/B test templates by duplicating rows  \n• Add AI for subject optimization or copy rewrite\n\n---\n\n### 📺 Connect With Me\nMore workflows, CRM strategy & AI marketing automation 👇  \nLinkedIn: https://linkedin.com/in/nima-salimi-a655a6231  \n\nFollow & ⭐️ this template if it helped you 🚀\n",
+  "featuredImage": "/data/workflows/10179/10179.webp",
+  "author": {
+    "id": 101,
+    "slug": "salimi",
+    "name": "Nima Salimi",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 116,
+  "downloads": 11,
+  "createdAt": "2025-10-25T18:46:38.370Z",
+  "updatedAt": "2026-01-16T09:03:51.504Z",
+  "publishedAt": "2025-10-25T18:46:38.370Z",
+  "nodes": 34,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10179",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a complete email CRM with Google Sheets & MailerSend",
+    "workflowName": "Build a complete email CRM with Google Sheets & MailerSend",
+    "description": "## ✉️ Automate MailerSend Email (Google Sheets)\n\n---\n\n### 🌐 Overview\nThis workflow converts **Google Sheets into a full Email CRM** — no HubSpot or Customer.io needed!  \nIt automates segmentation, sending, validation, and delivery tracking using:\n\n✅ Google Sheets → CDP + Email Performance DB  \n✅ MailerSend → Email Template Delivery  \n✅ n8n → Automation + Logic + Scheduling\n\nIt automatically:\n• Reads subscribers from a selected segment sheet  \n• Validates email + checks for disposable domains  \n• Sends a MailerSend email template  \n• Updates send status + delivery result in Sheets\n\nPerfect for onboarding emails, promo campaigns, retention flows, newsletters & more!\n\n---\n\n### ✅ Key Features\n• 🎯 Unlimited audience segments  \n• 🚫 Deduplication system per execution  \n• 🛡️ Disposable email filtering  \n• 🔄 Automatic recurring runs (every 30 minutes)  \n• 🧩 Template-based personalization (name, codes, journey)  \n• 📊 Real-time delivery tracking + analytics-ready data  \n• 🔐 Zero CRM vendor lock-in  \n\n---\n\n### 📊 Database Sheets (Google Sheets Required)\n\nUse this database template:  \n🔗 https://docs.google.com/spreadsheets/d/17KqltP-NqchPhZV7gk6QToqCZX6IiA5EBkDCBNsIX_0/edit?usp=sharing\n\n| Sheet Name | Purpose | Required Fields |\n|-----------|---------|----------------|\n| `template` | Campaign configuration | Id, template_name, journey, type, type_template_id, discount_code |\n| `segment1` / `segment2` | Audience lists | user_id, email, first_name, number |\n| `transaction` | Status + results history | user_id, status, sent_result, sent_at, template_name |\n\n### transaction\n| CreatedAt                        | UpdatedAt                        | user_id         | email                   | number      | first_name | status     | database_id | type  | template_id | type_template_id   | template_name   | journey | discount_code | gift_code |\n|----------------------------------|----------------------------------|-----------------|------------------------|-------------|------------|------------|-------------|------|-------------|-------------------|-----------------|---------|---------------|-----------|\n| 2025-10-25T13:11:41.567-04:00    | 2025-10-25T13:11:41.567-04:00    | uid_0000000001  | nimasalimi42@gmail.com | 9362000000  | Liam       | 1-sending  | segment1    | email | 1           | v28xxl2sq8dg785k  | SMS-TEST        | Test    | disxxx        |           |\n| 2025-10-25T13:11:41.567-04:00    | 2025-10-25T13:11:41.567-04:00    | uid_0000000002  | user2@gmail.com        | 9362000001  | Noah       | 1-sending  | segment1    | email | 1           | v28xxl2sq8dg785k  | SMS-TEST        | Test    | disxxx        |           |\n| 2025-10-25T13:11:41.567-04:00    | 2025-10-25T13:11:41.567-04:00    | uid_0000000003  | user3@gmail.com        | 9362000002  | Oliver     | 1-sending  | segment1    | email | 1           | v28xxl2sq8dg785k  | SMS-TEST        | Test    | disxxx        |           |\n\n## template\n| Id | template_name              | journey        | database_id | type  | type_template_id   | discount_code | gift_code |\n|----|---------------------------|----------------|-------------|------|-------------------|---------------|-----------|\n| 3  | Order-Confirmation        | Order          | segment3    | email | v28xxl2sq8dg785k  | discount2     |           |\n| 4  | Shipping-Notification     | Notification   | segment4    | email | v28xxl2sq8dg785c  | discount3     |           |\n| 5  | Add-to-Cart-day1          | Add-to-Car     | segment5    | email | v28xxl2sq8dg785d  | discount4     |           |\n| 6  | Welcome-New-Customer      | Welcome        | segment6    | email | v28xxl2sq8dg785s  | discount5     |           |\n| 7  | Churn-Pro-Plan            | Churn          | segment7    | email | v28xxl2sq8dg785g  | proxc         |           |\n| 8  | Churn-Pro-Plan-1day-ago   | Churn          | segment8    | email | v28xxl2sq8dg785h  |               | shipx     |\n\n## segment1\n| user_id         | email                   | number        | first_name | database_id |\n|-----------------|-------------------------|--------------|------------|-------------|\n| uid_0000000001  | nimasalimi42@gmail.com  | 09362000000  | Liam       | segment1    |\n| uid_0000000002  | user2@gmail.com         | 09362000001  | Noah       | segment1    |\n| uid_0000000003  | user3@gmail.com         | 09362000002  | Oliver     | segment1    |\n| uid_0000000004  | user4@gmail.com         | 09362000003  | Elijah     | segment1    |\n| uid_0000000005  | user5@gmail.com         | 09362000004  | James      | segment1    |\n\n\n📌 Add more segments simply by creating new sheets (segment3, segment4...)  \n📌 Change campaign by updating `template_id` in Setup Flow node  \n\n---\n\n### 👤 Who’s it for?\n• Ecommerce email retention teams  \n• SaaS CRM automation operators  \n• Digital marketing & lifecycle pros  \n• Agencies running multi-brand campaigns  \n• No-code builders who want scalable CRM logic\n\n---\n\n### ⚙️ Automations Included\n\n#### Flow 1 — Insert Users (Triggered on schedule)\n• Pull users from selected segment tab  \n• Insert into transaction sheet  \n• Status: `0-processing` → `1-sending`  \n• Prevent duplicate sending ✅\n\n#### Flow 2 — Send Emails (Runs every 30 min)\n• Selects “ready” users (`1-sending`)  \n• Checks:\n  - Missing email → `3-no-email`\n  - Disposable → `4-disposal-email`\n• Sends via MailerSend template ID in sheet  \n• Updates status → `2-sent` + message result\n\n🎯 Your entire CRM sending logic runs automatically every day\n\n---\n\n### 🧠 Personalization Support\nAvailable merge-fields:\n• `first_name`  \n• `discount_code`  \n• `gift_code`  \n(Modify jsonBody to add more!)\n\n---\n\n### 🔐 MailerSend Setup Required\nInside MailerSend node:\n- Replace “info@example.com” with your verified sender email ✅\n\nYou must:\n✔ Verify domain  \n✔ Approve sender email  \n✔ Copy correct template ID → Google Sheet  \n\n---\n\n### 💡 Optional Enhancements\n• Slack alerts for failed sends  \n• Connect Looker Studio for dashboards  \n• Add SMS / WhatsApp parallel flows  \n• A/B test templates by duplicating rows  \n• Add AI for subject optimization or copy rewrite\n\n---\n\n### 📺 Connect With Me\nMore workflows, CRM strategy & AI marketing automation 👇  \nLinkedIn: https://linkedin.com/in/nima-salimi-a655a6231  \n\nFollow & ⭐️ this template if it helped you 🚀",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Setup Flow",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Template",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "IF Template Parameters OK",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "IF user_id is not empty",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IF Type Email",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If email is not empty",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Disposal Check",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get user_id from cdp",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Add records By Status Processing",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Insert Data By Status Processing",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Change Status to Sending",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Insert Data By Status Sending",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "No Email Update",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Disposal Email Update",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Update Status: 2-Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Get all flow templates from Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send an template HTML Mailerlite",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

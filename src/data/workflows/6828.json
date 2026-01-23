@@ -1,0 +1,163 @@
+{
+  "id": 6828,
+  "slug": "6828",
+  "title": "Prevent duplicate processing with Redis item state tracking",
+  "description": "I built this tool because we faced a real, recurring problem: managing hundreds of client projects in a weekly automated loop. \n\nThere was a time when a single error in that process could create a complete data mess, forcing us to manually clean and re-run everything. The Item Tracker was our solution. \n\nIt proved that something simple, when used correctly, can be a game-changer for maintaining order and reliability in your workflows (at least it was for us).\n\n---\n\n### How the System Works: A Story of Order from Chaos\n\nOur main automation, which fetches and summarizes data, is where the heavy lifting happens. But its newfound stability comes from a simple, critical collaboration with the Item Tracker. It's like a two-step handshake that happens for every single project.\n\n* Our main workflow starts by getting a long list of active projects.\n* For each project, it first asks the Item Tracker: \"Is this one already being worked on?\"\n* If the answer is no, the Item Tracker immediately puts a temporary \"in-progress\" note on the project\n* Once our main workflow successfully completes its task for that project, it tells the Item Tracker to remove the \"in-progress\" note and set a \"completed\" note.\n\nThis simple process is our safety net. If a task fails, that \"in-progress\" note will eventually disappear, allowing the system to confidently pick up and re-run only that specific item later. ++This saves us from having to start the entire job over from scratch.++\n\n### Key Components & Their Purpose\n\n* **Main Workflow:** This is the primary automation that does the heavy lifting, like getting a list of projects and connecting to HubSpot.\n* **Item Tracker Utility:** The smart part of the system. This separate tool keeps a simple record of what each project's status is at any given moment.\n* **Redis Database:** This is the fast, central hub where all of the Item Tracker's notes are stored. It's the engine that makes the entire system reliable.\n\n---\n\n### The Item Tracker in Action: Your Digital To-Do List\n\nFor beginners, the names of the tracking notes (called \"keys\") might seem confusing, but the idea is actually simple. Imagine a digital to-do list for every project. A key is just the project's name on that list.\n\nEvery key has three parts that tell you everything you need to know:\n* **The Group:** The first part groups all similar items together, like all your HubSpot projects.\n* **The ID:** The middle part is the project's unique ID, so you know exactly which project you're talking about.\n* **The Status:** The last part is a simple word that shows its status, like `in_progress` or `completed`.\n\nThis simple naming system is the secret to keeping hundreds of projects organized, so you can easily see what's happening and what needs attention.\n\n---\n\n### Overall Business Value\n\nThis solution directly addresses the pain of large-scale automation failures. It gave us a new level of confidence in our automated processes. Instead of facing the chaos of a messy run, this system provides immediate visibility into which project failed and why. It eliminates the need for manual cleanup and allows us to confidently re-run a specific item without risking data corruption across the entire set. The result is a highly reliable and scalable process that saves time, reduces frustration, and maintains data integrity.",
+  "featuredImage": "/data/workflows/6828/6828.webp",
+  "author": {
+    "id": 101,
+    "slug": "reklaim",
+    "name": "Stephan Koning",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 154,
+  "downloads": 15,
+  "createdAt": "2025-08-02T00:26:30.880Z",
+  "updatedAt": "2026-01-16T08:47:14.351Z",
+  "publishedAt": "2025-08-02T00:26:30.880Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6828",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Prevent duplicate processing with Redis item state tracking",
+    "workflowName": "Prevent duplicate processing with Redis item state tracking",
+    "description": "I built this tool because we faced a real, recurring problem: managing hundreds of client projects in a weekly automated loop. \n\nThere was a time when a single error in that process could create a complete data mess, forcing us to manually clean and re-run everything. The Item Tracker was our solution. \n\nIt proved that something simple, when used correctly, can be a game-changer for maintaining order and reliability in your workflows (at least it was for us).\n\n---\n\n### How the System Works: A Story of Order from Chaos\n\nOur main automation, which fetches and summarizes data, is where the heavy lifting happens. But its newfound stability comes from a simple, critical collaboration with the Item Tracker. It's like a two-step handshake that happens for every single project.\n\n* Our main workflow starts by getting a long list of active projects.\n* For each project, it first asks the Item Tracker: \"Is this one already being worked on?\"\n* If the answer is no, the Item Tracker immediately puts a temporary \"in-progress\" note on the project\n* Once our main workflow successfully completes its task for that project, it tells the Item Tracker to remove the \"in-progress\" note and set a \"completed\" note.\n\nThis simple process is our safety net. If a task fails, that \"in-progress\" note will eventually disappear, allowing the system to confidently pick up and re-run only that specific item later. ++This saves us from having to start the entire job over from scratch.++\n\n### Key Components & Their Purpose\n\n* **Main Workflow:** This is the primary automation that does the heavy lifting, like getting a list of projects and connecting to HubSpot.\n* **Item Tracker Utility:** The smart part of the system. This separate tool keeps a simple record of what each project's status is at any given moment.\n* **Redis Database:** This is the fast, central hub where all of the Item Tracker's notes are stored. It's the engine that makes the entire system reliable.\n\n---\n\n### The Item Tracker in Action: Your Digital To-Do List\n\nFor beginners, the names of the tracking notes (called \"keys\") might seem confusing, but the idea is actually simple. Imagine a digital to-do list for every project. A key is just the project's name on that list.\n\nEvery key has three parts that tell you everything you need to know:\n* **The Group:** The first part groups all similar items together, like all your HubSpot projects.\n* **The ID:** The middle part is the project's unique ID, so you know exactly which project you're talking about.\n* **The Status:** The last part is a simple word that shows its status, like `in_progress` or `completed`.\n\nThis simple naming system is the secret to keeping hundreds of projects organized, so you can easily see what's happening and what needs attention.\n\n---\n\n### Overall Business Value\n\nThis solution directly addresses the pain of large-scale automation failures. It gave us a new level of confidence in our automated processes. Instead of facing the chaos of a messy run, this system provides immediate visibility into which project failed and why. It eliminates the need for manual cleanup and allows us to confidently re-run a specific item without risking data corruption across the entire set. The result is a highly reliable and scalable process that saves time, reduces frustration, and maintains data integrity.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Handle Invalid Action",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set CHECK Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Set ADD Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Redis: GET (Check Processed)",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Redis: SET (Add to Processed)",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch Action",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Trigger (from other workflows)",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Redis: DELETE (Untrack Item)",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "To_redis-audit-log",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set DELETE Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Code: Prepare Audit Log & Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set: Context for Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Redis: SET (Update Result)2",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set UPDATE Output2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Parse Log Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "redis-audit-log",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "On new Redis event",
+      "type": "n8n-nodes-base.redisTrigger",
+      "role": "redisTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

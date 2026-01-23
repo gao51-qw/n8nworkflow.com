@@ -1,0 +1,182 @@
+{
+  "id": 10922,
+  "slug": "10922",
+  "title": "Track and visualize daily moods with GPT-4o, Wolfram Alpha, Sheets, and Slack",
+  "description": "## Overview\nThis workflow, \"Mood Graph Studio,\" offers a comprehensive solution to track and visualize your emotional well-being. By simply inputting a single sentence about your mood, this template uses AI to perform a sentiment analysis, generates a visual graph via Wolfram Alpha, provides personalized feedback, and logs everything to Google Sheets.\n\nIt is designed for anyone interested in mindfulness, self-reflection, or quantified self-tracking.\n\n## How It Works\nThe workflow is divided into two main API functionalities and a manual trigger for easy testing.\n\n1. **Analyze a Single Mood (`/mood` endpoint)**\n- An AI Agent (OpenAI) quantifies your mood text into `valence` (positivity) and `energy` (activity).\n- A query is sent to **Wolfram Alpha** to generate a simple linear graph based on the score.\n- A second AI Agent provides short, encouraging advice in Japanese.\n- The complete entry is logged as a new row in **Google Sheets**.\n- Returns a JSON response containing the full analysis and the graph image.\n\n2. **Generate Mood History Graph (`/history` endpoint)**\n- Retrieves historical mood data for a specified user from Google Sheets.\n- A Code node formats the data into a time-series plot query.\n- **Wolfram Alpha** generates a line graph visualizing the mood trend over time.\n- The resulting graph is automatically posted to **Slack**.\n\n## How to Set Up\n\n### 1. Credentials\nYou must add your own credentials for the following services in the respective nodes:\n- **OpenAI**: Used in both Chat Model nodes.\n- **Google Sheets**: Used in the \"Log Mood\" and \"Get History\" nodes.\n- **Slack**: Used in the \"Send History\" node.\n\n### 2. Wolfram Alpha App ID\nThis workflow uses the HTTP Request node to call the Wolfram Alpha API.\n- Get a free App ID from the [Wolfram|Alpha Developer Portal](https://developer.wolframalpha.com/portal/myapps/index.html).\n- Paste your App ID into the `appid` parameter value in both `Generate...Graph` nodes.\n\n### 3. Google Sheet Configuration\n- Create a new Google Sheet.\n- Paste the **Sheet ID** into the `Document ID` field in both Google Sheets nodes.\n- **Crucially**, ensure the first row has the following headers exactly (case-sensitive):\n`userId`, `moodText`, `valence`, `energy`, `createdAt`, `wolframQuery`, `feedback`\n\n## How to Use\n\n**For Testing:**\nUse the **Manual Trigger**. Modify the sample text in the \"Set Test Data\" node and click \"Execute Workflow\" on the canvas.\n\n**For Production:**\nActivate the workflow. Send POST requests to the Production URL of the Webhook nodes.",
+  "featuredImage": "/data/workflows/10922/10922.webp",
+  "author": {
+    "id": 101,
+    "slug": "nagi",
+    "name": "koichi nagino",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 24,
+  "downloads": 2,
+  "createdAt": "2025-11-17T12:33:51.556Z",
+  "updatedAt": "2026-01-16T09:06:48.636Z",
+  "publishedAt": "2025-11-17T12:33:51.556Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10922",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Track and visualize daily moods with GPT-4o, Wolfram Alpha, Sheets, and Slack",
+    "workflowName": "Track and visualize daily moods with GPT-4o, Wolfram Alpha, Sheets, and Slack",
+    "description": "This workflow, \"Mood Graph Studio,\" offers a comprehensive solution to track and visualize your emotional well-being. By simply inputting a single sentence about your mood, this template uses AI to perform a sentiment analysis, generates a visual graph via Wolfram Alpha, provides personalized feedback, and logs everything to Google Sheets.\n\nIt is designed for anyone interested in mindfulness, self-reflection, or quantified self-tracking.\n\n## How It Works\nThe workflow is divided into two main API functionalities and a manual trigger for easy testing.\n\n1. **Analyze a Single Mood (`/mood` endpoint)**\n- An AI Agent (OpenAI) quantifies your mood text into `valence` (positivity) and `energy` (activity).\n- A query is sent to **Wolfram Alpha** to generate a simple linear graph based on the score.\n- A second AI Agent provides short, encouraging advice in Japanese.\n- The complete entry is logged as a new row in **Google Sheets**.\n- Returns a JSON response containing the full analysis and the graph image.\n\n2. **Generate Mood History Graph (`/history` endpoint)**\n- Retrieves historical mood data for a specified user from Google Sheets.\n- A Code node formats the data into a time-series plot query.\n- **Wolfram Alpha** generates a line graph visualizing the mood trend over time.\n- The resulting graph is automatically posted to **Slack**.\n\n## How to Set Up\n\n### 1. Credentials\nYou must add your own credentials for the following services in the respective nodes:\n- **OpenAI**: Used in both Chat Model nodes.\n- **Google Sheets**: Used in the \"Log Mood\" and \"Get History\" nodes.\n- **Slack**: Used in the \"Send History\" node.\n\n### 2. Wolfram Alpha App ID\nThis workflow uses the HTTP Request node to call the Wolfram Alpha API.\n- Get a free App ID from the [Wolfram|Alpha Developer Portal](https://developer.wolframalpha.com/portal/myapps/index.html).\n- Paste your App ID into the `appid` parameter value in both `Generate...Graph` nodes.\n\n### 3. Google Sheet Configuration\n- Create a new Google Sheet.\n- Paste the **Sheet ID** into the `Document ID` field in both Google Sheets nodes.\n- **Crucially**, ensure the first row has the following headers exactly (case-sensitive):\n`userId`, `moodText`, `valence`, `energy`, `createdAt`, `wolframQuery`, `feedback`\n\n## How to Use\n\n**For Testing:**\nUse the **Manual Trigger**. Modify the sample text in the \"Set Test Data\" node and click \"Execute Workflow\" on the canvas.\n\n**For Production:**\nActivate the workflow. Send POST requests to the Production URL of the Webhook nodes.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook: Mood Input",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare Data Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create Wolfram Query",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate Mood Graph",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Log Mood to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Return API Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Webhook: History Request",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get History from Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create Time Series Query",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate History Graph",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "AI: Analyze Mood to Numbers",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI: Generate Feedback",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Test Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Mood Graph Studio",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload a file",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    }
+  ]
+}

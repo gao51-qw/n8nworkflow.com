@@ -1,0 +1,344 @@
+{
+  "id": 10750,
+  "slug": "10750",
+  "title": "Automate blog-to-social media with GPT-4 for LinkedIn, X, and Reddit",
+  "description": "\nTurn your blog into a set-and-forget content engine: every new article is instantly repurposed into channel-specific social posts with visuals, keeping your brand visible on LinkedIn, X, and Reddit without extra copywriting time. Perfect for lean marketing teams who want consistent, always-on distribution from a single source of content.\n\n# How it works\n• Watches your blog RSS feed (or receives a single URL) and detects new articles.\n• Saves each post in Postgres so every article is only processed once.\n• Fetches the article HTML, extracts the main body content and sends it to OpenAI (GPT-4.1).\n• OpenAI creates platform-optimized copy: 1 LinkedIn post, 1 X/Twitter post, 1 Reddit post + image prompts.\n• Generates on-brand images with OpenAI and publishes everything automatically to LinkedIn, X, and Reddit.\n• You can also trigger it manually or via webhook whenever you want to push a specific campaign.\n\n![image1.png](fileId:3287)\n![image2.png](fileId:3288)\n\n\n# Setup Steps\n• Time: around 20–40 minutes for someone familiar with n8n and the platforms.\n• Create a Postgres table “rss_items” with fields: guid (PRIMARY KEY), title, link, published_at.\n• Add credentials in n8n for:\n  – Postgres\n  – OpenAI\n  – LinkedIn OAuth2\n  – X/Twitter OAuth2 + OAuth1 (for media upload)\n  – Reddit OAuth2\n• In the RSS node, set your blog feed URL (for example: https://yourblog.com/feed).\n• In the webhook node, confirm the URL/path you want external tools or other workflows to call with a “link” field.\n• Run the manual trigger with one test blog URL to verify:\n  – Article content is extracted correctly.\n  – AI returns LinkedIn/X/Reddit posts and image prompts.\n  – Posts and images appear correctly on all social accounts.\n• Once tests look good, enable the Schedule Trigger so Blog2Social AI runs automatically at your chosen interval.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+  "featuredImage": "/data/workflows/10750/10750.webp",
+  "author": {
+    "id": 101,
+    "slug": "leeseifer",
+    "name": "Le Nguyen",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 279,
+  "downloads": 27,
+  "createdAt": "2025-11-12T09:24:53.723Z",
+  "updatedAt": "2026-01-16T09:06:08.727Z",
+  "publishedAt": "2025-11-12T09:24:53.723Z",
+  "nodes": 51,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10750",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate blog-to-social media with GPT-4 for LinkedIn, X, and Reddit",
+    "workflowName": "Automate blog-to-social media with GPT-4 for LinkedIn, X, and Reddit",
+    "description": "Turn your blog into a set-and-forget content engine: every new article is instantly repurposed into channel-specific social posts with visuals, keeping your brand visible on LinkedIn, X, and Reddit without extra copywriting time. Perfect for lean marketing teams who want consistent, always-on distribution from a single source of content.\n\n# How it works\n• Watches your blog RSS feed (or receives a single URL) and detects new articles.\n• Saves each post in Postgres so every article is only processed once.\n• Fetches the article HTML, extracts the main body content and sends it to OpenAI (GPT-4.1).\n• OpenAI creates platform-optimized copy: 1 LinkedIn post, 1 X/Twitter post, 1 Reddit post + image prompts.\n• Generates on-brand images with OpenAI and publishes everything automatically to LinkedIn, X, and Reddit.\n• You can also trigger it manually or via webhook whenever you want to push a specific campaign.\n\n![image1.png](fileId:3287)\n![image2.png](fileId:3288)\n\n\n# Setup Steps\n• Time: around 20–40 minutes for someone familiar with n8n and the platforms.\n• Create a Postgres table “rss_items” with fields: guid (PRIMARY KEY), title, link, published_at.\n• Add credentials in n8n for:\n  – Postgres\n  – OpenAI\n  – LinkedIn OAuth2\n  – X/Twitter OAuth2 + OAuth1 (for media upload)\n  – Reddit OAuth2\n• In the RSS node, set your blog feed URL (for example: https://yourblog.com/feed).\n• In the webhook node, confirm the URL/path you want external tools or other workflows to call with a “link” field.\n• Run the manual trigger with one test blog URL to verify:\n  – Article content is extracted correctly.\n  – AI returns LinkedIn/X/Reddit posts and image prompts.\n  – Posts and images appear correctly on all social accounts.\n• Once tests look good, enable the Schedule Trigger so Blog2Social AI runs automatically at your chosen interval.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTML",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create a post",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Tweet",
+      "type": "n8n-nodes-base.twitter",
+      "role": "twitter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Twitter Post Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Generate Image for X",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Generate an image for LinkedIn",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Pass URL",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Execute a SQL query",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "Set Link",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Call Post Social",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post Social Manual",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge Results For Response",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post Reddit",
+      "type": "n8n-nodes-base.reddit",
+      "role": "reddit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait 5s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note23",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note25",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note26",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note27",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

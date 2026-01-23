@@ -1,0 +1,265 @@
+{
+  "id": 8595,
+  "slug": "8595",
+  "title": "Auto-like Instagram posts from chosen profiles with Phantombuster + SharePoint",
+  "description": "## Who’s it for  \nSocial-media managers, growth hackers, and brands who want to keep their Instagram accounts active by auto-liking posts from *specific profiles* they track—without scrolling feeds manually.  \n\n## How it works / What it does  \n1. **Schedule Trigger** runs every 2 h.  \n2. **Profile Post Extractor** pulls up to 20 recent posts from each Instagram profile in your CSV.  \n3. **Select Cookie** rotates Instagram session-cookies.  \n4. **Get Random Post** picks one and checks against `instagram_posts_already_liked.csv`.  \n5. Builds `instagram_posts_to_like.csv`, uploads to SharePoint.  \n6. **Phantombuster Autolike Agent** likes the post.  \n7. Liked URLs are appended to prevent duplicates.  \n8. **Wait nodes** throttle activity (~12 likes/profile/day).  \n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `instagram_session_cookies.txt` (one per line).  \n   • `instagram_posts_already_liked.csv` (header `postUrl`).  \n   • `profiles_instagram.csv` with profile URLs.  \n3. Adjust schedule if needed.  \n4. Activate the workflow—likes will run automatically.  \n\n## Requirements  \n- n8n 1.33+  \n- Phantombuster Growth plan  \n- Microsoft 365 SharePoint tenant  \n\n## How to customize  \n- Add/remove tracked profiles in `profiles_instagram.csv`.  \n- Adjust throttle by changing `Wait` intervals.  \n- Swap SharePoint for Google Drive/Dropbox if needed.  ",
+  "featuredImage": "/data/workflows/8595/8595.webp",
+  "author": {
+    "id": 101,
+    "slug": "plemeo",
+    "name": "plemeo",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1629,
+  "downloads": 162,
+  "createdAt": "2025-09-15T11:01:06.494Z",
+  "updatedAt": "2026-01-16T08:56:43.621Z",
+  "publishedAt": "2025-09-15T11:01:06.494Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8595",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-like Instagram posts from chosen profiles with Phantombuster + SharePoint",
+    "workflowName": "Auto-like Instagram posts from chosen profiles with Phantombuster + SharePoint",
+    "description": "## Who’s it for  \nSocial-media managers, growth hackers, and brands who want to keep their Instagram accounts active by auto-liking posts from *specific profiles* they track—without scrolling feeds manually.  \n\n## How it works / What it does  \n1. **Schedule Trigger** runs every 2 h.  \n2. **Profile Post Extractor** pulls up to 20 recent posts from each Instagram profile in your CSV.  \n3. **Select Cookie** rotates Instagram session-cookies.  \n4. **Get Random Post** picks one and checks against `instagram_posts_already_liked.csv`.  \n5. Builds `instagram_posts_to_like.csv`, uploads to SharePoint.  \n6. **Phantombuster Autolike Agent** likes the post.  \n7. Liked URLs are appended to prevent duplicates.  \n8. **Wait nodes** throttle activity (~12 likes/profile/day).  \n\n## How to set up  \n1. Add credentials: Phantombuster API, SharePoint OAuth2.  \n2. In SharePoint › “Phantombuster” folder create:  \n   • `instagram_session_cookies.txt` (one per line).  \n   • `instagram_posts_already_liked.csv` (header `postUrl`).  \n   • `profiles_instagram.csv` with profile URLs.  \n3. Adjust schedule if needed.  \n4. Activate the workflow—likes will run automatically.  \n\n## Requirements  \n- n8n 1.33+  \n- Phantombuster Growth plan  \n- Microsoft 365 SharePoint tenant  \n\n## How to customize  \n- Add/remove tracked profiles in `profiles_instagram.csv`.  \n- Adjust throttle by changing `Wait` intervals.  \n- Swap SharePoint for Google Drive/Dropbox if needed.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Random Post",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create CSV Binary",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Upload CSV",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Response",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Autoliking Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Launch AL Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set ENV Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Update file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if in List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait2",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare Updated Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Available Session Cookies",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Cookies",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select Cookie",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Launch Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Profile Extractor Agent",
+      "type": "n8n-nodes-base.phantombuster",
+      "role": "phantombuster",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get List of Accounts",
+      "type": "n8n-nodes-base.microsoftSharePoint",
+      "role": "microsoftSharePoint",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If Empty",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Prepare Posts",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

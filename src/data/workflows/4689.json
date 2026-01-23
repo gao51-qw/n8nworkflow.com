@@ -1,0 +1,194 @@
+{
+  "id": 4689,
+  "slug": "4689",
+  "title": "Build a chatbot with Reinforced Learning Human Feedback (RLHF) and RAG",
+  "description": "### Who is this for?\nThis template is designed for internal support teams, product specialists, and knowledge managers who want to build an AI-powered knowledge assistant with retrieval-augmented generation (RAG) and reinforcement learning from human feedback (RLHF) via Telegram.\n\n### What problem is this workflow solving?\nManual knowledge management and answering support queries can be time-consuming and error-prone. This solution automates importing and indexing official documentation into MongoDB vector search and enhances AI responses with Telegram-based user feedback to continuously improve answer quality.\n\n### What these workflows do\n#### Workflow 1: Document ingestion & indexing\n- Manually triggered workflow imports product documentation from Google Docs.\n- Documents are split into manageable chunks and embedded using OpenAI embeddings.\n- Embedded document chunks are stored in MongoDB Atlas vector store to enable semantic search.\n\n#### Workflow 2: Telegram chat with RLHF feedback loop\n- Listens for user messages via Telegram bot integration.\n- Uses vector similarity search on MongoDB to retrieve relevant documentation chunks.\n- Generates answers with OpenAI GPT-4o-mini model using retrieval-augmented generation.\n- Sends answers back via Telegram and waits for user feedback (approval or disapproval).\n- Captures feedback, maps it as positive or negative, and stores it with the conversation data for future model improvement.\n\n### Setup\n#### Setting up vector embeddings\n1. Authenticate Google Docs and connect your Google Docs URL containing the product documentation you want to index.\n2. Authenticate MongoDB Atlas and connect the collection where you want to store the vector embeddings. Create a search index on this collection to support vector similarity queries. \n3. Ensure the index name matches the one configured in n8n (data_index). \n4. See the example MongoDB search index template below for reference.\n\n#### Setting up chat with Telegram RLHF\n1. Create a bot in Telegram with @botFather using the /newbot command.\n2. Connect the MongoDB database and search index used for vector search in the previous workflow. Also create two new collections in MongoDB Atlas: one for feedback and one for chat history. Create a search index for feedback, copying the provided template.\n3. Configure the AI system prompt in the “Knowledge Base Agent” node, making sure it references all three tools connected (productDocs, feedbackPositive, feedbackNegative) as provided in the template prompt.\n### Make sure\n- Product documentation and feedback collections must connect to the same MongoDB database.\n- There are three distinct MongoDB collections: one for product documentation, one for feedback, and one for chat history (chat history collection can be separate).\n- Telegram API credentials are valid and webhook URLs are correctly set up.\n\n### MongoDB Search Index Templates\n#### Documentation Collection Index\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"_id\": {\n        \"type\": \"string\"\n      },\n      \"text\": {\n        \"type\": \"string\"\n      },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"source\": {\n        \"type\": \"string\"\n      },\n      \"doc_id\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}\n\n#### Feedback Collection Index\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"prompt\": {\n        \"type\": \"string\"\n      },\n      \"response\": {\n        \"type\": \"string\"\n      },\n      \"text\": {\n        \"type\": \"string\"\n      },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"feedback\": {\n        \"type\": \"token\"\n      }\n    }\n  }\n}",
+  "featuredImage": "/data/workflows/4689/4689.webp",
+  "author": {
+    "id": 101,
+    "slug": "thomasgpt",
+    "name": "NovaNode",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 6035,
+  "downloads": 603,
+  "createdAt": "2025-06-05T13:39:18.776Z",
+  "updatedAt": "2026-01-16T08:35:41.768Z",
+  "publishedAt": "2025-06-05T13:39:18.776Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4689",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a chatbot with Reinforced Learning Human Feedback (RLHF) and RAG",
+    "workflowName": "Build a chatbot with Reinforced Learning Human Feedback (RLHF) and RAG",
+    "description": "### Who is this for?\nThis template is designed for internal support teams, product specialists, and knowledge managers who want to build an AI-powered knowledge assistant with retrieval-augmented generation (RAG) and reinforcement learning from human feedback (RLHF) via Telegram.\n\n### What problem is this workflow solving?\nManual knowledge management and answering support queries can be time-consuming and error-prone. This solution automates importing and indexing official documentation into MongoDB vector search and enhances AI responses with Telegram-based user feedback to continuously improve answer quality.\n\n### What these workflows do\n#### Workflow 1: Document ingestion & indexing\n- Manually triggered workflow imports product documentation from Google Docs.\n- Documents are split into manageable chunks and embedded using OpenAI embeddings.\n- Embedded document chunks are stored in MongoDB Atlas vector store to enable semantic search.\n\n#### Workflow 2: Telegram chat with RLHF feedback loop\n- Listens for user messages via Telegram bot integration.\n- Uses vector similarity search on MongoDB to retrieve relevant documentation chunks.\n- Generates answers with OpenAI GPT-4o-mini model using retrieval-augmented generation.\n- Sends answers back via Telegram and waits for user feedback (approval or disapproval).\n- Captures feedback, maps it as positive or negative, and stores it with the conversation data for future model improvement.\n\n### Setup\n#### Setting up vector embeddings\n1. Authenticate Google Docs and connect your Google Docs URL containing the product documentation you want to index.\n2. Authenticate MongoDB Atlas and connect the collection where you want to store the vector embeddings. Create a search index on this collection to support vector similarity queries. \n3. Ensure the index name matches the one configured in n8n (data_index). \n4. See the example MongoDB search index template below for reference.\n\n#### Setting up chat with Telegram RLHF\n1. Create a bot in Telegram with @botFather using the /newbot command.\n2. Connect the MongoDB database and search index used for vector search in the previous workflow. Also create two new collections in MongoDB Atlas: one for feedback and one for chat history. Create a search index for feedback, copying the provided template.\n3. Configure the AI system prompt in the “Knowledge Base Agent” node, making sure it references all three tools connected (productDocs, feedbackPositive, feedbackNegative) as provided in the template prompt.\n### Make sure\n- Product documentation and feedback collections must connect to the same MongoDB database.\n- There are three distinct MongoDB collections: one for product documentation, one for feedback, and one for chat history (chat history collection can be separate).\n- Telegram API credentials are valid and webhook URLs are correctly set up.\n\n### MongoDB Search Index Templates\n#### Documentation Collection Index\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"_id\": {\n        \"type\": \"string\"\n      },\n      \"text\": {\n        \"type\": \"string\"\n      },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"source\": {\n        \"type\": \"string\"\n      },\n      \"doc_id\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}\n\n#### Feedback Collection Index\n\n{\n  \"mappings\": {\n    \"dynamic\": false,\n    \"fields\": {\n      \"prompt\": {\n        \"type\": \"string\"\n      },\n      \"response\": {\n        \"type\": \"string\"\n      },\n      \"text\": {\n        \"type\": \"string\"\n      },\n      \"embedding\": {\n        \"type\": \"knnVector\",\n        \"dimensions\": 1536,\n        \"similarity\": \"cosine\"\n      },\n      \"feedback\": {\n        \"type\": \"token\"\n      }\n    }\n  }\n}",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Knowledge Base Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Document Section Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Document Chunker",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Embeddings Generator",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Docs Importer",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "MongoDB Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "role": "memoryMongoDbChat",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI3",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Search Positive Interactions",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Search Documentation",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Search Negative Interactions",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Receive Message on Telegram",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Message on Telegram, Wait for Feedback",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Map feedback data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set feedback fields for collection storage",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Submit embedded chat feedback",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI Embeddings Generator1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "MongoDB Documentation Inserter",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.1"
+    }
+  ]
+}

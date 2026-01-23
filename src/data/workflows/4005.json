@@ -1,0 +1,146 @@
+{
+  "id": 4005,
+  "slug": "4005",
+  "title": "AI-generated LinkedIn posts with OpenAI, Google Sheets & email approval workflow",
+  "description": "### How it works\nThis workflow automates the process of creating, approving, and optionally posting LinkedIn content from a Google Sheet. Here's a high-level overview:\n1. **Scheduled Trigger**: Runs automatically based on your defined time interval (daily, weekly, etc.).\n2. **Fetch Data from Google Sheets**: Pulls the first row from your sheet where Status is marked as Pending.\n3. **Generate LinkedIn Post Content**: Uses OpenAI to create a professional LinkedIn post using the Post Description and Instructions from the sheet.\n4. **Format & Prepare Data**: Formats the generated content along with the original instruction and post description for email.\n5. **Send for Approval**: Sends an email to a predefined user (e.g., marketing team) with a custom form for approval, including a dropdown to accept/reject and an optional field for edits.\n6. **(Optional) Image Fetch**: Downloads an image from a URL (if provided in the sheet) for future use in post visuals.\n\n\n### Set up steps\nYou’ll need the following before you start:\n\n- A Google Sheet with the following columns: Post Description, Instructions, Image (URL), Status\n- Access to an OpenAI API key\n- A connected Gmail account for sending approval emails\n- Your own Google Sheets and Gmail credentials added in n8n\n\n### Steps:\n1. Google Sheet Preparation:\nCreate a new Google Sheet with the mentioned columns (Post Description, Instructions, Image, Status, Output, Post Link).\nAdd a row with test data and set Status to Pending.\n\n2. Credentials:\nIn n8n, create OAuth2 credentials for:\na. Google Sheets\nb. Gmail\nc. OpenAI (API Key)\nAssign these credentials to the respective nodes in the JSON.\n\n3. OpenAI Model:\nChoose a model like gpt-4o-mini (used here) or any other available in your plan.\nAdjust the prompt in the \"Generate Post Content\" node if needed.\n\n4. Email Configuration:\nIn the Gmail node, set the recipient email to your own or your team’s address.\nCustomize the email message template if necessary.\n\n5. Schedule the Workflow:\nSet the trigger interval (e.g., every morning at 9 AM).\n\n6. Testing:\nRun the workflow manually first to confirm everything works.\nCheck Gmail for the approval form, respond, and verify the results.",
+  "featuredImage": "/data/workflows/4005/4005.webp",
+  "author": {
+    "id": 101,
+    "slug": "shindearyan",
+    "name": "Aryan Shinde",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 40863,
+  "downloads": 4086,
+  "createdAt": "2025-05-12T23:11:35.083Z",
+  "updatedAt": "2026-01-16T08:32:34.103Z",
+  "publishedAt": "2025-05-12T23:11:35.083Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4005",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "AI-generated LinkedIn posts with OpenAI, Google Sheets & email approval workflow",
+    "workflowName": "AI-generated LinkedIn posts with OpenAI, Google Sheets & email approval workflow",
+    "description": "### How it works\nThis workflow automates the process of creating, approving, and optionally posting LinkedIn content from a Google Sheet. Here's a high-level overview:\n1. **Scheduled Trigger**: Runs automatically based on your defined time interval (daily, weekly, etc.).\n2. **Fetch Data from Google Sheets**: Pulls the first row from your sheet where Status is marked as Pending.\n3. **Generate LinkedIn Post Content**: Uses OpenAI to create a professional LinkedIn post using the Post Description and Instructions from the sheet.\n4. **Format & Prepare Data**: Formats the generated content along with the original instruction and post description for email.\n5. **Send for Approval**: Sends an email to a predefined user (e.g., marketing team) with a custom form for approval, including a dropdown to accept/reject and an optional field for edits.\n6. **(Optional) Image Fetch**: Downloads an image from a URL (if provided in the sheet) for future use in post visuals.\n\n\n### Set up steps\nYou’ll need the following before you start:\n\n- A Google Sheet with the following columns: Post Description, Instructions, Image (URL), Status\n- Access to an OpenAI API key\n- A connected Gmail account for sending approval emails\n- Your own Google Sheets and Gmail credentials added in n8n\n\n### Steps:\n1. Google Sheet Preparation:\nCreate a new Google Sheet with the mentioned columns (Post Description, Instructions, Image, Status, Output, Post Link).\nAdd a row with test data and set Status to Pending.\n\n2. Credentials:\nIn n8n, create OAuth2 credentials for:\na. Google Sheets\nb. Gmail\nc. OpenAI (API Key)\nAssign these credentials to the respective nodes in the JSON.\n\n3. OpenAI Model:\nChoose a model like gpt-4o-mini (used here) or any other available in your plan.\nAdjust the prompt in the \"Generate Post Content\" node if needed.\n\n4. Email Configuration:\nIn the Gmail node, set the recipient email to your own or your team’s address.\nCustomize the email message template if necessary.\n\n5. Schedule the Workflow:\nSet the trigger interval (e.g., every morning at 9 AM).\n\n6. Testing:\nRun the workflow manually first to confirm everything works.\nCheck Gmail for the approval form, respond, and verify the results.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Data from Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Generate Post Content",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Data Formatting 1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Content Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Content Confirmation Logic",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Regenerate Post Content",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "If Image Provided",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Post With Image",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post Without Image",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

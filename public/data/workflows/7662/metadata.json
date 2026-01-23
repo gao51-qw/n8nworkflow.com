@@ -1,0 +1,27 @@
+{
+  "id": 7662,
+  "slug": "7662",
+  "title": "Automated document compliance validation with AI and vector database",
+  "description": " ## Description \n\nThis workflow automates compliance validation between a policy/procedure and a corresponding uploaded document. It leverages an AI agent to determine whether the content of the document aligns with the expectations outlined in the provided procedure or policy. \n\n## How It Works \n\n1. Document Upload \n\n* A document (e.g., PDF) is uploaded via an HTTP Request Webhook. \n\n* The content is processed into vector embeddings using a Qdrant vector store and an embedding model. \n\n2. Procedure Submission \n\n* A policy/procedure text and description are submitted via a second HTTP Request Webhook. \n\n* These serve as the basis for evaluating the uploaded document. \n\n3. AI-Based Validation \n\n The AI agent receives: \n\n* The uploaded document (via vector embeddings) \n\n* The submitted procedure/policy text \n\n* The description/context \n\nIt returns a structured compliance analysis including: \n\n* Summary of Compliance (sections that align with policy) \n\n* Summary of Non-Compliance (gaps or missing elements) \n\n* Supporting Text Citations (document evidence) \n\n* Confidence Level (0–100 score based on evidence quality) \n\n \n\n## Setup Instructions \n\nPre-Conditions / Requirements \n\n* An n8n instance running with access to: \n\n*  Qdrant (for vector storage) \n\n* An embedding model (e.g., OpenAI, HuggingFace, or local model) \n\n* Optional: Microsoft Graph or another storage system for document retrieval. \n\n## Workflow Setup \n\n1. HTTP Request Node 1: Document Upload \n\nAccepts binary document files (PDF, DOCX, etc.). \n\nExtracts text, generates embeddings, and stores them in Qdrant. \n\nReturns a spDocumentId for reference. \n\n2. HTTP Request Node 2: Procedure Submission \n\nAccepts a JSON payload with: \n\n{ \n  \"procedure\": \"Policy or procedure text\", \n  \"description\": \"Brief context or objective\", \n  \"spDocumentId\": \"ID of the uploaded document\" \n} \n  \n\nLinks the procedure to the previously uploaded document. \n\n3. Order of Operations \n\nStep 1: Upload the document. \n\nStep 2: Submit the procedure referencing the same spDocumentId. \n\nStep 3: AI agent evaluates compliance and returns results. \n\n \n\n## Example Input & Output \n\nExample Input: Document Upload (Webhook 1) \n\n* Request: Binary file upload (example_policy.pdf) \n\n* Response: \n\n{ \n  \"spDocumentId\": \"12345\" \n} \n  \n\n### Example Input: Procedure Submission (Webhook 2) \n\n{ \n  \"procedure\": \"All financial records must be retained for 7 years.\", \n  \"description\": \"Retention policy compliance validation\", \n  \"spDocumentId\": \"12345\" \n} \n  \n\n### Example Output: AI Compliance Validation \n\n{ \n  \"compliance_summary\": \"The document includes a 7-year retention requirement for invoices and payroll records.\", \n  \"non_compliance_summary\": \"No reference to retention of vendor contracts.\", \n  \"citations\": [ \n    { \n      \"text\": \"Invoices will be stored for 7 years.\", \n      \"page\": 4 \n    } \n  ], \n  \"confidence\": 87 \n} \n  \n\n ",
+  "featuredImage": "/data/workflows/7662/7662.webp",
+  "author": {
+    "id": 101,
+    "slug": "mango25",
+    "name": "Thapani Sawaengsri",
+    "avatar": ""
+  },
+  "categories": [
+    "AI RAG",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 572,
+  "downloads": 57,
+  "createdAt": "2025-08-20T18:24:40.249Z",
+  "updatedAt": "2026-01-16T08:51:39.627Z",
+  "publishedAt": "2025-08-20T18:24:40.249Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7662"
+}

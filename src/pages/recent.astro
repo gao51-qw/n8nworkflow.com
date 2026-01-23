@@ -11,16 +11,25 @@ import Breadcrumb from '../components/ui/Breadcrumb.astro';
 import SortDropdown from '../components/ui/SortDropdown.astro';
 import FilterBar from '../components/ui/FilterBar.astro';
 import { getWorkflows } from '../lib/services/workflows';
+import { getStats } from '../lib/services/stats';
+import { formatLongDate } from '../lib/utils/date';
 import { getCategories } from '../lib/services/categories';
 import { generateRecentInsights } from '../lib/services/content-generator';
+import type { Workflow } from '../lib/types/workflow';
+
+export const prerender = false;
 
 // 获取分页参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const categoryFilter = Astro.url.searchParams.get('category') || undefined;
+const complexityFilter = Astro.url.searchParams.get('complexity') || undefined;
+const priceFilter = Astro.url.searchParams.get('price') as 'free' | 'paid' | undefined;
+
 const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
 // 获取最新工作流（按发布时间排序）
-let workflows = [];
+let workflows: Workflow[] = [];
 let totalCount = 0;
 
 try {
@@ -28,6 +37,9 @@ try {
     sort: 'date-desc',
     limit: pageSize,
     offset: offset,
+    category: categoryFilter,
+    complexity: complexityFilter,
+    price: priceFilter,
   });
   workflows = result.workflows;
   totalCount = result.total;
@@ -35,8 +47,13 @@ try {
   console.error('Error fetching recent workflows:', error);
 }
 
+// 构建基础 URL，保留现有的筛选参数（除了 page）
+const baseUrlObj = new URL(Astro.url);
+baseUrlObj.searchParams.delete('page');
+const paginationBaseUrl = baseUrlObj.pathname + (baseUrlObj.search ? baseUrlObj.search : '');
+
 // 获取分类用于筛选
-let categories = [];
+let categories: any[] = [];
 try {
   categories = await getCategories();
 } catch (error) {
@@ -63,9 +80,49 @@ let recentInsights = [
 ];
 
 try {
-  recentInsights = await generateRecentInsights();
+  const generatedInsights = await generateRecentInsights();
+  if (generatedInsights && generatedInsights.length > 0) {
+    recentInsights = generatedInsights;
+  }
 } catch (error) {
   console.error('Error generating recent insights:', error);
+}
+
+// 获取统计数据
+let stats: any = {
+  totalWorkflows: 0,
+  totalAuthors: 0,
+  totalCategories: 0,
+  totalDownloads: 0,
+  recentWorkflows: 0,
+  lastUpdatedAt: new Date().toISOString(),
+};
+
+try {
+  const fetchedStats = await getStats();
+  if (fetchedStats) {
+    stats = fetchedStats;
+    // 同步更新洞察内容中的统计数据
+    recentInsights = [
+      {
+        title: 'Fresh Ideas',
+        description: 'Discover new automation approaches and innovative solutions.',
+        stats: `${stats.recentWorkflows}+ new monthly`,
+      },
+      {
+        title: 'Latest Trends',
+        description: 'See what the community is building and sharing right now.',
+        stats: `${Math.ceil(stats.recentWorkflows / 4)}+ per week`,
+      },
+      {
+        title: 'Growing Ecosystem',
+        description: 'The N8N community expands rapidly with new contributors and workflows joining regularly.',
+        stats: `${stats.totalWorkflows.toLocaleString()}+ workflows`,
+      },
+    ];
+  }
+} catch (error) {
+  console.error('Error fetching stats:', error);
 }
 
 // SEO 配置
@@ -126,7 +183,12 @@ const totalPages = Math.ceil(totalCount / pageSize);
     </div>
 
     <!-- Filters -->
-    <FilterBar categories={categories} currentPrice="all" currentComplexity="all" />
+    <FilterBar 
+      categories={categories} 
+      currentCategory={categoryFilter}
+      currentPrice={priceFilter || 'all'} 
+      currentComplexity={complexityFilter || 'all'} 
+    />
 
     <!-- Sort Bar -->
     <div class="flex items-center justify-between mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -146,7 +208,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            baseUrl="/recent"
+            baseUrl={paginationBaseUrl}
           />
         )}
       </>
@@ -167,7 +229,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
     <!-- Info Section -->
     <div class="mt-12 bg-primary-50 dark:bg-gray-800 rounded-lg p-8 border border-primary-200 dark:border-gray-700">
       <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-4">
-        Stay Updated with Latest Workflows
+        Stay Updated with Latest Workflows (Last updated: {formatLongDate(stats.lastUpdatedAt || new Date())})
       </h2>
       <div class="grid md:grid-cols-3 gap-6 text-sm text-gray-600 dark:text-gray-300">
         {recentInsights.map((insight, index) => (

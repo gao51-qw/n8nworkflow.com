@@ -1,0 +1,182 @@
+{
+  "id": 11136,
+  "slug": "11136",
+  "title": "Auto-generate WordPress blog tags with GPT-4.1-mini and smart tag mapping",
+  "description": "## **Overview**\n\nThis n8n template demonstrates how to use AI to automatically analyze WordPress blog content and generate relevant, SEO-optimized tags for WordPress posts.\n\n## **Use cases** \nAutomate content tagging for WordPress blogs, maintain consistent taxonomy across large content libraries, save hours of manual tagging work, or improve SEO by ensuring every post has relevant, searchable tags!\n\n## **Good to know**\n* The workflow creates new tags automatically if they don't exist in WordPress.\n* Tag generation is intelligent - it avoids duplicates by mapping to existing tag IDs.\n\n## **How it works**\n* We fetch a WordPress blog post using the WordPress node with sticky data enabled for testing.\n* The post content is sent to GPT-4.1-mini which analyzes it and generates 5-10 relevant tags using a structured output parser.\n* All existing WordPress tags are fetched via HTTP Request to check for matches.\n* A smart loop processes each AI-generated tag:\n  * If the tag already exists, it maps to the existing tag ID\n  * If it's new, it creates the tag via WordPress API\n* All tag IDs are aggregated and the WordPress post is updated with the complete tag list.\n\n## **How to use**\n* The manual trigger node is used as an example but feel free to replace this with other triggers such as webhook, schedule, or WordPress webhook for new posts.\n* Modify the \"Fetch One WordPress Blog\" node to fetch multiple posts or integrate with your publishing workflow.\n\n## **Requirements**\n* WordPress site with REST API enabled\n* OpenAI API\n\n## **Customising this workflow**\n* Adjust the AI prompt to generate tags specific to your industry or SEO strategy\n* Change the tag count (currently 5-10) based on your needs\n* Add filtering logic to only tag posts in specific categories",
+  "featuredImage": "/data/workflows/11136/11136.webp",
+  "author": {
+    "id": 101,
+    "slug": "bhavyshekhaliya",
+    "name": "Bhavy Shekhaliya",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 180,
+  "downloads": 18,
+  "createdAt": "2025-11-22T15:03:25.071Z",
+  "updatedAt": "2026-01-16T09:07:43.134Z",
+  "publishedAt": "2025-11-22T15:03:25.071Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11136",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-generate WordPress blog tags with GPT-4.1-mini and smart tag mapping",
+    "workflowName": "Auto-generate WordPress blog tags with GPT-4.1-mini and smart tag mapping",
+    "description": "**\n\nThis n8n template demonstrates how to use AI to automatically analyze WordPress blog content and generate relevant, SEO-optimized tags for WordPress posts.\n\n## **Use cases** \nAutomate content tagging for WordPress blogs, maintain consistent taxonomy across large content libraries, save hours of manual tagging work, or improve SEO by ensuring every post has relevant, searchable tags!\n\n## **Good to know**\n* The workflow creates new tags automatically if they don't exist in WordPress.\n* Tag generation is intelligent - it avoids duplicates by mapping to existing tag IDs.\n\n## **How it works**\n* We fetch a WordPress blog post using the WordPress node with sticky data enabled for testing.\n* The post content is sent to GPT-4.1-mini which analyzes it and generates 5-10 relevant tags using a structured output parser.\n* All existing WordPress tags are fetched via HTTP Request to check for matches.\n* A smart loop processes each AI-generated tag:\n  * If the tag already exists, it maps to the existing tag ID\n  * If it's new, it creates the tag via WordPress API\n* All tag IDs are aggregated and the WordPress post is updated with the complete tag list.\n\n## **How to use**\n* The manual trigger node is used as an example but feel free to replace this with other triggers such as webhook, schedule, or WordPress webhook for new posts.\n* Modify the \"Fetch One WordPress Blog\" node to fetch multiple posts or integrate with your publishing workflow.\n\n## **Requirements**\n* WordPress site with REST API enabled\n* OpenAI API\n\n## **Customising this workflow**\n* Adjust the AI prompt to generate tags specific to your industry or SEO strategy\n* Change the tag count (currently 5-10) based on your needs\n* Add filtering logic to only tag posts in specific categories",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Fetch One WordPress Blog",
+      "type": "n8n-nodes-base.wordpress",
+      "role": "wordpress",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "5-mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "4.1 mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Blog Tags Generator",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Update a post",
+      "type": "n8n-nodes-base.wordpress",
+      "role": "wordpress",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Tagging Loop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch All Tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Clean Data",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out for Loop",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create New Tag",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Return Tag ID & Name",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Return Name Only",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge Old and Mapped Tags",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

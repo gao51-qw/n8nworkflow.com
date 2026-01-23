@@ -1,0 +1,200 @@
+{
+  "id": 9700,
+  "slug": "9700",
+  "title": "Capture and Store CRM Contacts with Telegram & Gemini AI",
+  "description": "## What it does\n\nThis workflow is an AI agent in the form of a Telegram bot. Its main purpose is to **capture contact information and store it in a CRM**. The agent supports multi-modal inputs and can extract contact details from text messages, voice recordings, and images (like photos of business cards).\n\nThe bot guides the user through data collection via a natural conversation, asks clarifying questions for missing information, and summarizes the extracted data for confirmation before saving. It also checks for duplicate contacts by email and gives users the choice to either create a new contact or update an existing one.\n\nFor simplicity, this example uses a Google Sheets document to store collected contacts. It can easily be replaced by a real CRM like HubSpot, Pipedrive, Monday, etc.\n\n### How to use the bot\n\nSend contact details via text or voice, or upload a photo of a business card. The bot will show the extracted information and ask questions when needed. Once the bot confirms saving of the current contact, you can send the next one. Use the `/new` command at any moment to discard the previous conversation and start from scratch.\n\n### Requirements\n1. A Telegram bot [Access Token](https://docs.n8n.io/integrations/builtin/credentials/telegram/)\n2. Google Gemini API key\n3. Google Sheets credentials\n\n### How to set up\n1. Create a new Telegram bot (see [n8n docs](https://docs.n8n.io/integrations/builtin/credentials/telegram/#using-api-bot-access-token) and [Telegram bot API docs](https://core.telegram.org/bots/features) for details)\n2. Take webhook URL from the Telegram Trigger node (`WEBHOOK_URL`) and your bot's access token (`TOKEN`) and run `curl -X POST \"https://api.telegram.org/bot{TOKEN}/setWebhook?url={WEBHOOK_URL}\"`\n2. Create a new Google Sheets document with \"Full name\", \"Email\", \"Phone\", \"Company\", \"Job title\" and \"Meeting notes\" columns\n3. Configure parameters in the **parameters** node:\n    - Set ID of the Google Sheets document\n    - Set sheet name (\"Sheet1\" by default)\n4. Configure Google Sheets credentials for AI Agent's tools: **Search for contact** and **Create new contact** and **Update existing contact**.\n5. Add Google Gemini API key for the models (\"AI Agent\", \"Transcribe audio\", \"Analyze image\" nodes)",
+  "featuredImage": "/data/workflows/9700/9700.webp",
+  "author": {
+    "id": 101,
+    "slug": "coderik",
+    "name": "Vadim",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 98,
+  "downloads": 9,
+  "createdAt": "2025-10-15T10:51:26.444Z",
+  "updatedAt": "2026-01-16T09:01:33.868Z",
+  "publishedAt": "2025-10-15T10:51:26.444Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9700",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Capture and Store CRM Contacts with Telegram & Gemini AI",
+    "workflowName": "Capture and Store CRM Contacts with Telegram & Gemini AI",
+    "description": "## What it does\n\nThis workflow is an AI agent in the form of a Telegram bot. Its main purpose is to **capture contact information and store it in a CRM**. The agent supports multi-modal inputs and can extract contact details from text messages, voice recordings, and images (like photos of business cards).\n\nThe bot guides the user through data collection via a natural conversation, asks clarifying questions for missing information, and summarizes the extracted data for confirmation before saving. It also checks for duplicate contacts by email and gives users the choice to either create a new contact or update an existing one.\n\nFor simplicity, this example uses a Google Sheets document to store collected contacts. It can easily be replaced by a real CRM like HubSpot, Pipedrive, Monday, etc.\n\n### How to use the bot\n\nSend contact details via text or voice, or upload a photo of a business card. The bot will show the extracted information and ask questions when needed. Once the bot confirms saving of the current contact, you can send the next one. Use the `/new` command at any moment to discard the previous conversation and start from scratch.\n\n### Requirements\n1. A Telegram bot [Access Token](https://docs.n8n.io/integrations/builtin/credentials/telegram/)\n2. Google Gemini API key\n3. Google Sheets credentials\n\n### How to set up\n1. Create a new Telegram bot (see [n8n docs](https://docs.n8n.io/integrations/builtin/credentials/telegram/#using-api-bot-access-token) and [Telegram bot API docs](https://core.telegram.org/bots/features) for details)\n2. Take webhook URL from the Telegram Trigger node (`WEBHOOK_URL`) and your bot's access token (`TOKEN`) and run `curl -X POST \"https://api.telegram.org/bot{TOKEN}/setWebhook?url={WEBHOOK_URL}\"`\n2. Create a new Google Sheets document with \"Full name\", \"Email\", \"Phone\", \"Company\", \"Job title\" and \"Meeting notes\" columns\n3. Configure parameters in the **parameters** node:\n    - Set ID of the Google Sheets document\n    - Set sheet name (\"Sheet1\" by default)\n4. Configure Google Sheets credentials for AI Agent's tools: **Search for contact** and **Create new contact** and **Update existing contact**.\n5. Add Google Gemini API key for the models (\"AI Agent\", \"Transcribe audio\", \"Analyze image\" nodes)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get sessionID",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Generate sessionID",
+      "type": "n8n-nodes-base.crypto",
+      "role": "crypto",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upsert row(s)",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If no sessionID or /new",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Add sessionID to input",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "parameters",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Create new contact",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Update existing contact",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Search for contact",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send \"typing...\"",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get audio file",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Transcribe audio",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process audio transcript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process extracted data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process text input",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

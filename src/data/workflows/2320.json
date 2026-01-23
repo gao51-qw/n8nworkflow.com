@@ -1,0 +1,194 @@
+{
+  "id": 2320,
+  "slug": "2320",
+  "title": "Invoice data extraction with LlamaParse and OpenAI",
+  "description": "This n8n workflow automates the process of parsing and extracting data from PDF invoices. With this workflow, accounts and finance people can realise huge time and cost savings in their busy schedules.\n\n**Read the Blog**: [https://blog.n8n.io/how-to-extract-data-from-pdf-to-excel-spreadsheet-advance-parsing-with-n8n-io-and-llamaparse/](https://blog.n8n.io/how-to-extract-data-from-pdf-to-excel-spreadsheet-advance-parsing-with-n8n-io-and-llamaparse/)\n\n## How it works\n\n* This workflow will watch an email inbox for incoming invoices from suppliers\n* It will download the attached PDFs and processing them through a third party service called LlamaParse.\n* LlamaParse is specifically designed to handle and convert complex PDF data structures such as tables to markdown.\n* Markdown is easily to process for LLM models and so the data extraction by our AI agent is more accurate and reliable.\n* The workflow exports the extracted data from the AI agent to Google Sheets once the job complete.\n\n## Requirements\n\n* The criteria of the email trigger must be configured to capture emails with attachments.\n* The gmail label \"invoice synced\" must be created before using this workflow.\n* A LlamaIndex.ai account to use the LlamaParse service.\n* An OpenAI account to use GPT for AI work.\n* Google Sheets to save the output of the data extraction process although this can be replaced for whatever your needs.\n\n## Customizing this workflow\n\nThis workflow uses Gmail and Google Sheets but these can easily be swapped out for equivalent services such as Outlook and Excel.\n\nNot using Excel? Simple redirect the output of the AI agent to your accounting software of choice.  \n",
+  "featuredImage": "/data/workflows/2320/2320.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 44297,
+  "downloads": 4429,
+  "createdAt": "2024-07-09T10:24:28.654Z",
+  "updatedAt": "2026-01-16T08:24:01.581Z",
+  "publishedAt": "2024-07-09T10:24:28.654Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2320",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Invoice data extraction with LlamaParse and OpenAI",
+    "workflowName": "Invoice data extraction with LlamaParse and OpenAI",
+    "description": "This n8n workflow automates the process of parsing and extracting data from PDF invoices. With this workflow, accounts and finance people can realise huge time and cost savings in their busy schedules.\n\n**Read the Blog**: [https://blog.n8n.io/how-to-extract-data-from-pdf-to-excel-spreadsheet-advance-parsing-with-n8n-io-and-llamaparse/](https://blog.n8n.io/how-to-extract-data-from-pdf-to-excel-spreadsheet-advance-parsing-with-n8n-io-and-llamaparse/)\n\n## How it works\n\n* This workflow will watch an email inbox for incoming invoices from suppliers\n* It will download the attached PDFs and processing them through a third party service called LlamaParse.\n* LlamaParse is specifically designed to handle and convert complex PDF data structures such as tables to markdown.\n* Markdown is easily to process for LLM models and so the data extraction by our AI agent is more accurate and reliable.\n* The workflow exports the extracted data from the AI agent to Google Sheets once the job complete.\n\n## Requirements\n\n* The criteria of the email trigger must be configured to capture emails with attachments.\n* The gmail label \"invoice synced\" must be created before using this workflow.\n* A LlamaIndex.ai account to use the LlamaParse service.\n* An OpenAI account to use GPT for AI work.\n* Google Sheets to save the output of the data extraction process although this can be replaced for whatever your needs.\n\n## Customizing this workflow\n\nThis workflow uses Gmail and Google Sheets but these can easily be swapped out for equivalent services such as Outlook and Excel.\n\nNot using Excel? Simple redirect the output of the AI agent to your accounting software of choice.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Model",
+      "type": "@n8n/n8n-nodes-langchain.lmOpenAi",
+      "role": "lmOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Upload to LlamaParse",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Receiving Invoices",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append to Reconciliation Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Get Processing Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wait to stay within service limits",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Is Job Ready?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add \"invoice synced\" Label",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Parsed Invoice Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Map Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Apply Data Extraction Rules",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Should Process Email?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split Out Labels",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Labels Names",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Combine Label Names",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email with Label Names",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

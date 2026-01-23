@@ -1,0 +1,134 @@
+{
+  "id": 8764,
+  "slug": "8764",
+  "title": "Generate product videos automatically with Gemini, FAL and Google Workspace",
+  "description": "## 📄 What this workflow does\n This workflow turns your n8n into an automated product-video generator powered by Google Sheets. When a new row is added with status = run, it:\n\n- Downloads the product image from Google Drive.\n- Converts the image to base64 and sends it to Gemini, which creates a branded ad-style variant.\n- Saves the generated image back into a designated Google Drive folder.\n- Sends the image to FAL (image-to-video) to generate a short promotional video clip.\n- Polls FAL’s response_url until the video is ready.\n- Uploads the video to Google Drive (videos folder).\n- Updates the original Google Sheet row with the video link and sets status = finished.\n- Handles API latency via wait/polling and logs failures into the sheet if needed.\n\n\n## 👤 Who is this for\n- Marketing teams automating creative asset production.\n- E-commerce businesses needing quick product promo videos.\n- Agencies creating branded ad content at scale.\n\n\n## ✅ Requirements\n- An n8n instance.\n- A Google Sheet with at least these columns: STT, link_image, note, status, link_video.\n- Google Sheets & Google Drive OAuth2 credentials connected in n8n.\n- Gemini API key (for ad-style image generation).\n- FAL API key (for image-to-video).\n\n\n⚙️ How to set up\n1. Import the provided workflow JSON into n8n.\n2. Connect Google Sheets credentials and point to your sheet (documentId + gid).\n3. Connect Google Drive credentials and update folder IDs in the two Upload File nodes (images/videos).\n4. Add Gemini and FAL API keys in the respective HTTP Request headers (via Credentials).\n5. Test: add a row with link_image, note, and status = run. The workflow should generate and save a video, then update the sheet with the link.\n\n\n🔁 How it works\n- Trigger → Google Sheets Trigger fires on rowAdded where status = run.\n- Pre-processing → Download the product image from Google Drive → extract base64.\n- LLM Image Generation → Gemini generates an ad-style variant based on note.\n- Storage → Upload the generated image into the “images” Drive folder.\n- Video Creation → FAL converts the branded image into a short video.\n- Polling → Wait node + HTTP Request check job status until video is completed.\n- Write-back → Upload final video into the “videos” Drive folder, update the sheet with the link_video, and set status = finished.\n",
+  "featuredImage": "/data/workflows/8764/8764.webp",
+  "author": {
+    "id": 101,
+    "slug": "cong-nguyen",
+    "name": "Cong Nguyen",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 681,
+  "downloads": 68,
+  "createdAt": "2025-09-20T03:50:41.996Z",
+  "updatedAt": "2026-01-16T08:57:32.327Z",
+  "publishedAt": "2025-09-20T03:50:41.996Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8764",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate product videos automatically with Gemini, FAL and Google Workspace",
+    "workflowName": "Generate product videos automatically with Gemini, FAL and Google Workspace",
+    "description": "## 📄 What this workflow does\n This workflow turns your n8n into an automated product-video generator powered by Google Sheets. When a new row is added with status = run, it:\n\n- Downloads the product image from Google Drive.\n- Converts the image to base64 and sends it to Gemini, which creates a branded ad-style variant.\n- Saves the generated image back into a designated Google Drive folder.\n- Sends the image to FAL (image-to-video) to generate a short promotional video clip.\n- Polls FAL’s response_url until the video is ready.\n- Uploads the video to Google Drive (videos folder).\n- Updates the original Google Sheet row with the video link and sets status = finished.\n- Handles API latency via wait/polling and logs failures into the sheet if needed.\n\n\n## 👤 Who is this for\n- Marketing teams automating creative asset production.\n- E-commerce businesses needing quick product promo videos.\n- Agencies creating branded ad content at scale.\n\n\n## ✅ Requirements\n- An n8n instance.\n- A Google Sheet with at least these columns: STT, link_image, note, status, link_video.\n- Google Sheets & Google Drive OAuth2 credentials connected in n8n.\n- Gemini API key (for ad-style image generation).\n- FAL API key (for image-to-video).\n\n\n⚙️ How to set up\n1. Import the provided workflow JSON into n8n.\n2. Connect Google Sheets credentials and point to your sheet (documentId + gid).\n3. Connect Google Drive credentials and update folder IDs in the two Upload File nodes (images/videos).\n4. Add Gemini and FAL API keys in the respective HTTP Request headers (via Credentials).\n5. Test: add a row with link_image, note, and status = run. The workflow should generate and save a video, then update the sheet with the link.\n\n\n🔁 How it works\n- Trigger → Google Sheets Trigger fires on rowAdded where status = run.\n- Pre-processing → Download the product image from Google Drive → extract base64.\n- LLM Image Generation → Gemini generates an ad-style variant based on note.\n- Storage → Upload the generated image into the “images” Drive folder.\n- Video Creation → FAL converts the branded image into a short video.\n- Polling → Wait node + HTTP Request check job status until video is completed.\n- Write-back → Upload final video into the “videos” Drive folder, update the sheet with the link_video, and set status = finished.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Upload file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note — Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note — Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note — Notes & Tips",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Create product image with model",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Link Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Download video",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Upload video",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    }
+  ]
+}

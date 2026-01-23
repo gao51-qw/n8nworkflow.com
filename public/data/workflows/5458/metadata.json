@@ -1,0 +1,26 @@
+{
+  "id": 5458,
+  "slug": "5458",
+  "title": "Automate quote request processing with Tally, Airtable, Slack, and Gmail",
+  "description": "## What if your quote requests managed themselves?\n\nEvery quote request is a potential deal — but only if it's handled quickly, properly, and without things falling through the cracks. What if instead of copy-pasting emails and pinging teammates manually, your entire process just... ran itself?\n\nThis automation makes it happen: it captures form submissions, notifies your sales team on Slack, stores leads in Airtable, and sends an email confirmation to the client — all in one seamless n8n flow.\n\n---\n\n## ⚙️ Tools used\n\n* **Tally** – to collect client quote requests\n* **n8n** – to automate everything, no code needed\n* **Airtable** – to store leads and track status\n* **Slack** – to instantly notify your sales team\n* **Gmail** – to confirm the request with the client\n\n---\n\n## 🧩 Flow structure overview\n\n1. Trigger from a Tally form using a webhook\n2. Extract and format the data\n3. Create a new record in Airtable\n4. Send a message to Slack\n5. Wait 5 minutes\n6. Send an email confirmation via Gmail\n\n---\n\n## 📥 Step 1 – Webhook (Tally)\n\nThis node listens for incoming quote requests from the Tally form.\n\n* **HTTP Method:** POST\n* **Path:** /Request a Quote\n* **Authentication:** None\n* **Respond:** Immediately\n\nThe data arrives as an array inside `body.data.fields`. Each field has a `label` and a `value` that we’ll need to map manually.\n\n---\n\n## 🧹 Step 2 – Edit Fields (Set)\n\nThis step extracts usable values from the raw form data.\n\nExample mapping:\n\n```\nName = {{ $json.body.data.fields[0].label }}\nEmail Address = {{ $json.body.data.fields[1].value }}\nType of Service Needed = {{ $json.body.data.fields[2].value }}\nEstimated Budget = {{ $json.body.data.fields[3].value }}\nPreferred Timeline = {{ $json.body.data.fields[4].value }}\nAdditional Details or Questions = {{ $json.body.data.fields[5].value }}\n```\n\n---\n\n## 📊 Step 3 – Create record in Airtable\n\nWe send the cleaned fields into a database (CRM) in Airtable.\n\n* **Operation:** Create\n* **Base & Table:** Request a Quote - Airtable Base\n* **Mapping:** Manual field-to-column matching\n\nEach quote submission becomes a new record with all project details.\n\n---\n\n## 📣 Step 4 – Send a message to Slack\n\nThis node notifies your sales team immediately in a Slack channel.\n\nMessage format:\n\n```\n:new: *New quote request received!*\n\n👤 Name: {{ $json.fields.Name }}\n📧 Email: {{ $json.fields.Email }}\n💼 Service: {{ $json.fields[\"Type of Service\"] }}\n💰 Budget: {{ $json.fields[\"Estimated Budget (€)\"] }}\n⏱️ Timeline: {{ $json.fields[\"Preferred Timeline\"] }}\n📝 Notes: {{ $json.fields[\"Additional Details\"] }}\n```\n\n---\n\n## ⏳ Step 5 – Wait 5 minutes\n\nThis node simply delays the email by 5 minutes.\nWhy? To give a human salesperson time to reach out manually before the automated confirmation goes out. It adds a personal buffer.\n\n---\n\n## 📧 Step 6 – Send confirmation via Gmail\n\n* **To:** {{ \\$('Edit Fields').item.json\\[\"Email Address\"] }}\n* **Subject:** Thanks for your quote request 🙌\n* **Email Type:** HTML\n\nMessage body:\n\n```\nHi {{ $('Edit Fields').item.json.Name }},\n\nThanks a lot for your quote request — we’ve received your information!\n\nOur team will get back to you within the next 24 hours to discuss your project.\n\nTalk soon,  \n— The WebExperts Team\n```\n\n---\n\n## ✅ Final result\n\nWith this automation in place:\n\n* The client feels acknowledged and taken seriously\n* Your team gets notified in real time\n* You store everything in a clean, structured database\n\nAll this without writing a single line of backend code. It’s fast, scalable, and business-ready.\n",
+  "featuredImage": "/data/workflows/5458/5458.webp",
+  "author": {
+    "id": 101,
+    "slug": "baptistefort",
+    "name": "Baptiste Fort",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 818,
+  "downloads": 81,
+  "createdAt": "2025-06-29T19:34:09.144Z",
+  "updatedAt": "2026-01-16T08:39:47.512Z",
+  "publishedAt": "2025-06-29T19:34:09.144Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5458"
+}

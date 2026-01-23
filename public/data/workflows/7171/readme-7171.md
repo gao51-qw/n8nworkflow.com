@@ -1,0 +1,80 @@
+# Build a GLPI knowledge base RAG pipeline with Google Gemini and PostgreSQL
+
+> ## Description
+This workflow automates the creation of a Retrieval-Augmented Generation (RAG) pipeline using content from the GLPI Knowledge Base. It retrieves and processes FAQ articles directly via the GLPI API, cleans and vectorizes the content using pgvector in PostgreSQL, and prepares the data for use by LLM-powered AI agents.
+
+
+
+## What Problem Does This Solve?
+Manually building a RAG pipeline from a GLPI knowledge base requires integrating multiple tools, cleaning data, and managing embeddings—tasks that are often complex and repetitive. This subworkflow simplifies the entire process by automating data retrieval, transformation, and vector storage, allowing you to focus on building intelligent support agents or chatbots powered by your internal documentation.
+
+## Features
+Connects to GLPI via API to fetch FAQ articles
+
+Cleans and normalizes content for better embedding quality
+
+Generates vector embeddings using Google Gemini (or another model)
+
+Stores embeddings in a PostgreSQL database with pgvector
+
+Fully modular: easily integrate with any RAG-ready LLM pipeline
+
+## Prerequisites
+Before using this subworkflow, make sure you have:
+
+A GLPI instance installed on a Linux server with API access enabled
+
+A PostgreSQL database with the pgvector extension installed
+
+An OpenAI API key (or alternative embedding provider)
+
+n8n instance (self-hosted or cloud)
+
+## Suggested Usage
+This subworkflow is intended to be part of a larger AI pipeline. Attach it to a scheduled workflow (e.g. daily sync) or use it in response to updates in your GLPI base. Ideal for internal support bots, IT documentation assistants, and help desk AI agents that rely on up-to-date knowledge.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7171
+- **Complexity:** intermediate
+- **Node Count:** 9
+- **Views:** 244
+- **Downloads:** 24
+- **Created:** 2025/8/8
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7171)
+
+## 👤 Author
+
+- **Name:** Thiago Vazzoler Loureiro
+- **Username:** @thiagovazzoler
+
+## 🏷️ Categories
+
+- Internal Wiki
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **@n8n/n8n-nodes-langchain.chatTrigger** 
+- **@n8n/n8n-nodes-langchain.embeddingsGoogleGemini** (×2)
+- **stickyNote** 
+- **@n8n/n8n-nodes-langchain.vectorStorePGVector** (×2)
+- **@n8n/n8n-nodes-langchain.memoryBufferWindow** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 9 nodes with 8 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

@@ -1,0 +1,26 @@
+{
+  "id": 4105,
+  "slug": "4105",
+  "title": "Generate invoices, save to Drive and send email to customer with JS + G Sheets",
+  "description": "This workflow automates invoice generation from form submissions, ensuring unique order IDs, creating PDF invoices, storing files, emailing customers, and logging invoice data — all seamlessly integrated.\n\n---\n\n## 🔹 Workflow Overview\n\n1. **Trigger (Webhook)**\n   Starts when an order form is submitted, capturing customer and order details.\n\n2. **Generate Random Order ID**\n   A Function node creates a unique alphanumeric invoice ID (e.g., `INV-X92B7D`).\n\n3. **Check for Duplicate Order ID**\n   Google Sheets looks up the generated order ID in your invoice log sheet to prevent duplicates.\n\n4. **Conditional Check (IF Node)**\n\n   * If the ID already exists → regenerates a new ID (loops back)\n   * If unique → proceeds to invoice creation\n\n5. **Prepare Invoice Data**\n   A Set node formats customer info, date, order items, and the unique order ID to fit your invoice template.\n\n6. **Convert HTML to PDF**\n   HTTP Request node sends your invoice HTML to the RapidAPI HTML-to-PDF service and receives the PDF file.\n\n7. **Upload PDF to Cloud Storage**\n   Save the PDF in Google Drive or Dropbox with a clear file name like `Invoice-INV-X92B7D.pdf`.\n\n8. **Send Invoice Email to Customer**\n   Email node attaches the PDF and includes the order ID in the email subject/body.\n\n9. **Log Invoice Details**\n   Append invoice data (customer info, order ID, total, PDF link) to your Google Sheet for tracking.\n\n---\n\n## ⚙️ Node Details & Setup\n\n### 1. Webhook Trigger\n\n* Configure to receive form submissions (order details like name, email, items, total).\n\n### 2. Function: Generate Random Order ID\n\n* Sample JS code generates unique IDs prefixed by `INV-`.\n\n### 3. Google Sheets: Lookup Row\n\n* Set up connection to your invoice log sheet.\n* Search for existing order ID to avoid duplicates.\n\n### 4. IF Node: Check Order ID Existence\n\n* Condition: If order ID found → loop to regenerate.\n* Else → continue workflow.\n\n### 5. Set Node: Prepare Invoice HTML\n\n* Define variables like customer name, date, items, and order ID.\n* This data populates your HTML invoice template.\n\n### 6. HTTP Request: Convert HTML to PDF\n\n* [API URL to get your key](https://rapidapi.com/rhodium/api/html2pdf2/playground/apiendpoint_9b1017c6-2f56-4b7e-80d5-0fe24937d398)\n* Send invoice HTML in the request body.\n* Receive PDF file blob or download URL.\n\n### 7. Google Drive (or Dropbox) Upload\n\n* Upload the PDF file.\n* Use file name format: `Invoice-{{$json[\"order_id\"]}}.pdf`\n\n### 8. Email Node\n\n* Recipient: customer email from the form data.\n* Attach generated PDF.\n* Include order ID in email subject or body for reference.\n\n### 9. Google Sheets: Append Row\n\n* Log invoice metadata to keep records updated.\n\n---\n\n## 📁 Google Sheets Template\n\nYou can make a copy of the invoice log template [here](https://docs.google.com/spreadsheets/d/1QW_Lg1aoEBku8GaxwPbZfBY5ITAuSdvoAXRyNdCEujM/edit?gid=0)\n\n`This sheet includes columns for order\\_id, customer name, email, total, and invoice PDF link. Customize it as needed.`\n\n---\n\n## 📌 Additional Notes\n\n* Customize the invoice HTML template inside the Set node to match your branding.\n* Ensure API credentials for RapidAPI, Google Drive/Dropbox, and email are properly set up in your n8n credentials.\n* You can expand this workflow by adding payment processing or SMS notifications.\n\n---\n\n## Need help or want a custom workflow?\n\nReach out via email at [joseph@uppfy.com](mailto:joseph@uppfy.com).",
+  "featuredImage": "/data/workflows/4105/4105.webp",
+  "author": {
+    "id": 101,
+    "slug": "mjomba",
+    "name": "Joseph",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 7639,
+  "downloads": 763,
+  "createdAt": "2025-05-16T11:59:58.245Z",
+  "updatedAt": "2026-01-16T08:33:05.242Z",
+  "publishedAt": "2025-05-16T11:59:58.245Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4105"
+}

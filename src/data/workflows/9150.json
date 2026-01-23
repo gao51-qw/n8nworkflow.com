@@ -1,0 +1,163 @@
+{
+  "id": 9150,
+  "slug": "9150",
+  "title": "Automated email verification & onboarding with VerifiEmail, Gmail & Slack",
+  "description": "# Customer Onboarding Email Verification\n\nAutomated email verification and welcome email workflow that validates new user signups, prevents fake emails, and creates a seamless onboarding experience with real-time team notifications.\n\n## Features\n\n✅ Real-time email validation with VerifiEmail API  \n✅ Automatic data sanitization (lowercase, trim whitespace)  \n✅ Smart typo detection and correction suggestions  \n✅ Disposable email domain blocking  \n✅ Professional HTML welcome emails with responsive design  \n✅ Automatic duplicate prevention in Google Sheets logging  \n✅ Real-time Slack notifications for sales/marketing teams  \n✅ MX record and SMTP deliverability checks  \n\n## What You Need\n\n### Required Accounts/APIs:\n\n1. **VerifiEmail API** - For email validation ([verifi.email](https://verifi.email))\n2. **Gmail account** (or SMTP server) - For sending welcome emails\n3. **Google Sheets** - For logging verified users\n4. **Slack workspace** - For team notifications (optional but recommended)\n\n## Setup Instructions\n\n1. **Create Google Sheet**\n   - Create new spreadsheet named \"Verified Users\"\n   - Add headers: Name | Email | Status | Verified At | Original Email | Validation Score\n\n2. **Connect Credentials**\n   - Add VerifiEmail API key in n8n credentials\n   - Connect Gmail via OAuth2 (enable 2FA, generate app password if needed)\n   - Connect Google Sheets via OAuth2\n   - Connect Slack workspace via OAuth2\n\n3. **Customize Email Template**\n   - Open \"Personalize Welcome Email\" node\n   - Replace \"Your Company\" with your brand name (appears 3 times)\n   - Update CTA URLs:\n     - `yourapp.com/dashboard` → Your actual dashboard URL\n     - `yourapp.com/getting-started` → Your docs/guide URL\n     - `yourapp.com/support` → Your support page URL\n   - Modify colors: Purple gradient `#667eea` to `#764ba2` (line 37)\n\n4. **Configure Slack Channel**\n   - Create #new-signup channel in Slack (or use existing)\n   - Update channel in \"Team Notification\" node\n\n5. **Test Workflow**\n   - Activate workflow\n   - Copy webhook URL from Webhook node\n   - Test with: `curl -X POST [webhook-url] -H \"Content-Type: application/json\" -d '{\"name\":\"Test User\",\"email\":\"test@gmail.com\"}'`\n\n6. **Integrate with Your Signup Form**\n   - Point form submission to webhook URL\n   - Ensure payload includes `name` and `email` fields\n\n## Input Format\n\nSend POST request to webhook with this JSON:\n\n```json\n{\n  \"name\": \"John Doe\",\n  \"email\": \"johndoe@gmail.com\"\n}\n```\n\nThe workflow handles various input formats (nested in `body` field, query params, etc.) and sanitizes automatically.\n\n## Output\n\nAfter execution, you'll get:\n\n1. **Email validated** via VerifiEmail API with deliverability score\n2. **Welcome email sent** to user with personalized greeting and CTAs\n3. **User logged** to Google Sheets with timestamp and validation details\n4. **Slack notification** sent to team with user details and status\n5. **Invalid emails blocked** with typo correction suggestions prepared\n\n### For Valid Emails (~85-90%):\n- Professional HTML welcome email delivered\n- Entry added to \"Verified Users\" sheet\n- Real-time Slack alert to #new-signup channel\n\n### For Invalid Emails (~10-15%):\n- Workflow stops with error message\n- No email sent (prevents bounces)\n- Typo suggestion prepared (e.g., gmial.com → gmail.com)\n\n## Customization\n\n### Change Email Design:\nEdit the \"Personalize Welcome Email\" node HTML:\n- **Colors**: Change gradient in line 37: `background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)`\n- **Logo**: Add `<img>` tag in header section\n- **Buttons**: Modify CTA text and links in lines 45-65\n- **Footer**: Update copyright year and company name\n\n### Modify Validation Rules:\nIn \"Prepare Correction Email\" node, add more typo patterns:\n```javascript\nconst commonTypos = {\n  'gmial': 'gmail',\n  'gmai': 'gmail',\n  // Add your custom patterns:\n  'yourdomain': 'yourcorrectdomain'\n}\n```\n\n### Enable Correction Email Sending:\nReplace \"Stop and Error\" node with Gmail \"Send Email\" node:\n- Connect from \"Prepare Correction Email\"\n- Use `{{ $json.email }}` as recipient\n- Use `{{ $json.emailBody }}` as message\n- User receives helpful correction suggestion instead of silent failure\n\n### Add More Notification Channels:\nAfter \"Log Valid Users\" node, add:\n- Discord webhook for team notifications\n- Microsoft Teams connector\n- Email to sales@ or support@\n- Custom webhook to your CRM\n\n### Log Invalid Attempts:\nAdd Google Sheets node after \"Prepare Correction Email\":\n- Create \"Invalid Attempts\" tab in same spreadsheet\n- Log: Name, Email, Reason, Suggestion, Timestamp\n- Analyze patterns weekly for form improvements\n\n## Troubleshooting\n\n**\"undefined\" error in Data Sanitization:**\n- Check webhook payload structure\n- Verify `name` and `email` fields are present\n- Test with the debug code provided in sticky notes\n\n**All emails marked as invalid:**\n- Verify VerifiEmail API key is active\n- Test API directly at verifi.email dashboard\n\n**Welcome emails not sending:**\n- Confirm Gmail OAuth2 is connected (check for expired tokens)\n- Verify sending limits not exceeded\n- Check spam folder if testing with personal email\n- Review Gmail \"Sent\" folder for delivery confirmation\n\n**No Slack notifications:**\n- Verify OAuth2 connection is active\n- Check bot has permission to post in #new-signup channel\n- Confirm channel ID is correct\n- Test Slack credentials in n8n\n\n**Duplicate entries in Google Sheets:**\n- Verify \"Email\" is set as matching column\n- Confirm operation is \"Append or Update\" not just \"Append\"\n- Check Sheet1 has the exact column names expected\n\n**High validation failure rate:**\n- Review invalid emails in execution logs\n- Check for form submission issues (bots, testing)\n- Verify VerifiEmail API is not blocking legitimate domains\n\n## Performance Optimization\n\nFor high-volume signups (&gt;100/day):\n- Switch Slack notifications to hourly digest\n- Implement rate limiting on webhook\n- Consider caching frequent domain validations\n- Use Google Workspace for higher email sending limits\n\n## Maintenance\n\n**Weekly:**\n- Check VerifiEmail API usage and quota\n- Review Slack notifications for anomalies\n- Scan Google Sheets for data quality\n- Test with sample signup\n\n**Monthly:**\n- Archive old Google Sheets data (&gt;90 days)\n- Review invalid email patterns\n- Update email template if needed\n- Audit credential security\n\n## Support\n\nFor issues or questions, visit the [n8n community forum](https://community.n8n.io).\n\n---",
+  "featuredImage": "/data/workflows/9150/9150.webp",
+  "author": {
+    "id": 101,
+    "slug": "jiteshdugar",
+    "name": "Jitesh Dugar",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 180,
+  "downloads": 18,
+  "createdAt": "2025-10-01T11:23:38.672Z",
+  "updatedAt": "2026-01-16T08:59:13.010Z",
+  "publishedAt": "2025-10-01T11:23:38.672Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9150",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated email verification & onboarding with VerifiEmail, Gmail & Slack",
+    "workflowName": "Automated email verification & onboarding with VerifiEmail, Gmail & Slack",
+    "description": "# Customer Onboarding Email Verification\n\nAutomated email verification and welcome email workflow that validates new user signups, prevents fake emails, and creates a seamless onboarding experience with real-time team notifications.\n\n## Features\n\n✅ Real-time email validation with VerifiEmail API  \n✅ Automatic data sanitization (lowercase, trim whitespace)  \n✅ Smart typo detection and correction suggestions  \n✅ Disposable email domain blocking  \n✅ Professional HTML welcome emails with responsive design  \n✅ Automatic duplicate prevention in Google Sheets logging  \n✅ Real-time Slack notifications for sales/marketing teams  \n✅ MX record and SMTP deliverability checks  \n\n## What You Need\n\n### Required Accounts/APIs:\n\n1. **VerifiEmail API** - For email validation ([verifi.email](https://verifi.email))\n2. **Gmail account** (or SMTP server) - For sending welcome emails\n3. **Google Sheets** - For logging verified users\n4. **Slack workspace** - For team notifications (optional but recommended)\n\n## Setup Instructions\n\n1. **Create Google Sheet**\n   - Create new spreadsheet named \"Verified Users\"\n   - Add headers: Name | Email | Status | Verified At | Original Email | Validation Score\n\n2. **Connect Credentials**\n   - Add VerifiEmail API key in n8n credentials\n   - Connect Gmail via OAuth2 (enable 2FA, generate app password if needed)\n   - Connect Google Sheets via OAuth2\n   - Connect Slack workspace via OAuth2\n\n3. **Customize Email Template**\n   - Open \"Personalize Welcome Email\" node\n   - Replace \"Your Company\" with your brand name (appears 3 times)\n   - Update CTA URLs:\n     - `yourapp.com/dashboard` → Your actual dashboard URL\n     - `yourapp.com/getting-started` → Your docs/guide URL\n     - `yourapp.com/support` → Your support page URL\n   - Modify colors: Purple gradient `#667eea` to `#764ba2` (line 37)\n\n4. **Configure Slack Channel**\n   - Create #new-signup channel in Slack (or use existing)\n   - Update channel in \"Team Notification\" node\n\n5. **Test Workflow**\n   - Activate workflow\n   - Copy webhook URL from Webhook node\n   - Test with: `curl -X POST [webhook-url] -H \"Content-Type: application/json\" -d '{\"name\":\"Test User\",\"email\":\"test@gmail.com\"}'`\n\n6. **Integrate with Your Signup Form**\n   - Point form submission to webhook URL\n   - Ensure payload includes `name` and `email` fields\n\n## Input Format\n\nSend POST request to webhook with this JSON:\n\n```json\n{\n  \"name\": \"John Doe\",\n  \"email\": \"johndoe@gmail.com\"\n}\n```\n\nThe workflow handles various input formats (nested in `body` field, query params, etc.) and sanitizes automatically.\n\n## Output\n\nAfter execution, you'll get:\n\n1. **Email validated** via VerifiEmail API with deliverability score\n2. **Welcome email sent** to user with personalized greeting and CTAs\n3. **User logged** to Google Sheets with timestamp and validation details\n4. **Slack notification** sent to team with user details and status\n5. **Invalid emails blocked** with typo correction suggestions prepared\n\n### For Valid Emails (~85-90%):\n- Professional HTML welcome email delivered\n- Entry added to \"Verified Users\" sheet\n- Real-time Slack alert to #new-signup channel\n\n### For Invalid Emails (~10-15%):\n- Workflow stops with error message\n- No email sent (prevents bounces)\n- Typo suggestion prepared (e.g., gmial.com → gmail.com)\n\n## Customization\n\n### Change Email Design:\nEdit the \"Personalize Welcome Email\" node HTML:\n- **Colors**: Change gradient in line 37: `background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)`\n- **Logo**: Add `<img>` tag in header section\n- **Buttons**: Modify CTA text and links in lines 45-65\n- **Footer**: Update copyright year and company name\n\n### Modify Validation Rules:\nIn \"Prepare Correction Email\" node, add more typo patterns:\n```javascript\nconst commonTypos = {\n  'gmial': 'gmail',\n  'gmai': 'gmail',\n  // Add your custom patterns:\n  'yourdomain': 'yourcorrectdomain'\n}\n```\n\n### Enable Correction Email Sending:\nReplace \"Stop and Error\" node with Gmail \"Send Email\" node:\n- Connect from \"Prepare Correction Email\"\n- Use `{{ $json.email }}` as recipient\n- Use `{{ $json.emailBody }}` as message\n- User receives helpful correction suggestion instead of silent failure\n\n### Add More Notification Channels:\nAfter \"Log Valid Users\" node, add:\n- Discord webhook for team notifications\n- Microsoft Teams connector\n- Email to sales@ or support@\n- Custom webhook to your CRM\n\n### Log Invalid Attempts:\nAdd Google Sheets node after \"Prepare Correction Email\":\n- Create \"Invalid Attempts\" tab in same spreadsheet\n- Log: Name, Email, Reason, Suggestion, Timestamp\n- Analyze patterns weekly for form improvements\n\n## Troubleshooting\n\n**\"undefined\" error in Data Sanitization:**\n- Check webhook payload structure\n- Verify `name` and `email` fields are present\n- Test with the debug code provided in sticky notes\n\n**All emails marked as invalid:**\n- Verify VerifiEmail API key is active\n- Test API directly at verifi.email dashboard\n\n**Welcome emails not sending:**\n- Confirm Gmail OAuth2 is connected (check for expired tokens)\n- Verify sending limits not exceeded\n- Check spam folder if testing with personal email\n- Review Gmail \"Sent\" folder for delivery confirmation\n\n**No Slack notifications:**\n- Verify OAuth2 connection is active\n- Check bot has permission to post in #new-signup channel\n- Confirm channel ID is correct\n- Test Slack credentials in n8n\n\n**Duplicate entries in Google Sheets:**\n- Verify \"Email\" is set as matching column\n- Confirm operation is \"Append or Update\" not just \"Append\"\n- Check Sheet1 has the exact column names expected\n\n**High validation failure rate:**\n- Review invalid emails in execution logs\n- Check for form submission issues (bots, testing)\n- Verify VerifiEmail API is not blocking legitimate domains\n\n## Performance Optimization\n\nFor high-volume signups (&gt;100/day):\n- Switch Slack notifications to hourly digest\n- Implement rate limiting on webhook\n- Consider caching frequent domain validations\n- Use Google Workspace for higher email sending limits\n\n## Maintenance\n\n**Weekly:**\n- Check VerifiEmail API usage and quota\n- Review Slack notifications for anomalies\n- Scan Google Sheets for data quality\n- Test with sample signup\n\n**Monthly:**\n- Archive old Google Sheets data (&gt;90 days)\n- Review invalid email patterns\n- Update email template if needed\n- Audit credential security\n\n## Support\n\nFor issues or questions, visit the [n8n community forum](https://community.n8n.io).\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Data Sanitization",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email Validation",
+      "type": "n8n-nodes-verifiemail.verifiEmail",
+      "role": "verifiEmail",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Validation Decision",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Personalize Welcome Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Correction Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Team Notification",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Log Valid Users",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -12,6 +12,9 @@ import EmptyState from '../../components/ui/EmptyState.astro';
 import SortDropdown from '../../components/ui/SortDropdown.astro';
 import { getCategories, getCategoryBySlug } from '../../lib/services/categories';
 import { getWorkflows } from '../../lib/services/workflows';
+import type { Workflow } from '../../lib/types/workflow';
+
+export const prerender = false;
 
 // 生成静态路径
 export async function getStaticPaths() {
@@ -28,15 +31,31 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const { category } = Astro.props;
+let category = Astro.props.category;
+
+// 如果 category 不存在（例如在 SSR 模式下），尝试按 slug 获取
+if (!category && slug) {
+  const result = await getCategoryBySlug(slug);
+  if (result) {
+    category = result;
+  }
+}
+
+// 如果仍然没有找到分类，重定向到 404
+if (!category) {
+  return Astro.redirect('/404');
+}
 
 // 获取分页参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const complexityFilter = Astro.url.searchParams.get('complexity') || undefined;
+const priceFilter = Astro.url.searchParams.get('price') as 'free' | 'paid' | undefined;
+
 const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
 // 获取该分类下的工作流
-let workflows = [];
+let workflows: Workflow[] = [];
 let totalCount = 0;
 
 try {
@@ -44,12 +63,19 @@ try {
     category: slug,
     limit: pageSize,
     offset: offset,
+    complexity: complexityFilter,
+    price: priceFilter,
   });
   workflows = result.workflows;
   totalCount = result.total;
 } catch (error) {
   console.error('Error fetching workflows:', error);
 }
+
+// 构建基础 URL，保留现有的筛选参数（除了 page）
+const baseUrlObj = new URL(Astro.url);
+baseUrlObj.searchParams.delete('page');
+const paginationBaseUrl = baseUrlObj.pathname + (baseUrlObj.search ? baseUrlObj.search : '');
 
 // SEO 配置
 const seoConfig = {
@@ -115,7 +141,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            baseUrl={`/categories/${slug}`}
+            baseUrl={paginationBaseUrl}
           />
         )}
       </>

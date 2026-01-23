@@ -1,0 +1,236 @@
+{
+  "id": 2326,
+  "slug": "2326",
+  "title": "Organise an Event using Slack, Google Calendar and AI",
+  "description": "This n8n workflow takes Slack conversations and turns them into Calendar events complete with accurate date and times and location information. Adding and removing attendees are also managed automatically.\n\n## How it works\n\n* Workflow monitors a Slack channel for invite messages with a \"📅\" reaction and sends this to the AI agent.\n* AI agent parses the message determining the time, date and location.\n* Using its Location tool, the AI agent searches for the precise location address from Google Maps.\n* Using its Calendar tool, the AI agent creates a Google Calendar invite with the title, description and location address for the user.\n* Back in the Slack channel, others can RSVP to the invite by reacting with the \"✅\" emjoi.\n* The workflow polls the message after a while and adds the users who have reacted to the Calendar Invite as attendees. Conversely, removing any attendees who have since removed their reaction.\n\n## Examples\n\n**Jill**: \"Hey team, I'm organising a round of Laser Tag (Bunker 51) next Thursday around 6pm. Please RSVP with a ✅\"\n\n**AI**: \"I've helped you create an event in your calendar https://cal.google.com/...\"\n\n**Jack**: \"✅\"\n\n**AI**: \"I've added Jack to the event as an attendee\".\n\n## Requirements\n* Slack channel to attach the workflow\n* OpenAI account to use a GPT model\n* Google Calendar to create and update events\n\n## Customising the Workflow\n\nThis workflow can work with other messaging platforms that support reactions or tagging like features such as discord. Don't use Google Calendar? Swap it out for Outlook or your own.\n\nUse any combinations of emjoi reactions and add new rules like \"RSVP maybe\" which could send reminder updates nearer the event date.",
+  "featuredImage": "/data/workflows/2326/2326.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 7901,
+  "downloads": 790,
+  "createdAt": "2024-07-10T10:46:41.626Z",
+  "updatedAt": "2026-01-16T08:24:04.410Z",
+  "publishedAt": "2024-07-10T10:46:41.626Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2326",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Organise an Event using Slack, Google Calendar and AI",
+    "workflowName": "Organise an Event using Slack, Google Calendar and AI",
+    "description": "This n8n workflow takes Slack conversations and turns them into Calendar events complete with accurate date and times and location information. Adding and removing attendees are also managed automatically.\n\n## How it works\n\n* Workflow monitors a Slack channel for invite messages with a \"📅\" reaction and sends this to the AI agent.\n* AI agent parses the message determining the time, date and location.\n* Using its Location tool, the AI agent searches for the precise location address from Google Maps.\n* Using its Calendar tool, the AI agent creates a Google Calendar invite with the title, description and location address for the user.\n* Back in the Slack channel, others can RSVP to the invite by reacting with the \"✅\" emjoi.\n* The workflow polls the message after a while and adds the users who have reacted to the Calendar Invite as attendees. Conversely, removing any attendees who have since removed their reaction.\n\n## Examples\n\n**Jill**: \"Hey team, I'm organising a round of Laser Tag (Bunker 51) next Thursday around 6pm. Please RSVP with a ✅\"\n\n**AI**: \"I've helped you create an event in your calendar https://cal.google.com/...\"\n\n**Jack**: \"✅\"\n\n**AI**: \"I've added Jack to the event as an attendee\".\n\n## Requirements\n* Slack channel to attach the workflow\n* OpenAI account to use a GPT model\n* Google Calendar to create and update events\n\n## Customising the Workflow\n\nThis workflow can work with other messaging platforms that support reactions or tagging like features such as discord. Don't use Google Calendar? Swap it out for Outlook or your own.\n\nUse any combinations of emjoi reactions and add new rules like \"RSVP maybe\" which could send reminder updates nearer the event date.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "For Each User ID...",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get User",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Search for Invite Requests",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Existing Invite EventID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Should Create Event?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Invite Reactions",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Invite Replies",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Extract Invite Reactions",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Old EventId",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Add Attendee to Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Event Details",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Is Attending",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Get User Email",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Should Add Attendee?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "SerpAPI",
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "role": "toolSerpApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "role": "toolWikipedia",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Reply Invite with EventId",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Calendar Event Booking Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

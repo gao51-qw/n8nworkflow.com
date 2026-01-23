@@ -1,0 +1,158 @@
+{
+  "id": 9252,
+  "slug": "9252",
+  "title": "Validate email lists weekly with Google Sheets, VerifiEmail and Gmail reports",
+  "description": "# Email List Hygiene - Automated Weekly Validator\n\n## Overview\n\nValidates email lists through automated checks, categorizes results as Valid/Invalid/Risky, updates Google Sheets in real-time, and delivers HTML reports. Runs every Friday at 5 PM via cron scheduling.\n\n---\n\n## Workflow Architecture\n\n```\nSchedule Trigger → Read Google Sheets → Loop (Process Each Email)\n    → Validate API → IF Branch (Valid/Invalid)\n    → Update Google Sheets → Merge → Loop Back\n    → Calculate Statistics → Send Email Report\n```\n\n### Loop Mechanism\n- Split in Batches processes one email at a time\n- Each email: validate → branch → update sheet → merge → continue\n- Loop accumulates all results internally\n- \"Done\" output triggers statistics calculation after all emails processed\n\n### Health Score Formula\n```\nScore = (Valid% × 100) - (Invalid% × 20) - (Risky% × 10)\nBounded: 0-100\n```\n\n**Ranges:**\n- 80-100: Excellent (green)\n- 60-79: Good (orange)  \n- 0-59: Needs Attention (red)\n\n---\n\n## Prerequisites\n\n**Required:**\n- Google account with Sheets access\n- Email validation API (VerifiEmail)\n- n8n v1.0+\n\n## Google Sheet Structure\n\n| Column | Type | Filled By |\n|--------|------|-----------|\n| row_number | Number | Auto-generated |\n| name | Text | You |\n| email | Text | You |\n| status | Text | Workflow |\n| checked_at | Text | Workflow |\n| notes | Text | Workflow |\n\nOnly populate first three columns.\n\n---\n\n## Setup\n\n### 1. Import Template\nImport JSON file to n8n via Workflows → Add workflow → Import from File\n\n### 2. Configure Credentials\n\n**Google Sheets OAuth2** (used by 3 nodes):\n- Create credential via any Google Sheets node\n- Grant spreadsheet permissions\n- Apply same credential to all Google Sheets nodes\n\n**Validation API:**\n- Get API key from https://verifi.email\n- Add credential to \"Validate Email Address\" node\n\n**Gmail OAuth2:**\n- Add credential to \"Send Weekly Report\" node\n- Grant email sending permissions\n\n### 3. Connect Google Sheet\n\nIn all three Google Sheets nodes:\n- Select your spreadsheet from Document dropdown\n- Select sheet tab\n- Verify \"Column to Match On\" = row_number (for Update nodes)\n\n### 4. Set Email Recipient\n\nIn \"Send Weekly Report\" node:\n- Change \"Send To\" from placeholder to your email\n- Optional: Add CC/BCC for multiple recipients\n\n### 5. Test\n\n- Add 3-5 test emails (mix of valid/invalid)\n- Click \"Execute Workflow\"\n- Verify sheet updates and email arrives\n\n### 6. Activate\n\nToggle \"Active\" switch. Workflow runs automatically every Friday at 5 PM.\n\n---\n\n## Customization\n\n**Change Schedule:**\nEdit \"Weekly Schedule\" node cron expression:\n- Daily 9 AM: `0 9 * * *`\n- Monday 5 PM: `0 17 * * 1`\n- First of month: `0 9 1 * *`\n\n**Email Design:**\nEdit HTML in \"Send Weekly Report\" message field. Modify colors (search hex codes), text, or add branding.\n\n**Archive Invalid Emails:**\nAdd Google Sheets Append node after \"Update Invalid Status\" → create \"Invalid_Archive\" tab → append email, name, reason, date\n\n**Slack Notifications:**\nAdd Slack node after email report → configure channel → use summary text from statistics\n\n**Rate Limiting:**\nAdd Wait node (1-2 seconds) after validation for large lists to prevent API throttling\n\n---\n\n## Troubleshooting\n\n**\"Column not found\":**\nVerify exact column names in sheet: `row_number`, `name`, `email`, `status`, `checked_at`, `notes` (case-sensitive)\n\n**Only processes 1 email:**\nCheck Google Sheets node Range field is empty or set to include all rows. Verify \"Use Header Row\" enabled.\n\n**Wrong statistics:**\nEnable \"Execute Once\" in Calculate Statistics node settings (gear icon)\n\n**Email not arriving:**\nCheck spam/promotions folder, verify Gmail credential authorized, confirm recipient address correct\n\n**API errors:**\nVerify API key valid, check quota not exceeded, test with simple email like test@gmail.com\n\n**Merge node error:**\nConfirm both Update nodes connect to Merge inputs (top and bottom). Check both branches execute successfully.\n\n---\n\n## Validation Checks\n\nEach email undergoes:\n- RFC 5322 format compliance\n- MX record existence (domain has mail servers)\n- SMTP verification (mailbox exists)\n- Disposable email service detection\n- Catch-all domain detection\n\n**Categories:**\n- Valid: All checks passed\n- Invalid: Critical checks failed\n- Risky: Disposable or catch-all domain\n\n---\n\n## Support\n\nCheck execution logs in n8n Executions tab for errors. Use \"Execute Node\" on individual nodes to isolate issues. Visit n8n community forum for additional help.\n\n---\n\n## Tags\n`email-validation` `marketing-automation` `data-cleaning` `google-sheets` `scheduled-workflow` `deliverability` `list-hygiene`",
+  "featuredImage": "/data/workflows/9252/9252.webp",
+  "author": {
+    "id": 101,
+    "slug": "jiteshdugar",
+    "name": "Jitesh Dugar",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 137,
+  "downloads": 13,
+  "createdAt": "2025-10-03T20:30:19.139Z",
+  "updatedAt": "2026-01-16T08:59:40.670Z",
+  "publishedAt": "2025-10-03T20:30:19.139Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9252",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Validate email lists weekly with Google Sheets, VerifiEmail and Gmail reports",
+    "workflowName": "Validate email lists weekly with Google Sheets, VerifiEmail and Gmail reports",
+    "description": "# Email List Hygiene - Automated Weekly Validator\n\n## Overview\n\nValidates email lists through automated checks, categorizes results as Valid/Invalid/Risky, updates Google Sheets in real-time, and delivers HTML reports. Runs every Friday at 5 PM via cron scheduling.\n\n---\n\n## Workflow Architecture\n\n```\nSchedule Trigger → Read Google Sheets → Loop (Process Each Email)\n    → Validate API → IF Branch (Valid/Invalid)\n    → Update Google Sheets → Merge → Loop Back\n    → Calculate Statistics → Send Email Report\n```\n\n### Loop Mechanism\n- Split in Batches processes one email at a time\n- Each email: validate → branch → update sheet → merge → continue\n- Loop accumulates all results internally\n- \"Done\" output triggers statistics calculation after all emails processed\n\n### Health Score Formula\n```\nScore = (Valid% × 100) - (Invalid% × 20) - (Risky% × 10)\nBounded: 0-100\n```\n\n**Ranges:**\n- 80-100: Excellent (green)\n- 60-79: Good (orange)  \n- 0-59: Needs Attention (red)\n\n---\n\n## Prerequisites\n\n**Required:**\n- Google account with Sheets access\n- Email validation API (VerifiEmail)\n- n8n v1.0+\n\n## Google Sheet Structure\n\n| Column | Type | Filled By |\n|--------|------|-----------|\n| row_number | Number | Auto-generated |\n| name | Text | You |\n| email | Text | You |\n| status | Text | Workflow |\n| checked_at | Text | Workflow |\n| notes | Text | Workflow |\n\nOnly populate first three columns.\n\n---\n\n## Setup\n\n### 1. Import Template\nImport JSON file to n8n via Workflows → Add workflow → Import from File\n\n### 2. Configure Credentials\n\n**Google Sheets OAuth2** (used by 3 nodes):\n- Create credential via any Google Sheets node\n- Grant spreadsheet permissions\n- Apply same credential to all Google Sheets nodes\n\n**Validation API:**\n- Get API key from https://verifi.email\n- Add credential to \"Validate Email Address\" node\n\n**Gmail OAuth2:**\n- Add credential to \"Send Weekly Report\" node\n- Grant email sending permissions\n\n### 3. Connect Google Sheet\n\nIn all three Google Sheets nodes:\n- Select your spreadsheet from Document dropdown\n- Select sheet tab\n- Verify \"Column to Match On\" = row_number (for Update nodes)\n\n### 4. Set Email Recipient\n\nIn \"Send Weekly Report\" node:\n- Change \"Send To\" from placeholder to your email\n- Optional: Add CC/BCC for multiple recipients\n\n### 5. Test\n\n- Add 3-5 test emails (mix of valid/invalid)\n- Click \"Execute Workflow\"\n- Verify sheet updates and email arrives\n\n### 6. Activate\n\nToggle \"Active\" switch. Workflow runs automatically every Friday at 5 PM.\n\n---\n\n## Customization\n\n**Change Schedule:**\nEdit \"Weekly Schedule\" node cron expression:\n- Daily 9 AM: `0 9 * * *`\n- Monday 5 PM: `0 17 * * 1`\n- First of month: `0 9 1 * *`\n\n**Email Design:**\nEdit HTML in \"Send Weekly Report\" message field. Modify colors (search hex codes), text, or add branding.\n\n**Archive Invalid Emails:**\nAdd Google Sheets Append node after \"Update Invalid Status\" → create \"Invalid_Archive\" tab → append email, name, reason, date\n\n**Slack Notifications:**\nAdd Slack node after email report → configure channel → use summary text from statistics\n\n**Rate Limiting:**\nAdd Wait node (1-2 seconds) after validation for large lists to prevent API throttling\n\n---\n\n## Troubleshooting\n\n**\"Column not found\":**\nVerify exact column names in sheet: `row_number`, `name`, `email`, `status`, `checked_at`, `notes` (case-sensitive)\n\n**Only processes 1 email:**\nCheck Google Sheets node Range field is empty or set to include all rows. Verify \"Use Header Row\" enabled.\n\n**Wrong statistics:**\nEnable \"Execute Once\" in Calculate Statistics node settings (gear icon)\n\n**Email not arriving:**\nCheck spam/promotions folder, verify Gmail credential authorized, confirm recipient address correct\n\n**API errors:**\nVerify API key valid, check quota not exceeded, test with simple email like test@gmail.com\n\n**Merge node error:**\nConfirm both Update nodes connect to Merge inputs (top and bottom). Check both branches execute successfully.\n\n---\n\n## Validation Checks\n\nEach email undergoes:\n- RFC 5322 format compliance\n- MX record existence (domain has mail servers)\n- SMTP verification (mailbox exists)\n- Disposable email service detection\n- Catch-all domain detection\n\n**Categories:**\n- Valid: All checks passed\n- Invalid: Critical checks failed\n- Risky: Disposable or catch-all domain\n\n---\n\n## Support\n\nCheck execution logs in n8n Executions tab for errors. Use \"Execute Node\" on individual nodes to isolate issues. Visit n8n community forum for additional help.\n\n---\n\n## Tags\n`email-validation` `marketing-automation` `data-cleaning` `google-sheets` `scheduled-workflow` `deliverability` `list-hygiene`",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Calculate Statistics",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Weekly Schedule (Friday 5PM)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Read Email List",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Process Each Email",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Validate Email Address",
+      "type": "n8n-nodes-verifiemail.verifiEmail",
+      "role": "verifiEmail",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Validation Result",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Process Valid Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Process Invalid Email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Valid Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Update Invalid Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Send Weekly Report",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

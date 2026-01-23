@@ -1,0 +1,512 @@
+{
+  "id": 4525,
+  "slug": "4525",
+  "title": "Build a multi-functional Telegram bot with Gemini, RAG PDF search & Google Suite",
+  "description": "## The Ultimate Beginner's Guide to an AI-Powered Telegram Assistant (PDF, Brave search & Google Suite)\n\nThis comprehensive workflow bundle is designed as a powerful starter kit, enabling you to build a multi-functional AI assistant on Telegram. It seamlessly integrates AI-powered voice interactions, an intelligent PDF document search using a Retrieval-Augmented Generation (RAG) system, and automates various Google Suite tasks like calendar management and document generation. Perfect for beginners looking to explore advanced AI and automation capabilities.\n\n## Disclaimer\nThis template is designed for self-hosted n8n instances.\n\n\n## 🚀 Key Features\n*   **Telegram Bot Interface:** Interact with your AI assistant using both text and voice commands through Telegram.\n*   **AI Voice Bot:**\n    *   Transcribes user voice messages using OpenAI Whisper.\n    *   Processes requests with an AI agent powered by Google Gemini.\n    *   Responds with AI-synthesized voice using Replicate API.\n*   **PDF RAG System:**\n    *   Index PDF documents from Google Drive via Telegram commands.\n    *   Utilizes Mistral AI for Optical Character Recognition (OCR) on PDFs.\n    *   Stores document content and embeddings in a Qdrant vector database.\n    *   Answers questions about your documents using Google Gemini, based on retrieved context.\n*   **Google Suite Automation:**\n    *   Manage Google Calendar: Create events, find upcoming holidays, and list birthdays.\n    *   Google Drive: Search for PDF files and manage document templates.\n    *   Google Docs: Automatically generate invoices from templates.\n*   **Intelligent Web Search:** Employs Brave Search for fetching real-time information from the web.\n*   **Versatile AI Agent:** Leverages Google Gemini with a suite of tools including a calculator, date & time utilities, and custom integrations (e.g., example Airbnb tools).\n*   **Command-Driven Functionality:** Easily trigger specific actions using Telegram commands like `/help`, `/pdf`, `/rag`, `/invoice`, `/chat`, `/brave`, and `/birthday`.\n\n## ⚙️ How It Works\nThe workflow is initiated by messages or commands sent to your Telegram bot. A central `Switch` node directs the flow based on the input received.\n\n## 1. Telegram Interaction & Command Routing\n*   A **Telegram Trigger** node listens for new messages (text or voice).\n*   A \"typing...\" indicator is sent to Telegram for better user experience.\n*   The **Switch** node parses the message content and routes it to the appropriate sub-workflow based on predefined commands (e.g., `/pdf`, `/rag`, `/voice`) or general chat.\n\n## 2. AI Voice Bot Functionality\n*   For voice messages (or if the voice path is triggered):\n    *   The voice file is downloaded from Telegram.\n    *   **OpenAI Whisper** transcribes the audio into text.\n    *   The transcribed text is fed to an **AI Agent** (powered by Google Gemini and equipped with various tools and memory).\n    *   The AI Agent's text response is then sent to the **Replicate API** to generate a natural-sounding voice.\n    *   The generated audio response is sent back to the user on Telegram.\n\n## 3. PDF RAG System with Mistral OCR & Qdrant\n*   **Indexing PDFs (via `/qdrant &lt;Google_Drive_File_ID&gt;` command):**\n    *   The specified PDF is downloaded from Google Drive.\n    *   The PDF is uploaded to **Mistral AI** for OCR processing.\n    *   The extracted text (in markdown format) is retrieved.\n    *   The text is split into manageable chunks.\n    *   **OpenAI Embeddings** are generated for each chunk.\n    *   These chunks and their embeddings are stored in a **Qdrant** vector collection.\n    *   A confirmation message is sent to Telegram.\n*   **Querying PDFs (via `/rag &lt;your_question&gt;` command):**\n    *   The user's question is processed by a **RetrievalQA Chain**.\n    *   This chain uses Google Gemini as the Language Model and retrieves relevant document chunks from Qdrant based on semantic similarity (embeddings).\n    *   Google Gemini then generates a concise answer based on the user's question and the retrieved contextual information from the documents.\n    *   The answer is sent back to the user on Telegram.\n*   **Searching PDFs in Drive (via `/pdf &lt;search_term&gt;` command):**\n    *   Searches your Google Drive for PDF files matching the provided search term.\n    *   Sends a list of found PDF files (name and ID) to the user on Telegram, allowing them to easily identify files for indexing with `/qdrant`.\n\n## 4. AI Chat & Task Automation (General Chat & `/chat` command)\n*   Handles general text messages or transcribed voice inputs that are not specific commands.\n*   An **AI Agent** (Google Gemini) processes these inputs.\n*   The agent is equipped with tools such as:\n    *   **Google Calendar Tools:** To create events, find the next public holiday, or list upcoming birthdays.\n    *   **Brave Search Tool:** To search the internet for information.\n    *   **Calculator Tool:** For mathematical computations.\n    *   **Date & Time Utility:** For handling and formatting dates.\n    *   **Example Airbnb Tools:** Demonstrates extensibility for custom tool integrations.\n*   The agent utilizes a \"Think Node\" process for reasoning and **Window Buffer Memory** to maintain conversational context.\n*   Responses are formulated and sent back to the user on Telegram.\n\n## 5. Google Automations\n*   **Invoice Generation (via `/invoice` command):**\n    *   Copies a predefined Google Docs invoice template from your Google Drive.\n    *   Populates the new document with details (client name, items, etc. – currently uses placeholder data from an 'Edit Fields' node, which can be customized to parse input from the command).\n    *   Converts the populated Google Doc into a PDF file.\n    *   Sends the generated PDF invoice to the user via Telegram.\n*   **Calendar Management (via AI Agent or specific commands like `/birthday`):**\n    *   The `/birthday` command fetches upcoming birthdays from a specified Google Calendar.\n    *   The AI Agent can also interact with Google Calendar to create events or retrieve information based on natural language requests.\n\n## 6. Web Search (via `/brave &lt;query&gt;` command or AI Agent)\n*   Performs a web search using the Brave Search API.\n*   Returns a list of search results, including titles and URLs, to the user on Telegram.\n\n## 7. Help Command (`/help`)\n*   Provides the user with a formatted list of all available Telegram commands and their basic usage instructions.\n\n## 🛠️ Setup Steps & Credentials\nTo get this workflow bundle up and running, you'll need to configure several credentials:\n\n1.  **Telegram:**\n    *   Create a new bot via `@BotFather` on Telegram to obtain a **Bot Token**.\n    *   Add this token to the `Telegram Trigger` node and all `Telegram` (sender) nodes in the workflow.\n2.  **OpenAI:**\n    *   Obtain an API Key from [platform.openai.com](https://platform.openai.com).\n    *   Create an `OpenAI` credential.\n    *   Use this credential in the `Convert audio to text` (OpenAI node for Whisper transcription) and all `Embeddings OpenAI` nodes (for RAG system).\n3.  **Replicate API (Text-to-Speech):**\n    *   Sign up at [replicate.com](https://replicate.com) and get your API token.\n    *   Create an `HTTP Bearer Auth` credential using this token.\n    *   Assign this credential to the `Call Replicate API` (HTTP Request) node.\n4.  **Google Gemini (PaLM API):**\n    *   Get an API key from Google AI Studio or Google Cloud Console.\n    *   Create a `Google Gemini(PaLM) Api` credential.\n    *   Assign it to all `Google Gemini Chat Model` nodes.\n5.  **Qdrant (Vector Database):**\n    *   Set up a Qdrant instance (either cloud-hosted or self-managed).\n    *   Note your Qdrant instance URL and API Key (if security is enabled).\n    *   Create a `QdrantApi` credential with these details.\n    *   Assign it to the `Qdrant Vector Store` nodes.\n    *   For the `Refresh collection` node (an HTTP Request node used to clear the collection for `/pdf` command demo), create an `HTTP Header Auth` credential with your Qdrant API key if required by your instance.\n6.  **Mistral AI (PDF OCR):**\n    *   Obtain an API key from [console.mistral.ai](https://console.mistral.ai).\n    *   Create a `Mistral Cloud API` credential.\n    *   Assign this to the `Mistral Upload`, `Mistral Signed URL`, and `Mistral DOC OCR` (HTTP Request) nodes.\n7.  **Google Drive & Google Docs:**\n    *   Ensure the Google Drive API and Google Docs API are enabled in your Google Cloud Console project.\n    *   Set up OAuth 2.0 credentials (Client ID and Client Secret).\n    *   Create `Google Drive OAuth2 Api` and `Google Docs OAuth2 Api` credentials.\n    *   Assign these to the respective `Google Drive` and `Google Docs` nodes throughout the workflow.\n    *   *Important:* Configure relevant Folder IDs (for PDF search, invoice template source, invoice output) and the invoice template Document ID in the Google Drive and Google Docs nodes.\n8.  **Google Calendar:**\n    *   Enable the Google Calendar API in your Google Cloud Console project.\n    *   Set up OAuth 2.0 credentials.\n    *   Create a `Google Calendar OAuth2 Api` credential.\n    *   Assign it to the `Google CalendarTool` and `Google Calendar` nodes.\n    *   Specify the correct calendar names or IDs in the nodes (e.g., for birthdays, holidays, new event creation).\n9.  **Brave Search:**\n    *   Get a Brave Search API key from their developer portal.\n    *   Create a `Brave Search API` credential.\n    *   Assign it to the `Brave Search` nodes and tools.\n10. **(Optional) Airbnb MCP Client:**\n    *   The workflow includes example nodes for Airbnb MCP tools. If you intend to use or expand these, set up the corresponding `MCP Client API` credentials.\n\n## 💡 Customization & Learning\nThis \"Beginner Bundle\" is not just a ready-to-use solution but also a fantastic learning resource:\n\n*   **Explore AI Agent Prompts:** Dive into the `AI Agent` nodes to see how prompts are structured to guide the LLM's behavior, including the \"Think Node\" process and character guidance for robust messaging.\n*   **Modify Toolsets:** Easily add or remove tools for the AI agent to expand its capabilities.\n*   **Invoice Customization:** Adapt the `Edit Fields` node and the Google Docs template to match your invoicing needs. You can extend it to parse invoice details directly from the Telegram command.\n*   **RAG Parameters:** Experiment with chunk sizes, overlap, and different embedding models in the RAG pipeline.\n*   **Extend Commands:** Add new commands and corresponding functionalities by expanding the main `Switch` node and building out new automation paths.\n\nBy setting up and dissecting this workflow, beginners can gain a practical understanding of building complex, AI-driven applications, integrating various services, and managing different data flows.",
+  "featuredImage": "/data/workflows/4525/4525.webp",
+  "author": {
+    "id": 101,
+    "slug": "devgor",
+    "name": "Issam AGGOUR",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1511,
+  "downloads": 151,
+  "createdAt": "2025-05-30T22:34:27.586Z",
+  "updatedAt": "2026-01-16T08:34:51.693Z",
+  "publishedAt": "2025-05-30T22:34:27.586Z",
+  "nodes": 79,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4525",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a multi-functional Telegram bot with Gemini, RAG PDF search & Google Suite",
+    "workflowName": "Build a multi-functional Telegram bot with Gemini, RAG PDF search & Google Suite",
+    "description": "## The Ultimate Beginner's Guide to an AI-Powered Telegram Assistant (PDF, Brave search & Google Suite)\n\nThis comprehensive workflow bundle is designed as a powerful starter kit, enabling you to build a multi-functional AI assistant on Telegram. It seamlessly integrates AI-powered voice interactions, an intelligent PDF document search using a Retrieval-Augmented Generation (RAG) system, and automates various Google Suite tasks like calendar management and document generation. Perfect for beginners looking to explore advanced AI and automation capabilities.\n\n## Disclaimer\nThis template is designed for self-hosted n8n instances.\n\n\n## 🚀 Key Features\n*   **Telegram Bot Interface:** Interact with your AI assistant using both text and voice commands through Telegram.\n*   **AI Voice Bot:**\n    *   Transcribes user voice messages using OpenAI Whisper.\n    *   Processes requests with an AI agent powered by Google Gemini.\n    *   Responds with AI-synthesized voice using Replicate API.\n*   **PDF RAG System:**\n    *   Index PDF documents from Google Drive via Telegram commands.\n    *   Utilizes Mistral AI for Optical Character Recognition (OCR) on PDFs.\n    *   Stores document content and embeddings in a Qdrant vector database.\n    *   Answers questions about your documents using Google Gemini, based on retrieved context.\n*   **Google Suite Automation:**\n    *   Manage Google Calendar: Create events, find upcoming holidays, and list birthdays.\n    *   Google Drive: Search for PDF files and manage document templates.\n    *   Google Docs: Automatically generate invoices from templates.\n*   **Intelligent Web Search:** Employs Brave Search for fetching real-time information from the web.\n*   **Versatile AI Agent:** Leverages Google Gemini with a suite of tools including a calculator, date & time utilities, and custom integrations (e.g., example Airbnb tools).\n*   **Command-Driven Functionality:** Easily trigger specific actions using Telegram commands like `/help`, `/pdf`, `/rag`, `/invoice`, `/chat`, `/brave`, and `/birthday`.\n\n## ⚙️ How It Works\nThe workflow is initiated by messages or commands sent to your Telegram bot. A central `Switch` node directs the flow based on the input received.\n\n## 1. Telegram Interaction & Command Routing\n*   A **Telegram Trigger** node listens for new messages (text or voice).\n*   A \"typing...\" indicator is sent to Telegram for better user experience.\n*   The **Switch** node parses the message content and routes it to the appropriate sub-workflow based on predefined commands (e.g., `/pdf`, `/rag`, `/voice`) or general chat.\n\n## 2. AI Voice Bot Functionality\n*   For voice messages (or if the voice path is triggered):\n    *   The voice file is downloaded from Telegram.\n    *   **OpenAI Whisper** transcribes the audio into text.\n    *   The transcribed text is fed to an **AI Agent** (powered by Google Gemini and equipped with various tools and memory).\n    *   The AI Agent's text response is then sent to the **Replicate API** to generate a natural-sounding voice.\n    *   The generated audio response is sent back to the user on Telegram.\n\n## 3. PDF RAG System with Mistral OCR & Qdrant\n*   **Indexing PDFs (via `/qdrant &lt;Google_Drive_File_ID&gt;` command):**\n    *   The specified PDF is downloaded from Google Drive.\n    *   The PDF is uploaded to **Mistral AI** for OCR processing.\n    *   The extracted text (in markdown format) is retrieved.\n    *   The text is split into manageable chunks.\n    *   **OpenAI Embeddings** are generated for each chunk.\n    *   These chunks and their embeddings are stored in a **Qdrant** vector collection.\n    *   A confirmation message is sent to Telegram.\n*   **Querying PDFs (via `/rag &lt;your_question&gt;` command):**\n    *   The user's question is processed by a **RetrievalQA Chain**.\n    *   This chain uses Google Gemini as the Language Model and retrieves relevant document chunks from Qdrant based on semantic similarity (embeddings).\n    *   Google Gemini then generates a concise answer based on the user's question and the retrieved contextual information from the documents.\n    *   The answer is sent back to the user on Telegram.\n*   **Searching PDFs in Drive (via `/pdf &lt;search_term&gt;` command):**\n    *   Searches your Google Drive for PDF files matching the provided search term.\n    *   Sends a list of found PDF files (name and ID) to the user on Telegram, allowing them to easily identify files for indexing with `/qdrant`.\n\n## 4. AI Chat & Task Automation (General Chat & `/chat` command)\n*   Handles general text messages or transcribed voice inputs that are not specific commands.\n*   An **AI Agent** (Google Gemini) processes these inputs.\n*   The agent is equipped with tools such as:\n    *   **Google Calendar Tools:** To create events, find the next public holiday, or list upcoming birthdays.\n    *   **Brave Search Tool:** To search the internet for information.\n    *   **Calculator Tool:** For mathematical computations.\n    *   **Date & Time Utility:** For handling and formatting dates.\n    *   **Example Airbnb Tools:** Demonstrates extensibility for custom tool integrations.\n*   The agent utilizes a \"Think Node\" process for reasoning and **Window Buffer Memory** to maintain conversational context.\n*   Responses are formulated and sent back to the user on Telegram.\n\n## 5. Google Automations\n*   **Invoice Generation (via `/invoice` command):**\n    *   Copies a predefined Google Docs invoice template from your Google Drive.\n    *   Populates the new document with details (client name, items, etc. – currently uses placeholder data from an 'Edit Fields' node, which can be customized to parse input from the command).\n    *   Converts the populated Google Doc into a PDF file.\n    *   Sends the generated PDF invoice to the user via Telegram.\n*   **Calendar Management (via AI Agent or specific commands like `/birthday`):**\n    *   The `/birthday` command fetches upcoming birthdays from a specified Google Calendar.\n    *   The AI Agent can also interact with Google Calendar to create events or retrieve information based on natural language requests.\n\n## 6. Web Search (via `/brave &lt;query&gt;` command or AI Agent)\n*   Performs a web search using the Brave Search API.\n*   Returns a list of search results, including titles and URLs, to the user on Telegram.\n\n## 7. Help Command (`/help`)\n*   Provides the user with a formatted list of all available Telegram commands and their basic usage instructions.\n\n## 🛠️ Setup Steps & Credentials\nTo get this workflow bundle up and running, you'll need to configure several credentials:\n\n1.  **Telegram:**\n    *   Create a new bot via `@BotFather` on Telegram to obtain a **Bot Token**.\n    *   Add this token to the `Telegram Trigger` node and all `Telegram` (sender) nodes in the workflow.\n2.  **OpenAI:**\n    *   Obtain an API Key from [platform.openai.com](https://platform.openai.com).\n    *   Create an `OpenAI` credential.\n    *   Use this credential in the `Convert audio to text` (OpenAI node for Whisper transcription) and all `Embeddings OpenAI` nodes (for RAG system).\n3.  **Replicate API (Text-to-Speech):**\n    *   Sign up at [replicate.com](https://replicate.com) and get your API token.\n    *   Create an `HTTP Bearer Auth` credential using this token.\n    *   Assign this credential to the `Call Replicate API` (HTTP Request) node.\n4.  **Google Gemini (PaLM API):**\n    *   Get an API key from Google AI Studio or Google Cloud Console.\n    *   Create a `Google Gemini(PaLM) Api` credential.\n    *   Assign it to all `Google Gemini Chat Model` nodes.\n5.  **Qdrant (Vector Database):**\n    *   Set up a Qdrant instance (either cloud-hosted or self-managed).\n    *   Note your Qdrant instance URL and API Key (if security is enabled).\n    *   Create a `QdrantApi` credential with these details.\n    *   Assign it to the `Qdrant Vector Store` nodes.\n    *   For the `Refresh collection` node (an HTTP Request node used to clear the collection for `/pdf` command demo), create an `HTTP Header Auth` credential with your Qdrant API key if required by your instance.\n6.  **Mistral AI (PDF OCR):**\n    *   Obtain an API key from [console.mistral.ai](https://console.mistral.ai).\n    *   Create a `Mistral Cloud API` credential.\n    *   Assign this to the `Mistral Upload`, `Mistral Signed URL`, and `Mistral DOC OCR` (HTTP Request) nodes.\n7.  **Google Drive & Google Docs:**\n    *   Ensure the Google Drive API and Google Docs API are enabled in your Google Cloud Console project.\n    *   Set up OAuth 2.0 credentials (Client ID and Client Secret).\n    *   Create `Google Drive OAuth2 Api` and `Google Docs OAuth2 Api` credentials.\n    *   Assign these to the respective `Google Drive` and `Google Docs` nodes throughout the workflow.\n    *   *Important:* Configure relevant Folder IDs (for PDF search, invoice template source, invoice output) and the invoice template Document ID in the Google Drive and Google Docs nodes.\n8.  **Google Calendar:**\n    *   Enable the Google Calendar API in your Google Cloud Console project.\n    *   Set up OAuth 2.0 credentials.\n    *   Create a `Google Calendar OAuth2 Api` credential.\n    *   Assign it to the `Google CalendarTool` and `Google Calendar` nodes.\n    *   Specify the correct calendar names or IDs in the nodes (e.g., for birthdays, holidays, new event creation).\n9.  **Brave Search:**\n    *   Get a Brave Search API key from their developer portal.\n    *   Create a `Brave Search API` credential.\n    *   Assign it to the `Brave Search` nodes and tools.\n10. **(Optional) Airbnb MCP Client:**\n    *   The workflow includes example nodes for Airbnb MCP tools. If you intend to use or expand these, set up the corresponding `MCP Client API` credentials.\n\n## 💡 Customization & Learning\nThis \"Beginner Bundle\" is not just a ready-to-use solution but also a fantastic learning resource:\n\n*   **Explore AI Agent Prompts:** Dive into the `AI Agent` nodes to see how prompts are structured to guide the LLM's behavior, including the \"Think Node\" process and character guidance for robust messaging.\n*   **Modify Toolsets:** Easily add or remove tools for the AI agent to expand its capabilities.\n*   **Invoice Customization:** Adapt the `Edit Fields` node and the Google Docs template to match your invoicing needs. You can extend it to parse invoice details directly from the Telegram command.\n*   **RAG Parameters:** Experiment with chunk sizes, overlap, and different embedding models in the RAG pipeline.\n*   **Extend Commands:** Add new commands and corresponding functionalities by expanding the main `Switch` node and building out new automation paths.\n\nBy setting up and dissecting this workflow, beginners can gain a practical understanding of building complex, AI-driven applications, integrating various services, and managing different data flows.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Listen for incoming events",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download voice file",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Combine content and set properties",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert audio to text",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Send Typing action",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Call Replicate API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send AI Voice Response via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Download Replicate Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send AI Text Response (Chat)",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Brave Search Results via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Think",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "role": "toolThink",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTimeTool",
+      "role": "dateTimeTool",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Brave Search 2",
+      "type": "@brave/n8n-nodes-brave-search.braveSearch",
+      "role": "braveSearch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Brave Search",
+      "type": "@brave/n8n-nodes-brave-search.braveSearchTool",
+      "role": "braveSearchTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Calendar Create Event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Calendar Next Holiday",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Question and Answer Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "role": "chainRetrievalQa",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Vector Store Retriever",
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "role": "retrieverVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gemini for RAG Answer",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send RAG Answer via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Refresh collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Search PDFs",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Send PDF Search Results via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Qdrant Indexing Confirmation",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mistral Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Mistral Signed URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Mistral DOC OCR",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Token Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "role": "textSplitterTokenSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "role": "vectorStoreQdrant",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set page",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Get PDF",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Determine content type1",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Think1",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "role": "toolThink",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Calculator1",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "role": "toolCalculator",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Date & Time1",
+      "type": "n8n-nodes-base.dateTimeTool",
+      "role": "dateTimeTool",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Brave Search1",
+      "type": "@brave/n8n-nodes-brave-search.braveSearchTool",
+      "role": "braveSearchTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Calendar Create Event1",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Calendar Next Holiday1",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent3",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Window Buffer Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Help Responder1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airbnb MCP",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airbnb Tools",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airbnb MCP1",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airbnb Tools1",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Docs",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Google Drive1",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Drive2",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Invoice PDF via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Calendar 2",
+      "type": "n8n-nodes-base.googleCalendar",
+      "role": "googleCalendar",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Send Birthday List via Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

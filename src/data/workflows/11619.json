@@ -1,0 +1,140 @@
+{
+  "id": 11619,
+  "slug": "11619",
+  "title": "Automate Document Q&A with Multi-Agent RAG Orchestration using Contextual AI & Gemini",
+  "description": "## PROBLEM  \nManaging multiple RAG AI agents can be complex when each has its own purpose and vector database.  \n- Manually tracking agents and deciding which one to query wastes time.  \n- LLMs often struggle to determine which agent best fits a user’s request.  \n\n### This workflow enables automated multi-agent orchestration, dynamically selecting and querying the correct agent using Contextual AI Query Tool and Gemini 2.5 Flash.  \n\n## How it works  \n- A **form trigger** allows users to create new agents by specifying a name, description, datastore, and uploading files.  \n- A new agent is created with the provided information and files are ingested in the datastore\n- We get the status of file ingestion every 30 seconds until the ingestion process is complete\n- When users send queries, the **Agent Orchestrator** identifies the most relevant agent to generate grounded, context-aware responses.  \n\n**Note:** The document ingestion process is asynchronous and may take a few minutes before your agent has the document fully available in the datastore for querying.\n\n## How to set up  \n- Create a free [Contextual AI account](https://app.contextual.ai/) and obtain your `CONTEXTUALAI_API_KEY`.  \n- Add `CONTEXTUALAI_API_KEY` as an **environment variable** in n8n. \n- For the baseline model, we have used Gemini 2.5 Flash Model, you can find your Gemini API key[ here](https://ai.google.dev/gemini-api/docs/api-key) \n\n\n## How to customize the workflow  \n- Replace the **Form Trigger** with a **Webhook Trigger** or manual input to integrate with custom systems.  \n- Swap **Gemini 2.5 Flash** with another LLM provider\n- Update the wait time as per user requirement\n- Modify the system prompt to fine-tune how the orchestration logic selects and queries agents.  \n- You can check out this [Contextual AI API reference](https://docs.contextual.ai/api-reference/agents/create-agent) for more details on agent creation and usage.  \n- If you have feedback or need support, please email **feedback@contextual.ai**.\n",
+  "featuredImage": "/data/workflows/11619/11619.webp",
+  "author": {
+    "id": 101,
+    "slug": "jinash",
+    "name": "Jinash Rouniyar",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 551,
+  "downloads": 55,
+  "createdAt": "2025-12-09T03:04:49.524Z",
+  "updatedAt": "2026-01-16T09:09:22.737Z",
+  "publishedAt": "2025-12-09T03:04:49.524Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11619",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate Document Q&A with Multi-Agent RAG Orchestration using Contextual AI & Gemini",
+    "workflowName": "Automate Document Q&A with Multi-Agent RAG Orchestration using Contextual AI & Gemini",
+    "description": "## PROBLEM  \nManaging multiple RAG AI agents can be complex when each has its own purpose and vector database.  \n- Manually tracking agents and deciding which one to query wastes time.  \n- LLMs often struggle to determine which agent best fits a user’s request.  \n\n### This workflow enables automated multi-agent orchestration, dynamically selecting and querying the correct agent using Contextual AI Query Tool and Gemini 2.5 Flash.  \n\n## How it works  \n- A **form trigger** allows users to create new agents by specifying a name, description, datastore, and uploading files.  \n- A new agent is created with the provided information and files are ingested in the datastore\n- We get the status of file ingestion every 30 seconds until the ingestion process is complete\n- When users send queries, the **Agent Orchestrator** identifies the most relevant agent to generate grounded, context-aware responses.  \n\n**Note:** The document ingestion process is asynchronous and may take a few minutes before your agent has the document fully available in the datastore for querying.\n\n## How to set up  \n- Create a free [Contextual AI account](https://app.contextual.ai/) and obtain your `CONTEXTUALAI_API_KEY`.  \n- Add `CONTEXTUALAI_API_KEY` as an **environment variable** in n8n. \n- For the baseline model, we have used Gemini 2.5 Flash Model, you can find your Gemini API key[ here](https://ai.google.dev/gemini-api/docs/api-key) \n\n\n## How to customize the workflow  \n- Replace the **Form Trigger** with a **Webhook Trigger** or manual input to integrate with custom systems.  \n- Swap **Gemini 2.5 Flash** with another LLM provider\n- Update the wait time as per user requirement\n- Modify the system prompt to fine-tune how the orchestration logic selects and queries agents.  \n- You can check out this [Contextual AI API reference](https://docs.contextual.ai/api-reference/agents/create-agent) for more details on agent creation and usage.  \n- If you have feedback or need support, please email **feedback@contextual.ai**.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Create Agent",
+      "type": "n8n-nodes-contextualai.contextualAi",
+      "role": "contextualAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Submit Agent Information",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Preprocessing Step",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Agent Orchestrator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Chat",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Query Agent Tool",
+      "type": "n8n-nodes-contextualai.contextualAiTool",
+      "role": "contextualAiTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "List Agents Tool",
+      "type": "n8n-nodes-contextualai.contextualAiTool",
+      "role": "contextualAiTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Iterate over each files",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get Document Ingestion Status",
+      "type": "n8n-nodes-contextualai.contextualAi",
+      "role": "contextualAi",
+      "configDescription": "Version 1"
+    }
+  ]
+}

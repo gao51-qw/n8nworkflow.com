@@ -41,22 +41,6 @@ const timeLabels: Record<string, string> = {
 ---
 
 <div class="space-y-8">
-  <!-- Time Period -->
-  <div>
-    <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Time Period</h3>
-    <div class="space-y-1">
-      {Object.entries(filterCounts.timePeriods).map(([key, count]) => (
-        <a 
-          href={`?time=${key}`} 
-          class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${currentFilters.timePeriod === key ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-        >
-          <span>{timeLabels[key] || key}</span>
-          <span class="text-xs text-gray-600 dark:text-gray-400">{count}</span>
-        </a>
-      ))}
-    </div>
-  </div>
-
   <!-- Price -->
   <div>
     <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Price</h3>
@@ -82,7 +66,7 @@ const timeLabels: Record<string, string> = {
       </a>
       {Object.entries(filterCounts.categories).map(([name, count]) => (
         <a 
-          href={`/categories/${name.toLowerCase()}`} 
+          href={`/categories/${name.toLowerCase().trim().replace(/\s+/g, '-')}`} 
           class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${currentFilters.category === name ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
         >
           <span>{name}</span>
@@ -96,14 +80,22 @@ const timeLabels: Record<string, string> = {
   <div>
     <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Complexity</h3>
     <div class="space-y-1">
+      <a 
+        href="/complexity" 
+        class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${!currentFilters.complexity || currentFilters.complexity === 'all' ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+      >
+        <span>All Levels</span>
+      </a>
       {Object.entries(filterCounts.complexities).map(([key, count]) => (
-        <a 
-          href={`/complexity/${key}`} 
-          class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${currentFilters.complexity === key ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-        >
-          <span class="capitalize">{key}</span>
-          <span class="text-xs text-gray-600 dark:text-gray-400">{count}</span>
-        </a>
+        key !== 'all' && (
+          <a 
+            href={`/complexity/${key}`} 
+            class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${currentFilters.complexity === key ? 'bg-primary-50 text-primary-700 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+          >
+            <span class="capitalize">{key}</span>
+            <span class="text-xs text-gray-600 dark:text-gray-400">{count}</span>
+          </a>
+        )
       ))}
     </div>
   </div>

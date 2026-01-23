@@ -1,0 +1,152 @@
+{
+  "id": 4218,
+  "slug": "4218",
+  "title": "OpenAI responses API adapter for LLM and AI agent workflows",
+  "description": "### This n8n template demonstrates how to use OpenAI's Responses API with existing LLM and AI Agent nodes.\n\nThough I would recommend just waiting for official support, if you're impatient and would like a round-about way to integrate OpenAI's responses API into your existing AI workflows then this template is sure to satisfy!\n\nThis approach implements a simple API wrapper for the Responses API using n8n's builtin webhooks. When the base url is pointed to these webhooks using a custom OpenAI credential, it's possible to intercept the request and remap for compatibility.\n\n### How it works\n* An OpenAI subnode is attached to our agent but has a special custom credential where the base_url is changed to point at this template's webhooks.\n* When executing a query, the agent's request is forwarded to our mini chat completion workflow.\n* Here, we take the default request and remap the values to use with a HTTP node which is set to query the Responses API.\n* Once a response is received, we'll need to remap the output for Langchain compatibility. This just means the LLM or Agent node can parse it and respond to the user.\n* There are two response formats, one for streaming and one for non-streaming responses.\n\n### How to use\n* You must activate this workflow to be able to use the webhooks.\n* Create the custom OpenAI credential as instructed.\n* Go to your existing AI workflows and replace the LLM node with the custom OpenAI credential. You do not need to copy anything else over to the existing template.\n\n### Requirements\n* OpenAI account for Responses API\n\n### Customising this workflow\n* Feel free to experiment with other LLMs using this same technique!\n* Keep up to date with the Responses API announcements and make modifications as required.\n",
+  "featuredImage": "/data/workflows/4218/4218.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3367,
+  "downloads": 336,
+  "createdAt": "2025-05-19T07:49:48.086Z",
+  "updatedAt": "2026-01-16T08:33:20.789Z",
+  "publishedAt": "2025-05-19T07:49:48.086Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4218",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "OpenAI responses API adapter for LLM and AI agent workflows",
+    "workflowName": "OpenAI responses API adapter for LLM and AI agent workflows",
+    "description": "### This n8n template demonstrates how to use OpenAI's Responses API with existing LLM and AI Agent nodes.\n\nThough I would recommend just waiting for official support, if you're impatient and would like a round-about way to integrate OpenAI's responses API into your existing AI workflows then this template is sure to satisfy!\n\nThis approach implements a simple API wrapper for the Responses API using n8n's builtin webhooks. When the base url is pointed to these webhooks using a custom OpenAI credential, it's possible to intercept the request and remap for compatibility.\n\n### How it works\n* An OpenAI subnode is attached to our agent but has a special custom credential where the base_url is changed to point at this template's webhooks.\n* When executing a query, the agent's request is forwarded to our mini chat completion workflow.\n* Here, we take the default request and remap the values to use with a HTTP node which is set to query the Responses API.\n* Once a response is received, we'll need to remap the output for Langchain compatibility. This just means the LLM or Agent node can parse it and respond to the user.\n* There are two response formats, one for streaming and one for non-streaming responses.\n\n### How to use\n* You must activate this workflow to be able to use the webhooks.\n* Create the custom OpenAI credential as instructed.\n* Go to your existing AI workflows and replace the LLM node with the custom OpenAI credential. You do not need to copy anything else over to the existing template.\n\n### Requirements\n* OpenAI account for Responses API\n\n### Customising this workflow\n* Feel free to experiment with other LLMs using this same technique!\n* Keep up to date with the Responses API announcements and make modifications as required.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Models",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "POST ChatCompletions",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Models Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Remap to Response API Schema",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Responses API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Is Agent?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "n8n Webhook",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Completion Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "JSON Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Text Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format Stream Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

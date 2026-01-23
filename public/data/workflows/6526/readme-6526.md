@@ -1,0 +1,92 @@
+# Fetch all page content from website and store with Gemini embedding in Pinecone
+
+> ## Fetch and Extract all Website Pages Content and Store in Pinecone Vector Database as KnowledgeBase with Google Gemini Embeddings
+ 
+Use cases are many: Populate a custom chatbot's knowledge base, create a powerful search index for your website, or build a comprehensive repository of information for internal tools!
+
+**Good to know**
+
+* At time of writing, Pinecone and Gemini API costs apply based on usage. Refer to their respective pricing pages for updated information.
+* The models used in this workflow are subject to regional availability. If you encounter a "model not found" error, the service may not be available in your country or region.
+
+**How it works**
+
+1.  **Input Collection:** The workflow starts by collecting URLs, either from a user-provided sitemap or a list of individual page URLs.
+2.  **URL Processing:** It then fetches sitemap XML (if provided), converts it to JSON, extracts all page URLs, and merges them with any manually entered URLs. All duplicate URLs are removed to ensure efficiency.
+3.  **Content Fetching:** The workflow iterates through the unique URLs, sending HTTP requests to download the HTML content of each page. A small delay is added between requests to be courteous to the website servers.
+4.  **Content Extraction:** The HTML content is then processed to extract the main textual content from the page's body, excluding images, and cleaning the text for better quality.
+5.  **Embedding Generation:** Gemini's embedding model converts the extracted text into vector embeddings, capturing the semantic meaning of the content.
+6.  **Pinecone Storage:** Finally, these vector embeddings, along with their associated content, are uploaded to your specified Pinecone index, creating a searchable knowledge base. Existing data in the namespace is cleared before new data is inserted.
+
+**How to use**
+
+* The workflow is triggered by a form where you input your sitemap or page URLs.
+* You can monitor the execution flow within n8n to see pages being processed and uploaded.
+* The `Wait 5 sec` node can be adjusted if you need to fetch content more rapidly or slowly, depending on the website's rate limits.
+
+**Requirements**
+
+* **Google Gemini API key** for text embeddings.
+* **Pinecone API key** for vector database storage.
+
+**Customising this workflow**
+
+This workflow can be adapted for various purposes. Consider:
+
+* Adding more sophisticated HTML parsing logic to extract specific sections of a webpage.
+* For building a Web Support Chatbot
+* Integrating with other services to trigger updates to the knowledge base (e.g., automatically updating when new blog posts are published).
+* Connecting the Pinecone knowledge base to a chatbot or search application for enhanced functionalities.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 6526
+- **Complexity:** advanced
+- **Node Count:** 16
+- **Views:** 322
+- **Downloads:** 32
+- **Created:** 2025/7/27
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/6526)
+
+## 👤 Author
+
+- **Name:** Zain Khan
+- **Username:** @zain
+
+## 🏷️ Categories
+
+- Document Extraction
+- AI RAG
+
+## 🔗 Nodes Used
+
+- **stickyNote** 
+- **code** (×2)
+- **xml** 
+- **httpRequest** (×2)
+- **merge** 
+- **removeDuplicates** 
+- **splitInBatches** 
+- **html** 
+- **wait** 
+- **@n8n/n8n-nodes-langchain.documentDefaultDataLoader** 
+- **@n8n/n8n-nodes-langchain.embeddingsGoogleGemini** 
+- **@n8n/n8n-nodes-langchain.vectorStorePinecone** 
+- **formTrigger** 
+- **switch** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 16 nodes with 14 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

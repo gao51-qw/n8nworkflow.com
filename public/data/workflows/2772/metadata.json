@@ -1,0 +1,26 @@
+{
+  "id": 2772,
+  "slug": "2772",
+  "title": "Realtime Notion Todoist 2-way sync with Redis",
+  "description": "## Purpose\n\nThis solution enables you to manage all your Notion and Todoist tasks from different workspaces as well as your calendar events in a single place.\n\nAll tasks can be managed in Todoist and additionally Fantastical can be used to manage scheduled tasks & events all together.\n\n## Demo & Explanation\n\n[![demo video](https://img.youtube.com/vi/k66j6ZspjCg/0.jpg)](https://youtu.be/k66j6ZspjCg)\n\n## How it works\n\n- The realtime sync consists of two workflows, both triggered by a registered webhook from either Notion or Todoist\n- To avoid overwrites by lately arriving webhook calls, every time the current task is retrieved from both sides.\n- Redis is used to prevent from endless loops, since an update in one system triggers another webhook call again. Using the ID of the task, the trigger is being locked down for 15 seconds.\n- Depending on the detected changes, the other side is updated accordingly.\nGenerally Notion is treaded as the main source. Using an \"Obsolete\" Status, it is guaranteed, that tasks never get deleted entirely by accident.\n- The Todoist ID is stored in the Notion task, so they stay linked together\n- An additional full sync workflow daily fixes inconsistencies, if any of them occurred, since webhooks cannot be trusted entirely.\n- Since Todoist requires a more complex setup, a tiny workflow helps with activating the webhook.\n- Another tiny workflow helps generating a global config, which is used by all workflows for mapping purposes.\n\n## Mapping (Notion &gt;&gt; Todoist)\n\n- Name: Task Name\n- Priority: Priority (1: do first, 2: urgent, 3: important, 4: unset)\n- Due: Date\n- Status: Section (Done: completed, Obsolete: deleted)\n- &lt;page_link&gt;: Description (read-only)\n- Todoist ID: &lt;task_id&gt;\n\n## Current limitations\n\n- Changes on the same task cannot be made simultaneously in both systems within a 15-20 second time frame\n- Subtasks are not linked automatically to their parent yet\n- Recurring tasks are not supported yet\n- Tasks names do not support URL’s yet\n\n## Prerequisites\n\n### Notion\n- A database must already exist (get a basic template [here](https://steadfast-banjo-d1f.notion.site/17682b476c848086b002de766879aa71)) with the following properties (case matters!):\n  - Text: \"Name\"\n  - Status: \"Status\", containing at least the options \"Backlog\", \"In progress\", \"Done\", \"Obsolete\"\n  - Select: \"Priority\", containing the options \"do first\", \"urgent\", \"important\"\n  - Date: \"Due\"\n  - Checkbox: \"Focus\"\n  - Text: \"Todoist ID\"\n### Todoist\n- A project must already exist with the same sections like defined as Status in Notion (except Done and Obsolete)\n### Redis\n- Create a [Free Redis Cloud](https://redis.io/try-free/) instance or self-host\n\n\n## Setup\n\n[![setup video](https://img.youtube.com/vi/73jhyU0t4c4/0.jpg)](https://youtu.be/73jhyU0t4c4)\n\n*The setup involves quite a lot of steps, yet many of them can be automated for business internal purposes.*\n\nJust follow the video or do the following steps:\n- Setup credentials for Notion (access token), Todoist (access token) and Redis - you can also create empty credentials and populate these later during further setup\n- Clone this workflow by clicking the \"Use workflow\" button and then choosing your n8n instance - otherwise you need to map the credentials of many nodes.\n- Follow the instructions described within the bundle of sticky notes on the top left of the workflow\n\n\n## How to use\n\n- You can apply changes (create, update, delete) to tasks both in Notion and Todoist which then get synced over within a couple of seconds (this is handled by the differential realtime sync)\n- The daily running full sync, resolves possible discrepancies in Todoist and sends a summary via email, if anything needed to be updated. In case that contains an unintended change, you can jump to the Task from the email directly to fix it manually.",
+  "featuredImage": "/data/workflows/2772/2772.webp",
+  "author": {
+    "id": 101,
+    "slug": "octionic",
+    "name": "Mario",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 8193,
+  "downloads": 819,
+  "createdAt": "2025-01-21T22:51:02.952Z",
+  "updatedAt": "2026-01-16T08:26:23.861Z",
+  "publishedAt": "2025-01-21T22:51:02.952Z",
+  "nodes": 246,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2772"
+}

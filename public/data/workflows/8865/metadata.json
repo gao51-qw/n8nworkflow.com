@@ -1,0 +1,27 @@
+{
+  "id": 8865,
+  "slug": "8865",
+  "title": "Build a knowledge-based WhatsApp assistant with RAG, Gemini, Supabase & Google Docs",
+  "description": "#### Workflow Execution Link:\n[Watch Execution Video](https://youtu.be/NUWeQywOMTw?si=7slubwmqYqs2m6sh)\n\n\n# Workflow Pre-requisites\n\n### **Step 1: Supabase Setup**\n\nFirst, replace the keys in the \"Save the embedding in DB\" & \"Search Embeddings\" nodes with your new Supabase keys. After that, run the following code snippets in your Supabase SQL editor:\n\n1.  Create the table to store chunks and embeddings:\n    ```sql\n    CREATE TABLE public.\"RAG\"\n    (\n        id bigserial PRIMARY KEY,\n        chunk text NULL,\n        embeddings vector(1024) NULL\n    )\n    TABLESPACE pg_default;\n    ```\n\n2.  Create a function to match embeddings:\n    ```sql\n    DROP FUNCTION IF EXISTS public.matchembeddings1(integer, vector);\n\n    CREATE OR REPLACE FUNCTION public.matchembeddings1(\n        match_count integer,\n        query_embedding vector\n    )\n    RETURNS TABLE (\n        chunk text,\n        similarity float\n    )\n    LANGUAGE plpgsql\n    AS $$\n    BEGIN\n        RETURN QUERY\n        SELECT\n            R.chunk,\n            1 - (R.embeddings &lt;=&gt; query_embedding) AS similarity\n        FROM public.\"RAG\" AS R\n        ORDER BY R.embeddings &lt;=&gt; query_embedding\n        LIMIT match_count;\n    END;\n    $$;\n    ```\n\n### **Step 2: Create Knowledge Base**\n\nCreate a new Google Doc with the complete knowledge base about your business and replace the document ID in the \"Content for the Training\" node.\n\n### **Step 3: Get Together AI API Key**\n\nGet a Together AI API key and paste it into the \"Embedding Uploaded document\" node and the \"Embed User Message\" node.\n\n### **Step 4: Setup Meta App for WhatsApp Business Cloud**\n\n1.  Go to `https://business.facebook.com/latest/settings/apps`, create an app, and select the use case \"Connect with customer through WhatsApp\". Copy the **Client ID** and **Client Secret** and add them to the first node.\n\n2.  Go to that newly created META app in the app dashboard, click on the use case, and then click on \"customise...\". Go to the API setup, add your number, and also generate an **access token** on that page. Now paste the **access token** and the **WhatsApp Business Account ID** into the send message node.\n\n# Part A: Document Preparation (One-Time Setup)\n\n## 1. When clicking ‘Execute workflow’  \n- **Type:** `manualTrigger`  \n- **Purpose:** Manually starts the workflow for preparing training content.  \n\n## 2. Content for the Training  \n- **Type:** `googleDocs`  \n- **Purpose:** Fetches the document content that will be used for training.  \n\n## 3. Splitting into Chunks  \n- **Type:** `code`  \n- **Purpose:** Breaks the document text into smaller pieces for processing.  \n\n## 4. Embedding Uploaded document  \n- **Type:** `httpRequest`  \n- **Purpose:** Converts each chunk into embeddings via an external API.  \n\n## 5. Save the embedding in DB  \n- **Type:** `supabase`  \n- **Purpose:** Stores both the chunks and embeddings in the database for future use.  \n---\n\n# Part B: Chat Interaction (Realtime Flow)\n\n## 1. WhatsApp Trigger  \n- **Type:** `whatsAppTrigger`  \n- **Purpose:** Starts the workflow whenever a user sends a WhatsApp message.  \n\n## 2. If  \n- **Type:** `if`  \n- **Purpose:** Checks whether the incoming WhatsApp message contains text.  \n\n## 3. Embend User Message  \n- **Type:** `httpRequest`  \n- **Purpose:** Converts the user’s message into an embedding.  \n\n## 4. Search Embeddings  \n- **Type:** `httpRequest`  \n- **Purpose:** Finds the top matching document chunks from the database using embeddings.  \n\n## 5. Aggregate  \n- **Type:** `aggregate`  \n- **Purpose:** Merges retrieved chunks into one context block.  \n\n## 6. AI Agent  \n- **Type:** `langchain agent`  \n- **Purpose:** Builds the prompt combining user’s message and context.  \n\n## 7. Google Gemini Chat Model  \n- **Type:** `lmChatGoogleGemini`  \n- **Purpose:** Generates the AI response based on the prepared prompt.  \n\n## 8. Send message  \n- **Type:** `whatsApp`  \n- **Purpose:** Sends the AI’s reply back to the user on WhatsApp.  \n",
+  "featuredImage": "/data/workflows/8865/8865.webp",
+  "author": {
+    "id": 101,
+    "slug": "iamvaar",
+    "name": "iamvaar",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 174,
+  "downloads": 17,
+  "createdAt": "2025-09-23T12:42:05.454Z",
+  "updatedAt": "2026-01-16T08:58:01.937Z",
+  "publishedAt": "2025-09-23T12:42:05.454Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8865"
+}

@@ -1,0 +1,464 @@
+{
+  "id": 7663,
+  "slug": "7663",
+  "title": "Build a WhatsApp assistant with memory, Google Suite & multi-AI research and imaging",
+  "description": "![image.png](fileId:2278)The \"**WhatsApp Productivity Assistant with Memory and AI Imaging**\" is a comprehensive n8n workflow that transforms your WhatsApp into a powerful, multi-talented AI assistant. It's designed to handle a wide range of tasks by understanding user messages, analyzing images, and connecting to various external tools and services. The assistant can hold natural conversations, remember past interactions using a MongoDB vector store (RAG), and decide which tool is best suited for a user's request. Whether you need to check your schedule, research a topic, get the latest news, create an image, or even analyze a picture you send, this workflow orchestrates it all seamlessly through a single WhatsApp chat interface.\n\nThe workflow is structured into several interconnected components:\n\n*   **WhatsApp Trigger & Incoming Message Processing:** This is the entry point, starting when a message (text or image) is received via WhatsApp. A `Route Message by Type (Image/Text)` node then intelligently routes the message based on its content type. A `Typing....` node sends a typing indicator to the user for a better experience. If an image is received, it's downloaded, processed via an HTTP Request, and analyzed by the `Analyze image` node. The `Code1` node then standardizes both text and image analysis output into a single, unified input for the main AI agent.\n*   **Core AI Agent:** This is the brain of the operation. The `AI Agent1` node receives the user's input, maintains short-term conversational memory using `Simple Memory`, and uses a powerful language model (`gpt-oss-120b2` or `gpt-oss-120b1`) to decide which tool or sub-agent to use. It orchestrates all the other agents and tools.\n*   **Productivity Tools Agent:** This group of nodes connects the assistant to your personal productivity suite. It includes sub-agents and tools for managing `Google Calendar`, `Google Tasks`, and `Gmail`, allowing you to schedule events, manage to-dos, and read emails. It leverages a language model (`gpt-4.1-mini` or `gemini-2.5-flash`) for understanding and executing commands within these tools.\n*   **Research Tool Agent:** This agent handles all research-related queries. It has access to multiple search tools (`Brave Web Search`, `Brave News Search`, `Wikipedia`, `Tavily`, and a custom `perprlexcia` search) to find the most accurate and up-to-date information from the web. It uses a language model (`gpt-oss-120b` or `gpt-4.1-nanoChat Model1`) for reasoning.\n*   **Long-Term Memory Webhook:![image.png](fileId:2276)** A dedicated sub-workflow (`Webhook2`) that processes conversation history, extracts key information using `Extract Memory Info`, and stores it in a `MongoDB Atlas Vector Store` for long-term memory. This allows the AI agent to remember past preferences and facts.\n*   **Image Generation Webhook: ![image.png](fileId:2277)** A specialized sub-workflow (`Webhook3`) triggered when a user asks to create an image. It uses a dedicated `AI Agent` with `MongoDB Atlas Vector Store1` for contextual image prompt generation, `Clean Prompt Text1` to refine the prompt, an `HTTP Request` to an external image generation API (e.g., Together.xyz), and then converts and sends the generated image back to the user via WhatsApp.\n\n---\n\n## Use Cases\n\n*   **Personal Assistant:** Schedule appointments, create tasks, read recent emails, and manage your daily agenda directly from WhatsApp.\n*   **Information Retrieval:** Ask any factual, news, or research-based question and get real-time answers from various web sources.\n*   **Creative Content Generation:** Request the AI to generate images based on your descriptions for logos, artwork, or social media content.\n*   **Smart Communication:** Engage in natural, contextual conversations with an AI that remembers past interactions.\n*   **Image Analysis:** Send an image and ask the AI to describe its contents or answer questions about it.\n\n---\n\n## Pre-conditions\n\nBefore importing and running this template, you will need:\n\n*   **Self-hosted n8n Instance:** This template requires a self-hosted n8n instance as it uses webhooks that need public accessibility.\n*   **WhatsApp Business Account:** A Meta Developer Account configured for WhatsApp Business Platform API access.\n*   **MongoDB Atlas Account:** A MongoDB Atlas cluster with a database and collection set up for the vector store.\n*   **Google Cloud Project:** Configured with API access for Google Calendar, Google Tasks, and Gmail.\n*   **API Keys/Accounts for:**\n    *   **OpenWeatherMap:** For weather forecasts.\n    *   **Groq, OpenRouter, or Vercel AI Gateway:** For various Language Models (e.g., `gpt-oss-120b`, `gpt-5-nano`, `gpt-4o-mini`).\n    *   **Mistral Cloud:** For embedding models (e.g., `codestral-embed-2505`).\n    *   **Brave Search:** For web and news searches.\n    *   **Tavily API:** For structured search results.\n    *   **Together.xyz or similar Image Generation API:** For creating images.\n    *   **Perplexity API (or self-hosted instance):** For the `perprlexcia` tool (the current URL `http://self hoseted perplexcia/api/search` implies a self-hosted or custom endpoint).\n*   **Publicly Accessible URLs:** Your n8n instance and any custom webhook endpoints (like `perprlexcia`) must be publicly accessible.\n\n---\n\n## Requirements (n8n Credentials)\n\nYou will need to set up the following credentials within your n8n instance:\n\n*   **WhatsApp OAuth account:** For the `WhatsApp Trigger` node.\n*   **WhatsApp account:** For `Send message2`, `Send message3`, `Download media`, and `Typing....` nodes.\n*   **Google Palm Api account:** For `Analyze image`, `Google Gemini Chat Model`, `gemini-2.5-flash`, and `Google Gemini Chat Model5` nodes.\n*   **OpenWeatherMap account:** For the `Get Weather Forecast` node.\n*   **Groq account:** For `gpt-oss-120b` node.\n*   **Google Calendar OAuth2Api account:** For the Google Calendar tools.\n*   **MongoDB account:** For `MongoDB Atlas Vector Store` nodes.\n*   **OpenRouter account:** For `gpt-5-nano` and `gpt-4.1-nanoChat Model1` nodes.\n*   **Gmail account :** For `Get many messages` and `Get a message` nodes (ensure correct Gmail OAuth2 setup for each).\n*   **Google Tasks account:** For the Google Tasks tools.\n*   **Bearer Auth account:** For `HTTP Request5` (used in media download).\n*   **Brave Search account:** For `Brave Web Search` and `Brave News Search` nodes.\n*   **Vercel Ai Gateway Api account:** For `gpt-4.1-mini`, `gpt-oss-120b`, `gpt-oss-120b2`, and `gpt-4.1-nano` nodes.\n*   **HTTP Header Auth account:** For `Tavily web search` (create a new one named \"Tavily API Key\" with `Authorization: Bearer YOUR_TAVILY_API_KEY`) and `HTTP Request` (for Together.xyz, e.g., \"Together.xyz API Key\").\n*   **Mistral Cloud account:** For `codestral-embed-2505`, `codestral-embed-`, and `codestral-embed-2506` nodes.\n",
+  "featuredImage": "/data/workflows/7663/7663.webp",
+  "author": {
+    "id": 101,
+    "slug": "netwithjc",
+    "name": "Iniyavan JC",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 3538,
+  "downloads": 353,
+  "createdAt": "2025-08-20T18:30:45.797Z",
+  "updatedAt": "2026-01-16T08:51:42.581Z",
+  "publishedAt": "2025-08-20T18:30:45.797Z",
+  "nodes": 71,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7663",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Build a WhatsApp assistant with memory, Google Suite & multi-AI research and imaging",
+    "workflowName": "Build a WhatsApp assistant with memory, Google Suite & multi-AI research and imaging",
+    "description": "![image.png](fileId:2278)The \"**WhatsApp Productivity Assistant with Memory and AI Imaging**\" is a comprehensive n8n workflow that transforms your WhatsApp into a powerful, multi-talented AI assistant. It's designed to handle a wide range of tasks by understanding user messages, analyzing images, and connecting to various external tools and services. The assistant can hold natural conversations, remember past interactions using a MongoDB vector store (RAG), and decide which tool is best suited for a user's request. Whether you need to check your schedule, research a topic, get the latest news, create an image, or even analyze a picture you send, this workflow orchestrates it all seamlessly through a single WhatsApp chat interface.\n\nThe workflow is structured into several interconnected components:\n\n*   **WhatsApp Trigger & Incoming Message Processing:** This is the entry point, starting when a message (text or image) is received via WhatsApp. A `Route Message by Type (Image/Text)` node then intelligently routes the message based on its content type. A `Typing....` node sends a typing indicator to the user for a better experience. If an image is received, it's downloaded, processed via an HTTP Request, and analyzed by the `Analyze image` node. The `Code1` node then standardizes both text and image analysis output into a single, unified input for the main AI agent.\n*   **Core AI Agent:** This is the brain of the operation. The `AI Agent1` node receives the user's input, maintains short-term conversational memory using `Simple Memory`, and uses a powerful language model (`gpt-oss-120b2` or `gpt-oss-120b1`) to decide which tool or sub-agent to use. It orchestrates all the other agents and tools.\n*   **Productivity Tools Agent:** This group of nodes connects the assistant to your personal productivity suite. It includes sub-agents and tools for managing `Google Calendar`, `Google Tasks`, and `Gmail`, allowing you to schedule events, manage to-dos, and read emails. It leverages a language model (`gpt-4.1-mini` or `gemini-2.5-flash`) for understanding and executing commands within these tools.\n*   **Research Tool Agent:** This agent handles all research-related queries. It has access to multiple search tools (`Brave Web Search`, `Brave News Search`, `Wikipedia`, `Tavily`, and a custom `perprlexcia` search) to find the most accurate and up-to-date information from the web. It uses a language model (`gpt-oss-120b` or `gpt-4.1-nanoChat Model1`) for reasoning.\n*   **Long-Term Memory Webhook:![image.png](fileId:2276)** A dedicated sub-workflow (`Webhook2`) that processes conversation history, extracts key information using `Extract Memory Info`, and stores it in a `MongoDB Atlas Vector Store` for long-term memory. This allows the AI agent to remember past preferences and facts.\n*   **Image Generation Webhook: ![image.png](fileId:2277)** A specialized sub-workflow (`Webhook3`) triggered when a user asks to create an image. It uses a dedicated `AI Agent` with `MongoDB Atlas Vector Store1` for contextual image prompt generation, `Clean Prompt Text1` to refine the prompt, an `HTTP Request` to an external image generation API (e.g., Together.xyz), and then converts and sends the generated image back to the user via WhatsApp.\n\n---\n\n## Use Cases\n\n*   **Personal Assistant:** Schedule appointments, create tasks, read recent emails, and manage your daily agenda directly from WhatsApp.\n*   **Information Retrieval:** Ask any factual, news, or research-based question and get real-time answers from various web sources.\n*   **Creative Content Generation:** Request the AI to generate images based on your descriptions for logos, artwork, or social media content.\n*   **Smart Communication:** Engage in natural, contextual conversations with an AI that remembers past interactions.\n*   **Image Analysis:** Send an image and ask the AI to describe its contents or answer questions about it.\n\n---\n\n## Pre-conditions\n\nBefore importing and running this template, you will need:\n\n*   **Self-hosted n8n Instance:** This template requires a self-hosted n8n instance as it uses webhooks that need public accessibility.\n*   **WhatsApp Business Account:** A Meta Developer Account configured for WhatsApp Business Platform API access.\n*   **MongoDB Atlas Account:** A MongoDB Atlas cluster with a database and collection set up for the vector store.\n*   **Google Cloud Project:** Configured with API access for Google Calendar, Google Tasks, and Gmail.\n*   **API Keys/Accounts for:**\n    *   **OpenWeatherMap:** For weather forecasts.\n    *   **Groq, OpenRouter, or Vercel AI Gateway:** For various Language Models (e.g., `gpt-oss-120b`, `gpt-5-nano`, `gpt-4o-mini`).\n    *   **Mistral Cloud:** For embedding models (e.g., `codestral-embed-2505`).\n    *   **Brave Search:** For web and news searches.\n    *   **Tavily API:** For structured search results.\n    *   **Together.xyz or similar Image Generation API:** For creating images.\n    *   **Perplexity API (or self-hosted instance):** For the `perprlexcia` tool (the current URL `http://self hoseted perplexcia/api/search` implies a self-hosted or custom endpoint).\n*   **Publicly Accessible URLs:** Your n8n instance and any custom webhook endpoints (like `perprlexcia`) must be publicly accessible.\n\n---\n\n## Requirements (n8n Credentials)\n\nYou will need to set up the following credentials within your n8n instance:\n\n*   **WhatsApp OAuth account:** For the `WhatsApp Trigger` node.\n*   **WhatsApp account:** For `Send message2`, `Send message3`, `Download media`, and `Typing....` nodes.\n*   **Google Palm Api account:** For `Analyze image`, `Google Gemini Chat Model`, `gemini-2.5-flash`, and `Google Gemini Chat Model5` nodes.\n*   **OpenWeatherMap account:** For the `Get Weather Forecast` node.\n*   **Groq account:** For `gpt-oss-120b` node.\n*   **Google Calendar OAuth2Api account:** For the Google Calendar tools.\n*   **MongoDB account:** For `MongoDB Atlas Vector Store` nodes.\n*   **OpenRouter account:** For `gpt-5-nano` and `gpt-4.1-nanoChat Model1` nodes.\n*   **Gmail account :** For `Get many messages` and `Get a message` nodes (ensure correct Gmail OAuth2 setup for each).\n*   **Google Tasks account:** For the Google Tasks tools.\n*   **Bearer Auth account:** For `HTTP Request5` (used in media download).\n*   **Brave Search account:** For `Brave Web Search` and `Brave News Search` nodes.\n*   **Vercel Ai Gateway Api account:** For `gpt-4.1-mini`, `gpt-oss-120b`, `gpt-oss-120b2`, and `gpt-4.1-nano` nodes.\n*   **HTTP Header Auth account:** For `Tavily web search` (create a new one named \"Tavily API Key\" with `Authorization: Bearer YOUR_TAVILY_API_KEY`) and `HTTP Request` (for Together.xyz, e.g., \"Together.xyz API Key\").\n*   **Mistral Cloud account:** For `codestral-embed-2505`, `codestral-embed-`, and `codestral-embed-2506` nodes.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "role": "whatsAppTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "send chat history to MongoDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "WeatherMap",
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "role": "openWeatherMapTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download media",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyze image",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request5",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Think",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "role": "toolThink",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Gmail tool",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Typing....",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Calendar Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get many events",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Create an event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Update an event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Delete an event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Get an event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "MongoDB Atlas Vector Store2",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "gemini-2.5-flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "gpt-5-nano",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get many messages",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get a message",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Task agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create a task in Google Tasks",
+      "type": "n8n-nodes-base.googleTasksTool",
+      "role": "googleTasksTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Delete a task in Google Tasks",
+      "type": "n8n-nodes-base.googleTasksTool",
+      "role": "googleTasksTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get many tasks in Google Tasks",
+      "type": "n8n-nodes-base.googleTasksTool",
+      "role": "googleTasksTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "image creation",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Brave Search",
+      "type": "@brave/n8n-nodes-brave-search.braveSearchTool",
+      "role": "braveSearchTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Brave Search1",
+      "type": "@brave/n8n-nodes-brave-search.braveSearchTool",
+      "role": "braveSearchTool",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "gpt-4.1-nanoChat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Research agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "role": "agentTool",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "perprlexcia",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "role": "toolWikipedia",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Extract Memory Info",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Check If Worth Remembering",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook2",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook3",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields5",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Clean Prompt Text1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Summarize Chat",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send message3",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "MongoDB Atlas Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "MongoDB Atlas Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMongoDBAtlas",
+      "role": "vectorStoreMongoDBAtlas",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "gpt-4.1-nano",
+      "type": "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway",
+      "role": "lmChatVercelAiGateway",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "codestral-embed-2505",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "codestral-embed-",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "codestral-embed-2506",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "role": "embeddingsMistralCloud",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "openai LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway",
+      "role": "lmChatVercelAiGateway",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "openai LLM1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "role": "lmChatGroq",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "openai/gpt-oss-120b",
+      "type": "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway",
+      "role": "lmChatVercelAiGateway",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Tavily web search",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "role": "httpRequestTool",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "openai/gpt-5-mini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway",
+      "role": "lmChatVercelAiGateway",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "openai/gpt-5-mini1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatVercelAiGateway",
+      "role": "lmChatVercelAiGateway",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send message",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "id": 6460,
+  "slug": "6460",
+  "title": "Automatically send daily sales reports from Square via Gmail",
+  "description": "## Automatically Send Square Summary Report for Yesterday's Sales via Gmail\n\n## What It Does  \nThis workflow automatically connects to the Square API and generates a daily sales summary report for all your Square locations. The report matches the figures displayed in **Square Dashboard &gt; Reports &gt; Sales Summary**.\n\nIt's designed to run daily and pull the previous day's sales into a CSV file, which is then sent to a manager/finance team for analysis.\n\nThis workflow builds on my previous template, which allows users to automatically pull data from the Square API into n8n for processing. (See here: [https://n8n.io/workflows/6358](https://n8n.io/workflows/6358))\n\n## Prerequisites  \nTo use this workflow, you'll need:\n- A Square API credential (configured as a Header Auth credential)\n- A Gmail credential\n\n## How to Set Up Square Credentials:  \n- Go to **Credentials &gt; Create New**  \n- Choose **Header Auth**  \n- Set the **Name** to `Authorization`  \n- Set the **Value** to your Square Access Token (e.g., `Bearer &lt;your-api-key&gt;`)\n\n## How It Works  \n1. **Trigger:** The workflow runs every day at 4:00 AM  \n2. **Fetch Locations:** An HTTP request retrieves all Square locations linked to your account  \n3. **Fetch Orders:** For each location, an HTTP request pulls completed orders for the specified report_date  \n4. **Filter Empty Locations:** Locations with no sales are ignored  \n5. **Aggregate Sales Data:** A Code node processes the order data and produces a summary identical to Square’s built-in Sales Summary report  \n6. **Create CSV File:** A CSV file is created containing the relevant data  \n7. **Send Email:** An email is sent to the chosen third party  \n\n## Example Use Cases  \n- Automatically send Square sales data to management to improve the quality of planning and scheduling decisions  \n- Automatically send data to an external third party, such as a landlord or agent, who is paid via commission  \n- Automatically send data to a bookkeeper for entry into QuickBooks  \n\n## How to Use  \n- Configure both HTTP Request nodes to use your Square API credential  \n- Set the workflow to **Active** so it runs automatically  \n- Enter the email address of the person you want to send the report to and update the message body  \n- If you want to remove the n8n attribution, you can do so in the last node  \n\n## Customization Options  \n- Add pagination to handle locations with more than 1,000 orders per day\n- Instead of a daily summary, you can modify this workflow to produce a weekly summary once a week  \n\n## Why It's Useful  \nThis workflow saves time, reduces manual report pulling from Square, and enables smarter automation around sales data — whether for operations, finance, or performance monitoring.\n",
+  "featuredImage": "/data/workflows/6460/6460.webp",
+  "author": {
+    "id": 101,
+    "slug": "roshragel",
+    "name": "Rosh Ragel",
+    "avatar": ""
+  },
+  "categories": [
+    "CRM"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 218,
+  "downloads": 21,
+  "createdAt": "2025-07-25T20:20:23.267Z",
+  "updatedAt": "2026-01-16T08:45:05.038Z",
+  "publishedAt": "2025-07-25T20:20:23.267Z",
+  "nodes": 15,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6460",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automatically send daily sales reports from Square via Gmail",
+    "workflowName": "Automatically send daily sales reports from Square via Gmail",
+    "description": "## Automatically Send Square Summary Report for Yesterday's Sales via Gmail\n\n## What It Does  \nThis workflow automatically connects to the Square API and generates a daily sales summary report for all your Square locations. The report matches the figures displayed in **Square Dashboard &gt; Reports &gt; Sales Summary**.\n\nIt's designed to run daily and pull the previous day's sales into a CSV file, which is then sent to a manager/finance team for analysis.\n\nThis workflow builds on my previous template, which allows users to automatically pull data from the Square API into n8n for processing. (See here: [https://n8n.io/workflows/6358](https://n8n.io/workflows/6358))\n\n## Prerequisites  \nTo use this workflow, you'll need:\n- A Square API credential (configured as a Header Auth credential)\n- A Gmail credential\n\n## How to Set Up Square Credentials:  \n- Go to **Credentials &gt; Create New**  \n- Choose **Header Auth**  \n- Set the **Name** to `Authorization`  \n- Set the **Value** to your Square Access Token (e.g., `Bearer &lt;your-api-key&gt;`)\n\n## How It Works  \n1. **Trigger:** The workflow runs every day at 4:00 AM  \n2. **Fetch Locations:** An HTTP request retrieves all Square locations linked to your account  \n3. **Fetch Orders:** For each location, an HTTP request pulls completed orders for the specified report_date  \n4. **Filter Empty Locations:** Locations with no sales are ignored  \n5. **Aggregate Sales Data:** A Code node processes the order data and produces a summary identical to Square’s built-in Sales Summary report  \n6. **Create CSV File:** A CSV file is created containing the relevant data  \n7. **Send Email:** An email is sent to the chosen third party  \n\n## Example Use Cases  \n- Automatically send Square sales data to management to improve the quality of planning and scheduling decisions  \n- Automatically send data to an external third party, such as a landlord or agent, who is paid via commission  \n- Automatically send data to a bookkeeper for entry into QuickBooks  \n\n## How to Use  \n- Configure both HTTP Request nodes to use your Square API credential  \n- Set the workflow to **Active** so it runs automatically  \n- Enter the email address of the person you want to send the report to and update the message body  \n- If you want to remove the n8n attribution, you can do so in the last node  \n\n## Customization Options  \n- Add pagination to handle locations with more than 1,000 orders per day\n- Instead of a daily summary, you can modify this workflow to produce a weekly summary once a week  \n\n## Why It's Useful  \nThis workflow saves time, reduces manual report pulling from Square, and enables smarter automation around sales data — whether for operations, finance, or performance monitoring.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get Square Locations",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Turn Locations Into List",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Ignore Locations w/o Sales",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get Sales from Square",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Compile Sales Reports",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert Sales Summary to CSV File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Report",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

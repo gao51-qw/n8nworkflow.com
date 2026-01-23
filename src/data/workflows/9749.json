@@ -1,0 +1,350 @@
+{
+  "id": 9749,
+  "slug": "9749",
+  "title": "Scheduled YouTube transcription with de-duplication using Transcript.io and Supabase",
+  "description": "## **Scheduled YouTube Transcription with Duplicate Prevention**\n\n### **Who's It For?**\n\nThis template is for advanced users, content teams, and data analysts who need a robust, automated system for capturing YouTube transcripts. It’s ideal for those who monitor multiple channels and want to ensure they only process and save each video's transcript once.\n\n\n### **What It Does**\n\nThis is an advanced, \"set-it-and-forget-it\" workflow that runs on a daily schedule to monitor YouTube channels for new content. It enhances the basic transcription process by connecting to your **Supabase** database to prevent duplicate entries.\n\nThe workflow fetches all recent videos from the channels you track, filters out any that are too old, and then checks your database to see if a video's transcript has already been saved. Only brand-new videos are sent for transcription via the `youtube-transcript.io` API, with the final data (title, URL, full transcript, author) being saved back to your Supabase table.\n\n### **Requirements**\n\n* A **Supabase** account with a table to store video data. This table must have a column for the `source_url` to enable duplicate checking.\n* An API key from [youtube-transcript.io](https://www.youtube-transcript.io/) (offers a free tier).\n* The **Channel ID** for each YouTube channel you want to track.\n\n### **How to Set Up**\n\n1.  **Set Your Time Filter:**\n    * In the **\"Max Days\"** node, set the number of days you want to look back for new videos (e.g., `7` for the last week).\n2.  **Add Channel IDs:**\n    * In the **\"Channels To Track\"** node, replace the example YouTube Channel IDs with the ones you want to monitor.\n3.  **Configure API Credentials:**\n    * Select the **\"Get Transcript from API\"** node.\n    * In the credentials tab, create a new \"Header Auth\" credential. Name it `youtube-transcript-io` and paste your API key into the \"Value\" field. The \"Name\" field should be `x-api-key`.\n4.  **Connect Your Supabase Account:**\n    * This workflow uses Supabase in two places: **\"Check if URL Is In Database\"** and **\"Add to Content Queue Table\"**.\n    * You must configure your Supabase credentials in **both** nodes.\n    * In each node, select your target table and ensure the columns are mapped correctly.\n5.  **Adjust the Schedule:**\n    * The **\"Schedule Trigger\"** node is set to run once a day. Click it to adjust the time and frequency to your needs.\n6.  **Activate the Workflow:**\n    * Save your changes and toggle the workflow to **Active**.",
+  "featuredImage": "/data/workflows/9749/9749.webp",
+  "author": {
+    "id": 101,
+    "slug": "automate-social-media",
+    "name": "automedia",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 139,
+  "downloads": 13,
+  "createdAt": "2025-10-16T05:10:57.465Z",
+  "updatedAt": "2026-01-16T09:01:44.984Z",
+  "publishedAt": "2025-10-16T05:10:57.465Z",
+  "nodes": 52,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9749",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Scheduled YouTube transcription with de-duplication using Transcript.io and Supabase",
+    "workflowName": "Scheduled YouTube transcription with de-duplication using Transcript.io and Supabase",
+    "description": "## **Scheduled YouTube Transcription with Duplicate Prevention**\n\n### **Who's It For?**\n\nThis template is for advanced users, content teams, and data analysts who need a robust, automated system for capturing YouTube transcripts. It’s ideal for those who monitor multiple channels and want to ensure they only process and save each video's transcript once.\n\n\n### **What It Does**\n\nThis is an advanced, \"set-it-and-forget-it\" workflow that runs on a daily schedule to monitor YouTube channels for new content. It enhances the basic transcription process by connecting to your **Supabase** database to prevent duplicate entries.\n\nThe workflow fetches all recent videos from the channels you track, filters out any that are too old, and then checks your database to see if a video's transcript has already been saved. Only brand-new videos are sent for transcription via the `youtube-transcript.io` API, with the final data (title, URL, full transcript, author) being saved back to your Supabase table.\n\n### **Requirements**\n\n* A **Supabase** account with a table to store video data. This table must have a column for the `source_url` to enable duplicate checking.\n* An API key from [youtube-transcript.io](https://www.youtube-transcript.io/) (offers a free tier).\n* The **Channel ID** for each YouTube channel you want to track.\n\n### **How to Set Up**\n\n1.  **Set Your Time Filter:**\n    * In the **\"Max Days\"** node, set the number of days you want to look back for new videos (e.g., `7` for the last week).\n2.  **Add Channel IDs:**\n    * In the **\"Channels To Track\"** node, replace the example YouTube Channel IDs with the ones you want to monitor.\n3.  **Configure API Credentials:**\n    * Select the **\"Get Transcript from API\"** node.\n    * In the credentials tab, create a new \"Header Auth\" credential. Name it `youtube-transcript-io` and paste your API key into the \"Value\" field. The \"Name\" field should be `x-api-key`.\n4.  **Connect Your Supabase Account:**\n    * This workflow uses Supabase in two places: **\"Check if URL Is In Database\"** and **\"Add to Content Queue Table\"**.\n    * You must configure your Supabase credentials in **both** nodes.\n    * In each node, select your target table and ensure the columns are mapped correctly.\n5.  **Adjust the Schedule:**\n    * The **\"Schedule Trigger\"** node is set to run once a day. Click it to adjust the time and frequency to your needs.\n6.  **Activate the Workflow:**\n    * Save your changes and toggle the workflow to **Active**.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Discard URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check if URL Is In Database",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Channel Info",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Channel Info + Channel ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Max Content Age Days",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "role": "dateTime",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add to Content Queue Table",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transcript Worked?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "New Video Information",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Verify Channel ID + Create RSS Link",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "try to get video_id again",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Each Channel",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Loop Over Recent Videos",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Loop Over New Videos",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Is Video Recent Enough?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Was Video ID Found?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Merge DB Check Result",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Add Client & Age Rules",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Data with Raw Date",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge Formatted Date",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Add Transcript to Video Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Transcript Failed",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Video ID With Video Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Rename URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Rename Original URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Find Video ID",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Is Video ID valid?",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Clean Up URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Find Channel's Videos",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Channels To Track",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Official Captions/Transcript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "author + title + link + pubDate",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Transcript from API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Set Max Video Age",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Is Video Already in Database?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Filter Out YouTube Shorts",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    }
+  ]
+}

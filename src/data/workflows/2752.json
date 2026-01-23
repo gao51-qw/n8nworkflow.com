@@ -1,0 +1,200 @@
+{
+  "id": 2752,
+  "slug": "2752",
+  "title": "HR & IT helpdesk chatbot with audio transcription",
+  "description": "An intelligent chatbot that assists employees by answering common HR or IT questions, supporting both **text** and **audio messages**. This unique feature ensures employees can conveniently ask questions via voice messages, which are transcribed and processed just like text queries.\n\n---\n\n### How It Works\n1. **Message Capture**: When an employee sends a message to the chatbot in WhatsApp or Telegram (text or audio), the chatbot captures the input.\n2. **Audio Transcription**: For audio messages, the chatbot transcribes the content into text using an AI-powered transcription service (e.g., Whisper, Google Cloud Speech-to-Text).\n3. **Query Processing**:\n   - The transcribed text (or directly entered text) is sent to an AI service (e.g., OpenAI) to generate embeddings.\n   - These embeddings are used to search a vector database (e.g., Supabase or Qdrant) containing the company’s internal HR and IT documentation.\n   - The most relevant data is retrieved and sent back to the AI service to compose a concise and helpful response.\n4. **Response Delivery**: The chatbot sends the final response back to the employee, whether the input was text or audio.\n\n---\n\n### Set Up Steps\n- **Estimated Time**: 20–25 minutes\n- **Prerequisites**:\n  1. Create an account with an AI provider (e.g., OpenAI).\n  2. Connect WhatsApp or Telegram credentials in n8n.\n  3. Set up a transcription service (e.g., Whisper or Google Cloud Speech-to-Text).\n  4. Configure a vector database (e.g., Supabase or Qdrant) and add your internal HR and IT documentation.\n  5. Import the workflow template into n8n and update environment variables for your credentials.",
+  "featuredImage": "/data/workflows/2752/2752.webp",
+  "author": {
+    "id": 101,
+    "slug": "occult",
+    "name": "Felipe Braga",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 40298,
+  "downloads": 4029,
+  "createdAt": "2025-01-19T21:41:25.066Z",
+  "updatedAt": "2026-01-16T08:26:18.910Z",
+  "publishedAt": "2025-01-19T21:41:25.066Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2752",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "HR & IT helpdesk chatbot with audio transcription",
+    "workflowName": "HR & IT helpdesk chatbot with audio transcription",
+    "description": "An intelligent chatbot that assists employees by answering common HR or IT questions, supporting both **text** and **audio messages**. This unique feature ensures employees can conveniently ask questions via voice messages, which are transcribed and processed just like text queries.\n\n---\n\n### How It Works\n1. **Message Capture**: When an employee sends a message to the chatbot in WhatsApp or Telegram (text or audio), the chatbot captures the input.\n2. **Audio Transcription**: For audio messages, the chatbot transcribes the content into text using an AI-powered transcription service (e.g., Whisper, Google Cloud Speech-to-Text).\n3. **Query Processing**:\n   - The transcribed text (or directly entered text) is sent to an AI service (e.g., OpenAI) to generate embeddings.\n   - These embeddings are used to search a vector database (e.g., Supabase or Qdrant) containing the company’s internal HR and IT documentation.\n   - The most relevant data is retrieved and sent back to the AI service to compose a concise and helpful response.\n4. **Response Delivery**: The chatbot sends the final response back to the employee, whether the input was text or audio.\n\n---\n\n### Set Up Steps\n- **Estimated Time**: 20–25 minutes\n- **Prerequisites**:\n  1. Create an account with an AI provider (e.g., OpenAI).\n  2. Connect WhatsApp or Telegram credentials in n8n.\n  3. Set up a transcription service (e.g., Whisper or Google Cloud Speech-to-Text).\n  4. Configure a vector database (e.g., Supabase or Qdrant) and add your internal HR and IT documentation.\n  5. Import the workflow template into n8n and update environment variables for your credentials.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create HR Policies",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "role": "vectorStorePGVector",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Verify Message Type",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Telegram1",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Unsupported Message Type",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "role": "memoryPostgresChat",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Answer questions with a vector store",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "role": "toolVectorStore",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Postgres PGVector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "role": "vectorStorePGVector",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

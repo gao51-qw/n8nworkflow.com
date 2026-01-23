@@ -1,0 +1,151 @@
+{
+  "id": 4302,
+  "slug": "4302",
+  "title": "Airtable base backups to S3",
+  "description": "This workflow exports every table in a base as its own CSV, saves the files in a time-stamped folder in Amazon S3, pings you on Slack, and optionally prunes older copies. You get an automated weekly backup that is easy to inspect or re-import as needed. You can easily swap the S3 node for the storage provider of your choice.\n\n++How it works++\n\nWeekly Backup\n- Schedule trigger fires weekly\n- Sets and formats the week ex. [2025-W12]\n- Create a folder in S3 bucket with the week\n- Loops through all tables in Airtable base creating CSVs and uploading to the new path\n- Slack message is sent on completion\n\nMonthly Prune\n- Schedule trigger fires weekly\n- Sets a cut-off date 4 weeks in the past\n- Lists folders in S3\n- Deletes all folders &gt; 4 weeks old\n\n++Setup Steps++\n\n1. Clone workflow\n2. Swap credentials for Airtable, AWS, and Slack\n\t- Ensure AWS credential has appropriate IAM policy to manage bucket & objects\n3. Set workflow to \"Active\" \n\n",
+  "featuredImage": "/data/workflows/4302/4302.webp",
+  "author": {
+    "id": 101,
+    "slug": "autonomouswork",
+    "name": "Autonomous Work",
+    "avatar": ""
+  },
+  "categories": [
+    "File Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 371,
+  "downloads": 37,
+  "createdAt": "2025-05-22T04:33:58.776Z",
+  "updatedAt": "2026-01-16T08:33:46.847Z",
+  "publishedAt": "2025-05-22T04:33:58.776Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4302",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Airtable base backups to S3",
+    "workflowName": "Airtable base backups to S3",
+    "description": "This workflow exports every table in a base as its own CSV, saves the files in a time-stamped folder in Amazon S3, pings you on Slack, and optionally prunes older copies. You get an automated weekly backup that is easy to inspect or re-import as needed. You can easily swap the S3 node for the storage provider of your choice.\n\n++How it works++\n\nWeekly Backup\n- Schedule trigger fires weekly\n- Sets and formats the week ex. [2025-W12]\n- Create a folder in S3 bucket with the week\n- Loops through all tables in Airtable base creating CSVs and uploading to the new path\n- Slack message is sent on completion\n\nMonthly Prune\n- Schedule trigger fires weekly\n- Sets a cut-off date 4 weeks in the past\n- Lists folders in S3\n- Deletes all folders &gt; 4 weeks old\n\n++Setup Steps++\n\n1. Clone workflow\n2. Swap credentials for Airtable, AWS, and Slack\n\t- Ensure AWS credential has appropriate IAM policy to manage bucket & objects\n3. Set workflow to \"Active\"",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Create Table Metadata",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Pull Records",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "role": "convertToFile",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AWS S3",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Monthly Prune",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Timestamps",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Delete File",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Folder",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "List Folders",
+      "type": "n8n-nodes-base.awsS3",
+      "role": "awsS3",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Week",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Weekly Backup",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    }
+  ]
+}

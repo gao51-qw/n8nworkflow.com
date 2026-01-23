@@ -1,0 +1,121 @@
+{
+  "id": 10098,
+  "slug": "10098",
+  "title": "Automated YouTube video uploads with 12h interval scheduling in JST",
+  "description": "This workflow automates a **batch upload of multiple videos to YouTube**, spacing each upload **12 hours apart** in **Japan Standard Time (UTC+9)** and automatically adding them to a playlist.\n\n### ⚙️ Workflow Logic\n\n1. **Manual Trigger** — Starts the workflow manually.  \n2. **List Video Files** — Uses a shell command to find all `.mp4` files under the specified directory (`/opt/downloads/单词卡/A1-A2`).  \n3. **Sort and Generate Items** — Sorts videos by day number (`dayXX`) extracted from filenames and assigns a sequential `order` value.  \n4. **Calculate Publish Schedule (+12h Interval)** —  \n   - Computes the next rounded JST hour plus a configurable buffer (default 30 min).  \n   - Staggers each video’s scheduled time by `order × 12 hours`.  \n   - Converts JST back to UTC for YouTube’s `publishAt` field.  \n5. **Split in Batches (1 per video)** — Iterates over each video item.  \n6. **Read Video File** — Loads the corresponding video from disk.  \n7. **Upload to YouTube (Scheduled)** — Uploads the video privately with the computed `publishAtUtc`.  \n8. **Add to Playlist** — Adds the newly uploaded video to the target playlist.\n\n### 🕒 Highlights\n\n- **Timezone-safe:** Pure UTC ↔ JST conversion avoids double-offset errors.  \n- **Sequential scheduling:** Ensures each upload is 12 hours apart to prevent clustering.  \n- **Customizable:** Change `SPAN_HOURS`, `BUFFER_MIN`, or directory paths easily.  \n- **Retry-ready:** Each upload and playlist step has retry logic to handle transient errors.\n\n### 💡 Typical Use Cases\n\n- Multi-part educational video series (e.g., A1–A2 English learning).  \n- Regular content release cadence without manual scheduling.  \n- Automated YouTube publishing pipelines for pre-produced content.\n\n---\n\n**Author:** Zane  \n**Category:** Automation / YouTube / Scheduler  \n**Timezone:** JST (UTC+09:00)",
+  "featuredImage": "/data/workflows/10098/10098.webp",
+  "author": {
+    "id": 101,
+    "slug": "zane",
+    "name": "Zane",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 220,
+  "downloads": 22,
+  "createdAt": "2025-10-24T02:43:56.960Z",
+  "updatedAt": "2026-01-16T09:03:22.889Z",
+  "publishedAt": "2025-10-24T02:43:56.960Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10098",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated YouTube video uploads with 12h interval scheduling in JST",
+    "workflowName": "Automated YouTube video uploads with 12h interval scheduling in JST",
+    "description": "This workflow automates a **batch upload of multiple videos to YouTube**, spacing each upload **12 hours apart** in **Japan Standard Time (UTC+9)** and automatically adding them to a playlist.\n\n### ⚙️ Workflow Logic\n\n1. **Manual Trigger** — Starts the workflow manually.  \n2. **List Video Files** — Uses a shell command to find all `.mp4` files under the specified directory (`/opt/downloads/单词卡/A1-A2`).  \n3. **Sort and Generate Items** — Sorts videos by day number (`dayXX`) extracted from filenames and assigns a sequential `order` value.  \n4. **Calculate Publish Schedule (+12h Interval)** —  \n   - Computes the next rounded JST hour plus a configurable buffer (default 30 min).  \n   - Staggers each video’s scheduled time by `order × 12 hours`.  \n   - Converts JST back to UTC for YouTube’s `publishAt` field.  \n5. **Split in Batches (1 per video)** — Iterates over each video item.  \n6. **Read Video File** — Loads the corresponding video from disk.  \n7. **Upload to YouTube (Scheduled)** — Uploads the video privately with the computed `publishAtUtc`.  \n8. **Add to Playlist** — Adds the newly uploaded video to the target playlist.\n\n### 🕒 Highlights\n\n- **Timezone-safe:** Pure UTC ↔ JST conversion avoids double-offset errors.  \n- **Sequential scheduling:** Ensures each upload is 12 hours apart to prevent clustering.  \n- **Customizable:** Change `SPAN_HOURS`, `BUFFER_MIN`, or directory paths easily.  \n- **Retry-ready:** Each upload and playlist step has retry logic to handle transient errors.\n\n### 💡 Typical Use Cases\n\n- Multi-part educational video series (e.g., A1–A2 English learning).  \n- Regular content release cadence without manual scheduling.  \n- Automated YouTube publishing pipelines for pre-produced content.\n\n---\n\n**Author:** Zane  \n**Category:** Automation / YouTube / Scheduler  \n**Timezone:** JST (UTC+09:00)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "List Video Files",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sort and Generate Items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Calculate Publish Schedule (+12h Interval)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split in Batches (1 per video)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Read Video File",
+      "type": "n8n-nodes-base.readWriteFile",
+      "role": "readWriteFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload to YouTube (Scheduled)",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add to Playlist",
+      "type": "n8n-nodes-base.youTube",
+      "role": "youTube",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

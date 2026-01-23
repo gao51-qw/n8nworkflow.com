@@ -1,0 +1,26 @@
+{
+  "id": 3976,
+  "slug": "3976",
+  "title": "Prevent concurrent workflow runs using Redis",
+  "description": "## What does this template do?  \nThis workflow sets a small \"lock\" value in Redis so that only one copy of a long job can run at the same time. If another trigger fires while the job is still busy, the workflow sees the lock, stops early, and throws a clear error. This protects your data and keeps you from hitting rate limits.  \nBecause the workflow also stores simple progress flags (\"working\", \"loading\", \"finishing\"), you can poll the current status and show live progress for very long jobs.\n\n## Use Case  \nGreat when the same workflow can be called many times in parallel (for example by webhooks, cron jobs, or nested Execute Workflow calls) and you need an \"only run once at a time\" guarantee without building a full queue system.\n\n## What the Workflow Does  \n- ⚡ Starts through **Execute Workflow Trigger** called by another workflow  \n- 🔄 A **Switch** sends the run to **Get**, **Set**, or **Unset** actions  \n- 💾 **Redis** reads or writes a key named `process_status_&lt;key&gt;` with a time‑to‑live (default 600 s)  \n- 🚦 **If** nodes check the key and decide to continue or stop  \n- ⏱️ **Wait** nodes stand in for the slow part of your job (replace these with your real work)  \n- 📈 Updates the key with human‑readable progress values that another workflow can fetch with `action = get`  \n- 🏁 When done, the lock is removed so the next run can start  \n\n## Apps & Services Used  \n- Redis  \n- Core n8n nodes (Switch, If, Set, Wait, Stop and Error)  \n\n## Pre‑requisites  \n- A Redis server that n8n can reach  \n- Redis credentials stored in n8n  \n- A second workflow that calls this one and sends:  \n  - `action` set to `get`, `set`, or `unset`  \n  - `key` set to a unique name for the job  \n  - Optional `timeout` in seconds  \n\n## Customization Tips  \n- Increase or decrease the TTL in the **Set Timeout** node to match how long your job usually runs  \n- Add or rename status values (\"working\", \"loading\", \"finishing\", and so on) to show finer progress  \n- Replace **Stop and Error** with a Slack or email alert, or even push the extra trigger into a queue if you prefer waiting instead of failing  \n- Use different Redis keys if you need separate locks for different tasks  \n- Build a small \"status endpoint\" workflow that calls this one with `action = get` to display real‑time progress to users\n\n## Additional Use Cases  \n\n### 🛑 Telegram callback spam filter  \nIf a Telegram bot sends many identical callbacks in a burst, call this workflow first to place a lock. Only the first callback will proceed; the rest will exit cleanly until the lock clears. This keeps your bot from flooding downstream APIs.\n\n### 🧩 External API rate‑limit protection  \nRun heavy API syncs one after the other so parallel calls do not break vendor rate limits.\n\n### 🔔 Maintenance window lock  \nBlock scheduled maintenance tasks from overlapping, making sure each window finishes before the next starts.",
+  "featuredImage": "/data/workflows/3976/3976.webp",
+  "author": {
+    "id": 101,
+    "slug": "hpstock",
+    "name": "Hugues Stock",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 853,
+  "downloads": 85,
+  "createdAt": "2025-05-10T23:21:45.044Z",
+  "updatedAt": "2026-01-16T08:32:28.013Z",
+  "publishedAt": "2025-05-10T23:21:45.044Z",
+  "nodes": 43,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3976"
+}

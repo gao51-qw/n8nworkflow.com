@@ -1,0 +1,26 @@
+{
+  "id": 3961,
+  "slug": "3961",
+  "title": "Convert LLM output into rich Telegram messages — Auto-Media & smart chunking",
+  "description": "# Telegram Rich Output Helper Workflow\n\n**Who is this for?**  \nBuilders of Telegram chat‑bots, AI assistants, or notification services who already run **n8n** and need to convert long, mixed‑media answers from an LLM (or any upstream source) into Telegram‑friendly messages.\n\n**Prerequisites**\n\n1. A Telegram bot created with **@BotFather**.  \n2. The bot’s HTTP API token saved as a *Telegram API* credential in n8n.  \n3. n8n ≥ 1.0 with the built‑in **Telegram** node still installed.  \n4. A parent workflow that calls this one via **Execute Workflow** and passes:  \n\n   * `chatId` — the destination chat ID (integer).  \n   * `output` — a string that can contain plain text *and* HTTP links to images, audio, or video.\n\n---\n\n## What the workflow does\n\n1. **Extract Links** – A JavaScript Code node scans `output`, deduplicates URLs, and classifies each by file extension.  \n2. **Link Path**  \n   * If no media links exist, the text path is used.  \n   * Otherwise, each link is routed through a **Switch** node that triggers the correct Telegram call (`sendPhoto`, `sendAudio`, `sendVideo`) so users get inline previews or players.  \n3. **Text Path**  \n   * An *IF* node checks whether the remaining text exceeds Telegram’s 1 000‑character limit.  \n   * When it does, a Code node slices the text at line boundaries; **SplitInBatches** then sends the chunks sequentially so nothing is lost.  \n4. All branches converge, keeping the whole exchange inside one execution.\n\n---\n\n## Customisation tips\n\n* **Adjust the character limit** – edit the first expression in “If text too long”.  \n* **Filter/enrich links** – extend the regex or add MIME checks before dispatch.  \n* **Captions & keyboards** – populate `additionalFields` in the three “Send back” nodes.  \n* **Throughput vs. order** – tweak the batch size in both **SplitInBatches** nodes.\n\nWith this template in place, your users receive the complete message, playable media, and zero manual formatting – all within Telegram’s API limits.\n",
+  "featuredImage": "/data/workflows/3961/3961.webp",
+  "author": {
+    "id": 101,
+    "slug": "dmitry-expert",
+    "name": "Dmitry Mikheev",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 970,
+  "downloads": 97,
+  "createdAt": "2025-05-09T12:51:34.675Z",
+  "updatedAt": "2026-01-16T08:32:23.254Z",
+  "publishedAt": "2025-05-09T12:51:34.675Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3961"
+}

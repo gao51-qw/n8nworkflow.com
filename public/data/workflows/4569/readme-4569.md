@@ -1,0 +1,107 @@
+# Create AI videos with scripts, images & HeyGen avatars (🔥 LIMITED-TIME OFFER)
+
+> ### Short Content Automation 🎬 (AI Video System with Bulk Gen, Avatar & Music Customization)
+🔥 LIMITED-TIME OFFER: AI Video Automation (Previously \$59)
+[Previously Template](https://n8n.io/workflows/4107-create-ai-videos-with-openai-scripts-leonardo-images-and-heygen-avatars/)
+![Screenshot 20250515 at 19.29.18.png](fileId:1424)
+**🚀 Transform Your Content Game in Minutes – Save Hours of Work!**
+Introducing a powerful **AI Video System** to automate short video creation — from **scriptwriting** to **avatar + image generation**, **music**, and **assembly** — all with n8n. This is **not** a basic template. It's a **complete, customizable system** with step-by-step videos and my personal enhancements.
+
+![AI Video Automation Diagram.png](fileId:1425)
+
+---
+
+### 🎁 Why $10 Now? (Regular Price: \$59)
+
+✅ Over **4000 people** viewed my original automation — [see it here](https://n8n.io/workflows/4107-create-ai-videos-with-openai-scripts-leonardo-images-and-heygen-avatars) — and I receive many messages from people who want it.
+
+✅ I learned n8n from **free templates** and I want to give back.
+
+✅ People asking for a more accessible price — this is my answer.
+
+---
+
+### ⏳ Limited-Time Deal: 7 Days Only!
+
+After that, this price **goes away** and the blueprint will be **unlisted**.
+
+---
+
+### 📦 What You Get
+
+* ✅ Full n8n Workflow: From text prompt → ready-to-publish short video
+* ✅ AI Tools Integration: OpenAI, Leonardo.AI, HeyGen, etc.
+* ✅ Customization Options: Avatar, Voice, Music, Style
+* ✅ Video Setup Guide: Step-by-step walkthrough
+* ✅ Clean UI, easy-to-use, even if you're not a developer
+
+---
+
+### 💬 Made With Love by an n8n Creator
+
+This system is based on **months of refinement and feedback** from users like you.
+Now it’s your turn to scale your content, automate your work, and stand out.
+
+---
+
+### 💵 Only $10 – Let’s Build Together.
+
+&gt; 📌 Get it now. Use it forever. No subscriptions. Just value.
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 4569
+- **Complexity:** advanced
+- **Node Count:** 68
+- **Views:** 1003
+- **Downloads:** 100
+- **Created:** 2025/6/2
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/4569)
+
+## 👤 Author
+
+- **Name:** Abdellah Homrani
+- **Username:** @adamcrafts
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×9)
+- **if** (×5)
+- **switch** (×4)
+- **@n8n/n8n-nodes-langchain.chainLlm** (×2)
+- **set** (×4)
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** (×2)
+- **httpRequest** (×11)
+- **wait** (×5)
+- **splitOut** 
+- **splitInBatches** 
+- **code** (×3)
+- **baserow** (×4)
+- **executeWorkflow** (×12)
+- **aggregate** 
+- **webhook** 
+- **stopAndError** 
+- **executeWorkflowTrigger** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 68 nodes with 43 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

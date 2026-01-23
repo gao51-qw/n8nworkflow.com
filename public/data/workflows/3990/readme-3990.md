@@ -1,0 +1,96 @@
+# Backup n8n workflows to Github
+
+> ## Introduction
+This workflow will backup all of your existed workflows to a single Github repository.
+
+The Backup folders' name are based on the current backup date and have default format: "yyyy/MM/dd" (setup at "Create sub path" node).
+
+Throughout the backup process, the N8N will inform user via discord with clear message about Start, Success and Failure backups.
+
+The workflow will be 
+
+## Tech Stack
+The following nodes / services / libraries are used in this workflow:
+
+### Nodes:
+1. **Discord:** To send message to configured setup channel.
+2. **N8N:** To get all workflows' information.
+3. **Github:** To store backup data.
+4. **Code:** To run data comparison (Existed vs Latest workflow data).
+5. **Wait:** To avoid discord message rate limit.
+
+### External libraries:
+1. **Underscore.js:** JavaScript library that provides lots of common Javascript functions, to help user save time when using code node.
+
+## Guideline
+1. Open "Config" node and setup the following information:
+    - **repo_owner:** Your Github username.
+    - **repo_name:** The repository that you want to store workflows backup data.
+2. Open "Create sub path" node and change the naming and path format of backup folder(s).
+3. Setup custom messages in 3 discord nodes:
+    - **Starting Message:** N8N inform user at the time workflow start.
+    - **Inform Success Flows:** After each success backup, N8N will notify user.
+    - **Inform Failed Flows:** After each failure backup, N8N will notify user to have appropriate action.
+    - **Completed Notifications:** Then at the final, the workflow will give user a summary.
+4. Setup "Schedule Trigger" node to change default automated backup time.
+
+# Screenshots
+
+## Discord output
+
+![image.png](fileId:1309)
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 3990
+- **Complexity:** advanced
+- **Node Count:** 30
+- **Views:** 2066
+- **Downloads:** 206
+- **Created:** 2025/5/12
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/3990)
+
+## 👤 Author
+
+- **Name:** Dat Proto
+- **Username:** @datproto
+
+## 🏷️ Categories
+
+- DevOps
+
+## 🔗 Nodes Used
+
+- **manualTrigger** 
+- **stickyNote** (×3)
+- **executeWorkflowTrigger** 
+- **n8n** 
+- **set** (×3)
+- **if** 
+- **merge** 
+- **noOp** (×3)
+- **github** (×4)
+- **splitInBatches** 
+- **scheduleTrigger** 
+- **discord** (×4)
+- **executeWorkflow** 
+- **wait** (×3)
+- **code** 
+- **switch** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 30 nodes with 25 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

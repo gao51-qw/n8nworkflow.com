@@ -1,0 +1,151 @@
+{
+  "id": 9777,
+  "slug": "9777",
+  "title": "Automate hotel price comparison with multi-platform scraping and email reporting",
+  "description": "This is a **production-ready, end-to-end workflow** that automatically compares hotel prices across multiple booking platforms and delivers beautiful email reports to users. Unlike basic building blocks, this workflow is a complete solution ready to deploy.\n\n---\n\n## ✨ What Makes This Production-Ready\n\n### ✅ Complete End-to-End Automation\n- **Input**: Natural language queries via webhook\n- **Processing**: Multi-platform scraping & comparison\n- **Output**: Professional email reports + analytics\n- **Feedback**: Real-time webhook responses\n\n### ✅ Advanced Features\n- 🧠 Natural Language Processing for flexible queries\n- 🔄 Parallel scraping from multiple platforms\n- 📊 Analytics tracking with Google Sheets integration\n- 💌 Beautiful HTML email reports\n- 🛡️ Error handling and graceful degradation\n- 📱 Webhook responses for real-time feedback\n\n### ✅ Business Value\n- **For Travel Agencies**: Instant price comparison service for clients\n- **For Hotels**: Competitive pricing intelligence\n- **For Travelers**: Save time and money with automated research\n\n---\n\n## 🚀 Setup Instructions\n\n### Step 1: Import Workflow\n\n1. Copy the workflow JSON from the artifact\n2. In n8n, go to **Workflows** → **Import from File/URL**\n3. Paste the JSON and click **Import**\n\n### Step 2: Configure Credentials\n\n#### A. SMTP Email (Required)\n```\nSettings → Credentials → Add Credential → SMTP\n\nHost: smtp.gmail.com (for Gmail)\nPort: 587\nUser: your-email@gmail.com\nPassword: your-app-password (not regular password!)\n```\n\n**Gmail Setup:**\n1. Enable 2FA on your Google Account\n2. Generate App Password: https://myaccount.google.com/apppasswords\n3. Use the generated password in n8n\n\n#### B. Google Sheets (Optional - for analytics)\n```\nSettings → Credentials → Add Credential → Google Sheets OAuth2\n\nFollow the OAuth flow to connect your Google account\n```\n\n**Sheet Setup:**\n1. Create a new Google Sheet\n2. Name the first sheet \"Analytics\"\n3. Add headers: `timestamp`, `query`, `hotel`, `city`, `checkIn`, `checkOut`, `bestPrice`, `platform`, `totalResults`, `userEmail`\n4. Copy the Sheet ID from URL and paste in the \"Save to Google Sheets\" node\n\n### Step 3: Set Up Scraping Service\n\nYou need to create a scraping API that the workflow calls. Here are your options:\n\n#### Option A: Use Your Existing Python Script\n\n**Create a simple Flask API wrapper:**\n\n```python\n# api_wrapper.py\nfrom flask import Flask, request, jsonify\nimport subprocess\nimport json\n\napp = Flask(__name__)\n\n@app.route('/scrape/&lt;platform&gt;', methods=['POST'])\ndef scrape(platform):\n    data = request.json\n    query = f\"{data['checkIn']} to {data['checkOut']}, {data['hotel']}, {data['city']}\"\n    \n    try:\n        result = subprocess.run(\n            ['python3', 'price_scrap_2.py', query, platform],\n            capture_output=True,\n            text=True,\n            timeout=30\n        )\n        \n        # Parse your script output\n        output = result.stdout\n        # Assuming your script returns price data\n        \n        return jsonify({\n            'price': extracted_price,\n            'currency': 'USD',\n            'roomType': 'Standard Room',\n            'url': booking_url,\n            'availability': True\n        })\n    except Exception as e:\n        return jsonify({'error': str(e)}), 500\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=5000)\n```\n\n**Deploy:**\n```bash\npip install flask\npython api_wrapper.py\n```\n\n**Update n8n HTTP Request nodes:**\n```\nURL: http://your-server-ip:5000/scrape/booking\nURL: http://your-server-ip:5000/scrape/agoda\nURL: http://your-server-ip:5000/scrape/expedia\n```\n\n#### Option B: Use Third-Party Scraping Services\n\n**Recommended Services:**\n- **ScraperAPI** (scraperapi.com) - $49/month for 100k requests\n- **Bright Data** (brightdata.com) - Pay as you go\n- **Apify** (apify.com) - Has pre-built hotel scrapers\n\n**Example with ScraperAPI:**\n```javascript\n// In HTTP Request node\nURL: http://api.scraperapi.com\nQuery Parameters:\n  api_key: YOUR_API_KEY\n  url: https://booking.com/search?hotel={{$json.hotelName}}...\n```\n\n#### Option C: Use n8n SSH Node (Like Your Original)\n\nKeep your SSH approach but improve it:\n\n1. Replace HTTP Request nodes with SSH nodes\n2. Point to your server with the Python script\n3. Ensure error handling and timeouts\n\n```javascript\n// SSH Node Configuration\nHost: your-server-ip\nCommand: python3 /path/to/price_scrap_2.py \"{{$json.hotelName}}\" \"{{$json.city}}\" \"{{$json.checkInISO}}\" \"{{$json.checkOutISO}}\" \"booking\"\n```\n\n### Step 4: Activate Webhook\n\n1. Click on \"Webhook - Receive Request\" node\n2. Click \"Listen for Test Event\"\n3. Copy the webhook URL (e.g., `https://your-n8n.com/webhook/hotel-price-check`)\n4. Test with this curl command:\n\n```bash\ncurl -X POST https://your-n8n.com/webhook/hotel-price-check \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"message\": \"I want to check Marriott Hotel in Singapore from 15th March to 18th March\",\n    \"email\": \"user@example.com\",\n    \"name\": \"John Doe\"\n  }'\n```\n\n### Step 5: Activate Workflow\n\n1. Toggle the workflow to **Active**\n2. The webhook is now live and ready to receive requests\n\n---\n\n## 📝 Usage Examples\n\n### Example 1: Basic Query\n```json\n{\n  \"message\": \"Hilton Hotel in Dubai from 20th December to 23rd December\",\n  \"email\": \"traveler@email.com\",\n  \"name\": \"Sarah\"\n}\n```\n\n### Example 2: Flexible Format\n```json\n{\n  \"message\": \"I need prices for Taj Hotel, Mumbai. Check-in: 5th January, Check-out: 8th January\",\n  \"email\": \"customer@email.com\"\n}\n```\n\n### Example 3: Short Format\n```json\n{\n  \"message\": \"Hyatt Singapore March 10 to March 13\",\n  \"email\": \"user@email.com\"\n}\n```\n\n---\n\n## 🎨 Customization Options\n\n### 1. Add More Booking Platforms\n\n**Steps:**\n1. Duplicate an existing \"Scrape\" node\n2. Update the platform parameter\n3. Connect it to \"Aggregate & Compare\"\n4. Update the aggregation logic to include the new platform\n\n### 2. Change Email Template\n\nEdit the \"Format Email Report\" node's JavaScript:\n- Modify HTML structure\n- Change colors (currently purple gradient)\n- Add your company logo\n- Include terms and conditions\n\n### 3. Add SMS Notifications\n\n**Using Twilio:**\n1. Add new node: Twilio → Send SMS\n2. Connect after \"Aggregate & Compare\"\n3. Format: \"Best deal: ${hotel} at ${platform} for ${price}\"\n\n### 4. Add Slack Integration\n\n1. Add Slack node after \"Aggregate & Compare\"\n2. Send to #travel-deals channel\n3. Include quick booking links\n\n### 5. Implement Caching\n\nAdd Redis or n8n's built-in cache:\n```javascript\n// Before scraping, check cache\nconst cacheKey = `${hotelName}-${city}-${checkIn}-${checkOut}`;\nconst cached = await $cache.get(cacheKey);\n\nif (cached && Date.now() - cached.timestamp &lt; 3600000) {\n  return cached.data; // Use 1-hour cache\n}\n```\n\n---\n\n## 📊 Analytics & Monitoring\n\n### Google Sheets Dashboard\n\nThe workflow automatically logs to Google Sheets. Create a dashboard with:\n\n**Metrics to track:**\n- Total searches per day/week\n- Most searched hotels\n- Most searched cities\n- Average price ranges\n- Platform with best prices (frequency)\n- User engagement (repeat users)\n\n**Example Sheet Formulas:**\n```\n// Total searches today\n=COUNTIF(A:A, TODAY())\n\n// Most popular hotel\n=INDEX(C:C, MODE(MATCH(C:C, C:C, 0)))\n\n// Average best price\n=AVERAGE(G:G)\n```\n\n### Set Up Alerts\n\nAdd a node after \"Aggregate & Compare\":\n```javascript\n// Alert if prices are unusually high\nif (bestDeal.price &gt; avgPrice * 1.5) {\n  // Send alert to admin\n  return [{\n    json: {\n      alert: true,\n      message: `High prices detected for ${hotelName}`\n    }\n  }];\n}\n```\n\n---\n\n## 🛡️ Error Handling\n\nThe workflow includes comprehensive error handling:\n\n### 1. Missing Information\nIf user doesn't provide hotel/city/dates → Responds with helpful prompt\n\n### 2. Scraping Failures\nIf all platforms fail → Sends \"No results\" email with suggestions\n\n### 3. Partial Results\nIf some platforms work → Shows available results + notes errors\n\n### 4. Email Delivery Issues\nUses `continueOnFail: true` to prevent workflow crashes\n\n---\n\n## 🔒 Security Best Practices\n\n### 1. Rate Limiting\nAdd rate limiting to prevent abuse:\n\n```javascript\n// In Parse & Validate node\nconst userEmail = $json.email;\nconst recentSearches = await $cache.get(`searches:${userEmail}`);\n\nif (recentSearches && recentSearches.length &gt; 10) {\n  return [{\n    json: {\n      status: 'rate_limited',\n      response: 'Too many requests. Please try again in 1 hour.'\n    }\n  }];\n}\n```\n\n### 2. Input Validation\nAlready implemented - validates hotel names, cities, dates\n\n### 3. Email Verification\nAdd email verification before first use:\n\n```javascript\n// Send verification code\nconst code = Math.random().toString(36).substring(7);\nawait $sendEmail({\n  to: userEmail,\n  subject: 'Verify your email',\n  body: `Your code: ${code}`\n});\n```\n\n### 4. API Key Protection\nNever expose scraping API keys in responses or logs\n---\n\n## 🚀 Deployment Options\n\n### Option 1: n8n Cloud (Easiest)\n1. Sign up at n8n.cloud\n2. Import workflow\n3. Configure credentials\n4. Activate\n\n**Pros:** No maintenance, automatic updates\n**Cons:** Monthly cost\n\n### Option 2: Self-Hosted (Most Control)\n```bash\n# Using Docker\ndocker run -it --rm \\\n  --name n8n \\\n  -p 5678:5678 \\\n  -v ~/.n8n:/home/node/.n8n \\\n  n8nio/n8n\n\n# Using npm\nnpm install -g n8n\nn8n start\n```\n\n**Pros:** Free, full control\n**Cons:** You manage updates\n\n### Option 3: Cloud Platforms\n- Railway.app (recommended for beginners)\n- DigitalOcean App Platform\n- AWS ECS\n- Google Cloud Run\n\n---\n\n## 📈 Scaling Recommendations\n\n### For &lt; 100 searches/day\n- Current setup is perfect\n- Use n8n Cloud Starter or small VPS\n\n### For 100-1000 searches/day\n- Add Redis caching (1-hour cache)\n- Use queue system for scraping\n- Upgrade to n8n Cloud Pro\n\n### For 1000+ searches/day\n- Implement job queue (Bull/Redis)\n- Use dedicated scraping service\n- Load balance multiple n8n instances\n- Consider microservices architecture\n\n---\n\n## 🐛 Troubleshooting\n\n### Issue: Webhook not responding\n**Solution:**\n1. Check workflow is Active\n2. Verify webhook URL is correct\n3. Check n8n logs: Settings → Log Streaming\n\n### Issue: No prices returned\n**Solution:**\n1. Test scraping endpoints individually\n2. Check if hotel name matches exactly\n3. Verify dates are in future\n4. Try different date ranges\n\n### Issue: Emails not sending\n**Solution:**\n1. Verify SMTP credentials\n2. Check \"less secure apps\" setting (Gmail)\n3. Use App Password instead of regular password\n4. Check spam folder\n\n### Issue: Slow response times\n**Solution:**\n1. Enable parallel scraping (already configured)\n2. Add timeout limits (30 seconds recommended)\n3. Implement caching\n4. Use faster scraping service",
+  "featuredImage": "/data/workflows/9777/9777.webp",
+  "author": {
+    "id": 101,
+    "slug": "oneclick-ai",
+    "name": "Oneclick AI Squad",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 678,
+  "downloads": 67,
+  "createdAt": "2025-10-16T12:19:59.313Z",
+  "updatedAt": "2026-01-16T09:01:52.284Z",
+  "publishedAt": "2025-10-16T12:19:59.313Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9777",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate hotel price comparison with multi-platform scraping and email reporting",
+    "workflowName": "Automate hotel price comparison with multi-platform scraping and email reporting",
+    "description": "This is a **production-ready, end-to-end workflow** that automatically compares hotel prices across multiple booking platforms and delivers beautiful email reports to users. Unlike basic building blocks, this workflow is a complete solution ready to deploy.\n\n---\n\n## ✨ What Makes This Production-Ready\n\n### ✅ Complete End-to-End Automation\n- **Input**: Natural language queries via webhook\n- **Processing**: Multi-platform scraping & comparison\n- **Output**: Professional email reports + analytics\n- **Feedback**: Real-time webhook responses\n\n### ✅ Advanced Features\n- 🧠 Natural Language Processing for flexible queries\n- 🔄 Parallel scraping from multiple platforms\n- 📊 Analytics tracking with Google Sheets integration\n- 💌 Beautiful HTML email reports\n- 🛡️ Error handling and graceful degradation\n- 📱 Webhook responses for real-time feedback\n\n### ✅ Business Value\n- **For Travel Agencies**: Instant price comparison service for clients\n- **For Hotels**: Competitive pricing intelligence\n- **For Travelers**: Save time and money with automated research\n\n---\n\n## 🚀 Setup Instructions\n\n### Step 1: Import Workflow\n\n1. Copy the workflow JSON from the artifact\n2. In n8n, go to **Workflows** → **Import from File/URL**\n3. Paste the JSON and click **Import**\n\n### Step 2: Configure Credentials\n\n#### A. SMTP Email (Required)\n```\nSettings → Credentials → Add Credential → SMTP\n\nHost: smtp.gmail.com (for Gmail)\nPort: 587\nUser: your-email@gmail.com\nPassword: your-app-password (not regular password!)\n```\n\n**Gmail Setup:**\n1. Enable 2FA on your Google Account\n2. Generate App Password: https://myaccount.google.com/apppasswords\n3. Use the generated password in n8n\n\n#### B. Google Sheets (Optional - for analytics)\n```\nSettings → Credentials → Add Credential → Google Sheets OAuth2\n\nFollow the OAuth flow to connect your Google account\n```\n\n**Sheet Setup:**\n1. Create a new Google Sheet\n2. Name the first sheet \"Analytics\"\n3. Add headers: `timestamp`, `query`, `hotel`, `city`, `checkIn`, `checkOut`, `bestPrice`, `platform`, `totalResults`, `userEmail`\n4. Copy the Sheet ID from URL and paste in the \"Save to Google Sheets\" node\n\n### Step 3: Set Up Scraping Service\n\nYou need to create a scraping API that the workflow calls. Here are your options:\n\n#### Option A: Use Your Existing Python Script\n\n**Create a simple Flask API wrapper:**\n\n```python\n# api_wrapper.py\nfrom flask import Flask, request, jsonify\nimport subprocess\nimport json\n\napp = Flask(__name__)\n\n@app.route('/scrape/&lt;platform&gt;', methods=['POST'])\ndef scrape(platform):\n    data = request.json\n    query = f\"{data['checkIn']} to {data['checkOut']}, {data['hotel']}, {data['city']}\"\n    \n    try:\n        result = subprocess.run(\n            ['python3', 'price_scrap_2.py', query, platform],\n            capture_output=True,\n            text=True,\n            timeout=30\n        )\n        \n        # Parse your script output\n        output = result.stdout\n        # Assuming your script returns price data\n        \n        return jsonify({\n            'price': extracted_price,\n            'currency': 'USD',\n            'roomType': 'Standard Room',\n            'url': booking_url,\n            'availability': True\n        })\n    except Exception as e:\n        return jsonify({'error': str(e)}), 500\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=5000)\n```\n\n**Deploy:**\n```bash\npip install flask\npython api_wrapper.py\n```\n\n**Update n8n HTTP Request nodes:**\n```\nURL: http://your-server-ip:5000/scrape/booking\nURL: http://your-server-ip:5000/scrape/agoda\nURL: http://your-server-ip:5000/scrape/expedia\n```\n\n#### Option B: Use Third-Party Scraping Services\n\n**Recommended Services:**\n- **ScraperAPI** (scraperapi.com) - $49/month for 100k requests\n- **Bright Data** (brightdata.com) - Pay as you go\n- **Apify** (apify.com) - Has pre-built hotel scrapers\n\n**Example with ScraperAPI:**\n```javascript\n// In HTTP Request node\nURL: http://api.scraperapi.com\nQuery Parameters:\n  api_key: YOUR_API_KEY\n  url: https://booking.com/search?hotel={{$json.hotelName}}...\n```\n\n#### Option C: Use n8n SSH Node (Like Your Original)\n\nKeep your SSH approach but improve it:\n\n1. Replace HTTP Request nodes with SSH nodes\n2. Point to your server with the Python script\n3. Ensure error handling and timeouts\n\n```javascript\n// SSH Node Configuration\nHost: your-server-ip\nCommand: python3 /path/to/price_scrap_2.py \"{{$json.hotelName}}\" \"{{$json.city}}\" \"{{$json.checkInISO}}\" \"{{$json.checkOutISO}}\" \"booking\"\n```\n\n### Step 4: Activate Webhook\n\n1. Click on \"Webhook - Receive Request\" node\n2. Click \"Listen for Test Event\"\n3. Copy the webhook URL (e.g., `https://your-n8n.com/webhook/hotel-price-check`)\n4. Test with this curl command:\n\n```bash\ncurl -X POST https://your-n8n.com/webhook/hotel-price-check \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"message\": \"I want to check Marriott Hotel in Singapore from 15th March to 18th March\",\n    \"email\": \"user@example.com\",\n    \"name\": \"John Doe\"\n  }'\n```\n\n### Step 5: Activate Workflow\n\n1. Toggle the workflow to **Active**\n2. The webhook is now live and ready to receive requests\n\n---\n\n## 📝 Usage Examples\n\n### Example 1: Basic Query\n```json\n{\n  \"message\": \"Hilton Hotel in Dubai from 20th December to 23rd December\",\n  \"email\": \"traveler@email.com\",\n  \"name\": \"Sarah\"\n}\n```\n\n### Example 2: Flexible Format\n```json\n{\n  \"message\": \"I need prices for Taj Hotel, Mumbai. Check-in: 5th January, Check-out: 8th January\",\n  \"email\": \"customer@email.com\"\n}\n```\n\n### Example 3: Short Format\n```json\n{\n  \"message\": \"Hyatt Singapore March 10 to March 13\",\n  \"email\": \"user@email.com\"\n}\n```\n\n---\n\n## 🎨 Customization Options\n\n### 1. Add More Booking Platforms\n\n**Steps:**\n1. Duplicate an existing \"Scrape\" node\n2. Update the platform parameter\n3. Connect it to \"Aggregate & Compare\"\n4. Update the aggregation logic to include the new platform\n\n### 2. Change Email Template\n\nEdit the \"Format Email Report\" node's JavaScript:\n- Modify HTML structure\n- Change colors (currently purple gradient)\n- Add your company logo\n- Include terms and conditions\n\n### 3. Add SMS Notifications\n\n**Using Twilio:**\n1. Add new node: Twilio → Send SMS\n2. Connect after \"Aggregate & Compare\"\n3. Format: \"Best deal: ${hotel} at ${platform} for ${price}\"\n\n### 4. Add Slack Integration\n\n1. Add Slack node after \"Aggregate & Compare\"\n2. Send to #travel-deals channel\n3. Include quick booking links\n\n### 5. Implement Caching\n\nAdd Redis or n8n's built-in cache:\n```javascript\n// Before scraping, check cache\nconst cacheKey = `${hotelName}-${city}-${checkIn}-${checkOut}`;\nconst cached = await $cache.get(cacheKey);\n\nif (cached && Date.now() - cached.timestamp &lt; 3600000) {\n  return cached.data; // Use 1-hour cache\n}\n```\n\n---\n\n## 📊 Analytics & Monitoring\n\n### Google Sheets Dashboard\n\nThe workflow automatically logs to Google Sheets. Create a dashboard with:\n\n**Metrics to track:**\n- Total searches per day/week\n- Most searched hotels\n- Most searched cities\n- Average price ranges\n- Platform with best prices (frequency)\n- User engagement (repeat users)\n\n**Example Sheet Formulas:**\n```\n// Total searches today\n=COUNTIF(A:A, TODAY())\n\n// Most popular hotel\n=INDEX(C:C, MODE(MATCH(C:C, C:C, 0)))\n\n// Average best price\n=AVERAGE(G:G)\n```\n\n### Set Up Alerts\n\nAdd a node after \"Aggregate & Compare\":\n```javascript\n// Alert if prices are unusually high\nif (bestDeal.price &gt; avgPrice * 1.5) {\n  // Send alert to admin\n  return [{\n    json: {\n      alert: true,\n      message: `High prices detected for ${hotelName}`\n    }\n  }];\n}\n```\n\n---\n\n## 🛡️ Error Handling\n\nThe workflow includes comprehensive error handling:\n\n### 1. Missing Information\nIf user doesn't provide hotel/city/dates → Responds with helpful prompt\n\n### 2. Scraping Failures\nIf all platforms fail → Sends \"No results\" email with suggestions\n\n### 3. Partial Results\nIf some platforms work → Shows available results + notes errors\n\n### 4. Email Delivery Issues\nUses `continueOnFail: true` to prevent workflow crashes\n\n---\n\n## 🔒 Security Best Practices\n\n### 1. Rate Limiting\nAdd rate limiting to prevent abuse:\n\n```javascript\n// In Parse & Validate node\nconst userEmail = $json.email;\nconst recentSearches = await $cache.get(`searches:${userEmail}`);\n\nif (recentSearches && recentSearches.length &gt; 10) {\n  return [{\n    json: {\n      status: 'rate_limited',\n      response: 'Too many requests. Please try again in 1 hour.'\n    }\n  }];\n}\n```\n\n### 2. Input Validation\nAlready implemented - validates hotel names, cities, dates\n\n### 3. Email Verification\nAdd email verification before first use:\n\n```javascript\n// Send verification code\nconst code = Math.random().toString(36).substring(7);\nawait $sendEmail({\n  to: userEmail,\n  subject: 'Verify your email',\n  body: `Your code: ${code}`\n});\n```\n\n### 4. API Key Protection\nNever expose scraping API keys in responses or logs\n---\n\n## 🚀 Deployment Options\n\n### Option 1: n8n Cloud (Easiest)\n1. Sign up at n8n.cloud\n2. Import workflow\n3. Configure credentials\n4. Activate\n\n**Pros:** No maintenance, automatic updates\n**Cons:** Monthly cost\n\n### Option 2: Self-Hosted (Most Control)\n```bash\n# Using Docker\ndocker run -it --rm \\\n  --name n8n \\\n  -p 5678:5678 \\\n  -v ~/.n8n:/home/node/.n8n \\\n  n8nio/n8n\n\n# Using npm\nnpm install -g n8n\nn8n start\n```\n\n**Pros:** Free, full control\n**Cons:** You manage updates\n\n### Option 3: Cloud Platforms\n- Railway.app (recommended for beginners)\n- DigitalOcean App Platform\n- AWS ECS\n- Google Cloud Run\n\n---\n\n## 📈 Scaling Recommendations\n\n### For &lt; 100 searches/day\n- Current setup is perfect\n- Use n8n Cloud Starter or small VPS\n\n### For 100-1000 searches/day\n- Add Redis caching (1-hour cache)\n- Use queue system for scraping\n- Upgrade to n8n Cloud Pro\n\n### For 1000+ searches/day\n- Implement job queue (Bull/Redis)\n- Use dedicated scraping service\n- Load balance multiple n8n instances\n- Consider microservices architecture\n\n---\n\n## 🐛 Troubleshooting\n\n### Issue: Webhook not responding\n**Solution:**\n1. Check workflow is Active\n2. Verify webhook URL is correct\n3. Check n8n logs: Settings → Log Streaming\n\n### Issue: No prices returned\n**Solution:**\n1. Test scraping endpoints individually\n2. Check if hotel name matches exactly\n3. Verify dates are in future\n4. Try different date ranges\n\n### Issue: Emails not sending\n**Solution:**\n1. Verify SMTP credentials\n2. Check \"less secure apps\" setting (Gmail)\n3. Use App Password instead of regular password\n4. Check spam folder\n\n### Issue: Slow response times\n**Solution:**\n1. Enable parallel scraping (already configured)\n2. Add timeout limits (30 seconds recommended)\n3. Implement caching\n4. Use faster scraping service",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook - Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Parse & Validate Request",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check If Ready",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Scrape Booking.com",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Scrape Agoda",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Scrape Expedia",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Aggregate & Compare",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Email Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "role": "emailSend",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Webhook Response (Success)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook Response (Info)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Analytics",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

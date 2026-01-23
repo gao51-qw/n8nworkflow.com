@@ -1,0 +1,320 @@
+{
+  "id": 9147,
+  "slug": "9147",
+  "title": "RSS to social: automated content generation with Llama 3 & GetLate Publishing",
+  "description": "🚀 **Automate your social media presence!** This workflow duo automatically curates content from your Wallabag RSS feeds, generates platform-specific posts using AI, and publishes them—complete with AI-generated images.\n\n### **⚙️ Setup & Configuration**\n\n**Required Credentials & Services:**\nTo run this workflow, you will need to set up the following credentials in n8n:\n*   **Wallabag RSS Feeds:** This workflow uses Wallabag as your content curation service. Wallabag is the most cost-effective option—easy to self-host or use as a paid service. You'll need to generate access tokens for RSS feed access.\n*   **Airtable API Key:** To create and update records in your \"Content Store\" database.\n*   **LLM Provider API Key:** To power the social media content generation. The demo uses **Groq (llama-3.3-70b-versatile)**, but this can be replaced with any preferred LLM (OpenAI, Anthropic, etc.).\n*   **GetLate API Key:** To authenticate and post to your social media platforms.\n*   **Imgbb API Key:** To host the AI-generated images.\n*   **An Image Generation Service API Key:** For creating images from prompts. The demo uses **Hugging Face (stable-diffusion-xl-base-1.0)**, but this can be swapped for any other service (Fal.ai, Stability AI, etc.).\n\n**Key Setup Requirement: Define Your Tagging Convention**\nBefore running this workflow, establish a consistent tagging system in Wallabag where each tag corresponds to a specific social media platform. For example:\n* `#to-share-linkedin` for LinkedIn content\n* `#to-share-bluesky` for Bluesky content\n* `#to-share-instagram` for Instagram content\n\n**Adding More Feeds & Platforms:**\n* **New Feeds:** Simply duplicate the example sub-workflows and update the RSS feed URL and target platform information for each new tag/platform combination.\n* **New Platforms:** To add support for additional social platforms, duplicate one of the existing platform sub-workflows (LinkedIn or Bluesky) and update the platform-specific parameters, prompts, and GetLate API settings for your new platform.\n\n**Airtable Database Schema: \"RSS Feed - Content Store\"**\nThe workflow uses an Airtable base with the following fields to track content from ingestion to publication:\n*   `id` (Primary Field):  Formula, for unique record ID (`RECORD_ID()`)\n*   `audience_targeted`: Long text\n*   `author`: Long text\n*   `character_count`: Number\n*   `content_markdown`: Long text\n*   `cta_used`: Long text\n*   `feed_id`: Single line text\n*   `goal_applied`: Long text\n*   `image_filename`: Singe line text\n*   `image_id`: Single line text\n*   `image_link`: URL\n*   `image_prompt`: Long text\n*   `is_posted`: Number, default is 0\n*   `platform`: Single line text\n*   `post_text`: Long text\n*   `suggested_hashtags`: Long text\n*   `title`: Long text\n*   `tone_applied`: Long text\n*   `article_url`: URL\n\n**Customizable User Inputs:**\nThis workflow is built for flexibility. Key inputs you can customize include:\n*   **Wallabag RSS Feed URL & Platform Tag:** The specific feed and platform-specific tag (e.g., `#to-share-linkedin`) to monitor in Workflow #1.\n*   **Target Social Platform:** Defined per feed in the \"Edit Field\" node.\n*   **Content Generation Schedule:** The frequency for auto-posting in the Schedule Trigger.\n*   **Brand Voice & LLM Parameters:** The tone, style, and specific instructions for the AI in the \"Set Custom SMCG Prompt\" node.\n*   **Platform-Specific Prompts:** The template used to generate posts for each social network (Instagram, LinkedIn, etc.).\n*   **Posting Behavior & Image Generation:** Configured within the **SMCG (Social Media Content Generation) node**. This is where you set the posting mode (immediate vs. draft) and define a boolean for each platform to enable or disable AI-generated images for its posts.\n\n### **📥 Workflow 1: RSS Aggregator & Content Store**\n\n- **RSS Trigger** → Pulls tagged articles from Wallabag feeds using platform-specific tags\n- **Platform Assignment** → Sets target social platform based on tag\n- **Content Conversion** → HTML to Markdown formatting\n- **Airtable Storage** → Saves articles to content database\n\n**🌟 Adding New RSS Feeds:** To monitor additional Wallabag feeds for different content sources, simply duplicate the existing RSS feed sub-workflow and update the RSS URL with your new Wallabag access token and platform-specific tag. Each feed can target a different social platform or content category.\n\n### **🔄 Workflow 2: AI Content Generator & Publisher**\n\n- **Schedule Trigger** → Runs on your preferred frequency\n- **Content Selection** → Pulls unpublished articles from Airtable\n- **AI Configuration** → Sets brand voice, posting behavior, and image generation preferences\n- **Platform Routing** → Directs to appropriate social platform workflow\n- **AI Content Generation** → Creates posts and image prompts using LLM\n- **Image Generation** → Creates & hosts images when enabled\n- **Social Publishing** → Posts to platforms via GetLate API\n- **Database Update** → Marks content as published in Airtable\n\n**🌟 Adding New Platform Support:** To extend this workflow to additional social platforms, simply duplicate one of the existing platform sub-workflows and update the platform-specific parameters, LLM prompts, and GetLate API configuration for your target platform.\n",
+  "featuredImage": "/data/workflows/9147/9147.webp",
+  "author": {
+    "id": 101,
+    "slug": "deletosh",
+    "name": "Dele Tosh ",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 202,
+  "downloads": 20,
+  "createdAt": "2025-10-01T09:31:53.078Z",
+  "updatedAt": "2026-01-16T08:59:12.669Z",
+  "publishedAt": "2025-10-01T09:31:53.078Z",
+  "nodes": 47,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9147",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "RSS to social: automated content generation with Llama 3 & GetLate Publishing",
+    "workflowName": "RSS to social: automated content generation with Llama 3 & GetLate Publishing",
+    "description": "🚀 **Automate your social media presence!** This workflow duo automatically curates content from your Wallabag RSS feeds, generates platform-specific posts using AI, and publishes them—complete with AI-generated images.\n\n### **⚙️ Setup & Configuration**\n\n**Required Credentials & Services:**\nTo run this workflow, you will need to set up the following credentials in n8n:\n*   **Wallabag RSS Feeds:** This workflow uses Wallabag as your content curation service. Wallabag is the most cost-effective option—easy to self-host or use as a paid service. You'll need to generate access tokens for RSS feed access.\n*   **Airtable API Key:** To create and update records in your \"Content Store\" database.\n*   **LLM Provider API Key:** To power the social media content generation. The demo uses **Groq (llama-3.3-70b-versatile)**, but this can be replaced with any preferred LLM (OpenAI, Anthropic, etc.).\n*   **GetLate API Key:** To authenticate and post to your social media platforms.\n*   **Imgbb API Key:** To host the AI-generated images.\n*   **An Image Generation Service API Key:** For creating images from prompts. The demo uses **Hugging Face (stable-diffusion-xl-base-1.0)**, but this can be swapped for any other service (Fal.ai, Stability AI, etc.).\n\n**Key Setup Requirement: Define Your Tagging Convention**\nBefore running this workflow, establish a consistent tagging system in Wallabag where each tag corresponds to a specific social media platform. For example:\n* `#to-share-linkedin` for LinkedIn content\n* `#to-share-bluesky` for Bluesky content\n* `#to-share-instagram` for Instagram content\n\n**Adding More Feeds & Platforms:**\n* **New Feeds:** Simply duplicate the example sub-workflows and update the RSS feed URL and target platform information for each new tag/platform combination.\n* **New Platforms:** To add support for additional social platforms, duplicate one of the existing platform sub-workflows (LinkedIn or Bluesky) and update the platform-specific parameters, prompts, and GetLate API settings for your new platform.\n\n**Airtable Database Schema: \"RSS Feed - Content Store\"**\nThe workflow uses an Airtable base with the following fields to track content from ingestion to publication:\n*   `id` (Primary Field):  Formula, for unique record ID (`RECORD_ID()`)\n*   `audience_targeted`: Long text\n*   `author`: Long text\n*   `character_count`: Number\n*   `content_markdown`: Long text\n*   `cta_used`: Long text\n*   `feed_id`: Single line text\n*   `goal_applied`: Long text\n*   `image_filename`: Singe line text\n*   `image_id`: Single line text\n*   `image_link`: URL\n*   `image_prompt`: Long text\n*   `is_posted`: Number, default is 0\n*   `platform`: Single line text\n*   `post_text`: Long text\n*   `suggested_hashtags`: Long text\n*   `title`: Long text\n*   `tone_applied`: Long text\n*   `article_url`: URL\n\n**Customizable User Inputs:**\nThis workflow is built for flexibility. Key inputs you can customize include:\n*   **Wallabag RSS Feed URL & Platform Tag:** The specific feed and platform-specific tag (e.g., `#to-share-linkedin`) to monitor in Workflow #1.\n*   **Target Social Platform:** Defined per feed in the \"Edit Field\" node.\n*   **Content Generation Schedule:** The frequency for auto-posting in the Schedule Trigger.\n*   **Brand Voice & LLM Parameters:** The tone, style, and specific instructions for the AI in the \"Set Custom SMCG Prompt\" node.\n*   **Platform-Specific Prompts:** The template used to generate posts for each social network (Instagram, LinkedIn, etc.).\n*   **Posting Behavior & Image Generation:** Configured within the **SMCG (Social Media Content Generation) node**. This is where you set the posting mode (immediate vs. draft) and define a boolean for each platform to enable or disable AI-generated images for its posts.\n\n### **📥 Workflow 1: RSS Aggregator & Content Store**\n\n- **RSS Trigger** → Pulls tagged articles from Wallabag feeds using platform-specific tags\n- **Platform Assignment** → Sets target social platform based on tag\n- **Content Conversion** → HTML to Markdown formatting\n- **Airtable Storage** → Saves articles to content database\n\n**🌟 Adding New RSS Feeds:** To monitor additional Wallabag feeds for different content sources, simply duplicate the existing RSS feed sub-workflow and update the RSS URL with your new Wallabag access token and platform-specific tag. Each feed can target a different social platform or content category.\n\n### **🔄 Workflow 2: AI Content Generator & Publisher**\n\n- **Schedule Trigger** → Runs on your preferred frequency\n- **Content Selection** → Pulls unpublished articles from Airtable\n- **AI Configuration** → Sets brand voice, posting behavior, and image generation preferences\n- **Platform Routing** → Directs to appropriate social platform workflow\n- **AI Content Generation** → Creates posts and image prompts using LLM\n- **Image Generation** → Creates & hosts images when enabled\n- **Social Publishing** → Posts to platforms via GetLate API\n- **Database Update** → Marks content as published in Airtable\n\n**🌟 Adding New Platform Support:** To extend this workflow to additional social platforms, simply duplicate one of the existing platform sub-workflows and update the platform-specific parameters, LLM prompts, and GetLate API configuration for your target platform.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "role": "lmChatGroq",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Set Post Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Markdown: Convert Article Content",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Groq Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "role": "lmChatGroq",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "LinkedIn SMCG",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Bluesky SMCG",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Convert Image to Base64 (Bluesky)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Generate Post Image (Bluesky)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Store Image on Imgbb (Bluesky)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post/Draft via GetLate API (Bluesky)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Store Generated Post Content (Bluesky)",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Post/Draft via GetLate API (No Image, Bluesky)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Store Generated Post Content (No Image, Bluesky)",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Check For Image Generation Prompt (Bluesky)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Check For Image Generation Prompt (LinkedIn)",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Post/Draft via GetLate API (No Image, LinkedIn))",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Generate Post Image (LinkedIn)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Convert Image to Base64 (LinkedIn)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store Image on Imgbb (LinkedIn)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post/Draft via GetLate API (LinkedIn)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Store Generated Post Content (LinkedIn)",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Store Generated Post Content (No Image, LinkedIn)",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Check Platform",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Bluesky SMCG Prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Pull New Article",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Set SMCG Custom Prompt Parameters",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Markdown: Convert Article Content1",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RSS Feed Trigger: '#to-share-bluesky'",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "role": "rssFeedReadTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Platform (Bluesky)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Store Article Content (LinkedIn)",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Set Platform (LinkedIn)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "RSS Feed Trigger: '#to-share-linkedin'",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "role": "rssFeedReadTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Article Content",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "LinkedIn SMCG Prompt",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

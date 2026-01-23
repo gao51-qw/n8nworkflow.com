@@ -1,0 +1,266 @@
+{
+  "id": 11580,
+  "slug": "11580",
+  "title": "Automated customer support system with Gemini AI, RAG & security guardrails",
+  "description": "## Description\n\nThis workflow acts as an autonomous Tier 2 Customer Support Agent. It doesn't just answer questions; it manages the entire lifecycle of a support ticket—from triage to resolution with Guardrails to deal with prompt injections, PII information blocking, etc. enabling such threats are blocked and logged in Airtable.\n\nUnlike standard auto-responders, this system uses a \"Master Orchestrator\" architecture to coordinate specialized sub-agents. It creates a safe, human-like support experience by combining RAG (Knowledge Base retrieval) with a safety-first state machine.\n\n## How it works\n\nThe workflow operates on a strict \"Hub and Spoke\" model managed by a Master Orchestrator:\n\n1. Security Guardrails (The Gatekeeper) Before the AI even sees the message, a hard-coded security layer scans for Prompt Injection attacks, Profanity, and PII. If a threat is detected, the workflow locks down, logs the incident to Airtable, and stops execution immediately.\n\n2. Orchestration & Triage Once the message passes safety checks, the Master Orchestrator takes over. Its first action is to call the Ticket Analyser Agent.\n\n3. Analysis & Scoring The Ticket Analyser classifies the issue (e.g., \"Technical,\" \"Billing\") and scores the customer's sentiment. It returns a priority_score to the Master Orchestrator.\n\n4. The Decision Logic (Circuit Breaker) The Master Orchestrator evaluates the score:\n\nEscalation: If the customer is \"Furious\" or the score is high, it bypasses AI drafting and immediately alerts a human manager via Slack.\n\nResolution Path: If the request is standard, it proceeds to the next steps.\n\n5. Knowledge Retrieval (RAG) The Orchestrator calls the Knowledge Worker Agent. This agent searches your Supabase vector store to find specific, verified company policies or troubleshooting steps relevant to the user's issue.\n\n6. Resolution Drafting Armed with the analysis and the retrieved facts, the Orchestrator calls the Resolution Agent. This agent synthesizes a polite, professional email draft.\n\n7. Final Execution The Master Orchestrator reviews the final draft and sends the email via Gmail.\n\n## Set up\n\nThis is multi-agent system. Please follow these steps to configure the environment:\n\n⚠️ IMPORTANT: This template contains the Main Orchestrator AND the Sub-Agents in a single view. You must separate them for the system to function:\n\nSeparate the Agents: Copy the nodes for each sub-agent (Ticket Analyser, Knowledge Worker, Resolution Agent) into their own new workflows.\n\nLink the Tools: In the Main Orchestrator workflow, open the \"Call [Agent Name]\" tool nodes and update the Workflow ID to point to the new workflows you just created.\n\nConfigure Credentials: You will need credentials for Gmail (or your preferred email provider), Slack, Airtable, Supabase (for the vector store), and Google Gemini (or OpenAI).\n\nInitialize the Knowledge Base:\n\nOpen the \"One time Document Loader\" section in the workflow.\n\nUpload your policy document (PDF/Text) to the \"Upload your file here\" node.\n\nRun this branch once to vectorize your documents into Supabase.\n\nSetup Airtable: Create a simple table with columns for Sender Email, Incident Type, and Flagged Content to log security threats caught by the guardrails.\n\nCustomize the Trigger: Update the Gmail Trigger node to watch for your specific support alias (e.g., support@yourdomain.com) and ensure it only picks up \"Unread\" emails.\n\nAdjust the Escalation Sensitivity: In the Orchestrator Agent node, you can tweak the \"Phase 2\" logic to change what triggers a human hand-off (currently set to priority_score &gt;= 0.9).\n\nGood to go!\n\n![image.png](fileId:3643)",
+  "featuredImage": "/data/workflows/11580/11580.webp",
+  "author": {
+    "id": 101,
+    "slug": "rams1005",
+    "name": "RamS",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 200,
+  "downloads": 20,
+  "createdAt": "2025-12-07T13:25:00.540Z",
+  "updatedAt": "2026-01-16T09:09:12.621Z",
+  "publishedAt": "2025-12-07T13:25:00.540Z",
+  "nodes": 38,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11580",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated customer support system with Gemini AI, RAG & security guardrails",
+    "workflowName": "Automated customer support system with Gemini AI, RAG & security guardrails",
+    "description": "## Description\n\nThis workflow acts as an autonomous Tier 2 Customer Support Agent. It doesn't just answer questions; it manages the entire lifecycle of a support ticket—from triage to resolution with Guardrails to deal with prompt injections, PII information blocking, etc. enabling such threats are blocked and logged in Airtable.\n\nUnlike standard auto-responders, this system uses a \"Master Orchestrator\" architecture to coordinate specialized sub-agents. It creates a safe, human-like support experience by combining RAG (Knowledge Base retrieval) with a safety-first state machine.\n\n## How it works\n\nThe workflow operates on a strict \"Hub and Spoke\" model managed by a Master Orchestrator:\n\n1. Security Guardrails (The Gatekeeper) Before the AI even sees the message, a hard-coded security layer scans for Prompt Injection attacks, Profanity, and PII. If a threat is detected, the workflow locks down, logs the incident to Airtable, and stops execution immediately.\n\n2. Orchestration & Triage Once the message passes safety checks, the Master Orchestrator takes over. Its first action is to call the Ticket Analyser Agent.\n\n3. Analysis & Scoring The Ticket Analyser classifies the issue (e.g., \"Technical,\" \"Billing\") and scores the customer's sentiment. It returns a priority_score to the Master Orchestrator.\n\n4. The Decision Logic (Circuit Breaker) The Master Orchestrator evaluates the score:\n\nEscalation: If the customer is \"Furious\" or the score is high, it bypasses AI drafting and immediately alerts a human manager via Slack.\n\nResolution Path: If the request is standard, it proceeds to the next steps.\n\n5. Knowledge Retrieval (RAG) The Orchestrator calls the Knowledge Worker Agent. This agent searches your Supabase vector store to find specific, verified company policies or troubleshooting steps relevant to the user's issue.\n\n6. Resolution Drafting Armed with the analysis and the retrieved facts, the Orchestrator calls the Resolution Agent. This agent synthesizes a polite, professional email draft.\n\n7. Final Execution The Master Orchestrator reviews the final draft and sends the email via Gmail.\n\n## Set up\n\nThis is multi-agent system. Please follow these steps to configure the environment:\n\n⚠️ IMPORTANT: This template contains the Main Orchestrator AND the Sub-Agents in a single view. You must separate them for the system to function:\n\nSeparate the Agents: Copy the nodes for each sub-agent (Ticket Analyser, Knowledge Worker, Resolution Agent) into their own new workflows.\n\nLink the Tools: In the Main Orchestrator workflow, open the \"Call [Agent Name]\" tool nodes and update the Workflow ID to point to the new workflows you just created.\n\nConfigure Credentials: You will need credentials for Gmail (or your preferred email provider), Slack, Airtable, Supabase (for the vector store), and Google Gemini (or OpenAI).\n\nInitialize the Knowledge Base:\n\nOpen the \"One time Document Loader\" section in the workflow.\n\nUpload your policy document (PDF/Text) to the \"Upload your file here\" node.\n\nRun this branch once to vectorize your documents into Supabase.\n\nSetup Airtable: Create a simple table with columns for Sender Email, Incident Type, and Flagged Content to log security threats caught by the guardrails.\n\nCustomize the Trigger: Update the Gmail Trigger node to watch for your specific support alias (e.g., support@yourdomain.com) and ensure it only picks up \"Unread\" emails.\n\nAdjust the Escalation Sensitivity: In the Orchestrator Agent node, you can tweak the \"Phase 2\" logic to change what triggers a human hand-off (currently set to priority_score &gt;= 0.9).\n\nGood to go!\n\n![image.png](fileId:3643)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Guardrails",
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "role": "guardrails",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Orchestrator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Call Ticket Analyser Agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Call Knowledge Worker Agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Call Resolution Agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Email Reply Tool",
+      "type": "n8n-nodes-base.gmailTool",
+      "role": "gmailTool",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Slack Tool",
+      "type": "n8n-nodes-base.slackTool",
+      "role": "slackTool",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Guard LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Reasoning Model for Orchestrator",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Threats in Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "role": "emailReadImap",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Knowledge worker and Investigator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Knowledge Base Retrieval",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Knowledge Base Storage",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "role": "vectorStoreSupabase",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "RAG LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clean Json",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Ticket Analyser LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Clean JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Email / Ticket Analyser Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Resolution Agent LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Resolution Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory for RAG agent",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Simple Memory for Resolution Agent",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Simple Memory for Email Analyser Agent",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload File / Copy Text here",
+      "type": "n8n-nodes-base.formTrigger",
+      "role": "formTrigger",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Placeholder 2(Read Note and Setup)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Placeholder 1(Read Note and Setup)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Placeholder 3(Read Note and Setup)",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

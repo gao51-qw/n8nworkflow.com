@@ -1,0 +1,290 @@
+{
+  "id": 9059,
+  "slug": "9059",
+  "title": "Auto-generate social media posts from URLs with AI, Telegram & multi-platform posting",
+  "description": "## How it works\n\nThis workflow turns any URL sent to a Telegram bot into ready-to-publish social posts:\n\t1.\tTrigger: Telegram message (checks if it contains a URL).\n\t2.\tFetch & parse: Downloads the page and extracts readable text + title.\n\t3.\tAI writing: Generates platform-specific copy (Facebook, Instagram, LinkedIn).\n\t4.\tImage: Creates an AI image and stores it in Supabase Storage.\n\t5.\tPublish: Posts to Facebook Pages, Instagram Business, LinkedIn.\n\t6.\tLogging: Updates Google Sheets with post URLs and sends a Telegram confirmation (image + links).\n\n## Setup\n\t1.\tTelegram – create a bot, connect via n8n Telegram credentials.\n\t2.\tOpenAI / Gemini – add API key in n8n Credentials and select it in the AI nodes.\n\t3.\tFacebook/Instagram (Graph API) – create a credential called facebookGraph with:\n\t•\taccessToken (page-scoped or system user)\n\t•\tpageId (for Facebook Page photos)\n\t•\tigUserId (Instagram Business account ID)\n\t•\toptional fbApiVersion (default v19.0)\n\t4.\tLinkedIn – connect with OAuth2 in the LinkedIn node (leave as credential).\n\t5.\tSupabase – credential supabase with url and apiKey. Ensure a bucket exists (default used in the Set node is social-media).\n\t6.\tGoogle Sheets – replace YOUR_GOOGLE_SHEET_ID and Sheet1. Grant your n8n Google OAuth2 access.\n\n## Notes\n\t•\tNo API keys are stored in the template. Everything runs via n8n Credentials.\n\t•\tYou can change bucket name, image size/quality, and AI prompts in the respective nodes.\n\t•\tThe confirmation message on Telegram includes direct permalinks to the published posts.\n\n## Required credentials\n\t•\tTelegram Bot\n\t•\tOpenAI (or Gemini)\n\t•\tFacebook/Instagram Graph\n\t•\tLinkedIn OAuth2\n\t•\tSupabase (url + apiKey)\n\t•\tGoogle Sheets OAuth2\n\n## Inputs\n\t•\tA Telegram message that contains a URL.\n\n## Outputs\n\t•\tSocial posts published on Facebook, Instagram, LinkedIn.\n\t•\tRow appended/updated in Google Sheets with post URLs and image link.\n\t•\tTelegram confirmation with the generated image + post links.",
+  "featuredImage": "/data/workflows/9059/9059.webp",
+  "author": {
+    "id": 101,
+    "slug": "smart-camp-ai",
+    "name": "Karol Otręba",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 999,
+  "downloads": 99,
+  "createdAt": "2025-09-28T21:52:49.972Z",
+  "updatedAt": "2026-01-16T08:58:54.406Z",
+  "publishedAt": "2025-09-28T21:52:49.972Z",
+  "nodes": 42,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9059",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-generate social media posts from URLs with AI, Telegram & multi-platform posting",
+    "workflowName": "Auto-generate social media posts from URLs with AI, Telegram & multi-platform posting",
+    "description": "## How it works\n\nThis workflow turns any URL sent to a Telegram bot into ready-to-publish social posts:\n\t1.\tTrigger: Telegram message (checks if it contains a URL).\n\t2.\tFetch & parse: Downloads the page and extracts readable text + title.\n\t3.\tAI writing: Generates platform-specific copy (Facebook, Instagram, LinkedIn).\n\t4.\tImage: Creates an AI image and stores it in Supabase Storage.\n\t5.\tPublish: Posts to Facebook Pages, Instagram Business, LinkedIn.\n\t6.\tLogging: Updates Google Sheets with post URLs and sends a Telegram confirmation (image + links).\n\n## Setup\n\t1.\tTelegram – create a bot, connect via n8n Telegram credentials.\n\t2.\tOpenAI / Gemini – add API key in n8n Credentials and select it in the AI nodes.\n\t3.\tFacebook/Instagram (Graph API) – create a credential called facebookGraph with:\n\t•\taccessToken (page-scoped or system user)\n\t•\tpageId (for Facebook Page photos)\n\t•\tigUserId (Instagram Business account ID)\n\t•\toptional fbApiVersion (default v19.0)\n\t4.\tLinkedIn – connect with OAuth2 in the LinkedIn node (leave as credential).\n\t5.\tSupabase – credential supabase with url and apiKey. Ensure a bucket exists (default used in the Set node is social-media).\n\t6.\tGoogle Sheets – replace YOUR_GOOGLE_SHEET_ID and Sheet1. Grant your n8n Google OAuth2 access.\n\n## Notes\n\t•\tNo API keys are stored in the template. Everything runs via n8n Credentials.\n\t•\tYou can change bucket name, image size/quality, and AI prompts in the respective nodes.\n\t•\tThe confirmation message on Telegram includes direct permalinks to the published posts.\n\n## Required credentials\n\t•\tTelegram Bot\n\t•\tOpenAI (or Gemini)\n\t•\tFacebook/Instagram Graph\n\t•\tLinkedIn OAuth2\n\t•\tSupabase (url + apiKey)\n\t•\tGoogle Sheets OAuth2\n\n## Inputs\n\t•\tA Telegram message that contains a URL.\n\n## Outputs\n\t•\tSocial posts published on Facebook, Instagram, LinkedIn.\n\t•\tRow appended/updated in Google Sheets with post URLs and image link.\n\t•\tTelegram confirmation with the generated image + post links.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Bot Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract URL",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch URL Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Text Content",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Final Status Update",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4"
+    },
+    {
+      "name": "Publishing Phase",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to Instagram1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Facebook Post",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Instagram Post",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "LinkedIn Post",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If message contains URL",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Binary File",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Merge3",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Get Post URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Code2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Code3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Generate an image1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Basic LLM Chain2",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Send a photo message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Credentials",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Input",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Image pipeline",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sheets mapping",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Publishing Phase1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload to Supabase (uses credentials)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Supabase Config",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Supabase Public URL",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Publishing Phase2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

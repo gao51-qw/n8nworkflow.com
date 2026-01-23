@@ -1,0 +1,81 @@
+---
+/**
+ * 文章卡片组件
+ * 用于在列表中展示手写的文章
+ */
+
+interface Props {
+  article: {
+    slug: string;
+    data: {
+      title: string;
+      description: string;
+      pubDate: Date;
+      author: string;
+      image?: string;
+      tags: string[];
+    };
+  };
+}
+
+const { article } = Astro.props;
+const { title, description, pubDate, author, image, tags } = article.data;
+
+// 格式化日期
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+  {image && (
+    <a href={`/articles/${article.slug}`} class="block aspect-video overflow-hidden">
+      <img 
+        src={image} 
+        alt={title} 
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+      />
+    </a>
+  )}
+  
+  <div class="p-6 flex-1 flex flex-col">
+    <div class="flex items-center gap-2 mb-3">
+      {tags.slice(0, 2).map(tag => (
+        <span class="px-2 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-[10px] font-bold rounded uppercase tracking-wider">
+          {tag}
+        </span>
+      ))}
+    </div>
+
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+      <a href={`/articles/${article.slug}`} class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+        {title}
+      </a>
+    </h3>
+
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 flex-1">
+      {description}
+    </p>
+
+    <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 mt-auto">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400">
+          {author.charAt(0)}
+        </div>
+        <div class="text-xs">
+          <div class="font-bold text-gray-900 dark:text-white">{author}</div>
+          <div class="text-gray-500 dark:text-gray-500">{formattedDate}</div>
+        </div>
+      </div>
+      
+      <a 
+        href={`/articles/${article.slug}`} 
+        class="text-primary-600 dark:text-primary-400 text-sm font-bold hover:underline"
+      >
+        Read More
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,206 @@
+{
+  "id": 2446,
+  "slug": "2446",
+  "title": "Voice activated multi-agent demo for Vagent.io using Notion and Google Calendar",
+  "description": "## Purpose\nUse a lightweight Voice Interface, for you and your entire organization, to interact with an AI Supervisor, a personal AI Assistant, which has access to your custom workflows. You can also connect the supervisor to your already existing Agents.\n\n## Demo & Explanation\n[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/qe23D1hgLwY/0.jpg)](https://youtu.be/qe23D1hgLwY)\n\n## How it works\n- After recording a message in the Vagent App, it gets transcribed and sent in combination with a session ID to the registered webhook\n- The Main Agent acts as a router. I interprets the message while using the stored chat history (bound to the session ID) and chooses which tool to use to perform the required action and. Tools on this level are workflows, which contain subordinated Agents. Since the Main Agent interprets the original message, the raw input is passed to the Tools/Sub-Agents as a separate parameter\n- Within the Sub-Agents the actual processing takes place. Each of those has it’s separate chat memory (with a suffix to the main session ID), to achieve a clear separation of concerns\n- Depending on the required action an HTTP Request Tool is called. The result is being formatted in Markdown and returned to the Main Agent with an additional short prompt, so it does not get interpreted by the Main Agent.\n- Drafts are separated from a short message by added indentation (angle brackets). If some information is missing, no tool is called just yet, instead a message is returned back to the user\n- The Main Agent then outputs the result from the called Sub-Agent. If a draft is included, it gets separated from the spoken output\n- Finally the formatted output is returned as response to the webhook. The message is split into a spoken and a text version, which enables the App to read out loud unnecessary information like drafts in this example\n\nSee the full documentation of Vagent: [https://vagent.io/docs](https://vagent.io/docs)\n\n## Setup\n- Import this workflow into your n8n instance\n- Follow the instructions given in the sticky notes on the canvas\n- Setup your credentials. OpenAI can be replaced by another LLM in the workflow, but is required for the App to work. Google Calendar and Notion are required for all scenarios to work\n- Copy the Webhook URL from the Webhook node of the main workflow\n- Download the Vagent App from [https://vagent.io](https://vagent.io)\n- In the settings paste your OpenAI API Token, the Webhook URL and the password defined for Header Auth\n- Now you can use the App to interact with the Multi-Agent using your Voice by tapping the Mic symbol in the App to record your message.\n\n*To use the chat trigger (for testing) properly, temporarily disable the nodes after the Tools Agent.*",
+  "featuredImage": "/data/workflows/2446/2446.webp",
+  "author": {
+    "id": 101,
+    "slug": "octionic",
+    "name": "Mario",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 12585,
+  "downloads": 1258,
+  "createdAt": "2024-09-30T21:52:26.532Z",
+  "updatedAt": "2026-01-16T08:24:48.465Z",
+  "publishedAt": "2024-09-30T21:52:26.532Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2446",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Voice activated multi-agent demo for Vagent.io using Notion and Google Calendar",
+    "workflowName": "Voice activated multi-agent demo for Vagent.io using Notion and Google Calendar",
+    "description": "## Purpose\nUse a lightweight Voice Interface, for you and your entire organization, to interact with an AI Supervisor, a personal AI Assistant, which has access to your custom workflows. You can also connect the supervisor to your already existing Agents.\n\n## Demo & Explanation\n[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/qe23D1hgLwY/0.jpg)](https://youtu.be/qe23D1hgLwY)\n\n## How it works\n- After recording a message in the Vagent App, it gets transcribed and sent in combination with a session ID to the registered webhook\n- The Main Agent acts as a router. I interprets the message while using the stored chat history (bound to the session ID) and chooses which tool to use to perform the required action and. Tools on this level are workflows, which contain subordinated Agents. Since the Main Agent interprets the original message, the raw input is passed to the Tools/Sub-Agents as a separate parameter\n- Within the Sub-Agents the actual processing takes place. Each of those has it’s separate chat memory (with a suffix to the main session ID), to achieve a clear separation of concerns\n- Depending on the required action an HTTP Request Tool is called. The result is being formatted in Markdown and returned to the Main Agent with an additional short prompt, so it does not get interpreted by the Main Agent.\n- Drafts are separated from a short message by added indentation (angle brackets). If some information is missing, no tool is called just yet, instead a message is returned back to the user\n- The Main Agent then outputs the result from the called Sub-Agent. If a draft is included, it gets separated from the spoken output\n- Finally the formatted output is returned as response to the webhook. The message is split into a spoken and a text version, which enables the App to read out loud unnecessary information like drafts in this example\n\nSee the full documentation of Vagent: [https://vagent.io/docs](https://vagent.io/docs)\n\n## Setup\n- Import this workflow into your n8n instance\n- Follow the instructions given in the sticky notes on the canvas\n- Setup your credentials. OpenAI can be replaced by another LLM in the workflow, but is required for the App to work. Google Calendar and Notion are required for all scenarios to work\n- Copy the Webhook URL from the Webhook node of the main workflow\n- Download the Vagent App from [https://vagent.io](https://vagent.io)\n- In the settings paste your OpenAI API Token, the Webhook URL and the password defined for Header Auth\n- Now you can use the App to interact with the Multi-Agent using your Voice by tapping the Mic symbol in the App to record your message.\n\n*To use the chat trigger (for testing) properly, temporarily disable the nodes after the Tools Agent.*",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "calendarAgent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "taskAgent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Map Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Map Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Exclude Previews from Speech",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Main Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HTTP Request",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "role": "toolHttpRequest",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Format output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Notion Task Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get calendar availability",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "role": "toolHttpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Book appointment",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "role": "toolHttpRequest",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Calendar Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Settings1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Format output1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Window Buffer Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    }
+  ]
+}

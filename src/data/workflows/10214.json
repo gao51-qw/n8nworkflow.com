@@ -1,0 +1,146 @@
+{
+  "id": 10214,
+  "slug": "10214",
+  "title": "Hotel receptionist with WhatsApp, Gemini model-switching, Redis & Google Sheets",
+  "description": "### Overview  \nThis project is an **AI-powered hotel receptionist** built using **n8n**, designed to handle guest queries automatically through **WhatsApp**.  \nIt integrates **Google Gemini**, **Redis**, **MySQL**, and **Google Sheets** via **LangChain** to create an intelligent conversational system that understands and answers booking-related questions in real time.  \n\nA standout feature of this workflow is its **AI model-switching system** — it dynamically assigns users to different Gemini models, balancing traffic, improving performance, and reducing API costs.  \n\n---\n\n## How It Works  \n\n### WhatsApp Trigger  \nThe workflow starts when a hotel guest sends a message through WhatsApp.  \nThe system captures the **message text**, **contact details**, and **session information** for further processing.  \n\n### Redis-Based Model Management  \n- The workflow checks **Redis** for a saved record of the user’s previously assigned AI model.  \n- If no record exists, a **Model Decider** node assigns a new model (e.g., Gemini 1 or Gemini 2).  \n- Redis then stores this model assignment for an hour, ensuring consistent routing and controlled traffic distribution.  \n\n### Model Selector  \nThe **Model Selector** routes each user’s request to the correct Gemini instance, enabling parallel execution across multiple AI models for **faster response times** and **cost optimization**.  \n\n### AI Agent Logic  \nThe **LangChain AI Agent** serves as the system’s reasoning core. It:  \n- Interprets guest questions such as:  \n  - “Who checked in today?”  \n  - “Show me tomorrow’s bookings.”  \n  - “What’s the price for a deluxe suite for two nights?”  \n- Generates safe, **read-only SQL SELECT queries**.  \n- Fetches the requested data from the **MySQL database**.  \n- Combines this with dynamic pricing or promotions from **Google Sheets**, if available.  \n\n### Response Delivery  \nOnce the AI Agent formulates an answer, it sends a natural-sounding message back to the guest via WhatsApp, completing the interaction loop.  \n\n---\n\n## Setup & Requirements  \n\n### Prerequisites  \nBefore deploying this workflow, ensure the following:  \n- **n8n Instance** (local or hosted)  \n- **WhatsApp Cloud API** with messaging permissions  \n- **Google Gemini API Key** (for both models)  \n- **Redis Database** for user session and model routing  \n- **MySQL Database** for hotel booking and guest data  \n- **Google Sheets Account** (optional, for pricing or offer data)  \n\n### Step-by-Step Setup  \n\n1. **Configure Credentials**  \n   - Add all API credentials in **n8n → Settings → Credentials** (WhatsApp, Redis, MySQL, Google).  \n\n2. **Prepare Databases**  \n   - **MySQL Tables Example:**  \n     - `bookings(id, guest_name, room_type, check_in, check_out)`  \n     - `rooms(id, type, rate, status)`  \n   - Ensure the MySQL user has **read-only** permissions.  \n\n3. **Set Up Redis**  \n   - Create Redis keys for each user:  \n     ```\n     llm-user:&lt;whatsapp_id&gt; = { \"modelIndex\": 0 }\n     ```  \n   - TTL: 3600 seconds (1 hour).  \n\n4. **Connect Google Sheets (Optional)**  \n   - Add your sheet under **Google Sheets OAuth2**.  \n   - Use it to manage room rates, discounts, or seasonal offers dynamically.  \n\n5. **WhatsApp Webhook Configuration**  \n   - In Meta’s Developer Console, set the webhook URL to your n8n instance.  \n   - Select message updates to trigger the workflow.  \n\n6. **Testing the Workflow**  \n   - Send messages like “Who booked today?” or a voice message.  \n   - Confirm responses include real data from MySQL and contextual replies.  \n\n---\n\n## Key Features  \n\n- **Text & voice support** for guest interactions  \n- **Automatic AI model-switching** using Redis  \n- **Session memory** for context-aware conversations  \n- **Read-only SQL query generation** for database safety  \n- **Google Sheets integration** for live pricing and availability  \n- **Scalable design** supporting multiple LLM instances  \n\n---\n\n## Example Guest Queries  \n\n| Guest Query | AI Response Example |\n|--------------|--------------------|\n| “Who checked in today?” | “Two guests have checked in today: Mr. Ahmed (Room 203) and Ms. Priya (Room 410).” |\n| “How much is a deluxe room for two nights?” | “A deluxe room costs $120 per night. The total for two nights is $240.” |\n| “Do you have any discounts this week?” | “Yes! We’re offering a 10% weekend discount on all deluxe and suite rooms.” |\n| “Show me tomorrow’s check-outs.” | “Three check-outs are scheduled tomorrow: Mr. Khan (101), Ms. Lee (207), and Mr. Singh (309).” |\n\n---\n\n## Customization Options  \n\n### 🧩 Model Assignment Logic  \nYou can modify the **Model Decider node** to:  \n- Assign models based on user load, region, or priority level.  \n- Increase or decrease TTL in Redis for longer model persistence.  \n\n### 🧠 AI Agent Prompt  \nAdjust the **system prompt** to control tone and response behavior — for example:  \n- Add multilingual support.  \n- Include upselling or booking confirmation messages.  \n\n### 🗂️ Database Expansion  \nExtend MySQL to include:  \n- Staff schedules  \n- Maintenance records  \n- Restaurant reservations  \nThen link new queries in the AI Agent node for richer responses.  \n\n---\n\n## Tech Stack  \n\n- **n8n** – Workflow automation & orchestration  \n- **Google Gemini (PaLM)** – LLM for reasoning & generation  \n- **Redis** – Model assignment & session management  \n- **MySQL** – Booking & guest data storage  \n- **Google Sheets** – Dynamic pricing reference  \n- **WhatsApp Cloud API** – Messaging interface  \n\n---\n\n## Outcome  \nThis workflow demonstrates how **AI automation** can transform hotel operations by combining **WhatsApp communication**, **database intelligence**, and **multi-model AI reasoning**.  \nIt’s a production-ready foundation for **scalable, cost-optimized, AI-driven hospitality solutions** that deliver fast, accurate, and personalized guest interactions.  \n````\n",
+  "featuredImage": "/data/workflows/10214/10214.webp",
+  "author": {
+    "id": 101,
+    "slug": "akshay6",
+    "name": "Akshay",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1666,
+  "downloads": 166,
+  "createdAt": "2025-10-27T10:17:33.801Z",
+  "updatedAt": "2026-01-16T09:03:58.705Z",
+  "publishedAt": "2025-10-27T10:17:33.801Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10214",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Hotel receptionist with WhatsApp, Gemini model-switching, Redis & Google Sheets",
+    "workflowName": "Hotel receptionist with WhatsApp, Gemini model-switching, Redis & Google Sheets",
+    "description": "This project is an **AI-powered hotel receptionist** built using **n8n**, designed to handle guest queries automatically through **WhatsApp**.  \nIt integrates **Google Gemini**, **Redis**, **MySQL**, and **Google Sheets** via **LangChain** to create an intelligent conversational system that understands and answers booking-related questions in real time.  \n\nA standout feature of this workflow is its **AI model-switching system** — it dynamically assigns users to different Gemini models, balancing traffic, improving performance, and reducing API costs.  \n\n---\n\n## How It Works  \n\n### WhatsApp Trigger  \nThe workflow starts when a hotel guest sends a message through WhatsApp.  \nThe system captures the **message text**, **contact details**, and **session information** for further processing.  \n\n### Redis-Based Model Management  \n- The workflow checks **Redis** for a saved record of the user’s previously assigned AI model.  \n- If no record exists, a **Model Decider** node assigns a new model (e.g., Gemini 1 or Gemini 2).  \n- Redis then stores this model assignment for an hour, ensuring consistent routing and controlled traffic distribution.  \n\n### Model Selector  \nThe **Model Selector** routes each user’s request to the correct Gemini instance, enabling parallel execution across multiple AI models for **faster response times** and **cost optimization**.  \n\n### AI Agent Logic  \nThe **LangChain AI Agent** serves as the system’s reasoning core. It:  \n- Interprets guest questions such as:  \n  - “Who checked in today?”  \n  - “Show me tomorrow’s bookings.”  \n  - “What’s the price for a deluxe suite for two nights?”  \n- Generates safe, **read-only SQL SELECT queries**.  \n- Fetches the requested data from the **MySQL database**.  \n- Combines this with dynamic pricing or promotions from **Google Sheets**, if available.  \n\n### Response Delivery  \nOnce the AI Agent formulates an answer, it sends a natural-sounding message back to the guest via WhatsApp, completing the interaction loop.  \n\n---\n\n## Setup & Requirements  \n\n### Prerequisites  \nBefore deploying this workflow, ensure the following:  \n- **n8n Instance** (local or hosted)  \n- **WhatsApp Cloud API** with messaging permissions  \n- **Google Gemini API Key** (for both models)  \n- **Redis Database** for user session and model routing  \n- **MySQL Database** for hotel booking and guest data  \n- **Google Sheets Account** (optional, for pricing or offer data)  \n\n### Step-by-Step Setup  \n\n1. **Configure Credentials**  \n   - Add all API credentials in **n8n → Settings → Credentials** (WhatsApp, Redis, MySQL, Google).  \n\n2. **Prepare Databases**  \n   - **MySQL Tables Example:**  \n     - `bookings(id, guest_name, room_type, check_in, check_out)`  \n     - `rooms(id, type, rate, status)`  \n   - Ensure the MySQL user has **read-only** permissions.  \n\n3. **Set Up Redis**  \n   - Create Redis keys for each user:  \n     ```\n     llm-user:&lt;whatsapp_id&gt; = { \"modelIndex\": 0 }\n     ```  \n   - TTL: 3600 seconds (1 hour).  \n\n4. **Connect Google Sheets (Optional)**  \n   - Add your sheet under **Google Sheets OAuth2**.  \n   - Use it to manage room rates, discounts, or seasonal offers dynamically.  \n\n5. **WhatsApp Webhook Configuration**  \n   - In Meta’s Developer Console, set the webhook URL to your n8n instance.  \n   - Select message updates to trigger the workflow.  \n\n6. **Testing the Workflow**  \n   - Send messages like “Who booked today?” or a voice message.  \n   - Confirm responses include real data from MySQL and contextual replies.  \n\n---\n\n## Key Features  \n\n- **Text & voice support** for guest interactions  \n- **Automatic AI model-switching** using Redis  \n- **Session memory** for context-aware conversations  \n- **Read-only SQL query generation** for database safety  \n- **Google Sheets integration** for live pricing and availability  \n- **Scalable design** supporting multiple LLM instances  \n\n---\n\n## Example Guest Queries  \n\n| Guest Query | AI Response Example |\n|--------------|--------------------|\n| “Who checked in today?” | “Two guests have checked in today: Mr. Ahmed (Room 203) and Ms. Priya (Room 410).” |\n| “How much is a deluxe room for two nights?” | “A deluxe room costs $120 per night. The total for two nights is $240.” |\n| “Do you have any discounts this week?” | “Yes! We’re offering a 10% weekend discount on all deluxe and suite rooms.” |\n| “Show me tomorrow’s check-outs.” | “Three check-outs are scheduled tomorrow: Mr. Khan (101), Ms. Lee (207), and Mr. Singh (309).” |\n\n---\n\n## Customization Options  \n\n### 🧩 Model Assignment Logic  \nYou can modify the **Model Decider node** to:  \n- Assign models based on user load, region, or priority level.  \n- Increase or decrease TTL in Redis for longer model persistence.  \n\n### 🧠 AI Agent Prompt  \nAdjust the **system prompt** to control tone and response behavior — for example:  \n- Add multilingual support.  \n- Include upselling or booking confirmation messages.  \n\n### 🗂️ Database Expansion  \nExtend MySQL to include:  \n- Staff schedules  \n- Maintenance records  \n- Restaurant reservations  \nThen link new queries in the AI Agent node for richer responses.  \n\n---\n\n## Tech Stack  \n\n- **n8n** – Workflow automation & orchestration  \n- **Google Gemini (PaLM)** – LLM for reasoning & generation  \n- **Redis** – Model assignment & session management  \n- **MySQL** – Booking & guest data storage  \n- **Google Sheets** – Dynamic pricing reference  \n- **WhatsApp Cloud API** – Messaging interface  \n\n---\n\n## Outcome  \nThis workflow demonstrates how **AI automation** can transform hotel operations by combining **WhatsApp communication**, **database intelligence**, and **multi-model AI reasoning**.  \nIt’s a production-ready foundation for **scalable, cost-optimized, AI-driven hospitality solutions** that deliver fast, accurate, and personalized guest interactions.  \n````",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pricing",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "role": "whatsAppTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Model Decider",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send message",
+      "type": "n8n-nodes-base.whatsApp",
+      "role": "whatsApp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute a SQL query in MySQL",
+      "type": "n8n-nodes-base.mySqlTool",
+      "role": "mySqlTool",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store User Number",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check User Number",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Choose Model",
+      "type": "@n8n/n8n-nodes-langchain.modelSelector",
+      "role": "modelSelector",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

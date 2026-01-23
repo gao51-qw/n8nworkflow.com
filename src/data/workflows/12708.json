@@ -1,0 +1,272 @@
+{
+  "id": 12708,
+  "slug": "12708",
+  "title": "Sync and enrich HubSpot leads from Google Sheets and Telegram with Gemini and Lusha",
+  "description": "This workflow automates lead ingestion from Google Sheets and Telegram, leveraging Gemini AI and Lusha for intelligent matching and deep data enrichment. By normalizing incoming data into a standard structure, it uses custom fuzzy logic to identify existing HubSpot records—preventing duplicates and ensuring your CRM stays clean with validated contact and company details.\n\n**Key Features:**\n\n**Agnostic Intake:** Seamlessly processes leads from structured Google Sheets or raw Telegram messages parsed by Gemini AI.\n\n**Intelligent Matching:** Custom JS engine performs two-tier matching (hard & fuzzy) to save Lusha credits and keep CRM data integrity.\n\n**Deep Enrichment:** Automatically triggers Lusha API to find missing emails and update firmographic data like revenue and industry.\n\n**Automated Sync:** Closes the loop by notifying the team on Telegram and updating the spreadsheet status once a lead is processed.\n\n**Setup Instructions:**\n\n1. Connect your HubSpot, Lusha, Gemini, Google Sheets, and Telegram credentials.\n\n2. Input your Spreadsheet ID in the 'Trigger' and 'Acknowledge' nodes.\n\n3. Adjust the similarity threshold in the 'Switch Logic' node (default 80) based on your data needs.",
+  "featuredImage": "/data/workflows/12708/12708.webp",
+  "author": {
+    "id": 101,
+    "slug": "danme",
+    "name": "Danny",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 0,
+  "downloads": 0,
+  "createdAt": "2026-01-14T12:20:50.886Z",
+  "updatedAt": "2026-01-16T09:12:53.322Z",
+  "publishedAt": "2026-01-14T12:20:50.886Z",
+  "nodes": 39,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12708",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sync and enrich HubSpot leads from Google Sheets and Telegram with Gemini and Lusha",
+    "workflowName": "Sync and enrich HubSpot leads from Google Sheets and Telegram with Gemini and Lusha",
+    "description": "This workflow automates lead ingestion from Google Sheets and Telegram, leveraging Gemini AI and Lusha for intelligent matching and deep data enrichment. By normalizing incoming data into a standard structure, it uses custom fuzzy logic to identify existing HubSpot records—preventing duplicates and ensuring your CRM stays clean with validated contact and company details.\n\n**Key Features:**\n\n**Agnostic Intake:** Seamlessly processes leads from structured Google Sheets or raw Telegram messages parsed by Gemini AI.\n\n**Intelligent Matching:** Custom JS engine performs two-tier matching (hard & fuzzy) to save Lusha credits and keep CRM data integrity.\n\n**Deep Enrichment:** Automatically triggers Lusha API to find missing emails and update firmographic data like revenue and industry.\n\n**Automated Sync:** Closes the loop by notifying the team on Telegram and updating the spreadsheet status once a lead is processed.\n\n**Setup Instructions:**\n\n1. Connect your HubSpot, Lusha, Gemini, Google Sheets, and Telegram credentials.\n\n2. Input your Spreadsheet ID in the 'Trigger' and 'Acknowledge' nodes.\n\n3. Adjust the similarity threshold in the 'Switch Logic' node (default 80) based on your data needs.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "HubSpot: Update Company",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "HubSpot: Create Company",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Switch Logic",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Parse Telegram Message",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get HubSpot data",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "New or Updated row",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create or update a contact",
+      "type": "n8n-nodes-base.hubspot",
+      "role": "hubspot",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Add a Note to Hubspot company",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Identify Telegram triggered flow",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Update Telegram user",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Identify updated row",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Acknowledge in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Resolve Company ID",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Retry ID resolution",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Filter processed lines",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Lusha Enrichment - email",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Switch on email field",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Lusha Company Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "HubSpot: Update Enriched Company",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Domain Resolver",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "role": "googleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Match Lead to Existing Company",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append Resolved Domain to Lead",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Combine Lead with CRM Reference Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Split HubSpot Search Results",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mark as HubSpot Reference Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Telegram Lead Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map Contact Enrichment Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Firmographic Updates",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Validate Company ID Status",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check for Existing Contact Email",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Filter Leads with Data Changes",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

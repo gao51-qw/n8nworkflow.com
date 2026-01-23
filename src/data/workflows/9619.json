@@ -1,0 +1,134 @@
+{
+  "id": 9619,
+  "slug": "9619",
+  "title": "Food image analysis for calorie estimation with Vision AI and Telegram",
+  "description": "## Who’s it for\n\nTeams building health/fitness apps, coaches running check-ins in chat, and anyone who needs quick, structured nutrition insights from food photos—without manual logging.\n\n## What it does / How it works\n\nThis workflow accepts a food image (URL or Base64), uses a vision-capable LLM to infer likely ingredients and rough gram amounts, estimates per-ingredient calories, and returns a strict JSON summary with total calories and a short nutrition note. It normalizes different payloads (e.g., Telegram/LINE/Webhook) into a common format, handles transient errors with retries, and avoids hardcoded secrets by using credentials/env vars.\n\n## Requirements\n\n* Vision-capable LLM credentials (e.g., `gpt-4o` or equivalent)\n* One input channel (Webhook, Telegram, or LINE)\n* Environment variables for model name/temperature and optional request validation\n\n## How to set up\n\n1. Connect your input channel and enable the Webhook (copy the test URL).\n2. Add LLM credentials and set `LLM_MODEL` and `LLM_TEMPERATURE` (e.g., `0.3`).\n3. Turn on the workflow, send a sample payload with `imageUrl`, and confirm the strict JSON output.\n4. (Optional) Configure a reply node (Telegram/Slack or HTTP Response) and a logger (Google Sheets/Notion).\n\n## How to customize the workflow\n\n* **Outputs**: Add macros (protein/fat/carb) or micronutrient fields.\n* **Units**: Convert portion descriptions (piece/slice) to grams with your own mapping.\n* **Languages**: Toggle multilingual output (ja/en).\n* **Policies**: Tighten validation (reject low-confidence parses) or add manual review steps.\n* **Security**: Use signed/temporary URLs for private images; mask PII in logs.\n\n## Data model (strict JSON)\n\n```json\n{\n  \"dishName\": \"string\",\n  \"ingredients\": [{ \"name\": \"string\", \"amount\": 0, \"calories\": 0 }],\n  \"totalCalories\": 0,\n  \"nutritionEvaluation\": \"string\"\n}\n```\n\n## Notes\n\nRename all nodes clearly, include sticky notes explaining the setup, and never commit real IDs, tokens, or API keys.\n",
+  "featuredImage": "/data/workflows/9619/9619.webp",
+  "author": {
+    "id": 101,
+    "slug": "minami",
+    "name": "Toshiya Minami",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 455,
+  "downloads": 45,
+  "createdAt": "2025-10-14T11:39:05.551Z",
+  "updatedAt": "2026-01-16T09:01:15.087Z",
+  "publishedAt": "2025-10-14T11:39:05.551Z",
+  "nodes": 16,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9619",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Food image analysis for calorie estimation with Vision AI and Telegram",
+    "workflowName": "Food image analysis for calorie estimation with Vision AI and Telegram",
+    "description": "## Who’s it for\n\nTeams building health/fitness apps, coaches running check-ins in chat, and anyone who needs quick, structured nutrition insights from food photos—without manual logging.\n\n## What it does / How it works\n\nThis workflow accepts a food image (URL or Base64), uses a vision-capable LLM to infer likely ingredients and rough gram amounts, estimates per-ingredient calories, and returns a strict JSON summary with total calories and a short nutrition note. It normalizes different payloads (e.g., Telegram/LINE/Webhook) into a common format, handles transient errors with retries, and avoids hardcoded secrets by using credentials/env vars.\n\n## Requirements\n\n* Vision-capable LLM credentials (e.g., `gpt-4o` or equivalent)\n* One input channel (Webhook, Telegram, or LINE)\n* Environment variables for model name/temperature and optional request validation\n\n## How to set up\n\n1. Connect your input channel and enable the Webhook (copy the test URL).\n2. Add LLM credentials and set `LLM_MODEL` and `LLM_TEMPERATURE` (e.g., `0.3`).\n3. Turn on the workflow, send a sample payload with `imageUrl`, and confirm the strict JSON output.\n4. (Optional) Configure a reply node (Telegram/Slack or HTTP Response) and a logger (Google Sheets/Notion).\n\n## How to customize the workflow\n\n* **Outputs**: Add macros (protein/fat/carb) or micronutrient fields.\n* **Units**: Convert portion descriptions (piece/slice) to grams with your own mapping.\n* **Languages**: Toggle multilingual output (ja/en).\n* **Policies**: Tighten validation (reject low-confidence parses) or add manual review steps.\n* **Security**: Use signed/temporary URLs for private images; mask PII in logs.\n\n## Data model (strict JSON)\n\n```json\n{\n  \"dishName\": \"string\",\n  \"ingredients\": [{ \"name\": \"string\", \"amount\": 0, \"calories\": 0 }],\n  \"totalCalories\": 0,\n  \"nutritionEvaluation\": \"string\"\n}\n```\n\n## Notes\n\nRename all nodes clearly, include sticky notes explaining the setup, and never commit real IDs, tokens, or API keys.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent - 食材分析",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format for Gmail",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send a message1",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky 1: Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 2: Prerequisites",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 3: Input Format",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 4: Model & Prompt",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 5: Output Schema",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 6: Test Steps",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 7: Errors & Limits",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 8: Security",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 9: Delivery",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky 10: Extensibility",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "id": 9964,
+  "slug": "9964",
+  "title": "CoinGecko crypto price forecasting pipeline with Gemini AI, Decodo, and Gmail",
+  "description": "## Automated Crypto Forecast Pipeline using Decodo and Gmail\n\nSign Up for Decodo [HERE](https://visit.decodo.com/discount) for discount\n\nThis template scrapes CoinGecko pages for selected coins, converts metrics into clean JSON, stores them in an n8n Data Table, generates 24-hour direction forecasts with Gemini, and emails a concise report.\n\n## Who’s it for?\nCrypto watchers who want automated snapshots, forecasts, and a daily email—without managing a full data stack.\n\n## How it works\n1. 30-min schedule loops coins, scrapes CoinGecko (Decodo), parses metrics, and upserts to Data Table.\n2. 18:00 schedule loads last 48h data.\n3. Gemini estimates next-24h direction windows.\n4. Email is rendered (HTML + plain text) and sent.\n\n## How to set up\n- Add [Decodo](https://visit.decodo.com/discount), Gmail, and Gemini credentials.\n- Open **Configure Coins** to edit tickers.\n- Set Data Table ID.\n- Replace recipient email.\n- (Self-host only) Community node **Decodo** required. @decodo/n8n-nodes-decodo (community)\n",
+  "featuredImage": "/data/workflows/9964/9964.webp",
+  "author": {
+    "id": 101,
+    "slug": "fahmiiireza",
+    "name": "Fahmi Fahreza",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 105,
+  "downloads": 10,
+  "createdAt": "2025-10-21T01:12:49.169Z",
+  "updatedAt": "2026-01-16T09:02:46.490Z",
+  "publishedAt": "2025-10-21T01:12:49.169Z",
+  "nodes": 25,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9964",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "CoinGecko crypto price forecasting pipeline with Gemini AI, Decodo, and Gmail",
+    "workflowName": "CoinGecko crypto price forecasting pipeline with Gemini AI, Decodo, and Gmail",
+    "description": "## Automated Crypto Forecast Pipeline using Decodo and Gmail\n\nSign Up for Decodo [HERE](https://visit.decodo.com/discount) for discount\n\nThis template scrapes CoinGecko pages for selected coins, converts metrics into clean JSON, stores them in an n8n Data Table, generates 24-hour direction forecasts with Gemini, and emails a concise report.\n\n## Who’s it for?\nCrypto watchers who want automated snapshots, forecasts, and a daily email—without managing a full data stack.\n\n## How it works\n1. 30-min schedule loops coins, scrapes CoinGecko (Decodo), parses metrics, and upserts to Data Table.\n2. 18:00 schedule loads last 48h data.\n3. Gemini estimates next-24h direction windows.\n4. Email is rendered (HTML + plain text) and sent.\n\n## How to set up\n- Add [Decodo](https://visit.decodo.com/discount), Gmail, and Gemini credentials.\n- Open **Configure Coins** to edit tickers.\n- Set Data Table ID.\n- Replace recipient email.\n- (Self-host only) Community node **Decodo** required. @decodo/n8n-nodes-decodo (community)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Convert Output to JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Insert Data",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Make it JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule: Every 30m (Scrape & Log)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Configure Coins",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Build Coin Items",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "For Each Coin",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape CoinGecko (Decodo)",
+      "type": "@decodo/n8n-nodes-decodo.decodo",
+      "role": "decodo",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Coin Metrics (LLM)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Gemini for Parsing",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Load Data Last 48h",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Forecast Next 24h (LLM)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Build Email (HTML + Text)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Send Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Gemini for Forecast",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recipient Email + Timezone",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule: 18:00 Daily (Forecast Email)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

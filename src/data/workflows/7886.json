@@ -1,0 +1,152 @@
+{
+  "id": 7886,
+  "slug": "7886",
+  "title": "Monitor TP-Link Omada network disconnections with Gmail & Pushover",
+  "description": "# Monitor device disconnections from Omada emails to Google Sheets with Pushover alerts\n\n## Who’s it for\nThis workflow is designed for IT admins, network engineers, or small business owners who need to automatically monitor device connectivity from Omada Controller email alerts. If you want a lightweight, low-cost solution for tracking device uptime without complex monitoring software, this template is for you.\n\n## How it works\nThe workflow listens for Omada Controller email alerts using Gmail, parses each email, and logs device connection status (connected/disconnected) into Google Sheets. Every 5 minutes, it checks for devices that have been disconnected for more than 30 minutes. If a device has not reconnected, the workflow sends a push notification via Pushover. Old logs are cleared automatically every 2 days to keep the sheet clean.\n\n---\n\n## Workflow Overview\nThe workflow is broken into three main parts:\n\n### 1. Email Processing (Receives Alert -&gt; Append Row in Sheet)  \nTriggered whenever a new email is received. It uses a Code node to parse the raw text of the email, extracting details like device name, MAC address, and connection status. This data is formatted and appended as a new row to Google Sheets, creating a comprehensive log of all connection events.  \n\n\n**Important:** In the Gmail trigger node, make sure to set the search field or filter so that it only matches the subject line used by Omada Controller alert emails. This ensures the workflow only processes the intended alerts and not unrelated emails.\n\n### 2. Disconnected Device Alerting (Check Every 5 minutes -&gt; Alert User)  \nRuns every 5 minutes. It reads the device log from Google Sheets, identifies the most recent status for each device, and filters for devices currently disconnected. If a device has been disconnected for more than 30 minutes, a high-priority push notification is sent to **Pushover account**. Once sent, the workflow updates the corresponding row in the Google Sheet to prevent duplicate alerts.\n\n### 3. Data Maintenance (Clear Rows Every 2 days -&gt; Clear sheet)  \nRuns every two days to clean up the Google Sheet by deleting the oldest rows, keeping the log from growing too large.\n\n---\n\n## Services and Dependencies\nTo run this workflow, you’ll need the following services connected to n8n:\n\n- **Google Sheets**: Logs all connection events and tracks device status  \n- **Gmail**: Acts as the trigger, listening for Omada Controller alerts  \n- **Pushover**: Sends real-time, high-priority push notifications to mobile devices  \n\n---\n\n## Setup Instructions\n\n### 1. Create a Google Sheet Log\n- Create a new Google Sheet in your Google Drive  \n- Name it something like `Omada Device Log`  \n- Add these headers in the first row:  \n\n**exact spelling and order is crucial**\n`rowId`, `timestamp`, `timestampISO`, `category`, `severity`, `mac`, `name`, `type`, `status`, `checkAfter`, `alertSent`, `timeStampFormated`\n\n### 2. Configure Credentials\n- **Google Sheets**: Create a new OAuth2 credential in n8n  \n- **Gmail**: Create a new OAuth2 credential (must receive Omada alerts)  \n- **Pushover**: Create a new API credential and get user keys for each recipient  \n\n### 3. Import the Workflow\n- Copy the JSON workflow file  \n- In n8n: click **New → Import from JSON**  \n- Paste the JSON code  \n\n### 4. Update the Nodes\n- **Receives Alert**: Link it to your Gmail credential  \n- **Append Row in Sheet, Get Row(s) in Sheet, Update Alert, Clear sheet**: Replace `YOUR_GOOGLE_SHEET_ID` with your Google Sheet’s ID (found in the sheet URL between `/d/` and `/edit`)  \n- **Alert User**: Replace `YOUR_PUSHOVER_USER_KEY` with your Pushover user keys  \n\n---\n\n## Node Breakdown\n- **Receives Alert** (Gmail Trigger): Listens for new emails  \n- **Process Email and Extract** (Code): Parses email and extracts structured data (timestamps, device info, status)  \n- **Append Row in Sheet** (Google Sheets): Adds a new row to your log  \n- **Check Every 5 minutes** (Schedule Trigger): Runs regularly to check device status  \n- **Get Row(s) in Sheet** (Google Sheets): Reads log to get latest status per device  \n- **Check Device and Notify** (Code): Groups rows by MAC, filters disconnected devices past 30 minutes  \n- **Alert User** (Pushover): Sends formatted push notification with device details  \n- **Update Alert** (Google Sheets): Marks the row as alerted to prevent duplicates  \n- **Clear Rows Every 2 days** (Schedule Trigger): Runs maintenance  \n- **Clear sheet** (Google Sheets): Deletes old rows, preserves header  \n\n\n",
+  "featuredImage": "/data/workflows/7886/7886.webp",
+  "author": {
+    "id": 101,
+    "slug": "krade1027",
+    "name": "Krade1027",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 261,
+  "downloads": 26,
+  "createdAt": "2025-08-26T08:32:44.519Z",
+  "updatedAt": "2026-01-16T08:52:52.762Z",
+  "publishedAt": "2025-08-26T08:32:44.519Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7886",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Monitor TP-Link Omada network disconnections with Gmail & Pushover",
+    "workflowName": "Monitor TP-Link Omada network disconnections with Gmail & Pushover",
+    "description": "# Monitor device disconnections from Omada emails to Google Sheets with Pushover alerts\n\n## Who’s it for\nThis workflow is designed for IT admins, network engineers, or small business owners who need to automatically monitor device connectivity from Omada Controller email alerts. If you want a lightweight, low-cost solution for tracking device uptime without complex monitoring software, this template is for you.\n\n## How it works\nThe workflow listens for Omada Controller email alerts using Gmail, parses each email, and logs device connection status (connected/disconnected) into Google Sheets. Every 5 minutes, it checks for devices that have been disconnected for more than 30 minutes. If a device has not reconnected, the workflow sends a push notification via Pushover. Old logs are cleared automatically every 2 days to keep the sheet clean.\n\n---\n\n## Workflow Overview\nThe workflow is broken into three main parts:\n\n### 1. Email Processing (Receives Alert -&gt; Append Row in Sheet)  \nTriggered whenever a new email is received. It uses a Code node to parse the raw text of the email, extracting details like device name, MAC address, and connection status. This data is formatted and appended as a new row to Google Sheets, creating a comprehensive log of all connection events.  \n\n\n**Important:** In the Gmail trigger node, make sure to set the search field or filter so that it only matches the subject line used by Omada Controller alert emails. This ensures the workflow only processes the intended alerts and not unrelated emails.\n\n### 2. Disconnected Device Alerting (Check Every 5 minutes -&gt; Alert User)  \nRuns every 5 minutes. It reads the device log from Google Sheets, identifies the most recent status for each device, and filters for devices currently disconnected. If a device has been disconnected for more than 30 minutes, a high-priority push notification is sent to **Pushover account**. Once sent, the workflow updates the corresponding row in the Google Sheet to prevent duplicate alerts.\n\n### 3. Data Maintenance (Clear Rows Every 2 days -&gt; Clear sheet)  \nRuns every two days to clean up the Google Sheet by deleting the oldest rows, keeping the log from growing too large.\n\n---\n\n## Services and Dependencies\nTo run this workflow, you’ll need the following services connected to n8n:\n\n- **Google Sheets**: Logs all connection events and tracks device status  \n- **Gmail**: Acts as the trigger, listening for Omada Controller alerts  \n- **Pushover**: Sends real-time, high-priority push notifications to mobile devices  \n\n---\n\n## Setup Instructions\n\n### 1. Create a Google Sheet Log\n- Create a new Google Sheet in your Google Drive  \n- Name it something like `Omada Device Log`  \n- Add these headers in the first row:  \n\n**exact spelling and order is crucial**\n`rowId`, `timestamp`, `timestampISO`, `category`, `severity`, `mac`, `name`, `type`, `status`, `checkAfter`, `alertSent`, `timeStampFormated`\n\n### 2. Configure Credentials\n- **Google Sheets**: Create a new OAuth2 credential in n8n  \n- **Gmail**: Create a new OAuth2 credential (must receive Omada alerts)  \n- **Pushover**: Create a new API credential and get user keys for each recipient  \n\n### 3. Import the Workflow\n- Copy the JSON workflow file  \n- In n8n: click **New → Import from JSON**  \n- Paste the JSON code  \n\n### 4. Update the Nodes\n- **Receives Alert**: Link it to your Gmail credential  \n- **Append Row in Sheet, Get Row(s) in Sheet, Update Alert, Clear sheet**: Replace `YOUR_GOOGLE_SHEET_ID` with your Google Sheet’s ID (found in the sheet URL between `/d/` and `/edit`)  \n- **Alert User**: Replace `YOUR_PUSHOVER_USER_KEY` with your Pushover user keys  \n\n---\n\n## Node Breakdown\n- **Receives Alert** (Gmail Trigger): Listens for new emails  \n- **Process Email and Extract** (Code): Parses email and extracts structured data (timestamps, device info, status)  \n- **Append Row in Sheet** (Google Sheets): Adds a new row to your log  \n- **Check Every 5 minutes** (Schedule Trigger): Runs regularly to check device status  \n- **Get Row(s) in Sheet** (Google Sheets): Reads log to get latest status per device  \n- **Check Device and Notify** (Code): Groups rows by MAC, filters disconnected devices past 30 minutes  \n- **Alert User** (Pushover): Sends formatted push notification with device details  \n- **Update Alert** (Google Sheets): Marks the row as alerted to prevent duplicates  \n- **Clear Rows Every 2 days** (Schedule Trigger): Runs maintenance  \n- **Clear sheet** (Google Sheets): Deletes old rows, preserves header",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Process Email and Extract",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append Row in Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Check Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Row(s) in Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Check Device and Notify",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Alert",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Receives Alert",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Clear sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Clear Rows Every 2 days",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Alert User",
+      "type": "n8n-nodes-base.pushover",
+      "role": "pushover",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

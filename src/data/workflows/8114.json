@@ -1,0 +1,85 @@
+{
+  "id": 8114,
+  "slug": "8114",
+  "title": "Daily BGV status digest: Track verifications with Google Sheets to Gmail alerts",
+  "description": "# Background Verification Executive Digest Automation: Track Completed & Pending Verifications via Email (from Google Sheets)\n\nThis automation sends a daily late-night email summary to each Background Verification (BGV) executive — straight out of your “BGV Tracker” Google Sheet. Each executive gets their own digest listing candidates whose background checks were **completed today** and which ones are still **pending**, complete with clear “stale” alerts for overdue follow-ups. The workflow runs reliably via n8n, auto-grouping entries and packaging the results in a user-friendly tabular email, every day at 23:00 IST.\n\n## Who’s it for\n\n- **BGV team leads & vendors** who want automatic updates on their queue.\n- **HR managers** looking to automate candidate tracking without manual report compilation.\n- **Ops teams** with Google Sheets-based BGV tracking wanting digest emails for each owner.\n- Any organization managing candidate checks across multiple owners/executives.\n\n## How it works\n\n1. **Schedule Trigger:** Runs every night at 23:00 IST (Asia/Kolkata), weekends OFF by default.\n2. **Google Sheets:** Reads all rows from your “BGV Tracker” (tab), using columns:\n\t- `candidate_name`, `previous_company`, `prevco_hr_name`, `prevco_hr_email`\n\t- `bgv_status`, `last_follow_up`, `bgv_completion_date`, `bgv_executive`, `bgv_exe_email`\n3. **Code Node #1 (“Normalize & Parse”):**\n\t- Cleans and lower-cases all column names for consistency.\n\t- Parses `last_follow_up` & `bgv_completion_date` from multiple local date formats.\n\t- Adds helper flags: `isCompletedToday`, `isStale` (pending and last-follow-up ≥ 3 days).\n4. **Code Node #2 (“Group & Filter”):**\n\t- Groups rows by `bgv_exe_email` (executive).\n\t- Within each group: Segregates “Completed Today” and “Pending” items.\n5. **Code Node #3 (“Format Digest”):**\n\t- Generates a personalized HTML email per executive, with two tables:\n\t- **Completed Today** (with candidate/prevco info)\n\t- **Pending** (with “stale” ⚠️ flags)\n\t- Builds the subject line showing per-executive summary counts.\n6. **Gmail Node:**\n\t- Sends the formatted email to each executive automatically.\n\t- Can be customized for preview/test mode, CC or CSV attachments.\n\n# How to set up\n1. **Prepare Google Sheet:**\n\t- Create “BGV Tracker” tab (case-insensitive column names).\n\t- Fill columns:\n\t- `candidate_name`, `previous_company`, `prevco_hr_name`, `prevco_hr_email`, `bgv_status`, `last_follow_up`, `bgv_completion_date`, `bgv_executive`, `bgv_exe_email`\n2. **n8n Configuration:**\n\t- Authenticate Google Sheets node (OAuth).\n\t- Authenticate Gmail node (App Password recommended).\n\t- Import workflow JSON and adjust credentials and sheet IDs.\n3. **Test run (optional):**\n\t- Fill sample data in the sheet.\n\t- Start workflow and review “dry run” outputs (optional).\n4. **Activate workflow** for daily auto-emails.\n\n## Requirements\n- A Google Sheet tab called **“BGV Tracker”** with supported columns.\n- Gmail (SMTP or OAuth) credentials with permissions to send.\n- n8n cloud or self-hosted, with Google and Gmail creds configured.\n\n\n## How to customize\n- **Change run time:** Modify the Schedule Trigger for different hours/days.\n- **Weekend handling:** Add condition to skip Sat/Sun.\n- **Stale threshold:** Adjust the “&gt;= 3 days” flag logic in code node.\n- **Email template:** Edit HTML layout, subject, header/footer as needed.\n- **Digest content:** Add/remove columns in the email tables within the code node.\n- **Preview/test mode:** Add a DRY_RUN variable and IF node for safe previewing before going live.\n- **Attachment/CC:** Add extra nodes to attach CSV, send summary to managers or post to Slack.\n\n\n## Add‑ons\n- **Manager summary:** Aggregate all digests and send to HR head or ops manager.\n- **CSV exports:** Automatically attach filtered candidate lists per executive.\n- **Slack reminders:** DM executives with only their stale pending items.\n- **Auto-writeback:** Update next follow-up date in Sheet for stale cases.\n\n\n## Use Case Examples\n- **BGV vendor:** Nightly queue email lets each checker focus on fresh items to close first.\n- **Recruiter audit:** HRBP gets an easy, nightly record of outstanding verifications, with overdue flags for fast escalation.\n- **Multi-client projects:** Divide the worksheet, send only relevant candidates to each exec, boosting clarity and compliance.\n\n## Common Troubleshooting\n\n| Issue | Possible Cause | Solution |\n|-------------------------------|-------------------------------------------------|----------------------------------------------|\n| No emails sent | SMTP/Gmail credentials missing or expired | Re-authenticate Gmail node; check permissions|\n| Some candidates missing | Sheet has missing/invalid `bgv_exe_email` | Ensure every row has valid executive email |\n| Completed items not listed | Wrong/combo date formats in completion column | Use supported date format; ensure status=\"Completed\" |\n| Pending doesn’t show stale | Last follow-up date out of expected format | Use supported date format & review data |\n| Workflow runs on weekends | Schedule misconfigured (or missed weekend filter)| Add/exclude Sat/Sun via config/node logic |\n| Pending pool includes “To be Sent” | Status filter in code not precise | Adjust code node filter to exclude explicitly|\n| Emails not delivered | Gmail sending limit exceeded | Add rate limit (wait node), check quota |\n\n\n## Need Help?\n\nIf you need a hand setting up, customizing or want to add more integrations (Slack, CSVs, approvals, etc.) reach out to us at WeblineIndia anytime.\n\n**We can setup error handling, advanced templates and even help connect your flows to external systems!**",
+  "featuredImage": "/data/workflows/8114/8114.webp",
+  "author": {
+    "id": 101,
+    "slug": "weblineindia",
+    "name": "WeblineIndia",
+    "avatar": ""
+  },
+  "categories": [
+    "HR"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 60,
+  "downloads": 6,
+  "createdAt": "2025-09-01T10:06:58.499Z",
+  "updatedAt": "2026-01-16T08:54:13.663Z",
+  "publishedAt": "2025-09-01T10:06:58.499Z",
+  "nodes": 8,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8114",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Daily BGV status digest: Track verifications with Google Sheets to Gmail alerts",
+    "workflowName": "Daily BGV status digest: Track verifications with Google Sheets to Gmail alerts",
+    "description": "# Background Verification Executive Digest Automation: Track Completed & Pending Verifications via Email (from Google Sheets)\n\nThis automation sends a daily late-night email summary to each Background Verification (BGV) executive — straight out of your “BGV Tracker” Google Sheet. Each executive gets their own digest listing candidates whose background checks were **completed today** and which ones are still **pending**, complete with clear “stale” alerts for overdue follow-ups. The workflow runs reliably via n8n, auto-grouping entries and packaging the results in a user-friendly tabular email, every day at 23:00 IST.\n\n## Who’s it for\n\n- **BGV team leads & vendors** who want automatic updates on their queue.\n- **HR managers** looking to automate candidate tracking without manual report compilation.\n- **Ops teams** with Google Sheets-based BGV tracking wanting digest emails for each owner.\n- Any organization managing candidate checks across multiple owners/executives.\n\n## How it works\n\n1. **Schedule Trigger:** Runs every night at 23:00 IST (Asia/Kolkata), weekends OFF by default.\n2. **Google Sheets:** Reads all rows from your “BGV Tracker” (tab), using columns:\n\t- `candidate_name`, `previous_company`, `prevco_hr_name`, `prevco_hr_email`\n\t- `bgv_status`, `last_follow_up`, `bgv_completion_date`, `bgv_executive`, `bgv_exe_email`\n3. **Code Node #1 (“Normalize & Parse”):**\n\t- Cleans and lower-cases all column names for consistency.\n\t- Parses `last_follow_up` & `bgv_completion_date` from multiple local date formats.\n\t- Adds helper flags: `isCompletedToday`, `isStale` (pending and last-follow-up ≥ 3 days).\n4. **Code Node #2 (“Group & Filter”):**\n\t- Groups rows by `bgv_exe_email` (executive).\n\t- Within each group: Segregates “Completed Today” and “Pending” items.\n5. **Code Node #3 (“Format Digest”):**\n\t- Generates a personalized HTML email per executive, with two tables:\n\t- **Completed Today** (with candidate/prevco info)\n\t- **Pending** (with “stale” ⚠️ flags)\n\t- Builds the subject line showing per-executive summary counts.\n6. **Gmail Node:**\n\t- Sends the formatted email to each executive automatically.\n\t- Can be customized for preview/test mode, CC or CSV attachments.\n\n# How to set up\n1. **Prepare Google Sheet:**\n\t- Create “BGV Tracker” tab (case-insensitive column names).\n\t- Fill columns:\n\t- `candidate_name`, `previous_company`, `prevco_hr_name`, `prevco_hr_email`, `bgv_status`, `last_follow_up`, `bgv_completion_date`, `bgv_executive`, `bgv_exe_email`\n2. **n8n Configuration:**\n\t- Authenticate Google Sheets node (OAuth).\n\t- Authenticate Gmail node (App Password recommended).\n\t- Import workflow JSON and adjust credentials and sheet IDs.\n3. **Test run (optional):**\n\t- Fill sample data in the sheet.\n\t- Start workflow and review “dry run” outputs (optional).\n4. **Activate workflow** for daily auto-emails.\n\n## Requirements\n- A Google Sheet tab called **“BGV Tracker”** with supported columns.\n- Gmail (SMTP or OAuth) credentials with permissions to send.\n- n8n cloud or self-hosted, with Google and Gmail creds configured.\n\n\n## How to customize\n- **Change run time:** Modify the Schedule Trigger for different hours/days.\n- **Weekend handling:** Add condition to skip Sat/Sun.\n- **Stale threshold:** Adjust the “&gt;= 3 days” flag logic in code node.\n- **Email template:** Edit HTML layout, subject, header/footer as needed.\n- **Digest content:** Add/remove columns in the email tables within the code node.\n- **Preview/test mode:** Add a DRY_RUN variable and IF node for safe previewing before going live.\n- **Attachment/CC:** Add extra nodes to attach CSV, send summary to managers or post to Slack.\n\n\n## Add‑ons\n- **Manager summary:** Aggregate all digests and send to HR head or ops manager.\n- **CSV exports:** Automatically attach filtered candidate lists per executive.\n- **Slack reminders:** DM executives with only their stale pending items.\n- **Auto-writeback:** Update next follow-up date in Sheet for stale cases.\n\n\n## Use Case Examples\n- **BGV vendor:** Nightly queue email lets each checker focus on fresh items to close first.\n- **Recruiter audit:** HRBP gets an easy, nightly record of outstanding verifications, with overdue flags for fast escalation.\n- **Multi-client projects:** Divide the worksheet, send only relevant candidates to each exec, boosting clarity and compliance.\n\n## Common Troubleshooting\n\n| Issue | Possible Cause | Solution |\n|-------------------------------|-------------------------------------------------|----------------------------------------------|\n| No emails sent | SMTP/Gmail credentials missing or expired | Re-authenticate Gmail node; check permissions|\n| Some candidates missing | Sheet has missing/invalid `bgv_exe_email` | Ensure every row has valid executive email |\n| Completed items not listed | Wrong/combo date formats in completion column | Use supported date format; ensure status=\"Completed\" |\n| Pending doesn’t show stale | Last follow-up date out of expected format | Use supported date format & review data |\n| Workflow runs on weekends | Schedule misconfigured (or missed weekend filter)| Add/exclude Sat/Sun via config/node logic |\n| Pending pool includes “To be Sent” | Status filter in code not precise | Adjust code node filter to exclude explicitly|\n| Emails not delivered | Gmail sending limit exceeded | Add rate limit (wait node), check quota |\n\n\n## Need Help?\n\nIf you need a hand setting up, customizing or want to add more integrations (Slack, CSVs, approvals, etc.) reach out to us at WeblineIndia anytime.\n\n**We can setup error handling, advanced templates and even help connect your flows to external systems!**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Normalize & Parse",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Group & Filter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Digest",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

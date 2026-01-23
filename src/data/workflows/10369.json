@@ -1,0 +1,140 @@
+{
+  "id": 10369,
+  "slug": "10369",
+  "title": "Automate loan document analysis with Mistral OCR and GPT for underwriting decisions",
+  "description": "**LOB Underwriting with AI**\n\nThis template ingests borrower documents from OneDrive, extracts text with OCR, classifies each file (ID, paystub, bank statement, utilities, tax forms, etc.), aggregates everything per borrower, and asks an LLM to produce a clear underwriting summary and decision (plus next steps).\n\n**Good to know**\n\n1. AI and OCR usage consume credits (OpenAI + your OCR provider).\n2. Folder lookups by name can be ambiguous—use a fixed folderId in production.\n3. Scanned image quality drives OCR accuracy; bad scans yield weak text.\n4. This flow handles PII—mask sensitive data in logs and control access.\n5. Start small: batch size and pagination keep costs/memory sane.\n\n**How it works**\n\n1. Import & locate docs: Manual trigger kicks off a OneDrive folder search (e.g., “LOBs”) and lists files inside.\n2. Per-file loop: Download each file → run OCR → classify the document type using filename + extracted text.\n3. Aggregate: Combine per-file results into a borrower payload (make BorrowerName dynamic).\n4. LLM analysis: Feed the payload to an AI Agent (OpenAI model) to extract underwriting-relevant facts and produce a decision + next steps.\n5. Output: Return a human-readable summary (and optionally structured JSON for systems).\n\n**How to use**\n\n1. Start with the Manual Trigger to validate end-to-end on a tiny test folder.\n2. Once stable, swap in a Schedule/Cron or Webhook trigger.\n3. Review the generated underwriting summary; handle only flagged exceptions (unknown/unreadable docs, low confidence).\n\n**Setup steps**\n\n**Connect accounts**\n\n- Add credentials for OneDrive, OCR, and OpenAI.\n\n**Configure inputs**\n\n- In Search a folder, point to your borrower docs (prefer folderId; otherwise tighten the name query).\n- In Get items in a folder, enable pagination if the folder is large.\n- In Split in Batches, set a conservative batch size to control costs.\n\n**Wire the file path**\n\n- Download a file must receive the current file’s id from the folder listing.\n- Make sure the OCR node receives binary input (PDFs/images).\n\n**Classification**\n\n- Update keyword rules to match your region/lenders/utilities/tax forms.\n- Keep a fallback Unknown class and log it for review.\n\n**Combine**\n\n1. Replace the hard-coded BorrowerName with:\n\n  - a Set node field,\n  - a form input, or\n  - parsing from folder/file naming conventions.\n\n**AI Agent**\n\n- Set your OpenAI model/credentials.\n- Ask the model to output JSON first (structured fields) and Markdown second (readable summary).\n- Keep temperature low for consistent, audit-friendly results.\n\n**Optional outputs**\n\n- Persist JSON/Markdown to Notion/Docs/DB or write to storage.\n\n**Customize if needed**\n\n- Doc types: add/remove categories and keywords without touching core logic.\n- Error handling: add IF paths for empty folders, failed downloads, empty OCR, or Unknown class; retry transient API errors.\n- Privacy: redact IDs/account numbers in logs; restrict execution visibility.\n- Scale: add MIME/size filters, duplicate detection, and multi-borrower folder patterns (parent → subfolders).\n",
+  "featuredImage": "/data/workflows/10369/10369.webp",
+  "author": {
+    "id": 101,
+    "slug": "vgangidi",
+    "name": "Vinay Gangidi",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 425,
+  "downloads": 42,
+  "createdAt": "2025-10-30T20:54:53.471Z",
+  "updatedAt": "2026-01-16T09:04:45.176Z",
+  "publishedAt": "2025-10-30T20:54:53.471Z",
+  "nodes": 17,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10369",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate loan document analysis with Mistral OCR and GPT for underwriting decisions",
+    "workflowName": "Automate loan document analysis with Mistral OCR and GPT for underwriting decisions",
+    "description": "**LOB Underwriting with AI**\n\nThis template ingests borrower documents from OneDrive, extracts text with OCR, classifies each file (ID, paystub, bank statement, utilities, tax forms, etc.), aggregates everything per borrower, and asks an LLM to produce a clear underwriting summary and decision (plus next steps).\n\n**Good to know**\n\n1. AI and OCR usage consume credits (OpenAI + your OCR provider).\n2. Folder lookups by name can be ambiguous—use a fixed folderId in production.\n3. Scanned image quality drives OCR accuracy; bad scans yield weak text.\n4. This flow handles PII—mask sensitive data in logs and control access.\n5. Start small: batch size and pagination keep costs/memory sane.\n\n**How it works**\n\n1. Import & locate docs: Manual trigger kicks off a OneDrive folder search (e.g., “LOBs”) and lists files inside.\n2. Per-file loop: Download each file → run OCR → classify the document type using filename + extracted text.\n3. Aggregate: Combine per-file results into a borrower payload (make BorrowerName dynamic).\n4. LLM analysis: Feed the payload to an AI Agent (OpenAI model) to extract underwriting-relevant facts and produce a decision + next steps.\n5. Output: Return a human-readable summary (and optionally structured JSON for systems).\n\n**How to use**\n\n1. Start with the Manual Trigger to validate end-to-end on a tiny test folder.\n2. Once stable, swap in a Schedule/Cron or Webhook trigger.\n3. Review the generated underwriting summary; handle only flagged exceptions (unknown/unreadable docs, low confidence).\n\n**Setup steps**\n\n**Connect accounts**\n\n- Add credentials for OneDrive, OCR, and OpenAI.\n\n**Configure inputs**\n\n- In Search a folder, point to your borrower docs (prefer folderId; otherwise tighten the name query).\n- In Get items in a folder, enable pagination if the folder is large.\n- In Split in Batches, set a conservative batch size to control costs.\n\n**Wire the file path**\n\n- Download a file must receive the current file’s id from the folder listing.\n- Make sure the OCR node receives binary input (PDFs/images).\n\n**Classification**\n\n- Update keyword rules to match your region/lenders/utilities/tax forms.\n- Keep a fallback Unknown class and log it for review.\n\n**Combine**\n\n1. Replace the hard-coded BorrowerName with:\n\n  - a Set node field,\n  - a form input, or\n  - parsing from folder/file naming conventions.\n\n**AI Agent**\n\n- Set your OpenAI model/credentials.\n- Ask the model to output JSON first (structured fields) and Markdown second (readable summary).\n- Keep temperature low for consistent, audit-friendly results.\n\n**Optional outputs**\n\n- Persist JSON/Markdown to Notion/Docs/DB or write to storage.\n\n**Customize if needed**\n\n- Doc types: add/remove categories and keywords without touching core logic.\n- Error handling: add IF paths for empty folders, failed downloads, empty OCR, or Unknown class; retry transient API errors.\n- Privacy: redact IDs/account numbers in logs; restrict execution visibility.\n- Scale: add MIME/size filters, duplicate detection, and multi-borrower folder patterns (parent → subfolders).",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Search a folder",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get items in a folder",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download a file",
+      "type": "n8n-nodes-base.microsoftOneDrive",
+      "role": "microsoftOneDrive",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract text",
+      "type": "n8n-nodes-base.mistralAi",
+      "role": "mistralAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Classify the File",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Combine the Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

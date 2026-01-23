@@ -1,0 +1,116 @@
+{
+  "id": 11728,
+  "slug": "11728",
+  "title": "Auto-resolve Jira tickets with GitHub Copilot using Port Context",
+  "description": "## Auto-resolve Jira tickets with coding agents\n\nCoding agents can significantly speed up development, but crucial engineering context often gets lost in the process. This guide demonstrates how to use Port as a context lake in n8n workflows to automatically generate GitHub issues from Jira tickets with rich organizational context, ensuring that important information is preserved when assigning them to GitHub Copilot and linking pull requests back to Jira. This setup helps establish a seamless ticket-to-PR workflow, bridging the gap between Jira and GitHub while leveraging Port's comprehensive software catalog as a source of truth.\n\n## How it works\nThe n8n workflow orchestrates the following steps:\n\n- Jira trigger — The workflow listens for Jira issue updates via webhook.\n- Condition check — Verifies that the issue status is \"In Progress\" and has the required label (e.g., \"product_approved\") without the \"copilot_assigned\" label.\n- Port context extraction — Uses Port's n8n node to query your software catalog for relevant context about services, repositories, teams, dependencies, and documentation related to the Jira issue.\n- Parse response — Retrieves the AI-generated GitHub issue title and body from Port.\n- Create GitHub issue — Creates a new GitHub issue with the enriched context from Port.\n- Assign to Copilot — Adds a comment to the GitHub issue instructing Copilot to take ownership.\n- Add issue link to Jira ticket — Adds a comment to the Jira ticket with the GitHub issue URL, providing clear traceability.\n- Mark ticket as assigned — Updates the Jira ticket to add the \"copilot_assigned\" label, preventing duplicate processing.\n\n## Setup\n- [ ] Connect your Jira Cloud account and enable issue_updated events\n- [ ] Register for free on [Port.io](https://www.port.io)\n- [ ]  Connect your Port.io account and add the API key\n- [ ] Connect your GitHub account and select the target repository\n- [ ] Ensure a Copilot bot or @copilot user has access to the repository\n- [ ] Confirm the workflow webhook or Jira trigger URL is active\n- [ ] Test by moving a `product_approved` ticket to `In Progress`.\n- [ ] You should be good to go!\n\n## Prerequisites\n- You have a Port account and have completed the onboarding process.\n- Port's GitHub app is installed in your account.\n- Port's Jira integration is installed in your account.\n- You have a working n8n instance (Cloud or self-hosted) with Port's n8n custom node installed.\n- Your GitHub organization has GitHub Copilot enabled, so Copilot can be automatically assigned to any issues created through this guide.\n\n\n⚠️ This template is intended for Self-Hosted instances only. \n\n",
+  "featuredImage": "/data/workflows/11728/11728.webp",
+  "author": {
+    "id": 101,
+    "slug": "portio",
+    "name": "Port IO",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI RAG"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 189,
+  "downloads": 18,
+  "createdAt": "2025-12-12T05:12:30.755Z",
+  "updatedAt": "2026-01-16T09:09:52.930Z",
+  "publishedAt": "2025-12-12T05:12:30.755Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11728",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-resolve Jira tickets with GitHub Copilot using Port Context",
+    "workflowName": "Auto-resolve Jira tickets with GitHub Copilot using Port Context",
+    "description": "## Auto-resolve Jira tickets with coding agents\n\nCoding agents can significantly speed up development, but crucial engineering context often gets lost in the process. This guide demonstrates how to use Port as a context lake in n8n workflows to automatically generate GitHub issues from Jira tickets with rich organizational context, ensuring that important information is preserved when assigning them to GitHub Copilot and linking pull requests back to Jira. This setup helps establish a seamless ticket-to-PR workflow, bridging the gap between Jira and GitHub while leveraging Port's comprehensive software catalog as a source of truth.\n\n## How it works\nThe n8n workflow orchestrates the following steps:\n\n- Jira trigger — The workflow listens for Jira issue updates via webhook.\n- Condition check — Verifies that the issue status is \"In Progress\" and has the required label (e.g., \"product_approved\") without the \"copilot_assigned\" label.\n- Port context extraction — Uses Port's n8n node to query your software catalog for relevant context about services, repositories, teams, dependencies, and documentation related to the Jira issue.\n- Parse response — Retrieves the AI-generated GitHub issue title and body from Port.\n- Create GitHub issue — Creates a new GitHub issue with the enriched context from Port.\n- Assign to Copilot — Adds a comment to the GitHub issue instructing Copilot to take ownership.\n- Add issue link to Jira ticket — Adds a comment to the Jira ticket with the GitHub issue URL, providing clear traceability.\n- Mark ticket as assigned — Updates the Jira ticket to add the \"copilot_assigned\" label, preventing duplicate processing.\n\n## Setup\n- [ ] Connect your Jira Cloud account and enable issue_updated events\n- [ ] Register for free on [Port.io](https://www.port.io)\n- [ ]  Connect your Port.io account and add the API key\n- [ ] Connect your GitHub account and select the target repository\n- [ ] Ensure a Copilot bot or @copilot user has access to the repository\n- [ ] Confirm the workflow webhook or Jira trigger URL is active\n- [ ] Test by moving a `product_approved` ticket to `In Progress`.\n- [ ] You should be good to go!\n\n## Prerequisites\n- You have a Port account and have completed the onboarding process.\n- Port's GitHub app is installed in your account.\n- Port's Jira integration is installed in your account.\n- You have a working n8n instance (Cloud or self-hosted) with Port's n8n custom node installed.\n- Your GitHub organization has GitHub Copilot enabled, so Copilot can be automatically assigned to any issues created through this guide.\n\n\n⚠️ This template is intended for Self-Hosted instances only.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Is issue creation successful?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Is ready for assignment?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create a GitHub issue",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Assign issue to Copilot",
+      "type": "n8n-nodes-base.github",
+      "role": "github",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Add issue link to Jira ticket",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mark ticket as assigned",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "On Jira ticket updated",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "role": "jiraTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse Port AI response",
+      "type": "@port-labs/n8n-nodes-portio-experimental.portApiAi",
+      "role": "portApiAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract context from Port",
+      "type": "@port-labs/n8n-nodes-portio-experimental.portApiAi",
+      "role": "portApiAi",
+      "configDescription": "Version 1"
+    }
+  ]
+}

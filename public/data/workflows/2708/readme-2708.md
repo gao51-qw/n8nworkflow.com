@@ -1,0 +1,74 @@
+# Send Jira task notifications to Telegram user via Bot
+
+> **What we wanna do?**
+
+Let's look at the concern. In my experience, some developers don't check their Jira board to find out whether there are new updates on the issues or not or if some Issues need to be addressed as soon as possible. So, the developer or anyone else in other fields needs to be informed about the task as soon as possible, too. One way to send this immediate notification is through the Telegram Bot.
+
+**Setup Guide**
+
+so, first of all, you need to register a Telegram Bot in your account and obtain its token, so that we'll be able to send Telegram messages by using this token through our bot;
+after getting your telegram bot token
+- go to the workflow and click on *one of the telegram nodes*
+- select the telegram credential or create one through the **Credential to connect with** field
+- and put the token in the token in the **Access Token** field.
+
+Ok, you're done with the Telegram Side setup.
+
+then you need the Jira accounts (team users) **accountId** and also their telegram **chatId** for the **telegram account** node so that it can find the corresponding telegram user from the assignee of the issue, put this data as following guide comments in the **telegram account** node.
+
+Now we go for the Jira side setup, you need to setup some **automation rules** as your needs.
+- go to the Jira settings and **Global automation** section, click on the *Create Rule* button
+- select the **Issue Created** trigger type in the *When* step
+- add a **Send webhook request** action, after selecting it you'll see its settings
+- go back to workflow and from the **jira-webhook** node copy the **Production URL** 
+- paste it in the **Web request URL** field in the Jira action setting
+- then set the **HTTP method** field on **POST** 
+- set **Web request body** on **Issue Data (Automation format)**
+- in the header section, add a new header with the name **type** and value **created** for the creation event.
+
+OK, the Jira side also is done! Now It's time to test!
+
+If you've put your Jira **accountId** and telegram **chatId** in the **telegram account** node and of course started the telegram bot, after creating an Issue that is assigned to you, the creation notif will send to you in telegram!
+
+## 📊 Basic Information
+
+- **Workflow ID:** 2708
+- **Complexity:** intermediate
+- **Node Count:** 8
+- **Views:** 2311
+- **Downloads:** 231
+- **Created:** 2025/1/9
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/2708)
+
+## 👤 Author
+
+- **Name:** Abolfazl Akbarzadeh
+- **Username:** @abolfazlakbarzadeh
+
+## 🏷️ Categories
+
+- Project Management
+
+## 🔗 Nodes Used
+
+- **code** 
+- **if** (×2)
+- **switch** 
+- **telegram** (×3)
+- **webhook** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 8 nodes with 5 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

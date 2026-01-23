@@ -1,0 +1,108 @@
+# Create photorealistic social media images with Flux Realism, LoRa models & Airtable
+
+> # AI Image Generation Workflow for Social Media Content
+
+## Overview
+This n8n workflow automates the creation of photorealistic AI-generated images for social media content. The workflow uses RunComfy (ComfyUI cloud service) combined with Airtable for data management to create high-quality images based on custom prompts and LoRa models.
+
+## Key Features
+
+**Automated Image Generation**: Creates photorealistic images using Flux Realism model and custom LoRa models
+
+**Airtable Integration**: Centrally manages content requests, model information, and image status
+
+**Cloud-based Processing**: Utilizes RunComfy servers for powerful GPU processing without local hardware requirements
+
+**Status Tracking**: Monitors generation process and automatically updates database entries
+
+**Telegram Notifications**: Sends success notifications after image completion
+
+## Technical Workflow
+
+1. **Server Initialization**: Starts RunComfy server with configured specifications
+2. **Data Retrieval**: Fetches content requests from Airtable database
+3. **Image Generation**: Sends prompts to ComfyUI with Flux Realism + LoRa models
+4. **Status Monitoring**: Checks generation progress in 30-second intervals
+5. **Download**: Downloads completed images
+6. **Database Update**: Updates Airtable with image links and status
+7. **Server Cleanup**: Deletes RunComfy server for cost optimization
+
+## Prerequisites
+
+- **RunComfy Membership** with API access
+- **Airtable Account** with configured database
+- **Telegram Bot** for notifications
+- **Flux Realism Workflow** in RunComfy library
+- **Uploaded LoRa Models** in RunComfy
+
+## Airtable Schema
+
+The database must contain these fields:
+- `topic`: Content description
+- `pose_1`: Detailed image prompt  
+- `LoRa Name Flux`: LoRa model name
+- `Model`: Character name
+- `pose_1_drive_fotolink`: Link to generated image
+- `Bilder erstellt`: Generation status
+
+## Configuration Options
+
+**Image Resolution**: Default 832x1216px (adjustable in ComfyUI parameters)
+
+**Generation Parameters**: 35 steps, Euler sampler, Guidance 2.0
+
+**Server Size**: "Large" for optimal performance (adjustable based on requirements)
+
+**Time Intervals**: 30s status checks, 50s server initialization
+
+This workflow is ideal for content creators who need regular, high-quality, character-consistent images for social media campaigns.
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7578
+- **Complexity:** advanced
+- **Node Count:** 24
+- **Views:** 627
+- **Downloads:** 62
+- **Created:** 2025/8/19
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7578)
+
+## 👤 Author
+
+- **Name:** Robert Schröder
+- **Username:** @saits
+
+## 🏷️ Categories
+
+- Content Creation
+- Multimodal AI
+
+## 🔗 Nodes Used
+
+- **if** (×2)
+- **splitInBatches** 
+- **code** 
+- **httpRequest** (×7)
+- **manualTrigger** 
+- **airtable** (×2)
+- **wait** (×2)
+- **stickyNote** (×3)
+- **scheduleTrigger** 
+- **set** (×3)
+- **telegram** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 24 nodes with 19 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

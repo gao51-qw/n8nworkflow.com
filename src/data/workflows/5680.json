@@ -1,0 +1,116 @@
+{
+  "id": 5680,
+  "slug": "5680",
+  "title": "RAG chatbot with Supabase + TogetherAI + Openrouter",
+  "description": "## ⚠️ RUN the FIRST WORKFLOW ONLY ONCE \n(as it will convert your content in Embedding format and save it in DB and is ready for the RAG Chat)\n\n## 📌 Telegram Trigger\n\n* **Type:** `telegramTrigger`\n* **Purpose:** Waits for new Telegram messages to trigger the workflow.\n* **Note:** Currently disabled.\n\n---\n\n## 📄 Content for the Training\n\n* **Type:** `googleDocs`\n* **Purpose:** Fetches document content from Google Docs using its URL.\n* **Details:** Uses Service Account authentication.\n\n---\n\n## ✂️ Splitting into Chunks\n\n* **Type:** `code`\n* **Purpose:** Splits the fetched document text into smaller chunks (1000 chars each) for processing.\n* **Logic:** Loops over text and slices it.\n\n---\n\n## 🧠 Embedding Uploaded Document\n\n* **Type:** `httpRequest`\n* **Purpose:** Calls Together AI embedding API to get vector embeddings for each text chunk.\n* **Details:** Sends JSON with model name and chunk as input.\n\n---\n\n## 🛢 Save the embedding in DB\n\n* **Type:** `supabase`\n* **Purpose:** Saves each text chunk and its embedding vector into the Supabase `embed` table.\n\n\n## SECOND WORKFLOW EXPLAINATION:\n\n## 💬 When chat message received\n\n* **Type:** `chatTrigger`\n* **Purpose:** Starts the workflow when a user sends a chat message.\n* **Details:** Sends an initial greeting message to the user.\n\n---\n\n## 🧩 Embend User Message\n\n* **Type:** `httpRequest`\n* **Purpose:** Generates embedding for the user’s input message.\n* **Details:** Calls Together AI embeddings API.\n\n---\n\n## 🔍 Search Embeddings\n\n* **Type:** `httpRequest`\n* **Purpose:** Searches Supabase DB for the top 5 most similar text chunks based on the generated embedding.\n* **Details:** Calls Supabase RPC function `matchembeddings1`.\n\n---\n\n## 📦 Aggregate\n\n* **Type:** `aggregate`\n* **Purpose:** Combines all retrieved text chunks into a single aggregated context for the LLM.\n\n---\n\n## 🧠 Basic LLM Chain\n\n* **Type:** `chainLlm`\n* **Purpose:** Passes the user's question + aggregated context to the LLM to generate a detailed answer.\n* **Details:** Contains prompt instructing the LLM to answer only based on context.\n\n---\n\n## 🤖 OpenRouter Chat Model\n\n* **Type:** `lmChatOpenRouter`\n* **Purpose:** Provides the actual AI language model that processes the prompt.\n* **Details:** Uses `qwen/qwen3-8b:free` model via OpenRouter and you can use any of your choice.",
+  "featuredImage": "/data/workflows/5680/5680.webp",
+  "author": {
+    "id": 101,
+    "slug": "iamvaar",
+    "name": "iamvaar",
+    "avatar": ""
+  },
+  "categories": [
+    "Internal Wiki",
+    "AI RAG"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 6434,
+  "downloads": 643,
+  "createdAt": "2025-07-04T18:23:28.386Z",
+  "updatedAt": "2026-01-16T08:40:53.246Z",
+  "publishedAt": "2025-07-04T18:23:28.386Z",
+  "nodes": 13,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5680",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "RAG chatbot with Supabase + TogetherAI + Openrouter",
+    "workflowName": "RAG chatbot with Supabase + TogetherAI + Openrouter",
+    "description": "## ⚠️ RUN the FIRST WORKFLOW ONLY ONCE \n(as it will convert your content in Embedding format and save it in DB and is ready for the RAG Chat)\n\n## 📌 Telegram Trigger\n\n* **Type:** `telegramTrigger`\n* **Purpose:** Waits for new Telegram messages to trigger the workflow.\n* **Note:** Currently disabled.\n\n---\n\n## 📄 Content for the Training\n\n* **Type:** `googleDocs`\n* **Purpose:** Fetches document content from Google Docs using its URL.\n* **Details:** Uses Service Account authentication.\n\n---\n\n## ✂️ Splitting into Chunks\n\n* **Type:** `code`\n* **Purpose:** Splits the fetched document text into smaller chunks (1000 chars each) for processing.\n* **Logic:** Loops over text and slices it.\n\n---\n\n## 🧠 Embedding Uploaded Document\n\n* **Type:** `httpRequest`\n* **Purpose:** Calls Together AI embedding API to get vector embeddings for each text chunk.\n* **Details:** Sends JSON with model name and chunk as input.\n\n---\n\n## 🛢 Save the embedding in DB\n\n* **Type:** `supabase`\n* **Purpose:** Saves each text chunk and its embedding vector into the Supabase `embed` table.\n\n\n## SECOND WORKFLOW EXPLAINATION:\n\n## 💬 When chat message received\n\n* **Type:** `chatTrigger`\n* **Purpose:** Starts the workflow when a user sends a chat message.\n* **Details:** Sends an initial greeting message to the user.\n\n---\n\n## 🧩 Embend User Message\n\n* **Type:** `httpRequest`\n* **Purpose:** Generates embedding for the user’s input message.\n* **Details:** Calls Together AI embeddings API.\n\n---\n\n## 🔍 Search Embeddings\n\n* **Type:** `httpRequest`\n* **Purpose:** Searches Supabase DB for the top 5 most similar text chunks based on the generated embedding.\n* **Details:** Calls Supabase RPC function `matchembeddings1`.\n\n---\n\n## 📦 Aggregate\n\n* **Type:** `aggregate`\n* **Purpose:** Combines all retrieved text chunks into a single aggregated context for the LLM.\n\n---\n\n## 🧠 Basic LLM Chain\n\n* **Type:** `chainLlm`\n* **Purpose:** Passes the user's question + aggregated context to the LLM to generate a detailed answer.\n* **Details:** Contains prompt instructing the LLM to answer only based on context.\n\n---\n\n## 🤖 OpenRouter Chat Model\n\n* **Type:** `lmChatOpenRouter`\n* **Purpose:** Provides the actual AI language model that processes the prompt.\n* **Details:** Uses `qwen/qwen3-8b:free` model via OpenRouter and you can use any of your choice.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Content for the Training",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Splitting into Chunks",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Embedding Uploaded document",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Save the embedding in DB",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Search Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Embend User Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

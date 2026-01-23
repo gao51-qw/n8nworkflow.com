@@ -1,0 +1,95 @@
+# Automatic Gmail categorization and labeling with AI
+
+> *This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*
+
+## Who is this for?
+
+If your inbox is full of unread emails, this workflow is for you.  
+Instead of reading through them one by one, let AI do the sorting.  
+It reads your emails and flags only what needs action.
+
+## What does it solve?
+
+This workflow reads your unread Gmail emails and uses AI to decide what’s important — and what’s not.
+It labels emails that need your attention, identifies receipts, and trashes everything else.
+No more manual reading. Just an inbox that uses AI to take care of itself.
+
+## How it works
+
+1. Every hour, the workflow runs automatically.
+2. It searches for unread emails in your Gmail inbox.
+3. For each email:
+   - It extracts the content and sends it to OpenAI.
+4. The AI returns one of four labels: `Action`, `Receipt`, `Informational` or `Spam`.
+5. Based on the label:
+   - Emails are marked with the appropriate label.
+   - Or moved to trash it is `spam`.
+6. It marks the email as read once processed.
+
+## How to set up?
+
+1. Connect these services in your n8n credentials:
+   - Gmail (OAuth2)
+   - OpenAI (API key)
+2. Create the Gmail labels:
+   - In your Gmail account, create these labels exactly as written:  
+     `Action`, `Receipt`, and `Informational`  
+   - The workflow will apply these labels based on AI classification.
+
+## How to customize this workflow to your needs
+
+- Change the AI prompt to detect more types of emails like `Meeting` or `Newsletter`.
+- Add more branches to the Switch node to apply custom logic.
+- Change the schedule to fit your workflow.
+By default, it runs every hour, but you can update this in the Schedule Trigger node.
+
+
+
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 5820
+- **Complexity:** advanced
+- **Node Count:** 17
+- **Views:** 4897
+- **Downloads:** 489
+- **Created:** 2025/7/9
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/5820)
+
+## 👤 Author
+
+- **Name:** Matt Chong | n8n Creator
+- **Username:** @mattxchong
+
+## 🏷️ Categories
+
+- Personal Productivity
+- AI Summarization
+
+## 🔗 Nodes Used
+
+- **set** 
+- **@n8n/n8n-nodes-langchain.agent** 
+- **@n8n/n8n-nodes-langchain.outputParserStructured** 
+- **scheduleTrigger** 
+- **@n8n/n8n-nodes-langchain.lmChatOpenAi** (×2)
+- **gmail** (×6)
+- **switch** 
+- **stickyNote** (×4)
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 17 nodes with 12 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

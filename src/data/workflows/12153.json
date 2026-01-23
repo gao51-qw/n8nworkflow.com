@@ -1,0 +1,248 @@
+{
+  "id": 12153,
+  "slug": "12153",
+  "title": "Schedule BlueSky posts and threads using Google Sheets as content calendar",
+  "description": "This workflow turns a Google Sheet into a fully automated content calendar for BlueSky. It handles single posts, multi-post threads, and image attachments, allowing you to manage your entire social presence from a simple spreadsheet.\n\n## Who is this for\nIdeal for social media managers, content creators, and growth marketers who want to schedule content in bulk without using expensive third-party tools.\n\n## What it does\nIt runs on a schedule to check your Google Sheet for posts marked \"Ready.\" It automatically handles:\n* **Threading:** Links posts together if they share a Thread ID and Sequence.\n* **Images:** Downloads image URLs and uploads them as blobs to BlueSky.\n* **Status Updates:** Marks rows as \"Posted\" and saves the live URL back to your sheet.\n\n## How to set up\n1. **Google Sheet:** Create a sheet with these columns: `Content`, `Thread ID`, `Sequence` (use '1' for single posts), `Image URL`, `Scheduled Time`, `Status`, `Post Link`.\n   * **Important:** Even if it is a single post (not a thread), you must add a unique `Thread ID`.\n   * **Note:** `Image URL` is optional.\n   * **Format:** Set the \"Scheduled Time\" column type to **Plain Text** to prevent date errors.\n   * *(A sample Google Sheet link is provided inside the workflow notes)*.\n2. **Credentials:** Enter your BlueSky Handle and App Password in the \"Configuration\" node.\n3. **Select Sheet:** In both the \"Get row(s)\" and \"Update row\" nodes, select your specific Google Sheet.\n\n## 🚀 The BlueSky Growth Suite\nThis workflow is part of a 3-part automation suite designed to help you grow on BlueSky:\n* **Part 1: Post Scheduler** (This template)\n* **Part 2: Analytics Tracker** (Track likes/reposts back to Sheets)\n* **Part 3: Lead Magnet Bot** (Auto-DM users who reply to your posts)",
+  "featuredImage": "/data/workflows/12153/12153.webp",
+  "author": {
+    "id": 101,
+    "slug": "sahu",
+    "name": "Soumya Sahu",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 18,
+  "downloads": 1,
+  "createdAt": "2025-12-26T08:44:48.094Z",
+  "updatedAt": "2026-01-16T09:11:33.826Z",
+  "publishedAt": "2025-12-26T08:44:48.094Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12153",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Schedule BlueSky posts and threads using Google Sheets as content calendar",
+    "workflowName": "Schedule BlueSky posts and threads using Google Sheets as content calendar",
+    "description": "This workflow turns a Google Sheet into a fully automated content calendar for BlueSky. It handles single posts, multi-post threads, and image attachments, allowing you to manage your entire social presence from a simple spreadsheet.\n\n## Who is this for\nIdeal for social media managers, content creators, and growth marketers who want to schedule content in bulk without using expensive third-party tools.\n\n## What it does\nIt runs on a schedule to check your Google Sheet for posts marked \"Ready.\" It automatically handles:\n* **Threading:** Links posts together if they share a Thread ID and Sequence.\n* **Images:** Downloads image URLs and uploads them as blobs to BlueSky.\n* **Status Updates:** Marks rows as \"Posted\" and saves the live URL back to your sheet.\n\n## How to set up\n1. **Google Sheet:** Create a sheet with these columns: `Content`, `Thread ID`, `Sequence` (use '1' for single posts), `Image URL`, `Scheduled Time`, `Status`, `Post Link`.\n   * **Important:** Even if it is a single post (not a thread), you must add a unique `Thread ID`.\n   * **Note:** `Image URL` is optional.\n   * **Format:** Set the \"Scheduled Time\" column type to **Plain Text** to prevent date errors.\n   * *(A sample Google Sheet link is provided inside the workflow notes)*.\n2. **Credentials:** Enter your BlueSky Handle and App Password in the \"Configuration\" node.\n3. **Select Sheet:** In both the \"Get row(s)\" and \"Update row\" nodes, select your specific Google Sheet.\n\n## 🚀 The BlueSky Growth Suite\nThis workflow is part of a 3-part automation suite designed to help you grow on BlueSky:\n* **Part 1: Post Scheduler** (This template)\n* **Part 2: Analytics Tracker** (Track likes/reposts back to Sheets)\n* **Part 3: Lead Magnet Bot** (Auto-DM users who reply to your posts)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sort",
+      "type": "n8n-nodes-base.sort",
+      "role": "sort",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "HTTP Download Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Construct Payload",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "BlueSky Auth",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Create Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Update Thread State",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upload Blob",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Attach Image Blob",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Consolidate Streams",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

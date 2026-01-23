@@ -1,0 +1,230 @@
+{
+  "id": 10184,
+  "slug": "10184",
+  "title": "Automate customer support with GPT-4o, Slack, and CRM integration",
+  "description": "🧾 Short Description\n\nAn AI-powered customer support workflow that automatically triages, summarizes, classifies, and routes tickets to the right Slack and CRM queues. It sends personalized auto-replies, logs results to Google Sheets, and uses a DLQ for failed cases.\n\n⚙️ How It Works\n\nTrigger: Captures messages from email or form submissions.\n\nAI Triage: Summarizes and classifies issues, scores urgency, and suggests next steps.\n\nRouting: Directs to Slack or CRM queue based on type and priority.\n\nLogging: Records summaries, urgency, and responses in Google Sheets.\n\nAuto-Reply: Sends an acknowledgment email with ticket ID and SLA timeframe.\n\nError Handling: Failed triage or delivery attempts are logged in a DLQ.\n\n🧩 How to Use\n\n1. Configure triggers (email or webhook) and connect credentials for OpenAI, Slack, Gmail, and Google Sheets.\n\n2. In Workflow Configuration, set:\n\n    * Slack Channel IDs\n\n    * CRM Type (HubSpot, Salesforce, or custom)\n\n    * Google Sheet URL\n\n    * SLA thresholds (e.g., 2h, 6h, 24h)\n\n3. Test with a sample ticket and verify routing and summaries in Slack and Sheets.\n\n🔑 Requirements\n\nOpenAI API key (GPT-4o-mini or newer)\n\nSlack OAuth credentials\n\nGoogle Sheets API access\n\nGmail/SMTP credentials\n\nCRM API (HubSpot, Salesforce, or custom endpoint)\n\n💡 Customization Ideas\n\nAdd sentiment detection for customer tone.\n\nLocalize responses for multilingual support.\n\nExtend DLQ logging to Notion or Airtable.\n\nAdd escalation alerts for SLA breaches.\n\n\n\n",
+  "featuredImage": "/data/workflows/10184/10184.webp",
+  "author": {
+    "id": 101,
+    "slug": "robertsantini",
+    "name": "NodeAlchemy",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 80,
+  "downloads": 8,
+  "createdAt": "2025-10-25T23:20:29.697Z",
+  "updatedAt": "2026-01-16T09:03:52.553Z",
+  "publishedAt": "2025-10-25T23:20:29.697Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10184",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate customer support with GPT-4o, Slack, and CRM integration",
+    "workflowName": "Automate customer support with GPT-4o, Slack, and CRM integration",
+    "description": "🧾 Short Description\n\nAn AI-powered customer support workflow that automatically triages, summarizes, classifies, and routes tickets to the right Slack and CRM queues. It sends personalized auto-replies, logs results to Google Sheets, and uses a DLQ for failed cases.\n\n⚙️ How It Works\n\nTrigger: Captures messages from email or form submissions.\n\nAI Triage: Summarizes and classifies issues, scores urgency, and suggests next steps.\n\nRouting: Directs to Slack or CRM queue based on type and priority.\n\nLogging: Records summaries, urgency, and responses in Google Sheets.\n\nAuto-Reply: Sends an acknowledgment email with ticket ID and SLA timeframe.\n\nError Handling: Failed triage or delivery attempts are logged in a DLQ.\n\n🧩 How to Use\n\n1. Configure triggers (email or webhook) and connect credentials for OpenAI, Slack, Gmail, and Google Sheets.\n\n2. In Workflow Configuration, set:\n\n    * Slack Channel IDs\n\n    * CRM Type (HubSpot, Salesforce, or custom)\n\n    * Google Sheet URL\n\n    * SLA thresholds (e.g., 2h, 6h, 24h)\n\n3. Test with a sample ticket and verify routing and summaries in Slack and Sheets.\n\n🔑 Requirements\n\nOpenAI API key (GPT-4o-mini or newer)\n\nSlack OAuth credentials\n\nGoogle Sheets API access\n\nGmail/SMTP credentials\n\nCRM API (HubSpot, Salesforce, or custom endpoint)\n\n💡 Customization Ideas\n\nAdd sentiment detection for customer tone.\n\nLocalize responses for multilingual support.\n\nExtend DLQ logging to Notion or Airtable.\n\nAdd escalation alerts for SLA breaches.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Inbound Trigger (Email/Form/Chat)",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Customer Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "AI Triage & Summarization Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Route by Classification",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Post to Technical Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Post to Billing Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Post to General Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Post to Urgent Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Create CRM Task (Technical)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create CRM Task (Billing)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create CRM Task (General)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Create CRM Task (Urgent)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Log to Google Sheets (Technical)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Log to Google Sheets (Billing)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Log to Google Sheets (General)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Log to Google Sheets (Urgent)",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Check Urgency for SLA",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Error Handler - Log to DLQ",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Generate Reference Number",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Auto-Reply Email Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Send Auto-Reply via Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Retry Auto-Reply (Attempt 1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Retry Auto-Reply (Attempt 2)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Log Failed Auto-Reply to DLQ",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

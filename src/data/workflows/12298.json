@@ -1,0 +1,361 @@
+{
+  "id": 12298,
+  "slug": "12298",
+  "title": "Notify Redmine project members in Slack about teammates’ approved Odoo leave",
+  "description": "## 📌Who is this for?\nThis workflow is designed for engineering teams, project managers, and IT operations who need consistent visibility into team availability across multiple projects.\nIt’s perfect for organizations that use Odoo for leave management and Redmine for project collaboration, and want to ensure that everyone involved gets timely, automated Slack notifications whenever a team member will be absent the next day.\n\n## 📌The problem\nWhen team members go dark, everything grinds to a halt. You're stuck with:\n- Last-minute meeting reschedules (and frustrated stakeholders)\n- Tasks assigned to people who aren't there\n- No time to redistribute workload\n- Bottlenecks affecting multiple projects\n\n## 📌How it works\n1. **Runs** daily at 17:15 - Set it and forget it. Executes every afternoon, giving teams time to prepare.\n2. **Fetches** Tomorrow's Approved Leaves from Odoo - Pulls all leave records with tomorrow's start date and \"approved\" status.\n3. **Maps** Employee & Project Data - Grabs the employee's details and identifies every Redmine project they're assigned to.\n4. **Finds** All Teammates on the Same Projects - Deduplicates across overlapping projects to avoid notification spam.\n5. **Sends** Targeted Slack Notifications - Only notifies people who actually work with the absent member, plus optional manager alerts.\n\n## 📌Quick setup\nBefore you start, you’ll need:\n- Odoo API key\n- Redmine API key\n- Slack Bot Token (or Incoming Webhook URL)\n- Subflows need to be created within a new flow; the main flow will call these subflows.\n\n## 📌Results\nWhat changes immediately:\n- Zero surprises - teams know absences 24 hours ahead\n- Workload rebalancing happens before the person goes off\n- Managers make proactive decisions, not reactive ones\n- No more wasted Slack messages to irrelevant people\n- This creates a more predictable and transparent workflow across your engineering and project teams.\n\n## 📌Take it further\nReady to supercharge it? Add:\n- Auto-assign backup owners for critical tasks\n- Sync absences to Google Calendar/Outlook\n- Log notifications to a database for auditing\n- Conditional alerts (key roles, high-priority projects only)\n- Daily summary digest of all upcoming absences\n\n## 📌Need help customizing?\nContact me for consulting and support:\n[Linkedin](https://www.linkedin.com/company/bac-ha-software/posts/?feedView=all) / [Website](https://bachasoftware.com/bhsoft-contacts)",
+  "featuredImage": "/data/workflows/12298/12298.webp",
+  "author": {
+    "id": 101,
+    "slug": "bhsoft",
+    "name": "BHSoft",
+    "avatar": ""
+  },
+  "categories": [
+    "Project Management"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 4,
+  "downloads": 0,
+  "createdAt": "2025-12-30T09:24:48.455Z",
+  "updatedAt": "2026-01-16T09:12:01.585Z",
+  "publishedAt": "2025-12-30T09:24:48.455Z",
+  "nodes": 54,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12298",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Notify Redmine project members in Slack about teammates’ approved Odoo leave",
+    "workflowName": "Notify Redmine project members in Slack about teammates’ approved Odoo leave",
+    "description": "## 📌Who is this for?\nThis workflow is designed for engineering teams, project managers, and IT operations who need consistent visibility into team availability across multiple projects.\nIt’s perfect for organizations that use Odoo for leave management and Redmine for project collaboration, and want to ensure that everyone involved gets timely, automated Slack notifications whenever a team member will be absent the next day.\n\n## 📌The problem\nWhen team members go dark, everything grinds to a halt. You're stuck with:\n- Last-minute meeting reschedules (and frustrated stakeholders)\n- Tasks assigned to people who aren't there\n- No time to redistribute workload\n- Bottlenecks affecting multiple projects\n\n## 📌How it works\n1. **Runs** daily at 17:15 - Set it and forget it. Executes every afternoon, giving teams time to prepare.\n2. **Fetches** Tomorrow's Approved Leaves from Odoo - Pulls all leave records with tomorrow's start date and \"approved\" status.\n3. **Maps** Employee & Project Data - Grabs the employee's details and identifies every Redmine project they're assigned to.\n4. **Finds** All Teammates on the Same Projects - Deduplicates across overlapping projects to avoid notification spam.\n5. **Sends** Targeted Slack Notifications - Only notifies people who actually work with the absent member, plus optional manager alerts.\n\n## 📌Quick setup\nBefore you start, you’ll need:\n- Odoo API key\n- Redmine API key\n- Slack Bot Token (or Incoming Webhook URL)\n- Subflows need to be created within a new flow; the main flow will call these subflows.\n\n## 📌Results\nWhat changes immediately:\n- Zero surprises - teams know absences 24 hours ahead\n- Workload rebalancing happens before the person goes off\n- Managers make proactive decisions, not reactive ones\n- No more wasted Slack messages to irrelevant people\n- This creates a more predictable and transparent workflow across your engineering and project teams.\n\n## 📌Take it further\nReady to supercharge it? Add:\n- Auto-assign backup owners for critical tasks\n- Sync absences to Google Calendar/Outlook\n- Log notifications to a database for auditing\n- Conditional alerts (key roles, high-priority projects only)\n- Daily summary digest of all upcoming absences\n\n## 📌Need help customizing?\nContact me for consulting and support:\n[Linkedin](https://www.linkedin.com/company/bac-ha-software/posts/?feedView=all) / [Website](https://bachasoftware.com/bhsoft-contacts)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Step2: Set Variables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Step 1: Schedule the trigger to run every weekday at 5:15 PM.",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Step3: Get datetime",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step4: Get all user in Redmine6",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step5: Get a list of closed projects.",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step7: Get the list of members' leave records for tomorrow.",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "End1",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step1: When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Step3: Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Step4: Get membership list of user in Redmine 6",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step2: Return redmine list ProjectID of user",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step5: Get redmine project Team MemberIds",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step6: Remove duplicate id",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step2: Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Step3: Wait 1s",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Step6: Get many users",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.4"
+    },
+    {
+      "name": "Step8: Check if there is a record or not?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Step9: Handling and get user information in Odoo 18",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step10: Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Step11: Get leave record information",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step12: Get name record",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step13: Get employee information in Odoo 18",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step14: Get work_email",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step15: Get information for this employee's manager on Odoo 18",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step16: Get work_email of manager",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step17: Get user info in Redmine 6",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step18:  Check if there is a record or not?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Step19.1: Get membership list of user in Redmine 6",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step19.2: Return isAccountRedmine = false",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step20: Get project IDs that the member is participating in.",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step21: Merge data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step22: Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Step 23: If redmine_listProjectID != [] ==> true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Step 24: Call subflow: \"Get membership list of user in Redmine'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Step25: Get email Redmine project Team Member Info",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step26: Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Step 27: If redmine_listProjectID != [] ==> true",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Step28.1: Prepare information about leave schedules for announcement.",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step28.2: Prepare information about leave schedules for announcement.",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Step29: Call subflow: 'Push message to member'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "role": "executeWorkflow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Step4: Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Step5.1: Send a message to the project team members.",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Step5.2: Send a message to the project team members.",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "id": 9638,
+  "slug": "9638",
+  "title": "Automated email digest from Gmail to Slack with GPT-4o summary",
+  "description": "## Who’s it for\n\nTeams that start their day in Slack and want a concise, automated summary of yesterday’s emails—ops leads, PMs, founders, and anyone handling busy inboxes without writing code.\n\n## What it does / How it works\n\nRuns every morning at **08:00** (cron `0 0 8 * * *`), fetches all emails received **yesterday**, and routes the result: if none were found, it posts a polite “no emails” notice; if emails exist, it aggregates them and asks an AI agent to produce a structured digest, then formats and posts to your chosen Slack channel. The flow uses **Gmail → If → Aggregate (Item Lists) → AI Agent (OpenRouter model with structured output) → Code (Slack formatter) → Slack**. A set of sticky notes on the canvas explains each step and required inputs. \n\n## How to set up\n\n1. Connect **Gmail (OAuth2)** and keep the default date window (yesterday → today at 00:00).\n2. Connect **Slack (OAuth2)** and select your target channel.\n3. Add **OpenRouter** credentials and pick a compact model (e.g., `gpt-4o-mini`).\n4. Keep the provided structured-output schema and formatter code.\n5. Adjust the schedule/timezone if needed (the fallback message includes an Asia/Tokyo example).\n6. Paste this description into the **yellow sticky note** at the top of the canvas.\n\n## Requirements\n\n* Gmail & Slack accounts with appropriate scopes\n* OpenRouter API key stored in **Credentials** (no hard-coded keys)\n* n8n Cloud or self-host with LangChain agent nodes enabled\n\n## How to customize the workflow\n\n* Narrow Gmail results with label/search filters (e.g., `from:`, `subject:`).\n* Change the digest sections or tone in the **AI Agent** system prompt.\n* Swap the model for cost/quality needs and tweak temperature/max tokens.\n* Localize dates/timezones in the formatter code and Slack messages.\n* Branch the output to email, Google Docs, or Sheets for archival.\n\n## Security & publishing tips\n\nRename all nodes clearly, **do not** hardcode API keys, remove real channel IDs/emails before sharing, and group end-user variables in a **Set (Fields)** node. Keep the sticky notes—they’re mandatory for reviewers. \n",
+  "featuredImage": "/data/workflows/9638/9638.webp",
+  "author": {
+    "id": 101,
+    "slug": "yusei",
+    "name": "Yusei Miyakoshi",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 113,
+  "downloads": 11,
+  "createdAt": "2025-10-14T13:49:54.439Z",
+  "updatedAt": "2026-01-16T09:01:18.473Z",
+  "publishedAt": "2025-10-14T13:49:54.439Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9638",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated email digest from Gmail to Slack with GPT-4o summary",
+    "workflowName": "Automated email digest from Gmail to Slack with GPT-4o summary",
+    "description": "## Who’s it for\n\nTeams that start their day in Slack and want a concise, automated summary of yesterday’s emails—ops leads, PMs, founders, and anyone handling busy inboxes without writing code.\n\n## What it does / How it works\n\nRuns every morning at **08:00** (cron `0 0 8 * * *`), fetches all emails received **yesterday**, and routes the result: if none were found, it posts a polite “no emails” notice; if emails exist, it aggregates them and asks an AI agent to produce a structured digest, then formats and posts to your chosen Slack channel. The flow uses **Gmail → If → Aggregate (Item Lists) → AI Agent (OpenRouter model with structured output) → Code (Slack formatter) → Slack**. A set of sticky notes on the canvas explains each step and required inputs. \n\n## How to set up\n\n1. Connect **Gmail (OAuth2)** and keep the default date window (yesterday → today at 00:00).\n2. Connect **Slack (OAuth2)** and select your target channel.\n3. Add **OpenRouter** credentials and pick a compact model (e.g., `gpt-4o-mini`).\n4. Keep the provided structured-output schema and formatter code.\n5. Adjust the schedule/timezone if needed (the fallback message includes an Asia/Tokyo example).\n6. Paste this description into the **yellow sticky note** at the top of the canvas.\n\n## Requirements\n\n* Gmail & Slack accounts with appropriate scopes\n* OpenRouter API key stored in **Credentials** (no hard-coded keys)\n* n8n Cloud or self-host with LangChain agent nodes enabled\n\n## How to customize the workflow\n\n* Narrow Gmail results with label/search filters (e.g., `from:`, `subject:`).\n* Change the digest sections or tone in the **AI Agent** system prompt.\n* Swap the model for cost/quality needs and tweak temperature/max tokens.\n* Localize dates/timezones in the formatter code and Slack messages.\n* Branch the output to email, Google Docs, or Sheets for archival.\n\n## Security & publishing tips\n\nRename all nodes clearly, **do not** hardcode API keys, remove real channel IDs/emails before sharing, and group end-user variables in a **Set (Fields)** node. Keep the sticky notes—they’re mandatory for reviewers.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Gmail - Get Yesterday's Emails",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent - Analyze Emails",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Format for Slack",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Slack - Send Summary",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Slack - No Emails",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": 6613,
+  "slug": "6613",
+  "title": "Automate social media content distribution with Google Sheets & Slack",
+  "description": "Okay, here are the \"How It Works\" and \"Setup Steps\" for your \"Automated Social Media Content Distribution System,\" presented clearly in Markdown.\n\n---\n\n### How It Works (Workflow Stages) ⚙️\n\nThis system transforms manual, repetitive tasks into a smooth, automated content distribution pipeline:\n\n1.  **Content Submission & Trigger:**\n    * You add a new row to your designated Google Sheet with all the content details (Title, URL, Short_Description, Image_URL, Hashtags, and boolean flags for which platforms to post to).\n    * The **Google Sheets Trigger** node immediately detects this new entry, initiating the workflow.\n\n2.  **Content Preparation:**\n    * The **Set** node takes the raw data from your Google Sheet and formats it into a cohesive text string (`social_media_text_core`) that is suitable for posting across different social media platforms.\n\n3.  **Conditional Social Media Posting:**\n    * A series of **If** nodes (`Check Facebook Post`, `Check Twitter Post`, `Check LinkedIn Post`) sequentially check your preferences (based on the `Post_to_Facebook`, `Post_to_Twitter`, `Post_to_LinkedIn` columns in your sheet).\n    * If a platform is marked `TRUE`, the corresponding social media node (`Facebook`, `Twitter`, `LinkedIn`) is activated to publish your content. If `FALSE`, that platform is skipped, and the workflow moves to the next check.\n\n4.  **Status Update & Notification:**\n    * After attempting to post to all selected platforms, the **Google Sheets (Update)** node updates the `Publication_Status` column of your original row to \"Published.\" This prevents re-posting and provides a clear record.\n    * Finally, the **Slack (Notification)** node sends an alert to your chosen Slack channel, confirming that the content has been successfully distributed.\n\n### Setup Steps 🛠️ (Build It Yourself!)\n\nFollow these detailed steps to build and implement this workflow in your n8n instance:\n\n1.  **Prepare Your Google Sheet:**\n    * Create a new Google Sheet (e.g., named \"Social Media Posts\").\n    * Set up the following **exact** column headers in the first row:\n        `Title`, `URL`, `Short_Description`, `Image_URL`, `Hashtags`, `Post_to_Facebook`, `Post_to_Twitter`, `Post_to_LinkedIn`, `Publication_Status`\n    * Fill in a test row with some sample data, ensuring `TRUE`/`FALSE` values for the posting flags.\n\n2.  **Gather Your API Keys & Credentials:**\n    * **Google Sheets Credential**: You'll need an OAuth2 credential for Google Sheets in n8n to allow read/write access to your sheet.\n    * **Facebook Credential**: An OAuth2 credential for Facebook with permissions to post to your selected Page.\n    * **Twitter Credential**: A Twitter API credential (API Key, API Secret, Access Token, Access Token Secret) from your Twitter Developer App.\n    * **LinkedIn Credential**: An OAuth2 credential for LinkedIn with permissions to share updates to your profile or organization page.\n    * **Slack Credential**: A Slack API token (Bot User OAuth Token) for sending messages to your channel.\n\n3.  **Build the n8n Workflow Manually (10 Nodes):**\n    * Start a new workflow in n8n.\n    * Drag and drop each of the following nodes onto the canvas and connect them as described below:\n\n    1.  **Google Sheets Trigger**\n        * **Name:** `Google Sheets Trigger`\n        * **Parameters:**\n            * **Authentication:** Select your Google Sheets credential.\n            * **Spreadsheet ID:** `[Copy the ID from your Google Sheet's URL]`\n            * **Sheet Name:** `[Your Sheet Name, e.g., 'Sheet1' or 'Content']`\n            * **Watch For:** `Rows`\n            * **Events:** `Added`\n        * **Connections:** Output to `Set Content Parameters`.\n\n    2.  **Set**\n        * **Name:** `Set Content Parameters`\n        * **Parameters:**\n            * **Values to Set:** Add a new value:\n                * **Type:** `String`\n                * **Name:** `social_media_text_core`\n                * **Value:** `={{ $json.Title }} - {{ $json.Short_Description }}\\nRead more: {{ $json.URL }}\\n{{ $json.Hashtags }}`\n        * **Connections:** Output to `Check Facebook Post`.\n\n    3.  **If**\n        * **Name:** `Check Facebook Post`\n        * **Parameters:**\n            * **Value 1:** `={{ $json.Post_to_Facebook }}`\n            * **Operation:** `is true`\n        * **Connections:** `True` output to `Post Facebook Message`. `False` output to `Check Twitter Post`.\n\n    4.  **Facebook**\n        * **Name:** `Post Facebook Message`\n        * **Parameters:**\n            * **Authentication:** Select your Facebook credential.\n            * **Page ID:** `[YOUR_FACEBOOK_PAGE_ID]`\n            * **Message:** `={{ $json.social_media_text_core }}`\n            * **Link:** `={{ $json.URL }}`\n            * **Picture:** `={{ $json.Image_URL }}`\n            * **Options:** `Published` (checked)\n        * **Connections:** Output to `Check Twitter Post`.\n\n    5.  **If**\n        * **Name:** `Check Twitter Post`\n        * **Parameters:**\n            * **Value 1:** `={{ $json.Post_to_Twitter }}`\n            * **Operation:** `is true`\n        * **Connections:** `True` output to `Create Tweet`. `False` output to `Check LinkedIn Post`.\n\n    6.  **Twitter**\n        * **Name:** `Create Tweet`\n        * **Parameters:**\n            * **Authentication:** Select your Twitter credential.\n            * **Tweet:** `={{ $json.social_media_text_core }}`\n            * **Image URL:** `={{ $json.Image_URL }}`\n        * **Connections:** Output to `Check LinkedIn Post`.\n\n    7.  **If**\n        * **Name:** `Check LinkedIn Post`\n        * **Parameters:**\n            * **Value 1:** `={{ $json.Post_to_LinkedIn }}`\n            * **Operation:** `is true`\n        * **Connections:** `True` output to `Share LinkedIn Update`. `False` output to `Update Publication Status`.\n\n    8.  **LinkedIn**\n        * **Name:** `Share LinkedIn Update`\n        * **Parameters:**\n            * **Authentication:** Select your LinkedIn credential.\n            * **Resource:** `Share Update`\n            * **Type:** `Organization` or `Personal` (Choose as appropriate)\n            * **Organization ID:** `[YOUR_LINKEDIN_ORG_ID]` (If `Organization` type selected)\n            * **Content:** `={{ $json.social_media_text_core }}`\n            * **Content URL:** `={{ $json.URL }}`\n            * **Image URL:** `={{ $json.Image_URL }}`\n        * **Connections:** Output to `Update Publication Status`.\n\n    9.  **Google Sheets**\n        * **Name:** `Update Publication Status`\n        * **Parameters:**\n            * **Authentication:** Select your Google Sheets credential.\n            * **Spreadsheet ID:** `[YOUR_GOOGLE_SHEET_CONTENT_ID]`\n            * **Sheet Name:** `[Your Sheet Name, e.g., 'Sheet1' or 'Content']`\n            * **Operation:** `Update Row`\n            * **Key Column:** `URL`\n            * **Key Value:** `={{ $json.URL }}`\n            * **Values:** Add a new value:\n                * **Column:** `Publication_Status`\n                * **Value:** `Published`\n        * **Connections:** Receives connections from both `Share LinkedIn Update` and the `False` branch of `Check LinkedIn Post`.\n\n    10. **Slack**\n        * **Name:** `Send Slack Notification`\n        * **Parameters:**\n            * **Authentication:** Select your Slack credential.\n            * **Chat ID:** `[YOUR_SLACK_CHANNEL_ID]`\n            * **Text:** `New content \"{{ $json.Title }}\" successfully published to social media! 🎉 Check: {{ $json.URL }}`\n        * **Connections:** Output to `Update Publication Status`.\n\n4.  **Final Steps & Activation:**\n    * **Test the Workflow:** Before activating, manually add a new row to your Google Sheet or use n8n's \"Execute Workflow\" button (if available for triggers). Observe the flow through each node to ensure it behaves as expected and posts to your social media accounts.\n    * **Activate Workflow:** Once you are confident it's working correctly, turn the workflow \"Active\" in the top right corner of your n8n canvas.",
+  "featuredImage": "/data/workflows/6613/6613.webp",
+  "author": {
+    "id": 101,
+    "slug": "marth",
+    "name": "Marth",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 285,
+  "downloads": 28,
+  "createdAt": "2025-07-29T08:17:58.818Z",
+  "updatedAt": "2026-01-16T08:45:57.800Z",
+  "publishedAt": "2025-07-29T08:17:58.818Z",
+  "nodes": 12,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6613",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate social media content distribution with Google Sheets & Slack",
+    "workflowName": "Automate social media content distribution with Google Sheets & Slack",
+    "description": "Okay, here are the \"How It Works\" and \"Setup Steps\" for your \"Automated Social Media Content Distribution System,\" presented clearly in Markdown.\n\n---\n\n### How It Works (Workflow Stages) ⚙️\n\nThis system transforms manual, repetitive tasks into a smooth, automated content distribution pipeline:\n\n1.  **Content Submission & Trigger:**\n    * You add a new row to your designated Google Sheet with all the content details (Title, URL, Short_Description, Image_URL, Hashtags, and boolean flags for which platforms to post to).\n    * The **Google Sheets Trigger** node immediately detects this new entry, initiating the workflow.\n\n2.  **Content Preparation:**\n    * The **Set** node takes the raw data from your Google Sheet and formats it into a cohesive text string (`social_media_text_core`) that is suitable for posting across different social media platforms.\n\n3.  **Conditional Social Media Posting:**\n    * A series of **If** nodes (`Check Facebook Post`, `Check Twitter Post`, `Check LinkedIn Post`) sequentially check your preferences (based on the `Post_to_Facebook`, `Post_to_Twitter`, `Post_to_LinkedIn` columns in your sheet).\n    * If a platform is marked `TRUE`, the corresponding social media node (`Facebook`, `Twitter`, `LinkedIn`) is activated to publish your content. If `FALSE`, that platform is skipped, and the workflow moves to the next check.\n\n4.  **Status Update & Notification:**\n    * After attempting to post to all selected platforms, the **Google Sheets (Update)** node updates the `Publication_Status` column of your original row to \"Published.\" This prevents re-posting and provides a clear record.\n    * Finally, the **Slack (Notification)** node sends an alert to your chosen Slack channel, confirming that the content has been successfully distributed.\n\n### Setup Steps 🛠️ (Build It Yourself!)\n\nFollow these detailed steps to build and implement this workflow in your n8n instance:\n\n1.  **Prepare Your Google Sheet:**\n    * Create a new Google Sheet (e.g., named \"Social Media Posts\").\n    * Set up the following **exact** column headers in the first row:\n        `Title`, `URL`, `Short_Description`, `Image_URL`, `Hashtags`, `Post_to_Facebook`, `Post_to_Twitter`, `Post_to_LinkedIn`, `Publication_Status`\n    * Fill in a test row with some sample data, ensuring `TRUE`/`FALSE` values for the posting flags.\n\n2.  **Gather Your API Keys & Credentials:**\n    * **Google Sheets Credential**: You'll need an OAuth2 credential for Google Sheets in n8n to allow read/write access to your sheet.\n    * **Facebook Credential**: An OAuth2 credential for Facebook with permissions to post to your selected Page.\n    * **Twitter Credential**: A Twitter API credential (API Key, API Secret, Access Token, Access Token Secret) from your Twitter Developer App.\n    * **LinkedIn Credential**: An OAuth2 credential for LinkedIn with permissions to share updates to your profile or organization page.\n    * **Slack Credential**: A Slack API token (Bot User OAuth Token) for sending messages to your channel.\n\n3.  **Build the n8n Workflow Manually (10 Nodes):**\n    * Start a new workflow in n8n.\n    * Drag and drop each of the following nodes onto the canvas and connect them as described below:\n\n    1.  **Google Sheets Trigger**\n        * **Name:** `Google Sheets Trigger`\n        * **Parameters:**\n            * **Authentication:** Select your Google Sheets credential.\n            * **Spreadsheet ID:** `[Copy the ID from your Google Sheet's URL]`\n            * **Sheet Name:** `[Your Sheet Name, e.g., 'Sheet1' or 'Content']`\n            * **Watch For:** `Rows`\n            * **Events:** `Added`\n        * **Connections:** Output to `Set Content Parameters`.\n\n    2.  **Set**\n        * **Name:** `Set Content Parameters`\n        * **Parameters:**\n            * **Values to Set:** Add a new value:\n                * **Type:** `String`\n                * **Name:** `social_media_text_core`\n                * **Value:** `={{ $json.Title }} - {{ $json.Short_Description }}\\nRead more: {{ $json.URL }}\\n{{ $json.Hashtags }}`\n        * **Connections:** Output to `Check Facebook Post`.\n\n    3.  **If**\n        * **Name:** `Check Facebook Post`\n        * **Parameters:**\n            * **Value 1:** `={{ $json.Post_to_Facebook }}`\n            * **Operation:** `is true`\n        * **Connections:** `True` output to `Post Facebook Message`. `False` output to `Check Twitter Post`.\n\n    4.  **Facebook**\n        * **Name:** `Post Facebook Message`\n        * **Parameters:**\n            * **Authentication:** Select your Facebook credential.\n            * **Page ID:** `[YOUR_FACEBOOK_PAGE_ID]`\n            * **Message:** `={{ $json.social_media_text_core }}`\n            * **Link:** `={{ $json.URL }}`\n            * **Picture:** `={{ $json.Image_URL }}`\n            * **Options:** `Published` (checked)\n        * **Connections:** Output to `Check Twitter Post`.\n\n    5.  **If**\n        * **Name:** `Check Twitter Post`\n        * **Parameters:**\n            * **Value 1:** `={{ $json.Post_to_Twitter }}`\n            * **Operation:** `is true`\n        * **Connections:** `True` output to `Create Tweet`. `False` output to `Check LinkedIn Post`.\n\n    6.  **Twitter**\n        * **Name:** `Create Tweet`\n        * **Parameters:**\n            * **Authentication:** Select your Twitter credential.\n            * **Tweet:** `={{ $json.social_media_text_core }}`\n            * **Image URL:** `={{ $json.Image_URL }}`\n        * **Connections:** Output to `Check LinkedIn Post`.\n\n    7.  **If**\n        * **Name:** `Check LinkedIn Post`\n        * **Parameters:**\n            * **Value 1:** `={{ $json.Post_to_LinkedIn }}`\n            * **Operation:** `is true`\n        * **Connections:** `True` output to `Share LinkedIn Update`. `False` output to `Update Publication Status`.\n\n    8.  **LinkedIn**\n        * **Name:** `Share LinkedIn Update`\n        * **Parameters:**\n            * **Authentication:** Select your LinkedIn credential.\n            * **Resource:** `Share Update`\n            * **Type:** `Organization` or `Personal` (Choose as appropriate)\n            * **Organization ID:** `[YOUR_LINKEDIN_ORG_ID]` (If `Organization` type selected)\n            * **Content:** `={{ $json.social_media_text_core }}`\n            * **Content URL:** `={{ $json.URL }}`\n            * **Image URL:** `={{ $json.Image_URL }}`\n        * **Connections:** Output to `Update Publication Status`.\n\n    9.  **Google Sheets**\n        * **Name:** `Update Publication Status`\n        * **Parameters:**\n            * **Authentication:** Select your Google Sheets credential.\n            * **Spreadsheet ID:** `[YOUR_GOOGLE_SHEET_CONTENT_ID]`\n            * **Sheet Name:** `[Your Sheet Name, e.g., 'Sheet1' or 'Content']`\n            * **Operation:** `Update Row`\n            * **Key Column:** `URL`\n            * **Key Value:** `={{ $json.URL }}`\n            * **Values:** Add a new value:\n                * **Column:** `Publication_Status`\n                * **Value:** `Published`\n        * **Connections:** Receives connections from both `Share LinkedIn Update` and the `False` branch of `Check LinkedIn Post`.\n\n    10. **Slack**\n        * **Name:** `Send Slack Notification`\n        * **Parameters:**\n            * **Authentication:** Select your Slack credential.\n            * **Chat ID:** `[YOUR_SLACK_CHANNEL_ID]`\n            * **Text:** `New content \"{{ $json.Title }}\" successfully published to social media! 🎉 Check: {{ $json.URL }}`\n        * **Connections:** Output to `Update Publication Status`.\n\n4.  **Final Steps & Activation:**\n    * **Test the Workflow:** Before activating, manually add a new row to your Google Sheet or use n8n's \"Execute Workflow\" button (if available for triggers). Observe the flow through each node to ensure it behaves as expected and posts to your social media accounts.\n    * **Activate Workflow:** Once you are confident it's working correctly, turn the workflow \"Active\" in the top right corner of your n8n canvas.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Content Parameters",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Check Facebook Post",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Post Message",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Twitter Post",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Create Tweet",
+      "type": "n8n-nodes-base.twitter",
+      "role": "twitter",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check LinkedIn Post",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Share Update",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Publication Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "id": 9873,
+  "slug": "9873",
+  "title": "Automated rsync backup with password auth & alert system",
+  "description": "# Automated Rsync Backup with Password Auth & Alert System\n\n## Overview\nThis n8n workflow provides automated rsync backup capabilities between servers using password authentication. It automatically installs required dependencies, performs the backup operation from a source server to a target server, and sends status notifications via Telegram and SMS.\n\n## Features\n- Password-based SSH authentication (no key management required)\n- Automatic dependency installation (sshpass, rsync)\n- Cross-platform support (Ubuntu/Debian, RHEL/CentOS, Alpine)\n- Source-to-target backup execution\n- Multi-channel notifications (Telegram and SMS)\n- Detailed success/failure reporting\n- Manual trigger for on-demand backups\n\n## Setup Instructions\n\n### Prerequisites\n1. **n8n Instance**: Running n8n with Linux environment\n2. **Server Access**: SSH access to both source and target servers\n3. **Telegram Bot**: Created via @BotFather (optional)\n4. **Textbelt API Key**: For SMS notifications (optional)\n5. **Network**: Connectivity between n8n, source, and target servers\n\n### Server Requirements\n**Source Server:**\n- SSH access enabled\n- User with sudo privileges (for package installation)\n- Read access to source folder\n\n**Target Server:**\n- SSH access enabled\n- Write access to target folder\n- Sufficient storage space\n\n### Configuration Steps\n\n#### 1. Server Parameters Configuration\nOpen the **Server Parameters** node and configure:\n\n**Source Server Settings:**\n- `source_host`: IP address or hostname of source server\n- `source_port`: SSH port (typically 22)\n- `source_user`: Username for source server\n- `source_password`: Password for source user\n- `source_folder`: Full path to folder to backup (e.g., `/home/user/data`)\n\n**Target Server Settings:**\n- `target_host`: IP address or hostname of target server\n- `target_port`: SSH port (typically 22)\n- `target_user`: Username for target server\n- `target_password`: Password for target user\n- `target_folder`: Full path to destination folder (e.g., `/backup/data`)\n\n**Rsync Options:**\n- `rsync_options`: Default is `-avz --delete`\n  - `-a`: Archive mode (preserves permissions, timestamps, etc.)\n  - `-v`: Verbose output\n  - `-z`: Compression during transfer\n  - `--delete`: Remove files from target that don't exist in source\n\n#### 2. Notification Setup (Optional)\n\n**Telegram Configuration:**\n1. Create bot via @BotFather on Telegram\n2. Get bot token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)\n3. Create notification channel\n4. Add bot as administrator\n5. Get channel ID:\n   - Send test message to channel\n   - Visit: `https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates`\n   - Find `\"chat\":{\"id\":-100XXXXXXXXXX}`\n\n**SMS Configuration:**\n1. Register at https://textbelt.com\n2. Purchase credits\n3. Obtain API key\n\n**Update Notification Node:**\nEdit **Process Finish Report --- Telegram & SMS** node:\n- Replace `YOUR-TELEGRAM-BOT-TOKEN` with bot token\n- Replace `YOUR-TELEGRAM-CHANNEL-ID` with channel ID\n- Replace `+36301234567` with target phone number(s)\n- Replace `YOUR-TEXTBELT-API-KEY` with Textbelt key\n\n#### 3. Security Considerations\n**Password Storage:**\n- Consider using n8n credentials for sensitive passwords\n- Avoid hardcoding passwords in workflow\n- Use environment variables where possible\n\n**SSH Security:**\n- Workflow uses `StrictHostKeyChecking=no` for automation\n- Consider adding known hosts manually for production\n- Review firewall rules between servers\n\n### Testing\n1. Start with small test folder\n2. Verify network connectivity: `ping source_host` and `ping target_host`\n3. Test SSH access manually first\n4. Run workflow with test data\n5. Verify backup completion on target server\n\n## How to Use\n\n### Automatic Operation\nOnce activated, the workflow runs automatically:\n- **Frequency**: Every days midnight\n\n### Manual Execution\n1. Open the workflow in n8n\n2. Click on **Manual Trigger** node\n3. Click \"Execute Workflow\"\n4. Monitor execution progress\n\n### Scheduled Execution\nTo automate backups:\n1. Replace **Manual Trigger** with **Schedule Trigger** node\n2. Configure schedule (e.g., daily at 2 AM)\n3. Save and activate workflow\n\n### Workflow Process\n\n#### Step 1: Dependency Check\nThe workflow automatically:\n1. Checks if sshpass is installed locally\n2. Installs if missing (supports apt, yum, dnf, apk)\n3. Checks sshpass on source server\n4. Installs on source if needed (with sudo)\n\n#### Step 2: Backup Execution\n- Connects to source server via SSH\n- Executes rsync command from source to target\n- Uses password authentication for both connections\n- Transfers data directly between servers (not through n8n)\n\n#### Step 3: Status Reporting\n**Success Message Format:**\n```\n[Timestamp] -- SUCCESS :: source_host:/path -&gt; target_host:/path :: [rsync output]\n```\n\n**Failure Message Format:**\n```\n[Timestamp] -- ERROR :: source_host -&gt; target_host :: [exit code] -- [error message]\n```\n\n### Rsync Options Guide\n\n**Common Options:**\n- `-a`: Archive mode (recommended)\n- `-v`: Verbose output for monitoring\n- `-z`: Compression (useful for slow networks)\n- `--delete`: Mirror source (removes extra files from target)\n- `--exclude`: Skip specific files/folders\n- `--dry-run`: Test without actual transfer\n- `--progress`: Show transfer progress\n- `--bwlimit`: Limit bandwidth usage\n\n**Example Configurations:**\n```bash\n# Basic backup\n-avz\n\n# Mirror with deletion\n-avz --delete\n\n# Exclude temporary files\n-avz --exclude='*.tmp' --exclude='*.cache'\n\n# Bandwidth limited (1MB/s)\n-avz --bwlimit=1000\n\n# Dry run test\n-avzn --delete\n```\n\n### Monitoring\n\n#### Execution Logs\n- Check n8n Executions tab\n- Review stdout for rsync details\n- Check stderr for error messages\n\n#### Verification\nAfter backup:\n1. SSH to target server\n2. Check folder size: `du -sh /target/folder`\n3. Verify file count: `find /target/folder -type f | wc -l`\n4. Compare with source: `ls -la /target/folder`\n\n### Troubleshooting\n\n#### Connection Issues\n**\"Connection refused\" error:**\n- Verify SSH port is correct\n- Check firewall rules\n- Ensure SSH service is running\n\n**\"Permission denied\" error:**\n- Verify username/password\n- Check user has required permissions\n- Ensure sudo works (for installation)\n\n#### Installation Failures\n**\"Unsupported package manager\":**\n- Workflow supports: apt, yum, dnf, apk\n- Manual installation may be required for others\n\n**\"sudo: password required\":**\n- User needs passwordless sudo or\n- Modify installation commands\n\n#### Rsync Errors\n**\"rsync error: some files/attrs were not transferred\":**\n- Usually permission issues\n- Check file ownership\n- Review excluded files\n\n**\"No space left on device\":**\n- Check target server storage\n- Clean up old backups\n- Consider compression options\n\n#### Notification Issues\n**No Telegram message:**\n- Verify bot token and channel ID\n- Check bot is admin in channel\n- Test with curl command manually\n\n**SMS not received:**\n- Check Textbelt credit balance\n- Verify phone number format\n- Review API key validity\n\n### Best Practices\n\n#### Backup Strategy\n1. **Test First**: Always test with small datasets\n2. **Schedule Wisely**: Run during low-traffic periods\n3. **Monitor Space**: Ensure adequate storage on target\n4. **Verify Backups**: Regularly test restore procedures\n5. **Rotate Backups**: Implement retention policies\n\n#### Security\n1. **Use Strong Passwords**: Complex passwords for all accounts\n2. **Limit Permissions**: Use dedicated backup users\n3. **Network Security**: Consider VPN for internet transfers\n4. **Audit Access**: Log all backup operations\n5. **Encrypt Sensitive Data**: Consider rsync with encryption\n\n#### Performance\n1. **Compression**: Use `-z` for slow networks\n2. **Bandwidth Limits**: Prevent network saturation\n3. **Incremental Backups**: Rsync only transfers changes\n4. **Parallel Transfers**: Consider multiple workflows for different folders\n5. **Off-Peak Hours**: Schedule during quiet periods\n\n### Advanced Configuration\n\n#### Multiple Backup Jobs\nCreate separate workflows for:\n- Different server pairs\n- Various schedules\n- Distinct retention policies\n\n#### Backup Rotation\nImplement versioning:\n```bash\n# Add timestamp to target folder\ntarget_folder=\"/backup/data_$(date +%Y%m%d)\"\n```\n\n#### Pre/Post Scripts\nAdd nodes for:\n- Database dumps before backup\n- Service stops/starts\n- Cleanup operations\n- Verification scripts\n\n#### Error Handling\nEnhance workflow with:\n- Retry mechanisms\n- Fallback servers\n- Detailed error logging\n- Escalation procedures\n\n### Maintenance\n\n#### Regular Tasks\n- **Daily**: Check backup completion\n- **Weekly**: Verify backup integrity\n- **Monthly**: Test restore procedure\n- **Quarterly**: Review and optimize rsync options\n- **Annually**: Audit security settings\n\n#### Monitoring Metrics\nTrack:\n- Backup duration\n- Transfer size\n- Success/failure rate\n- Storage utilization\n- Network bandwidth usage\n\n## Recovery Procedures\n\n### Restore from Backup\nTo restore files:\n```bash\n# Reverse the rsync direction\nrsync -avz target_server:/backup/folder/ source_server:/restore/location/\n```\n\n### Disaster Recovery\n1. Document server configurations\n2. Maintain backup access credentials\n3. Test restore procedures regularly\n4. Keep workflow exports as backup\n\n## Support Resources\n- Rsync documentation: https://rsync.samba.org/\n- n8n community: https://community.n8n.io/\n- SSH troubleshooting guides\n- Network diagnostics tools",
+  "featuredImage": "/data/workflows/9873/9873.webp",
+  "author": {
+    "id": 101,
+    "slug": "vighsandor",
+    "name": "Vigh Sandor",
+    "avatar": ""
+  },
+  "categories": [
+    "DevOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 80,
+  "downloads": 8,
+  "createdAt": "2025-10-18T21:30:33.901Z",
+  "updatedAt": "2026-01-16T09:02:23.887Z",
+  "publishedAt": "2025-10-18T21:30:33.901Z",
+  "nodes": 21,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9873",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated rsync backup with password auth & alert system",
+    "workflowName": "Automated rsync backup with password auth & alert system",
+    "description": "# Automated Rsync Backup with Password Auth & Alert System\n\n## Overview\nThis n8n workflow provides automated rsync backup capabilities between servers using password authentication. It automatically installs required dependencies, performs the backup operation from a source server to a target server, and sends status notifications via Telegram and SMS.\n\n## Features\n- Password-based SSH authentication (no key management required)\n- Automatic dependency installation (sshpass, rsync)\n- Cross-platform support (Ubuntu/Debian, RHEL/CentOS, Alpine)\n- Source-to-target backup execution\n- Multi-channel notifications (Telegram and SMS)\n- Detailed success/failure reporting\n- Manual trigger for on-demand backups\n\n## Setup Instructions\n\n### Prerequisites\n1. **n8n Instance**: Running n8n with Linux environment\n2. **Server Access**: SSH access to both source and target servers\n3. **Telegram Bot**: Created via @BotFather (optional)\n4. **Textbelt API Key**: For SMS notifications (optional)\n5. **Network**: Connectivity between n8n, source, and target servers\n\n### Server Requirements\n**Source Server:**\n- SSH access enabled\n- User with sudo privileges (for package installation)\n- Read access to source folder\n\n**Target Server:**\n- SSH access enabled\n- Write access to target folder\n- Sufficient storage space\n\n### Configuration Steps\n\n#### 1. Server Parameters Configuration\nOpen the **Server Parameters** node and configure:\n\n**Source Server Settings:**\n- `source_host`: IP address or hostname of source server\n- `source_port`: SSH port (typically 22)\n- `source_user`: Username for source server\n- `source_password`: Password for source user\n- `source_folder`: Full path to folder to backup (e.g., `/home/user/data`)\n\n**Target Server Settings:**\n- `target_host`: IP address or hostname of target server\n- `target_port`: SSH port (typically 22)\n- `target_user`: Username for target server\n- `target_password`: Password for target user\n- `target_folder`: Full path to destination folder (e.g., `/backup/data`)\n\n**Rsync Options:**\n- `rsync_options`: Default is `-avz --delete`\n  - `-a`: Archive mode (preserves permissions, timestamps, etc.)\n  - `-v`: Verbose output\n  - `-z`: Compression during transfer\n  - `--delete`: Remove files from target that don't exist in source\n\n#### 2. Notification Setup (Optional)\n\n**Telegram Configuration:**\n1. Create bot via @BotFather on Telegram\n2. Get bot token (format: `1234567890:ABCdefGHIjklMNOpqrsTUVwxyz`)\n3. Create notification channel\n4. Add bot as administrator\n5. Get channel ID:\n   - Send test message to channel\n   - Visit: `https://api.telegram.org/bot&lt;YOUR_BOT_TOKEN&gt;/getUpdates`\n   - Find `\"chat\":{\"id\":-100XXXXXXXXXX}`\n\n**SMS Configuration:**\n1. Register at https://textbelt.com\n2. Purchase credits\n3. Obtain API key\n\n**Update Notification Node:**\nEdit **Process Finish Report --- Telegram & SMS** node:\n- Replace `YOUR-TELEGRAM-BOT-TOKEN` with bot token\n- Replace `YOUR-TELEGRAM-CHANNEL-ID` with channel ID\n- Replace `+36301234567` with target phone number(s)\n- Replace `YOUR-TEXTBELT-API-KEY` with Textbelt key\n\n#### 3. Security Considerations\n**Password Storage:**\n- Consider using n8n credentials for sensitive passwords\n- Avoid hardcoding passwords in workflow\n- Use environment variables where possible\n\n**SSH Security:**\n- Workflow uses `StrictHostKeyChecking=no` for automation\n- Consider adding known hosts manually for production\n- Review firewall rules between servers\n\n### Testing\n1. Start with small test folder\n2. Verify network connectivity: `ping source_host` and `ping target_host`\n3. Test SSH access manually first\n4. Run workflow with test data\n5. Verify backup completion on target server\n\n## How to Use\n\n### Automatic Operation\nOnce activated, the workflow runs automatically:\n- **Frequency**: Every days midnight\n\n### Manual Execution\n1. Open the workflow in n8n\n2. Click on **Manual Trigger** node\n3. Click \"Execute Workflow\"\n4. Monitor execution progress\n\n### Scheduled Execution\nTo automate backups:\n1. Replace **Manual Trigger** with **Schedule Trigger** node\n2. Configure schedule (e.g., daily at 2 AM)\n3. Save and activate workflow\n\n### Workflow Process\n\n#### Step 1: Dependency Check\nThe workflow automatically:\n1. Checks if sshpass is installed locally\n2. Installs if missing (supports apt, yum, dnf, apk)\n3. Checks sshpass on source server\n4. Installs on source if needed (with sudo)\n\n#### Step 2: Backup Execution\n- Connects to source server via SSH\n- Executes rsync command from source to target\n- Uses password authentication for both connections\n- Transfers data directly between servers (not through n8n)\n\n#### Step 3: Status Reporting\n**Success Message Format:**\n```\n[Timestamp] -- SUCCESS :: source_host:/path -&gt; target_host:/path :: [rsync output]\n```\n\n**Failure Message Format:**\n```\n[Timestamp] -- ERROR :: source_host -&gt; target_host :: [exit code] -- [error message]\n```\n\n### Rsync Options Guide\n\n**Common Options:**\n- `-a`: Archive mode (recommended)\n- `-v`: Verbose output for monitoring\n- `-z`: Compression (useful for slow networks)\n- `--delete`: Mirror source (removes extra files from target)\n- `--exclude`: Skip specific files/folders\n- `--dry-run`: Test without actual transfer\n- `--progress`: Show transfer progress\n- `--bwlimit`: Limit bandwidth usage\n\n**Example Configurations:**\n```bash\n# Basic backup\n-avz\n\n# Mirror with deletion\n-avz --delete\n\n# Exclude temporary files\n-avz --exclude='*.tmp' --exclude='*.cache'\n\n# Bandwidth limited (1MB/s)\n-avz --bwlimit=1000\n\n# Dry run test\n-avzn --delete\n```\n\n### Monitoring\n\n#### Execution Logs\n- Check n8n Executions tab\n- Review stdout for rsync details\n- Check stderr for error messages\n\n#### Verification\nAfter backup:\n1. SSH to target server\n2. Check folder size: `du -sh /target/folder`\n3. Verify file count: `find /target/folder -type f | wc -l`\n4. Compare with source: `ls -la /target/folder`\n\n### Troubleshooting\n\n#### Connection Issues\n**\"Connection refused\" error:**\n- Verify SSH port is correct\n- Check firewall rules\n- Ensure SSH service is running\n\n**\"Permission denied\" error:**\n- Verify username/password\n- Check user has required permissions\n- Ensure sudo works (for installation)\n\n#### Installation Failures\n**\"Unsupported package manager\":**\n- Workflow supports: apt, yum, dnf, apk\n- Manual installation may be required for others\n\n**\"sudo: password required\":**\n- User needs passwordless sudo or\n- Modify installation commands\n\n#### Rsync Errors\n**\"rsync error: some files/attrs were not transferred\":**\n- Usually permission issues\n- Check file ownership\n- Review excluded files\n\n**\"No space left on device\":**\n- Check target server storage\n- Clean up old backups\n- Consider compression options\n\n#### Notification Issues\n**No Telegram message:**\n- Verify bot token and channel ID\n- Check bot is admin in channel\n- Test with curl command manually\n\n**SMS not received:**\n- Check Textbelt credit balance\n- Verify phone number format\n- Review API key validity\n\n### Best Practices\n\n#### Backup Strategy\n1. **Test First**: Always test with small datasets\n2. **Schedule Wisely**: Run during low-traffic periods\n3. **Monitor Space**: Ensure adequate storage on target\n4. **Verify Backups**: Regularly test restore procedures\n5. **Rotate Backups**: Implement retention policies\n\n#### Security\n1. **Use Strong Passwords**: Complex passwords for all accounts\n2. **Limit Permissions**: Use dedicated backup users\n3. **Network Security**: Consider VPN for internet transfers\n4. **Audit Access**: Log all backup operations\n5. **Encrypt Sensitive Data**: Consider rsync with encryption\n\n#### Performance\n1. **Compression**: Use `-z` for slow networks\n2. **Bandwidth Limits**: Prevent network saturation\n3. **Incremental Backups**: Rsync only transfers changes\n4. **Parallel Transfers**: Consider multiple workflows for different folders\n5. **Off-Peak Hours**: Schedule during quiet periods\n\n### Advanced Configuration\n\n#### Multiple Backup Jobs\nCreate separate workflows for:\n- Different server pairs\n- Various schedules\n- Distinct retention policies\n\n#### Backup Rotation\nImplement versioning:\n```bash\n# Add timestamp to target folder\ntarget_folder=\"/backup/data_$(date +%Y%m%d)\"\n```\n\n#### Pre/Post Scripts\nAdd nodes for:\n- Database dumps before backup\n- Service stops/starts\n- Cleanup operations\n- Verification scripts\n\n#### Error Handling\nEnhance workflow with:\n- Retry mechanisms\n- Fallback servers\n- Detailed error logging\n- Escalation procedures\n\n### Maintenance\n\n#### Regular Tasks\n- **Daily**: Check backup completion\n- **Weekly**: Verify backup integrity\n- **Monthly**: Test restore procedure\n- **Quarterly**: Review and optimize rsync options\n- **Annually**: Audit security settings\n\n#### Monitoring Metrics\nTrack:\n- Backup duration\n- Transfer size\n- Success/failure rate\n- Storage utilization\n- Network bandwidth usage\n\n## Recovery Procedures\n\n### Restore from Backup\nTo restore files:\n```bash\n# Reverse the rsync direction\nrsync -avz target_server:/backup/folder/ source_server:/restore/location/\n```\n\n### Disaster Recovery\n1. Document server configurations\n2. Maintain backup access credentials\n3. Test restore procedures regularly\n4. Keep workflow exports as backup\n\n## Support Resources\n- Rsync documentation: https://rsync.samba.org/\n- n8n community: https://community.n8n.io/\n- SSH troubleshooting guides\n- Network diagnostics tools",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Server Parameters",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Sshpass Local",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is Installed Local?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Install Sshpass Local",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check Sshpass on Source",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Is Installed on Source?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Install Sshpass on Source",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Execute Rsync Backup",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Success?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Backup Successful",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Backup Failed",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Process Finish Report --- Telegam & SMS",
+      "type": "n8n-nodes-base.executeCommand",
+      "role": "executeCommand",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

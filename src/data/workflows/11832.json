@@ -1,0 +1,158 @@
+{
+  "id": 11832,
+  "slug": "11832",
+  "title": "Sales lead routing with Gemini Sentiment Analysis & Model Evaluation Framework",
+  "description": "This n8n template demonstrates how to deploy an AI workflow in production while simultaneously running a robust, data-driven Evaluation Framework to ensure quality and optimize costs.\n\n## Use Cases\nModel Comparison: Quickly A/B test different LLM models (e.g., Gemini 3 Pro vs. Flash Lite) for speed and cost efficiency against your specific task.\n\nPrompt Regression: Ensure that tweaks to your system prompt do not introduce new errors or lower the accuracy of your lead categorization.\n\nProduction Safety: Guarantee that test runs never trigger real-world actions like sending emails to a client or sales team.\n\n## Requirements\nA configured Gmail Trigger (or equivalent email trigger).\n\nA Google Gemini account for the LLM models.\n\nAn n8n Data Table containing your \"Golden Dataset\" of test cases and ground truths.\n\n## How it Works\nThe workflow contains two distinct, parallel execution paths:\n\n### Production Path:\n\nThe Gmail Trigger monitors for new emails.\n\nThe email text is routed through the Sentiment Analysis node, which categorizes the lead as Positive, Neutral, or Negative.\n\nCheck if Evaluating nodes verify the current execution mode. If it is not an evaluation run (the Fail branch), the lead is routed to the corresponding Send Email node for action.\n\n### Evaluation Path:\n\nThe When fetching a dataset row trigger pulls test cases (input text and expected sentiment/ground truth) from an n8n Data Table.\n\nEach test case loops through the same Sentiment Analysis node.\n\nThe Check if Evaluating nodes route this path to the Success branch, skipping the real email actions.\n\nThe Save Output node writes the model's prediction to the Data Table.\n\nThe Set Metrics node uses the Categorization metric to compare the prediction against the ground truth, returning a score (0 or 1) to measure accuracy.\n\n## Key Technical Details\nModel Switching: Multiple Google Gemini Chat Model nodes are connected via the Model input on the Sentiment Analysis node, allowing you to easily swap and compare models without changing the core logic.\n\nEdge Case Handling: The System Prompt Template in the Sentiment Analysis node is customized to handle tricky inputs, such as negative feedback about a competitor that should be classified as a Positive lead.\n\nMetrics: The workflow uses the built-in Categorization metric, which is ideal for classification tasks like sentiment analysis, to provide objective evidence of performance.\n",
+  "featuredImage": "/data/workflows/11832/11832.webp",
+  "author": {
+    "id": 101,
+    "slug": "mihailtd",
+    "name": "Mihai Farcas",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 228,
+  "downloads": 22,
+  "createdAt": "2025-12-15T15:06:26.946Z",
+  "updatedAt": "2026-01-16T09:10:17.229Z",
+  "publishedAt": "2025-12-15T15:06:26.946Z",
+  "nodes": 20,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11832",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sales lead routing with Gemini Sentiment Analysis & Model Evaluation Framework",
+    "workflowName": "Sales lead routing with Gemini Sentiment Analysis & Model Evaluation Framework",
+    "description": "This n8n template demonstrates how to deploy an AI workflow in production while simultaneously running a robust, data-driven Evaluation Framework to ensure quality and optimize costs.\n\n## Use Cases\nModel Comparison: Quickly A/B test different LLM models (e.g., Gemini 3 Pro vs. Flash Lite) for speed and cost efficiency against your specific task.\n\nPrompt Regression: Ensure that tweaks to your system prompt do not introduce new errors or lower the accuracy of your lead categorization.\n\nProduction Safety: Guarantee that test runs never trigger real-world actions like sending emails to a client or sales team.\n\n## Requirements\nA configured Gmail Trigger (or equivalent email trigger).\n\nA Google Gemini account for the LLM models.\n\nAn n8n Data Table containing your \"Golden Dataset\" of test cases and ground truths.\n\n## How it Works\nThe workflow contains two distinct, parallel execution paths:\n\n### Production Path:\n\nThe Gmail Trigger monitors for new emails.\n\nThe email text is routed through the Sentiment Analysis node, which categorizes the lead as Positive, Neutral, or Negative.\n\nCheck if Evaluating nodes verify the current execution mode. If it is not an evaluation run (the Fail branch), the lead is routed to the corresponding Send Email node for action.\n\n### Evaluation Path:\n\nThe When fetching a dataset row trigger pulls test cases (input text and expected sentiment/ground truth) from an n8n Data Table.\n\nEach test case loops through the same Sentiment Analysis node.\n\nThe Check if Evaluating nodes route this path to the Success branch, skipping the real email actions.\n\nThe Save Output node writes the model's prediction to the Data Table.\n\nThe Set Metrics node uses the Categorization metric to compare the prediction against the ground truth, returning a score (0 or 1) to measure accuracy.\n\n## Key Technical Details\nModel Switching: Multiple Google Gemini Chat Model nodes are connected via the Model input on the Sentiment Analysis node, allowing you to easily swap and compare models without changing the core logic.\n\nEdge Case Handling: The System Prompt Template in the Sentiment Analysis node is customized to handle tricky inputs, such as negative feedback about a competitor that should be classified as a Positive lead.\n\nMetrics: The workflow uses the built-in Categorization metric, which is ideal for classification tasks like sentiment analysis, to provide objective evidence of performance.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Sentiment Analysis",
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "role": "sentimentAnalysis",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Send Hot Lead Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send Marketing Insights Email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send Follow-up Notification",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "When fetching a dataset row",
+      "type": "n8n-nodes-base.evaluationTrigger",
+      "role": "evaluationTrigger",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Google Gemini 3 PRO",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini 2.5 Flash Lite",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Gemini 2.5 Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "role": "lmChatGoogleGemini",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set Metrics",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "Save Output",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "Check Neutral",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "Check Positive",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "Check Negative",
+      "type": "n8n-nodes-base.evaluation",
+      "role": "evaluation",
+      "configDescription": "Version 4.8"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

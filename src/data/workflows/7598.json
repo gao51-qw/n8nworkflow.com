@@ -1,0 +1,152 @@
+{
+  "id": 7598,
+  "slug": "7598",
+  "title": "IAM compliance automation: enforce MFA and clean up access keys in AWS",
+  "description": "# Automated AWS IAM Compliance Workflow for MFA Enforcement and Access Key Deactivation\n&gt; This workflow leverages AWS IAM APIs and n8n automation to ensure strict security compliance by continuously monitoring IAM users for MFA (Multi-Factor Authentication) enforcement.\n\n[![Watch the video](https://wisestackai.s3.ap-southeast-1.amazonaws.com/Red+and+Yellow+Modern+Shocking+Moments+YouTube+Thumbnail+(2).jpg)](https://www.youtube.com/watch?v=ZggCRl8z_gQ)\n\n## **Who’s it for**\nThis workflow is designed for **DevOps, Security, or Cloud Engineers** responsible for maintaining IAM security compliance in AWS accounts. It's ideal for teams who want to **enforce MFA usage** and **automatically disable access** for non-compliant IAM users.\n\n## **How it works / What it does**\nThis automated workflow performs a **daily check** to detect IAM users without an MFA device and deactivate their access keys.\n\n### Step-by-step:\n1. **Daily scheduler**: Triggers the workflow once a day.\n2. **Get many users**: Retrieves a list of all IAM users in the account.\n3. **Get IAM User MFA Devices**: Calls AWS API to get MFA device info for each user.\n4. **Filter out IAM users with MFA**: Keeps only users **without any MFA device**.\n5. **Send warning message(s)**: Sends Slack alerts for users who do not have MFA enabled.\n6. **Get User Access Key(s)**: Fetches access keys for each non-MFA user.\n7. **Parse the list of user access key(s)**: Extracts and flattens key information like `AccessKeyId`, `Status`, and `UserName`.\n8. **Filter out inactive keys**: Keeps only **active** access keys for further action.\n9. **Deactivate Access Key(s)**: Calls AWS API to deactivate each active key for non-MFA users.\n\n## **How to set up**\n1. **Configure AWS credentials** in your environment (IAM role or AWS access key with required permissions).\n2. **Connect Slack** via the Slack node for alerting (set channel and credentials).\n3. Set the **scheduler** to your preferred frequency (e.g., daily at 9AM).\n4. Adjust any Slack message template or filtering conditions as needed.\n\n## **Requirements**\n- IAM user or role credentials with the following AWS IAM permissions:\n  - `iam:ListUsers`\n  - `iam:ListMFADevices`\n  - `iam:ListAccessKeys`\n  - `iam:UpdateAccessKey`\n- Slack credentials (Bot token with `chat:write` permission).\n- n8n environment with:\n  - Slack integration\n  - AWS credentials (set via environment or credentials manager)\n\n## **How to customize the workflow**\n- **Alert threshold**: Instead of immediate deactivation, you can delay action (e.g., alert first, wait 24h, then disable).\n- **Change notification channel**: Modify the Slack node to send alerts to a different channel or add email integration.\n- **Whitelist exceptions**: Add a Set or IF node to exclude specific usernames (e.g., service accounts).\n- **Add audit logging**: Use Google Sheets, Airtable, or a database to log which users were flagged or had access disabled.\n- **Extend access checks**: Include console password check (`GetLoginProfile`) if needed.",
+  "featuredImage": "/data/workflows/7598/7598.webp",
+  "author": {
+    "id": 101,
+    "slug": "trungtran",
+    "name": "Trung Tran",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 301,
+  "downloads": 30,
+  "createdAt": "2025-08-19T16:06:41.021Z",
+  "updatedAt": "2026-01-16T08:51:17.887Z",
+  "publishedAt": "2025-08-19T16:06:41.021Z",
+  "nodes": 19,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7598",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "IAM compliance automation: enforce MFA and clean up access keys in AWS",
+    "workflowName": "IAM compliance automation: enforce MFA and clean up access keys in AWS",
+    "description": "# Automated AWS IAM Compliance Workflow for MFA Enforcement and Access Key Deactivation\n&gt; This workflow leverages AWS IAM APIs and n8n automation to ensure strict security compliance by continuously monitoring IAM users for MFA (Multi-Factor Authentication) enforcement.\n\n[![Watch the video](https://wisestackai.s3.ap-southeast-1.amazonaws.com/Red+and+Yellow+Modern+Shocking+Moments+YouTube+Thumbnail+(2).jpg)](https://www.youtube.com/watch?v=ZggCRl8z_gQ)\n\n## **Who’s it for**\nThis workflow is designed for **DevOps, Security, or Cloud Engineers** responsible for maintaining IAM security compliance in AWS accounts. It's ideal for teams who want to **enforce MFA usage** and **automatically disable access** for non-compliant IAM users.\n\n## **How it works / What it does**\nThis automated workflow performs a **daily check** to detect IAM users without an MFA device and deactivate their access keys.\n\n### Step-by-step:\n1. **Daily scheduler**: Triggers the workflow once a day.\n2. **Get many users**: Retrieves a list of all IAM users in the account.\n3. **Get IAM User MFA Devices**: Calls AWS API to get MFA device info for each user.\n4. **Filter out IAM users with MFA**: Keeps only users **without any MFA device**.\n5. **Send warning message(s)**: Sends Slack alerts for users who do not have MFA enabled.\n6. **Get User Access Key(s)**: Fetches access keys for each non-MFA user.\n7. **Parse the list of user access key(s)**: Extracts and flattens key information like `AccessKeyId`, `Status`, and `UserName`.\n8. **Filter out inactive keys**: Keeps only **active** access keys for further action.\n9. **Deactivate Access Key(s)**: Calls AWS API to deactivate each active key for non-MFA users.\n\n## **How to set up**\n1. **Configure AWS credentials** in your environment (IAM role or AWS access key with required permissions).\n2. **Connect Slack** via the Slack node for alerting (set channel and credentials).\n3. Set the **scheduler** to your preferred frequency (e.g., daily at 9AM).\n4. Adjust any Slack message template or filtering conditions as needed.\n\n## **Requirements**\n- IAM user or role credentials with the following AWS IAM permissions:\n  - `iam:ListUsers`\n  - `iam:ListMFADevices`\n  - `iam:ListAccessKeys`\n  - `iam:UpdateAccessKey`\n- Slack credentials (Bot token with `chat:write` permission).\n- n8n environment with:\n  - Slack integration\n  - AWS credentials (set via environment or credentials manager)\n\n## **How to customize the workflow**\n- **Alert threshold**: Instead of immediate deactivation, you can delay action (e.g., alert first, wait 24h, then disable).\n- **Change notification channel**: Modify the Slack node to send alerts to a different channel or add email integration.\n- **Whitelist exceptions**: Add a Set or IF node to exclude specific usernames (e.g., service accounts).\n- **Add audit logging**: Use Google Sheets, Airtable, or a database to log which users were flagged or had access disabled.\n- **Extend access checks**: Include console password check (`GetLoginProfile`) if needed.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Get many users",
+      "type": "n8n-nodes-base.awsIam",
+      "role": "awsIam",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get IAM User MFA Devices",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter out IAM user with MFA device",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get User Access Key(s)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Daily scheduler",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Send warning message(s)",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Deactivate Access Key(s)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Filter out inactive keys",
+      "type": "n8n-nodes-base.filter",
+      "role": "filter",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Parse the list of user access key(s)",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send message and wait for response",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "id": 11321,
+  "slug": "11321",
+  "title": "Automated Facebook message response with GPT-4o and Airtable inventory matching",
+  "description": "## 📘 Description\n This workflow automates AI-driven Facebook Messenger product inquiry handling, connecting Facebook DMs with Airtable inventory and returning instant automated replies based on product availability.\n It runs hourly, fetches new messages, extracts the latest customer query, uses GPT-4o to identify the product and intent, merges this with the Airtable inventory dataset, performs an AI-assisted product match, and replies automatically inside the same Facebook conversation.\n Invalid or malformed messages are logged to Google Sheets for review.\n\n## ⚙️ What This Workflow Does (Step-by-Step)\n\n▶️ Trigger – Fetch New Facebook Messages (Every Hour)\n Schedules hourly polling of new conversations from Facebook Messenger.\n\n🟦 Fetch Facebook Conversation List (Graph API)\n Retrieves conversation threads from the connected Facebook Page.\n\n💬 Fetch Facebook Conversation Messages (Graph API)\n Loads message details (content, sender, timestamp) for the selected conversation.\n\n📩 Extract Latest Facebook Message (Code)\n Sorts all messages and picks the latest one → this is the message analyzed by AI.\n\n🔍 Validate Record Structure (IF)\n Ensures the incoming message has required fields.\n Valid → AI analysis\n Invalid → logged to Google Sheets.\n\n📄 Log Invalid Records to Google Sheet\n Stores malformed or unprocessable messages for audit and correction.\n\n🧠 Configure GPT-4o — Message Classification Model\n Defines AI model used to extract product details and intent from the customer’s message.\n\n🤖 AI – Extract Product & Customer Intent\n AI identifies:\nproduct name (standardized)\ncustomer intent (availability, pricing, inquiry)\ncleaned query\nalways returns structured JSON\nNo inventory lookup happens here.\n\n📦 Fetch Inventory Records from Airtable\n Pulls complete product inventory list to cross-match with customer request.\n\n🔁 Merge AI Output With Inventory Dataset\n Combines:\nAI-interpreted message data\nAirtable inventory records\n This prepares a unified object for product lookup.\n\n📝 Build Combined AI + Inventory Payload (Code)\n Constructs { ai: {...}, inventory: [...] } for the product-matching AI agent.\n\n🧠 Configure GPT-4o — Product Matching Model\n Sets strict rules for identifying whether the requested product exists in inventory.\n\n🤖 AI – Match Requested Product in Inventory\n AI checks:\nexact / close match to product name\nwhether item exists\ngenerates structured JSON reply text + confidence score.\n\n🧹 Parse AI Product Match JSON (Code)\n Ensures the AI output is valid JSON before making decisions.\n\n🔍 Check If Product Exists (IF)\n If found → sends “product available” reply\n If not → sends “product not found” reply.\n\n📨 Send Facebook Reply — Product Found (Graph API)\n Sends a personalized Messenger reply including matched product details.\n\n📨 Send Facebook Reply — Product Not Found (Graph API)\n Replies politely informing customer that the product is not available.\n\n## 🧩 Prerequisites\n- Facebook Graph API access token\n- Airtable API token\n- Azure OpenAI GPT-4o credentials\n- Google Sheets OAuth\n\n## 💡 Key Benefits\n ✔ Fully automated Facebook DM handling\n ✔ AI-powered product identification even with typos or unclear wording\n ✔ Real-time product availability responses\n ✔ Unified Airtable-driven catalog lookup\n ✔ Automatic fallback for invalid messages\n ✔ Zero manual intervention for customer support\n\n## 👥 Perfect For\n- Ecommerce stores\n- Catalog-based product businesses\n- Teams handling large volumes of Facebook DM inquiries\n- Businesses wanting instant customer replies without agents\n",
+  "featuredImage": "/data/workflows/11321/11321.webp",
+  "author": {
+    "id": 101,
+    "slug": "rahul08",
+    "name": "Rahul Joshi",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 190,
+  "downloads": 19,
+  "createdAt": "2025-11-28T06:54:37.327Z",
+  "updatedAt": "2026-01-16T09:08:24.553Z",
+  "publishedAt": "2025-11-28T06:54:37.327Z",
+  "nodes": 22,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11321",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated Facebook message response with GPT-4o and Airtable inventory matching",
+    "workflowName": "Automated Facebook message response with GPT-4o and Airtable inventory matching",
+    "description": "## 📘 Description\n This workflow automates AI-driven Facebook Messenger product inquiry handling, connecting Facebook DMs with Airtable inventory and returning instant automated replies based on product availability.\n It runs hourly, fetches new messages, extracts the latest customer query, uses GPT-4o to identify the product and intent, merges this with the Airtable inventory dataset, performs an AI-assisted product match, and replies automatically inside the same Facebook conversation.\n Invalid or malformed messages are logged to Google Sheets for review.\n\n## ⚙️ What This Workflow Does (Step-by-Step)\n\n▶️ Trigger – Fetch New Facebook Messages (Every Hour)\n Schedules hourly polling of new conversations from Facebook Messenger.\n\n🟦 Fetch Facebook Conversation List (Graph API)\n Retrieves conversation threads from the connected Facebook Page.\n\n💬 Fetch Facebook Conversation Messages (Graph API)\n Loads message details (content, sender, timestamp) for the selected conversation.\n\n📩 Extract Latest Facebook Message (Code)\n Sorts all messages and picks the latest one → this is the message analyzed by AI.\n\n🔍 Validate Record Structure (IF)\n Ensures the incoming message has required fields.\n Valid → AI analysis\n Invalid → logged to Google Sheets.\n\n📄 Log Invalid Records to Google Sheet\n Stores malformed or unprocessable messages for audit and correction.\n\n🧠 Configure GPT-4o — Message Classification Model\n Defines AI model used to extract product details and intent from the customer’s message.\n\n🤖 AI – Extract Product & Customer Intent\n AI identifies:\nproduct name (standardized)\ncustomer intent (availability, pricing, inquiry)\ncleaned query\nalways returns structured JSON\nNo inventory lookup happens here.\n\n📦 Fetch Inventory Records from Airtable\n Pulls complete product inventory list to cross-match with customer request.\n\n🔁 Merge AI Output With Inventory Dataset\n Combines:\nAI-interpreted message data\nAirtable inventory records\n This prepares a unified object for product lookup.\n\n📝 Build Combined AI + Inventory Payload (Code)\n Constructs { ai: {...}, inventory: [...] } for the product-matching AI agent.\n\n🧠 Configure GPT-4o — Product Matching Model\n Sets strict rules for identifying whether the requested product exists in inventory.\n\n🤖 AI – Match Requested Product in Inventory\n AI checks:\nexact / close match to product name\nwhether item exists\ngenerates structured JSON reply text + confidence score.\n\n🧹 Parse AI Product Match JSON (Code)\n Ensures the AI output is valid JSON before making decisions.\n\n🔍 Check If Product Exists (IF)\n If found → sends “product available” reply\n If not → sends “product not found” reply.\n\n📨 Send Facebook Reply — Product Found (Graph API)\n Sends a personalized Messenger reply including matched product details.\n\n📨 Send Facebook Reply — Product Not Found (Graph API)\n Replies politely informing customer that the product is not available.\n\n## 🧩 Prerequisites\n- Facebook Graph API access token\n- Airtable API token\n- Azure OpenAI GPT-4o credentials\n- Google Sheets OAuth\n\n## 💡 Key Benefits\n ✔ Fully automated Facebook DM handling\n ✔ AI-powered product identification even with typos or unclear wording\n ✔ Real-time product availability responses\n ✔ Unified Airtable-driven catalog lookup\n ✔ Automatic fallback for invalid messages\n ✔ Zero manual intervention for customer support\n\n## 👥 Perfect For\n- Ecommerce stores\n- Catalog-based product businesses\n- Teams handling large volumes of Facebook DM inquiries\n- Businesses wanting instant customer replies without agents",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Trigger – Fetch New Facebook Messages (Every Hour)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Fetch Inventory Records from Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Fetch Facebook Conversation List",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Facebook Conversation Messages",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI – Extract Product & Customer Intent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Extract Latest Facebook Message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Configure GPT-4o — Message Classification Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "role": "lmChatAzureOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge AI Output With Inventory Dataset",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Build Combined AI + Inventory Payload (",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "AI – Match Requested Product in Inventory",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Configure GPT-4o — Product Matching Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "role": "lmChatAzureOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse AI Product Match JSON",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check If Product Exists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Send Facebook Reply — Product Found",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Facebook Reply — Product Not Found",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Log Invalid Records to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Validate Record Structure",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

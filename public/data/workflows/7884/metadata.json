@@ -1,0 +1,27 @@
+{
+  "id": 7884,
+  "slug": "7884",
+  "title": "Daily swing trade ideas with GPT-4, Yahoo Finance, Google Sheets & Telegram",
+  "description": "# **Automated daily swing‑trade ideas from end‑of‑day (EOD) data, scored by an LLM, logged to Google Sheets, and pushed to Telegram.**\n\n---\n\n## What this workflow does\n\n* **Fetches EOD quotes** for a chosen stock universe (example: **NSE‑100** via RapidAPI).\n* **Cleans & filters** the universe using simple technical/quality gates (e.g., price/volume sanity, avoid illiquid names).\n* **Packages market context** and feeds it to **OpenAI** with a strict **JSON schema** to produce **top swing‑trade recommendations** (entry, target, stop, rationale).\n* **Splits structured output** into rows and **logs** them to a **Google Sheet** for tracking.\n* **Sends an alert** with the day’s trade ideas to **Telegram** (channel or DM).\n\n---\n\n## Ideal for\n\n* Retail traders who want a **daily, hands‑off idea generator**.\n* PMs/engineers prototyping **LLM‑assisted quant sidekicks**.\n* Creators who publish **daily trade notes** to their audience.\n\n---\n\n## Tech stack\n\n* **n8n** (orchestration)\n* **RapidAPI** (EOD quotes; pluggable data source)\n* **OpenAI** (LLM for idea generation)\n* **Google Sheets** (logging & performance tracker)\n* **Telegram** (alerts)\n\n---\n\n## Prerequisites\n\n1. **RapidAPI key** with access to an EOD quotes endpoint for your exchange.\n2. **OpenAI API key**.\n3. **Google account** with a Sheet named `Trade_Recommendations_Tracker` (or update the node).\n4. **Telegram bot token** (via @BotFather) and destination **chat ID**.\n\n&gt; You can replace any of the above vendors with equivalents (e.g., Alpha Vantage, Twelve Data, Polygon, etc.). Only the **HTTP Request** + **Format** nodes need tweaks.\n\n---\n\n## Environment variables\n\n| Key                  | Example                    | Used in               |\n| -------------------- | -------------------------- | --------------------- |\n| `RAPIDAPI_KEY`       | `xxxxxxxxxxxxxxxxxxxxxxxx` | HTTP Request (quotes) |\n| `OPENAI_API_KEY`     | `sk-…`                     | OpenAI node           |\n| `TELEGRAM_BOT_TOKEN` | `123456:ABC-DEF…`          | Telegram node         |\n| `TELEGRAM_CHAT_ID`   | `5357385827`               | Telegram node         |\n\n---\n\n## Google Sheet schema\n\nCreate a Sheet (tab: `EOD_Ideas`) with the headers:\n\n```\nDate, Symbol, Direction, Entry, Target, StopLoss, Confidence, Reason, SourceModel, UniverseTag\n```\n\n\n## Node map (name → purpose)\n\n1. **Trigger – Daily Market Close** → Fires daily after market close (e.g., 4:15 PM IST).\n2. **Prepare Stock List (NSE 100)** → Provides stock symbols to analyze (static list or from a Sheet/API).\n3. **Fetch EOD Data (RapidAPI)** → Gets EOD data for all symbols in one or batched calls.\n4. **Format EOD Data** → Normalizes API response to a clean array (symbol, close, high, low, volume, etc.).\n5. **Filter Valid Stock Data** → Drops illiquid/invalid rows (e.g., `volume &gt; 200k`, `close &gt; 50`).\n6. **Build LLM Prompt Input** → Creates compact market context & JSON instructions for the model.\n7. **Generate Swing Trade Ideas (OpenAI)** → Returns **strict JSON** with top ideas.\n8. **Split JSON Output (Trade‑wise)** → Explodes the JSON array into individual items.\n9. **Log Trade to Google Sheet** → Appends each idea as a row.\n10. **Send Trade Alert to Telegram** → Publishes a concise summary to Telegram.\n\n\n",
+  "featuredImage": "/data/workflows/7884/7884.webp",
+  "author": {
+    "id": 101,
+    "slug": "pandita",
+    "name": "Nishant",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 2722,
+  "downloads": 272,
+  "createdAt": "2025-08-26T07:34:11.507Z",
+  "updatedAt": "2026-01-16T08:52:52.525Z",
+  "publishedAt": "2025-08-26T07:34:11.507Z",
+  "nodes": 11,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7884"
+}

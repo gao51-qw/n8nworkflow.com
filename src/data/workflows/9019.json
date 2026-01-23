@@ -1,0 +1,121 @@
+{
+  "id": 9019,
+  "slug": "9019",
+  "title": "Job brief analysis with OpenAI to find relevant templates and log in Google Sheets",
+  "description": "## Who’s it for\n\nRecruiters, freelancers, and ops teams who scan job briefs and want quick, relevant n8n template suggestions, saved in a Google Sheet for tracking.\n\n## What it does\n\nParses any job text, extracts exactly 5 search keywords, queries the n8n template library, and appends the matched templates (ID, name, description, author) to Google Sheets, including the canonical template URL.\n\n## How it works\n\t1. Trigger receives a message or paste-in job brief.\n\t2. LLM agent returns 5 concise search terms (JSON).\n\t3. For each keyword, an HTTP request searches the n8n templates API.\n\t4. Results are split and written to Google Sheets; the workflow builds the public URL from ID+slug.\n\n## Set up\n\t1. Add credentials for OpenAI (or swap the LLM node to your provider).\n\t2. Create a Google Sheet with columns: Template ID, Name, User, Description, URL.\n\t3. In the ⚙️ Config node, set: GOOGLE_SHEETS_DOC_ID, GOOGLE_SHEET_NAME, N8N_TEMPLATES_API_URL.\n\n## Requirements\n\t• n8n (cloud or self-hosted)\n\t• OpenAI (or alternative LLM) credentials\n\t• Google Sheets OAuth credentials\n\n## Customize\n\t• Change the model/system prompt to tailor keyword extraction.\n\t• Swap Google Sheets for Airtable/Notion.\n\t• Extend filters (e.g., only AI/CRM templates) before writing rows.",
+  "featuredImage": "/data/workflows/9019/9019.webp",
+  "author": {
+    "id": 101,
+    "slug": "jerrywright",
+    "name": "Jeremiah Wright",
+    "avatar": ""
+  },
+  "categories": [
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 76,
+  "downloads": 7,
+  "createdAt": "2025-09-27T19:04:31.249Z",
+  "updatedAt": "2026-01-16T08:58:43.079Z",
+  "publishedAt": "2025-09-27T19:04:31.249Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9019",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Job brief analysis with OpenAI to find relevant templates and log in Google Sheets",
+    "workflowName": "Job brief analysis with OpenAI to find relevant templates and log in Google Sheets",
+    "description": "## Who’s it for\n\nRecruiters, freelancers, and ops teams who scan job briefs and want quick, relevant n8n template suggestions, saved in a Google Sheet for tracking.\n\n## What it does\n\nParses any job text, extracts exactly 5 search keywords, queries the n8n template library, and appends the matched templates (ID, name, description, author) to Google Sheets, including the canonical template URL.\n\n## How it works\n\t1. Trigger receives a message or paste-in job brief.\n\t2. LLM agent returns 5 concise search terms (JSON).\n\t3. For each keyword, an HTTP request searches the n8n templates API.\n\t4. Results are split and written to Google Sheets; the workflow builds the public URL from ID+slug.\n\n## Set up\n\t1. Add credentials for OpenAI (or swap the LLM node to your provider).\n\t2. Create a Google Sheet with columns: Template ID, Name, User, Description, URL.\n\t3. In the ⚙️ Config node, set: GOOGLE_SHEETS_DOC_ID, GOOGLE_SHEET_NAME, N8N_TEMPLATES_API_URL.\n\n## Requirements\n\t• n8n (cloud or self-hosted)\n\t• OpenAI (or alternative LLM) credentials\n\t• Google Sheets OAuth credentials\n\n## Customize\n\t• Change the model/system prompt to tailor keyword extraction.\n\t• Swap Google Sheets for Airtable/Notion.\n\t• Extend filters (e.g., only AI/CRM templates) before writing rows.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Parse Keywords",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Search Templates",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Converting to Array",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Append row in sheet2",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

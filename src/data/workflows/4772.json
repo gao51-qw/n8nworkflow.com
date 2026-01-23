@@ -1,0 +1,433 @@
+{
+  "id": 4772,
+  "slug": "4772",
+  "title": "Automated Airtable to Postgres migration with n8n",
+  "description": "\n\n##  Overview\n\nThis ETL system automates the process of migrating data from **Airtable** to **PostgreSQL** with a single API request.\n\n* It maps your Airtable schema into a Postgres-compatible structure.\n* Automatically creates new tables in your Postgres database.\n* Migrates all the data while preserving formats and relationships.\n\n&gt; ⚙️ Originally built in-house to help us migrate off Airtable after exceeding usage limits.\n\n---\n\n## 🔧 How It Works\n\n1. Accepts **Airtable** and **Postgres** credentials via HTTP requests.\n2. Authenticates both services and validates schema compatibility.\n3. Fetches data from Airtable and maps each table and field to PostgreSQL equivalents.\n4. Creates the necessary tables in your Postgres database.\n5. Inserts all records in batches.\n6. Returns a success response with summary stats.\n\n&gt; **Bonus operations:** You can list or delete created tables using API endpoints.\n\n---\n\n## Setup Instructions (n8n Workflow)\n\n### Step 1: Airtable Configuration\n\n* Generate an **Airtable access token** from the [Airtable developer hub](https://airtable.com/developers/web/api).\n* Copy your **Base ID** or URL.\n\n### Step 2: PostgreSQL Configuration\n\n* Gather your PostgreSQL connection details:\n\n  * Host\n  * Port\n  * Database name\n  * Username\n  * Password\n\n### Step 3: Deploy in n8n\n\n* Import the workflow into your n8n instance.\n* Use a simple HTTP request tool like `curl` or Postman to trigger migration actions.\n\n---\n\n##  API Endpoints & Payloads\n\nHere are the available HTTP endpoints and how to use them.\n\n---\n\n### 1. Test Airtable Credentials\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/validate-airtable\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"airtable\": {\n      \"airtableId\": \"app12345\",\n      \"airtableToken\": \"pjhy.iyhhs\"\n    }\n  }'\n```\n\n### 2. Test PostgreSQL Credentials\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/validate-postgres\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"postgres\": {\n      \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n      \"port\": \"6543\",\n      \"user\": \"postgres.username\",\n      \"password\": \"gamjgnrkxetb\",\n      \"database\": \"postgres\"\n    }\n  }'\n```\n\n---\n\n### 3. Sync Airtable Data to Postgres\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/sync\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n    \"port\": \"6543\",\n    \"user\": \"postgres.username\",\n    \"password\": \"gamjgnrkxetb\",\n    \"database\": \"postgres\",\n    \"airtableId\": \"app73PqALbM3AM0xN\",\n    \"airtableToken\": \"patNCueRkrLI98fEq.9ae7f9786e9ad73ac21ca26d8046f08ad77e135ae950a6e2ff3760d85aca3db4\",\n    \"action\": \"Move\"\n  }'\n```\n\n#### Expected Response:\n\n```json\n[\n  {\n    \"statusCode\": 200,\n    \"statusMessage\": \"Data migration successful\",\n    \"recordsProcessed\": 152,\n    \"tablesProcessed\": 3\n  }\n]\n```\n\n---\n\n### 4.List All Created Tables\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/list-tables\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"postgres\": {\n      \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n      \"port\": \"6543\",\n      \"user\": \"postgres.username\",\n      \"password\": \"gamjgnrkxetb\",\n      \"database\": \"postgres\"\n    }\n  }'\n```\n\n---\n\n### 5. Delete Migrated Tables\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/delete-tables\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"postgres\": {\n      \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n      \"port\": \"6543\",\n      \"user\": \"postgres.username\",\n      \"password\": \"gamjgnrkxetb\",\n      \"database\": \"postgres\"\n    }\n  }'\n```\n\n---\n\n## Technical Notes\n\n* **Schema Mapping**: Field types from Airtable are mapped to PostgreSQL equivalents (e.g. `singleLineText → VARCHAR`, `number → INTEGER`, `checkbox → BOOLEAN`, etc.).\n* **Linked Records**: Relationships in Airtable bases are resolved and converted into foreign key-friendly formats.\n* **Batch Inserts**: Records are inserted in optimized chunks to improve performance and avoid payload limits.\n* **Error Handling**: Invalid credentials, schema mismatches, or connection issues will return proper HTTP status codes and error messages.\n\n---\n\n##  Usage Scenarios\n\n* Airtable to Postgres migration during scale-up.\n* Backup or sync Airtable records to a SQL environment.\n* Use Postgres-powered dashboards while editing in Airtable.\n\n---\n\n## Requirements\n\n* Airtable Pro/Developer Account\n* PostgreSQL database (e.g. Supabase, Render, or local instance)\n* n8n instance with webhook exposure\n* Basic familiarity with HTTP requests (`curl`, Postman, or integrations)\n\n---\n\n## Need Help?\n\nFeel free to reach out via **LinkedIn** or **Email** if you need help adapting this workflow for your organization or extending it with extra transformations.\n\n**Happy productivity!**\n\n\n",
+  "featuredImage": "/data/workflows/4772/4772.webp",
+  "author": {
+    "id": 101,
+    "slug": "imperolq",
+    "name": "Zacharia Kimotho",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 162,
+  "downloads": 16,
+  "createdAt": "2025-06-08T06:31:28.007Z",
+  "updatedAt": "2026-01-16T08:36:07.393Z",
+  "publishedAt": "2025-06-08T06:31:28.007Z",
+  "nodes": 66,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4772",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated Airtable to Postgres migration with n8n",
+    "workflowName": "Automated Airtable to Postgres migration with n8n",
+    "description": "##  Overview\n\nThis ETL system automates the process of migrating data from **Airtable** to **PostgreSQL** with a single API request.\n\n* It maps your Airtable schema into a Postgres-compatible structure.\n* Automatically creates new tables in your Postgres database.\n* Migrates all the data while preserving formats and relationships.\n\n&gt; ⚙️ Originally built in-house to help us migrate off Airtable after exceeding usage limits.\n\n---\n\n## 🔧 How It Works\n\n1. Accepts **Airtable** and **Postgres** credentials via HTTP requests.\n2. Authenticates both services and validates schema compatibility.\n3. Fetches data from Airtable and maps each table and field to PostgreSQL equivalents.\n4. Creates the necessary tables in your Postgres database.\n5. Inserts all records in batches.\n6. Returns a success response with summary stats.\n\n&gt; **Bonus operations:** You can list or delete created tables using API endpoints.\n\n---\n\n## Setup Instructions (n8n Workflow)\n\n### Step 1: Airtable Configuration\n\n* Generate an **Airtable access token** from the [Airtable developer hub](https://airtable.com/developers/web/api).\n* Copy your **Base ID** or URL.\n\n### Step 2: PostgreSQL Configuration\n\n* Gather your PostgreSQL connection details:\n\n  * Host\n  * Port\n  * Database name\n  * Username\n  * Password\n\n### Step 3: Deploy in n8n\n\n* Import the workflow into your n8n instance.\n* Use a simple HTTP request tool like `curl` or Postman to trigger migration actions.\n\n---\n\n##  API Endpoints & Payloads\n\nHere are the available HTTP endpoints and how to use them.\n\n---\n\n### 1. Test Airtable Credentials\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/validate-airtable\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"airtable\": {\n      \"airtableId\": \"app12345\",\n      \"airtableToken\": \"pjhy.iyhhs\"\n    }\n  }'\n```\n\n### 2. Test PostgreSQL Credentials\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/validate-postgres\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"postgres\": {\n      \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n      \"port\": \"6543\",\n      \"user\": \"postgres.username\",\n      \"password\": \"gamjgnrkxetb\",\n      \"database\": \"postgres\"\n    }\n  }'\n```\n\n---\n\n### 3. Sync Airtable Data to Postgres\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/sync\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n    \"port\": \"6543\",\n    \"user\": \"postgres.username\",\n    \"password\": \"gamjgnrkxetb\",\n    \"database\": \"postgres\",\n    \"airtableId\": \"app73PqALbM3AM0xN\",\n    \"airtableToken\": \"patNCueRkrLI98fEq.9ae7f9786e9ad73ac21ca26d8046f08ad77e135ae950a6e2ff3760d85aca3db4\",\n    \"action\": \"Move\"\n  }'\n```\n\n#### Expected Response:\n\n```json\n[\n  {\n    \"statusCode\": 200,\n    \"statusMessage\": \"Data migration successful\",\n    \"recordsProcessed\": 152,\n    \"tablesProcessed\": 3\n  }\n]\n```\n\n---\n\n### 4.List All Created Tables\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/list-tables\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"postgres\": {\n      \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n      \"port\": \"6543\",\n      \"user\": \"postgres.username\",\n      \"password\": \"gamjgnrkxetb\",\n      \"database\": \"postgres\"\n    }\n  }'\n```\n\n---\n\n### 5. Delete Migrated Tables\n\n```bash\ncurl -X POST \"https://n8n.com/webhook/123/delete-tables\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"postgres\": {\n      \"host\": \"aws-0-us-west-1.pooler.supabase.com\",\n      \"port\": \"6543\",\n      \"user\": \"postgres.username\",\n      \"password\": \"gamjgnrkxetb\",\n      \"database\": \"postgres\"\n    }\n  }'\n```\n\n---\n\n## Technical Notes\n\n* **Schema Mapping**: Field types from Airtable are mapped to PostgreSQL equivalents (e.g. `singleLineText → VARCHAR`, `number → INTEGER`, `checkbox → BOOLEAN`, etc.).\n* **Linked Records**: Relationships in Airtable bases are resolved and converted into foreign key-friendly formats.\n* **Batch Inserts**: Records are inserted in optimized chunks to improve performance and avoid payload limits.\n* **Error Handling**: Invalid credentials, schema mismatches, or connection issues will return proper HTTP status codes and error messages.\n\n---\n\n##  Usage Scenarios\n\n* Airtable to Postgres migration during scale-up.\n* Backup or sync Airtable records to a SQL environment.\n* Use Postgres-powered dashboards while editing in Airtable.\n\n---\n\n## Requirements\n\n* Airtable Pro/Developer Account\n* PostgreSQL database (e.g. Supabase, Render, or local instance)\n* n8n instance with webhook exposure\n* Basic familiarity with HTTP requests (`curl`, Postman, or integrations)\n\n---\n\n## Need Help?\n\nFeel free to reach out via **LinkedIn** or **Email** if you need help adapting this workflow for your organization or extending it with extra transformations.\n\n**Happy productivity!**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create database",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Ser user data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "set error",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Ser user data1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Upsert records",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set columns",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Limit3",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Loop Over Items2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Ser user data2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "get schema",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "set globals",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Split Out2",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Upsert records2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Airtable - Postgres",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Claude",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Test credentials",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pass all data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Get records",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split Out3",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set record fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "New mapper",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If3",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Airtable - Postgres system",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "set tables found",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "success message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Failure message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Pass both responses",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "if successful",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Test postgres credentials",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Edit postgres fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "base id to delete",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "get schema to delete",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Delete table",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set user data3",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Edit airtable fields1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Edit airtable fields2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "set webhook",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "postgres credentials",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Credential response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Credential response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Set webhook user data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "airtable fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Validate  base id",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Field mapping",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

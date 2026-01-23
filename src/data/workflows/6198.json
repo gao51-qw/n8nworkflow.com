@@ -1,0 +1,206 @@
+{
+  "id": 6198,
+  "slug": "6198",
+  "title": "Generate LinkedIn posts from books using OpenAI, LangChain & Pinecone vector search",
+  "description": "Automates the process of generating, storing, and publishing engaging LinkedIn posts derived from books (PDFs) using AI and vector search.\n\n---\n\n## 🧠 Overview\n\nThis workflow:\n1. **Watches a Google Drive folder** for new or updated book PDFs.\n2. **Extracts and embeds** the content using OpenAI.\n3. **Stores the data** in a Pinecone vector database.\n4. **Uses a LangChain agent** to generate post ideas.\n5. **Creates concise LinkedIn posts** with hook, insight, CTA.\n6. **Updates a Google Sheet** and posts to LinkedIn.\n\n---\n\n## 🛠 Workflow Breakdown\n\n### 📥 1. Google Drive Trigger\n- **Trigger:** Watches a folder for new or updated PDF files.\n- **Action:** Downloads the updated PDF.\n\n### 📄 2. Extract and Embed Content\n- **Extract from File:** Parses PDF to extract text.\n- **Text Splitter:** Breaks text into chunks.\n- **Embeddings (OpenAI):** Converts chunks into vector embeddings.\n- **Pinecone Vector Store:** Saves the embeddings with the book name as namespace.\n\n### 🧠 3. Post Idea Generation (LangChain Agent)\n- Uses a prompt to:\n  - Search Pinecone DB\n  - Extract insights\n  - Format into 5 LinkedIn post ideas with:\n    - **Hook**\n    - **Insight**\n    - **CTA**\n- **Memory buffer** and structured output parser are used for clean AI interaction.\n\n### ✍️ 4. Post Creation\n- Each idea is:\n  - **Split**\n  - Rewritten with a GPT model prompt to match LinkedIn tone\n  - Styled for under 600 characters\n  - Includes emojis, hashtags, and tone guidelines\n\n### 📊 5. Google Sheet Integration\n- Saves all generated posts to a **Google Sheet**.\n- Marks status: `\"published\"` or `\"no\"`.\n\n### 🔁 6. Scheduled Publishing\n- Every day:\n  - Pulls an unpublished post\n  - Publishes it to LinkedIn\n  - Updates the post's status and timestamp in the Google Sheet\n\n---\n\n## ⚙️ Setup Guide\n\n### 📂 Google Drive\n- Create a folder for book PDFs\n- Connect your Google Drive account to n8n\n- Provide access token with file read permission\n\n### 📊 Google Sheets\n- Create a Google Sheet with columns:\n  - `bookname`, `hook`, `insight`, `cta`, `postContent`, `published`, `date`\n- Add credentials in n8n with read/write permission\n\n### 🧠 Pinecone\n- Set up a Pinecone project and index (`linkdenpost`)\n- Namespace will be auto-named using the book filename\n\n### 🔑 API Credentials Required\n- **OpenAI API** (for embeddings and post generation)\n- **Pinecone API** (for vector storage and retrieval)\n- **LinkedIn OAuth2** (to publish posts)\n- **Google Drive & Sheets** credentials\n\n---\n\n## 🔁 Flow Summary\n\n```mermaid\ngraph TD\n  A[Google Drive Trigger] --&gt; B[Download PDF]\n  B --&gt; C[Extract Text]\n  C --&gt; D[Text Splitter]\n  D --&gt; E[Create Embeddings]\n  E --&gt; F[Pinecone Vector Store]\n  F --&gt; G[LangChain Agent]\n  G --&gt; H[Structured Output (5 Post Ideas)]\n  H --&gt; I[Split Ideas]\n  I --&gt; J[Format as LinkedIn Post (GPT)]\n  J --&gt; K[Store in Google Sheet]\n  L[Schedule Trigger] --&gt; M[Get Unpublished Post]\n  M --&gt; N[Post to LinkedIn]\n  N --&gt; O[Mark as Published]\n```\n\n---\n\n## 🧪 Prompt Example (Used in LangChain Agent)\n\n```text\nYou are a content strategist. Search the Pinecone vector DB containing a book. Generate 5 unique LinkedIn post ideas with:\n- A Hook (curiosity driven)\n- Insight (summary &lt; 100 words)\n- CTA (\"Agree or disagree?\", etc.)\n\nRespond in structured JSON:\n[\n  { \"Hook\": \"...\", \"Insight\": \"...\", \"CTA\": \"...\" },\n  ...\n]\n```\n\n---\n\n## ✅ Output Sample\n\n```json\n{\n  \"Hook\": \"Why your lab's results might be invalid 😱\",\n  \"Insight\": \"ISO/IEC 17025 stresses that labs must plan and address risks to impartiality and validity.\",\n  \"CTA\": \"Does your lab audit for these risks?\"\n}\n```\n\n---\n\n## 📆 Schedule Control\n\n- Uses **Schedule Trigger** to post daily at a set time.\n- Ensures automation with LinkedIn and accurate Google Sheet syncing.\n\n---\n\n## 📝 Notes\n\n- Posts remain **professional and concise** for a LinkedIn audience\n- Works with **any PDF book**\n- Supports multi-book pipelines\n- You can filter and tag books by filename or folder for segmenting post styles",
+  "featuredImage": "/data/workflows/6198/6198.webp",
+  "author": {
+    "id": 101,
+    "slug": "mohelwah",
+    "name": "Mohamed Abdelwahab",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 682,
+  "downloads": 68,
+  "createdAt": "2025-07-20T10:11:33.869Z",
+  "updatedAt": "2026-01-16T08:43:47.201Z",
+  "publishedAt": "2025-07-20T10:11:33.869Z",
+  "nodes": 28,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6198",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate LinkedIn posts from books using OpenAI, LangChain & Pinecone vector search",
+    "workflowName": "Generate LinkedIn posts from books using OpenAI, LangChain & Pinecone vector search",
+    "description": "Automates the process of generating, storing, and publishing engaging LinkedIn posts derived from books (PDFs) using AI and vector search.\n\n---\n\n## 🧠 Overview\n\nThis workflow:\n1. **Watches a Google Drive folder** for new or updated book PDFs.\n2. **Extracts and embeds** the content using OpenAI.\n3. **Stores the data** in a Pinecone vector database.\n4. **Uses a LangChain agent** to generate post ideas.\n5. **Creates concise LinkedIn posts** with hook, insight, CTA.\n6. **Updates a Google Sheet** and posts to LinkedIn.\n\n---\n\n## 🛠 Workflow Breakdown\n\n### 📥 1. Google Drive Trigger\n- **Trigger:** Watches a folder for new or updated PDF files.\n- **Action:** Downloads the updated PDF.\n\n### 📄 2. Extract and Embed Content\n- **Extract from File:** Parses PDF to extract text.\n- **Text Splitter:** Breaks text into chunks.\n- **Embeddings (OpenAI):** Converts chunks into vector embeddings.\n- **Pinecone Vector Store:** Saves the embeddings with the book name as namespace.\n\n### 🧠 3. Post Idea Generation (LangChain Agent)\n- Uses a prompt to:\n  - Search Pinecone DB\n  - Extract insights\n  - Format into 5 LinkedIn post ideas with:\n    - **Hook**\n    - **Insight**\n    - **CTA**\n- **Memory buffer** and structured output parser are used for clean AI interaction.\n\n### ✍️ 4. Post Creation\n- Each idea is:\n  - **Split**\n  - Rewritten with a GPT model prompt to match LinkedIn tone\n  - Styled for under 600 characters\n  - Includes emojis, hashtags, and tone guidelines\n\n### 📊 5. Google Sheet Integration\n- Saves all generated posts to a **Google Sheet**.\n- Marks status: `\"published\"` or `\"no\"`.\n\n### 🔁 6. Scheduled Publishing\n- Every day:\n  - Pulls an unpublished post\n  - Publishes it to LinkedIn\n  - Updates the post's status and timestamp in the Google Sheet\n\n---\n\n## ⚙️ Setup Guide\n\n### 📂 Google Drive\n- Create a folder for book PDFs\n- Connect your Google Drive account to n8n\n- Provide access token with file read permission\n\n### 📊 Google Sheets\n- Create a Google Sheet with columns:\n  - `bookname`, `hook`, `insight`, `cta`, `postContent`, `published`, `date`\n- Add credentials in n8n with read/write permission\n\n### 🧠 Pinecone\n- Set up a Pinecone project and index (`linkdenpost`)\n- Namespace will be auto-named using the book filename\n\n### 🔑 API Credentials Required\n- **OpenAI API** (for embeddings and post generation)\n- **Pinecone API** (for vector storage and retrieval)\n- **LinkedIn OAuth2** (to publish posts)\n- **Google Drive & Sheets** credentials\n\n---\n\n## 🔁 Flow Summary\n\n```mermaid\ngraph TD\n  A[Google Drive Trigger] --&gt; B[Download PDF]\n  B --&gt; C[Extract Text]\n  C --&gt; D[Text Splitter]\n  D --&gt; E[Create Embeddings]\n  E --&gt; F[Pinecone Vector Store]\n  F --&gt; G[LangChain Agent]\n  G --&gt; H[Structured Output (5 Post Ideas)]\n  H --&gt; I[Split Ideas]\n  I --&gt; J[Format as LinkedIn Post (GPT)]\n  J --&gt; K[Store in Google Sheet]\n  L[Schedule Trigger] --&gt; M[Get Unpublished Post]\n  M --&gt; N[Post to LinkedIn]\n  N --&gt; O[Mark as Published]\n```\n\n---\n\n## 🧪 Prompt Example (Used in LangChain Agent)\n\n```text\nYou are a content strategist. Search the Pinecone vector DB containing a book. Generate 5 unique LinkedIn post ideas with:\n- A Hook (curiosity driven)\n- Insight (summary &lt; 100 words)\n- CTA (\"Agree or disagree?\", etc.)\n\nRespond in structured JSON:\n[\n  { \"Hook\": \"...\", \"Insight\": \"...\", \"CTA\": \"...\" },\n  ...\n]\n```\n\n---\n\n## ✅ Output Sample\n\n```json\n{\n  \"Hook\": \"Why your lab's results might be invalid 😱\",\n  \"Insight\": \"ISO/IEC 17025 stresses that labs must plan and address risks to impartiality and validity.\",\n  \"CTA\": \"Does your lab audit for these risks?\"\n}\n```\n\n---\n\n## 📆 Schedule Control\n\n- Uses **Schedule Trigger** to post daily at a set time.\n- Ensures automation with LinkedIn and accurate Google Sheet syncing.\n\n---\n\n## 📝 Notes\n\n- Posts remain **professional and concise** for a LinkedIn audience\n- Works with **any PDF book**\n- Supports multi-book pipelines\n- You can filter and tag books by filename or folder for segmenting post styles",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "DownLoadPdf",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "role": "documentDefaultDataLoader",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "role": "textSplitterRecursiveCharacterTextSplitter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "LinkedIn Post Idea Generation",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "role": "embeddingsOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Pinecorn Vector Store-book",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "role": "vectorStorePinecone",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "GeneratePostContent",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "linkedInPostsContent",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "linkedInPostsContent1",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "linkedInPostsContent2",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,272 @@
+{
+  "id": 6583,
+  "slug": "6583",
+  "title": "Generate & test SQL code with GPT/OpenRouter AI and PostgreSQL sandbox",
+  "description": "This is the core AI agent used for [queryverify.com]( https://queryverify.com). \n\nDon't trust complex AI-generated SQL queries without double-checking them in a safe environment. That's where queryverify comes in. It automatically creates a test environment with the necessary data, generates code for your task, runs it to double-check for correctness, and handles errors if necessary.\nIf you enable auto-fixing, queryverify will detect and fix issues on its own. If not, it will ask for your permission before making changes during debugging. In the end, you get thoroughly verified code along with full details about the environment it ran in.\n\n\n## Setup\n\nIt is an embedded chat for the website, but you can pin input data and run it on your own n8n instance.\n\n### Input data\n---\n\n1. `sessionId`: *uuid\\_v4*. **Required** to handle ongoing conversations and to create table names (used as a prefix).\n2. `threadId`: *string | nullable*. If `aiProvider` is **openai**, conversation history is managed on OpenAI’s side. This is not needed in the first request—it will start a new conversation. For ongoing conversations, you must provide this value. You can get it from the `OpenAIMainBrain` node output after the first run. If you want to start a new conversation, just leave it as `null`.\n3. `apiKey`: *string*. Your API key for the selected `aiProvider`.\n4. `aiProvider`: *string*. Currently supported values: **openai**, **openrouter**.\n5. `model`: *string*. The AI model key (e.g., `gpt-4.1`, `o3-mini`, or any supported model key from OpenRouter).\n6. `autoErrorFixing`: *boolean*. If `true`, it will automatically fix errors encountered when running code in the environment. If `false`, it will ask for your permission before attempting a fix.\n7. `chatInput`: *string*. The user's prompt or message.\n8. `currentDbSchemaWithData`: *string*. A JSON representation of the database schema with sample data. Used to inform the AI about the current database structure during an ongoing conversation. Please use the '[]' value in the first request. Example string for filled db structure : `'{\"users\":[{\"id\":1,\"name\":\"John Doe\",\"email\":\"john.d@example.com\"},{\"id\":2,\"name\":\"Jane Smith\",\"email\":\"jane.s@example.com\"}],\"products\":[{\"product_id\":101,\"product_name\":\"Laptop\",\"price\":999.99}]}'`\n\n---\n\nMake sure to fill in your credentials:\n\n1. Your OpenAI or OpenRouter API key\n2. Access to a local PostgreSQL database for test execution\n\nYou can view your generated tables using your preferred PostgreSQL GUI. We recommend **DBeaver**.\nAlternatively, you can activate the **“Deactivated DB Visualization”** nodes below. To use them, connect each to the most recent successful **Set** node and manually adjust the output.\nHowever, the easiest and most efficient method is to use a GUI.\n\n## Workflow Explanation\n\n1. We store all input values in the `localVariables` node. Please use this node to *get* the necessary data.\n2. `OpenAI` has a built-in assistant that manages chat history on their side. For OpenRouter, we handle chat history locally. That’s why we use separate nodes like `ifOpenAi` and `isOpenAi`. Note that `if` logic can also be used *inside* nodes.\n3. The `AutoErrorFixing` loop will run only a limited number of times, as defined by the `isMaxAutoErrorReached` node. This prevents infinite loops.\n4. The `Execute_AI_result` node connects to the PostgreSQL test database used to execute queries.\n\n## Guidance on customization\n\nThis setup is built for **PostgreSQL**, but it can be adapted to any **programming language**, and the logic can be extended to any **programming framework**.\n\nTo customize the logic for other programming languages:\n1. Change `instruction` parameter in `localVariables` node.\n2. Replace the `Execute_AI_result` PostgreSQL node with another executable node. For example, you can use the HTTP Request node.\n3. Update the `GenerateErrorPrompt` node's `prompt` parameter to generate code specific to your target language or framework.\n\n\n*Any workflows built on top of this must credit the original author and be released under an open-source license.*\n\n",
+  "featuredImage": "/data/workflows/6583/6583.webp",
+  "author": {
+    "id": 101,
+    "slug": "muhammad",
+    "name": "Muhammadumar",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 498,
+  "downloads": 49,
+  "createdAt": "2025-07-28T13:49:22.924Z",
+  "updatedAt": "2026-01-16T08:45:48.482Z",
+  "publishedAt": "2025-07-28T13:49:22.924Z",
+  "nodes": 39,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6583",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate & test SQL code with GPT/OpenRouter AI and PostgreSQL sandbox",
+    "workflowName": "Generate & test SQL code with GPT/OpenRouter AI and PostgreSQL sandbox",
+    "description": "This is the core AI agent used for [queryverify.com]( https://queryverify.com). \n\nDon't trust complex AI-generated SQL queries without double-checking them in a safe environment. That's where queryverify comes in. It automatically creates a test environment with the necessary data, generates code for your task, runs it to double-check for correctness, and handles errors if necessary.\nIf you enable auto-fixing, queryverify will detect and fix issues on its own. If not, it will ask for your permission before making changes during debugging. In the end, you get thoroughly verified code along with full details about the environment it ran in.\n\n\n## Setup\n\nIt is an embedded chat for the website, but you can pin input data and run it on your own n8n instance.\n\n### Input data\n---\n\n1. `sessionId`: *uuid\\_v4*. **Required** to handle ongoing conversations and to create table names (used as a prefix).\n2. `threadId`: *string | nullable*. If `aiProvider` is **openai**, conversation history is managed on OpenAI’s side. This is not needed in the first request—it will start a new conversation. For ongoing conversations, you must provide this value. You can get it from the `OpenAIMainBrain` node output after the first run. If you want to start a new conversation, just leave it as `null`.\n3. `apiKey`: *string*. Your API key for the selected `aiProvider`.\n4. `aiProvider`: *string*. Currently supported values: **openai**, **openrouter**.\n5. `model`: *string*. The AI model key (e.g., `gpt-4.1`, `o3-mini`, or any supported model key from OpenRouter).\n6. `autoErrorFixing`: *boolean*. If `true`, it will automatically fix errors encountered when running code in the environment. If `false`, it will ask for your permission before attempting a fix.\n7. `chatInput`: *string*. The user's prompt or message.\n8. `currentDbSchemaWithData`: *string*. A JSON representation of the database schema with sample data. Used to inform the AI about the current database structure during an ongoing conversation. Please use the '[]' value in the first request. Example string for filled db structure : `'{\"users\":[{\"id\":1,\"name\":\"John Doe\",\"email\":\"john.d@example.com\"},{\"id\":2,\"name\":\"Jane Smith\",\"email\":\"jane.s@example.com\"}],\"products\":[{\"product_id\":101,\"product_name\":\"Laptop\",\"price\":999.99}]}'`\n\n---\n\nMake sure to fill in your credentials:\n\n1. Your OpenAI or OpenRouter API key\n2. Access to a local PostgreSQL database for test execution\n\nYou can view your generated tables using your preferred PostgreSQL GUI. We recommend **DBeaver**.\nAlternatively, you can activate the **“Deactivated DB Visualization”** nodes below. To use them, connect each to the most recent successful **Set** node and manually adjust the output.\nHowever, the easiest and most efficient method is to use a GUI.\n\n## Workflow Explanation\n\n1. We store all input values in the `localVariables` node. Please use this node to *get* the necessary data.\n2. `OpenAI` has a built-in assistant that manages chat history on their side. For OpenRouter, we handle chat history locally. That’s why we use separate nodes like `ifOpenAi` and `isOpenAi`. Note that `if` logic can also be used *inside* nodes.\n3. The `AutoErrorFixing` loop will run only a limited number of times, as defined by the `isMaxAutoErrorReached` node. This prevents infinite loops.\n4. The `Execute_AI_result` node connects to the PostgreSQL test database used to execute queries.\n\n## Guidance on customization\n\nThis setup is built for **PostgreSQL**, but it can be adapted to any **programming language**, and the logic can be extended to any **programming framework**.\n\nTo customize the logic for other programming languages:\n1. Change `instruction` parameter in `localVariables` node.\n2. Replace the `Execute_AI_result` PostgreSQL node with another executable node. For example, you can use the HTTP Request node.\n3. Update the `GenerateErrorPrompt` node's `prompt` parameter to generate code specific to your target language or framework.\n\n\n*Any workflows built on top of this must credit the original author and be released under an open-source license.*",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "GenerateErrorPrompt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AutoErrorFixing",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "IfError",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Execute_AI_result",
+      "type": "n8n-nodes-base.postgres",
+      "role": "postgres",
+      "configDescription": "Version 2.6"
+    },
+    {
+      "name": "isAssistantExists",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "isAssistantExistsCode",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "isOpenAI",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "assistant",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "IfOpenAI",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IsMaxAutoErrorReached",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AgentName",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "setOutputByProvider",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAIMainBrain",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "askUserHowToHandleError",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "maxAutoErrorLimitReached",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "wordsForUser1",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "isExecutable",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "getAssistantsList",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenRouterAgent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "createOpenAiAssistant",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "localVariables",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "executedSQLQuery",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "issueOnOpenAiSide",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "mergeExecutionsResult",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "collectErrorLoopDetails",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "setThreadId",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "collectErrorLoopDetails1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Execute a SQL query",
+      "type": "n8n-nodes-base.mySql",
+      "role": "mySql",
+      "configDescription": "Version 2.5"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    }
+  ]
+}

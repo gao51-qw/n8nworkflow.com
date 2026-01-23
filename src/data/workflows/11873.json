@@ -1,0 +1,200 @@
+{
+  "id": 11873,
+  "slug": "11873",
+  "title": "Create autonomous payment agents using AgentGatePay and multi-chain tokens",
+  "description": "# AgentGatePay N8N Quick Start Guide\n\n**Get your AI agents paying for resources autonomously in under 10 minutes.**\n\n&gt; **⚠️ BETA VERSION**: These templates are currently in beta. We're actively adding features and improvements based on user feedback. Expect updates for enhanced functionality, additional blockchain networks, and new payment options.\n\n---\n\n## What You'll Build\n\n- **Buyer Agent**: Automatically pays for API resources using **USDC, USDT, or DAI** on **Ethereum, Base, Polygon, or Arbitrum** blockchains\n- **Seller API**: Accepts multi-token payments and delivers resources\n- **Monitoring**: Track spending and revenue in real-time across all chains and tokens\n\n**Supported Tokens:**\n- USDC (6 decimals) - Recommended\n- USDT (6 decimals)\n- DAI (18 decimals)\n\n**Supported Blockchains:**\n- Ethereum (mainnet)\n- Base (recommended for low gas fees ~$0.001)\n- Polygon\n- Arbitrum\n\n---\n\n## Prerequisites (5 minutes)\n\n### 1. Create AgentGatePay Accounts\n\n**Buyer Account** (agent that pays):\n```bash\ncurl -X POST https://api.agentgatepay.com/v1/users/signup \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"email\": \"buyer@example.com\",\n    \"password\": \"SecurePass123!\",\n    \"user_type\": \"agent\"\n  }'\n```\n\n**Seller Account** (receives payments):\n```bash\ncurl -X POST https://api.agentgatepay.com/v1/users/signup \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"email\": \"seller@example.com\",\n    \"password\": \"SecurePass123!\",\n    \"user_type\": \"merchant\"\n  }'\n```\n\n**Save both API keys** - shown only once!\n\n### 2. Deploy Transaction Signing Service (2 minutes)\n\n**One-Click Render Deploy:**\n1. Click: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AgentGatePay/TX)\n2. Enter:\n   - `AGENTGATEPAY_API_KEY`: Your buyer API key\n   - `WALLET_PRIVATE_KEY`: Your wallet private key (0x...)\n3. Deploy → Copy service URL: `https://your-app.onrender.com`\n\n### 3. Fund Wallet\n- Send **USDC, USDT, or DAI** to your buyer wallet\n- Default: **Base network** (lowest gas fees)\n- Need ~$1 in tokens for testing + ~$0.01 ETH for gas (on Ethereum) or ~$0.001 on Base\n\n---\n\n## Installation (3 minutes)\n\n### Step 1: Import Templates\n\n**In N8N:**\n1. Go to **Workflows** → **Add Workflow**\n2. Click **⋮** (three dots) → **Import from File**\n3. Import all 4 workflows:\n   - `🤖 Create a Cryptocurrency-Powered API for Selling Digital Resources with AgentGatePay`\n   - `💲Create a Cryptocurrency-Powered API for Selling Digital Resources with AgentGatePay`\n   - `📊 Buyer Agent [Monitoring] - AgentGatePay Autonomous Payment Workflow`\n   - `💲 Seller Agent [Monitoring] - AgentGatePay Autonomous Payment Workflow`\n\n### Step 2: Create Data Table\n\n**In N8N Settings:**\n1. Go to **Settings** → **Data** → **Data Tables**\n2. Create table: `AgentPay_Mandates`\n3. Add column: `mandate_token` (type: String)\n4. Save\n\n---\n\n## Configuration (2 minutes)\n\n### Configure Seller API First\n\n**Open:** `💲Seller Resource API - CLIENT TEMPLATE`\n\n**Edit Node 1** (Parse Request):\n```javascript\nconst SELLER_CONFIG = {\n  merchant: {\n    wallet_address: \"0xYourSellerWallet...\",  // ← Your seller wallet\n    api_key: \"pk_live_xyz789...\"              // ← Your seller API key\n  },\n  catalog: {\n    \"demo-resource\": {\n      id: \"demo-resource\",\n      price_usd: 0.01,                        // $0.01 per resource\n      description: \"Demo API Resource\"\n    }\n  }\n};\n```\n\n**Activate workflow** → Copy webhook URL\n\n### Configure Buyer Agent\n\n**Open:** `🤖 Buyer Agent - CLIENT TEMPLATE`\n\n**Edit Node 1** (Load Config):\n```javascript\nconst CONFIG = {\n  buyer: {\n    email: \"buyer@example.com\",              // ← Your buyer email\n    api_key: \"pk_live_abc123...\",            // ← Your buyer API key\n    budget_usd: 100,                         // $100 mandate budget\n    mandate_ttl_days: 7                      // 7-day validity\n  },\n  seller: {\n    api_url: \"https://YOUR-N8N.app.n8n.cloud/webhook/YOUR-WEBHOOK-ID\"  // ← Seller webhook base URL ONLY (see README.md for extraction instructions)\n  },\n  render: {\n    service_url: \"https://your-app.onrender.com\"  // ← Your Render URL\n  }\n};\n```\n\n---\n\n## Run Your First Payment (1 minute)\n\n### Execute Buyer Agent\n\n1. Open **Buyer Agent** workflow\n2. Click **Execute Workflow**\n3. Watch the magic happen:\n   - Mandate created ($100 budget)\n   - Resource requested (402 Payment Required)\n   - Payment signed (2 transactions: merchant + commission)\n   - Payment verified on blockchain\n   - Resource delivered\n\n**Total time:** ~5-8 seconds\n\n### Verify on Blockchain\n\nCheck transactions on BaseScan:\n```\nhttps://basescan.org/address/YOUR_BUYER_WALLET\n```\n\nYou'll see:\n- **TX 1:** Commission to AgentGatePay (0.5% = $0.00005)\n- **TX 2:** Payment to seller (99.5% = $0.00995)\n\n---\n\n## Monitor Activity\n\n### Buyer Monitoring\n\n**Open:** `📊 Buyer Monitoring - AUDIT LOGS`\n\n**Edit Node 1:** Set your buyer wallet address and API key\n\n**Execute** → See:\n- Mandate budget remaining\n- Payment history\n- Total spent\n- Average transaction size\n\n### Seller Monitoring\n\n**Open:** `💲 Seller Monitoring - AUDIT LOGS`\n\n**Edit Node 1:** Set your seller wallet address and API key\n\n**Execute** → See:\n- Total revenue\n- Commission breakdown\n- Top payers\n- Payment count\n\n---\n\n## How It Works\n\n### Payment Flow\n\n```\n1. Buyer Agent requests resource\n   ↓\n2. Seller returns 402 Payment Required\n   (includes: wallet address, price, token, chain)\n   ↓\n3. Buyer signs TWO blockchain transactions via Render:\n   - Merchant payment (99.5%)\n   - Gateway commission (0.5%)\n   ↓\n4. Buyer resubmits request with transaction hashes\n   ↓\n5. Seller verifies payment with AgentGatePay API\n   ↓\n6. Seller delivers resource\n```\n\n### Key Concepts\n\n**AP2 Mandate:**\n- Pre-authorized spending authority\n- Budget limit ($100 in example)\n- Time limit (7 days in example)\n- Stored in N8N Data Table for reuse\n\n**x402 Protocol:**\n- HTTP 402 \"Payment Required\" status code\n- Seller specifies payment details\n- Buyer pays and retries with proof\n\n**Two-Transaction Model:**\n- Transaction 1: Merchant receives 99.5%\n- Transaction 2: Gateway receives 0.5%\n- Both verified on blockchain\n\n---\n\n## Customization\n\n### Change Resource Price\n\nEdit seller Node 1:\n```javascript\ncatalog: {\n  \"expensive-api\": {\n    id: \"expensive-api\",\n    price_usd: 1.00,  // ← Change price\n    description: \"Premium API access\"\n  }\n}\n```\n\n### Add More Resources\n\n```javascript\ncatalog: {\n  \"basic\": { id: \"basic\", price_usd: 0.01, description: \"Basic API\" },\n  \"pro\": { id: \"pro\", price_usd: 0.10, description: \"Pro API\" },\n  \"enterprise\": { id: \"enterprise\", price_usd: 1.00, description: \"Enterprise API\" }\n}\n```\n\nBuyer requests by ID: `?resource_id=pro`\n\n### Change Blockchain and Token\n\nBy default, templates use **Base + USDC**. To change:\n\n**Edit buyer Node 1** (Load Config):\n```javascript\nconst CONFIG = {\n  buyer: { /* ... */ },\n  seller: { /* ... */ },\n  render: { /* ... */ },\n  payment: {\n    chain: \"polygon\",  // Options: ethereum, base, polygon, arbitrum\n    token: \"DAI\"       // Options: USDC, USDT, DAI\n  }\n};\n```\n\n**Important:**\n1. Ensure your wallet has the selected token on the selected chain\n2. Update Render service to support the chain (add RPC URL)\n3. Gas fees vary by chain.\n\n\n**Token Decimals:**\n- USDC/USDT: 6 decimals (automatic conversion)\n- DAI: 18 decimals (automatic conversion)\n\n### Schedule Monitoring\n\nReplace \"Execute Workflow\" trigger with **Schedule Trigger**:\n- Buyer monitoring: Every 1 hour\n- Seller monitoring: Every 6 hours\n\nAdd **Slack/Email** node to send alerts.\n\n---\n\n## Troubleshooting\n\n### \"Mandate expired\"\n**Fix:** Delete mandate from Data Table → Re-execute workflow\n\n### \"Transaction not found\"\n**Fix:** Wait 10-15 seconds for blockchain confirmation → Retry\n\n### \"Render service unavailable\"\n**Fix:** Render free tier spins down after 15 min → First request takes ~5 sec (cold start)\n\n### \"Insufficient funds\"\n**Fix:** Send more tokens (USDC/USDT/DAI) to buyer wallet\n- Check balance on blockchain explorer (BaseScan for Base, Etherscan for Ethereum, etc.)\n\n### \"Webhook not responding\"\n**Fix:** Ensure seller workflow is **Active** (toggle in top-right)\n\n---\n\n## Production Checklist\n\nBefore going live:\n\n- [ ] Use separate wallet for agent (not your main wallet)\n- [ ] Set conservative mandate budgets ($10-100)\n- [ ] Monitor spending daily (use monitoring workflows)\n- [ ] Upgrade Render to paid tier ($7/mo) for no cold starts\n- [ ] Set up Slack/email alerts for low balance\n- [ ] Test with small amounts first ($0.01-0.10)\n- [ ] Keep API keys secure (use N8N credentials manager)\n- [ ] Review transactions on blockchain explorer weekly\n\n---\n\n## Summary\n\nYou just built:\n- Autonomous payment agent (buys resources automatically)\n- Monetized API (sells resources for **USDC, USDT, or DAI**)\n- **Multi-chain support** (Ethereum, Base, Polygon, Arbitrum)\n- Real blockchain transactions (verified on-chain)\n- Budget management (AP2 mandates)\n- Monitoring dashboard (track spending/revenue)\n\n**Total setup time:** ~10 minutes\n**Total cost:** $0 (Render free tier + AgentGatePay free)\n\n---\n\n**Ready to scale?** Connect multiple agents, add more resources, integrate with your existing systems!\n\n**Questions?** Check `README.md` or contact support@agentgatepay.com\n\nWebsite:\nhttps://www.agentgatepay.com",
+  "featuredImage": "/data/workflows/11873/11873.webp",
+  "author": {
+    "id": 101,
+    "slug": "agentgatepay",
+    "name": "AgentGatePay",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 52,
+  "downloads": 5,
+  "createdAt": "2025-12-16T20:04:14.833Z",
+  "updatedAt": "2026-01-16T09:10:28.350Z",
+  "publishedAt": "2025-12-16T20:04:14.833Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11873",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create autonomous payment agents using AgentGatePay and multi-chain tokens",
+    "workflowName": "Create autonomous payment agents using AgentGatePay and multi-chain tokens",
+    "description": "# AgentGatePay N8N Quick Start Guide\n\n**Get your AI agents paying for resources autonomously in under 10 minutes.**\n\n&gt; **⚠️ BETA VERSION**: These templates are currently in beta. We're actively adding features and improvements based on user feedback. Expect updates for enhanced functionality, additional blockchain networks, and new payment options.\n\n---\n\n## What You'll Build\n\n- **Buyer Agent**: Automatically pays for API resources using **USDC, USDT, or DAI** on **Ethereum, Base, Polygon, or Arbitrum** blockchains\n- **Seller API**: Accepts multi-token payments and delivers resources\n- **Monitoring**: Track spending and revenue in real-time across all chains and tokens\n\n**Supported Tokens:**\n- USDC (6 decimals) - Recommended\n- USDT (6 decimals)\n- DAI (18 decimals)\n\n**Supported Blockchains:**\n- Ethereum (mainnet)\n- Base (recommended for low gas fees ~$0.001)\n- Polygon\n- Arbitrum\n\n---\n\n## Prerequisites (5 minutes)\n\n### 1. Create AgentGatePay Accounts\n\n**Buyer Account** (agent that pays):\n```bash\ncurl -X POST https://api.agentgatepay.com/v1/users/signup \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"email\": \"buyer@example.com\",\n    \"password\": \"SecurePass123!\",\n    \"user_type\": \"agent\"\n  }'\n```\n\n**Seller Account** (receives payments):\n```bash\ncurl -X POST https://api.agentgatepay.com/v1/users/signup \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"email\": \"seller@example.com\",\n    \"password\": \"SecurePass123!\",\n    \"user_type\": \"merchant\"\n  }'\n```\n\n**Save both API keys** - shown only once!\n\n### 2. Deploy Transaction Signing Service (2 minutes)\n\n**One-Click Render Deploy:**\n1. Click: [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/AgentGatePay/TX)\n2. Enter:\n   - `AGENTGATEPAY_API_KEY`: Your buyer API key\n   - `WALLET_PRIVATE_KEY`: Your wallet private key (0x...)\n3. Deploy → Copy service URL: `https://your-app.onrender.com`\n\n### 3. Fund Wallet\n- Send **USDC, USDT, or DAI** to your buyer wallet\n- Default: **Base network** (lowest gas fees)\n- Need ~$1 in tokens for testing + ~$0.01 ETH for gas (on Ethereum) or ~$0.001 on Base\n\n---\n\n## Installation (3 minutes)\n\n### Step 1: Import Templates\n\n**In N8N:**\n1. Go to **Workflows** → **Add Workflow**\n2. Click **⋮** (three dots) → **Import from File**\n3. Import all 4 workflows:\n   - `🤖 Create a Cryptocurrency-Powered API for Selling Digital Resources with AgentGatePay`\n   - `💲Create a Cryptocurrency-Powered API for Selling Digital Resources with AgentGatePay`\n   - `📊 Buyer Agent [Monitoring] - AgentGatePay Autonomous Payment Workflow`\n   - `💲 Seller Agent [Monitoring] - AgentGatePay Autonomous Payment Workflow`\n\n### Step 2: Create Data Table\n\n**In N8N Settings:**\n1. Go to **Settings** → **Data** → **Data Tables**\n2. Create table: `AgentPay_Mandates`\n3. Add column: `mandate_token` (type: String)\n4. Save\n\n---\n\n## Configuration (2 minutes)\n\n### Configure Seller API First\n\n**Open:** `💲Seller Resource API - CLIENT TEMPLATE`\n\n**Edit Node 1** (Parse Request):\n```javascript\nconst SELLER_CONFIG = {\n  merchant: {\n    wallet_address: \"0xYourSellerWallet...\",  // ← Your seller wallet\n    api_key: \"pk_live_xyz789...\"              // ← Your seller API key\n  },\n  catalog: {\n    \"demo-resource\": {\n      id: \"demo-resource\",\n      price_usd: 0.01,                        // $0.01 per resource\n      description: \"Demo API Resource\"\n    }\n  }\n};\n```\n\n**Activate workflow** → Copy webhook URL\n\n### Configure Buyer Agent\n\n**Open:** `🤖 Buyer Agent - CLIENT TEMPLATE`\n\n**Edit Node 1** (Load Config):\n```javascript\nconst CONFIG = {\n  buyer: {\n    email: \"buyer@example.com\",              // ← Your buyer email\n    api_key: \"pk_live_abc123...\",            // ← Your buyer API key\n    budget_usd: 100,                         // $100 mandate budget\n    mandate_ttl_days: 7                      // 7-day validity\n  },\n  seller: {\n    api_url: \"https://YOUR-N8N.app.n8n.cloud/webhook/YOUR-WEBHOOK-ID\"  // ← Seller webhook base URL ONLY (see README.md for extraction instructions)\n  },\n  render: {\n    service_url: \"https://your-app.onrender.com\"  // ← Your Render URL\n  }\n};\n```\n\n---\n\n## Run Your First Payment (1 minute)\n\n### Execute Buyer Agent\n\n1. Open **Buyer Agent** workflow\n2. Click **Execute Workflow**\n3. Watch the magic happen:\n   - Mandate created ($100 budget)\n   - Resource requested (402 Payment Required)\n   - Payment signed (2 transactions: merchant + commission)\n   - Payment verified on blockchain\n   - Resource delivered\n\n**Total time:** ~5-8 seconds\n\n### Verify on Blockchain\n\nCheck transactions on BaseScan:\n```\nhttps://basescan.org/address/YOUR_BUYER_WALLET\n```\n\nYou'll see:\n- **TX 1:** Commission to AgentGatePay (0.5% = $0.00005)\n- **TX 2:** Payment to seller (99.5% = $0.00995)\n\n---\n\n## Monitor Activity\n\n### Buyer Monitoring\n\n**Open:** `📊 Buyer Monitoring - AUDIT LOGS`\n\n**Edit Node 1:** Set your buyer wallet address and API key\n\n**Execute** → See:\n- Mandate budget remaining\n- Payment history\n- Total spent\n- Average transaction size\n\n### Seller Monitoring\n\n**Open:** `💲 Seller Monitoring - AUDIT LOGS`\n\n**Edit Node 1:** Set your seller wallet address and API key\n\n**Execute** → See:\n- Total revenue\n- Commission breakdown\n- Top payers\n- Payment count\n\n---\n\n## How It Works\n\n### Payment Flow\n\n```\n1. Buyer Agent requests resource\n   ↓\n2. Seller returns 402 Payment Required\n   (includes: wallet address, price, token, chain)\n   ↓\n3. Buyer signs TWO blockchain transactions via Render:\n   - Merchant payment (99.5%)\n   - Gateway commission (0.5%)\n   ↓\n4. Buyer resubmits request with transaction hashes\n   ↓\n5. Seller verifies payment with AgentGatePay API\n   ↓\n6. Seller delivers resource\n```\n\n### Key Concepts\n\n**AP2 Mandate:**\n- Pre-authorized spending authority\n- Budget limit ($100 in example)\n- Time limit (7 days in example)\n- Stored in N8N Data Table for reuse\n\n**x402 Protocol:**\n- HTTP 402 \"Payment Required\" status code\n- Seller specifies payment details\n- Buyer pays and retries with proof\n\n**Two-Transaction Model:**\n- Transaction 1: Merchant receives 99.5%\n- Transaction 2: Gateway receives 0.5%\n- Both verified on blockchain\n\n---\n\n## Customization\n\n### Change Resource Price\n\nEdit seller Node 1:\n```javascript\ncatalog: {\n  \"expensive-api\": {\n    id: \"expensive-api\",\n    price_usd: 1.00,  // ← Change price\n    description: \"Premium API access\"\n  }\n}\n```\n\n### Add More Resources\n\n```javascript\ncatalog: {\n  \"basic\": { id: \"basic\", price_usd: 0.01, description: \"Basic API\" },\n  \"pro\": { id: \"pro\", price_usd: 0.10, description: \"Pro API\" },\n  \"enterprise\": { id: \"enterprise\", price_usd: 1.00, description: \"Enterprise API\" }\n}\n```\n\nBuyer requests by ID: `?resource_id=pro`\n\n### Change Blockchain and Token\n\nBy default, templates use **Base + USDC**. To change:\n\n**Edit buyer Node 1** (Load Config):\n```javascript\nconst CONFIG = {\n  buyer: { /* ... */ },\n  seller: { /* ... */ },\n  render: { /* ... */ },\n  payment: {\n    chain: \"polygon\",  // Options: ethereum, base, polygon, arbitrum\n    token: \"DAI\"       // Options: USDC, USDT, DAI\n  }\n};\n```\n\n**Important:**\n1. Ensure your wallet has the selected token on the selected chain\n2. Update Render service to support the chain (add RPC URL)\n3. Gas fees vary by chain.\n\n\n**Token Decimals:**\n- USDC/USDT: 6 decimals (automatic conversion)\n- DAI: 18 decimals (automatic conversion)\n\n### Schedule Monitoring\n\nReplace \"Execute Workflow\" trigger with **Schedule Trigger**:\n- Buyer monitoring: Every 1 hour\n- Seller monitoring: Every 6 hours\n\nAdd **Slack/Email** node to send alerts.\n\n---\n\n## Troubleshooting\n\n### \"Mandate expired\"\n**Fix:** Delete mandate from Data Table → Re-execute workflow\n\n### \"Transaction not found\"\n**Fix:** Wait 10-15 seconds for blockchain confirmation → Retry\n\n### \"Render service unavailable\"\n**Fix:** Render free tier spins down after 15 min → First request takes ~5 sec (cold start)\n\n### \"Insufficient funds\"\n**Fix:** Send more tokens (USDC/USDT/DAI) to buyer wallet\n- Check balance on blockchain explorer (BaseScan for Base, Etherscan for Ethereum, etc.)\n\n### \"Webhook not responding\"\n**Fix:** Ensure seller workflow is **Active** (toggle in top-right)\n\n---\n\n## Production Checklist\n\nBefore going live:\n\n- [ ] Use separate wallet for agent (not your main wallet)\n- [ ] Set conservative mandate budgets ($10-100)\n- [ ] Monitor spending daily (use monitoring workflows)\n- [ ] Upgrade Render to paid tier ($7/mo) for no cold starts\n- [ ] Set up Slack/email alerts for low balance\n- [ ] Test with small amounts first ($0.01-0.10)\n- [ ] Keep API keys secure (use N8N credentials manager)\n- [ ] Review transactions on blockchain explorer weekly\n\n---\n\n## Summary\n\nYou just built:\n- Autonomous payment agent (buys resources automatically)\n- Monetized API (sells resources for **USDC, USDT, or DAI**)\n- **Multi-chain support** (Ethereum, Base, Polygon, Arbitrum)\n- Real blockchain transactions (verified on-chain)\n- Budget management (AP2 mandates)\n- Monitoring dashboard (track spending/revenue)\n\n**Total setup time:** ~10 minutes\n**Total cost:** $0 (Render free tier + AgentGatePay free)\n\n---\n\n**Ready to scale?** Connect multiple agents, add more resources, integrate with your existing systems!\n\n**Questions?** Check `README.md` or contact support@agentgatepay.com\n\nWebsite:\nhttps://www.agentgatepay.com",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "▶️ START",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "1️⃣ Load Config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "2️⃣ 📊 Get Mandate Token",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "2B️⃣ Normalize Result",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "3️⃣ Has Token?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "4️⃣ ✅ Verify Existing Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "4B️⃣ Check Verification",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "5️⃣ 🆕 Create New Mandate",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "5B️⃣ Parse New Mandate",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "6️⃣ ✅ Verify New Mandate",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "6B️⃣ Check New Mandate",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "7️⃣ 💾 Insert Token",
+      "type": "n8n-nodes-base.dataTable",
+      "role": "dataTable",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "7B️⃣ Restore Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "8️⃣ 🔀 Merge Paths",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "9️⃣ Request Resource (x402)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "9B️⃣ Parse 402 Response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "🔟 🔒 Sign Payment (Render)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "1️⃣1️⃣ Extract TX Hashes",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "1️⃣2️⃣ Submit Payment (MCP)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "1️⃣3️⃣ Receive Resource",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "1️⃣4️⃣ Complete Task",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "START HERE",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note 5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

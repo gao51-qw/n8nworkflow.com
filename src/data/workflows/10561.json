@@ -1,0 +1,218 @@
+{
+  "id": 10561,
+  "slug": "10561",
+  "title": "Generate personalized sales leads with Claude AI & Explorium for Gmail outreach",
+  "description": "# Outbound Agent - AI-Powered Lead Generation with Natural Language Prospecting\n\nThis n8n workflow transforms natural language queries into targeted B2B prospecting campaigns by combining Explorium's data intelligence with AI-powered research and personalized email generation. Simply describe your ideal customer profile in plain English, and the workflow automatically finds prospects, enriches their data, researches them, and creates personalized email drafts.\n\n## DEMO\n\n[Template Demo](https://youtu.be/7CddMDY8QUM)\n\n## Credentials Required\n\nTo use this workflow, set up the following credentials in your n8n environment:\n\n### Anthropic API\n- **Type:** API Key\n- **Used for:** AI Agent query interpretation, email research, and email writing\n- Get your API key at [Anthropic Console](https://console.anthropic.com/)\n\n### Explorium API\n- **Type:** Generic Header Auth\n- **Header:** `Authorization`\n- **Value:** `Bearer YOUR_API_KEY`\n- **Used for:** Prospect matching, contact enrichment, professional profiles, and MCP research\n- Get your API key at [Explorium Dashboard](https://app.explorium.ai/)\n\n### Explorium MCP\n- **Type:** HTTP Header Auth\n- **Used for:** Real-time company and prospect intelligence research\n- Connect to: `https://mcp.explorium.ai/mcp`\n\n### Gmail\n- **Type:** OAuth2\n- **Used for:** Creating email drafts\n- Alternative options: Outlook, Mailchimp, SendGrid, Lemlist\n\nGo to **Settings → Credentials**, create these credentials, and assign them in the respective nodes before running the workflow.\n\n---\n\n## Workflow Overview\n\n### Node 1: When chat message received\nThis node creates an interactive chat interface where users can describe their prospecting criteria in natural language.\n\n- **Type:** Chat Trigger\n- **Purpose:** Accept natural language queries like \"Get 5 marketing leaders at fintech startups who joined in the past year and have valid contact information\"\n- **Example Prompts:**\n  - \"Find SaaS executives in New York with 50-200 employees\"\n  - \"Get marketing directors at healthcare companies\"\n  - \"Show me VPs at fintech startups with recent funding\"\n\n### Node 2: Chat or Refinement\nThis code node manages the conversation flow, handling both initial user queries and validation error feedback.\n\n- **Function:** Routes either the original chat input or validation error messages to the AI Agent\n- **Dynamic Input:** Combines `chatInput` and `errorInput` fields\n- **Purpose:** Creates a feedback loop for validation error correction\n\n### Node 3: AI Agent\nThe core intelligence node that interprets natural language and generates structured API calls.\n\n**Functionality:**\n- Interprets user intent from natural language queries\n- Maps concepts to Explorium API filters (job levels, departments, company size, revenue, location, etc.)\n- Generates valid JSON requests with precise filter criteria\n- Handles off-topic queries with helpful guidance\n- Connected to MCP Client for real-time filter specifications\n\n**AI Components:**\n- **Anthropic Chat Model:** Claude Sonnet 4 for query interpretation\n- **Simple Memory:** Maintains conversation context (100 message window)\n- **Output Parser:** Structured JSON output with schema validation\n- **MCP Client:** Connected to `https://mcp.explorium.ai/mcp` for Explorium specifications\n\n**System Instructions:**\n- Expert in converting natural language to Explorium API filters\n- Can revise previous responses based on validation errors\n- Strict adherence to allowed filter values and formats\n- Default settings: `mode: \"full\"`, `size: 10000`, `page_size: 100`, `has_email: true`\n\n### Node 4: API Call Validation\nThis code node validates the AI-generated API request against Explorium's filter specifications.\n\n**Validation Checks:**\n- Filter key validity (only allowed filters from approved list)\n- Value format correctness (enums, ranges, country codes)\n- No duplicate values in arrays\n- Proper range structure for experience fields (`total_experience_months`, `current_role_months`)\n- Required field presence\n\n**Allowed Filters:**\n- `country_code`, `region_country_code`, `company_country_code`, `company_region_country_code`\n- `company_size`, `company_revenue`, `company_age`, `number_of_locations`\n- `google_category`, `naics_category`, `linkedin_category`, `company_name`\n- `city_region_country`, `website_keywords`\n- `has_email`, `has_phone_number`\n- `job_level`, `job_department`, `job_title`\n- `business_id`, `total_experience_months`, `current_role_months`\n\n**Output:**\n- `isValid`: Boolean validation status\n- `validationErrors`: Array of specific error messages\n\n### Node 5: Is API Call Valid?\nConditional routing node that determines the next step based on validation results.\n\n- **If Valid:** Proceed to Explorium API: Fetch Prospects\n- **If Invalid:** Route to Validation Prompter for correction\n\n### Node 6: Validation Prompter\nGenerates detailed error feedback for the AI Agent when validation fails.\nThis creates a self-correcting loop where the AI learns from validation errors and regenerates compliant requests by routing back to Node 2 (Chat or Refinement).\n\n### Node 7: Explorium API: Fetch Prospects\nMakes the validated API call to Explorium's prospect database.\n\n- **Method:** POST\n- **Endpoint:** `/v1/prospects/fetch`\n- **Authentication:** Header Auth (Bearer token)\n- **Input:** JSON with filters, mode, size, page_size, page\n- **Returns:** Array of matched prospects with prospect IDs based on filter criteria\n\n### Node 8: Pull Prospect IDs\nExtracts prospect IDs from the fetch response for bulk enrichment.\n\n- **Input:** Full fetch response with prospect data\n- **Output:** Array of `prospect_id` values formatted for enrichment API\n\n### Node 9: Explorium API: Contact Enrichment\nSingle enrichment node that enhances prospect data with both contact and profile information.\n\n- **Method:** POST\n- **Endpoint:** `/v1/prospects/enrich`\n- **Enrichment Types:** contacts, profiles\n- **Authentication:** Header Auth (Bearer token)\n- **Input:** Array of prospect IDs from Node 8\n\n**Returns:**\n- **Contacts:** Professional emails (current, verified), phone numbers (mobile, work), email validation status, all available email addresses\n- **Profiles:** Full professional history, current role details, company information, skills and expertise, education background, experience timeline, job titles and seniority levels\n\n### Node 10: Clean Output Data\nTransforms and structures the enriched data for downstream processing.\n\n### Node 11: Loop Over Items\nIterates through each prospect to generate individualized research and emails.\n\n- **Batch Size:** 1 (processes prospects one at a time)\n- **Purpose:** Enable personalized research and email generation for each prospect\n- **Loop Control:** Processes until all prospects are complete\n\n### Node 12: Research Email\nAI-powered research agent that investigates each prospect using Explorium MCP.\n\n**Input Data:**\n- Prospect name, job title, company name, company website\n- LinkedIn URL, job department, skills\n\n**Research Focus:**\n- Company automation tool usage (n8n, Zapier, Make, HubSpot, Salesforce)\n- Data enrichment practices\n- Tech stack and infrastructure (Snowflake, Segment, etc.)\n- Recent company activity and initiatives\n- Pain points related to B2B data (outdated CRM data, manual enrichment, static workflows)\n- Public content (speaking engagements, blog posts, thought leadership)\n\n**AI Components:**\n- **Anthropic Chat Model1:** Claude Sonnet 4 for research\n- **Simple Memory1:** Maintains research context\n- **Explorium MCP1:** Connected to `https://mcp.explorium.ai/mcp` for real-time intelligence\n\n**Output:** Structured JSON with research findings including automation tools, pain points, personalization notes\n\n### Node 13: Email Writer\nGenerates personalized cold email drafts based on research findings.\n\n**Input Data:**\n- Contact info from Loop Over Items\n- Current experience and skills\n- Research findings from Research Email agent\n- Company data (name, website)\n\n**AI Components:**\n- **Anthropic Chat Model3:** Claude Sonnet 4 for email writing\n- **Structured Output Parser:** Enforces JSON schema with email, subject, message fields\n\n**Output Schema:**\n- `email`: Selected prospect email address (professional preferred)\n- `subject`: Compelling, personalized subject line\n- `message`: HTML formatted email body\n\n### Node 14: Create a draft (Gmail)\nCreates email drafts in Gmail for review before sending.\n\n- **Resource:** Draft\n- **Subject:** From Email Writer output\n- **Message:** HTML formatted email body\n- **Send To:** Selected prospect email address\n- **Authentication:** Gmail OAuth2\n\n**After Creation:** Loops back to Node 11 (Loop Over Items) to process next prospect\n\n**Alternative Output Options:**\n- **Outlook:** Create drafts in Microsoft Outlook\n- **Mailchimp:** Add to email campaign\n- **SendGrid:** Queue for sending\n- **Lemlist:** Add to cold email sequence\n\n---\n\n## Workflow Flow Summary\n\n1. **Input:** User describes target prospects in natural language via chat interface\n2. **Interpret:** AI Agent converts query to structured Explorium API filters using MCP\n3. **Validate:** API call validation ensures filter compliance\n4. **Refine:** If invalid, error feedback loop helps AI correct the request\n5. **Fetch:** Retrieve matching prospect IDs from Explorium database\n6. **Enrich:** Parallel bulk enrichment of contact details and professional profiles\n7. **Clean:** Transform and structure enriched data\n8. **Loop:** Process each prospect individually\n9. **Research:** AI agent uses Explorium MCP to gather company and prospect intelligence\n10. **Write:** Generate personalized email based on research\n11. **Draft:** Create reviewable email drafts in preferred platform\n\nThis workflow eliminates manual prospecting work by combining natural language processing, intelligent data enrichment, automated research, and personalized email generation—taking you from \"I need marketing leaders at fintech companies\" to personalized, research-backed email drafts in minutes.\n\n---\n\n## Customization Options\n\n### Flexible Triggers\nThe chat interface can be replaced with:\n- Scheduled runs for recurring prospecting\n- Webhook triggers from CRM updates\n- Manual execution for ad-hoc campaigns\n\n### Scalable Enrichment\nAdjust enrichment depth by:\n- Adding more Explorium API endpoints (technographics, funding, news)\n- Configuring prospect batch sizes\n- Customizing data cleaning logic\n\n### Output Destinations\nRoute emails to your preferred platform:\n- **Email Platforms:** Gmail, Outlook, SendGrid, Mailchimp\n- **Sales Tools:** Lemlist, Outreach, SalesLoft\n- **CRM Integration:** Salesforce, HubSpot (create leads with research)\n- **Collaboration:** Slack notifications, Google Docs reports\n\n### AI Model Flexibility\nSwap AI providers based on your needs:\n- Default: Anthropic Claude (Sonnet 4)\n- Alternatives: OpenAI GPT-4, Google Gemini\n\n---\n\n## Setup Notes\n\n1. **Domain Filtering:** The workflow prioritizes professional emails—customize email selection logic in the Clean Output Data node\n2. **MCP Configuration:** Explorium MCP requires Header Auth setup—ensure credentials are properly configured\n3. **Rate Limits:** Adjust Loop Over Items batch size if hitting API rate limits\n4. **Memory Context:** Simple Memory maintains conversation history—increase window length for longer sessions\n5. **Validation:** The AI self-corrects through validation loops—monitor early runs to ensure filter accuracy\n\nThis workflow represents a complete AI-powered sales development representative (SDR) that handles prospecting, research, and personalized outreach with minimal human intervention.",
+  "featuredImage": "/data/workflows/10561/10561.webp",
+  "author": {
+    "id": 101,
+    "slug": "explorium",
+    "name": "explorium",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Generation",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 170,
+  "downloads": 17,
+  "createdAt": "2025-11-06T08:45:40.648Z",
+  "updatedAt": "2026-01-16T09:05:32.752Z",
+  "publishedAt": "2025-11-06T08:45:40.648Z",
+  "nodes": 30,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10561",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Generate personalized sales leads with Claude AI & Explorium for Gmail outreach",
+    "workflowName": "Generate personalized sales leads with Claude AI & Explorium for Gmail outreach",
+    "description": "# Outbound Agent - AI-Powered Lead Generation with Natural Language Prospecting\n\nThis n8n workflow transforms natural language queries into targeted B2B prospecting campaigns by combining Explorium's data intelligence with AI-powered research and personalized email generation. Simply describe your ideal customer profile in plain English, and the workflow automatically finds prospects, enriches their data, researches them, and creates personalized email drafts.\n\n## DEMO\n\n[Template Demo](https://youtu.be/7CddMDY8QUM)\n\n## Credentials Required\n\nTo use this workflow, set up the following credentials in your n8n environment:\n\n### Anthropic API\n- **Type:** API Key\n- **Used for:** AI Agent query interpretation, email research, and email writing\n- Get your API key at [Anthropic Console](https://console.anthropic.com/)\n\n### Explorium API\n- **Type:** Generic Header Auth\n- **Header:** `Authorization`\n- **Value:** `Bearer YOUR_API_KEY`\n- **Used for:** Prospect matching, contact enrichment, professional profiles, and MCP research\n- Get your API key at [Explorium Dashboard](https://app.explorium.ai/)\n\n### Explorium MCP\n- **Type:** HTTP Header Auth\n- **Used for:** Real-time company and prospect intelligence research\n- Connect to: `https://mcp.explorium.ai/mcp`\n\n### Gmail\n- **Type:** OAuth2\n- **Used for:** Creating email drafts\n- Alternative options: Outlook, Mailchimp, SendGrid, Lemlist\n\nGo to **Settings → Credentials**, create these credentials, and assign them in the respective nodes before running the workflow.\n\n---\n\n## Workflow Overview\n\n### Node 1: When chat message received\nThis node creates an interactive chat interface where users can describe their prospecting criteria in natural language.\n\n- **Type:** Chat Trigger\n- **Purpose:** Accept natural language queries like \"Get 5 marketing leaders at fintech startups who joined in the past year and have valid contact information\"\n- **Example Prompts:**\n  - \"Find SaaS executives in New York with 50-200 employees\"\n  - \"Get marketing directors at healthcare companies\"\n  - \"Show me VPs at fintech startups with recent funding\"\n\n### Node 2: Chat or Refinement\nThis code node manages the conversation flow, handling both initial user queries and validation error feedback.\n\n- **Function:** Routes either the original chat input or validation error messages to the AI Agent\n- **Dynamic Input:** Combines `chatInput` and `errorInput` fields\n- **Purpose:** Creates a feedback loop for validation error correction\n\n### Node 3: AI Agent\nThe core intelligence node that interprets natural language and generates structured API calls.\n\n**Functionality:**\n- Interprets user intent from natural language queries\n- Maps concepts to Explorium API filters (job levels, departments, company size, revenue, location, etc.)\n- Generates valid JSON requests with precise filter criteria\n- Handles off-topic queries with helpful guidance\n- Connected to MCP Client for real-time filter specifications\n\n**AI Components:**\n- **Anthropic Chat Model:** Claude Sonnet 4 for query interpretation\n- **Simple Memory:** Maintains conversation context (100 message window)\n- **Output Parser:** Structured JSON output with schema validation\n- **MCP Client:** Connected to `https://mcp.explorium.ai/mcp` for Explorium specifications\n\n**System Instructions:**\n- Expert in converting natural language to Explorium API filters\n- Can revise previous responses based on validation errors\n- Strict adherence to allowed filter values and formats\n- Default settings: `mode: \"full\"`, `size: 10000`, `page_size: 100`, `has_email: true`\n\n### Node 4: API Call Validation\nThis code node validates the AI-generated API request against Explorium's filter specifications.\n\n**Validation Checks:**\n- Filter key validity (only allowed filters from approved list)\n- Value format correctness (enums, ranges, country codes)\n- No duplicate values in arrays\n- Proper range structure for experience fields (`total_experience_months`, `current_role_months`)\n- Required field presence\n\n**Allowed Filters:**\n- `country_code`, `region_country_code`, `company_country_code`, `company_region_country_code`\n- `company_size`, `company_revenue`, `company_age`, `number_of_locations`\n- `google_category`, `naics_category`, `linkedin_category`, `company_name`\n- `city_region_country`, `website_keywords`\n- `has_email`, `has_phone_number`\n- `job_level`, `job_department`, `job_title`\n- `business_id`, `total_experience_months`, `current_role_months`\n\n**Output:**\n- `isValid`: Boolean validation status\n- `validationErrors`: Array of specific error messages\n\n### Node 5: Is API Call Valid?\nConditional routing node that determines the next step based on validation results.\n\n- **If Valid:** Proceed to Explorium API: Fetch Prospects\n- **If Invalid:** Route to Validation Prompter for correction\n\n### Node 6: Validation Prompter\nGenerates detailed error feedback for the AI Agent when validation fails.\nThis creates a self-correcting loop where the AI learns from validation errors and regenerates compliant requests by routing back to Node 2 (Chat or Refinement).\n\n### Node 7: Explorium API: Fetch Prospects\nMakes the validated API call to Explorium's prospect database.\n\n- **Method:** POST\n- **Endpoint:** `/v1/prospects/fetch`\n- **Authentication:** Header Auth (Bearer token)\n- **Input:** JSON with filters, mode, size, page_size, page\n- **Returns:** Array of matched prospects with prospect IDs based on filter criteria\n\n### Node 8: Pull Prospect IDs\nExtracts prospect IDs from the fetch response for bulk enrichment.\n\n- **Input:** Full fetch response with prospect data\n- **Output:** Array of `prospect_id` values formatted for enrichment API\n\n### Node 9: Explorium API: Contact Enrichment\nSingle enrichment node that enhances prospect data with both contact and profile information.\n\n- **Method:** POST\n- **Endpoint:** `/v1/prospects/enrich`\n- **Enrichment Types:** contacts, profiles\n- **Authentication:** Header Auth (Bearer token)\n- **Input:** Array of prospect IDs from Node 8\n\n**Returns:**\n- **Contacts:** Professional emails (current, verified), phone numbers (mobile, work), email validation status, all available email addresses\n- **Profiles:** Full professional history, current role details, company information, skills and expertise, education background, experience timeline, job titles and seniority levels\n\n### Node 10: Clean Output Data\nTransforms and structures the enriched data for downstream processing.\n\n### Node 11: Loop Over Items\nIterates through each prospect to generate individualized research and emails.\n\n- **Batch Size:** 1 (processes prospects one at a time)\n- **Purpose:** Enable personalized research and email generation for each prospect\n- **Loop Control:** Processes until all prospects are complete\n\n### Node 12: Research Email\nAI-powered research agent that investigates each prospect using Explorium MCP.\n\n**Input Data:**\n- Prospect name, job title, company name, company website\n- LinkedIn URL, job department, skills\n\n**Research Focus:**\n- Company automation tool usage (n8n, Zapier, Make, HubSpot, Salesforce)\n- Data enrichment practices\n- Tech stack and infrastructure (Snowflake, Segment, etc.)\n- Recent company activity and initiatives\n- Pain points related to B2B data (outdated CRM data, manual enrichment, static workflows)\n- Public content (speaking engagements, blog posts, thought leadership)\n\n**AI Components:**\n- **Anthropic Chat Model1:** Claude Sonnet 4 for research\n- **Simple Memory1:** Maintains research context\n- **Explorium MCP1:** Connected to `https://mcp.explorium.ai/mcp` for real-time intelligence\n\n**Output:** Structured JSON with research findings including automation tools, pain points, personalization notes\n\n### Node 13: Email Writer\nGenerates personalized cold email drafts based on research findings.\n\n**Input Data:**\n- Contact info from Loop Over Items\n- Current experience and skills\n- Research findings from Research Email agent\n- Company data (name, website)\n\n**AI Components:**\n- **Anthropic Chat Model3:** Claude Sonnet 4 for email writing\n- **Structured Output Parser:** Enforces JSON schema with email, subject, message fields\n\n**Output Schema:**\n- `email`: Selected prospect email address (professional preferred)\n- `subject`: Compelling, personalized subject line\n- `message`: HTML formatted email body\n\n### Node 14: Create a draft (Gmail)\nCreates email drafts in Gmail for review before sending.\n\n- **Resource:** Draft\n- **Subject:** From Email Writer output\n- **Message:** HTML formatted email body\n- **Send To:** Selected prospect email address\n- **Authentication:** Gmail OAuth2\n\n**After Creation:** Loops back to Node 11 (Loop Over Items) to process next prospect\n\n**Alternative Output Options:**\n- **Outlook:** Create drafts in Microsoft Outlook\n- **Mailchimp:** Add to email campaign\n- **SendGrid:** Queue for sending\n- **Lemlist:** Add to cold email sequence\n\n---\n\n## Workflow Flow Summary\n\n1. **Input:** User describes target prospects in natural language via chat interface\n2. **Interpret:** AI Agent converts query to structured Explorium API filters using MCP\n3. **Validate:** API call validation ensures filter compliance\n4. **Refine:** If invalid, error feedback loop helps AI correct the request\n5. **Fetch:** Retrieve matching prospect IDs from Explorium database\n6. **Enrich:** Parallel bulk enrichment of contact details and professional profiles\n7. **Clean:** Transform and structure enriched data\n8. **Loop:** Process each prospect individually\n9. **Research:** AI agent uses Explorium MCP to gather company and prospect intelligence\n10. **Write:** Generate personalized email based on research\n11. **Draft:** Create reviewable email drafts in preferred platform\n\nThis workflow eliminates manual prospecting work by combining natural language processing, intelligent data enrichment, automated research, and personalized email generation—taking you from \"I need marketing leaders at fintech companies\" to personalized, research-backed email drafts in minutes.\n\n---\n\n## Customization Options\n\n### Flexible Triggers\nThe chat interface can be replaced with:\n- Scheduled runs for recurring prospecting\n- Webhook triggers from CRM updates\n- Manual execution for ad-hoc campaigns\n\n### Scalable Enrichment\nAdjust enrichment depth by:\n- Adding more Explorium API endpoints (technographics, funding, news)\n- Configuring prospect batch sizes\n- Customizing data cleaning logic\n\n### Output Destinations\nRoute emails to your preferred platform:\n- **Email Platforms:** Gmail, Outlook, SendGrid, Mailchimp\n- **Sales Tools:** Lemlist, Outreach, SalesLoft\n- **CRM Integration:** Salesforce, HubSpot (create leads with research)\n- **Collaboration:** Slack notifications, Google Docs reports\n\n### AI Model Flexibility\nSwap AI providers based on your needs:\n- Default: Anthropic Claude (Sonnet 4)\n- Alternatives: OpenAI GPT-4, Google Gemini\n\n---\n\n## Setup Notes\n\n1. **Domain Filtering:** The workflow prioritizes professional emails—customize email selection logic in the Clean Output Data node\n2. **MCP Configuration:** Explorium MCP requires Header Auth setup—ensure credentials are properly configured\n3. **Rate Limits:** Adjust Loop Over Items batch size if hitting API rate limits\n4. **Memory Context:** Simple Memory maintains conversation history—increase window length for longer sessions\n5. **Validation:** The AI self-corrects through validation loops—monitor early runs to ensure filter accuracy\n\nThis workflow represents a complete AI-powered sales development representative (SDR) that handles prospecting, research, and personalized outreach with minimal human intervention.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "API Call Validation",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Validation Prompter",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Is API Call Valid?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Chat or Refinement",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Explorium API: Fetch Prospects",
+      "type": "@exploriumai/n8n-nodes-explorium-ai.exploriumApiNode",
+      "role": "exploriumApiNode",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simple Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Anthropic Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Pull Prospect IDs",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Clean Output Data",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Research Email",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Email Writer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Create a draft",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Explorium API: Contact Enrichment",
+      "type": "@exploriumai/n8n-nodes-explorium-ai.exploriumApiNode",
+      "role": "exploriumApiNode",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Anthropic Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Loop Over Items3",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Anthropic Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Explorium MCP3",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "MCP Client",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "role": "mcpClientTool",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+# Automate WhatsApp sales with DeepSeek AI, Google Sheets and Gmail notifications
+
+> ## Turn WhatsApp Into a 24/7 AI Sales Assistant — n8n + DeepSeek + Sheets + Gmail
+
+⚠️ **Self-Hosted n8n Only**
+
+### Description
+
+Turn your WhatsApp channel into a smart sales assistant! This workflow listens for inbound customer messages, looks up product data in Google Sheets, uses a DeepSeek Chat Model to answer in Saudi dialect, collects purchase details, and notifies your service rep only when the customer is ready to buy.
+
+---
+
+### 🔧 How to Install Community Nodes
+
+Go to **Settings → Community Nodes**
+Click **Install Node**, then add:
+
+```bash
+n8n-nodes-evolution-api
+```
+
+Restart n8n if prompted.
+
+---
+
+### 🔄 What This Workflow Does
+
+1. **Webhook Listener**
+   Captures inbound WhatsApp messages (`MESSAGES_UPSERT` via Evolution API).
+2. **Filters**
+   Ignores outbound (fromMe) and group (`@g.us`) messages.
+3. **Data Extraction**
+   Pulls the customer’s message and phone number.
+4. **AI Response**
+   Uses the **DeepSeek Chat Model** node to answer from your Google Sheets product list, greeting with “هلا وغلا” and speaking in Saudi dialect.
+5. **Purchase Flow**
+   Prompts for name, phone, and delivery/pickup date.
+6. **Notify Sales**
+   Sends an email via Gmail only when the customer requests to purchase.
+7. **Context Memory**
+   (Optional) Stores conversation history in Postgres for coherent multi-turn chats.
+
+---
+
+### 📸 Visual Preview
+
+#### 🧩 Workflow 
+
+![WhatsApp AI Product Bot.png](fileId:2316)
+
+---
+
+### 🛠️ Setup Instructions
+
+1. **Evolution API Webhook**
+
+   * In Evolution API dashboard → **Events → Webhook**
+   * Enable only **MESSAGES\_UPSERT**
+   * Set **Webhook URL** to:
+     `https://your-n8n-domain/webhook/whatsAppListen`
+
+2. **Google Sheets**
+
+   * Create a spreadsheet (“You Conmanay Name Items”) with your product data [Item name, Item Model, Item Description, Item Components, Item Price, Item Availability, ...]
+   * Connect your Google Sheets credentials in n8n
+
+3. **DeepSeek Chat Model**
+
+   * Configure your DeepSeek API credentials in the **DeepSeek Chat Model** node
+   * Ensure the system prompt matches your company’s tone and data columns
+
+4. **Gmail Notifications**
+
+   * Add Gmail OAuth2 credentials to the **Send a message in Gmail** node
+   * Customize subject and email template if needed
+
+5. **Postgres Memory (Optional)**
+
+   * Connect a Postgres instance in the **Postgres Chat Memory** node for session context
+
+---
+
+### 👥 Who Is This For?
+
+* **E-commerce teams** automating first-touch customer replies
+* **Sales reps** needing AI-driven chat support on WhatsApp
+* **Businesses** using WhatsApp as a primary customer channel
+
+---
+
+### 🔐 Credentials Required
+
+* Evolution API (webhook only)
+* Google Sheets API
+* DeepSeek API
+* Gmail OAuth2
+* Postgres (optional, for memory)
+
+---
+
+### 🏷 Tags
+
+```
+whatsapp bot, deepseek, google sheets, evolution api, gmail, postgres memory, ecommerce, sales automation, n8n template, no-code, ai, agent, ai agent
+```
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 7005
+- **Complexity:** intermediate
+- **Node Count:** 10
+- **Views:** 194
+- **Downloads:** 19
+- **Created:** 2025/8/5
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/7005)
+
+## 👤 Author
+
+- **Name:** Ahmed Saadawi
+- **Username:** @ahmedsaadawi
+
+## 🏷️ Categories
+
+- Lead Nurturing
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **@n8n/n8n-nodes-langchain.agent** 
+- **gmailTool** 
+- **googleSheetsTool** 
+- **@n8n/n8n-nodes-langchain.lmChatDeepSeek** 
+- **if** 
+- **noOp** 
+- **n8n-nodes-evolution-api.evolutionApi** 
+- **webhook** 
+- **stickyNote** 
+- **@n8n/n8n-nodes-langchain.memoryPostgresChat** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 10 nodes with 7 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

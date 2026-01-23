@@ -1,0 +1,200 @@
+{
+  "id": 3868,
+  "slug": "3868",
+  "title": "Automate support ticket triage and resolution with JIRA and AI",
+  "description": "### This n8n template automates triaging of newly opened support tickets and issue resolution via JIRA.\n\nIf your organisation deals with a large number of support requests daily, automating triaging is a great use-case for introducing AI to your support teams. Extending the idea, we can also get AI to give a first attempt at resolving the issue intelligently.\n\n### How it works\n* A scheduled trigger picks up newly opened JIRA support tickets from the queue and discards any seen before.\n* An AI agent analyses the open ticket to add labels, priority on the seriousness of the issue and simplifies the description for better readability and understanding for human support.\n* Next, the agent attempts to address and resolve the issue by finding similar issues (by tags) which have been resolved.\n* Each similar issue has its comments analysed and summarised to identify the actual resolution and facts.\n* These summarises are then used as context for the AI agent to suggest a fix to the open ticket.\n\n### How to use\n* Simply connect your JIRA instance to the workflow and activate to start watching for open tickets. Depending on frequency, you may need to increase for decrease the intervals.\n* Define labels to use in the agent's system prompt.\n* Restrict to certain projects or issue types to suit your organisation.\n\n### Requirements\n* JIRA for issue management and support portal\n* OpenAI for LLM\n\n### Customising this workflow\n* Not using JIRA? Try swapping out the nodes for Linear or your issue management system of choice.\n* Try a different approach for issue resolution. You might want to try RAG approach where a knowledge base is used.\n",
+  "featuredImage": "/data/workflows/3868/3868.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI RAG"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 7832,
+  "downloads": 783,
+  "createdAt": "2025-05-05T10:29:45.614Z",
+  "updatedAt": "2026-01-16T08:31:51.834Z",
+  "publishedAt": "2025-05-05T10:29:45.614Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/3868",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate support ticket triage and resolution with JIRA and AI",
+    "workflowName": "Automate support ticket triage and resolution with JIRA and AI",
+    "description": "### This n8n template automates triaging of newly opened support tickets and issue resolution via JIRA.\n\nIf your organisation deals with a large number of support requests daily, automating triaging is a great use-case for introducing AI to your support teams. Extending the idea, we can also get AI to give a first attempt at resolving the issue intelligently.\n\n### How it works\n* A scheduled trigger picks up newly opened JIRA support tickets from the queue and discards any seen before.\n* An AI agent analyses the open ticket to add labels, priority on the seriousness of the issue and simplifies the description for better readability and understanding for human support.\n* Next, the agent attempts to address and resolve the issue by finding similar issues (by tags) which have been resolved.\n* Each similar issue has its comments analysed and summarised to identify the actual resolution and facts.\n* These summarises are then used as context for the AI agent to suggest a fix to the open ticket.\n\n### How to use\n* Simply connect your JIRA instance to the workflow and activate to start watching for open tickets. Depending on frequency, you may need to increase for decrease the intervals.\n* Define labels to use in the agent's system prompt.\n* Restrict to certain projects or issue types to suit your organisation.\n\n### Requirements\n* JIRA for issue management and support portal\n* OpenAI for LLM\n\n### Customising this workflow\n* Not using JIRA? Try swapping out the nodes for Linear or your issue management system of choice.\n* Try a different approach for issue resolution. You might want to try RAG approach where a knowledge base is used.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get Open Tickets",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simplify Ticket",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Label, Prioritize & Rewrite",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Update Labels, Priority and Description",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Recent Similar Issues Resolved",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Issue Ref",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Comments",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Simplify Comments",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Summarise Resolution",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Simplify Issue",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Return Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Attempt to Resolve Issue",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Aggregate1",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Add Comment to Issue",
+      "type": "n8n-nodes-base.jira",
+      "role": "jira",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Mark as Seen",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "role": "removeDuplicates",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

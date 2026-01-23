@@ -6,14 +6,38 @@
 import type { Author } from '../types/workflow';
 import { supabase, isSupabaseConfigured, handleSupabaseError, withRetry } from './supabase';
 import { mockAuthors, getMockAuthorBySlug, getMockAuthorById } from '../../data/mock-authors';
+import workflowsData from '../../data/workflows.json';
 
 /**
  * 获取所有作者
  */
 export async function getAuthors(): Promise<Author[]> {
-  // 如果未配置 Supabase，使用模拟数据
+  // 从工作流数据中提取所有作者
+  const authorsMap = new Map<string, Author>();
+  
+  // 从本地工作流数据中提取作者
+  if (workflowsData && Array.isArray(workflowsData)) {
+    workflowsData.forEach((workflow: any) => {
+      if (workflow.author && workflow.author.slug) {
+        if (!authorsMap.has(workflow.author.slug)) {
+          // 尝试从模拟数据中获取更详细的信息
+          const mockAuthor = getMockAuthorBySlug(workflow.author.slug);
+          authorsMap.set(workflow.author.slug, {
+            ...workflow.author,
+            ...(mockAuthor || {}),
+            workflowCount: 1
+          });
+        } else {
+          const author = authorsMap.get(workflow.author.slug)!;
+          author.workflowCount = (author.workflowCount || 0) + 1;
+        }
+      }
+    });
+  }
+
+  // 如果未配置 Supabase，返回提取到的作者列表
   if (!isSupabaseConfigured()) {
-    return mockAuthors;
+    return Array.from(authorsMap.values());
   }
 
   try {
@@ -39,9 +63,13 @@ export async function getAuthors(): Promise<Author[]> {
  * 根据 slug 获取作者
  */
 export async function getAuthorBySlug(slug: string): Promise<Author | null> {
-  // 如果未配置 Supabase，使用模拟数据
+  const authors = await getAuthors();
+  const author = authors.find(a => a.slug === slug);
+  if (author) return author;
+
+  // 如果未配置 Supabase，返回 null
   if (!isSupabaseConfigured()) {
-    return getMockAuthorBySlug(slug) || null;
+    return null;
   }
 
   try {
@@ -72,9 +100,13 @@ export async function getAuthorBySlug(slug: string): Promise<Author | null> {
  * 根据 ID 获取作者
  */
 export async function getAuthorById(id: number): Promise<Author | null> {
-  // 如果未配置 Supabase，使用模拟数据
+  const authors = await getAuthors();
+  const author = authors.find(a => a.id === id);
+  if (author) return author;
+
+  // 如果未配置 Supabase，返回 null
   if (!isSupabaseConfigured()) {
-    return getMockAuthorById(id) || null;
+    return null;
   }
 
   try {

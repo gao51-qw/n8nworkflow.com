@@ -1,0 +1,145 @@
+{
+  "id": 9988,
+  "slug": "9988",
+  "title": "Sync multi-bank balance data to BigQuery using Plaid",
+  "description": "## Automated Multi-Bank Balance Sync to BigQuery\n\nThis workflow automatically fetches balances from multiple financial institutions (RBC, Amex, Wise, PayPal) using Plaid, maps them to QuickBooks account names, and loads structured records into Google BigQuery for analytics.\n\n## Who’s it for?\nFinance teams, accountants, and data engineers managing consolidated bank reporting in Google BigQuery.\n\n## How it works\n1. The Schedule Trigger runs weekly.\n2. Four Plaid API calls fetch balances from RBC, Amex, Wise, and PayPal.\n3. Each response splits out individual accounts and maps them to QuickBooks names.\n4. All accounts are merged into one dataset.\n5. The workflow structures the account data, generates UUIDs, and formats SQL inserts.\n6. BigQuery node uploads the finalized records.\n\n## How to set up\nAdd Plaid and Google BigQuery credentials, replace client IDs and secrets with variables, test each connection, and schedule the trigger for your reporting cadence.\n",
+  "featuredImage": "/data/workflows/9988/9988.webp",
+  "author": {
+    "id": 101,
+    "slug": "fahmiiireza",
+    "name": "Fahmi Fahreza",
+    "avatar": ""
+  },
+  "categories": [
+    "Invoice Processing"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 140,
+  "downloads": 14,
+  "createdAt": "2025-10-21T15:00:35.002Z",
+  "updatedAt": "2026-01-16T09:02:54.827Z",
+  "publishedAt": "2025-10-21T15:00:35.002Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9988",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Sync multi-bank balance data to BigQuery using Plaid",
+    "workflowName": "Sync multi-bank balance data to BigQuery using Plaid",
+    "description": "## Automated Multi-Bank Balance Sync to BigQuery\n\nThis workflow automatically fetches balances from multiple financial institutions (RBC, Amex, Wise, PayPal) using Plaid, maps them to QuickBooks account names, and loads structured records into Google BigQuery for analytics.\n\n## Who’s it for?\nFinance teams, accountants, and data engineers managing consolidated bank reporting in Google BigQuery.\n\n## How it works\n1. The Schedule Trigger runs weekly.\n2. Four Plaid API calls fetch balances from RBC, Amex, Wise, and PayPal.\n3. Each response splits out individual accounts and maps them to QuickBooks names.\n4. All accounts are merged into one dataset.\n5. The workflow structures the account data, generates UUIDs, and formats SQL inserts.\n6. BigQuery node uploads the finalized records.\n\n## How to set up\nAdd Plaid and Google BigQuery credentials, replace client IDs and secrets with variables, test each connection, and schedule the trigger for your reporting cadence.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Fetch RBC Balances (Plaid)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fetch Amex Balances (Plaid)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fetch Wise Balances (Plaid)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fetch PayPal Balances (Plaid)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Split RBC Accounts",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Amex Accounts",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Wise Accounts",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split PayPal Accounts",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Map RBC Accounts to QBO",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map Amex Accounts to QBO",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map Wise Accounts to QBO",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Map PayPal Accounts to QBO",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Combine All Accounts",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Structure Account Records",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare BigQuery Insert",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Load Accounts into BigQuery",
+      "type": "n8n-nodes-base.googleBigQuery",
+      "role": "googleBigQuery",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

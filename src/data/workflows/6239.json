@@ -1,0 +1,236 @@
+{
+  "id": 6239,
+  "slug": "6239",
+  "title": "LinkedIn job search: auto-match resume with AI + cover letter & Telegram alerts",
+  "description": "## Overview\nThis n8n templates helps you to authomatically search Linkeding jobs. It uses AI (Gemini or OpenAPI) to match your resume with each job description and write a sample cover letter for each job and update the job google sheet. You can receive daily matched linkedin job alerts by telegram.\n## Prerequisites\n- AI API Key from one model like:\n\t- [Google Gemini](https://aistudio.google.com/apikey)\n\t- [OpenAI](https://platform.openai.com/settings/organization/api-keys) \n- Telegram Bot Token - Create via @BotFather\n- Google Sheets - [OAuth2 credentials](https://console.cloud.google.com/apis/)\n- Google Drive - [OAuth2 credentials](https://console.cloud.google.com/apis/)\n## Setup\n### 1. Upload your resume\nUpload your CV in PDF format in google drive and configure google drive node to read your resume from list of google drive files. You need to configure Google Drive OAuth2 and grant access to your drive before that. You can find useful infomration about how to configure Googel OAuth2 API key in [n8n documents](https://docs.n8n.io/integrations/builtin/credentials/google/oauth-generic/).\n### 2. Create Google sheet\nYou need to create a google sheet document consist of two sheets, one sheet for define job filter criteria and second sheet to store job search result. You can download [this Google Sheet Template](https://docs.google.com/spreadsheets/d/1mtKVxj_z_QCLGXMx0mJVihWSgS41SzHfU1Rv4r_mRY0) and copy in your personal space. Then you can add your job filter in Google sheet. You can search job by keywords, location, remote type, job type and easy apply.\nYou need to configure Google Sheet OAuth2 and grant access to your drive before that.\n### 3. Conifgure Telegram Bot\nYou need to create a new Telegram Bot in [@BotFather](https://telegram.me/BotFather) and insert API Key in Telegram node and you need to TELEGRAM_CHAT_ID to your telegram ID.\n",
+  "featuredImage": "/data/workflows/6239/6239.webp",
+  "author": {
+    "id": 101,
+    "slug": "jashnniloofar",
+    "name": "Hojjat Jashnniloofar",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 32266,
+  "downloads": 3226,
+  "createdAt": "2025-07-21T16:02:16.951Z",
+  "updatedAt": "2026-01-16T08:44:05.892Z",
+  "publishedAt": "2025-07-21T16:02:16.951Z",
+  "nodes": 33,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/6239",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "LinkedIn job search: auto-match resume with AI + cover letter & Telegram alerts",
+    "workflowName": "LinkedIn job search: auto-match resume with AI + cover letter & Telegram alerts",
+    "description": "This n8n templates helps you to authomatically search Linkeding jobs. It uses AI (Gemini or OpenAPI) to match your resume with each job description and write a sample cover letter for each job and update the job google sheet. You can receive daily matched linkedin job alerts by telegram.\n## Prerequisites\n- AI API Key from one model like:\n\t- [Google Gemini](https://aistudio.google.com/apikey)\n\t- [OpenAI](https://platform.openai.com/settings/organization/api-keys) \n- Telegram Bot Token - Create via @BotFather\n- Google Sheets - [OAuth2 credentials](https://console.cloud.google.com/apis/)\n- Google Drive - [OAuth2 credentials](https://console.cloud.google.com/apis/)\n## Setup\n### 1. Upload your resume\nUpload your CV in PDF format in google drive and configure google drive node to read your resume from list of google drive files. You need to configure Google Drive OAuth2 and grant access to your drive before that. You can find useful infomration about how to configure Googel OAuth2 API key in [n8n documents](https://docs.n8n.io/integrations/builtin/credentials/google/oauth-generic/).\n### 2. Create Google sheet\nYou need to create a google sheet document consist of two sheets, one sheet for define job filter criteria and second sheet to store job search result. You can download [this Google Sheet Template](https://docs.google.com/spreadsheets/d/1mtKVxj_z_QCLGXMx0mJVihWSgS41SzHfU1Rv4r_mRY0) and copy in your personal space. Then you can add your job filter in Google sheet. You can search job by keywords, location, remote type, job type and easy apply.\nYou need to configure Google Sheet OAuth2 and grant access to your drive before that.\n### 3. Conifgure Telegram Bot\nYou need to create a new Telegram Bot in [@BotFather](https://telegram.me/BotFather) and insert API Key in Telegram node and you need to TELEGRAM_CHAT_ID to your telegram ID.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "role": "splitOut",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Score Filter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "role": "extractFromFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Send a text message",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.6"
+    },
+    {
+      "name": "Create search URL",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Jobs from Linkedin",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Job Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Parse AI Output",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Parse Job Attributes",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Modify Job Attributes",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Extract Job Links",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1.2"
+    }
+  ]
+}

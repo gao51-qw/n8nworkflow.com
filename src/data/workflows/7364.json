@@ -1,0 +1,194 @@
+{
+  "id": 7364,
+  "slug": "7364",
+  "title": "Create a self-hosted blockchain payment processor with x402 and 1Shot API",
+  "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n![facilitatorpreview.gif](fileId:2163)\n\n# Self-Hosted x402 Facilitator\n\nIn the [x402](https://x402.org) payment protocol, a [facilitator](https://x402.gitbook.io/x402/core-concepts/facilitator) is a role which helps sellers settle stablecoin payments onchain without dealing with blockchain complexities. This workflow allows you to run your own fully-featured, specification-compliant facilitator in n8n. You might want to do this if you want to accept payments in tokens not supported by existing facilitators or as your own business!\n\n## Details\n\nA facilitator supports three routes: `/verify`, `/settle`, and `/supported`. These routes are all created for you in this workflow with proper error handling and responses. \n\nA seller will first hit `/verify` with their payment details to ensure the payment information is correct. Next they will hit the `/settle` endpoint with the same payment information to settle the paymet on the blockchain. The `/supported` endpoint is used to indicate to sellers which blockchains you choose to support in a programatic fashion.\n\n## Setup\n\n1. Create a [1Shot API](https://1shotapi.com) account\n2. Create 1Shot API wallets for the networks where you wish to facilitate token payments and load them with sufficient gas tokens.\n3. Using [1Shot Prompts](https://app.1shotapi.com/1shot-prompts), import the `transferWithAuthorization` functions for the tokens you will settle payments for.\n4. Import this workflow into n8n and create a credential to link the 1Shot API community node to your 1Shot API business account.\n5. Enter the token and network information into the payment token and network configuration nodes indicated by the sticky nodes.\n6. Turn on your workflow and settle payments!\n",
+  "featuredImage": "/data/workflows/7364/7364.webp",
+  "author": {
+    "id": 101,
+    "slug": "oneshotapi",
+    "name": "1Shot API",
+    "avatar": ""
+  },
+  "categories": [
+    "Crypto Trading",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 525,
+  "downloads": 52,
+  "createdAt": "2025-08-14T05:17:29.215Z",
+  "updatedAt": "2026-01-16T08:49:55.470Z",
+  "publishedAt": "2025-08-14T05:17:29.215Z",
+  "nodes": 26,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7364",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Create a self-hosted blockchain payment processor with x402 and 1Shot API",
+    "workflowName": "Create a self-hosted blockchain payment processor with x402 and 1Shot API",
+    "description": "*This workflow contains community nodes that are only compatible with the self-hosted version of n8n.*\n\n![facilitatorpreview.gif](fileId:2163)\n\n# Self-Hosted x402 Facilitator\n\nIn the [x402](https://x402.org) payment protocol, a [facilitator](https://x402.gitbook.io/x402/core-concepts/facilitator) is a role which helps sellers settle stablecoin payments onchain without dealing with blockchain complexities. This workflow allows you to run your own fully-featured, specification-compliant facilitator in n8n. You might want to do this if you want to accept payments in tokens not supported by existing facilitators or as your own business!\n\n## Details\n\nA facilitator supports three routes: `/verify`, `/settle`, and `/supported`. These routes are all created for you in this workflow with proper error handling and responses. \n\nA seller will first hit `/verify` with their payment details to ensure the payment information is correct. Next they will hit the `/settle` endpoint with the same payment information to settle the paymet on the blockchain. The `/supported` endpoint is used to indicate to sellers which blockchains you choose to support in a programatic fashion.\n\n## Setup\n\n1. Create a [1Shot API](https://1shotapi.com) account\n2. Create 1Shot API wallets for the networks where you wish to facilitate token payments and load them with sufficient gas tokens.\n3. Using [1Shot Prompts](https://app.1shotapi.com/1shot-prompts), import the `transferWithAuthorization` functions for the tokens you will settle payments for.\n4. Import this workflow into n8n and create a credential to link the 1Shot API community node to your 1Shot API business account.\n5. Enter the token and network information into the payment token and network configuration nodes indicated by the sticky nodes.\n6. Turn on your workflow and settle payments!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Simulate Payment",
+      "type": "n8n-nodes-1shot.oneShot",
+      "role": "oneShot",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "/verify",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "/settle",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Settlement Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Verify Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Response: Bad POST Body (/verify)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Response: Bad POST Body (/settle)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "1Shot API Submit & Wait",
+      "type": "n8n-nodes-1shot.oneShotSynch",
+      "role": "oneShotSynch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check POST Payload",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "/supported",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Response: Return Supported Networks",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Supported Networks Config",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Unsupported Token",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "verify or settle",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Response: Unsupported Token (/verify)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Response: Unsupported Token (/settle)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Bad Payload",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Lookup Payment Configs & Split Signature",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

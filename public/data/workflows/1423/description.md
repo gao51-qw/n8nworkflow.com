@@ -1,0 +1,1 @@
+Every 10 minutes check if a new article was stared, if so, save it in wallabag to read it later.

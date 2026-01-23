@@ -1,0 +1,181 @@
+{
+  "id": 12233,
+  "slug": "12233",
+  "title": "Aggregate commercial property listings with ScrapeGraphAI, Baserow and Teams",
+  "description": "# Property Listing Aggregator with Microsoft Teams and Baserow\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically aggregates commercial real-estate listings from multiple broker and marketplace websites, stores the fresh data in Baserow, and pushes weekly availability alerts to Microsoft Teams. Ideal for business owners searching for new retail or office space, it runs on a timetable, scrapes property details, de-duplicates existing entries, and notifies your team of only the newest opportunities.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- An n8n instance (self-hosted or n8n.cloud)\n- ScrapeGraphAI community node installed\n- A Baserow workspace & table prepared to store property data\n- A Microsoft Teams channel with an incoming webhook URL\n- List of target real-estate URLs (CSV, JSON, or hard-coded array)\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables headless scraping of listing pages  \n- **Baserow Personal API Token** – Grants create/read access to your property table  \n- **Microsoft Teams Webhook URL** – Allows posting messages to your channel  \n\n### Baserow Table Schema\n| Column Name | Type    | Notes                          |\n|-------------|---------|--------------------------------|\n| `listing_id`| Text    | Unique ID or URL slug (primary)|\n| `title`     | Text    | Listing headline               |\n| `price`     | Number  | Monthly or annual rent         |\n| `sq_ft`     | Number  | Size in square feet            |\n| `location`  | Text    | City / neighborhood            |\n| `url`       | URL     | Original listing link          |\n| `scraped`   | Date    | Timestamp of last scrape       |\n\n## How it works\n\nThis workflow automatically aggregates commercial real-estate listings from multiple broker and marketplace websites, stores the fresh data in Baserow, and pushes weekly availability alerts to Microsoft Teams. Ideal for business owners searching for new retail or office space, it runs on a timetable, scrapes property details, de-duplicates existing entries, and notifies your team of only the newest opportunities.\n\n## Key Steps:\n- **Schedule Trigger**: Fires every week (or on demand) to start the aggregation cycle.\n- **Load URL List (Code node)**: Returns an array of listing or search-result URLs to be scraped.\n- **Split In Batches**: Processes URLs in manageable groups to avoid rate-limits.\n- **ScrapeGraphAI**: Extracts title, price, size, and location from each page.\n- **Merge**: Reassembles batches into a single dataset.\n- **IF Node**: Checks each listing against Baserow to detect new vs. existing entries.\n- **Baserow**: Inserts only brand-new listings into the table.\n- **Set Node**: Formats a concise Teams message with key details.\n- **Microsoft Teams**: Sends the alert to your designated channel.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install ScrapeGraphAI node**:  \n   In n8n, go to “Settings → Community Nodes”, search for “@n8n-nodes/scrapegraphai” and install.\n2. **Create Baserow table**:  \n   Follow the schema above. Copy your Personal API Token from Baserow profile settings.\n3. **Generate Teams webhook**:  \n   In Microsoft Teams, open channel → “Connectors” → “Incoming Webhook”, name it, and copy the URL.\n4. **Open the workflow** in n8n and set the following credentials:  \n   - ScrapeGraphAI API Key  \n   - Baserow token (Baserow node)  \n   - Teams webhook (Microsoft Teams node)\n5. **Define target URLs**:  \n   Edit the “Load URL List” Code node and add your marketplace or broker URLs.\n6. **Adjust schedule**:  \n   Double-click the “Schedule Trigger” and set the cron expression (default: weekly Monday 08:00).\n7. **Test-run** the workflow manually to verify scraping and data insertion.\n8. **Activate** the workflow once results look correct.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **stickyNote** – Provides inline documentation and reminders inside the canvas.\n- **Schedule Trigger** – Triggers the workflow on a weekly cron schedule.\n- **Code** – Holds an array of URLs and can implement dynamic logic (e.g., API calls to get URLs).\n- **SplitInBatches** – Splits URL list into configurable batch sizes (default: 5) to stay polite.\n- **ScrapeGraphAI** – Scrapes each URL and returns structured JSON for price, size, etc.\n- **Merge** – Combines batch outputs back into one array.\n- **IF** – Performs existence check against Baserow’s `listing_id` to prevent duplicates.\n- **Baserow** – Writes new records or updates existing ones.\n- **Set** – Builds a human-readable message string for Teams.\n- **Microsoft Teams** – Posts the summary into your channel.\n\n### Data Flow:\n1. Schedule Trigger → Code → Split In Batches → ScrapeGraphAI → Merge → IF → Baserow  \n2. IF (new listings) → Set → Microsoft Teams\n\n## Customization Examples\n\n### Add additional data points (e.g., number of parking spaces)\n```javascript\n// In ScrapeGraphAI \"Selectors\" field\n{\n  \"title\": \".listing-title\",\n  \"price\": \".price\",\n  \"sq_ft\": \".size\",\n  \"parking\": \".parking span\"   // new selector\n}\n```\n\n### Change Teams message formatting\n```javascript\n// In Set node\nreturn items.map(item =&gt; {\n  const l = item.json;\n  item.json = {\n    text: `🏢 *${l.title}* — ${l.price} USD\\n📍 ${l.location} | ${l.sq_ft} ft²\\n🔗 &lt;${l.url}|View Listing&gt;`\n  };\n  return item;\n});\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"listing_id\": \"12345-main-street-suite-200\",\n  \"title\": \"Downtown Office Space – Suite 200\",\n  \"price\": 4500,\n  \"sq_ft\": 2300,\n  \"location\": \"Austin, TX\",\n  \"url\": \"https://broker.com/listings/12345\",\n  \"scraped\": \"2024-05-01T08:00:00.000Z\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty fields** – Update CSS selectors or switch to XPath; run in headless:true mode.  \n2. **Duplicate records still appear** – Ensure `listing_id` is truly unique (use URL slug) and that the IF node compares correctly.  \n3. **Teams message not delivered** – Verify webhook URL and that the Teams connector is enabled for the channel.\n\n### Performance Tips\n- Reduce batch size if websites block rapid requests.\n- Cache previous URLs to skip unchanged search-result pages.\n\n**Pro Tips:**\n- Rotate proxies in ScrapeGraphAI for larger scraping volumes.  \n- Use environment variables for credentials to simplify migrations.  \n- Add a second Schedule Trigger for daily “hot deal” checks by duplicating the workflow and narrowing the URL list.",
+  "featuredImage": "/data/workflows/12233/12233.webp",
+  "author": {
+    "id": 101,
+    "slug": "vinci-king-01",
+    "name": "vinci-king-01",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 23,
+  "downloads": 2,
+  "createdAt": "2025-12-28T09:18:52.948Z",
+  "updatedAt": "2026-01-16T09:11:47.153Z",
+  "publishedAt": "2025-12-28T09:18:52.948Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/12233",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Aggregate commercial property listings with ScrapeGraphAI, Baserow and Teams",
+    "workflowName": "Aggregate commercial property listings with ScrapeGraphAI, Baserow and Teams",
+    "description": "# Property Listing Aggregator with Microsoft Teams and Baserow\n\n**⚠️ COMMUNITY TEMPLATE DISCLAIMER: This is a community-contributed template that uses ScrapeGraphAI (a community node). Please ensure you have the ScrapeGraphAI community node installed in your n8n instance before using this template.**\n\nThis workflow automatically aggregates commercial real-estate listings from multiple broker and marketplace websites, stores the fresh data in Baserow, and pushes weekly availability alerts to Microsoft Teams. Ideal for business owners searching for new retail or office space, it runs on a timetable, scrapes property details, de-duplicates existing entries, and notifies your team of only the newest opportunities.\n\n## Pre-conditions/Requirements\n\n### Prerequisites\n- An n8n instance (self-hosted or n8n.cloud)\n- ScrapeGraphAI community node installed\n- A Baserow workspace & table prepared to store property data\n- A Microsoft Teams channel with an incoming webhook URL\n- List of target real-estate URLs (CSV, JSON, or hard-coded array)\n\n### Required Credentials\n- **ScrapeGraphAI API Key** – Enables headless scraping of listing pages  \n- **Baserow Personal API Token** – Grants create/read access to your property table  \n- **Microsoft Teams Webhook URL** – Allows posting messages to your channel  \n\n### Baserow Table Schema\n| Column Name | Type    | Notes                          |\n|-------------|---------|--------------------------------|\n| `listing_id`| Text    | Unique ID or URL slug (primary)|\n| `title`     | Text    | Listing headline               |\n| `price`     | Number  | Monthly or annual rent         |\n| `sq_ft`     | Number  | Size in square feet            |\n| `location`  | Text    | City / neighborhood            |\n| `url`       | URL     | Original listing link          |\n| `scraped`   | Date    | Timestamp of last scrape       |\n\n## How it works\n\nThis workflow automatically aggregates commercial real-estate listings from multiple broker and marketplace websites, stores the fresh data in Baserow, and pushes weekly availability alerts to Microsoft Teams. Ideal for business owners searching for new retail or office space, it runs on a timetable, scrapes property details, de-duplicates existing entries, and notifies your team of only the newest opportunities.\n\n## Key Steps:\n- **Schedule Trigger**: Fires every week (or on demand) to start the aggregation cycle.\n- **Load URL List (Code node)**: Returns an array of listing or search-result URLs to be scraped.\n- **Split In Batches**: Processes URLs in manageable groups to avoid rate-limits.\n- **ScrapeGraphAI**: Extracts title, price, size, and location from each page.\n- **Merge**: Reassembles batches into a single dataset.\n- **IF Node**: Checks each listing against Baserow to detect new vs. existing entries.\n- **Baserow**: Inserts only brand-new listings into the table.\n- **Set Node**: Formats a concise Teams message with key details.\n- **Microsoft Teams**: Sends the alert to your designated channel.\n\n## Set up steps\n\n**Setup Time: 15-20 minutes**\n\n1. **Install ScrapeGraphAI node**:  \n   In n8n, go to “Settings → Community Nodes”, search for “@n8n-nodes/scrapegraphai” and install.\n2. **Create Baserow table**:  \n   Follow the schema above. Copy your Personal API Token from Baserow profile settings.\n3. **Generate Teams webhook**:  \n   In Microsoft Teams, open channel → “Connectors” → “Incoming Webhook”, name it, and copy the URL.\n4. **Open the workflow** in n8n and set the following credentials:  \n   - ScrapeGraphAI API Key  \n   - Baserow token (Baserow node)  \n   - Teams webhook (Microsoft Teams node)\n5. **Define target URLs**:  \n   Edit the “Load URL List” Code node and add your marketplace or broker URLs.\n6. **Adjust schedule**:  \n   Double-click the “Schedule Trigger” and set the cron expression (default: weekly Monday 08:00).\n7. **Test-run** the workflow manually to verify scraping and data insertion.\n8. **Activate** the workflow once results look correct.\n\n## Node Descriptions\n\n### Core Workflow Nodes:\n- **stickyNote** – Provides inline documentation and reminders inside the canvas.\n- **Schedule Trigger** – Triggers the workflow on a weekly cron schedule.\n- **Code** – Holds an array of URLs and can implement dynamic logic (e.g., API calls to get URLs).\n- **SplitInBatches** – Splits URL list into configurable batch sizes (default: 5) to stay polite.\n- **ScrapeGraphAI** – Scrapes each URL and returns structured JSON for price, size, etc.\n- **Merge** – Combines batch outputs back into one array.\n- **IF** – Performs existence check against Baserow’s `listing_id` to prevent duplicates.\n- **Baserow** – Writes new records or updates existing ones.\n- **Set** – Builds a human-readable message string for Teams.\n- **Microsoft Teams** – Posts the summary into your channel.\n\n### Data Flow:\n1. Schedule Trigger → Code → Split In Batches → ScrapeGraphAI → Merge → IF → Baserow  \n2. IF (new listings) → Set → Microsoft Teams\n\n## Customization Examples\n\n### Add additional data points (e.g., number of parking spaces)\n```javascript\n// In ScrapeGraphAI \"Selectors\" field\n{\n  \"title\": \".listing-title\",\n  \"price\": \".price\",\n  \"sq_ft\": \".size\",\n  \"parking\": \".parking span\"   // new selector\n}\n```\n\n### Change Teams message formatting\n```javascript\n// In Set node\nreturn items.map(item =&gt; {\n  const l = item.json;\n  item.json = {\n    text: `🏢 *${l.title}* — ${l.price} USD\\n📍 ${l.location} | ${l.sq_ft} ft²\\n🔗 &lt;${l.url}|View Listing&gt;`\n  };\n  return item;\n});\n```\n\n## Data Output Format\n\nThe workflow outputs structured JSON data:\n\n```json\n{\n  \"listing_id\": \"12345-main-street-suite-200\",\n  \"title\": \"Downtown Office Space – Suite 200\",\n  \"price\": 4500,\n  \"sq_ft\": 2300,\n  \"location\": \"Austin, TX\",\n  \"url\": \"https://broker.com/listings/12345\",\n  \"scraped\": \"2024-05-01T08:00:00.000Z\"\n}\n```\n\n## Troubleshooting\n\n### Common Issues\n1. **ScrapeGraphAI returns empty fields** – Update CSS selectors or switch to XPath; run in headless:true mode.  \n2. **Duplicate records still appear** – Ensure `listing_id` is truly unique (use URL slug) and that the IF node compares correctly.  \n3. **Teams message not delivered** – Verify webhook URL and that the Teams connector is enabled for the channel.\n\n### Performance Tips\n- Reduce batch size if websites block rapid requests.\n- Cache previous URLs to skip unchanged search-result pages.\n\n**Pro Tips:**\n- Rotate proxies in ScrapeGraphAI for larger scraping volumes.  \n- Use environment variables for credentials to simplify migrations.  \n- Add a second Schedule Trigger for daily “hot deal” checks by duplicating the workflow and narrowing the URL list.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Trigger & URL Prep",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Parallel Scraping",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Normalisation & Flattening",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Deduplication & Storage",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section – Teams Notifications",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Weekly Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Prepare URL List",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split URLs",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Scrape Listings",
+      "type": "n8n-nodes-scrapegraphai.scrapegraphAi",
+      "role": "scrapegraphAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Collect Listings",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Normalise Listings",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Listings",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Check Existing (Baserow List)",
+      "type": "n8n-nodes-base.baserow",
+      "role": "baserow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge Listing & Result",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Determine Action",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Need Create?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Row",
+      "type": "n8n-nodes-base.baserow",
+      "role": "baserow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Teams – New Listing",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "role": "microsoftTeams",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Need Update?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Update Row",
+      "type": "n8n-nodes-base.baserow",
+      "role": "baserow",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Teams – Update",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "role": "microsoftTeams",
+      "configDescription": "Version 2"
+    }
+  ]
+}

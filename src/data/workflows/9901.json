@@ -1,0 +1,182 @@
+{
+  "id": 9901,
+  "slug": "9901",
+  "title": "Beautiful web UI for GPT-4 multi-agent chat with specialized assistants",
+  "description": "# n8n Graphical Input Template - AI Agent Interface\n\nA beautiful, ready-to-use HTML interface for n8n workflows that allows your users to interact with AI agents through a clean web UI. No frontend skills required!\n\n![Version](https://img.shields.io/badge/version-1.0-blue.svg)\n![License](https://img.shields.io/badge/license-MIT-green.svg)\n\n## 🎯 Why Use This Template?\n\n- **No Frontend Skills Required**: Get a professional interface without writing React, Vue, or complex JavaScript\n- **Real-Time AI Responses**: Display AI responses directly in the interface with loading animations\n- **User-Friendly**: Your clients get a beautiful UI instead of dealing with APIs or command-line tools\n- **Plug & Play**: Just paste the code in an n8n Code node and connect your AI agents\n- **Fully Customizable**: Easy to modify colors, add more agents, or change the layout\n- **Dark/Light Mode**: Built-in theme toggle with localStorage persistence\n\n## 🚀 When to Use This?\n\nPerfect for:\n- **AI Agent Interactions**: Let users chat with different specialized AI agents (Database, Web Search, RAG)\n- **Customer Support**: Route customer questions to appropriate AI assistants\n- **Data Collection**: Gather information from clients with instant AI-powered responses\n- **Customer Portals**: Create simple interfaces for customers to interact with your AI automations\n- **Internal Tools**: Build quick admin panels with AI assistance\n\n## 📦 What's Included?\n\n- ✅ **Text Input Area**: Large textarea for user messages\n- ✅ **Send Button**: Main action button with smooth animations\n- ✅ **4 Specialized Agent Buttons**: Pre-configured for General, Database, Web, and RAG agents\n- ✅ **AI Response Display**: Beautiful response area with agent badges and loading states\n- ✅ **Project Guide Modal**: Built-in documentation for your users\n- ✅ **Theme Toggle**: Dark/Light mode with localStorage persistence\n- ✅ **Responsive Design**: Works perfectly on desktop, tablet, and mobile\n- ✅ **Font Awesome Icons**: Beautiful icons throughout the interface\n- ✅ **Error Handling**: Graceful error messages if something goes wrong\n\n## 🛠️ How to Use\n\n### Part 1: Display the Interface\n\nCreate a 3-node workflow to show the UI:\n\n```\nWebhook (GET) → Code Node → Respond to Webhook\n```\n\n**Configuration:**\n\n1. **Webhook Node (GET)**:\n   - Method: GET\n   - Path: `/your-interface` (e.g., `/ai-chat`)\n   - Authentication: Optional\n\n2. **Code Node**:\n   - Copy the entire content of `main.js`\n   - Paste it into the Code field\n\n3. **Respond to Webhook**:\n   - Respond With: First incoming item\n   - Response Data Source: Binary\n   - Binary Property: `data`\n\n### Part 2: Process AI Requests\n\nCreate a separate workflow to handle AI processing:\n\n```\nWebhook (POST) → Switch → AI Agents → Code Node → Respond to Webhook\n```\n\n**Configuration:**\n\n1. **Webhook Node (POST)**:\n   - Method: POST\n   - Path: `/webhook-endpoint`\n   - Response Mode: \"Respond to Webhook\"\n\n2. **Switch Node** - Route by agent type:\n   - Rule 1: `{{ $json.body.agent_type }}` equals `general`\n   - Rule 2: `{{ $json.body.agent_type }}` equals `database`\n   - Rule 3: `{{ $json.body.agent_type }}` equals `web`\n   - Rule 4: `{{ $json.body.agent_type }}` equals `rag`\n\n3. **AI Agent Nodes** (4 nodes, one per agent type):\n   - Connect one AI Agent to each Switch output\n   - Configure with OpenAI, Anthropic, or local LLM\n   - Add tools, memory, system prompts as needed\n\n4. **Code Node** - Format the response:\n```javascript\nconst webhookData = $('Webhook').first().json.body;\nconst aiResponse = $input.first().json;\n\nreturn [{\n  json: {\n    response: aiResponse.output || aiResponse.text || aiResponse.response,\n    agent_type: webhookData.agent_type,\n    user_message: webhookData.message,\n    timestamp: new Date().toISOString()\n  }\n}];\n```\n\n5. **Respond to Webhook** - Send back the formatted response\n\n## 🔧 What to Update\n\n### In main.js\n\n**Line 847** - Update webhook URL to match your n8n path:\n```javascript\nconst WEBHOOK_URL = '/webhook/webhook-endpoint';\n```\n\n**Line 20** - Customize project name:\n```javascript\nconst projectName = \"AI Assistant Hub\";\n```\n\n**Lines 34-56** - Change colors (optional):\n```javascript\n:root {\n  --primary: #6366f1;        /* Main accent color */\n  --primary-hover: #4f46e5;  /* Hover state */\n  --background: #ffffff;     /* Background */\n}\n```\n\n## 📊 How It Works\n\n```\nUser visits /your-interface\n    ↓\nSees the chat interface\n    ↓\nTypes message + clicks agent button\n    ↓\nPOST to /webhook/webhook-endpoint\n{\n  \"message\": \"Find users in database\",\n  \"agent_type\": \"database\",\n  \"timestamp\": \"2025-10-19T...\"\n}\n    ↓\nSwitch routes to Database AI Agent\n    ↓\nAI Agent processes with tools/memory\n    ↓\nCode Node formats response\n    ↓\nReturns { \"response\": \"Found 10 users...\" }\n    ↓\nInterface displays response with badge + animation\n```\n\n## 🎨 Customization Guide\n\n### Add More Agents\n\nCopy an agent card (lines ~700-730) and modify:\n\n```html\n<div>\n  <div>\n    <i></i>\n  </div>\n  <div>Custom AI Agent</div>\n  <div>\n    Specialized in your custom task.\n  </div>\n</div>\n```\n\nThen add CSS for the new agent type:\n\n```css\n.agent-card.custom-agent::before { background: #f59e0b; }\n.agent-card.custom-agent:hover { border-color: #f59e0b; }\n.agent-icon.custom-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }\n.response-agent-badge.custom-badge {\n  background: rgba(245, 158, 11, 0.1);\n  color: #f59e0b;\n}\n```\n\nAnd update the Switch node to handle the new agent type!\n\n### Modify Text Content\n\n- **Modal Guide**: Lines ~754-810 - Update help text\n- **Placeholder**: Line ~689 - Change textarea placeholder\n- **Subtitles**: Lines ~677, ~693 - Modify section descriptions\n\n### Change Agent Descriptions\n\nLines ~705, ~717, ~729 - Update the description text for each agent.\n\n## 📱 Built-in Features\n\n- **Enter to Send**: Press Enter to send (Shift+Enter for new line)\n- **Escape to Close**: Press Esc to close modals\n- **Loading State**: Animated spinner while AI processes\n- **Agent Badges**: Color-coded badges show which agent responded\n- **Clear Button**: Easily clear responses to start fresh\n- **Theme Persistence**: Theme choice saved in browser\n- **Smooth Animations**: Professional transitions and hover effects\n- **Error Handling**: User-friendly error messages\n\n## 💡 Example Workflow Ideas\n\n### Customer Support Bot\n- **General Agent**: Answers common questions\n- **Database Agent**: Looks up order status, account info\n- **Web Agent**: Searches knowledge base articles\n- **RAG Agent**: Searches company documentation\n\n### Data Analysis Tool\n- **General Agent**: Explains data concepts\n- **Database Agent**: Runs SQL queries on your data\n- **Web Agent**: Fetches external data sources\n- **RAG Agent**: Searches analysis reports\n\n### Internal Admin Panel\n- **General Agent**: General assistance\n- **Database Agent**: User management queries\n- **Web Agent**: Check external integrations\n- **RAG Agent**: Search internal docs/wikis\n\n## 🐛 Troubleshooting\n\n### Response not displaying?\n- Check that Code Node after AI Agent formats response with `response` field\n- Verify webhook URL in `main.js` matches your n8n webhook path\n- Check browser console for JavaScript errors\n\n### AI Agent not responding?\n- Ensure Switch node routes match agent types: `general`, `database`, `web`, `rag`\n- Verify AI Agent nodes are properly configured with API keys\n- Check n8n execution logs for errors\n\n### Styling issues?\n- Clear browser cache\n- Check that Font Awesome CDN is loading\n- Verify CSS variables are properly defined\n\n## 📝 Technical Details\n\n- **Framework**: Pure HTML/CSS/JavaScript (no dependencies!)\n- **Icons**: Font Awesome 6.4.0\n- **Browser Support**: All modern browsers (Chrome, Firefox, Safari, Edge)\n- **Mobile**: Fully responsive with touch support\n- **File Size**: ~1050 lines (~35KB minified)\n\n## 🤝 Contributing & Support\n\nThis template is designed to be simple and self-explanatory. The code structure:\n\n1. **Lines 1-23**: Configuration and setup\n2. **Lines 24-640**: CSS styles\n3. **Lines 641-751**: HTML structure\n4. **Lines 752-1048**: JavaScript functions\n\nFeel free to modify and adapt to your needs!\n\n## 📝 License\n\nFree to use and modify for your n8n workflows. No attribution required.\n\n---\n",
+  "featuredImage": "/data/workflows/9901/9901.webp",
+  "author": {
+    "id": 101,
+    "slug": "hugo-misery",
+    "name": "Hugo",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1398,
+  "downloads": 139,
+  "createdAt": "2025-10-19T14:48:56.258Z",
+  "updatedAt": "2026-01-16T09:02:33.150Z",
+  "publishedAt": "2025-10-19T14:48:56.258Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9901",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Beautiful web UI for GPT-4 multi-agent chat with specialized assistants",
+    "workflowName": "Beautiful web UI for GPT-4 multi-agent chat with specialized assistants",
+    "description": "# n8n Graphical Input Template - AI Agent Interface\n\nA beautiful, ready-to-use HTML interface for n8n workflows that allows your users to interact with AI agents through a clean web UI. No frontend skills required!\n\n![Version](https://img.shields.io/badge/version-1.0-blue.svg)\n![License](https://img.shields.io/badge/license-MIT-green.svg)\n\n## 🎯 Why Use This Template?\n\n- **No Frontend Skills Required**: Get a professional interface without writing React, Vue, or complex JavaScript\n- **Real-Time AI Responses**: Display AI responses directly in the interface with loading animations\n- **User-Friendly**: Your clients get a beautiful UI instead of dealing with APIs or command-line tools\n- **Plug & Play**: Just paste the code in an n8n Code node and connect your AI agents\n- **Fully Customizable**: Easy to modify colors, add more agents, or change the layout\n- **Dark/Light Mode**: Built-in theme toggle with localStorage persistence\n\n## 🚀 When to Use This?\n\nPerfect for:\n- **AI Agent Interactions**: Let users chat with different specialized AI agents (Database, Web Search, RAG)\n- **Customer Support**: Route customer questions to appropriate AI assistants\n- **Data Collection**: Gather information from clients with instant AI-powered responses\n- **Customer Portals**: Create simple interfaces for customers to interact with your AI automations\n- **Internal Tools**: Build quick admin panels with AI assistance\n\n## 📦 What's Included?\n\n- ✅ **Text Input Area**: Large textarea for user messages\n- ✅ **Send Button**: Main action button with smooth animations\n- ✅ **4 Specialized Agent Buttons**: Pre-configured for General, Database, Web, and RAG agents\n- ✅ **AI Response Display**: Beautiful response area with agent badges and loading states\n- ✅ **Project Guide Modal**: Built-in documentation for your users\n- ✅ **Theme Toggle**: Dark/Light mode with localStorage persistence\n- ✅ **Responsive Design**: Works perfectly on desktop, tablet, and mobile\n- ✅ **Font Awesome Icons**: Beautiful icons throughout the interface\n- ✅ **Error Handling**: Graceful error messages if something goes wrong\n\n## 🛠️ How to Use\n\n### Part 1: Display the Interface\n\nCreate a 3-node workflow to show the UI:\n\n```\nWebhook (GET) → Code Node → Respond to Webhook\n```\n\n**Configuration:**\n\n1. **Webhook Node (GET)**:\n   - Method: GET\n   - Path: `/your-interface` (e.g., `/ai-chat`)\n   - Authentication: Optional\n\n2. **Code Node**:\n   - Copy the entire content of `main.js`\n   - Paste it into the Code field\n\n3. **Respond to Webhook**:\n   - Respond With: First incoming item\n   - Response Data Source: Binary\n   - Binary Property: `data`\n\n### Part 2: Process AI Requests\n\nCreate a separate workflow to handle AI processing:\n\n```\nWebhook (POST) → Switch → AI Agents → Code Node → Respond to Webhook\n```\n\n**Configuration:**\n\n1. **Webhook Node (POST)**:\n   - Method: POST\n   - Path: `/webhook-endpoint`\n   - Response Mode: \"Respond to Webhook\"\n\n2. **Switch Node** - Route by agent type:\n   - Rule 1: `{{ $json.body.agent_type }}` equals `general`\n   - Rule 2: `{{ $json.body.agent_type }}` equals `database`\n   - Rule 3: `{{ $json.body.agent_type }}` equals `web`\n   - Rule 4: `{{ $json.body.agent_type }}` equals `rag`\n\n3. **AI Agent Nodes** (4 nodes, one per agent type):\n   - Connect one AI Agent to each Switch output\n   - Configure with OpenAI, Anthropic, or local LLM\n   - Add tools, memory, system prompts as needed\n\n4. **Code Node** - Format the response:\n```javascript\nconst webhookData = $('Webhook').first().json.body;\nconst aiResponse = $input.first().json;\n\nreturn [{\n  json: {\n    response: aiResponse.output || aiResponse.text || aiResponse.response,\n    agent_type: webhookData.agent_type,\n    user_message: webhookData.message,\n    timestamp: new Date().toISOString()\n  }\n}];\n```\n\n5. **Respond to Webhook** - Send back the formatted response\n\n## 🔧 What to Update\n\n### In main.js\n\n**Line 847** - Update webhook URL to match your n8n path:\n```javascript\nconst WEBHOOK_URL = '/webhook/webhook-endpoint';\n```\n\n**Line 20** - Customize project name:\n```javascript\nconst projectName = \"AI Assistant Hub\";\n```\n\n**Lines 34-56** - Change colors (optional):\n```javascript\n:root {\n  --primary: #6366f1;        /* Main accent color */\n  --primary-hover: #4f46e5;  /* Hover state */\n  --background: #ffffff;     /* Background */\n}\n```\n\n## 📊 How It Works\n\n```\nUser visits /your-interface\n    ↓\nSees the chat interface\n    ↓\nTypes message + clicks agent button\n    ↓\nPOST to /webhook/webhook-endpoint\n{\n  \"message\": \"Find users in database\",\n  \"agent_type\": \"database\",\n  \"timestamp\": \"2025-10-19T...\"\n}\n    ↓\nSwitch routes to Database AI Agent\n    ↓\nAI Agent processes with tools/memory\n    ↓\nCode Node formats response\n    ↓\nReturns { \"response\": \"Found 10 users...\" }\n    ↓\nInterface displays response with badge + animation\n```\n\n## 🎨 Customization Guide\n\n### Add More Agents\n\nCopy an agent card (lines ~700-730) and modify:\n\n```html\n<div>\n  <div>\n    <i></i>\n  </div>\n  <div>Custom AI Agent</div>\n  <div>\n    Specialized in your custom task.\n  </div>\n</div>\n```\n\nThen add CSS for the new agent type:\n\n```css\n.agent-card.custom-agent::before { background: #f59e0b; }\n.agent-card.custom-agent:hover { border-color: #f59e0b; }\n.agent-icon.custom-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }\n.response-agent-badge.custom-badge {\n  background: rgba(245, 158, 11, 0.1);\n  color: #f59e0b;\n}\n```\n\nAnd update the Switch node to handle the new agent type!\n\n### Modify Text Content\n\n- **Modal Guide**: Lines ~754-810 - Update help text\n- **Placeholder**: Line ~689 - Change textarea placeholder\n- **Subtitles**: Lines ~677, ~693 - Modify section descriptions\n\n### Change Agent Descriptions\n\nLines ~705, ~717, ~729 - Update the description text for each agent.\n\n## 📱 Built-in Features\n\n- **Enter to Send**: Press Enter to send (Shift+Enter for new line)\n- **Escape to Close**: Press Esc to close modals\n- **Loading State**: Animated spinner while AI processes\n- **Agent Badges**: Color-coded badges show which agent responded\n- **Clear Button**: Easily clear responses to start fresh\n- **Theme Persistence**: Theme choice saved in browser\n- **Smooth Animations**: Professional transitions and hover effects\n- **Error Handling**: User-friendly error messages\n\n## 💡 Example Workflow Ideas\n\n### Customer Support Bot\n- **General Agent**: Answers common questions\n- **Database Agent**: Looks up order status, account info\n- **Web Agent**: Searches knowledge base articles\n- **RAG Agent**: Searches company documentation\n\n### Data Analysis Tool\n- **General Agent**: Explains data concepts\n- **Database Agent**: Runs SQL queries on your data\n- **Web Agent**: Fetches external data sources\n- **RAG Agent**: Searches analysis reports\n\n### Internal Admin Panel\n- **General Agent**: General assistance\n- **Database Agent**: User management queries\n- **Web Agent**: Check external integrations\n- **RAG Agent**: Search internal docs/wikis\n\n## 🐛 Troubleshooting\n\n### Response not displaying?\n- Check that Code Node after AI Agent formats response with `response` field\n- Verify webhook URL in `main.js` matches your n8n webhook path\n- Check browser console for JavaScript errors\n\n### AI Agent not responding?\n- Ensure Switch node routes match agent types: `general`, `database`, `web`, `rag`\n- Verify AI Agent nodes are properly configured with API keys\n- Check n8n execution logs for errors\n\n### Styling issues?\n- Clear browser cache\n- Check that Font Awesome CDN is loading\n- Verify CSS variables are properly defined\n\n## 📝 Technical Details\n\n- **Framework**: Pure HTML/CSS/JavaScript (no dependencies!)\n- **Icons**: Font Awesome 6.4.0\n- **Browser Support**: All modern browsers (Chrome, Firefox, Safari, Edge)\n- **Mobile**: Fully responsive with touch support\n- **File Size**: ~1050 lines (~35KB minified)\n\n## 🤝 Contributing & Support\n\nThis template is designed to be simple and self-explanatory. The code structure:\n\n1. **Lines 1-23**: Configuration and setup\n2. **Lines 24-640**: CSS styles\n3. **Lines 641-751**: HTML structure\n4. **Lines 752-1048**: JavaScript functions\n\nFeel free to modify and adapt to your needs!\n\n## 📝 License\n\nFree to use and modify for your n8n workflows. No attribution required.\n\n---",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "AI Agent - General",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Respond to Webhook2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Respond to Webhook3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Respond to Webhook4",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "AI Agent Database",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent - Web",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "AI Agent - Rag",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Format Response - Code",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - Code1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - Code2",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Format Response - Code3",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

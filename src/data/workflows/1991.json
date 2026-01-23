@@ -1,0 +1,247 @@
+{
+  "id": 1991,
+  "slug": "1991",
+  "title": "Analyze email headers for IPs and spoofing",
+  "description": "This n8n workflow is designed to analyze email headers received via a webhook. The workflow splits into two main paths based on the presence of the received and authentication results headers.\n\nIn the first path, if received headers are present, the workflow extracts IP addresses from these headers and then queries the IP Quality Score API to gather information about the IP addresses, including fraud score, abuse history, organization, and more. Geolocation data is also obtained from the IP-API API. The workflow collects and aggregates this information for each IP address.\n\nIn the second path, if authentication-results headers are present, the workflow extracts SPF, DKIM, and DMARC authentication results. It then evaluates these results and sets fields accordingly (e.g., SPF pass/fail/neutral).\n\nThe paths merge their results, and the workflow responds to the original webhook with the aggregated analysis, including IP information and authentication results.\n\nPotential issues during setup include ensuring proper configuration of the webhook calls with header authentication, handling authentication and API keys for the IP Quality Score API, and addressing any discrepancies or errors in the logic nodes, such as handling SPF, DKIM, and DMARC results correctly. Additionally, thorough testing with various email header formats is essential to ensure accurate analysis and response.",
+  "featuredImage": "/data/workflows/1991/1991.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8n-team",
+    "name": "n8n Team",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5041,
+  "downloads": 504,
+  "createdAt": "2023-11-27T12:12:10.798Z",
+  "updatedAt": "2026-01-16T08:22:32.569Z",
+  "publishedAt": "2023-11-27T12:12:10.798Z",
+  "nodes": 35,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/1991",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Analyze email headers for IPs and spoofing",
+    "workflowName": "Analyze email headers for IPs and spoofing",
+    "description": "This n8n workflow is designed to analyze email headers received via a webhook. The workflow splits into two main paths based on the presence of the received and authentication results headers.\n\nIn the first path, if received headers are present, the workflow extracts IP addresses from these headers and then queries the IP Quality Score API to gather information about the IP addresses, including fraud score, abuse history, organization, and more. Geolocation data is also obtained from the IP-API API. The workflow collects and aggregates this information for each IP address.\n\nIn the second path, if authentication-results headers are present, the workflow extracts SPF, DKIM, and DMARC authentication results. It then evaluates these results and sets fields accordingly (e.g., SPF pass/fail/neutral).\n\nThe paths merge their results, and the workflow responds to the original webhook with the aggregated analysis, including IP information and authentication results.\n\nPotential issues during setup include ensuring proper configuration of the webhook calls with header authentication, handling authentication and API keys for the IP Quality Score API, and addressing any discrepancies or errors in the logic nodes, such as handling SPF, DKIM, and DMARC results correctly. Additionally, thorough testing with various email header formats is essential to ensure accurate analysis and response.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Receive Headers",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fraud Score",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Explode Email Header",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Split Out IPs",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Extract IPs from \"received\"",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "IP Quality Score",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "IP-API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Collect interesting data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "SPF/DKIM/DMARC from \"authentication-results\"",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "SPF from \"received-spf\"",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "DKIM from \"dkim-signature\"",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "DMARC from \"received-dmarc\"",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "DKIM",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Email Header from webhook",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Received Headers Present?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Authentication Results Present?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Aggregate Authentication Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "IP Data Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Merge Security Data",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Join IP Analysis into one JSON object",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Join results into one JSON object",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "SPF Authentication Checker",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Set SPF Pass Status",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set SPF Fail Status",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set SPF Neutral Status",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set SPF UnknownStatus",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 2"
+    }
+  ]
+}

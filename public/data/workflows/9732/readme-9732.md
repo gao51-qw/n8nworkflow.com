@@ -1,0 +1,87 @@
+# Qualify & verify leads with Google Gemini and sync to HubSpot from Jotform
+
+> ## AI-Enhanced Lead Qualification & HubSpot Synchronization (Jotform to HubSpot) 🧠✨
+
+Stop wasting time on bad leads and manual research. This advanced **n8n workflow** automates your entire lead qualification and CRM entry process for HubSpot, ensuring you only sync **high-quality, pre-researched contacts**.
+
+When a prospect submits your form, this automation immediately:
+
+1.  **Verifies the lead's email** using Verifalia to ensure deliverability.
+2.  **Performs an AI-powered website crawl** to extract and structure key competitive information like the prospect's **Company Name**, **Industry**, **Country**, and a **Website Summary**.
+3.  **Uses Google Gemini to create an instant, personalized summary** of the lead's potential, acting as your *virtual sales assistant*.
+4.  Finally, it creates or updates the comprehensive, enhanced contact record in **HubSpot CRM** and sends a smart **Gmail notification** to your sales team with the AI summary for immediate, informed follow-up.
+
+***
+
+## How it Works
+
+This automation turns raw form submissions into fully enriched, sales-ready contacts in HubSpot:
+
+1.  **Lead Capture (Jotform):** A prospect fills out your Jotform with their details, triggering the workflow instantly.
+2.  **Email Verification (Verifalia):** The email address is sent to the Verifalia API. **Only verified, deliverable emails are allowed to proceed**, eliminating bad data from your HubSpot portal.
+3.  **Website Crawl & Data Extraction (HTTP Request & AI):** The workflow accesses the prospect's website and uses an **Information Extractor** (powered by an underlying Language Model like Google Gemini or similar AI) to automatically pull essential business data like **Industry** and **Company Name**.
+4.  **AI Lead Scoring & Summarization (Google Gemini):** All captured and enriched data is fed to the Google Gemini model. The AI acts as a smart assistant, analyzing the lead's profile to generate a **short, prospective summary** for your sales team.
+5.  **HubSpot Synchronization:** The final, enriched contact data (including all AI-extracted fields) is used to either **create a new contact** or **update an existing one** in your **HubSpot CRM**.
+6.  **Intelligent Internal Notification (Gmail):** Your sales team receives an immediate internal email. This alert contains the raw lead data **plus the critical AI-generated summary**, allowing them to prioritize and personalize their follow-up immediately.
+
+***
+
+## Requirements
+
+To set up this intelligent lead funnel, you'll need the following accounts and credentials configured in your n8n instance:
+
+* **Jotform Credentials:** An **API Key** for the **JotForm Trigger**. 
+**Sign up for Jotform here:** [https://www.jotform.com/?partner=zainurrehman](https://www.jotform.com/?partner=zainurrehman)
+* **Verifalia Credentials:** An **API Key** for the **Lead Verification** node.
+* **AI/Language Model Credentials:** Credentials for the **Information Extractor** and **Message a model** (e.g., Google Gemini/PaLM API Key) to perform website research and summarization.
+* **HubSpot Credentials:** An **OAuth2** or **API Key** credential for the **HubSpot** node to manage contacts.
+* **Gmail Credentials:** An **OAuth2** credential for the **Gmail** node to send internal notifications.
+* **Jotform:** An active form containing the necessary fields: **First Name**, **Last Name**, **Email**, **Phone**, **Website**, and **Note**.
+
+
+## 📊 Basic Information
+
+- **Workflow ID:** 9732
+- **Complexity:** advanced
+- **Node Count:** 15
+- **Views:** 132
+- **Downloads:** 13
+- **Created:** 2025/10/16
+- **Last Updated:** 2026/1/16
+- **Source:** [View on n8n.io](https://n8n.io/workflows/9732)
+
+## 👤 Author
+
+- **Name:** Zain Khan
+- **Username:** @zain
+
+## 🏷️ Categories
+
+- Lead Generation
+- AI Chatbot
+
+## 🔗 Nodes Used
+
+- **stickyNote** (×7)
+- **hubspot** 
+- **jotFormTrigger** 
+- **gmail** 
+- **httpRequest** (×2)
+- **@n8n/n8n-nodes-langchain.informationExtractor** 
+- **@n8n/n8n-nodes-langchain.lmChatGoogleGemini** 
+- **@n8n/n8n-nodes-langchain.googleGemini** 
+
+## 🚀 How to Use
+
+1. Download the workflow JSON file
+2. Import it into your n8n instance
+3. Configure the credentials for the nodes
+4. Activate and test the workflow
+
+## 🔀 Workflow Structure
+
+This workflow contains 15 nodes with 7 node connections.
+
+---
+
+*This workflow was sourced from [n8n.io](https://n8n.io) community templates.*

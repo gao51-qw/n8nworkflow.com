@@ -9,14 +9,37 @@ import WorkflowGrid from '../components/workflow/WorkflowGrid.astro';
 import FilterSidebar from '../components/ui/FilterSidebar.astro';
 import Pagination from '../components/ui/Pagination.astro';
 import SearchBar from '../components/ui/SearchBar.astro';
+import AdRow from '../components/ui/AdRow.astro';
 import { getWorkflows, getFilterCountsV2 } from '../lib/services/workflows';
 import { getStats } from '../lib/services/stats';
+import { formatLongDate } from '../lib/utils/date';
 import { generateHeroContent } from '../lib/services/content-generator';
 import { generateWebSiteSchema, generateOrganizationSchema, combineSchemas } from '../lib/utils/schema';
 import type { Workflow } from '../lib/types/workflow';
 
-// 获取分页参数
+export const prerender = false;
+
+// 获取分页参数和过滤参数
 const currentPage = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const timeFilter = Astro.url.searchParams.get('time') || undefined;
+const priceFilter = Astro.url.searchParams.get('price') as 'free' | 'paid' | undefined;
+const categoryFilter = Astro.url.searchParams.get('category') || undefined;
+const complexityFilter = Astro.url.searchParams.get('complexity') || undefined;
+
+// 构建基础 URL，保留现有的筛选参数（除了 page）
+const baseUrl = new URL(Astro.url);
+baseUrl.searchParams.delete('page');
+// 确保 baseUrl 包含 search 部分，如果 search 为空则不加 ?
+const paginationBaseUrl = baseUrl.pathname + (baseUrl.search ? baseUrl.search : '');
+
+// 构建当前过滤器对象
+const currentFilters = {
+  timePeriod: timeFilter,
+  price: priceFilter,
+  category: categoryFilter,
+  complexity: complexityFilter,
+};
+
 const pageSize = 12;
 const offset = (currentPage - 1) * pageSize;
 
@@ -29,6 +52,10 @@ try {
     sort: 'date-desc',
     limit: pageSize,
     offset: offset,
+    time: timeFilter,
+    price: priceFilter,
+    category: categoryFilter,
+    complexity: complexityFilter,
   });
   workflows = result.workflows;
   totalCount = result.total;
@@ -38,30 +65,21 @@ try {
 
 // 获取筛选计数数据
 let filterCounts: any = {
-  timePeriods: { all: 7947, '7days': 8, month: 374, '6months': 4508, year: 6758 },
+  timePeriods: { all: 7947, '7d': 8, '1m': 374, '6m': 4508, '1y': 6758 },
   categories: { 'multimodal-ai': 2270, ai: 1600 },
   complexities: { all: 7947, beginner: 500, intermediate: 2835, advanced: 4602 },
   price: { all: 7947, free: 6898, paid: 1049 },
 };
 
 try {
-  filterCounts = await getFilterCountsV2();
+  filterCounts = await getFilterCountsV2({
+    timePeriod: timeFilter,
+    price: priceFilter,
+    category: categoryFilter,
+    complexity: complexityFilter,
+  });
 } catch (error) {
   console.error('Error fetching filter counts:', error);
-}
-
-// 获取统计数据
-let stats = {
-  totalWorkflows: 7943,
-  totalAuthors: 1250,
-  totalCategories: 45,
-  totalDownloads: 150000,
-};
-
-try {
-  stats = await getStats();
-} catch (error) {
-  console.error('Error fetching stats:', error);
 }
 
 // 获取Hero内容
@@ -79,6 +97,30 @@ try {
   heroContent = await generateHeroContent();
 } catch (error) {
   console.error('Error generating hero content:', error);
+}
+
+// 获取统计数据
+let stats: any = {
+  totalWorkflows: 7943,
+  totalAuthors: 1250,
+  totalCategories: 45,
+  totalDownloads: 150000,
+  recentWorkflows: 50,
+  lastUpdatedAt: new Date().toISOString(),
+};
+
+try {
+  const fetchedStats = await getStats();
+  stats = { ...stats, ...fetchedStats };
+  
+  // 同步更新 Hero 内容中的统计数据
+  heroContent.stats = {
+    workflows: `${Math.floor(stats.totalWorkflows / 100) * 100}+`,
+    authors: `${Math.floor(stats.totalAuthors / 10) * 10}+`,
+    recent: `${stats.recentWorkflows}+`,
+  };
+} catch (error) {
+  console.error('Error fetching stats:', error);
 }
 
 const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://n8nworkflow.com';
@@ -108,7 +150,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
           N8N Workflows Catalog
         </h1>
         <div class="inline-block px-4 py-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-400 mb-6 shadow-sm">
-          {stats.totalWorkflows.toLocaleString()} workflows available (updated Jan 10, 2026)
+          {stats.totalWorkflows.toLocaleString()} workflows available (updated {formatLongDate(stats.lastUpdatedAt || new Date())})
         </div>
         <p class="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
           Discover ready-to-use automation workflows to optimize your processes.
@@ -142,61 +184,11 @@ const totalPages = Math.ceil(totalCount / pageSize);
 
       <!-- Search Bar -->
       <div class="max-w-4xl mx-auto mb-12">
-        <div class="relative">
-          <label for="hero-search-input" class="sr-only">Search for a workflow</label>
-          <input
-            type="text"
-            id="hero-search-input"
-            placeholder="Search for a workflow..."
-            class="w-full px-6 py-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm focus:ring-2 focus:ring-primary-500 outline-none text-lg"
-          />
-          <button aria-label="Search" class="absolute right-3 top-1/2 -translate-y-1/2 p-3 bg-primary-700 text-white rounded-xl hover:bg-primary-800 transition-colors">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          </button>
-        </div>
+        <SearchBar placeholder="Search for a workflow..." />
       </div>
 
       <!-- Promo/Ads Row -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-        <a href="https://s.n8nworkflows.xyz/sYhvf" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 flex-shrink-0 bg-red-50 rounded-lg flex items-center justify-center">
-            <img src="https://n8n.io/favicon.ico" alt="n8n" class="w-8 h-8" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">n8n Cloud</p>
-            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">$20/month : Unlimited workflows</p>
-          </div>
-          <span class="text-xs font-bold text-primary-700">Try free</span>
-        </a>
-        <a href="https://s.n8nworkflows.xyz/MVX4S" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 flex-shrink-0 bg-blue-50 rounded-lg flex items-center justify-center">
-            <img src="https://brightdata.com/favicon.ico" alt="Bright Data" class="w-8 h-8" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Bright Data</p>
-            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">#1 Web Scraping Platform</p>
-          </div>
-          <span class="text-xs font-bold text-primary-700">Try free</span>
-        </a>
-        <a href="https://s.n8nworkflows.xyz/uhyV1" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 flex-shrink-0 bg-purple-50 rounded-lg flex items-center justify-center text-xl">🚀</div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Hostinger</p>
-            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">Self-hosted n8n from $4.99</p>
-          </div>
-          <span class="text-xs font-bold text-primary-700">Try free</span>
-        </a>
-        <a href="https://s.n8nworkflows.xyz/apify" target="_blank" rel="noopener noreferrer" class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div class="w-12 h-12 flex-shrink-0 bg-orange-50 rounded-lg flex items-center justify-center">
-            <img src="https://apify.com/favicon.ico" alt="Apify" class="w-8 h-8" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">Apify</p>
-            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">AI & Automation Hub</p>
-          </div>
-          <span class="text-xs font-bold text-primary-700">Try free</span>
-        </a>
-      </div>
+      <AdRow variant="simple" />
 
       <!-- Main Content - 2 Column Layout -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -233,7 +225,10 @@ const totalPages = Math.ceil(totalCount / pageSize);
           </div>
 
           <!-- Filter Sidebar Component -->
-          <FilterSidebar filterCounts={filterCounts} />
+          <FilterSidebar 
+            filterCounts={filterCounts} 
+            currentFilters={currentFilters} 
+          />
         </aside>
 
         <!-- Workflow Grid -->
@@ -260,7 +255,7 @@ const totalPages = Math.ceil(totalCount / pageSize);
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  baseUrl="/"
+                  baseUrl={paginationBaseUrl}
                 />
               </div>
             </>

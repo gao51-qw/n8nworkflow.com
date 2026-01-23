@@ -1,0 +1,29 @@
+## Overview
+Automatically anonymize CVs/resumes while preserving professional information. Perfect for recruitment agencies ensuring GDPR compliance and bias-free hiring.
+
+## Features
+- Supports multiple file formats (PDF, DOCX, etc.)
+- Multi-language support (preserves original language)
+- Removes PII: names, emails, phones, addresses
+- Preserves: skills, experience, dates, achievements
+- Outputs professionally formatted PDF
+
+## Requirements
+- OpenAI API key (GPT-4 recommended)
+- Stirling PDF service (self-hosted or cloud)
+- n8n version 1.0+
+
+## Setup Instructions
+1. Configure OpenAI credentials
+2. Set up Stirling PDF API endpoint
+3. Update API key in HTTP Request nodes
+4. Activate workflow
+5. Test with sample CV
+
+## Usage
+POST to webhook endpoint with CV file as `UploadCV` field.
+
+## Use Cases
+- Recruitment agencies (GDPR compliance)
+- HR departments (bias-free screening)
+- Job boards (candidate privacy)

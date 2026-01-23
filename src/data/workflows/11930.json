@@ -1,0 +1,181 @@
+{
+  "id": 11930,
+  "slug": "11930",
+  "title": "Auto-schedule Instagram & Facebook posts from Google Sheets",
+  "description": "**How it works**\n\nThis workflow automatically publishes Instagram and Facebook posts using Google Sheets as a content calendar. Users add post details to a sheet, and the workflow handles scheduling, image processing, posting, and status updates without manual intervention.\n\n**Step-by-step**\n\n**Scheduled Trigger**\nThe workflow runs automatically at a fixed interval (for example, every 15 minutes) to check for posts that are ready to be published.\n\n**Configuration & Credentials**\nA configuration step stores reusable values such as spreadsheet ID, sheet name, and platform settings, keeping the workflow easy to customize and secure.\n\n**Data Retrieval & Filtering**\nPosts are read from Google Sheets and filtered to include only rows marked as “Pending” and scheduled for the current time or earlier.\n\n**Image Handling**\nIf an image link is provided, the workflow downloads the image from Google Drive. If no image is present, the post continues as text-only.\n\n**Platform Routing**\nBased on the selected platform (Instagram, Facebook, or both), the workflow routes the post to the appropriate publishing path.\n\n**Social Media Publishing**\nThe post is published to Instagram and/or Facebook using the connected business account credentials.\n\n**Status Update**\nAfter publishing, the workflow updates the original Google Sheet with the post status (Success or Failed), published timestamp, and error message if applicable.",
+  "featuredImage": "/data/workflows/11930/11930.webp",
+  "author": {
+    "id": 101,
+    "slug": "jamesdinakar",
+    "name": "Dinakar Selvakumar",
+    "avatar": ""
+  },
+  "categories": [
+    "Social Media"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 213,
+  "downloads": 21,
+  "createdAt": "2025-12-18T16:46:53.529Z",
+  "updatedAt": "2026-01-16T09:10:43.877Z",
+  "publishedAt": "2025-12-18T16:46:53.529Z",
+  "nodes": 24,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11930",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Auto-schedule Instagram & Facebook posts from Google Sheets",
+    "workflowName": "Auto-schedule Instagram & Facebook posts from Google Sheets",
+    "description": "**How it works**\n\nThis workflow automatically publishes Instagram and Facebook posts using Google Sheets as a content calendar. Users add post details to a sheet, and the workflow handles scheduling, image processing, posting, and status updates without manual intervention.\n\n**Step-by-step**\n\n**Scheduled Trigger**\nThe workflow runs automatically at a fixed interval (for example, every 15 minutes) to check for posts that are ready to be published.\n\n**Configuration & Credentials**\nA configuration step stores reusable values such as spreadsheet ID, sheet name, and platform settings, keeping the workflow easy to customize and secure.\n\n**Data Retrieval & Filtering**\nPosts are read from Google Sheets and filtered to include only rows marked as “Pending” and scheduled for the current time or earlier.\n\n**Image Handling**\nIf an image link is provided, the workflow downloads the image from Google Drive. If no image is present, the post continues as text-only.\n\n**Platform Routing**\nBased on the selected platform (Instagram, Facebook, or both), the workflow routes the post to the appropriate publishing path.\n\n**Social Media Publishing**\nThe post is published to Instagram and/or Facebook using the connected business account credentials.\n\n**Status Update**\nAfter publishing, the workflow updates the original Google Sheet with the post status (Success or Failed), published timestamp, and error message if applicable.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Read Pending Posts from Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Filter Posts Due Now",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check If Image Link Provided",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Download Image from Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Route by Platform",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Post to Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to Both Platforms - Instagram",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.3"
+    },
+    {
+      "name": "Post to Both Platforms - Facebook",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "role": "facebookGraphApi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Prepare Success Update",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Prepare Error Update",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Merge Success and Error Paths",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Update Sheet with Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Check Post Success - Instagram",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Check Post Success - Facebook",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Check Post Success - Both",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Section 1 Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 2 Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 3 Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 4 Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Section 5 Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Setup Instructions Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

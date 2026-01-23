@@ -1,0 +1,212 @@
+{
+  "id": 2330,
+  "slug": "2330",
+  "title": "Enrich property inventory survey with image recognition and AI agent",
+  "description": "This n8n workflow assists property managers and surveyors by reducing the time and effort it takes to complete property inventory surveys.\n\nIn such surveys, articles and goods within a property may need to be captured and reported as a matter of record. This can take a sizable amount of time if the property or number of items is big enough.\n\nOur solution is to delegate this task to a capable AI Agent who can identify and fill out the details of each item automatically.\n\n## How it works\n\n* An AirTable Base is used to capture just the image of an item within the property\n* Our workflow monitoring this AirTable Base sends the photo to an AI image recognition model to describe the item for purpose of identification.\n* Our AI agent uses this description and the help of Google's reverse image search in an attempt to find an online product page for the item.\n* If found, the product page is scraped for the item's specifications which are then used to fill out the rest of the details of the item in our Airtable.\n\n## Requirements\n\n* Airtable for capturing photos and product information\n* OpenAI account to for image recognition service and AI for agent\n* SerpAPI account for google reverse image search.\n* Firecrawl.dev account for webspacing.\n\n## Customising this workflow\n\nTry building an internal inventory database to query and integrate into the workflow. This could save on costs by avoiding fetching new each time for common items.",
+  "featuredImage": "/data/workflows/2330/2330.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 5564,
+  "downloads": 556,
+  "createdAt": "2024-07-10T12:23:15.128Z",
+  "updatedAt": "2026-01-16T08:24:03.787Z",
+  "publishedAt": "2024-07-10T12:23:15.128Z",
+  "nodes": 29,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2330",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Enrich property inventory survey with image recognition and AI agent",
+    "workflowName": "Enrich property inventory survey with image recognition and AI agent",
+    "description": "This n8n workflow assists property managers and surveyors by reducing the time and effort it takes to complete property inventory surveys.\n\nIn such surveys, articles and goods within a property may need to be captured and reported as a matter of record. This can take a sizable amount of time if the property or number of items is big enough.\n\nOur solution is to delegate this task to a capable AI Agent who can identify and fill out the details of each item automatically.\n\n## How it works\n\n* An AirTable Base is used to capture just the image of an item within the property\n* Our workflow monitoring this AirTable Base sends the photo to an AI image recognition model to describe the item for purpose of identification.\n* Our AI agent uses this description and the help of Google's reverse image search in an attempt to find an online product page for the item.\n* If found, the product page is scraped for the item's specifications which are then used to fill out the rest of the details of the item in our Airtable.\n\n## Requirements\n\n* Airtable for capturing photos and product information\n* OpenAI account to for image recognition service and AI for agent\n* SerpAPI account for google reverse image search.\n* Firecrawl.dev account for webspacing.\n\n## Customising this workflow\n\nTry building an internal inventory database to query and integrate into the workflow. This could save on costs by avoiding fetching new each time for common items.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking \"Test workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Applicable Rows",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "role": "executeWorkflowTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Fallback Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "SERP Google Reverse Image API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Reverse Image Search Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Reverse Image Search Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Firecrawl Scrape API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Scrape Success?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Firecrawl Scrape Success Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Firecrawl scrape Error Response",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Firecrawl Web Scaper Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "role": "toolWorkflow",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "role": "outputParserStructured",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Enrich Product Rows",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Analyse Image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Object Identifier Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Actions Router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

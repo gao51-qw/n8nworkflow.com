@@ -1,0 +1,122 @@
+{
+  "id": 2526,
+  "slug": "2526",
+  "title": "Telegram to Spotify with OpenAI",
+  "description": "**Search music and play to Spotify from Telegram**\n\nThis workflow is a simple demonstration on accessing a message model from Telegram and it makes searching for songs an easy task even if you can't remember the artist or song name.\nAn OpenAI message model tries to figure out the song and sends it to an active Spotify device**.\n\n**Use case**\nImagine an office where you play music in the background and the employees can control the music without having to login to the playing account.\n\n**How it works**\n- You describe the song in Telegram.\n- Telegram bot sends the text to n8n.\n- An OpenAI message model tries to find the song.\n- Spotify gets the search query string.\n- First match is then added to queue.\n-- If there is no match a message is sent to Telegram and the process ends.\n- We change to the next track in the list.\n- We make sure the song starts playing by trying to resume.\n- We fetch the currently playing track.\n- We return \"now playing\" information to Telegram: Song Name - Artist Name - Album Name.\n\n**Error handling**\n- Every Spotify step has it's on error handler under settings where we output the error.\n- Message parser receives the error and sends it to Telegram.\n\n**Requirements**\n- Active workflow*\n- OpenAI API key\n- Telegram bot\n- Spotify account and Oauth2 API\n- Spotify active on a device**\n\n.* The Telegram trigger is activated only if this workflow is active. You can however TEST the workflow in the editor by clicking \"Test step\" and then it waits for the Telegram event. When event is received, just step through all steps or just clicking \"Test step\" on the \"Fetch Now Playing\" node.\n\n.** You must have a Spotify device active when trying to communicate with a device. Open Spotify and play something - not it is active.\n\n",
+  "featuredImage": "/data/workflows/2526/2526.webp",
+  "author": {
+    "id": 101,
+    "slug": "nld-alex",
+    "name": "Alexander Bentlund",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 2675,
+  "downloads": 267,
+  "createdAt": "2024-11-05T09:33:03.164Z",
+  "updatedAt": "2026-01-16T08:25:12.024Z",
+  "publishedAt": "2024-11-05T09:33:03.164Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2526",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Telegram to Spotify with OpenAI",
+    "workflowName": "Telegram to Spotify with OpenAI",
+    "description": "**Search music and play to Spotify from Telegram**\n\nThis workflow is a simple demonstration on accessing a message model from Telegram and it makes searching for songs an easy task even if you can't remember the artist or song name.\nAn OpenAI message model tries to figure out the song and sends it to an active Spotify device**.\n\n**Use case**\nImagine an office where you play music in the background and the employees can control the music without having to login to the playing account.\n\n**How it works**\n- You describe the song in Telegram.\n- Telegram bot sends the text to n8n.\n- An OpenAI message model tries to find the song.\n- Spotify gets the search query string.\n- First match is then added to queue.\n-- If there is no match a message is sent to Telegram and the process ends.\n- We change to the next track in the list.\n- We make sure the song starts playing by trying to resume.\n- We fetch the currently playing track.\n- We return \"now playing\" information to Telegram: Song Name - Artist Name - Album Name.\n\n**Error handling**\n- Every Spotify step has it's on error handler under settings where we output the error.\n- Message parser receives the error and sends it to Telegram.\n\n**Requirements**\n- Active workflow*\n- OpenAI API key\n- Telegram bot\n- Spotify account and Oauth2 API\n- Spotify active on a device**\n\n.* The Telegram trigger is activated only if this workflow is active. You can however TEST the workflow in the editor by clicking \"Test step\" and then it waits for the Telegram event. When event is received, just step through all steps or just clicking \"Test step\" on the \"Fetch Now Playing\" node.\n\n.** You must have a Spotify device active when trying to communicate with a device. Open Spotify and play something - not it is active.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "role": "telegramTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "OpenAI - Ask about a track",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.6"
+    },
+    {
+      "name": "Search track",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add song",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Next Song",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Resume play",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Currently Playing",
+      "type": "n8n-nodes-base.spotify",
+      "role": "spotify",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Message parser",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Not found error message",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Return message to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Define Now Playing",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    }
+  ]
+}

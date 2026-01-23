@@ -1,0 +1,27 @@
+{
+  "id": 10863,
+  "slug": "10863",
+  "title": "AI-powered body measurement & clothing size estimator from image with Fal.ai",
+  "description": "This workflow automates the process of estimating a person’s fashion size from an uploaded image using an AI model.\n\nThis workflow is an automated pipeline that uses an AI model to estimate a person's body measurements and clothing size from an image URL.\n\n---\n\n## Key Features\n\n* **🔁 Full Automation** – From image submission to result display, the process requires no manual steps.\n* **⚙️ Easy Integration** – Uses n8n’s native nodes and simple HTTP requests to connect with Fal.ai’s API.\n* **🕒 Real-Time Processing** – Automatically waits and checks for the AI result, ensuring the user receives the output as soon as it’s ready.\n* **🧩 Modular Design** – Each step (submit → process → check → result) is clearly separated, making it easy to modify or extend (e.g., adding notifications or storing results in a database).\n* **💡 User-Friendly Interface** – The initial form and final result form make it accessible even for non-technical users.\n* **🔐 Secure** – Authentication to the Fal.ai API is handled through HTTP header authorization, keeping API keys protected.\n\n---\n\n\n### How it works\n\n\n1.  **Form Trigger:** The workflow starts with a public form where a user submits a URL of an image.\n2.  **AI Processing Request:** The submitted image URL is sent to the `fal.run` AI service (specifically, the \"fashion-size-estimator\" model) via a POST request. This initial request places the job in a queue and returns a unique `request_id`.\n3.  **Polling for Completion:** The AI processing is asynchronous and takes some time. The workflow enters a loop where it:\n    *   **Waits:** Pauses for 10 seconds to give the AI model time to process the request.\n    *   **Checks Status:** Uses the `request_id` to check the status of the job.\n    *   **Conditional Check:** An IF node checks if the status is \"COMPLETED\".\n        *   If `NO` (not completed), the loop repeats (wait, then check again).\n        *   If `YES`, the workflow exits the loop.\n4.  **Fetching and Displaying Results:** Once processing is complete, the workflow retrieves the final result (containing the size, height, bust, waist, and hip measurements) and automatically displays it to the user on a \"thank you\" page.\n---\n\n\n### Set up steps\n\nTo make this workflow operational, you need to configure the API authentication.\n\n1.  **Obtain an API Key:**\n    *   Create an account at fal.ai\n    *   Navigate to your account settings to generate an API key.\n\n2.  **Configure Credentials in n8n:**\n    *   In your n8n instance, create a new HTTP Header Auth credential (you can name it \"Fal.run API\").\n    *   Set the **Name** field to `Authorization`.\n    *   Set the **Value** field to `Key YOURAPIKEY`, replacing \"YOURAPIKEY\" with the actual key you obtained from fal.ai.\n    *   Ensure this credential is correctly selected in the three HTTP Request nodes: \"Send image to estimator\", \"Get status\", and \"Get result\".\n\n---\n### **Need help customizing?**  \n[Contact me](mailto:info@n3w.it) for consulting and support or add me on [Linkedin](https://www.linkedin.com/in/davideboizza/). ",
+  "featuredImage": "/data/workflows/10863/10863.webp",
+  "author": {
+    "id": 101,
+    "slug": "n3witalia",
+    "name": "Davide",
+    "avatar": ""
+  },
+  "categories": [
+    "Document Extraction",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 265,
+  "downloads": 26,
+  "createdAt": "2025-11-15T10:46:37.818Z",
+  "updatedAt": "2026-01-16T09:06:34.986Z",
+  "publishedAt": "2025-11-15T10:46:37.818Z",
+  "nodes": 23,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10863"
+}

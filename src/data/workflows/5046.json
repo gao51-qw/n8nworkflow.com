@@ -1,0 +1,230 @@
+{
+  "id": 5046,
+  "slug": "5046",
+  "title": "Automate customer support with Mintlify documentation & Zendesk AI agent",
+  "description": "This n8n workflow automates support ticket handling with AI-driven classification, response generation, and safety checks. Responses are based solely on your Mintlify documentation, ensuring accuracy, consistency, and reduced manual effort in customer support.\n\n**✅ Trigger: New Ticket Received**\nThe workflow is triggered whenever a new support ticket is created.\n\n**🔍 Check for Assignee**\nIf the ticket is already assigned to a human agent, the bot does nothing and exits.\nIf the ticket is unassigned, the bot continues processing.\n\n**🔢 Bot Response Count Check**\nThe workflow checks how many times the bot has already responded to this ticket.\nIf the bot has replied more than 3 times, it stops and waits for a human to take over.\nThis prevents endless loops and flags potentially complex cases for review.\n\n**🧠 AI-Based Ticket Categorization**\nAn AI model analyzes the ticket content and classifies it into one of the following categories:\n1. 🧾 Billing → Sends a predefined billing-related message.\n2. 📢 Advertising → Automatically deletes the ticket.\n3. 🚨 Fraud → Sends a predefined fraud-related message.\n4. ❓ Other → Proceeds to generate a dynamic response.\n\n**🤖 Mintlify Integration**\nFor tickets categorized as \"Other\", the customer’s question is sent to the Mintlify API, which returns a documentation-based answer.\n\n**✍️ AI Response Formatter**\nThe raw response from Mintlify is passed to an AI model that:\nSummarizes and rewrites the answer in a clear, friendly tone\nLimits the response to 120 words\nAdds conversational elements like “Hi,” “Thanks,” and a proper closing\n\n**🛡️ AI Confidence Filter**\nA second AI model reviews the formatted response to ensure it sounds confident and accurate.\nIt looks for uncertainty phrases like:\n- “I’m not sure”\n- “I don’t have enough information”\n- “It depends…”\nIf the response is flagged as uncertain, the workflow stops and waits for a human agent to respond.\n\n**📤 Send Response & Update Ticket**\nIf the response passes the confidence check:\nThe reply is sent to the customer\nThe ticket status is updated to “Pending”",
+  "featuredImage": "/data/workflows/5046/5046.webp",
+  "author": {
+    "id": 101,
+    "slug": "alexg",
+    "name": "Alex Gurinovich",
+    "avatar": ""
+  },
+  "categories": [
+    "Ticket Management",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1088,
+  "downloads": 108,
+  "createdAt": "2025-06-19T13:18:30.439Z",
+  "updatedAt": "2026-01-16T08:37:21.919Z",
+  "publishedAt": "2025-06-19T13:18:30.439Z",
+  "nodes": 32,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5046",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate customer support with Mintlify documentation & Zendesk AI agent",
+    "workflowName": "Automate customer support with Mintlify documentation & Zendesk AI agent",
+    "description": "This n8n workflow automates support ticket handling with AI-driven classification, response generation, and safety checks. Responses are based solely on your Mintlify documentation, ensuring accuracy, consistency, and reduced manual effort in customer support.\n\n**✅ Trigger: New Ticket Received**\nThe workflow is triggered whenever a new support ticket is created.\n\n**🔍 Check for Assignee**\nIf the ticket is already assigned to a human agent, the bot does nothing and exits.\nIf the ticket is unassigned, the bot continues processing.\n\n**🔢 Bot Response Count Check**\nThe workflow checks how many times the bot has already responded to this ticket.\nIf the bot has replied more than 3 times, it stops and waits for a human to take over.\nThis prevents endless loops and flags potentially complex cases for review.\n\n**🧠 AI-Based Ticket Categorization**\nAn AI model analyzes the ticket content and classifies it into one of the following categories:\n1. 🧾 Billing → Sends a predefined billing-related message.\n2. 📢 Advertising → Automatically deletes the ticket.\n3. 🚨 Fraud → Sends a predefined fraud-related message.\n4. ❓ Other → Proceeds to generate a dynamic response.\n\n**🤖 Mintlify Integration**\nFor tickets categorized as \"Other\", the customer’s question is sent to the Mintlify API, which returns a documentation-based answer.\n\n**✍️ AI Response Formatter**\nThe raw response from Mintlify is passed to an AI model that:\nSummarizes and rewrites the answer in a clear, friendly tone\nLimits the response to 120 words\nAdds conversational elements like “Hi,” “Thanks,” and a proper closing\n\n**🛡️ AI Confidence Filter**\nA second AI model reviews the formatted response to ensure it sounds confident and accurate.\nIt looks for uncertainty phrases like:\n- “I’m not sure”\n- “I don’t have enough information”\n- “It depends…”\nIf the response is flagged as uncertain, the workflow stops and waits for a human agent to respond.\n\n**📤 Send Response & Update Ticket**\nIf the response passes the confidence check:\nThe reply is sent to the customer\nThe ticket status is updated to “Pending”",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenRouter Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "New ticket?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse conversation",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Look for Mintlify topicId",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Add Mintlify topicID to ticket",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Create Mintlify Chat Topic",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Add Mintlify topicId to ticket tags",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Delete ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Check if human agent is assigned",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "If human assigned, don't reply",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenRouter Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check uncertainty",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "If more that x replies, don't reply",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "If uncertain, don't reply",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "OpenRouter Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "role": "lmChatOpenRouter",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Message classifier",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Uncertainty router",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Billing suspected - escalate",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fraud suspected - escalate",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Mintlify generated response (new)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Mintlify generated response (existing)",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Check how many times the AI replied",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Fetch Zendesk ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Fetch ticket conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Count AI replies",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Flip conversation to get the last message",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse mintlify response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse AI response",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Reply ticket and put on pending",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    }
+  ]
+}

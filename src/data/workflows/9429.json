@@ -1,0 +1,122 @@
+{
+  "id": 9429,
+  "slug": "9429",
+  "title": "Automated phone receptionist for scheduling with Twilio, ElevenLabs & Claude AI",
+  "description": "**Schedule appointments from phone calls with AI using Twilio and ElevenLabs**\n\nThis n8n template creates an intelligent phone receptionist that handles incoming calls, answers FAQs, and schedules appointments to Google Calendar. The system uses Twilio for phone handling, ElevenLabs for voice AI and basic conversations, and n8n for complex scheduling logic—keeping responses snappy by only invoking the workflow when calendar operations are needed.\n\n**Who's it for**\n\nBusinesses that need automated phone scheduling: service companies, clinics, consultants, or any business that takes appointments by phone. Perfect for reducing administrative overhead while maintaining a professional caller experience.\n\n**Good to know**\n\nRedis memory is essential—without it, the AI must reparse entire conversations causing severe lag in voice responses\n\nClaude 3.5 Sonnet is recommended for best scheduling results\n\nTypical response times: ElevenLabs-only responses &lt;1s, n8n tool calls 2-4s\n\nAll placeholder values must be customized or scheduling will fail\n\n**How it works**\n\nTwilio receives incoming calls and forwards to ElevenLabs voice AI\n\nElevenLabs handles casual conversation and FAQ responses instantly\n\nWhen calendar operations are needed, ElevenLabs calls your n8n webhook\n\nn8n checks Google Calendar availability using your business rules\n\nClaude AI agent processes the request, collects required information, and schedules appointments\nRedis maintains conversation context across the call\n\nCalendar invites are automatically sent to customers\n\n**How to set up**\n\nConnect Twilio to ElevenLabs: In Twilio Console, set your phone number webhook to your ElevenLabs agent URL\n\nConfigure ElevenLabs tools: Add \"Client Tools\" in ElevenLabs that point to your n8n webhook for checking availability, creating appointments, and updating appointments\n\nSet n8n webhook path: Replace REPLACE ME in the \"Webhook: Receive User Request\" node with a secure endpoint (e.g., /elevenlabs-voice-scheduler)\n\nConfigure Google Calendar: Replace all REPLACE ME instances with your Calendar ID in the three calendar nodes (Check Availability, Create Appointment, Update Event)\n\nSet up Redis: Configure connection details in the \"Redis Chat Memory\" node\n\nCustomize scheduling prompt: In the \"Voice AI Agent\" node, replace all bracketed placeholders with your business details:\n\n[TIMEZONE], [START_TIME], [END_TIME], [OPERATING_DAYS], [BLOCKED_DAYS]\n[MINIMUM_LEAD_TIME], [APPOINTMENT_DURATION], [SERVICE_TYPE]\n[REQUIRED_FIELDS], [REQUIRED_NOTES_FIELDS]\n\n\nTest: Make a test call to verify availability checking, information collection, and appointment creation\n\n**Requirements**\n\nTwilio account with phone number\nElevenLabs Conversational AI account\nGoogle Calendar with OAuth2 credentials\nRedis instance (for session management)\nAnthropic API key (for Claude AI)",
+  "featuredImage": "/data/workflows/9429/9429.webp",
+  "author": {
+    "id": 101,
+    "slug": "connorprovines",
+    "name": "Connor Provines",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 4945,
+  "downloads": 494,
+  "createdAt": "2025-10-09T17:50:11.715Z",
+  "updatedAt": "2026-01-16T09:00:28.968Z",
+  "publishedAt": "2025-10-09T17:50:11.715Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9429",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated phone receptionist for scheduling with Twilio, ElevenLabs & Claude AI",
+    "workflowName": "Automated phone receptionist for scheduling with Twilio, ElevenLabs & Claude AI",
+    "description": "**Schedule appointments from phone calls with AI using Twilio and ElevenLabs**\n\nThis n8n template creates an intelligent phone receptionist that handles incoming calls, answers FAQs, and schedules appointments to Google Calendar. The system uses Twilio for phone handling, ElevenLabs for voice AI and basic conversations, and n8n for complex scheduling logic—keeping responses snappy by only invoking the workflow when calendar operations are needed.\n\n**Who's it for**\n\nBusinesses that need automated phone scheduling: service companies, clinics, consultants, or any business that takes appointments by phone. Perfect for reducing administrative overhead while maintaining a professional caller experience.\n\n**Good to know**\n\nRedis memory is essential—without it, the AI must reparse entire conversations causing severe lag in voice responses\n\nClaude 3.5 Sonnet is recommended for best scheduling results\n\nTypical response times: ElevenLabs-only responses &lt;1s, n8n tool calls 2-4s\n\nAll placeholder values must be customized or scheduling will fail\n\n**How it works**\n\nTwilio receives incoming calls and forwards to ElevenLabs voice AI\n\nElevenLabs handles casual conversation and FAQ responses instantly\n\nWhen calendar operations are needed, ElevenLabs calls your n8n webhook\n\nn8n checks Google Calendar availability using your business rules\n\nClaude AI agent processes the request, collects required information, and schedules appointments\nRedis maintains conversation context across the call\n\nCalendar invites are automatically sent to customers\n\n**How to set up**\n\nConnect Twilio to ElevenLabs: In Twilio Console, set your phone number webhook to your ElevenLabs agent URL\n\nConfigure ElevenLabs tools: Add \"Client Tools\" in ElevenLabs that point to your n8n webhook for checking availability, creating appointments, and updating appointments\n\nSet n8n webhook path: Replace REPLACE ME in the \"Webhook: Receive User Request\" node with a secure endpoint (e.g., /elevenlabs-voice-scheduler)\n\nConfigure Google Calendar: Replace all REPLACE ME instances with your Calendar ID in the three calendar nodes (Check Availability, Create Appointment, Update Event)\n\nSet up Redis: Configure connection details in the \"Redis Chat Memory\" node\n\nCustomize scheduling prompt: In the \"Voice AI Agent\" node, replace all bracketed placeholders with your business details:\n\n[TIMEZONE], [START_TIME], [END_TIME], [OPERATING_DAYS], [BLOCKED_DAYS]\n[MINIMUM_LEAD_TIME], [APPOINTMENT_DURATION], [SERVICE_TYPE]\n[REQUIRED_FIELDS], [REQUIRED_NOTES_FIELDS]\n\n\nTest: Make a test call to verify availability checking, information collection, and appointment creation\n\n**Requirements**\n\nTwilio account with phone number\nElevenLabs Conversational AI account\nGoogle Calendar with OAuth2 credentials\nRedis instance (for session management)\nAnthropic API key (for Claude AI)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Webhook: Receive User Request (ElevenLabs)",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Webhook: Return AI Response (ElevenLabs)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Calendar: Check Availability",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Calendar: Create Appointment",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Reasoning Tool (LangChain)",
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "role": "toolThink",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Anthropic Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "role": "lmChatAnthropic",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Voice AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update an event in Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "role": "googleCalendarTool",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Redis Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "role": "memoryRedisChat",
+      "configDescription": "Version 1.5"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

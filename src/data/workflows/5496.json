@@ -1,0 +1,92 @@
+{
+  "id": 5496,
+  "slug": "5496",
+  "title": "Extract email tasks with Gmail, ChatGPT-4o and Supabase",
+  "description": "\n# 📩 Gmail → GPT → Supabase | Task Extractor\n\nThis n8n workflow automates the extraction of actionable tasks from unread Gmail messages using OpenAI's GPT API, stores the resulting task metadata in Supabase, and avoids re-processing previously handled emails.\n\n---\n\n## ✅ What It Does\n\n1. **Triggers on a schedule** to check for unread emails in your Gmail inbox.\n2. **Loops through each email individually** using `SplitInBatches`.\n3. **Checks Supabase** to see if the email has already been processed.\n4. If it's a new email:\n   - Formats the email content into a structured GPT prompt\n   - Calls **ChatGPT-4o** to extract structured task data\n   - Inserts the result into your `emails` table in Supabase\n\n---\n\n## 🧰 Prerequisites\n\nBefore using this workflow, you must have:\n\n- An active **n8n Cloud or self-hosted instance**\n- A connected **Gmail account** with OAuth credentials in n8n\n- A **Supabase project** with an `emails` table and:\n  ```sql\n  ALTER TABLE emails ADD CONSTRAINT unique_email_id UNIQUE (email_id);\n  ```\n- An **OpenAI API key** with access to GPT-4o or GPT-3.5-turbo\n\n---\n\n## 🔐 Required Credentials\n\n| Name            | Type       | Description                       |\n|-----------------|------------|-----------------------------------|\n| Gmail OAuth     | Gmail      | To pull unread messages           |\n| OpenAI API Key  | OpenAI     | To generate task summaries        |\n| Supabase API    | HTTP       | For inserting rows via REST API   |\n\n---\n\n## 🔁 Environment Variables or Replacements\n\n- `Supabase_TaskManagement_URI` → e.g., `https://your-project.supabase.co`\n- `Supabase_TaskManagement_ANON_KEY` → Your Supabase anon key\n\nThese are used in the HTTP request to Supabase.\n\n---\n\n## ⏰ Scheduling / Trigger\n\n- Triggered using a **Schedule node**\n- Default: every X minutes (adjust to your preference)\n- Uses a Gmail API filter: **unread emails with label = INBOX**\n\n---\n\n## 🧠 Intended Use Case\n\n&gt; Designed for productivity-minded professionals who want to extract, summarize, and store actionable tasks from incoming email — without processing the same email twice or wasting GPT API credits.\n\nThis is part of a larger system integrating GPT, calendar scheduling, and optional task platforms (like ClickUp).\n\n---\n\n## 📦 Output (Stored in Supabase)\n\nEach processed email includes:\n- `email_id`\n- `subject`\n- `sender`\n- `received_at`\n- `body` (email snippet)\n- `gpt_summary` (structured task)\n- `requires_deep_work` (from GPT logic)\n- `deleted` (initially false)",
+  "featuredImage": "/data/workflows/5496/5496.webp",
+  "author": {
+    "id": 101,
+    "slug": "ptylr",
+    "name": "Paul Taylor",
+    "avatar": ""
+  },
+  "categories": [
+    "Personal Productivity",
+    "AI Summarization"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 880,
+  "downloads": 88,
+  "createdAt": "2025-06-30T22:21:19.552Z",
+  "updatedAt": "2026-01-16T08:39:58.315Z",
+  "publishedAt": "2025-06-30T22:21:19.552Z",
+  "nodes": 9,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5496",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Extract email tasks with Gmail, ChatGPT-4o and Supabase",
+    "workflowName": "Extract email tasks with Gmail, ChatGPT-4o and Supabase",
+    "description": "# 📩 Gmail → GPT → Supabase | Task Extractor\n\nThis n8n workflow automates the extraction of actionable tasks from unread Gmail messages using OpenAI's GPT API, stores the resulting task metadata in Supabase, and avoids re-processing previously handled emails.\n\n---\n\n## ✅ What It Does\n\n1. **Triggers on a schedule** to check for unread emails in your Gmail inbox.\n2. **Loops through each email individually** using `SplitInBatches`.\n3. **Checks Supabase** to see if the email has already been processed.\n4. If it's a new email:\n   - Formats the email content into a structured GPT prompt\n   - Calls **ChatGPT-4o** to extract structured task data\n   - Inserts the result into your `emails` table in Supabase\n\n---\n\n## 🧰 Prerequisites\n\nBefore using this workflow, you must have:\n\n- An active **n8n Cloud or self-hosted instance**\n- A connected **Gmail account** with OAuth credentials in n8n\n- A **Supabase project** with an `emails` table and:\n  ```sql\n  ALTER TABLE emails ADD CONSTRAINT unique_email_id UNIQUE (email_id);\n  ```\n- An **OpenAI API key** with access to GPT-4o or GPT-3.5-turbo\n\n---\n\n## 🔐 Required Credentials\n\n| Name            | Type       | Description                       |\n|-----------------|------------|-----------------------------------|\n| Gmail OAuth     | Gmail      | To pull unread messages           |\n| OpenAI API Key  | OpenAI     | To generate task summaries        |\n| Supabase API    | HTTP       | For inserting rows via REST API   |\n\n---\n\n## 🔁 Environment Variables or Replacements\n\n- `Supabase_TaskManagement_URI` → e.g., `https://your-project.supabase.co`\n- `Supabase_TaskManagement_ANON_KEY` → Your Supabase anon key\n\nThese are used in the HTTP request to Supabase.\n\n---\n\n## ⏰ Scheduling / Trigger\n\n- Triggered using a **Schedule node**\n- Default: every X minutes (adjust to your preference)\n- Uses a Gmail API filter: **unread emails with label = INBOX**\n\n---\n\n## 🧠 Intended Use Case\n\n&gt; Designed for productivity-minded professionals who want to extract, summarize, and store actionable tasks from incoming email — without processing the same email twice or wasting GPT API credits.\n\nThis is part of a larger system integrating GPT, calendar scheduling, and optional task platforms (like ClickUp).\n\n---\n\n## 📦 Output (Stored in Supabase)\n\nEach processed email includes:\n- `email_id`\n- `subject`\n- `sender`\n- `received_at`\n- `body` (email snippet)\n- `gpt_summary` (structured task)\n- `requires_deep_work` (from GPT logic)\n- `deleted` (initially false)",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Trigger Workflow",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Prepare ChatGPT Prompt",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Extract Task Detail from Email",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Insert Email Detail to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Get Unread Emails from Inbox",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Get Email from Database",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check if Email in Database",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

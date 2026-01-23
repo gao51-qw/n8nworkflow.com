@@ -1,0 +1,146 @@
+{
+  "id": 2346,
+  "slug": "2346",
+  "title": "Enhance customer chat by buffering messages with Twilio and Redis",
+  "description": "This n8n workflow demonstrates a simple approach to improve chat UX by staggering an AI Agent's reply for users who send in a sequence of partial messages and in short bursts.\n\n## How it works\n* Twilio webhook receives user's messages which are recorded in a message stack powered by Redis.\n* The execution is immediately paused for 5 seconds and then another check is done against the message stack for the latest message.\n* The purpose of this check lets use know if the user is sending more messages or if they are waiting for a reply.\n* The execution is aborted if the latest message on the stack differs from the incoming message and continues if they are the same.\n* For the latter, the agent receives the buffered messages up to that point and is able to respond to them in a single reply.\n\n## Requirements\n* A Twilio account and SMS-enabled phone number to receive messages.\n* Redis instance for the messages stack.\n* OpenAI account for the language model.\n\n## Customising the workflow\n\nThis workflow should work for other common messaging platforms such as Whatsapp and Telegram.\n\n5 seconds too long or too short? Adjust the wait threshold to suit your customers.",
+  "featuredImage": "/data/workflows/2346/2346.webp",
+  "author": {
+    "id": 101,
+    "slug": "jimleuk",
+    "name": "Jimleuk",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "AI Chatbot"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 10668,
+  "downloads": 1066,
+  "createdAt": "2024-07-15T15:35:37.471Z",
+  "updatedAt": "2026-01-16T08:24:10.381Z",
+  "publishedAt": "2024-07-15T15:35:37.471Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2346",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Enhance customer chat by buffering messages with Twilio and Redis",
+    "workflowName": "Enhance customer chat by buffering messages with Twilio and Redis",
+    "description": "This n8n workflow demonstrates a simple approach to improve chat UX by staggering an AI Agent's reply for users who send in a sequence of partial messages and in short bursts.\n\n## How it works\n* Twilio webhook receives user's messages which are recorded in a message stack powered by Redis.\n* The execution is immediately paused for 5 seconds and then another check is done against the message stack for the latest message.\n* The purpose of this check lets use know if the user is sending more messages or if they are waiting for a reply.\n* The execution is aborted if the latest message on the stack differs from the incoming message and continues if they are the same.\n* For the latter, the agent receives the buffered messages up to that point and is able to respond to them in a single reply.\n\n## Requirements\n* A Twilio account and SMS-enabled phone number to receive messages.\n* Redis instance for the messages stack.\n* OpenAI account for the language model.\n\n## Customising the workflow\n\nThis workflow should work for other common messaging platforms such as Whatsapp and Telegram.\n\n5 seconds too long or too short? Adjust the wait threshold to suit your customers.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Add to Messages Stack",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Should Continue?",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Twilio Trigger",
+      "type": "n8n-nodes-base.twilioTrigger",
+      "role": "twilioTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Latest Message Stack",
+      "type": "n8n-nodes-base.redis",
+      "role": "redis",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.twilio",
+      "role": "twilio",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Wait 5 seconds",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Get Chat History",
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "role": "memoryManager",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "role": "memoryBufferWindow",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Get Messages Buffer",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.6"
+    }
+  ]
+}

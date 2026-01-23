@@ -1,0 +1,254 @@
+{
+  "id": 2180,
+  "slug": "2180",
+  "title": "Scrape and summarize posts of a news site without RSS feed using AI and save them to a NocoDB",
+  "description": "The [News Site](https://www.colt.net/resources/type/news/) from Colt, a telecom company, does not offer an RSS feed, therefore web scraping is the choice to extract and process the news.\n\nThe goal is to get only the newest posts, a summary of each post and their respective (technical) keywords.\n\nNote that the news site offers the links to each news post, but not the individual news. We collect first the links and dates of each post before extracting the newest ones.\n\nThe result is sent to a SQL database, in this case a NocoDB database.\n\nThis process happens each week thru a cron job.\n\n**Requirements**:\n- Basic understanding of CSS selectors and how to get them via browser (usually: right click &rarr; inspect)\n- ChatGPT API account - normal account is not sufficient\n- A NocoDB database - of course you may choose any type of output target\n\n**Assumptions**:\n- CSS selectors work on the news site\n- The post has a date with own CSS selector - meaning date is not part of the news content\n\n**\"Warnings\"**\n- Not every site likes to be scraped, especially not in high frequency\n- Each website is structured in different ways, the workflow may then need several adaptations.",
+  "featuredImage": "/data/workflows/2180/2180.webp",
+  "author": {
+    "id": 101,
+    "slug": "askans",
+    "name": "Askan",
+    "avatar": ""
+  },
+  "categories": [
+    "Market Research",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 29636,
+  "downloads": 2963,
+  "createdAt": "2024-03-17T20:13:47.141Z",
+  "updatedAt": "2026-01-16T08:23:27.003Z",
+  "publishedAt": "2024-03-17T20:13:47.141Z",
+  "nodes": 36,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/2180",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Scrape and summarize posts of a news site without RSS feed using AI and save them to a NocoDB",
+    "workflowName": "Scrape and summarize posts of a news site without RSS feed using AI and save them to a NocoDB",
+    "description": "The [News Site](https://www.colt.net/resources/type/news/) from Colt, a telecom company, does not offer an RSS feed, therefore web scraping is the choice to extract and process the news.\n\nThe goal is to get only the newest posts, a summary of each post and their respective (technical) keywords.\n\nNote that the news site offers the links to each news post, but not the individual news. We collect first the links and dates of each post before extracting the newest ones.\n\nThe result is sent to a SQL database, in this case a NocoDB database.\n\nThis process happens each week thru a cron job.\n\n**Requirements**:\n- Basic understanding of CSS selectors and how to get them via browser (usually: right click &rarr; inspect)\n- ChatGPT API account - normal account is not sufficient\n- A NocoDB database - of course you may choose any type of output target\n\n**Assumptions**:\n- CSS selectors work on the news site\n- The post has a date with own CSS selector - meaning date is not part of the news content\n\n**\"Warnings\"**\n- Not every site likes to be scraped, especially not in high frequency\n- Each website is structured in different ways, the workflow may then need several adaptations.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Extract the HTML with the right css class",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summary",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Keywords",
+      "type": "n8n-nodes-base.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rename keywords",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Rename Summary",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Extract date",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Select posts of last 7 days",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Merge date & links",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Merge Content with Date & Link",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Extract individual posts",
+      "type": "n8n-nodes-base.html",
+      "role": "html",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge ChatGPT output with Date & Link",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Retrieve the web page for further processsing",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Schedule Trigger each week",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "NocoDB news database",
+      "type": "n8n-nodes-base.nocoDb",
+      "role": "nocoDb",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create single link items",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Create single date items",
+      "type": "n8n-nodes-base.itemLists",
+      "role": "itemLists",
+      "configDescription": "Version 3"
+    }
+  ]
+}

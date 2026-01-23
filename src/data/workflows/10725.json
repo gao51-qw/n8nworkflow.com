@@ -1,0 +1,121 @@
+{
+  "id": 10725,
+  "slug": "10725",
+  "title": "Collect API user data and store in Google Sheets with CSV backup",
+  "description": "## 🧾 Overview\n\nThis n8n workflow automates the process of **fetching user data from an API**, verifying its validity, transforming the response, and then **saving it to Google Sheets** for team collaboration. Additionally, it generates a **CSV backup file** of the same data for offline access or external integrations.\n\nPerfect for developers, analysts, or teams who want an automated, no-code data ingestion and backup solution.\n\n---\n\n## ⚙️ Key Features\n\n* 🔌 Fetches data from any REST API endpoint (e.g., RandomUser API)\n* ✅ Validates successful API responses before processing\n* 🧠 Transforms JSON response into simple key-value pairs (name and country)\n* 📊 Appends data directly into Google Sheets\n* 💾 Generates a downloadable CSV backup file\n* 🧱 Modular design — easily customizable and extendable\n\n---\n\n## 🧱 Workflow Steps\n\n### 1. **Start Workflow Manually** (`Manual Trigger Node`)\n\nThe workflow starts manually by clicking **Execute Workflow**. You can later replace this with a **Cron** or **Webhook** trigger for automation.\n\n---\n\n### 2. **Fetch User Data from API** (`HTTP Request Node`)\n\nMakes an HTTP GET request to the configured API endpoint defined in the environment variable `BASE_URL`.\n\n**Example:**\n\n```\nhttps://randomuser.me/api/?results=10\n```\n\nThis node fetches raw user data in JSON format.\n\n---\n\n### 3. **Verify API Response Success** (`If Node`)\n\nChecks if the API response returned an HTTP `200` status code.\n\n* ✅ If status = 200 → Continue processing data\n* ❌ If status ≠ 200 → Trigger **Stop and Error** node to halt execution\n\nThis prevents saving invalid or failed responses.\n\n---\n\n### 4. **Transform API Data to Name and Country** (`Function Node`)\n\nFormats the raw JSON data to extract key details (name and country) from each user record.\n\n**Input Example:**\n\n```json\n{\n  \"results\": [\n    {\n      \"name\": { \"first\": \"John\", \"last\": \"Doe\" },\n      \"location\": { \"country\": \"United States\" }\n    }\n  ]\n}\n```\n\n**Output Example:**\n\n```json\n[\n  { \"name\": \"John Doe\", \"country\": \"United States\" }\n]\n```\n\nThis step makes the data compatible with Google Sheets.\n\n---\n\n### 5. **Append Data to Google Sheets** (`Google Sheets Node`)\n\nAppends the formatted data to your specified Google Sheet.\n\n**Environment Variables Required:**\n\n* `GOOGLE_SHEET_ID` → ID of your target Google Sheet\n\n**Configuration:**\n\n* **Range:** `A:B`\n* **Columns:** `Name` (A) and `Country` (B)\n\n**Example Google Sheet:**\n\n| Name       | Country       |\n| ---------- | ------------- |\n| John Doe   | United States |\n| Jane Smith | Canada        |\n\n---\n\n### 6. **Create CSV Backup File** (`Spreadsheet File Node`)\n\nGenerates a `.csv` file named `users_backup_export.csv` containing all saved user data.\n\nThis file can be:\n\n* Stored locally\n* Sent via email\n* Uploaded to cloud storage (e.g., Google Drive, Dropbox)\n* Used for external analytics tools\n\n---\n\n## ⚠️ Error Handling\n\nIf the API response is invalid (non-200), the **Stop on API Failure** node halts the workflow and logs the error:\n\n&gt; ❌ *API request failed — status code not 200. Workflow stopped.*\n\nThis ensures only valid data is stored.\n\n---\n\n## 🧰 Setup Instructions\n\n1. **Add Environment Variables:**\n\n   ```bash\n   BASE_URL=https://randomuser.me/api/?results=10\n   GOOGLE_SHEET_ID=&lt;your_google_sheet_id&gt;\n   ```\n\n2. **Add Credentials:**\n\n   * Google Sheets OAuth2 credentials\n   * API (if authentication is required)\n\n3. **Run Workflow:**\n\n   * Start manually or configure a **Cron** node to run periodically\n\n4. **Check Output:**\n\n   * Data appears in your Google Sheet\n   * CSV file is created in n8n’s file system\n\n---\n\n## 🧩 Customization Options\n\n| Goal                    | How to Modify                                                     |\n| ----------------------- | ----------------------------------------------------------------- |\n| Change API fields       | Edit `Transform API Data` function to extract desired fields      |\n| Add columns             | Expand output object and update Google Sheets range (e.g., `A:D`) |\n| Automate execution      | Replace manual trigger with a Cron or Webhook node                |\n| Filter users            | Add an If node after transformation to include/exclude data       |\n| Send email notification | Add Gmail or SMTP node after CSV creation                         |\n\n---\n\n## 🧠 Example Use Case\n\n* A recruiter fetches random candidate data daily from an HR API.\n* Data (Name + Country) is saved to Google Sheets.\n* A CSV backup is automatically generated for offline analysis.\n\n---\n\n## ✅ Benefits\n\n* Hands-free automated data collection\n* Centralized storage in Google Sheets for team access\n* Built-in CSV export for reporting and backups\n* Protects data integrity with API validation\n* Fully customizable for any API format\n\n---\n\n**✨ Tip:** Add a Slack or Telegram node at the end to notify your team whenever new data is added successfully!\n",
+  "featuredImage": "/data/workflows/10725/10725.webp",
+  "author": {
+    "id": 101,
+    "slug": "n8nwizard",
+    "name": "PrideVel",
+    "avatar": ""
+  },
+  "categories": [
+    "Engineering"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 33,
+  "downloads": 3,
+  "createdAt": "2025-11-11T11:47:04.185Z",
+  "updatedAt": "2026-01-16T09:06:02.527Z",
+  "publishedAt": "2025-11-11T11:47:04.185Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/10725",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Collect API user data and store in Google Sheets with CSV backup",
+    "workflowName": "Collect API user data and store in Google Sheets with CSV backup",
+    "description": "This n8n workflow automates the process of **fetching user data from an API**, verifying its validity, transforming the response, and then **saving it to Google Sheets** for team collaboration. Additionally, it generates a **CSV backup file** of the same data for offline access or external integrations.\n\nPerfect for developers, analysts, or teams who want an automated, no-code data ingestion and backup solution.\n\n---\n\n## ⚙️ Key Features\n\n* 🔌 Fetches data from any REST API endpoint (e.g., RandomUser API)\n* ✅ Validates successful API responses before processing\n* 🧠 Transforms JSON response into simple key-value pairs (name and country)\n* 📊 Appends data directly into Google Sheets\n* 💾 Generates a downloadable CSV backup file\n* 🧱 Modular design — easily customizable and extendable\n\n---\n\n## 🧱 Workflow Steps\n\n### 1. **Start Workflow Manually** (`Manual Trigger Node`)\n\nThe workflow starts manually by clicking **Execute Workflow**. You can later replace this with a **Cron** or **Webhook** trigger for automation.\n\n---\n\n### 2. **Fetch User Data from API** (`HTTP Request Node`)\n\nMakes an HTTP GET request to the configured API endpoint defined in the environment variable `BASE_URL`.\n\n**Example:**\n\n```\nhttps://randomuser.me/api/?results=10\n```\n\nThis node fetches raw user data in JSON format.\n\n---\n\n### 3. **Verify API Response Success** (`If Node`)\n\nChecks if the API response returned an HTTP `200` status code.\n\n* ✅ If status = 200 → Continue processing data\n* ❌ If status ≠ 200 → Trigger **Stop and Error** node to halt execution\n\nThis prevents saving invalid or failed responses.\n\n---\n\n### 4. **Transform API Data to Name and Country** (`Function Node`)\n\nFormats the raw JSON data to extract key details (name and country) from each user record.\n\n**Input Example:**\n\n```json\n{\n  \"results\": [\n    {\n      \"name\": { \"first\": \"John\", \"last\": \"Doe\" },\n      \"location\": { \"country\": \"United States\" }\n    }\n  ]\n}\n```\n\n**Output Example:**\n\n```json\n[\n  { \"name\": \"John Doe\", \"country\": \"United States\" }\n]\n```\n\nThis step makes the data compatible with Google Sheets.\n\n---\n\n### 5. **Append Data to Google Sheets** (`Google Sheets Node`)\n\nAppends the formatted data to your specified Google Sheet.\n\n**Environment Variables Required:**\n\n* `GOOGLE_SHEET_ID` → ID of your target Google Sheet\n\n**Configuration:**\n\n* **Range:** `A:B`\n* **Columns:** `Name` (A) and `Country` (B)\n\n**Example Google Sheet:**\n\n| Name       | Country       |\n| ---------- | ------------- |\n| John Doe   | United States |\n| Jane Smith | Canada        |\n\n---\n\n### 6. **Create CSV Backup File** (`Spreadsheet File Node`)\n\nGenerates a `.csv` file named `users_backup_export.csv` containing all saved user data.\n\nThis file can be:\n\n* Stored locally\n* Sent via email\n* Uploaded to cloud storage (e.g., Google Drive, Dropbox)\n* Used for external analytics tools\n\n---\n\n## ⚠️ Error Handling\n\nIf the API response is invalid (non-200), the **Stop on API Failure** node halts the workflow and logs the error:\n\n&gt; ❌ *API request failed — status code not 200. Workflow stopped.*\n\nThis ensures only valid data is stored.\n\n---\n\n## 🧰 Setup Instructions\n\n1. **Add Environment Variables:**\n\n   ```bash\n   BASE_URL=https://randomuser.me/api/?results=10\n   GOOGLE_SHEET_ID=&lt;your_google_sheet_id&gt;\n   ```\n\n2. **Add Credentials:**\n\n   * Google Sheets OAuth2 credentials\n   * API (if authentication is required)\n\n3. **Run Workflow:**\n\n   * Start manually or configure a **Cron** node to run periodically\n\n4. **Check Output:**\n\n   * Data appears in your Google Sheet\n   * CSV file is created in n8n’s file system\n\n---\n\n## 🧩 Customization Options\n\n| Goal                    | How to Modify                                                     |\n| ----------------------- | ----------------------------------------------------------------- |\n| Change API fields       | Edit `Transform API Data` function to extract desired fields      |\n| Add columns             | Expand output object and update Google Sheets range (e.g., `A:D`) |\n| Automate execution      | Replace manual trigger with a Cron or Webhook node                |\n| Filter users            | Add an If node after transformation to include/exclude data       |\n| Send email notification | Add Gmail or SMTP node after CSV creation                         |\n\n---\n\n## 🧠 Example Use Case\n\n* A recruiter fetches random candidate data daily from an HR API.\n* Data (Name + Country) is saved to Google Sheets.\n* A CSV backup is automatically generated for offline analysis.\n\n---\n\n## ✅ Benefits\n\n* Hands-free automated data collection\n* Centralized storage in Google Sheets for team access\n* Built-in CSV export for reporting and backups\n* Protects data integrity with API validation\n* Fully customizable for any API format\n\n---\n\n**✨ Tip:** Add a Slack or Telegram node at the end to notify your team whenever new data is added successfully!",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Start Workflow Manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch User Data from API",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Verify API Response Success",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Transform API Data to Name and Country",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Append Data to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Create CSV Backup File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "role": "spreadsheetFile",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Workflow Documentation",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Stop on API Failure",
+      "type": "n8n-nodes-base.stopAndError",
+      "role": "stopAndError",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 1 - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 2 - API Request",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 3 - Validation",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 4 - Transform",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 5 - Google Sheets",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Step 6 - CSV Backup",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

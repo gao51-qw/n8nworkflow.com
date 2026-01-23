@@ -1,0 +1,278 @@
+{
+  "id": 4226,
+  "slug": "4226",
+  "title": "Automate RSS content to blog posts with GPT-4o, WordPress & LinkedIn publishing",
+  "description": "# Automated Blog Post Review and Multi-Platform Publishing Workflow with RSS Feeds\n![RSS.png](fileId:1344)\n## Description\nThis workflow automates the process of generating, reviewing, and publishing blog posts across multiple platforms, now enhanced with support for RSS Feeds as a content source.\nIt streamlines the management of blog posts by fetching content from RSS Feeds, formatting, storing, reviewing, templating, and publishing to platforms like LinkedIn and WordPress.\nThe workflow is split into three key flows:  \n- **Initial Flow**: Fetches content from RSS Feeds, prepares and stores blog post data, sends a review email with approval/rejection links. \n- **Approval Flow**: Handles review actions via a webhook to update the status in Google Sheets.  \n- **Status Update Flow**: Monitors status changes and publishes approved posts.  \n\n**Target Audience** \n- Content creators, bloggers, and digital marketers. \n- Teams managing multi-platform content publishing.  \n- Users familiar with n8n, Google Sheets, LinkedIn, and RSS Feeds.  \n\n## Problem Solved\n\nManually managing blog posts, especially when sourcing content from RSS Feeds, can be time-consuming and error-prone \nThis workflow addresses:  \n- **Content Sourcing**: Fetches blog posts from RSS Feeds for automated processing  \n- **Content Formatting**: Automatically formats and stores blog posts. \n- **Review Process**: Simplifies approval with email notifications and webhook triggers.  \n- **Multi-Platform Publishing**: Publishes to LinkedIn, WordPress and optionally Medium) with delays to avoid rate limits  \n- **Status Tracking**: Tracks approval and publishing status in Google Sheets. \n\n## Setup Instructions\n\n### Prerequisites \n- **n8n Instance**: Ensure you have an active n8n instance  \n- **RSS Feed URL**: Identify an RSS Feed URL (e.g., a blog’s feed like `https://example.com/feed`)  \n- **Google Sheets**: Create a spreadsheet with columns: `Title`, `Blogpost`, `Publication Date`, `Keywords`, `Status`, `Published`, `Featured Image`, `articleUrl`, `Rendered Blog`. \n  - Sheet Name: `Posts Initial`  \n  - Add a dropdown for `Status`: `Pending, Approved, Rejected`.  \n- **Gmail Account**: For sending review and notification emails.  \n- **LinkedIn Account**: For publishing posts (OAuth credentials needed).  \n- **Optional**: WordPress.com or Medium account for additional publishing.  \n\n### Customization Guidance \nBelow is a detailed breakdown of each flow and node, including setup instructions.  \n\n#### 🔹 Initial Flow: Fetch from RSS Feeds, Prepare, and Send for Review.\n\n**Purpose**: Fetches blog posts from an RSS Feed, formats them, extracts images, stores data, and sends a review email.  \n\n1. **Fetch from RSS Feed**  \n   - **Type**: RSS Feed  \n   - **Purpose**: Retrieves blog posts from an RSS Feed  \n   - **Configuration**:  \n     - **URL**: `https://example.com/feed` (replace with your RSS Feed URL)  \n     - **Limit**: 1 (or adjust based on your needs)  \n   - **Setup**: Ensure the RSS Feed URL is valid and accessible; test the node to verify it fetches posts  \n\n2. **Set Fields**  \n   - **Type**: Set  \n   - **Purpose**: Maps RSS Feed data to blog post fields   \n   - **Setup**: Adjust field mappings based on your RSS Feed’s structure  \n\n3. **Format Blog Post for Storage**  \n   - **Type**: Code  \n   - **Purpose**: Cleans up the blog post content.  \n4. **Extract Featured Image**  \n   - **Type**: Code  \n   - **Purpose**: Extracts or generates a featured image URL.  \n   - **Setup**: Ensure `originalHtml` contains image data; otherwise, it uses a placeholder.  \n\n5. **Store Blog Posts Initial**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Stores initial blog post data  \n   - **Setup**: Ensure Google Sheets credentials are set up and the spreadsheet has the required columns.  \n\n6. **Set Fields for Email**  \n   - **Type**: Set  \n   - **Purpose**: Prepares fields for the review email.  \n   - **Setup**: Replace `https://your-n8n-instance` with your n8n instance URL.  \n\n7. **Prepare Email HTML**  \n   - **Type**: Code  \n   - **Purpose**: Generates HTML email content with conditional image display  \n   - **Setup**: No additional configuration needed  \n8. **Notify for Review (Gmail)**  \n   - **Type**: Gmail  \n   - **Purpose**: Sends a review email with approval/rejection links  \n  \n#### 🔹 Approval Flow: Handle Review Actions\n\n**Purpose**: Updates the blog post status based on approval/rejection  \n\n1. **Webhook Trigger**  \n   - **Type**: Webhook  \n   - **Purpose**: Triggers on approval/rejection link clicks  \n   - **Configuration**:  \n     - **HTTP Method**: GET  \n     - **Path**: `approve-post`  \n     - **Response Code**: 200  \n     - **Response Data**: `{\"message\": \"Status updated\"}`  \n   - **Setup**: Ensure the webhook URL matches the one in **Set Fields for Email**  \n\n2. **Find Row to Update**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Retrieves all rows to find the matching blog post  \n3. **Filter Row by Title**  \n   - **Type**: Code  \n   - **Purpose**: Filters the row matching the blog post title  \n \n   - **Setup**: No additional configuration needed  \n\n4. **Update Status on Approval**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Updates the status to `Approved` or `Rejected` \n\n#### 🔹 Status Update Flow: Publish Approved Posts\n\n**Purpose**: Monitors status changes and publishes approved posts  \n\n1. **Google Sheets Trigger (Fetch Row)**  \n   - **Type**: Google Sheets Trigger  \n   - **Purpose**: Triggers when a row’s status is updated  \n   - **Configuration**:  \n     - **Event**: Update  \n     - **Sheet Name**: `Posts Initial`  \n     - **Output Fields**: `title`, `status`, `published`, `featuredImage`, `articleUrl`  \n   - **Setup**: Ensure Google Sheets credentials are set up  \n\n2. **Router (Check Status)**  \n   - **Type**: Router  \n   - **Purpose**: Routes based on status and published state  \n   - **Configuration**:  \n     - **Route 1**: Approved and Not Published  \n       - **Condition**: `status` equals `Approved` AND `published` equals `NO`  \n     - **Route 2**: Rejected  \n       - **Condition**: `status` equals `Rejected`  \n     - **Route 3**: Pending  \n       - **Condition**: `status` equals `Pending`  \n   - **Setup**: No additional configuration needed  \n\n3. **Apply Blog Template**    \n\n4. **Store Blog Posts Final** \n   - **Type**: Google Sheets  \n   - **Purpose**: Stores the final HTML content  \n   - **Configuration**:  \n     - **Operation**: Update Row   \n   - **Setup**: Ensure the `Rendered Blog` column exists  \n\n5. **Loop Over Blog Posts**   \n   - **Type**: Split in Batches  \n   - **Purpose**: Processes each blog post individually  \n   - **Configuration**: Default settings  \n   - **Setup**: No additional configuration needed  \n\n6. **Delay Between Posts**\n   - **Type**: Wait  \n   - **Purpose**: Adds a delay to avoid rate limits  \n   - **Configuration**:  \n     - **Wait Type**: Delay  \n     - **Amount**: 1 second  \n   - **Setup**: Adjust delay as needed for LinkedIn rate limits  \n\n7. **Publish to LinkedIn** \n   - **Type**: LinkedIn  \n   - **Purpose**: Publishes the blog post to LinkedIn  \n   - **Configuration**:  \n     - **Operation**: Share Post  \n     - **Author**: `urn:li:person:YOUR_PERSONAL_URN`   \n   - **Setup**: Set up LinkedIn OAuth credentials and replace `YOUR_PERSONAL_URN` with your LinkedIn URN  \n\n8. **Update Published State**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Updates the published status  \n   - **Configuration**:  \n     - **Operation**: Update Row  \n \n   - **Setup**: Ensure the `Published` column exists  \n\n9. **Notify Team** \n   - **Type**: Gmail  \n   - **Purpose**: Notifies the team of successful publishing  \n   - **Configuration**:  \n  \n       The blog post \"{{ $json.title }}\" has been successfully published\n   \n   - **Setup**: Set up Gmail credentials; replace `[Link]` with the LinkedIn URL if captured  \n\n10. **Notify Rejection (Gmail)** (Route 2)  \n    - **Type**: Gmail  \n    - **Purpose**: Notifies on rejection  \n   \n        The blog post \"{{ $json.title }}\" has been rejected\n        Suggestions: Rewrite with more engaging content, adjust keywords, or verify facts\n        Please update the status in Google Sheets if you wish to revise and resubmit\n       \n    - **Setup**: Set up Gmail credentials  \n\n11. **Wait for Status Update** (Route 3)  \n    - **Type**: Wait  \n    - **Purpose**: Delays for status recheck  \n    - **Configuration**:  \n      - **Wait Type**: Delay  \n      - **Duration**: `24h`  \n    - **Setup**: Adjust delay as needed  \n\n##  Conclusion\n\n- This workflow streamlines blog post management with RSS Feeds, making it ideal \nfor busy content creators and teams.\n - Customize it by adding more platforms adjusting delays, or enhancing notifications.\n - Share your feedback in the n8n community to help others benefit from this automation.\n\n",
+  "featuredImage": "/data/workflows/4226/4226.webp",
+  "author": {
+    "id": 101,
+    "slug": "spectrabit",
+    "name": "Immanuel",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1872,
+  "downloads": 187,
+  "createdAt": "2025-05-19T15:22:59.133Z",
+  "updatedAt": "2026-01-16T08:33:25.608Z",
+  "publishedAt": "2025-05-19T15:22:59.133Z",
+  "nodes": 40,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/4226",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate RSS content to blog posts with GPT-4o, WordPress & LinkedIn publishing",
+    "workflowName": "Automate RSS content to blog posts with GPT-4o, WordPress & LinkedIn publishing",
+    "description": "# Automated Blog Post Review and Multi-Platform Publishing Workflow with RSS Feeds\n![RSS.png](fileId:1344)\n## Description\nThis workflow automates the process of generating, reviewing, and publishing blog posts across multiple platforms, now enhanced with support for RSS Feeds as a content source.\nIt streamlines the management of blog posts by fetching content from RSS Feeds, formatting, storing, reviewing, templating, and publishing to platforms like LinkedIn and WordPress.\nThe workflow is split into three key flows:  \n- **Initial Flow**: Fetches content from RSS Feeds, prepares and stores blog post data, sends a review email with approval/rejection links. \n- **Approval Flow**: Handles review actions via a webhook to update the status in Google Sheets.  \n- **Status Update Flow**: Monitors status changes and publishes approved posts.  \n\n**Target Audience** \n- Content creators, bloggers, and digital marketers. \n- Teams managing multi-platform content publishing.  \n- Users familiar with n8n, Google Sheets, LinkedIn, and RSS Feeds.  \n\n## Problem Solved\n\nManually managing blog posts, especially when sourcing content from RSS Feeds, can be time-consuming and error-prone \nThis workflow addresses:  \n- **Content Sourcing**: Fetches blog posts from RSS Feeds for automated processing  \n- **Content Formatting**: Automatically formats and stores blog posts. \n- **Review Process**: Simplifies approval with email notifications and webhook triggers.  \n- **Multi-Platform Publishing**: Publishes to LinkedIn, WordPress and optionally Medium) with delays to avoid rate limits  \n- **Status Tracking**: Tracks approval and publishing status in Google Sheets. \n\n## Setup Instructions\n\n### Prerequisites \n- **n8n Instance**: Ensure you have an active n8n instance  \n- **RSS Feed URL**: Identify an RSS Feed URL (e.g., a blog’s feed like `https://example.com/feed`)  \n- **Google Sheets**: Create a spreadsheet with columns: `Title`, `Blogpost`, `Publication Date`, `Keywords`, `Status`, `Published`, `Featured Image`, `articleUrl`, `Rendered Blog`. \n  - Sheet Name: `Posts Initial`  \n  - Add a dropdown for `Status`: `Pending, Approved, Rejected`.  \n- **Gmail Account**: For sending review and notification emails.  \n- **LinkedIn Account**: For publishing posts (OAuth credentials needed).  \n- **Optional**: WordPress.com or Medium account for additional publishing.  \n\n### Customization Guidance \nBelow is a detailed breakdown of each flow and node, including setup instructions.  \n\n#### 🔹 Initial Flow: Fetch from RSS Feeds, Prepare, and Send for Review.\n\n**Purpose**: Fetches blog posts from an RSS Feed, formats them, extracts images, stores data, and sends a review email.  \n\n1. **Fetch from RSS Feed**  \n   - **Type**: RSS Feed  \n   - **Purpose**: Retrieves blog posts from an RSS Feed  \n   - **Configuration**:  \n     - **URL**: `https://example.com/feed` (replace with your RSS Feed URL)  \n     - **Limit**: 1 (or adjust based on your needs)  \n   - **Setup**: Ensure the RSS Feed URL is valid and accessible; test the node to verify it fetches posts  \n\n2. **Set Fields**  \n   - **Type**: Set  \n   - **Purpose**: Maps RSS Feed data to blog post fields   \n   - **Setup**: Adjust field mappings based on your RSS Feed’s structure  \n\n3. **Format Blog Post for Storage**  \n   - **Type**: Code  \n   - **Purpose**: Cleans up the blog post content.  \n4. **Extract Featured Image**  \n   - **Type**: Code  \n   - **Purpose**: Extracts or generates a featured image URL.  \n   - **Setup**: Ensure `originalHtml` contains image data; otherwise, it uses a placeholder.  \n\n5. **Store Blog Posts Initial**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Stores initial blog post data  \n   - **Setup**: Ensure Google Sheets credentials are set up and the spreadsheet has the required columns.  \n\n6. **Set Fields for Email**  \n   - **Type**: Set  \n   - **Purpose**: Prepares fields for the review email.  \n   - **Setup**: Replace `https://your-n8n-instance` with your n8n instance URL.  \n\n7. **Prepare Email HTML**  \n   - **Type**: Code  \n   - **Purpose**: Generates HTML email content with conditional image display  \n   - **Setup**: No additional configuration needed  \n8. **Notify for Review (Gmail)**  \n   - **Type**: Gmail  \n   - **Purpose**: Sends a review email with approval/rejection links  \n  \n#### 🔹 Approval Flow: Handle Review Actions\n\n**Purpose**: Updates the blog post status based on approval/rejection  \n\n1. **Webhook Trigger**  \n   - **Type**: Webhook  \n   - **Purpose**: Triggers on approval/rejection link clicks  \n   - **Configuration**:  \n     - **HTTP Method**: GET  \n     - **Path**: `approve-post`  \n     - **Response Code**: 200  \n     - **Response Data**: `{\"message\": \"Status updated\"}`  \n   - **Setup**: Ensure the webhook URL matches the one in **Set Fields for Email**  \n\n2. **Find Row to Update**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Retrieves all rows to find the matching blog post  \n3. **Filter Row by Title**  \n   - **Type**: Code  \n   - **Purpose**: Filters the row matching the blog post title  \n \n   - **Setup**: No additional configuration needed  \n\n4. **Update Status on Approval**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Updates the status to `Approved` or `Rejected` \n\n#### 🔹 Status Update Flow: Publish Approved Posts\n\n**Purpose**: Monitors status changes and publishes approved posts  \n\n1. **Google Sheets Trigger (Fetch Row)**  \n   - **Type**: Google Sheets Trigger  \n   - **Purpose**: Triggers when a row’s status is updated  \n   - **Configuration**:  \n     - **Event**: Update  \n     - **Sheet Name**: `Posts Initial`  \n     - **Output Fields**: `title`, `status`, `published`, `featuredImage`, `articleUrl`  \n   - **Setup**: Ensure Google Sheets credentials are set up  \n\n2. **Router (Check Status)**  \n   - **Type**: Router  \n   - **Purpose**: Routes based on status and published state  \n   - **Configuration**:  \n     - **Route 1**: Approved and Not Published  \n       - **Condition**: `status` equals `Approved` AND `published` equals `NO`  \n     - **Route 2**: Rejected  \n       - **Condition**: `status` equals `Rejected`  \n     - **Route 3**: Pending  \n       - **Condition**: `status` equals `Pending`  \n   - **Setup**: No additional configuration needed  \n\n3. **Apply Blog Template**    \n\n4. **Store Blog Posts Final** \n   - **Type**: Google Sheets  \n   - **Purpose**: Stores the final HTML content  \n   - **Configuration**:  \n     - **Operation**: Update Row   \n   - **Setup**: Ensure the `Rendered Blog` column exists  \n\n5. **Loop Over Blog Posts**   \n   - **Type**: Split in Batches  \n   - **Purpose**: Processes each blog post individually  \n   - **Configuration**: Default settings  \n   - **Setup**: No additional configuration needed  \n\n6. **Delay Between Posts**\n   - **Type**: Wait  \n   - **Purpose**: Adds a delay to avoid rate limits  \n   - **Configuration**:  \n     - **Wait Type**: Delay  \n     - **Amount**: 1 second  \n   - **Setup**: Adjust delay as needed for LinkedIn rate limits  \n\n7. **Publish to LinkedIn** \n   - **Type**: LinkedIn  \n   - **Purpose**: Publishes the blog post to LinkedIn  \n   - **Configuration**:  \n     - **Operation**: Share Post  \n     - **Author**: `urn:li:person:YOUR_PERSONAL_URN`   \n   - **Setup**: Set up LinkedIn OAuth credentials and replace `YOUR_PERSONAL_URN` with your LinkedIn URN  \n\n8. **Update Published State**  \n   - **Type**: Google Sheets  \n   - **Purpose**: Updates the published status  \n   - **Configuration**:  \n     - **Operation**: Update Row  \n \n   - **Setup**: Ensure the `Published` column exists  \n\n9. **Notify Team** \n   - **Type**: Gmail  \n   - **Purpose**: Notifies the team of successful publishing  \n   - **Configuration**:  \n  \n       The blog post \"{{ $json.title }}\" has been successfully published\n   \n   - **Setup**: Set up Gmail credentials; replace `[Link]` with the LinkedIn URL if captured  \n\n10. **Notify Rejection (Gmail)** (Route 2)  \n    - **Type**: Gmail  \n    - **Purpose**: Notifies on rejection  \n   \n        The blog post \"{{ $json.title }}\" has been rejected\n        Suggestions: Rewrite with more engaging content, adjust keywords, or verify facts\n        Please update the status in Google Sheets if you wish to revise and resubmit\n       \n    - **Setup**: Set up Gmail credentials  \n\n11. **Wait for Status Update** (Route 3)  \n    - **Type**: Wait  \n    - **Purpose**: Delays for status recheck  \n    - **Configuration**:  \n      - **Wait Type**: Delay  \n      - **Duration**: `24h`  \n    - **Setup**: Adjust delay as needed  \n\n##  Conclusion\n\n- This workflow streamlines blog post management with RSS Feeds, making it ideal \nfor busy content creators and teams.\n - Customize it by adding more platforms adjusting delays, or enhancing notifications.\n - Share your feedback in the n8n community to help others benefit from this automation.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "role": "scheduleTrigger",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Merge RSS Feeds",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.1"
+    },
+    {
+      "name": "Date Filter",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Limit Articles",
+      "type": "n8n-nodes-base.limit",
+      "role": "limit",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Content",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Fetch Full Article",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Extract Article Body",
+      "type": "n8n-nodes-base.htmlExtract",
+      "role": "htmlExtract",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Convert to Markdown",
+      "type": "n8n-nodes-base.function",
+      "role": "function",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "RSS TheVerge",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "RSS TechCrunch",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "role": "rssFeedRead",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Generate Blog Post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 1.9"
+    },
+    {
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Set Blog Creation Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Set Fields",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Format Fields for Storage",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Notify for Review",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Prepare Fields Foor Notification",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "Add Featured Image",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Store Blog Posts Initial",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Generate SEO Keywords",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Update Approve Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Approval Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Apply Blog Template",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Loop Over Blog Posts",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Delay Between Posts",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Notify Rejection",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Wait for Status Update",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "Check Status",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Fetch Row",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "role": "googleSheetsTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Store Blog Posts Final",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Check if Already Published",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Update Publish Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.5"
+    },
+    {
+      "name": "Post to Wordpress",
+      "type": "n8n-nodes-base.wordpress",
+      "role": "wordpress",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "role": "linkedIn",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "NNotify Telegram on Completion",
+      "type": "n8n-nodes-base.telegram",
+      "role": "telegram",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Copy of the RenderedBlog",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    }
+  ]
+}

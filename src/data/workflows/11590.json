@@ -1,0 +1,344 @@
+{
+  "id": 11590,
+  "slug": "11590",
+  "title": "Automate personalized lead responses with website scraping, GPT-4o, and Airtable CRM",
+  "description": "This n8n template automatically processes inbound form leads, researches their company via their website, and uses AI to write and send a highly personalized \"speed to lead\" email instantly. It also tracks subsequent appointment bookings to keep your CRM up to date.\n\nUse cases are focused on high velocity sales: Perfect for agency owners, founders, and sales teams who need to respond to new leads in seconds while maintaining a high quality, personal touch.\n\n## Good to know\nAt the time of writing, this template is optimized for GPT-4o to ensure the highest quality personalization.\nThis template was originally designed using a Lovable form, but it works with any form builder (Typeform, Webflow, WordPress) that can send data via a webhook.\n\n## How it works\n* The workflow starts when a new lead submits your contact form via the Webhook node.\n* It immediately checks your Airtable CRM to ensure the lead is new and not a duplicate.\n* The system scrapes the provided website URL and uses custom code to clean the HTML data.\n* AI analyzes the cleaned website data to generate a concise summary of the business.\n* A second AI step uses this summary and the lead's goals to draft and send a personalized email via Gmail.\n* The lead data and website summary are logged into your Airtable base.\n* A parallel flow monitors your inbox for booking confirmations and updates the CRM automatically.\n\n## How to use\n* Create the necessary Base and Table in Airtable to store your leads.\n* Connect your website form to the Webhook URL in the workflow.\n* Update the OpenAI node prompts with your specific email signature and phone number.\n* Run a test submission to ensure the website scraper is capturing data correctly.\n\n## Requirements\n* Airtable account\n* OpenAI account (GPT-4o model recommended)\n* Gmail account\n\n## Customising this workflow\nYou can easily adapt this for different communication channels. Try swapping the Gmail node for a Slack notification to alert your team of high value leads, or connect it to HubSpot instead of Airtable for enterprise CRM management.",
+  "featuredImage": "/data/workflows/11590/11590.webp",
+  "author": {
+    "id": 101,
+    "slug": "jordan-ai-16",
+    "name": "Jordan",
+    "avatar": ""
+  },
+  "categories": [
+    "Lead Nurturing",
+    "AI Summarization"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 97,
+  "downloads": 9,
+  "createdAt": "2025-12-08T06:08:01.442Z",
+  "updatedAt": "2026-01-16T09:09:14.142Z",
+  "publishedAt": "2025-12-08T06:08:01.442Z",
+  "nodes": 51,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/11590",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automate personalized lead responses with website scraping, GPT-4o, and Airtable CRM",
+    "workflowName": "Automate personalized lead responses with website scraping, GPT-4o, and Airtable CRM",
+    "description": "This n8n template automatically processes inbound form leads, researches their company via their website, and uses AI to write and send a highly personalized \"speed to lead\" email instantly. It also tracks subsequent appointment bookings to keep your CRM up to date.\n\nUse cases are focused on high velocity sales: Perfect for agency owners, founders, and sales teams who need to respond to new leads in seconds while maintaining a high quality, personal touch.\n\n## Good to know\nAt the time of writing, this template is optimized for GPT-4o to ensure the highest quality personalization.\nThis template was originally designed using a Lovable form, but it works with any form builder (Typeform, Webflow, WordPress) that can send data via a webhook.\n\n## How it works\n* The workflow starts when a new lead submits your contact form via the Webhook node.\n* It immediately checks your Airtable CRM to ensure the lead is new and not a duplicate.\n* The system scrapes the provided website URL and uses custom code to clean the HTML data.\n* AI analyzes the cleaned website data to generate a concise summary of the business.\n* A second AI step uses this summary and the lead's goals to draft and send a personalized email via Gmail.\n* The lead data and website summary are logged into your Airtable base.\n* A parallel flow monitors your inbox for booking confirmations and updates the CRM automatically.\n\n## How to use\n* Create the necessary Base and Table in Airtable to store your leads.\n* Connect your website form to the Webhook URL in the workflow.\n* Update the OpenAI node prompts with your specific email signature and phone number.\n* Run a test submission to ensure the website scraper is capturing data correctly.\n\n## Requirements\n* Airtable account\n* OpenAI account (GPT-4o model recommended)\n* Gmail account\n\n## Customising this workflow\nYou can easily adapt this for different communication channels. Try swapping the Gmail node for a Slack notification to alert your team of high value leads, or connect it to HubSpot instead of Airtable for enterprise CRM management.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Create a record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Search records1",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Update record",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "scrape website",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Markdown",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Markdown1",
+      "type": "n8n-nodes-base.markdown",
+      "role": "markdown",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "role": "merge",
+      "configDescription": "Version 3.2"
+    },
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Summarizer",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 1.8"
+    },
+    {
+      "name": "Compose personalized email",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "send email",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": " Add summary to airtable",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": " Clean markdown",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": " Clean markdown1",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": " Scrape website about page",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": " If website errors ",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "have they filled a form already?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send appointment confirmed",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Send a message2",
+      "type": "n8n-nodes-base.gmail",
+      "role": "gmail",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": " Covert time to ISO",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "role": "openAi",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Check to see if record exist already",
+      "type": "n8n-nodes-base.airtable",
+      "role": "airtable",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Email from calendly?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Booking email?",
+      "type": "n8n-nodes-base.switch",
+      "role": "switch",
+      "configDescription": "Version 3.3"
+    },
+    {
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Watch for booking email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "role": "gmailTrigger",
+      "configDescription": "Version 1.3"
+    },
+    {
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2.1"
+    },
+    {
+      "name": "Sticky Note22",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "This is whatever you use to notify your team",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Extract Appointment Date",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Parse Webhook Data",
+      "type": "n8n-nodes-base.set",
+      "role": "set",
+      "configDescription": "Version 3.4"
+    },
+    {
+      "name": "key value pair",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    }
+  ]
+}

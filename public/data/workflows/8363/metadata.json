@@ -1,0 +1,27 @@
+{
+  "id": 8363,
+  "slug": "8363",
+  "title": "Generate SEO-optimized blog content with Google Gemini, RSS feeds and Telegram",
+  "description": "### Workflow Objective\n\nThis n8n workflow automates the entire content creation process by monitoring specified RSS feeds for new articles. It then leverages Google Gemini AI to generate comprehensive, SEO-optimized blog posts inspired by these articles, creates unique cover images, and distributes the final content as a JSON file to stakeholders via Telegram. The primary goal is to automate the end-to-end content pipeline, saving significant time and ensuring a consistent output of high-quality content.\n\n### Step-by-Step Breakdown\n\n1.  **Monitor News Sources (RSS Triggers):**\n    *   The workflow is triggered periodically (e.g., hourly, weekly) by multiple RSS Feed nodes that monitor sources like \"Search Engine Journal\" and \"Tech Crunch\" for new publications.\n\n2.  **Prevent Duplicate Content (Deduplication):**\n    *   For each new article fetched from the RSS feeds, the workflow checks an AWS DynamoDB database to see if the article's URL has been processed before.\n    *   If the link already exists in the database, the process for that item is halted, and a debug notification is sent to Telegram via the \"Telegram Debugger\" node. This prevents the generation of duplicate content.\n\n3.  **AI-Powered Content Generation (Gemini Content Generation):**\n    *   If the article is new, its link is passed to a Google Gemini node.\n    *   Using a highly detailed and structured prompt, Gemini generates a complete blog post in a specific JSON format. This output includes a title, meta description, SEO-friendly slug, a descriptive prompt for generating a cover image, and the full markdown body of the article (including an introduction, subheadings, conclusion, FAQ section, etc.).\n\n4.  **Data Cleaning and Parsing (JSON Parser):**\n    *   The raw text response from the AI is processed by a \"Code\" node. This custom script cleans the output—removing markdown code blocks, fixing potential syntax errors—and reliably parses it into a valid JSON object, ensuring the data is clean for subsequent steps.\n\n5.  **Image Generation and Cloud Storage:**\n    *   The `image_generation_prompt` from the parsed JSON is sent to another Google Gemini node configured for image generation, creating a 1200x630 cover image for the blog post.\n    *   The newly created image is renamed using the `slug`.\n    *   Finally, the image is uploaded to a cloud storage service like Cloudflare R2. If the upload fails, an error message is sent to Telegram.\n\n6.  **Final Data Assembly and Distribution:**\n    *   The generated text content is merged with the URL of the uploaded image to create the final, complete blog post data object.\n    *   This entire data structure is converted into a JSON file, named using the format `[slug].json`.\n    *   In the final step, this JSON file is sent as a document to designated recipients User via the Telegram nodes.\n\n### Technologies and Services Used\n\n*   **Trigger:** RSS Feed Reader\n*   **Artificial Intelligence:** Google Gemini (for both text and image generation)\n*   **Database:** AWS DynamoDB (for content deduplication)\n*   **Cloud Storage:** Cloudflare R2 (S3-compatible)\n*   **Notification & Distribution:** Telegram\n*   **Data Processing:** n8n's native nodes (Merge, If, Set, Code)",
+  "featuredImage": "/data/workflows/8363/8363.webp",
+  "author": {
+    "id": 101,
+    "slug": "baris",
+    "name": "Baris Cem Ant",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 572,
+  "downloads": 57,
+  "createdAt": "2025-09-08T06:41:24.588Z",
+  "updatedAt": "2026-01-16T08:55:26.582Z",
+  "publishedAt": "2025-09-08T06:41:24.588Z",
+  "nodes": 27,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/8363"
+}

@@ -1,0 +1,145 @@
+{
+  "id": 5021,
+  "slug": "5021",
+  "title": "Automated GitHub scanner for exposed AWS IAM keys",
+  "description": "# Automated GitHub Scanner for Exposed AWS IAM Keys\n\n## Overview\n\nThis n8n workflow automatically scans GitHub for exposed AWS IAM access keys associated with your AWS account, helping security teams quickly identify and respond to potential security breaches. When compromised keys are found, the workflow generates detailed security reports and sends Slack notifications with actionable remediation steps.\n\n## 🔑 Key Features\n\n- **Automated AWS IAM Key Scanning**: Regularly checks for exposed AWS access keys on GitHub\n- **Real-time Security Alerts**: Sends immediate Slack notifications when compromised keys are detected\n- **Comprehensive Security Reports**: Generates detailed reports with exposure information and risk assessment\n- **Actionable Remediation Steps**: Provides clear instructions for securing compromised credentials\n- **Continuous Monitoring**: Maintains ongoing surveillance of your AWS environment\n\n## 📋 Workflow Steps\n\n1. **List AWS Users**: Retrieves all users from your AWS account\n2. **Split Users for Processing**: Processes each user individually\n3. **Get User Access Keys**: Retrieves access keys for each user\n4. **Filter Active Keys Only**: Focuses only on currently active access keys\n5. **Search GitHub for Exposed Keys**: Scans GitHub repositories for exposed access keys\n6. **Aggregate Search Results**: Consolidates and deduplicates search findings\n7. **Check For Compromised Keys**: Determines if any keys have been exposed\n8. **Generate Security Report**: Creates detailed security reports for compromised keys\n9. **Extract AWS Usernames**: Extracts usernames from AWS response for notification\n10. **Format Slack Alert**: Prepares comprehensive Slack notifications\n11. **Send Slack Notification**: Delivers alerts with actionable information\n12. **Continue Scanning**: Maintains continuous monitoring cycle\n\n## 🛠️ Setup Requirements\n\n### Prerequisites\n\n- Active n8n instance\n- AWS account with IAM permissions\n- GitHub account/token for searching repositories\n- Slack workspace for notifications\n\n### Required Credentials\n\n1. **AWS Credentials**:\n   - IAM user with permissions to list users and access keys\n   - Access Key ID and Secret Access Key\n\n2. **GitHub Credentials**:\n   - Personal Access Token with search permissions\n\n3. **Slack Credentials**:\n   - Webhook URL for your notification channel\n\n## ⚙️ Configuration\n\n1. **AWS Configuration**:\n   - Configure the \"List AWS Users\" node with your AWS credentials\n   - Ensure proper IAM permissions for listing users and access keys\n\n2. **GitHub Configuration**:\n   - Set up the \"Search GitHub for Exposed Keys\" node with your GitHub token\n   - Adjust search parameters if needed\n\n3. **Slack Configuration**:\n   - Configure the Slack node with your webhook URL\n   - Customize notification format if desired\n\n## 🚀 Usage\n\n### Running the Workflow\n\n1. **Manual Execution**: Click \"Execute Workflow\" to run an immediate scan\n2. **Scheduled Execution**: Set up a schedule to run periodic scans (recommended daily or weekly)\n\n### Repository Compatibility\n\nThis workflow is compatible with both public and private GitHub repositories to which you have access. It will scan all repositories you have permission to view based on your GitHub credentials.\n\n### Handling Alerts\n\nWhen a compromised key is detected:\n\n1. Review the Slack notification for details about the exposure\n2. Follow the recommended remediation steps:\n   - Deactivate the compromised key immediately\n   - Create a new key if needed\n   - Investigate the exposure source\n   - Update any services using the compromised key\n\n## ⚠️ Disclaimer\n\nThis workflow template is provided for reference purposes only to demonstrate how to automate AWS IAM key exposure scanning. Please note:\n\n- The scanning process may produce false positives as it only matches potential AWS access key patterns\n- Always verify any reported exposures manually before taking action\n- Disabling or deleting access keys without proper verification could have significant negative impacts on your environment\n- Understand which systems and applications rely on identified access keys before deactivating them\n- This template should be customized to fit your specific environment and security policies\n\n**IMPORTANT**: Use this workflow with caution and only after thoroughly understanding your AWS environment. The authors of this template are not responsible for any disruptions or damages resulting from its use.\n\n## 🔒 Security Considerations\n\n- This workflow requires access to sensitive AWS credentials\n- Store all credentials securely within n8n\n- Review and rotate access keys regularly\n\n## 📝 Customization Options\n\n- Adjust GitHub search parameters for more targeted scanning\n- Customize Slack notification format and content\n- Modify security report generation for your specific needs\n- Integrate with additional notification channels (email, MS Teams, etc.)\n\n### Optional: Enabling Interactive Slack Buttons\n\nThe Slack Block Kit notification format supports interactive buttons that can be implemented if you want to perform actions directly from Slack:\n\n1. **Disable Key**: This button can be configured to automatically disable the compromised AWS IAM access key\n2. **View Details**: This button can be set up to show additional information about the exposure\n3. **Acknowledge**: This button can be used to mark the alert as acknowledged\n\nTo make these buttons functional:\n\n1. **Set up a Slack Socket Mode App**:\n   - Create a Slack app in the [Slack API Console](https://api.slack.com/apps)\n   - Enable Socket Mode and Interactive Components\n   - Subscribe to the `block_actions` event to capture button clicks\n\n2. **Create an n8n Webhook Endpoint**:\n   - Add a new webhook node to receive Slack button click events\n   - Create separate workflows for each button action\n\n3. **Implement AWS Key Disabling**:\n   - For the \"Disable Key\" button, create a workflow that uses the n8n HTTP Request node to call the AWS IAM `UpdateAccessKey` API\n   - Example HTTP request that can be implemented in n8n:\n     ```\n     Method: POST\n     URL: https://iam.amazonaws.com/\n     Query Parameters:\n       Action: UpdateAccessKey\n       AccessKeyId: AKIAIOSFODNN7EXAMPLE\n       Status: Inactive\n       UserName: {{$json.username}}\n       Version: 2010-05-08\n     ```\n\n4. **Update the Slack Message Format**:\n   - Modify the `Format Slack Alert` node to include your webhook URL in the button action values\n   - Add callback_id and action_id values to identify which button was clicked\n\nThis implementation allows for immediate response to security incidents directly from the Slack interface, reducing response time and improving security posture.",
+  "featuredImage": "/data/workflows/5021/5021.webp",
+  "author": {
+    "id": 101,
+    "slug": "niranjan",
+    "name": "Niranjan G",
+    "avatar": ""
+  },
+  "categories": [
+    "SecOps"
+  ],
+  "complexityLevel": "advanced",
+  "price": 0,
+  "visitors": 1155,
+  "downloads": 115,
+  "createdAt": "2025-06-18T13:22:16.072Z",
+  "updatedAt": "2026-01-16T08:37:14.752Z",
+  "publishedAt": "2025-06-18T13:22:16.072Z",
+  "nodes": 18,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/5021",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Automated GitHub scanner for exposed AWS IAM keys",
+    "workflowName": "Automated GitHub scanner for exposed AWS IAM keys",
+    "description": "# Automated GitHub Scanner for Exposed AWS IAM Keys\n\n## Overview\n\nThis n8n workflow automatically scans GitHub for exposed AWS IAM access keys associated with your AWS account, helping security teams quickly identify and respond to potential security breaches. When compromised keys are found, the workflow generates detailed security reports and sends Slack notifications with actionable remediation steps.\n\n## 🔑 Key Features\n\n- **Automated AWS IAM Key Scanning**: Regularly checks for exposed AWS access keys on GitHub\n- **Real-time Security Alerts**: Sends immediate Slack notifications when compromised keys are detected\n- **Comprehensive Security Reports**: Generates detailed reports with exposure information and risk assessment\n- **Actionable Remediation Steps**: Provides clear instructions for securing compromised credentials\n- **Continuous Monitoring**: Maintains ongoing surveillance of your AWS environment\n\n## 📋 Workflow Steps\n\n1. **List AWS Users**: Retrieves all users from your AWS account\n2. **Split Users for Processing**: Processes each user individually\n3. **Get User Access Keys**: Retrieves access keys for each user\n4. **Filter Active Keys Only**: Focuses only on currently active access keys\n5. **Search GitHub for Exposed Keys**: Scans GitHub repositories for exposed access keys\n6. **Aggregate Search Results**: Consolidates and deduplicates search findings\n7. **Check For Compromised Keys**: Determines if any keys have been exposed\n8. **Generate Security Report**: Creates detailed security reports for compromised keys\n9. **Extract AWS Usernames**: Extracts usernames from AWS response for notification\n10. **Format Slack Alert**: Prepares comprehensive Slack notifications\n11. **Send Slack Notification**: Delivers alerts with actionable information\n12. **Continue Scanning**: Maintains continuous monitoring cycle\n\n## 🛠️ Setup Requirements\n\n### Prerequisites\n\n- Active n8n instance\n- AWS account with IAM permissions\n- GitHub account/token for searching repositories\n- Slack workspace for notifications\n\n### Required Credentials\n\n1. **AWS Credentials**:\n   - IAM user with permissions to list users and access keys\n   - Access Key ID and Secret Access Key\n\n2. **GitHub Credentials**:\n   - Personal Access Token with search permissions\n\n3. **Slack Credentials**:\n   - Webhook URL for your notification channel\n\n## ⚙️ Configuration\n\n1. **AWS Configuration**:\n   - Configure the \"List AWS Users\" node with your AWS credentials\n   - Ensure proper IAM permissions for listing users and access keys\n\n2. **GitHub Configuration**:\n   - Set up the \"Search GitHub for Exposed Keys\" node with your GitHub token\n   - Adjust search parameters if needed\n\n3. **Slack Configuration**:\n   - Configure the Slack node with your webhook URL\n   - Customize notification format if desired\n\n## 🚀 Usage\n\n### Running the Workflow\n\n1. **Manual Execution**: Click \"Execute Workflow\" to run an immediate scan\n2. **Scheduled Execution**: Set up a schedule to run periodic scans (recommended daily or weekly)\n\n### Repository Compatibility\n\nThis workflow is compatible with both public and private GitHub repositories to which you have access. It will scan all repositories you have permission to view based on your GitHub credentials.\n\n### Handling Alerts\n\nWhen a compromised key is detected:\n\n1. Review the Slack notification for details about the exposure\n2. Follow the recommended remediation steps:\n   - Deactivate the compromised key immediately\n   - Create a new key if needed\n   - Investigate the exposure source\n   - Update any services using the compromised key\n\n## ⚠️ Disclaimer\n\nThis workflow template is provided for reference purposes only to demonstrate how to automate AWS IAM key exposure scanning. Please note:\n\n- The scanning process may produce false positives as it only matches potential AWS access key patterns\n- Always verify any reported exposures manually before taking action\n- Disabling or deleting access keys without proper verification could have significant negative impacts on your environment\n- Understand which systems and applications rely on identified access keys before deactivating them\n- This template should be customized to fit your specific environment and security policies\n\n**IMPORTANT**: Use this workflow with caution and only after thoroughly understanding your AWS environment. The authors of this template are not responsible for any disruptions or damages resulting from its use.\n\n## 🔒 Security Considerations\n\n- This workflow requires access to sensitive AWS credentials\n- Store all credentials securely within n8n\n- Review and rotate access keys regularly\n\n## 📝 Customization Options\n\n- Adjust GitHub search parameters for more targeted scanning\n- Customize Slack notification format and content\n- Modify security report generation for your specific needs\n- Integrate with additional notification channels (email, MS Teams, etc.)\n\n### Optional: Enabling Interactive Slack Buttons\n\nThe Slack Block Kit notification format supports interactive buttons that can be implemented if you want to perform actions directly from Slack:\n\n1. **Disable Key**: This button can be configured to automatically disable the compromised AWS IAM access key\n2. **View Details**: This button can be set up to show additional information about the exposure\n3. **Acknowledge**: This button can be used to mark the alert as acknowledged\n\nTo make these buttons functional:\n\n1. **Set up a Slack Socket Mode App**:\n   - Create a Slack app in the [Slack API Console](https://api.slack.com/apps)\n   - Enable Socket Mode and Interactive Components\n   - Subscribe to the `block_actions` event to capture button clicks\n\n2. **Create an n8n Webhook Endpoint**:\n   - Add a new webhook node to receive Slack button click events\n   - Create separate workflows for each button action\n\n3. **Implement AWS Key Disabling**:\n   - For the \"Disable Key\" button, create a workflow that uses the n8n HTTP Request node to call the AWS IAM `UpdateAccessKey` API\n   - Example HTTP request that can be implemented in n8n:\n     ```\n     Method: POST\n     URL: https://iam.amazonaws.com/\n     Query Parameters:\n       Action: UpdateAccessKey\n       AccessKeyId: AKIAIOSFODNN7EXAMPLE\n       Status: Inactive\n       UserName: {{$json.username}}\n       Version: 2010-05-08\n     ```\n\n4. **Update the Slack Message Format**:\n   - Modify the `Format Slack Alert` node to include your webhook URL in the button action values\n   - Add callback_id and action_id values to identify which button was clicked\n\nThis implementation allows for immediate response to security incidents directly from the Slack interface, reducing response time and improving security posture.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Split Users for Processing",
+      "type": "n8n-nodes-base.splitInBatches",
+      "role": "splitInBatches",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "Get User Access Keys",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Filter Active Keys Only",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Search GitHub for Exposed Keys",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Aggregate Search Results",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Check For Compromised Keys",
+      "type": "n8n-nodes-base.if",
+      "role": "if",
+      "configDescription": "Version 2.2"
+    },
+    {
+      "name": "Generate Security Report",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Continue Scanning",
+      "type": "n8n-nodes-base.noOp",
+      "role": "noOp",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "role": "slack",
+      "configDescription": "Version 2.3"
+    },
+    {
+      "name": "Format Slack Alert",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Prepare Github Search",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Rate Limit Wait",
+      "type": "n8n-nodes-base.wait",
+      "role": "wait",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "List AWS Users1",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Extract AWS Usernames",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Disable Access Keys",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "id": 7188,
+  "slug": "7188",
+  "title": "RAG-powered AI voice customer support agent (Supabase + Gemini + ElevenLabs)",
+  "description": "Execution video: [Youtube Link](https://youtu.be/GGvJBnIZQsY?si=y-SPWiy8EFo473_s)\n\nI built an **AI voice-triggered RAG assistant** where ElevenLabs’ conversational model acts as the front end and n8n handles the brain....here’s the real breakdown of what’s happening in that workflow:\n\n1. **Webhook** (`/inf`)\n\n   * Gets hit by ElevenLabs once the user finishes talking.\n   * Payload includes `user_question`.\n\n2. **Embed User Message** (Together API - BAAI/bge-large-en-v1.5)\n\n   * Turns the spoken question into a dense vector embedding.\n   * This embedding is the query representation for semantic search.\n\n3. **Search Embeddings** (Supabase RPC)\n\n   * Calls `matchembeddings1` to find the top 5 most relevant context chunks from your stored knowledge base.\n\n4. **Aggregate**\n\n   * Merges all retrieved `chunk` values into one block of text so the LLM gets full context at once.\n\n5. **Basic LLM Chain** (LangChain node)\n\n   * Prompt forces the model to only answer from the retrieved context and to sound human-like without saying “based on the context”....\n   * Uses **Google Vertex Gemini 2.5 Flash** as the actual model.\n\n6. **Respond to Webhook**\n\n   * Sends the generated answer back instantly to the webhook call, so ElevenLabs can speak it back.\n\nYou essentially have:\n**Voice → Text → Embedding → Vector Search → Context Injection → LLM → Response → Voice**",
+  "featuredImage": "/data/workflows/7188/7188.webp",
+  "author": {
+    "id": 101,
+    "slug": "iamvaar",
+    "name": "iamvaar",
+    "avatar": ""
+  },
+  "categories": [
+    "Support Chatbot",
+    "Multimodal AI"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 302,
+  "downloads": 30,
+  "createdAt": "2025-08-08T16:58:35.294Z",
+  "updatedAt": "2026-01-16T08:48:56.358Z",
+  "publishedAt": "2025-08-08T16:58:35.294Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/7188",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "RAG-powered AI voice customer support agent (Supabase + Gemini + ElevenLabs)",
+    "workflowName": "RAG-powered AI voice customer support agent (Supabase + Gemini + ElevenLabs)",
+    "description": "Execution video: [Youtube Link](https://youtu.be/GGvJBnIZQsY?si=y-SPWiy8EFo473_s)\n\nI built an **AI voice-triggered RAG assistant** where ElevenLabs’ conversational model acts as the front end and n8n handles the brain....here’s the real breakdown of what’s happening in that workflow:\n\n1. **Webhook** (`/inf`)\n\n   * Gets hit by ElevenLabs once the user finishes talking.\n   * Payload includes `user_question`.\n\n2. **Embed User Message** (Together API - BAAI/bge-large-en-v1.5)\n\n   * Turns the spoken question into a dense vector embedding.\n   * This embedding is the query representation for semantic search.\n\n3. **Search Embeddings** (Supabase RPC)\n\n   * Calls `matchembeddings1` to find the top 5 most relevant context chunks from your stored knowledge base.\n\n4. **Aggregate**\n\n   * Merges all retrieved `chunk` values into one block of text so the LLM gets full context at once.\n\n5. **Basic LLM Chain** (LangChain node)\n\n   * Prompt forces the model to only answer from the retrieved context and to sound human-like without saying “based on the context”....\n   * Uses **Google Vertex Gemini 2.5 Flash** as the actual model.\n\n6. **Respond to Webhook**\n\n   * Sends the generated answer back instantly to the webhook call, so ElevenLabs can speak it back.\n\nYou essentially have:\n**Voice → Text → Embedding → Vector Search → Context Injection → LLM → Response → Voice**",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "role": "aggregate",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "role": "chainLlm",
+      "configDescription": "Version 1.7"
+    },
+    {
+      "name": "Search Embeddings",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Embend User Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "role": "respondToWebhook",
+      "configDescription": "Version 1.4"
+    },
+    {
+      "name": "Content for the Training",
+      "type": "n8n-nodes-base.googleDocs",
+      "role": "googleDocs",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Splitting into Chunks",
+      "type": "n8n-nodes-base.code",
+      "role": "code",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Embedding Uploaded document",
+      "type": "n8n-nodes-base.httpRequest",
+      "role": "httpRequest",
+      "configDescription": "Version 4.2"
+    },
+    {
+      "name": "Save the embedding in DB",
+      "type": "n8n-nodes-base.supabase",
+      "role": "supabase",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "role": "manualTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Google Vertex Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "role": "lmChatGoogleVertex",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}

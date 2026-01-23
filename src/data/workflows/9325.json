@@ -1,0 +1,122 @@
+{
+  "id": 9325,
+  "slug": "9325",
+  "title": "Video transcript search and Q&A with VLM Run, GPT-4 & Google Workspace",
+  "description": "**Automate video transcription and Q&A with async VLM processing that scales from short clips to long recordings.**\n\n## What this workflow does\n\n1. **Monitors Google Drive** for new files in a specific folder and grabs the file ID on create\n2. **Automatically downloads** the binary to hand off for processing\n3. **Sends the video to VLM Run** for **async transcription** with a callback URL that posts results back to n8n\n4. **Receives the transcript JSON via Webhook** and **appends a row in Google Sheets** with the video identifier and transcript data\n5. **Enables chat Q&A** through the **Chat Trigger + AI Agent**. The agent fetches relevant rows from Sheets and answers only from those segments using the connected chat model\n\n## Setup\n\n**Prerequisites:** Google Drive and Google Sheets accounts, VLM Run API credentials, OpenAI (or another supported) chat model credentials, n8n instance.\n\nInstall the verified **VLM Run node** by searching for **VLM Run** in the nodes list, then click **Install**. You can also confirm on npm if needed. After install, it integrates directly for robust async transcription.\n\n**Quick Setup:**\n\n1. **Google Drive folder watch**\n\n   * Add **Google Drive Trigger** and choose **Specific folder**. Set polling to every minute, event to **File Created**. Connect Drive OAuth2.\n\n2. **Download the new file**\n\n   * Add **Google Drive** node with **Download**. Map `{{$json.id}}` and save the binary as `data`.\n\n3. **Async transcription with VLM Run**\n\n   * Add **VLM Run** node. Operation: **video**. Domain: `video.transcription`. Enable **Process Asynchronously** and set **Callback URL** to your Webhook path (for example `/transcript-video`). Add your VLM Run API key.\n\n4. **Webhook to receive results**\n\n   * Add **Webhook** node with method **POST** and path `/transcript-video`. This is the endpoint VLM Run calls when the job completes. Use **When Last Node Finishes** or respond via a Respond node if you prefer. \n\n5. **Append to Google Sheets**\n\n   * Add **Google Sheets** node with **Append**. Point to your spreadsheet and sheet. Map:\n\n     * **Video Name** → the video identifier from the webhook payload\n     * **Data** → the transcript text or JSON from the webhook payload\n   * Connect Google Sheets OAuth2.\n\n6. **Chat entry point and Agent**\n\n   * Add **Chat Trigger** to receive user questions.\n   * Add **AI Agent** and connect:\n\n     * a **Chat Model** (for example OpenAI Chat Model)\n     * the **Google Sheets Tool** to read relevant rows\n   * In the Agent system message, instruct:\n\n     * Use the Sheets tool to fetch transcript rows matching the question\n     * Answer **only** from those rows\n     * Cite or reference row context as needed\n\n7. **Test and activate**\n\n   * Upload a sample video to the watched Drive folder.\n   * Wait for the callback to populate your sheet.\n   * Ask a question through the Chat Trigger and confirm the agent quotes only from the retrieved rows.\n   * Activate your template and let it automate the task.\n\n## How to take this further\n\n* **Team memory:** Ask “What did we decide on pricing last week?” and get the exact clip and answer.\n* **Study helper:** Drop classes in, then ask for key points or formulas by topic.\n* **Customer FAQ builder:** Turn real support calls into answers your team can reuse.\n* **Podcast highlights:** Find quotes, tips, and standout moments from each episode.\n* **Meeting catch-up:** Get decisions and action items from any recording, fast.\n* **Marketing snippets:** Pull short, social-ready lines from long demos or webinars.\n* **Team learning hub:** Grow a searchable video brain that remembers everything.\n\n\n\nThis workflow uses the **VLM Run node for scalable, async video transcription** and the **AI Agent for grounded Q&A from Sheets**, giving you a durable pipeline from upload to searchable answers with minimal upkeep.",
+  "featuredImage": "/data/workflows/9325/9325.webp",
+  "author": {
+    "id": 101,
+    "slug": "atik",
+    "name": "Atik",
+    "avatar": ""
+  },
+  "categories": [
+    "Content Creation",
+    "AI RAG"
+  ],
+  "complexityLevel": "intermediate",
+  "price": 0,
+  "visitors": 147,
+  "downloads": 14,
+  "createdAt": "2025-10-06T20:37:04.425Z",
+  "updatedAt": "2026-01-16T09:00:01.013Z",
+  "publishedAt": "2025-10-06T20:37:04.425Z",
+  "nodes": 14,
+  "version": "1.0.0",
+  "sourceUrl": "https://n8n.io/workflows/9325",
+  "disclaimer": "This workflow is provided as-is. Please review and test before using in production.",
+  "overview": {
+    "title": "Video transcript search and Q&A with VLM Run, GPT-4 & Google Workspace",
+    "workflowName": "Video transcript search and Q&A with VLM Run, GPT-4 & Google Workspace",
+    "description": "**Automate video transcription and Q&A with async VLM processing that scales from short clips to long recordings.**\n\n## What this workflow does\n\n1. **Monitors Google Drive** for new files in a specific folder and grabs the file ID on create\n2. **Automatically downloads** the binary to hand off for processing\n3. **Sends the video to VLM Run** for **async transcription** with a callback URL that posts results back to n8n\n4. **Receives the transcript JSON via Webhook** and **appends a row in Google Sheets** with the video identifier and transcript data\n5. **Enables chat Q&A** through the **Chat Trigger + AI Agent**. The agent fetches relevant rows from Sheets and answers only from those segments using the connected chat model\n\n## Setup\n\n**Prerequisites:** Google Drive and Google Sheets accounts, VLM Run API credentials, OpenAI (or another supported) chat model credentials, n8n instance.\n\nInstall the verified **VLM Run node** by searching for **VLM Run** in the nodes list, then click **Install**. You can also confirm on npm if needed. After install, it integrates directly for robust async transcription.\n\n**Quick Setup:**\n\n1. **Google Drive folder watch**\n\n   * Add **Google Drive Trigger** and choose **Specific folder**. Set polling to every minute, event to **File Created**. Connect Drive OAuth2.\n\n2. **Download the new file**\n\n   * Add **Google Drive** node with **Download**. Map `{{$json.id}}` and save the binary as `data`.\n\n3. **Async transcription with VLM Run**\n\n   * Add **VLM Run** node. Operation: **video**. Domain: `video.transcription`. Enable **Process Asynchronously** and set **Callback URL** to your Webhook path (for example `/transcript-video`). Add your VLM Run API key.\n\n4. **Webhook to receive results**\n\n   * Add **Webhook** node with method **POST** and path `/transcript-video`. This is the endpoint VLM Run calls when the job completes. Use **When Last Node Finishes** or respond via a Respond node if you prefer. \n\n5. **Append to Google Sheets**\n\n   * Add **Google Sheets** node with **Append**. Point to your spreadsheet and sheet. Map:\n\n     * **Video Name** → the video identifier from the webhook payload\n     * **Data** → the transcript text or JSON from the webhook payload\n   * Connect Google Sheets OAuth2.\n\n6. **Chat entry point and Agent**\n\n   * Add **Chat Trigger** to receive user questions.\n   * Add **AI Agent** and connect:\n\n     * a **Chat Model** (for example OpenAI Chat Model)\n     * the **Google Sheets Tool** to read relevant rows\n   * In the Agent system message, instruct:\n\n     * Use the Sheets tool to fetch transcript rows matching the question\n     * Answer **only** from those rows\n     * Cite or reference row context as needed\n\n7. **Test and activate**\n\n   * Upload a sample video to the watched Drive folder.\n   * Wait for the callback to populate your sheet.\n   * Ask a question through the Chat Trigger and confirm the agent quotes only from the retrieved rows.\n   * Activate your template and let it automate the task.\n\n## How to take this further\n\n* **Team memory:** Ask “What did we decide on pricing last week?” and get the exact clip and answer.\n* **Study helper:** Drop classes in, then ask for key points or formulas by topic.\n* **Customer FAQ builder:** Turn real support calls into answers your team can reuse.\n* **Podcast highlights:** Find quotes, tips, and standout moments from each episode.\n* **Meeting catch-up:** Get decisions and action items from any recording, fast.\n* **Marketing snippets:** Pull short, social-ready lines from long demos or webinars.\n* **Team learning hub:** Grow a searchable video brain that remembers everything.\n\n\n\nThis workflow uses the **VLM Run node for scalable, async video transcription** and the **AI Agent for grounded Q&A from Sheets**, giving you a durable pipeline from upload to searchable answers with minimal upkeep.",
+    "features": [],
+    "useCases": []
+  },
+  "logicalBlocks": [],
+  "nodeDetails": [
+    {
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "role": "googleDriveTrigger",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Download file",
+      "type": "n8n-nodes-base.googleDrive",
+      "role": "googleDrive",
+      "configDescription": "Version 3"
+    },
+    {
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "role": "chatTrigger",
+      "configDescription": "Version 1.1"
+    },
+    {
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "role": "agent",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "role": "lmChatOpenAi",
+      "configDescription": "Version 1.2"
+    },
+    {
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "role": "googleSheets",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Get row(s) in sheet in Google Sheets",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "role": "googleSheetsTool",
+      "configDescription": "Version 4.7"
+    },
+    {
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "VLM Run for Video Processing",
+      "type": "@vlm-run/n8n-nodes-vlmrun.vlmRun",
+      "role": "vlmRun",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Receives JSON Data",
+      "type": "n8n-nodes-base.webhook",
+      "role": "webhook",
+      "configDescription": "Version 2"
+    },
+    {
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    },
+    {
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "role": "stickyNote",
+      "configDescription": "Version 1"
+    }
+  ]
+}
