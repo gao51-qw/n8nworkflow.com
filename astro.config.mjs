@@ -2,9 +2,11 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
+import cloudflare from '@astrojs/cloudflare';
+
 export default defineConfig({
   // 网站 URL
-  site: 'https://n8nworkflow.com',
+  site: 'https://n8nworkflows.2285571157.workers.dev',
 
   // 集成
   integrations: [
@@ -21,7 +23,7 @@ export default defineConfig({
   ],
 
   // 输出配置
-  output: 'static',
+  output: 'server',
 
   // 构建配置
   build: {
@@ -64,4 +66,8 @@ export default defineConfig({
     // 启用内容集合
     enabled: true,
   },
+
+  adapter: cloudflare({
+    mode: 'advanced'
+  }),
 });
